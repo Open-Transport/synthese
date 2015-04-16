@@ -1,0 +1,7 @@
+<?action&
+  a=VehicleServiceUpdate&
+  actionParamvehicle_service_id=<@vehicle_service_id@>&
+  actionParamname=<@name@>&
+  actionParam_field_services=<@services@>&
+  actionParam_field_operation_unit_id=<@unit_id@>&
+?>

@@ -1,0 +1,61 @@
+<#config#>
+<!DOCTYPE HTML>
+<@session_id=<?session&template=<{session&template=<@id@>}>?>@>
+<html lang="fr">
+ <head>
+  <meta charset="utf-8">
+  <title>Terminus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <script src="/lib/jquery/jquery-1.7.1.min.js"></script>
+    <script src="/lib/jquery_validate/js/jquery-validate.min.js"></script>
+  <script src="/lib/jquery-ui/jquery-ui-1.8.22.custom.min.js"></script>
+  <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+  <link href="/lib/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+  <link href="/terminus/css/terminus.css" rel="stylesheet">
+   
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+ </head>
+
+ <body onload="window.scrollTo(0, 1);">
+  <#navbar&top=1&section=<@section@>#>
+  <div class="container-fluid" id="main_container">
+
+   <?if&
+     cond=<@session_id@>&
+     else=
+	
+	<div class="hero-unit">
+        
+         <h2>Bienvenue sur Terminus</h2>
+         <?form&name=login&page_id=<@p@>&a=login&class=form-horizontal well?>
+        
+          <label>Veuillez remplir le formulaire suivant pour vous connecter :</label>
+          <input name="actionParamlogin" type="text" class="span3" placeholder="Login">
+          <label></label>
+          <input name="actionParampwd" type="password" class="span3" placeholder="Mot de passe">
+          <label></label>
+
+          <button type="submit" class="btn btn-primary">Connexion</button>
+         </form>
+        </div>
+	&
+     then=<@content@>
+   ?>
+      
+  </div>
+
+  <#navbar#>
+
+ </body>
+</html>

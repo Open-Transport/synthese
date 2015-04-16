@@ -1,0 +1,245 @@
+<@folder_id=<@roid?roid:0@>@>
+<@folder_name=<?ScenarioFoldersService&
+  root_id=0&
+  template=<{folder&recursive=1&template=<@recursive_content@><@(id==folder_id)?name:""@>}>
+?>@>
+
+<ul class="breadcrumb">
+ <@folder_id?  
+   ("<li>" + <?link&target=<@p@>?> + " <span class=\"divider\">/</span></li>"):
+   "<li class=\"active\">Bibliothèque</li>"
+ @>
+ <?ScenarioFoldersService&
+   root_id=0&
+   template=<{folder&recursive=1&template=
+   	<@recursive_content?("<li>"+<?link&target=<@p@>&roid=<@id@>&text=<@name@>?>+" <span class=\"divider\">/</span></li>"):""@>
+   	<@(id==folder_id)?("<li class=\"active\">"+name+"</li>"):""@>
+   	<@recursive_content@>
+ }>?>
+</ul>
+
+<div class="row-fluid">
+<div class="span3" id="tree">
+<ul class="nav nav-list well">
+ <li<@folder_id?"":" class=\"active\""@>><?link&
+                                      target=<@p@>&
+                                      text=Bibliothèque<@folder_id?"":"<div class=\"pull-right\" id=\"new_dir_link\"><i class=\"icon-plus icon-white\"></i></div>"@>?></li>
+ <?if&cond=<@folder_id@>&then=<@has_scenario=<?scenarii&t=1&f=<@folder_id@>&template=<{scenario&template=1}>?>@>?>
+ <?ScenarioFoldersService&
+   root_id=0&
+   template=<{folder&recursive=1&template=
+   	<li<@(id==folder_id)?" class=\"active\"":""@> style="padding-left:<@15+(depth*15)@>px;"><?link&
+   	      target=<@p@>&
+   	      roid=<@id@>&
+   	      text=<@name@>
+   	      <@(id==folder_id)?"<div class=\"pull-right\" id=\"new_dir_link\"><i class=\"icon-plus icon-white\"></i></div><div class=\"pull-right\" id=\"rename_dir_link\"><i class=\"icon-edit icon-white\"></i></div>":""@>
+   	      <@((!has_scenario)&&(id==folder_id))?"<div class=\"pull-right\" id=\"remove_dir_link\"><i class=\"icon-remove icon-white\"></i></div>":""@>
+	?></li>
+   	<@recursive_content@>   
+ }>?>
+</ul>
+
+</div>
+<div class="span9">
+
+
+<?form&name=search&page_id=<@p@>&class=form well?>
+<input name="text_search" value="<@text_search@>" />
+<button class="btn btn-primary">Rechercher</button>
+</form>
+
+<?form&
+  name=scenario_add&
+  target=/lib/scenario&
+  a=masca&
+  actionParamfi=<@folder_id@>&
+  co=1&
+?>
+<table class="table table-striped">
+<thead><tr><th>nom</th><th></th><th></th><th></th><th></th></tr></thead>
+<tbody>
+<?scenarii&
+  t=1&
+  text_search=<@text_search@>&
+  f=<@folder_id?folder_id:""@>&
+  template=<{scenario&template=
+	<tr>
+	 <td><@name@></td>
+	       <td><?link&
+		   target=/lib/scenario&
+		   class=btn btn-mini btn-primary&
+		   text=Ouvrir&
+		   roid=<@roid@>&
+		 ?></td>
+	 <td><div class="btn btn-mini btn-warning move_link" element_id="<@roid@>" element_name="<@name@>">Déplacer</div></td>
+	 <td><div class="btn btn-mini btn-warning rename_link" element_id="<@roid@>" element_name="<@name@>">Renommer</div></td>
+	 <td><div class="btn btn-mini btn-danger remove_link" element_id="<@roid@>" element_name="<@name@>">Supprimer</div></td>
+	</tr>
+}>?>
+</tbody><tfoot>
+<tr>
+<td><input name="actionParamna" placeholder="Nom" /></td>
+<td></td>
+<td></td>
+<td></td>
+<td><button class="btn-warning btn btn-mini">Ajouter</button></td></tr>
+</tfoot></table></form>
+
+</div></div>
+
+<div class="modal hide fade" id="newdir">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Nouveau répertoire</h3>
+ </div>
+ <?form&
+   name=newdir&
+   a=ScenarioFolderAdd&
+   target=<@p@>&
+   co=1&
+   class=form-horizontal&
+   actionParampi=<@folder_id@>
+ ?>
+  <div class="modal-body">
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls">
+     <input type="text" name="actionParamna">
+    </div>
+   </div>
+  </div><div class="modal-footer">
+   <button class="btn btn-warning" type="submit">Créer le répertoire</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+  </div>
+ </form>
+</div>
+
+<div class="modal hide fade" id="move_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Déplacer le modèle</h3>
+ </div>
+ <?form&
+   name=move_form&
+   a=scenario_save&
+   target=<@p@>&
+   roid=<@folder_id@>&
+   class=form-horizontal&
+   actionParamsid=0&
+   actionParamfi=<@folder_id@>&
+ ?>
+  <div class="modal-body">
+   <div class="control-group">
+    <label class="control-label">Emplacement</label>
+    <div class="controls"><ul class="nav nav-list well">
+	 <li class="move_element" element_id="0" <@folder_id?"":"active=\"1\""@>><a>Bibliothèque</a></li>
+	 <?ScenarioFoldersService&
+	   root_id=0&
+	   template=<{folder&recursive=1&template=
+	   	<li class="move_element" style="padding-left:<@15+(depth*15)@>px;" element_id="<@id@>" <@(folder_id==id)?"active=\"1\"":""@>><a href="#"><@name@></a></li>
+	   	<@recursive_content@>   
+	 }>?>
+    </ul></div>
+   </div>
+  </div><div class="modal-footer">
+   <button class="btn btn-warning" type="submit">Déplacer</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+  </div>
+ </form>
+</div>
+
+<div class="modal hide fade" id="rename_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Renommer le modèle</h3>
+ </div>
+ <?form&
+   name=rename_form&
+   a=scenario_save&
+   target=<@p@>&
+   roid=<@folder_id@>&
+   class=form-horizontal&
+   actionParamsid=0&
+ ?>
+  <div class="modal-body">
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls">
+     <input type="text" name="actionParamnam" id="rename_name_field" />
+    </div>
+   </div>
+  </div><div class="modal-footer">
+   <button class="btn btn-warning" type="submit">Renommer</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+  </div>
+ </form>
+</div>
+
+<div class="modal hide fade" id="renamedir">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Renommer le répertoire</h3>
+ </div>
+ <?form&
+   name=renamedir_form&
+   a=ScenarioFolderUpdateAction&
+   target=<@p@>&
+   roid=<@folder_id@>&
+   class=form-horizontal&
+ ?>
+  <div class="modal-body">
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls">
+     <input type="text" name="actionParamna" value="<@folder_name@>" />
+    </div>
+   </div>
+  </div><div class="modal-footer">
+   <button class="btn btn-warning" type="submit">Renommer</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+  </div>
+ </form>
+</div>
+
+<div class="modal hide fade" id="removedir">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Suppression de répertoire</h3>
+ </div>
+ <?form&
+   a=RemoveObjectAction&
+   target=<@p@>&
+   roid=0&
+   actionParamoi=<@folder_id@>
+ ?>
+  <div class="modal-body">
+   <p>Etes-vous sûr de vouloir supprimer le répertoire ?</p>
+  </div><div class="modal-footer">
+   <button class="btn btn-danger" type="submit">Oui</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Non</button>
+  </div>
+ </form>
+</div>
+
+<div class="modal hide fade" id="remove_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Suppression de modèle</h3>
+ </div>
+ <?form&
+   name=remove_form&
+   a=RemoveObjectAction&
+   target=<@p@>&
+   roid=<@folder_id@>&
+   actionParamoi=0&
+ ?>
+  <div class="modal-body">
+   <p>Etes-vous sûr de vouloir supprimer le modèle<span id="remove_name"></span> ?</p>
+  </div><div class="modal-footer">
+   <button class="btn btn-danger" type="submit">Oui</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Non</button>
+  </div>
+ </form>
+</div>
+
+<script src="/terminus/js/lib.js"></script>

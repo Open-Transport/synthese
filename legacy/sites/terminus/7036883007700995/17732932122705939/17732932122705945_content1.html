@@ -1,0 +1,13 @@
+<#config#>
+<li<?if&cond=<@current_page_in_branch@>&then= class="active"
+<@page_id=<@id@>@>
+
+<{roots&template=
+	<?if&cond=<@pageid==page_id@>&then=style="background-color:<@color@> !important;"
+?>}>
+?>><?link&target=<@id@>&text=<@title@>&class=<?if&cond=<@current_page_in_branch@>&then=<@page_id=<@id@>@>
+
+<{roots&template=
+	<?if&cond=<@pageid==page_id@>&then=<@id@>
+?>}>
+?>?></li>

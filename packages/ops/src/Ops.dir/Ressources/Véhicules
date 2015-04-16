@@ -1,0 +1,101 @@
+<script src="/ops/js/drt_areas.js"></script>
+<@vehicles:=<?GetVehiclesService?>@>
+<div class="row-fluid">
+ <div class="span3" id="tree">
+   <ul class="nav nav-list well" id="areas_list">
+    <li<@roid?"":" class=\"active\""@>>
+    <?link&
+      target=<@p@>&
+      unit=<@unit@>&
+      text=Véhicules
+           <div class="pull-right" id="add_area_link"><i class="icon-plus <@roid?"":"icon-white"@>"></i></div>
+    ?>
+    </li>
+    <{vehicles.vehicle&template=
+      <li class="tree_1 <@(id==roid)?"active":""@>">
+      <?link&
+  	target=<@p@>&
+   	roid=<@id@>&
+        unit=<@unit@>&
+  	text=<span class="unit_name"><@name?name:id@></span>
+   	     <@(id==roid)?("<div class=\"pull-right\" id=\"area_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>
+      ?>
+      </li>
+    }>
+   </ul>
+ </div><div class="span9">
+ <?if&cond=<@roid@>&then=
+ <@vehicle:=<?object&roid=<@roid@>&additional_parameters=1?>@>
+
+  <h3 class="well">
+   <span id="displayed_title"><@vehicle.name?vehicle.name:roid@></span>
+   <div class="btn-group pull-right">
+    <a href="#" id="save_link" class="btn btn-primary hide" data-id="<@roid@>">Enregistrer</a>
+   </div>
+  </h3>
+  
+  <form class="form-horizontal">
+  <div class="control-group">
+   <label class="control-label">Nom</label>
+   <div class="controls">
+    <input type="text" id="name_field" value="<@area.name@>" />
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label">Arrêts</label>
+   <div class="controls">
+    <table class="table table-striped table-condensed" id="stops"><tbody>
+    </tbody><tfoot>
+    <tr>
+    <td>
+     <input id="new_stop_field" value="" />
+    </td><td>
+     <a href="#" id="add_stop_link"><i class="icon icon-plus"></i></a>
+    </td></tr>
+    </tfoot></table>
+   </div>
+  </div>
+  </form>
+
+  <script>
+   add_stops({"stop":[
+   <{area.stop&template=
+         {
+         "id": "<@id@>",
+         "name": "<@cityName@> <@name@>"
+         },
+   }>
+   ]});
+  </script>
+
+ ?>
+ </div>
+</div>
+
+<#modal&
+  id=add_area_modal&
+  title=Créer une zone TAD&
+  form=<?form&
+         target=<@p@>&
+         a=ObjectCreate&
+         actionParam_table_id=71&
+         class=form-horizontal&
+         co=1&
+         unit=<@unit@>&
+  ?>&
+  body=
+  
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls">
+     <input type="text" name="actionParam_field_name" placeholder="Nom" />
+    </div>
+   </div>
+  
+  
+  &
+  footer=
+    <button type="submit" class="btn btn-warning">Créer</button>
+    <a class="btn" data-dismiss="modal" aria-hidden="true">Fermer</a>
+#>

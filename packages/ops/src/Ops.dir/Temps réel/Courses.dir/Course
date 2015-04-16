@@ -1,0 +1,4 @@
+<#html_vehiclejourney&
+  service=<@service@>&
+  read_reservations_from_day=<@read_reservations_from_day@>&
+#>

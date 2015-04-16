@@ -1,0 +1,21 @@
+<table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>rubrique</th>
+        <th>destinataires</th>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Lignes</td>
+        <td id="view_recipients_line-<@scenario_id@>-<@cat@>"></td>
+      </tr>
+      <tr>
+        <td>Arrêts</td>
+        <td id="view_recipients_stoparea-<@scenario_id@>-<@cat@>"></td>    
+      </tr>
+      <tr>
+        <td>Diffuseurs</td>
+        <td id="view_recipients_displayscreen-<@scenario_id@>-<@cat@>"></td>
+      </tr>
+    </tbody>
+</table>

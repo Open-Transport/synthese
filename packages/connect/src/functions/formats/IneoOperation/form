@@ -1,0 +1,18 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<#forms/text_input&
+  label=Fichier services voitures (SAB)&
+  name=pasab&
+#>
+
+<#forms/text_input&
+  label=Fichier affectations (AFA)&
+  name=paafa&
+#>
+
+<h3>Lien avec la base SYNTHESE</h3>
+
+<#forms/datasource_selector&
+  label=Source de données offre de transport public&
+  name=pt_datasource_id&
+#>

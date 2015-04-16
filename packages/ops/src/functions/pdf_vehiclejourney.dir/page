@@ -1,0 +1,153 @@
+<@a=
+<?pdf_open&
+  width=210&
+  height=297&
+?>
+<?pdf_add_font&
+  font=/files/TazRegular.ttf&
+?>
+
+<?pdf_rectangle&
+  x1=0&
+  y1=276&
+  x2=210&
+  y2=21&
+  height=20&
+  background_color=(0,0,0)&
+?>
+
+
+<@left=<@left1@>@>
+
+<@row_grid=0@>
+<<row_start>>
+
+<?pdf_line&
+  x1=<@left@>&
+  y1=<@270-(row_grid*row_height)@>&
+  x2=<@left+col_end@>&
+  y2=<@270-(row_grid*row_height)@>&
+  color=(128,128,128)&
+  width=0.2&
+?>
+
+<?pdf_line&
+  x1=<@left+5+col_end@>&
+  y1=<@270-(row_grid*row_height)@>&
+  x2=<@left+5+col_end+col_end@>&
+  y2=<@270-(row_grid*row_height)@>&
+  color=(128,128,128)&
+  width=0.2&
+?>
+
+<@row_grid=<@row_grid+1@>@>
+<%<?if&cond=<@row_grid<65@>&then=row_start?>%>
+
+<@shifted_y=<@margin+270@>@>
+
+
+<<cols>>
+
+<?pdf_text&
+  t=Commune&
+  x=<@left+margin@>&
+  y=<@shifted_y@>&
+  color=(0,0,0)&
+  size=3&
+  font=Taz&
+?>
+
+<?pdf_text&
+  t=Arrêt&
+  x=<@left+margin+col_stop@>&
+  y=<@shifted_y@>&
+?>
+
+<?pdf_text&
+  t=Min&
+  x=<@left+margin+col_min@>&
+  y=<@shifted_y@>&
+?>
+
+<?pdf_text&
+  t=Max&
+  x=<@left+margin+col_max@>&
+  y=<@shifted_y@>&
+?>
+
+<?pdf_text&
+  t=M&
+  x=<@left+margin+col_m@>&
+  y=<@shifted_y@>&
+?>
+
+<?pdf_text&
+  t=D&
+  x=<@left+margin+col_d@>&
+  y=<@shifted_y@>&
+?>
+
+<?pdf_text&
+  t=#&
+  x=<@left+margin+col_number@>&
+  y=<@shifted_y@>&
+?>
+
+<?pdf_line&
+  x1=<@left@>&
+  y1=270&
+  x2=<@left@>&
+  y2=<@270-(64*row_height)@>&
+  color=(128,128,128)&
+  width=0.2&
+?>
+
+<?pdf_line&
+  x1=<@left+col_min@>&
+  y1=270&
+  x2=<@left+col_min@>&
+  y2=<@270-(64*row_height)@>&
+  color=(128,128,128)&
+  width=0.2&
+?>
+
+<?pdf_line&
+  x1=<@left+col_m@>&
+  y1=270&
+  x2=<@left+col_m@>&
+  y2=<@270-(64*row_height)@>&
+  color=(128,128,128)&
+  width=0.2&
+?>
+
+<?pdf_line&
+  x1=<@left+col_d@>&
+  y1=270&
+  x2=<@left+col_d@>&
+  y2=<@270-(64*row_height)@>&
+  color=(128,128,128)&
+  width=0.2&
+?>
+
+<?pdf_line&
+  x1=<@left+col_number@>&
+  y1=270&
+  x2=<@left+col_number@>&
+  y2=<@270-(64*row_height)@>&
+  color=(128,128,128)&
+  width=0.2&
+?>
+
+<?pdf_line&
+  x1=<@left+col_end@>&
+  y1=270&
+  x2=<@left+col_end@>&
+  y2=<@270-(64*row_height)@>&
+  color=(128,128,128)&
+  width=0.2&
+?>
+
+<%<?if&cond=<@left==left1@>&then=<@left=<@left2@>@>cols?>%>
+
+
+@>

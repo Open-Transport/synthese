@@ -1,0 +1,15 @@
+<#forms/text_input&
+  label=Adresse&
+  name=address&
+#>
+
+<#forms/text_input&
+  label=Port&
+  name=port&
+  class=input-mini&
+#>
+
+<#forms/text_input&
+  label=ID esclave (présent sur la vue serveur du maître)&
+  name=slave_id&
+#>

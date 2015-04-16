@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="/onboard/css/main.css" rel="stylesheet" media="screen">
+<script src="/lib/jquery/jquery-1.7.1.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+<title>SYNTHESE Onboard</title>
+</head>
+<body>
+<div id="content">
+  <h3>Test</h3>
+  <a href="#">COUCOU</a>
+</div>
+<div id="waiting" style="display:none">
+Chargement en cours...
+</div>
+<script>
+function wait_anim()
+{
+ $('#waiting').css('display','block');
+ return true;
+}
+
+function wait_hide()
+{
+ $('#waiting').css('display','none');
+}
+
+$(function(){
+  $('a').click(wait_anim);
+  $('#waiting').click(wait_hide);
+});
+</script>
+</body>
+</html>

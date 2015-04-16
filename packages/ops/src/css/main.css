@@ -1,0 +1,87 @@
+@media screen
+{
+body {
+  overflow:hidden;
+}
+.tree_1 {
+ padding-left:16px;
+}
+.tree_2 {
+ padding-left:32px;
+}
+.tree_3 {
+ padding-left:48px;
+}
+.tree_4 {
+ padding-left:64px;
+}
+.tree_5 {
+ padding-left:80px;
+}
+.tree_6 {
+ padding-left:96px;
+}
+.tree_7 {
+ padding-left:112px;
+}
+.tree_8 {
+ padding-left:128px;
+}
+.tree_9 {
+ padding-left:144px;
+}
+.tree_10 {
+ padding-left:160px;
+}
+.tree_11 {
+ padding-left:176px;
+}
+.tree_12 {
+ padding-left:192px;
+}
+#content {
+  overflow:auto;
+  margin-top:-20px;
+}
+
+td.forbidden { background-color:#808080 !important; }
+span.small_hour { font-size:8px; }
+.resa { background-color:#6030E0; font-weight:bold; color:white; padding:0 3px; }
+.resa_option { border:#6030E0 2px solid; font-weight:bold; color:#6030E0; padding:0 2px; }
+.warning { background-color:gold; }
+#main { width:80%; margin:0 10%; }
+table#reservations tbody td { padding:1px; font-size:14px; }
+.col_m { border-style:none solid; border-width:1px; text-align:center !important; }
+
+
+/* scroll results */
+.ui-autocomplete {
+    max-height: 250px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+    /* add padding for vertical scrollbar */
+    padding-right: 5px;
+}
+ 
+.ui-autocomplete li {
+    font-size: 10px;
+}
+ 
+/* IE 6 doesnt support max-height
+* we use height instead, but this forces the menu to always be this tall
+*/
+* html .ui-autocomplete {
+    height: 250px;
+}
+
+.ui-helper-hidden-accessible { display:none; }
+}
+@media print
+{
+ .noprint, .modal { display:none !important; }
+ body { font-size:16pt; font-family:arial; }
+ table { border-collapse: collapse; }
+ td { border-bottom: 1px solid black; padding:16pt 16pt 0 16pt; }
+ a { text-decoration:none; color:black; }
+}

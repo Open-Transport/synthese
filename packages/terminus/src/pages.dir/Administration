@@ -1,0 +1,857 @@
+<ul class="breadcrumb">
+ <li class="active">Administration</li>
+</ul>
+
+<ul id="nav_tabs" class="nav nav-tabs">
+ <#tab_title&default=1&id=message_types&title=Types de messages#>
+ <#tab_title&id=display_types&title=Types de bornes#>
+ <#tab_title&id=mailing_lists&title=Listes de diffusion#>
+ <#tab_title&id=broadcast_points&title=Autres diffuseurs#>
+ <#tab_title&id=sections&title=Sections#>
+ <#tab_title&id=log&title=Journal#>
+ <#tab_title&id=system&title=Système#>
+</ul>
+
+<div id="tab_content" class="tab-content">
+
+<#tab_div&default=1&id=message_types#>
+
+ <@mt_id=<@(tab=="message_types")?roid:""@>@>
+ <div class="row-fluid">
+  <div class="span3" id="tree">
+   <ul class="nav nav-list well">
+    <li<@mt_id?"":" class=\"active\""@>>
+     <?link&
+       target=<@p@>&
+       tab=message_types&
+       text=Types de messages<div class="pull-right" id="mt_new_link"><i class="icon-plus <@mt_id?"":"icon-white"@>"></i></div>
+     ?>
+    </li>
+    <?message_types&
+      template=<{type&template=
+ 	<li class="tree_1 <@(id==mt_id)?"active":""@>">
+ 	 <?link&
+  	   target=<@p@>&
+   	   tab=message_types&
+   	   roid=<@id@>&
+  	   text=<@name@>
+   	      <@(id==mt_id)?("<div class=\"pull-right\" id=\"mt_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>
+      	 ?>
+	</li>
+    }>?>
+   </ul>
+  </div><div class="span6">
+   <?if&
+     cond=<@mt_id@>&
+     else=<div class="alert alert-info">Sélectionnez un type de message dans le menu ci-contre</div>&
+     then=<?form&
+            target=<@p@>&
+            tab=message_types&
+            a=ObjectUpdate&
+            actionParam_object_id=<@mt_id@>&
+            roid=<@mt_id@>&
+            class=form-horizontal&
+          ?><?message_types&
+              roid=<@mt_id@>&
+              template=<{type&template=
+		 <div class="control-group">
+		  <label class="control-label">Nom</label>
+		  <div class="controls">
+		   <input type="text" name="actionParam_field_name" value="<@name@>" />
+		  </div>
+		 </div><div class="control-group">
+		  <label class="control-label">Longueur maximale</label>
+		  <div class="controls">
+		   <input type="text" name="actionParam_field_max_length" value="<@max_length@>" />
+		  </div>
+		 </div><div class="control-group">
+		  <div class="controls">
+		   <button type="submit" class="btn btn-warning">Modifier</button>
+		  </div>
+		 </div>}>
+          ?>
+          </form>
+   ?>
+  </div>
+ </div>
+
+</div><#tab_div&id=display_types#>
+
+ <@dt_id=<@(tab=="display_types")?roid:""@>@>
+ <div class="row-fluid">
+  <div class="span3" id="tree">
+   <ul class="nav nav-list well">
+    <li<@dt_id?"":" class=\"active\""@>>
+     <?link&
+       target=<@p@>&
+       tab=display_types&
+       text=Types de bornes
+     ?>
+    </li>
+    <?display_types&
+      template=<{display_type&template=
+ 	<li class="tree_1 <@(id==dt_id)?"active":""@>">
+ 	 <?link&
+  	   target=<@p@>&
+   	   tab=display_types&
+   	   roid=<@id@>&
+  	   text=<@name@>
+      	 ?>
+	</li>}>
+    ?>
+   </ul>
+  </div><div class="span6">
+   <?if&
+     cond=<@dt_id@>&
+     else=<div class="alert alert-info">Sélectionnez un type de borne dans le menu ci-contre</div>&
+     then=<?form&
+            target=<@p@>&
+            tab=display_types&
+            a=updatedisplaytype&
+            actionParamdtu_id=<@dt_id@>&
+            roid=<@dt_id@>&
+            class=form-horizontal&
+          ?><?display_types&
+              roid=<@dt_id@>&
+              template=<{display_type&template=<?if&cond=<@id==dt_id@>&then=
+		 <div class="control-group">
+		  <label class="control-label">Type de message</label>
+		  <div class="controls">
+		   <select name="actionParam_message_type_id">
+		    <option value="0">Message principal</option>
+		    <?message_types&
+		      template=<{type&template=<option value="<@id@>" <?if&cond=<@message_type_id==id@>&then=selected="true"?>><@name@></option>}>
+		    ?>
+		   </select>
+		  </div>
+		 </div><div class="control-group">
+		  <label class="control-label">Règle d'affichage</label>
+		  <div class="controls">
+		   <select name="actionParam_message_is_displayed_page_id">
+		    <option value="0">Règle standard</option>
+		    <?menu&
+		      root=17733086741528586&
+		      raw_data=1&
+		      template=<{page&template=<option value="<@id@>" <?if&cond=<@message_is_displayed_page_id==id@>&then=selected="true"?>><@title@></option>}>&
+		    ?>
+		   </select>
+		  </div>
+		 </div><div class="control-group">
+		  <div class="controls">
+		   <button type="submit" class="btn btn-warning">Modifier</button>
+		  </div>
+		 </div>?>}>
+          ?>
+          </form>
+   ?>
+  </div>
+ </div>
+
+</div><#tab_div&id=mailing_lists#>
+
+ <@ml_id=<@(tab=="mailing_lists")?roid:""@>@>
+ <div class="row-fluid">
+  <div class="span3" id="tree">
+   <ul class="nav nav-list well">
+    <li<@ml_id?"":" class=\"active\""@>>
+     <?link&
+       target=<@p@>&
+       tab=mailing_lists&
+       text=Listes de diffusion&
+     ?>
+    </li>
+    <@has_ml=<?mailing_lists&manual_sending=0&template=<{mailing_list&template=1}>?>@>
+    <li class="tree_1">
+     <a>Listes à envoi automatique
+     <div class="pull-right link" id="ml_new_auto_link"><i class="icon-plus"></i></div></a>
+    </li>
+    <?mailing_lists&
+      manual_sending=0&
+      template=<{mailing_list&template=
+	<li class="tree_2 <@(id==ml_id)?"active":""@>">
+ 	 <?link&
+  	   target=<@p@>&
+   	   tab=mailing_lists&
+   	   roid=<@id@>&
+  	   text=<@name@>
+   	      <@(id==ml_id)?("<div class=\"pull-right\" id=\"ml_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
+      	 ?>
+	</li>
+    }>?>
+    <li>
+    <li class="tree_1">
+     <a>Listes à envoi manuel
+     <div class="pull-right link" id="ml_new_manu_link"><i class="icon-plus"></i></div></a>
+    </li>
+    <?mailing_lists&
+      manual_sending=1&
+      template=<{mailing_list&template=
+ 	<li class="tree_2 <@(id==ml_id)?"active":""@>">
+ 	 <?link&
+  	   target=<@p@>&
+   	   tab=mailing_lists&
+   	   roid=<@id@>&
+  	   text=<@name@>
+   	      <@(id==ml_id)?("<div class=\"pull-right\" id=\"ml_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
+      	 ?>
+	</li>
+    }>?>
+   </ul>
+  </div><div class="span6">
+   <?if&
+     cond=<@ml_id@>&
+     else=<div class="alert alert-info">Sélectionnez une liste de diffusion dans le menu ci-contre</div>&
+     then=<?form&
+            target=<@p@>&
+            tab=mailing_lists&
+            a=ObjectUpdate&
+            actionParam_object_id=<@ml_id@>&
+            class=form-horizontal&
+            roid=<@ml_id@>&
+          ?><?mailing_lists&
+              roid=<@ml_id@>&
+              with_subscriptions=1&
+              template=<{mailing_list&template=
+              
+              	<@subscriptions=<{subscription&template=<@rank?"":items_count@>}>@>
+              
+		 <div class="control-group">
+		  <label class="control-label">Nom</label>
+		  <div class="controls">
+		   <input type="text" name="actionParam_field_name" value="<@name@>" />
+		  </div>
+		 </div>
+		  
+  	   <div class="control-group">
+	    <label class="control-label">Type de message</label>
+	    <div class="controls">
+	     <select name="actionParam_field_message_type_id">
+	      <option value="0">Message principal</option>
+	      <?message_types&template=<{type&template=<option value="<@id@>" <?if&cond=<@message_type_id==id@>&then=selected="true"?>><@name@></option>}>?>
+	     </select>
+	    </div>
+	   </div>
+
+	   <div class="control-group">
+	    <label class="control-label">Libellé expéditeur</label>
+	    <div class="controls">
+	     <input type="text" name="actionParam_field_sender_name" value="<@sender_name@>" />
+	    </div>
+	   </div>
+
+	   <div class="control-group">
+	    <label class="control-label">E-mail expéditeur</label>
+	    <div class="controls">
+	     <input type="text" name="actionParam_field_sender" value="<@sender@>" />
+	    </div>
+	   </div>
+
+	   <div class="control-group">
+	    <label class="control-label">Format technique e-mail</label>
+	    <div class="controls">
+	     <label class="radio inline"><input type="radio" name="actionParam_field_format" <@format?"":"checked=\"true\""@> value="0" /> Texte</label>
+	     <label class="radio inline"><input type="radio" name="actionParam_field_format" <@(format==1)?"checked=\"true\"":""@> value="1" /> HTML</label>
+	    </div>
+	   </div>
+
+	   <div class="control-group">
+	    <label class="control-label">Envoi manuel des messages</label>
+	    <div class="controls">
+	     <label class="radio inline"><input type="radio" name="actionParam_field_manual_sending" <@manual_sending?"checked=\"true\"":""@> value="1" /> Oui</label>
+	     <label class="radio inline"><input type="radio" name="actionParam_field_manual_sending" <@manual_sending?"":"checked=\"true\""@> value="0" /> Non</label>
+	    </div>
+	   </div>
+		  
+		 <div class="control-group">
+		  <div class="controls">
+		   <button type="submit" class="btn btn-warning">Enregistrer</button>
+		  </div>
+		 </div>}>
+          ?>
+          </form>
+   ?>
+  </div><div class="span3">
+   <?if&cond=<@ml_id@>&then=
+	   <div class="well">
+	    <h4>Abonnés</h4>
+	    <p>Cette liste <@subscriptions?"":"ne "@>contient <a href="#" id="ml_subscription_link"><strong><@subscriptions?subscriptions:"aucun"@></strong> abonné<@(subscriptions>1)?"s":""@></a>.</p>
+	   </div>
+   ?>
+  </div>
+ </div>
+
+</div><#tab_div&id=broadcast_points#>
+
+ <@bp_id=<@((tab=="broadcast_points")&&roid)?roid:0@>@>
+ 
+ <div class="row-fluid">
+  <div class="span3" id="tree">
+   <ul class="nav nav-list well">
+    <li<@bp_id?"":" class=\"active\""@>>
+     <?link&
+       target=<@p@>&
+       tab=broadcast_points&
+       text=Autres diffuseurs<@bp_id?"":"<div class=\"pull-right\" id=\"bp_new_link\"><i class=\"icon-plus icon-white\"></i></div>"@>
+     ?>
+    </li>
+    <?custom_broadcast_points&
+      parent_id=0&
+      recursive=1&
+      template=<{broadcast_point&recursive=1&template=
+ 	<li class="tree_<@depth+1@> <@(id==bp_id)?"active":""@>">
+ 	 <?link&
+  	   target=<@p@>&
+   	   tab=broadcast_points&
+   	   roid=<@id@>&
+  	   text=<@name@>
+   	      <@(id==bp_id)?"<div class=\"pull-right\" id=\"bp_new_link\"><i class=\"icon-plus icon-white\"></i></div>":""@>
+   	      <@((!recursive_content)&&(id==bp_id))?("<div class=\"pull-right\" id=\"bp_remove_link\" element_id=\""+ id +"\" element_name=\""+ name +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>
+      	 ?>
+	</li>
+   	<@recursive_content@>   
+    }>?>
+   </ul>
+  </div><div class="span9">
+   <?if&
+     cond=<@bp_id@>&
+     then=
+      <?custom_broadcast_points&
+	roid=<@bp_id@>&
+	template=<{broadcast_point&template=
+		<?form&
+		  name=update&
+		  a=ObjectUpdate&
+		  actionParam_object_id=<@bp_id@>&
+		  target=<@p@>&
+		  class=form-horizontal&
+		  roid=<@roid@>&
+		  tab=broadcast_points&
+		?>
+		 <div class="control-group">
+		  <label class="control-label">Nom</label>
+		  <div class="controls">
+		   <input type="text" name="actionParam_field_name" value="<@name@>" />
+		  </div>
+		 </div>
+	
+		 <div class="control-group">
+		  <label class="control-label">Type de message</label>
+		  <div class="controls">
+		   <select name="actionParam_field_message_type_id">
+		    <option value="0">Message principal</option>
+		    <?message_types&template=<{type&template=<option value="<@id@>" <?if&cond=<@message_type_id==id@>&then=selected="true"?>><@name@></option>}>?>
+		   </select>
+		  </div>
+		 </div>
+	
+		 <div class="control-group">
+		  <label class="control-label">Règle de diffusion</label>
+		  <div class="controls">
+		   <textarea name="actionParam_field_broadcast_rule"><@broadcast_rule@></textarea>
+		  </div>
+		 </div>
+	
+		 <div class="control-group">
+		  <div class="controls">
+		   <button type="submit" class="btn btn-warning">Enregistrer</button>
+		  </div>
+		 </div>
+		</form>
+     }>?>&
+     else=
+      <div class="alert alert-info">Sélectionnez un diffuseur dans le menu ci-contre</div>
+   ?>
+  </div>
+ </div>
+
+</div><#tab_div&id=sections#>
+
+ <@s_id=<@(tab=="sections")?roid:""@>@>
+ <div class="row-fluid">
+  <div class="span3" id="tree">
+   <ul class="nav nav-list well" id="s_list">
+    <li class="not_sortable <@s_id?"":"active"@>">
+     <?link&
+       target=<@p@>&
+       tab=sections&
+       text=Sections<div class="pull-right" action="s_new_link" element_rank="0"><i class="icon-plus <@s_id?"":"icon-white"@>"></i></div>
+     ?>
+    </li>
+    <?messages_sections&
+      template=<{section&
+        sort_up=<@rank@>&
+        template=
+	 	<li class="tree_1 <@(id==s_id)?"active":""@>" element_id="<@id@>">
+	 	 <?link&
+	  	   target=<@p@>&
+	   	   tab=sections&
+	   	   roid=<@id@>&
+	  	   text=<@name@>
+		      <div class="pull-right" action="s_new_link" element_rank="<@rank+1@>"><i class="icon-plus <@(id==s_id)?"icon-white":""@>"></i></div>
+	   	      <@(id==s_id)?("<div class=\"pull-right\" id=\"s_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
+	      	 ?>
+		</li>
+    }>?>
+   </ul>
+   <?form&
+     name=s_rank_form&
+     form_id=s_rank_form&
+     target=<@p@>&
+     tab=sections&
+     a=ObjectUpdate&
+     actionParam_object_id=0&
+     actionParam_field_rank=0&
+   ?></form>
+  </div><div class="span6">
+   <?if&
+     cond=<@s_id@>&
+     else=<div class="alert alert-info">Sélectionnez une section dans le menu ci-contre</div>&
+     then=<?form&
+            target=<@p@>&
+            tab=sections&
+            a=ObjectUpdate&
+            actionParam_object_id=<@s_id@>&
+            roid=<@s_id@>&
+            class=form-horizontal&
+          ?><?object&
+              roid=<@s_id@>&
+              template=
+		 <div class="control-group">
+		  <label class="control-label">Nom</label>
+		  <div class="controls">
+		   <input type="text" name="actionParam_field_name" value="<@name@>" />
+		  </div>
+		 </div><div class="control-group">
+		  <label class="control-label">Code</label>
+		  <div class="controls">
+		   <input type="text" name="actionParam_field_code" value="<@code@>" />
+		  </div>
+		 </div><div class="control-group">
+		  <label class="control-label">Couleur</label>
+		  <div class="controls">
+		   <input type="text" name="actionParam_field_color" value="<@color@>" />
+		  </div>
+		 </div><div class="control-group">
+		  <label class="control-label">Activation automatique des messages ?</label>
+		  <div class="controls">
+		   <select name="actionParam_field_auto_activation">
+		    <option value="0" <?if&cond=<@auto_activation@>&else=selected="true"?>>Non</option>
+		    <option value="1" <?if&cond=<@auto_activation@>&then=selected="true"?>>Oui</option>
+		   </select>
+		  </div>
+		 </div><div class="control-group">
+		  <div class="controls">
+		   <button type="submit" class="btn btn-warning">Enregistrer</button>
+		  </div>
+		 </div>
+          ?>
+          </form>
+   ?>
+  </div>
+ </div>
+
+</div><#tab_div&id=log#>
+
+    <div class="pagination">
+    <ul>
+    <?if&cond=<@r>=150@>&then=<li><?link&target=<@p@>&r=0&text=1&tab=log?></li>?>
+    <?if&cond=<@r>=200@>&then=<li class="disabled"><a href="#">...</a></li>?>
+    <?if&cond=<@r>=100@>&then=<li><?link&target=<@p@>&r=<@r-100@>&text=<@(r/50)-1@>&tab=log?></li>?>
+    <?if&cond=<@r>=50@>&then=<li><?link&target=<@p@>&r=<@r-50@>&text=<@(r/50)@>&tab=log?></li>?>
+    <li class="active"><a href="#"><@1+(r/50)@></a></li>
+    <li><?link&target=<@p@>&r=<@r+50@>&text=<@(r/50)+2@>&tab=log?></li>
+    <li><?link&target=<@p@>&r=<@r+100@>&text=<@(r/50)+3@>&tab=log?></li>
+    </ul>
+    </div>
+<table class="table-striped table-condensed table">
+<thead><tr>
+<th>date</th>
+<th>utilisateur</th>
+<th>événement</th>
+<th>contenu</th>
+<th>action</th>
+</tr></thead>
+<tbody>
+<?db_log&
+	log_key=messages&
+	first=<@r@>&
+	template=<{entry&template=
+		<tr>
+		<td><@date@></td>
+		<td><{user&template=<@login@>}></td>
+		<td><@object_name@></td>
+		<td><@col0@></td>
+		<td><?substr&t=<@col1@>&n=200?></td>
+		</tr>
+	}>
+?>
+</tbody>
+</table>
+
+</div><#tab_div&id=system#>
+
+ <div class="form-horizontal">
+  <div class="control-group">
+   <label class="control-label">Nom du serveur (:port)</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=system&
+      a=global_variable_update&
+      actionParam_variable=server_name&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+     <input type="text" name="actionParam_value" value="<@~global("server_name")@>" />
+     <button type="submit" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+ <div class="control-group">
+   <label class="control-label">Adresse serveur SMTP</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=system&
+      a=global_variable_update&
+      actionParam_variable=smtp_server&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+     <input type="text" name="actionParam_value" value="<@~global("smtp_server")@>" />
+     <button type="submit" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>	
+  <div class="control-group">
+   <label class="control-label">Port serveur SMTP</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=system&
+      a=global_variable_update&
+      actionParam_variable=smtp_port&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+     <input type="text" name="actionParam_value" value="<@~global("smtp_port")@>" />
+     <button type="submit" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="selectMediaId">Site Médiathèque cible</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=system&
+      a=global_variable_update&
+      actionParam_variable=website_media_id&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+    <@websiteFound=0@>
+     <?websites&
+       template=
+         <select name="selectMediaId" field="inputMediaId">
+           <option value="none">Aucun</option>
+           <{website&template=
+             <option value="<@id@>"<?if&cond=<@~global("website_media_id")==id@>&then= selected="selected"?>><@name@></option>
+             <?if&cond=<@~global("website_media_id")==id@>&then=<@websiteFound=1@>?>
+           }>
+         </select>
+    ?>
+    <?if&cond=<@websiteFound@>&then=
+    <input type="hidden" id="inputMediaId" name="actionParam_value" value="<@~global("website_media_id")@>"/>
+    &else=<input type="hidden" id="inputMediaId" name="actionParam_value" value="none"/>
+    ?>
+     <button type="submit" id="submitMediaId" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="msgDefaultURL">Préfixe pour les messages numérisés</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=system&
+      a=global_variable_update&
+      actionParam_variable=default_messages_url&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+     <input type="text" name="actionParam_value" value="<@~global("default_messages_url")@>" />
+     <button type="submit" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="printAllSectionTab">Affichage de l'onglet <i>Toutes sections</i></label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=system&
+      a=global_variable_update&
+      actionParam_variable=print_all_section_tab&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+     <select name="actionParam_value">
+       <option value="0">NON</option>
+       <option value="1" <?if&cond=<@~global("print_all_section_tab")==1@>&then= selected="selected"?>>OUI</option>
+     </select>
+     <button type="submit" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  	
+ </div>
+
+</div>
+
+</div>
+
+
+<div class="modal hide fade" id="bp_new_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Nouveau diffuseur</h3>
+ </div>
+ <?form&
+   name=bp_newdir&
+   a=ObjectCreate&
+   actionParam_table_id=106&
+   target=<@p@>&
+   tab=broadcast_points&
+   co=1&
+   class=form-horizontal&
+   actionParam_field_up_id=<@bp_id@>
+ ?>
+  <div class="modal-body">
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls">
+     <input type="text" name="actionParam_field_name" />
+    </div>
+   </div>
+  </div><div class="modal-footer">
+   <button class="btn btn-warning" type="submit">Créer le diffuseur</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+  </div>
+ </form>
+</div>
+
+
+<div class="modal hide fade" id="mt_new_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Nouveau type de message</h3>
+ </div>
+ <?form&
+   name=mt_new_form&
+   a=ObjectCreate&
+   actionParam_table_id=101&
+   target=<@p@>&
+   tab=message_types&
+   co=1&
+   class=form-horizontal&
+ ?>
+  <div class="modal-body">
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls">
+     <input type="text" name="actionParam_field_name" />
+    </div>
+   </div>
+  </div><div class="modal-footer">
+   <button class="btn btn-warning" type="submit">Créer le type de message</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+  </div>
+ </form>
+</div>
+
+<div class="modal hide fade" id="ml_new_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Nouvelle liste de diffusion à envoi <span id="ml_new_auto_label"></span></h3>
+ </div>
+ <?form&
+   name=ml_new_form&
+   a=ObjectCreate&
+   actionParam_table_id=107&
+   actionParam_field_manual_sending=0&
+   target=<@p@>&
+   tab=mailing_lists&
+   co=1&
+   class=form-horizontal&
+ ?>
+  <div class="modal-body">
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls">
+     <input type="text" name="actionParam_field_name" />
+    </div>
+   </div>
+  </div><div class="modal-footer">
+   <button class="btn btn-warning" type="submit">Créer la liste de diffusion</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+  </div>
+ </form>
+</div>
+
+
+<div class="modal hide fade" id="ml_subscription_modal" <@open_subscriptions?"show_modal=\"1\"":""@>>
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Abonnés</h3>
+ </div><div class="modal-body">
+ 
+  <table class="table table-striped table-condensed">
+   <thead>
+    <tr><th>adresse</th><th>paramètres</th><th></th><th></th></tr>
+   </thead><tbody>
+    <?mailing_lists&
+      roid=<@ml_id@>&
+      with_subscriptions=1&
+      template=<{mailing_list&template=
+	  <{subscription&template=
+	  	<tr>
+	  	 <td><@email@></td>
+	  	 <td><@parameters@></td>
+	  	 <td><a href="#" action="mail_edit_link" element_id="<@id@>" element_email="<@email@>" element_parameters="<@parameters@>"><i class="icon-edit"></i></a></td>
+	  	 <td><a href="#" action="mail_remove_link" element_id="<@id@>" element_name="<@email@>"><i class="icon-remove"></i></a></td>
+	  	</tr>
+	  }>
+   }>?>
+   </tbody><tfoot>
+    <tr>
+     <td></td> 
+     <td></td> 
+     <td></td> 
+     <td><a href="#" id="mail_new_link"><i class="icon-plus"></i></a></td>
+    </tr>
+   </tfoot>
+  </table>
+
+ </div><div class="modal-footer">
+	 
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Fermer</button>
+ </div>
+</div>
+
+
+<div class="modal hide fade" id="mail_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Edition d'abonné</h3>
+ </div>
+ <?form&
+   name=mail_form&
+   a=ObjectCreate&
+   actionParam_table_id=108&
+   actionParam_object_id=0&
+   target=<@p@>&
+   roid=<@ml_id@>&
+   open_subscriptions=1&
+   tab=mailing_lists&
+   actionParam_field_mailing_list_id=<@ml_id@>&
+   class=form-horizontal&
+ ?>
+  <div class="modal-body">
+   <div class="control-group">
+    <label class="control-label">E-mail</label>
+    <div class="controls">
+     <input type="text" name="actionParam_field_email" id="mail_email" />
+    </div>
+   </div>
+   <div class="control-group">
+    <label class="control-label">Paramètres</label>
+    <div class="controls">
+     <input type="text" name="actionParam_field_parameters" id="mail_parameters" />
+    </div>
+   </div>
+  </div><div class="modal-footer">
+   <button class="btn btn-warning" type="submit">Enregistrer</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+  </div>
+ </form>
+</div>
+
+<div class="modal hide fade" id="remove_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Suppression <span id="remove_title"></span></h3>
+ </div>
+ <?form&
+   name=remove_form&
+   a=RemoveObjectAction&
+   target=<@p@>&
+   tab=&
+   open_subscriptions=0&
+   actionParamoi=0&
+ ?>
+  <div class="modal-body">
+   <p>Etes-vous sûr de vouloir supprimer <span id="remove_name"></span> ?</p>
+  </div><div class="modal-footer">
+   <button class="btn btn-danger" type="submit">Oui</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Non</button>
+  </div>
+ </form>
+</div>
+
+<div class="modal hide fade" id="mail_remove_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Suppression d'abonné de liste de diffusion</h3>
+ </div>
+ <?form&
+   name=mail_remove_form&
+   a=RemoveObjectAction&
+   target=<@p@>&
+   roid=<@ml_id@>&
+   tab=mailing_lists&
+   open_subscriptions=1&
+   actionParamoi=0&
+ ?>
+  <div class="modal-body">
+   <p>Etes-vous sûr de vouloir supprimer <span id="mail_remove_name"></span> ?</p>
+  </div><div class="modal-footer">
+   <button class="btn btn-danger" type="submit">Oui</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Non</button>
+  </div>
+ </form>
+</div>
+
+<div class="modal hide fade" id="s_new_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Nouvelle section</h3>
+ </div>
+ <?form&
+   name=s_new_form&
+   a=ObjectCreate&
+   actionParam_table_id=109&
+   target=<@p@>&
+   tab=sections&
+   co=1&
+   class=form-horizontal&
+   actionParam_field_rank=0&
+ ?>
+  <div class="modal-body">
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls">
+     <input type="text" name="actionParam_field_name" />
+    </div>
+   </div>
+  </div><div class="modal-footer">
+   <button class="btn btn-warning" type="submit">Créer la section</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+  </div>
+ </form>
+</div>
+
+<script src="/terminus/js/admin.js"></script>

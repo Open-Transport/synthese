@@ -1,0 +1,57 @@
+<#forms/text_input&
+  label=Connecteur de base de données&
+  name=conn_string&
+#>
+
+<#forms/text_input&
+  label=Nom de base de données&
+  name=db&
+#>
+
+<#forms/text_input&
+  label=Stop prefix&
+  name=stop_code_prefix&
+#>
+
+<#forms/datasource_selector&
+  label=Source de données des destinataires de messages (bornes)&
+  name=mr_ds&
+#>
+
+<#forms/datasource_selector&
+  label=Source de données des données théoriques&
+  name=th_ds&
+#>
+
+<#forms/section_selector&
+  label=Section cible des messages Terminus&
+  name=ms&
+#>
+
+<#forms/text_input&
+  label=Hysteresis&
+  name=hysteresis&
+  unit=s&
+#>
+
+<#forms/text_input&
+  label=Décallage à l'arrêt&
+  name=delay_bus_stop&
+  unit=s&
+#>
+
+<#forms/text_input&
+  label=Délai maximum de données temps réel à prendre en compte&
+  name=hours_to_keep&
+  unit=h&
+#>
+
+<#forms/yes_no_input&
+  label=Convertir les identifiants d'arrêts en minuscule&
+  name=convert_stop_code_to_lower&
+#>
+
+<#forms/yes_no_input&
+  label=Transmettre les annulations de course par inter_synthese&
+  name=send_deactivations_by_inter_synthese&
+#>

@@ -1,0 +1,93 @@
+<@lines:=<?LinesListFunction2?>@>
+<#modal&
+  id=add_service_modal&
+  title=Insérer une course&
+  width=80&
+  width_unit=%&
+  body=
+  
+   <h4>Recherche de course</h4>
+  
+   <form class="form-inline" id="service_search_form">
+    <label>ID<br />
+    <input type="text" placeholder="ID" id="service_search_field_id" class="input-medium" /></label>
+    <label>Numéro<br />
+    <input type="text" placeholder="Numéro" id="service_search_field_number" class="input-small" /></label>
+    <label>Ligne<br /><select id="service_search_field_line" class="input-small">
+     <{lines.line&template=<option value="<@id@>"><@short_name@></option>}>
+    </select></label>
+    <label>Tranche horaire<br />
+    <select id="service_search_field_time_range" class="input-small">
+     <option value="">(toutes)</option>
+     <@i=0@>
+     <<time_range_loop_start>>
+     <option value="<@i@>"><@i@>h-<@i+1@>h</option>
+     <@i=<@i+1@>@>
+     <%<@(i<24)?"time_range_loop_start":""@>%>
+    </select></label>
+    <a href="#" id="service_search_link" class="btn btn-primary">Chercher</a>
+   </form>
+   <div id="service_search_result"></div>
+   
+  
+  
+  &
+  footer=
+    <a class="btn" data-dismiss="modal" aria-hidden="true">Fermer</a>
+#>
+
+<script>
+
+function update_service_search_result()
+{
+  var roid = $('#service_search_field_id').val();
+  if(!roid)
+  {
+    roid = $('#service_search_field_line option:selected').val();
+  }
+  var url = "/ops/ajax/services_list?roid="+ roid;
+  var time_range = $('#service_search_field_time_range option:selected').val();
+  if(time_range != '')
+  {
+    url += "&min_departure_time="+ time_range +"&max_departure_time="+ (parseInt(time_range)+1);
+  }
+
+  $.ajax(url)
+      .done(function(data) {
+          $('#service_search_result').html(data);
+          $('#service_search_result a[data-service_id]').click(service_search_result_add);
+      });
+      
+  return false;
+}
+
+function service_search_result_add()
+{
+  var service = {};
+  service.class = 'commercial';
+  service.id = $(this).data('service_id');
+  var td = $(this).closest('td');
+  service.number = $(this).html();
+  td = td.next();
+  service.line = td.html();
+  td = td.next();
+  service.direction = td.html();
+  td = td.next();
+  service.departure_schedule = td.html();
+  td = td.next();
+  service.departure_place_name = td.html();
+  td = td.next();
+  service.arrival_place_name = td.html();
+  td = td.next();
+  service.arrival_schedule = td.html();
+  add_service(service, true);
+  $('#add_service_modal').modal('hide');
+  $('#save_link').removeClass('hide');
+  return false;
+}
+
+$(function(){
+  $('#service_search_link').click(update_service_search_result);
+  $('#service_search_form').submit(update_service_search_result);
+});
+</script>

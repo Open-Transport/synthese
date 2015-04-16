@@ -1,0 +1,14 @@
+<@networks:=<?PTNetworksListFunction?>@>
+<{networks.network&template=
+  <h3><@name@></h3>
+  <table class="table table-striped table-condensed">
+  <tbody>
+  <@lignes:=<?LinesListFunction2&ni=<@id@>?>@>
+  <{lignes.line&template=
+    <tr>
+     <td><?link&target=/offer/network/line&line=<@id@>&text=<@line_short_name@>?></td>
+     <td><?link&target=/offer/network/line&line=<@id@>&text=<@name@>?></td>
+    </tr>
+  }>
+  </tbody></table>
+}>

@@ -1,0 +1,117 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<#forms/text_input&
+  label=Fichier arrêts (stops)&
+  name=pastops&
+#>
+
+<#forms/text_input&
+  label=Fichier transfers (optionnel)&
+  name=patransfers&
+#>
+
+<#forms/text_input&
+  label=Fichier réseaux (agency)&
+  name=paagency&
+#>
+
+<#forms/text_input&
+  label=Fichier itinéraires (routes)&
+  name=paroutes&
+#>
+
+<#forms/text_input&
+  label=Fichier calendriers&
+  name=pacalendar&
+#>
+
+<#forms/text_input&
+  label=Fichier dates&
+  name=pacalendar_dates&
+#>
+
+<#forms/text_input&
+  label=Fichier voyages (trips)&
+  name=patrips&
+#>
+
+<#forms/text_input&
+  label=Fichier horaires (stop_times)&
+  name=pastop_times&
+#>
+
+<#forms/text_input&
+  label=Fichier attributs tarification (fare_attributes)&
+  name=pafare_attributes&
+#>
+
+<#forms/text_input&
+  label=Fichier règles de tarification (fare_rules)&
+  name=pafare_rules&
+#>
+
+<#forms/text_input&
+  label=Fichier géométries (shapes)&
+  name=pashapes&
+#>
+
+<#forms/text_input&
+  label=Fichier services continus (frequencies)&
+  name=pafrequencies&
+#>
+
+<h3>Retraitement des données</h3>
+
+<#forms/text_input&
+  name=sadc&
+  label=ID commune par défaut&
+#>
+
+<#forms/text_input&
+  name=sadt&
+  unit=min&
+  class=input-mini&
+  label=Temps de transfert par défaut&
+#>
+
+<#forms/text_input&
+  name=use_rule_block_id_mask&
+  label=Masque règles d'utilisation&
+#>
+
+<h3>Options d'import</h3>
+
+<#forms/yes_no_input&
+  name=from_today&
+  label=Ignorer données passées&
+#>
+
+<#forms/yes_no_input&
+  name=clean_old_data&
+  label=Effacer données actuelles&
+#>
+
+<#forms/yes_no_input&
+  name=clean_unused_stops&
+  label=Effacer arrêts non utilisés&
+#>
+
+<#forms/yes_no_input&
+  name=isa&
+  label=Import arrêts commerciaux&
+#>
+
+<#forms/yes_no_input&
+  name=display_linked_stops&
+  label=Affichage arrêts liés&
+#>
+
+<#forms/yes_no_input&
+  name=use_line_short_name_as_id&
+  label=Utiliser le nom court de ligne comme identifiant&
+#>
+
+<#forms/yes_no_input&
+  name=auto_create_stop_area&
+  label=Générer automatiquement les arrêts commerciaux&
+#>

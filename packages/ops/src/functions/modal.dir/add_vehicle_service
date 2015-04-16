@@ -1,0 +1,26 @@
+<#modal&
+  id=add_vehicle_service_modal&
+  title=Nouveau service voiture&
+  form=<?form&
+         target=<@p@>&
+         a=VehicleServiceUpdate&
+         class=form-horizontal&
+         co=1&
+         actionParam_field_operation_unit_id=<@unit@>&
+         unit=<@unit@>&
+       ?>&
+  body=
+  
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls">
+     <input type="text" name="actionParamname" value="" />
+    </div>
+   </div>
+  
+  
+  &
+  footer=
+    <button class="btn btn-primary">Ajouter</button>
+    <a class="btn" data-dismiss="modal" aria-hidden="true">Annuler</a>
+#>

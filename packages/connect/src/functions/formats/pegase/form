@@ -1,0 +1,59 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<#forms/text_input&
+  label=Fichier&
+  name=pa&
+#>
+
+<h3>Liens avec la base SYNTHESE</h3>
+
+<#forms/network_selector&
+  name=net&
+#>
+
+<#forms/text_input&
+  label=ID Mode de transport&
+  name=rolling_stock_id&
+#>
+
+<#forms/text_input&
+  label=ID commune pour les nouveaux arrêts commerciaux&
+  name=sadc&
+#>
+
+<#forms/text_input&
+  label=ID règle d'utilisation représentant la réservation obligatoire&
+  name=reservation_rule_id&
+#>
+
+<h3>Retraitements sur les données</h3>
+
+<#forms/radio_inputs&
+  label=Pattern des numéros de lignes pour réinterprétation&
+  name=line_filter_mode&
+  label1=LR{nnn} || LSR{nnn}&
+  value1=mode1&
+  label2=S{nombre chaine}&
+  value2=mode2&
+  label3=LR-{chaine}-{n} ou SR-{chaine}-{nn}&
+  value3=mode3&
+  label4=!LR-{chaine}-{n}&
+  value4=mode4&
+#>
+
+<h3>Options d'import</h3>
+
+<#forms/yes_no_input&
+  label=Effacer données existantes&
+  name=clean_old_data&
+#>
+
+<#forms/yes_no_input&
+  label=Effacer arrêts inutilisés&
+  name=clean_unused_stops&
+#>
+
+<#forms/yes_no_input&
+  label=Ignorer données passées&
+  name=from_today&
+#>

@@ -1,0 +1,9 @@
+<div id="images_site_explorer">
+ <div id="ise_tree">
+ </div>
+ <div id="ise_images">
+ </div>
+ <div id="ise_preview">
+ </div>
+</div>
+<script src="/terminus/js/images_site_explorer.js"></script>

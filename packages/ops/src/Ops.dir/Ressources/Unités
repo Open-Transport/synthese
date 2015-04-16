@@ -1,0 +1,79 @@
+<script src="/ops/js/units.js"></script>
+<@units:=<?operation_units?>@>
+<div class="row-fluid">
+ <div class="span3" id="tree">
+   <ul class="nav nav-list well" id="units_list">
+    <li<@roid?"":" class=\"active\""@>>
+    <?link&
+      target=<@p@>&
+      unit=<@unit@>&
+      text=Unités d'exploitation
+           <div class="pull-right" id="add_unit_link"><i class="icon-plus <@roid?"":"icon-white"@>"></i></div>
+    ?>
+    </li>
+    <{units.operation_unit&template=
+      <li class="tree_1 <@(id==roid)?"active":""@>">
+      <?link&
+  	target=<@p@>&
+   	roid=<@id@>&
+        unit=<@unit@>&
+  	text=<span class="unit_name"><@name?name:id@></span>
+   	     <@(id==roid)?("<div class=\"pull-right\" id=\"unit_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>
+      ?>
+      </li>
+    }>
+   </ul>
+ </div><div class="span9">
+ <?if&cond=<@roid@>&then=
+ <@unit:=<?object&roid=<@roid@>&additional_parameters=1?>@>
+
+  <h3 class="well">
+   <span id="displayed_title"><@unit.name?unit.name:roid@></span>
+   <div class="btn-group pull-right">
+    <a href="#" id="save_link" class="btn btn-primary hide" data-id="<@roid@>">Enregistrer</a>
+   </div>
+  </h3>
+  
+  <form class="form-horizontal">
+  <div class="control-group">
+   <label class="control-label">Nom</label>
+   <div class="controls">
+    <input type="text" id="name_field" value="<@unit.name@>" />
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label">Lignes autorisées</label>
+   <div class="controls">
+    <table class="table table-striped table-condensed" id="allowed_lines"><tbody>
+    </tbody><tfoot>
+    <tr>
+    <td>
+     <select id="lines">
+     <?LinesListFunction2&template=<{line&template=<option data-id="<@id@>" data-name="<@name@>" data-short_name="<@short_name@>"><@short_name@> <@name@></option>}>?>
+     </select>
+    </td><td>
+     <a href="#" id="add_line_link"><i class="icon icon-plus"></i></a>
+    </td></tr>
+    </tfoot></table>
+   </div>
+  </div>
+  </form>
+
+  <script>
+   add_lines({"line":[
+   <{unit.allowed_line&template=
+         {
+         "id": "<@id@>",
+         "short_name": "<@short_name@>",
+         "name": "<@name@>"
+         },
+   }>
+   ]});
+  </script>
+
+ ?>
+ </div>
+</div>
+
+<#modal/add_unit#>

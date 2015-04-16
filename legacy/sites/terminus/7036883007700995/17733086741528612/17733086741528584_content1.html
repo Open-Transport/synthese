@@ -1,0 +1,12 @@
+<@str_replace_pos=0@>
+<@str_replace_length=<?strlen&t=<@f@>?>@>
+
+<<str_replace_loop>>
+<%<?if&cond=<@str_replace_pos>=<?strlen&t=<@t@>?>@>&then=str_replace_end?>%>
+
+<@str_replace_char=<?substr&t=<@t@>&n=<@str_replace_length@>&f=<@str_replace_pos@>?>@>
+
+<?if&cond=<@str_replace_char==f@>&then=<@r@><@str_replace_pos=<@str_replace_pos+str_replace_length@>@>&else=<?substr&t=<@t@>&n=1&f=<@str_replace_pos@>?><@str_replace_pos=<@str_replace_pos+1@>@>?>
+
+<%str_replace_loop%>
+<<str_replace_end>>

@@ -1,0 +1,99 @@
+<@session_id=<?session&template=<{session&template=<@id@>}>?>@>
+<@user_id=<?session&template=<{session&template=<{user&template=<@id@>}>}>?>@>
+<@user_name=<?session&template=<{session&template=<{user&template=<@name@>}>}>?>@>
+<@rub=<@rub?rub:"home"@>@>
+<@icon=<@session_id?icon:"key.png"@>@>
+
+<?if&cond=<@session_id&&url_to_load@>&then=<?redirect&url=<@url_to_load@>?>?>
+
+<?admin_page&rub=<@rub@>&tab=<@tab@>&repeat_parameters=1&template=
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+<head>
+<meta charset="utf-8">
+<title><@title@> - SYNTHESE3 Admin</title>
+<?if&cond=<@icon@>&then=<link rel="icon" type="image/png" href="/admin/img/<@icon@>" />?>
+<style type="text/css">@import url(/admin/colors.css); @import url(/admin/admin.css); @import url(/lib/jscalendar/calendar-system.css);</style>
+<script type="text/javascript" src="/lib/jscalendar/calendar_stripped.js"></script>
+<script type="text/javascript" src="/lib/jscalendar/calendar-fr.js"></script>
+<script type="text/javascript" src="/lib/jscalendar/calendar-setup_stripped.js"></script>
+<script type="text/javascript" src="/lib/jquery/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="/lib/jquery-ui/jquery-ui-1.8.15.custom.min.js"></script>
+<link rel="stylesheet" href="/lib/jquery-ui/jquery.ui.autocomplete.css" type="text/css"></link>
+<link rel="stylesheet" href="/lib/jquery-ui/jquery.ui.theme.css" type="text/css"></link>
+<script type="text/javascript" src="/admin/treeview.js"></script>
+<script type="text/javascript" src="/lib/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/admin/ajax_forms.js"></script>
+</head>
+<body>
+
+<div id="wrapall">
+<div id="title">
+
+<div id="logo">
+<img src="/admin/img/synthese.png" alt="SYNTHESE" />
+<!--
+<div id="calls"><div id="call" if {{callduration}} { class="incall"}
+print {>}
+if {{callduration}} {EN APPEL}
+if {{callcustomer}} {{print { avec } {{callcustomer}}}}
+if {{callduration}} {{print {<span id="calldurationspan"></span><script type="text/javascript>durationSinceCallStart=} {{callduration}} {; updateCallStopwatch()</script>}}}
+print {</div>}
+-->
+
+<?if&cond=<@switch_call_url@>&then=<a class="linkbutton" onmouseover="this.className='activatedlinkbutton';" onmouseout="this.className='linkbutton';" onmousedown="this.className='clickedlinkbutton';" onmouseup="this.className='activatedlinkbutton';" href="<@switch_call_url@>"><img src="/admin/img/phone.png" alt="P" /> <?if&cond=<@current_call_id@>&then=Stopper l'appel&else=Prendre un appel?></a>?>
+
+</div>
+
+
+<div id="adminpos">\&nbsp;<?if&cond=<@session_id@>&then=<{position_node&template=
+<?if&cond=<@(rank+1)==items_count@>&else=
+<?if&cond=<@rank@>&then= / ?><a href="/admin?<@url@>"><@title@></a>?>}>?>
+</div>
+
+<div id="user">
+
+<?if&cond=<@session_id@>&then=<div id="username"><img src="/admin/img/user.png" alt="Utilisateur" /><@user_name@></div>?>
+<div id="logout"><?if&cond=<@user_name@>&then=<?link&target=<@p@>&class=linkbutton&a=logout&text=<img src="/admin/img/disconnect.png" title="Déconnecter">\&nbsp;Déconnecter?>?>
+</div></div>
+
+<div id="pagename"><img src="/admin/img/<@icon@>" /><?if&cond=<@session_id@>&then=<@title@>&else=Login?></div>
+
+</div>
+
+<div id="content">
+  <div id="admintree"><div id="admintree2">
+
+<{tree_node&recursive=1&template=
+
+<div class="<?if&cond=<@is_last@>&then=lastblock&else=notlastblock?>">
+<div class="tree_icon<?if&cond=<@depth@>&then=s?>"><?if&cond=<@depth@>&then=<?if&cond=<@recursive_content@>&then=<img class="node" src="/admin/img/<?if&cond=<@is_opened@>&then=ftv2mlastnode&else=ftv2plastnode?>.png" alt="+" />&else=<img src="/admin/img/ftv2lastnode.png" alt="-" />?>?><img src="/admin/img/<@icon@>" class="icon" alt="x" /></div>
+
+<div class="text level<@depth@>"><?if&cond=<@is_current@>&else=<a href="/admin?<@url@>">?><@title@><?if&cond=<@is_current@>&else=</a>?></div>
+<div <?if&cond=<@is_opened@>&else=style="display:none" ?> class="subtree subtree<@depth@>"><@recursive_content@></div>
+</div>
+
+
+}>
+
+</div></div>
+  <div id="admincontent"><div id="admincontent2"><?if&cond=<@session_id@>&then=<@tabs@><@content@>&else=
+
+<p><?form&name=login&a=login&page_id=<@p@>&url_to_load=<@equiv_url@>?>
+Login : <input name="actionParamlogin" /> Mot de passe : <input type="password" name="actionParampwd" /> <input type="submit" value="OK" />
+</form></p>
+
+?></div></div>
+</div>
+
+<div id="footer">
+SYNTHESE <?version&template=<@version@><?if&cond=<@revision@>&then= (révision <@revision@> - <@branch@> - compilée le <@build_date@>)?>?> - \&copy; 2003-2013 - SYNTHESE est un produit sous <a href="http://www.gnu.org/licenses/gpl.html">licence GPL</a> - Plus d'informations sur <a href="https://extranet.rcsmobility.com/projects/synthese/wiki" target="_new">le site du projet SYNTHESE</a>.\&nbsp;
+</div>
+
+</div>
+
+<?if&cond=<@rem@>&then=<script type="text/javascript">alert("<@rem@>");</script>?>
+
+?>
+
+</body></html>

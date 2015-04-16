@@ -1,0 +1,21 @@
+<h3>Répertoire où exporter</h3>
+
+<#forms/text_input&
+  label=Répertoire&
+  name=directory&
+#>
+
+<#forms/text_input&
+  label=Parent ID&
+  name=parent_id&
+#>
+
+<#forms/text_input&
+  label=Site ID&
+  name=import_site_id&
+#>
+
+<#forms/yes_no_input&
+  label=Avec métadonnées&
+  name=with_metadata&
+#>

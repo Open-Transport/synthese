@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="/lib/jquery-ui/jquery.ui.theme.css" rel="stylesheet" media="screen">
+<link href="/lib/jquery-ui/jquery.ui.autocomplete.css" rel="stylesheet" media="screen">
+<link href="/ops/css/main.css" rel="stylesheet">
+<?if&cond=<@unit@>&then=
+  <@current_unit:=<?object&roid=<@unit@>?>@>
+?><title><@unit?(current_unit.name+" - "):""@>SYNTHESE Ops</title>
+</head>
+<body>
+<script src="/lib/jquery/jquery-1.7.1.min.js"></script>
+<script src="/lib/jquery-ui/jquery-ui-1.10.3.min.js"></script>
+<div class="navbar navbar-inverse" id="navbar">
+ <div class="navbar-inner noprint">
+  <a class="brand" href="#" class="active"><@unit?(current_unit.name+" - "):""@>SYNTHESE Ops</a>
+  <ul class="nav">
+   <@pages:=<?menu&root=/&raw_data=1&max_depth=2?>@>
+   <{pages.page&template=
+     <?if&
+       cond=<@~length("page")@>&
+       then=<@active=<{page&template=<?if&cond=<@id==p@>&then=1?>}>@>
+            <li class="dropdown<@active?" active":""@>">
+             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><@title@><b class="caret"></b></a>
+             <ul class="dropdown-menu">
+             <{page&template=
+               <li><?link&target=<@id@>&unit=<@unit@>?></li>
+             }>
+            </ul></li>&
+       else=<li<@(id==p)?" class=\"active\"":""@>><?link&target=<@id@>&unit=<@unit@>?></li>&
+     ?>
+   }>
+  </ul>
+   <ul class="nav pull-right">
+    <li class="dropdown">
+     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+      Filtre
+      <b class="caret"></b>
+     </a>
+     <ul class="dropdown-menu">
+      <li><a href="#" id="select_current_unit_link">Unité</a></li>
+      <li><a href="#" id="date_filter">Date</a></li>
+     </ul>
+    </li>
+   </ul>
+ </div>
+</div>
+<div id="content">
+<@content@>
+</div>
+<#modal/select_current_unit#>
+<script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="/ops/js/main.js"></script>
+</body>
+</html>
