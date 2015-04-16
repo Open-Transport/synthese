@@ -131,9 +131,19 @@ namespace synthese
 				if(_projectedPoint.getRoadChunk()->getForwardEdge().getNext() &&
 					static_cast<const Crossing*>(_projectedPoint.getRoadChunk()->getForwardEdge().getNext()->getFromVertex()) == &crossing
 				){
+					// road chunk metric offsets are expressed from the start of the road
+					MetricOffset chunkStartOffset = _projectedPoint.getRoadChunk()->getMetricOffset();
+					MetricOffset chunkEndOffset   = _projectedPoint.getRoadChunk()->getForwardEdge().getEndMetricOffset();
+
+					// the metric offset of the projected point is expressed from the start of the chunk
+					MetricOffset distanceFromChunkStart = _projectedPoint.getMetricOffset();
+
+					// the distance from the projected point to the chunk end is : chunk size - offset of projected point
+					MetricOffset distanceFromChunkEnd   = (chunkStartOffset - chunkEndOffset) - distanceFromChunkStart;
+
 					return VertexAccess(
-						minutes(static_cast<long>((_projectedPoint.getRoadChunk()->getForwardEdge().getEndMetricOffset() - _projectedPoint.getMetricOffset()) / 50)),
-						_projectedPoint.getRoadChunk()->getForwardEdge().getEndMetricOffset() - _projectedPoint.getMetricOffset()
+						minutes(static_cast<long>(distanceFromChunkEnd / 50)),
+						distanceFromChunkEnd
 					);
 				}
 			}

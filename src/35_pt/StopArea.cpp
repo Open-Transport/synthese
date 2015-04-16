@@ -273,11 +273,8 @@ namespace synthese
 			const AccessParameters& accessParameters,
 			const geography::Place::GraphTypes& whatToSearch
 		) const {
-			/*
-			 * If StopArea isn't in a DRTArea, then attempt to use crossings arround stop.
-			 * Else AVOID IT : if user want to start from a stopArea (to make a reservation) we musn't change the starting stopArea without notification !!
-			 */
-			if(whatToSearch.find(RoadModule::GRAPH_ID) != whatToSearch.end()) // && !isInDRT()) !!!!!
+			// If the VAM uses road, append the crossings around each physical stops of the StopArea
+			if(whatToSearch.find(RoadModule::GRAPH_ID) != whatToSearch.end())
 			{
 				BOOST_FOREACH(
 					const PhysicalStops::value_type& it,
@@ -285,40 +282,54 @@ namespace synthese
 				){
 					if(!it.second->getProjectedPoint().getRoadChunk())
 					{
+						// This physical stop is not projected on a road chunk, we cannot retrieve its crossings
 						continue;
 					}
+
+					// The metric offset of the projected point is expressed from the start of its road chunk
+					MetricOffset distanceFromChunkStart = it.second->getProjectedPoint().getMetricOffset();
+
+					// Insert the crossing of the road chunk (= starting point of the road chunk) into the VAM
 					result.insert(
 						it.second->getProjectedPoint().getRoadChunk()->getFromCrossing(),
-						VertexAccess(minutes(static_cast<long>(it.second->getProjectedPoint().getMetricOffset() / 50)), it.second->getProjectedPoint().getMetricOffset())
-					);
-					/*
-					 * If next edge exist try add next crossing to vam (see issue #23315)
-					 */
+						VertexAccess(
+							minutes(static_cast<long>(ceil(distanceFromChunkStart / 50.0))),
+							distanceFromChunkStart
+					)	);
+
+					// If the next edge exist add the next crossing to the VAM (see issue #23315)
 					if(it.second->getProjectedPoint().getRoadChunk()->getForwardEdge().getNext())
 					{
+						// The metric offset of the road chunk start and end are expressed from the start of the road
+						MetricOffset chunkStartOffset     = it.second->getProjectedPoint().getRoadChunk()->getMetricOffset();
+						MetricOffset chunkEndOffset       = it.second->getProjectedPoint().getRoadChunk()->getForwardEdge().getEndMetricOffset();
+
+						// The distance between the chunk end and the stop projection is : chunk size - offset of projected point
+						MetricOffset distanceFromChunkEnd = (chunkEndOffset - chunkStartOffset) - distanceFromChunkStart;
+
+						// Insert the next crossing (= ending point of the road chunk) into the VAM
 						result.insert(
 							it.second->getProjectedPoint().getRoadChunk()->getForwardEdge().getNext()->getFromVertex(),
-                            VertexAccess(
-                            	minutes(
-									static_cast<long>(
-										ceil(((it.second->getProjectedPoint().getRoadChunk()->getForwardEdge().getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()) / 50.0))
-								)	),
-                            	it.second->getProjectedPoint().getRoadChunk()->getForwardEdge().getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()
+							VertexAccess(
+								minutes(static_cast<long>(ceil(distanceFromChunkEnd / 50.0))),
+								distanceFromChunkEnd
 						)	);
 					}
 				}
 			}
 
-			if (whatToSearch.find(PTModule::GRAPH_ID) == whatToSearch.end()) return;
-
-			BOOST_FOREACH(
-				const PhysicalStops::value_type& it,
-				_physicalStops
-			){
-				result.insert(
-					it.second,
-					VertexAccess()
-				);
+			// If the VAM uses public transportation, append each physical stops of the StopArea
+			if(whatToSearch.find(PTModule::GRAPH_ID) != whatToSearch.end())
+			{
+				BOOST_FOREACH(
+					const PhysicalStops::value_type& it,
+					_physicalStops
+				){
+					result.insert(
+						it.second,
+						VertexAccess()
+					);
+				}
 			}
 		}
 

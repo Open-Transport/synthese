@@ -187,7 +187,7 @@ namespace synthese
 			geos::linearref::LengthIndexedLine lil(static_cast<const geos::geom::Geometry*>(bestEdgeGeom.get()));
 			const geos::geom::Coordinate *ptCoords = ptGeom->getCoordinate();
 			geos::geom::Coordinate coord(*ptCoords);
-			double index = lil.project(coord) + bestEdge->getMetricOffset();
+			double index = lil.project(coord);
 			geos::geom::Coordinate projectedCoords = lil.extractPoint(index);
 			return boost::make_tuple(
 				projectedCoords,
