@@ -1,0 +1,6 @@
+<?action&
+  a=ObjectUpdate&
+  actionParam_object_id=<@area_id@>&
+  actionParam_field_name=<@name@>&
+  actionParam_field_stops=<@stops@>&
+?>

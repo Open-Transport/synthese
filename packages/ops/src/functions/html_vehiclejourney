@@ -1,0 +1,158 @@
+<@reservation_status[0]=option@>
+<@reservation_status[1]=option confirmée@>
+<@reservation_status[3]=à effectuer@>
+<@reservation_status[4]=confirmée@>
+<@reservation_status[5]=annulation à confirmer@>
+<@reservation_status[6]=annulée@>
+<@reservation_status[7]=annulée hors délai@>
+<@reservation_status[8]=annulée hors délai avec confirmation@>
+<@reservation_status[9]=théoriquement en cours@>
+<@reservation_status[10]=en cours@>
+<@reservation_status[15]=absent@>
+<@reservation_status[19]=théoriquement effectué@>
+<@reservation_status[20]=effectué@>
+
+<?service_detail&
+  roid=<@service@>&
+  base_calendar_id=15199653037342772&
+  read_reservations_from_day=<@read_reservations_from_day@>&
+  template=
+    <div class="row well" style="padding:5px; margin:0">
+    <dl class="span3">
+     <dt>Ligne</dt>
+     <dd><?object&roid=<@path_id@>&template=<@direction@>?></dd>
+     <dt>Itinéraire</dt>
+     <dd><?object&roid=<@path_id@>&template=<@name@>?></dd>
+     <dt>Code course</dt>
+     <dd><?object&roid=<@service@>&template=<?substr&t=<@service_number@>&n=2?>/<?substr&t=<@service_number@>&f=2&n=3?>?></dd>
+    </dl>
+    <dl class="span4">
+     <dt>Trajet</dt>
+     <dd><@departure_place_name@> - <@arrival_place_name@></dd>
+     <dt>Départ</dt>
+     <dd><?substr&t=<@departure_schedule@>&n=5?></dd>
+     <dt>Jours de fonctionnement</dt>
+     <dd><{calendar&template=<@name@>}> (2013-2014)</dd>
+    </dl>
+    <?if&cond=<@read_reservations_from_day@>&then=
+    <dl class="span3">
+     <dt>Réservations du</dt>
+     <dd>
+      <@read_reservations_from_day@>
+      <div class="btn-group" style="margin-left:15px;">
+       <?link&
+         target=<@p@>&
+         class=btn btn-mini&
+         text=\&lt;&
+         service=<@service@>&
+         read_reservations_from_day=<?date&d=-1&unit=day&b=<@read_reservations_from_day@> 00:00?>&
+       ?>
+       <?link&
+         target=<@p@>&
+         class=btn btn-mini&
+         text=\&gt;&
+         service=<@service@>&
+         read_reservations_from_day=<?date&d=+1&unit=day&b=<@read_reservations_from_day@> 00:00?>&
+       ?>
+    </div></dd>
+    <dt>Service voiture</dt>
+    <dd><?VehicleServicesList&
+          service=<@service@>&
+          date=<@read_reservations_from_day@>&
+          template=<{vehicleService&template=<@name@> }>&
+        ?>
+    </dd>     
+    <dt>Lecture</dt>
+    <dd id="reading"></dd>
+    </dl>
+    ?>
+    </div>
+    <table class="table table-striped table-condensed" id="reservations" style="margin-top:5px;">
+     <thead>
+      <tr><th>Commune</th><th>Arrêt</th><th>Min</th><th>Max</th><th>M</th><th>D</th><th>#</th></tr>
+     </thead><tbody>
+     <@row=1@>
+     <{stop&template=
+       <@with_departure_reservations=<{reservation_at_departure&template=<?if&cond=<@cancellation_time@>&else=1?>}>@>
+       <@with_departure_reservation_no_options=<{reservation_at_departure&template=<?if&cond=<@status.status==0@>&else=1?>}>@>
+       <@with_arrival_reservations=<{reservation_at_arrival&template=<?if&cond=<@cancellation_time@>&else=1?>}>@>
+       <@with_arrival_reservation_no_options=<{reservation_at_arrival&template=<?if&cond=<@status.status==0@>&else=1?>}>@>
+       <@with_inverted_arrival_reservations=<{reservation_with_arrival_before_departure&template=<?if&cond=<@cancellation_time@>&else=1?>}>@>
+
+       <tr>
+        <td><@(last_city==city_name)?"":city_name@></td>
+        <td><@stop_name@></td>
+        <td>
+	 <?if&
+	   cond=<@schedule_input&&departure_time&&((!is_area)||first_in_area||last_in_area)@>&
+	   then=<span class="small_hour"><?substr&t=<@departure_time@>&f=0&n=2?></span><?substr&t=<@departure_time@>&f=3&n=2?>&
+         ?>
+        </td>
+        <td>
+	 <?if&
+	   cond=<@schedule_input&&arrival_time&&((!is_area)||first_in_area||last_in_area)@>&
+	   then=<span class="small_hour"><?substr&t=<@arrival_time@>&f=0&n=2?></span><?substr&t=<@arrival_time@>&f=3&n=2?>&
+         ?>
+        </td>
+        <td class="col_m<@departure_time?"":" forbidden"@>">
+         <@(<departure_time&&(!with_reservation))?"X":""@>
+         <?if&cond=<@with_departure_reservations@>&then=
+           <a href="#reservations_departure_<@row@>" data-toggle="modal" class="<@with_departure_reservation_no_options?"resa":"resa_option"@>">R</a>
+           <#modal&
+             id=reservations_departure_<@row@>&
+             title=Réservations au départ de <@city_name@> <@stop_name@>&
+             body=<table class="table table-striped table-condensed">
+                  <thead><tr><th>destination</th><th>client</th><th>places</th><th>statut</th></tr></thead>
+                  <tbody>
+                  <{reservation_at_departure&template=
+                    <?if&cond=<@cancellation_time@>&else=
+                    <tr><td><@arrival_place_name@></td>
+                    <td><a href="/admin/?roid=<@client_id@>\&rub=ResaCustomerAdmin\&tab=tab_log" target="_new"><@name@></a></td>
+                    <td><@seats_number@></td>
+                    <td><@reservation_status[status.status]]@></td>
+                    </tr>
+                    ?>
+                  }></tbody></table>&
+           #>
+         ?>
+        </td>
+        <td class="col_m<@arrival_time?"":" forbidden"@><@with_inverted_arrival_reservations?" warning":""@>" <@with_inverted_arrival_reservations?" title=\"Inversion d'ordre de desserte\"":""@>>
+         <@(arrival_time&&(!with_reservation))?"X":""@>
+
+         <?if&cond=<@with_arrival_reservations@>&then=
+           <a href="#reservations_arrival_<@row@>" data-toggle="modal" class="<@with_arrival_reservation_no_options?"resa":"resa_option"@>">R</a>
+           <@with_inverted_arrival_reservations$?"!":""@>
+           <#modal&
+             id=reservations_arrival_<@row@>&
+             title=Réservations à l'arrivée à <@city_name@> <@stop_name@>&
+             body=<table class="table table-striped table-condensed">
+                  <thead><tr><th>provenance</th><th>client</th><th>places</th><th>statut</th></tr></thead>
+                  <tbody>
+                  <{reservation_at_arrival&template=
+                    <?if&cond=<@cancellation_time@>&else=
+                    <tr><td><@departure_place_name@></td>
+                    <td><a href="/admin/?roid=<@client_id@>\&rub=ResaCustomerAdmin\&tab=tab_log" target="_new"><@name@></a></td>
+                    <td><@seats_number@></td>
+                    <td>
+                    <@resa_id=<@id@>@>
+                    <?if&cond=<{reservation_with_arrival_before_departure&template=<@(id==resa_id)?"1":""@>}>&
+                      then=<span class="warning">Ordre inversé</span>&
+                    ?>
+                    </td>
+                    <td><@reservation_status[status.status]]@></td>
+                   </tr>
+                    ?>
+                  }></tbody></table>&
+           #>
+         ?>
+        </td>
+        <td><@row@></td>
+       </tr>
+
+      <@row=<@row+1@>@>
+      <@last_city=<@city_name@>@>
+    }>
+  </tbody></table>
+?>
+
+<script src="/ops/js/realtime_vehiclejourney.js"></script>

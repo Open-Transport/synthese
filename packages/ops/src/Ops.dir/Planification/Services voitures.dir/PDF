@@ -1,0 +1,4 @@
+<?object&
+  roid=<@service@>&
+  additional_parameters=1&
+  template=<{service&template=<#pdf_vehiclejourney&service=<@id@>#>}>?><?pdf_close?>

@@ -1,0 +1,27 @@
+<table class="table table-striped table-condensed" id="reservations">
+<tbody>
+<?services_list
+&roid=<@line@>
+&base_calendar_id=15199653037342772
+&template=<{service&template=
+
+<tr>
+<td><?object&roid=<@path_id@>&template=<@direction@>?></td>
+<td><?PTObjectInformationFunction&info=number&roid=<@id@>?></td>
+<td><@departure_schedule@></td>
+<td><@departure_place_name@></td>
+<td><@arrival_schedule@></td>
+<td><@arrival_place_name@></td>
+<td><?link&target=/offer/network/line/vehiclejourney&service=<@id@>&text=HTML?></td>
+<td><?link&target=/offer/network/line/vehiclejourney/vehiclejourney.pdf&service=<@id@>&text=PDF?></td>
+<td><?link&target=/realtime/network/vehiclejourney&service=<@id@>&text=Vue temps réel&read_reservations_from_day=<?date?>?></td>
+</tr>
+
+}>?>
+
+<tr>
+<td colspan="5">Toutes les fiches</td>
+<td><?link&target=/offer/network/line/line.pdf&line=<@line@>&text=PDF?></td>
+</tr>
+
+</tbody></table>

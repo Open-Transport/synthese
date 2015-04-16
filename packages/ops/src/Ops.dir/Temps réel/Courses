@@ -1,0 +1,75 @@
+<div class="well noprint">
+ <a href="#" class="btn btn-primary" id="resa_filter_link"><i class="icon icon-white icon-ok" style="visibility:hidden"></i> Filtrer courses avec réservation possible</a>
+ <a href="#" class="btn btn-primary" id="call_view_link"><i class="icon icon-white icon-ok" style="visibility:hidden"></i> Vue par points réservations</a>
+</div>
+
+<table class="table table-striped table-condensed" id="vehicle_journeys">
+<tbody>
+<@services:=<?services_list&
+              date_filter=<?date?>&
+              roid=<@unit_id@>&
+              min_delay_between_departure_and_call=10&
+            ?>@>
+<{services.service&template=
+
+<@line=<?object&roid=<@path_id@>&template=<@direction@>?>@>
+<?if&cond=<@line@>&else=
+<@line=<?object&roid=<@path_id@>&template=<?object&roid=<@commercial_line_id@>&template=<@short_name@>?>?>@>
+?>
+
+<tr class="summary">
+<td><@line@></td>
+<td>
+ <?link&
+   target=/realtime/network/vehiclejourney&
+   service=<@id@>&
+   read_reservations_from_day=<?date?>&
+   text=<@number@>&
+ ?>
+</td>
+<td><@is_reservable?"<span class=\"resa\">R</span>":""@><{reservation_delivery_time&template= / <?substr&t=<@time@>&n=5?>}></td>
+<td><?substr&t=<@departure_schedule@>&n=5?></td>
+<td><@departure_place_name@></td>
+<td><?substr&t=<@arrival_schedule@>&n=5?></td>
+<td><@arrival_place_name@></td>
+<td class="noprint">
+ <?link&
+   target=/realtime/network/vehiclejourney&
+   service=<@id@>&
+   read_reservations_from_day=<?date?>&
+   text=Détail&
+ ?>
+</td>
+</tr>
+<{reservation_delivery_time&template=
+<tr class="detail" style="display:none">
+<td><?substr&t=<@time@>&n=5?></td>
+<td><@line@></td>
+<td>
+ <?link&
+   target=/realtime/network/vehiclejourney&
+   service=<@id@>&
+   read_reservations_from_day=<?date?>&
+   text=<@number@>&
+ ?>
+</td>
+<td><?substr&t=<@departure_schedule@>&n=5?></td>
+<td><@departure_place_name@></td>
+<td><?substr&t=<@arrival_schedule@>&n=5?></td>
+<td><@arrival_place_name@></td>
+<td class="noprint">
+ <?link&
+   target=/realtime/network/vehiclejourney&
+   service=<@id@>&
+   read_reservations_from_day=<?date?>&
+   text=Détail&
+ ?>
+</td>
+</tr>
+
+}>
+}>
+</tbody>
+</table>
+
+<script src="/ops/js/realtime_runs.js"></script>

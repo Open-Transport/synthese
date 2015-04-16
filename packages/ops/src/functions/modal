@@ -1,0 +1,14 @@
+<div class="modal hide fade" id="<@id@>" <@width?(" style=\"width:"+ width + (width_unit?width_unit:"px") +";margin-left:-"+ (width/2) +(width_unit?width_unit:"px") ";\""):""@>>
+ <@form@>
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+  <h3><@title@></h3>
+ </div>
+ <div class="modal-body">
+  <@body@>
+ </div>
+ <div class="modal-footer">
+  <@footer@>
+ </div>
+ <@form?"</form>":""@>
+</div>

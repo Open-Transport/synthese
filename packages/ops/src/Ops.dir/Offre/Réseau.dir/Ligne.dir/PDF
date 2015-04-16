@@ -1,0 +1,5 @@
+<?services_list&
+  roid=<@line@>&
+  base_calendar_id=15199653037342772&
+  template=<{service&template=<#pdf_vehiclejourney&service=<@id@>#>}>&
+?><?pdf_close?>

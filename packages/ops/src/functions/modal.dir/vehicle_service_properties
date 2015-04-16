@@ -1,0 +1,56 @@
+<#modal&
+  id=vehicle_service_properties_modal&
+  title=Propriétés&
+  body=
+    <form class="form-horizontal" id="properties_form">
+     <div class="control-group">
+      <label class="control-label">Nom</label>
+      <div class="controls">
+       <input type="text" id="name_field" />
+      </div>
+     </div>
+     <div class="control-group">
+      <label class="control-label">Unité</label>
+      <div class="controls">
+       <select id="unit_field">
+       <option value="0">(aucune)</option>
+       <?operation_units&template=<{units.operation_unit&template=<option value="<@id@>"><@name@></option>}>?>
+       </select>
+      </div>
+     </div>
+    </form>
+  &footer=
+    <a class="btn btn-primary" href="#" id="vehicle_service_properties_update_link">Enregistrer</a>
+    <a class="btn" data-dismiss="modal">Annuler</a>
+#>
+
+<script>
+ function update_properties()
+ {
+   var name = $('#name_field').val();
+   var updated=false;
+   if(name != $('#save_link').data('name'))
+   {
+     $('#displayed_title').html((name == '') ? $('#save_link').attr('data-id') : name);
+     $('#save_link').data('name', name);
+     updated = true;
+   }
+   var unit_id = $('#unit_field option:selected').val();
+   if(unit_id != $('#save_link').data('unit_id'))
+   {
+     $('#save_link').data('unit_id', unit_id);
+     updated = true;
+   }
+   if(updated)
+   {
+     $('#save_link').removeClass('hide');
+   }
+   $('#vehicle_service_properties_modal').modal('hide');
+   return false;
+ }
+
+ $(function(){
+   $('#vehicle_service_properties_update_link').click(update_properties);
+   $('#properties_form').submit(update_properties);
+ });
+</script>

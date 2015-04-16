@@ -1,0 +1,26 @@
+<#modal&
+  id=add_unit_modal&
+  title=Créer une unité d'exploitation&
+  form=<?form&
+         target=<@p@>&
+         a=ObjectCreate&
+         actionParam_table_id=116&
+         class=form-horizontal&
+         co=1&
+         unit=<@unit@>&
+  ?>&
+  body=
+  
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls">
+     <input type="text" name="actionParam_field_name" placeholder="Nom" />
+    </div>
+   </div>
+  
+  
+  &
+  footer=
+    <button type="submit" class="btn btn-warning">Créer</button>
+    <a class="btn" data-dismiss="modal" aria-hidden="true">Fermer</a>
+#>

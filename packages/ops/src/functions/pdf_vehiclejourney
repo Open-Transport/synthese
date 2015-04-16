@@ -1,0 +1,293 @@
+<@a=
+
+<@left=5@>
+<@col_stop=25@>
+<@col_min=60@>
+<@col_max=70@>
+<@col_m=80@>
+<@col_d=85@>
+<@col_number=90@>
+<@col_end=97@>
+<@margin=0.7@>
+<@row_height=4@>
+<@left1=5@>
+<@left2=<@left1+col_end+left1@>@>
+
+<#pdf_vehiclejourney/page#>
+
+<?pdf_text&
+  t=km départ :&
+  x=<@left1@>&
+  y=<@10@>&
+  color=(0,0,0)&
+  size=3&
+  font=Taz&
+?>
+
+<?pdf_text&
+  t=km arrivée :&
+  x=<@left1+col_min@>&
+  y=<@10@>&
+  color=(0,0,0)&
+  size=3&
+  font=Taz&
+?>
+
+
+
+
+<@left=<@left1@>@>
+<@shifted_y=280@>
+<@row_size=-5@>
+<@text_size=4@>
+
+<?service_detail&
+  roid=<@service@>&
+  base_calendar_id=15199653037342772&
+  template=
+
+
+<@shifted_y=291@>
+
+<?pdf_text&
+  t=Ligne&
+  x=30&
+  y=<@shifted_y@>&
+  color=(255,255,255)&
+  size=3&
+  font=Taz&
+?>
+
+<?pdf_text&
+  t=Itinéraire&
+  x=45&
+  y=<@shifted_y@>&
+?>
+
+<?pdf_text&
+  t=Code course&
+  x=65&
+  y=<@shifted_y@>&
+?>
+
+<?pdf_text&
+  t=Trajet&
+  x=85&
+  y=<@shifted_y@>&
+?>
+
+<?pdf_text&
+  t=Départ&
+  x=191&
+  y=<@shifted_y@>&
+?>
+
+<@shifted_y=286@>
+
+<@line=<?object&roid=<@path_id@>&template=<@direction_text@>?>@>
+<?if&cond=<@line@>&else=
+<@line=<?object&roid=<@path_id@>&template=<?object&roid=<@commercial_line_id@>&template=<@short_name@>?>?>@>
+?>
+<?pdf_text&
+  t=<?object&roid=<@path_id@>&template=<@line@>?>&
+  x=30&
+  y=<@shifted_y@>&
+  color=(255,255,255)&
+  size=6&
+  font=Taz&
+?>
+
+<?pdf_text&
+  t=<?object&roid=<@path_id@>&template=<@name@>?>&
+  x=45&
+  y=<@shifted_y@>&
+  color=(255,255,255)&
+  size=6&
+  max_width=19&
+?>
+
+<?pdf_text&
+  t=<?object&roid=<@service@>&template=<?substr&t=<@service_number@>&n=2?>/<?substr&t=<@service_number@>&f=2&n=3?>?>&
+  x=65&
+  y=<@shifted_y@>&
+  color=(255,255,255)&
+  size=6&
+  max_width=19&
+?>
+
+<?pdf_text&
+  t=<@departure_place_name@> - <@arrival_place_name@>&
+  x=85&
+  y=<@shifted_y@>&
+  max_width=105&
+?>
+
+<?pdf_text&
+  t=<?substr&t=<@departure_schedule@>&n=5?>&
+  x=191&
+  y=<@shifted_y@>&
+?>
+
+<@shifted_y=282@>
+
+<?pdf_text&
+  t=Jours de fonctionnement&
+  x=30&
+  y=<@shifted_y@>&
+  size=3&
+?>
+
+<?pdf_text&
+  t=Contact régulation&
+  x=116&
+  y=<@shifted_y@>&
+?>
+
+<@shifted_y=277@>
+
+<?pdf_text&
+  t=<{calendar&template=<@name@>}> (2013-2014)&
+  x=30&
+  y=<@shifted_y@>&
+  size=6&
+?>
+
+<?pdf_text&
+  t=05 34 25 33 79 ou 0041 24 566 72 79&
+  x=116&
+  y=<@shifted_y@>&
+?>
+
+
+<@shifted_y=270@>
+
+
+
+
+<@row=1@>
+<@last_city=@>
+<@shifted_y=<@shifted_y-row_height@>@>
+<{stop&template=
+
+	<?pdf_text&
+	  t=<@(last_city==city_name)?"":city_name@>&
+	  x=<@left+margin@>&
+	  y=<@shifted_y+margin@>&
+	  color=(0,0,0)&
+	  size=3&
+	  max_width=<@col_stop-(2*margin)@>&
+	?>
+	
+	<?pdf_text&
+	  t=<@stop_name@>&
+	  x=<@left+col_stop+margin@>&
+	  y=<@shifted_y+margin@>&
+	  max_width=<@(col_min-col_stop)-(2*margin)@>&
+	?>
+	
+	<?if&cond=<@schedule_input&&departure_time&&((!is_area)||first_in_area||last_in_area)@>&then=
+		<?pdf_text&
+		  t=<?substr&t=<@departure_time@>&f=0&n=2?>&
+		  x=<@left+col_min+margin@>&
+		  y=<@shifted_y+margin+1@>&
+		  size=1.5&
+		?>
+	
+		<?pdf_text&
+		  t=<?substr&t=<@departure_time@>&f=3&n=2?>&
+		  x=<@left+col_min+margin+1.5@>&
+		  y=<@shifted_y+margin@>&
+		  size=3&
+		?>
+	?>
+		
+	<?if&
+	  cond=<@departure_time@>&
+	  then=<?if&
+		  cond=<@!with_reservation@>&
+		  then=<?pdf_text&
+			  t=X&
+			  x=<@left+col_m+margin@>&
+			  y=<@shifted_y+margin@>&
+			  color=(0,0,0)&
+			?>&
+	       ?>&
+	  else=<?pdf_rectangle&
+	         x1=<@left+col_m@>&
+	         y1=<@shifted_y@>&
+	         x2=<@col_d-col_m@>&
+	         y2=<@row_height@>&
+	         background_color=(128,128,128)&
+	       ?>
+	?>
+
+	<?if&cond=<@schedule_input&&arrival_time&&((!is_area)||first_in_area||last_in_area)@>&then=
+		<?pdf_text&
+		  t=<?substr&t=<@arrival_time@>&f=0&n=2?>&
+		  x=<@left+col_max+margin@>&
+		  y=<@shifted_y+margin+1@>&
+		  size=1.5&
+		  color=(0,0,0)&
+		?>
+	
+		<?pdf_text&
+		  t=<?substr&t=<@arrival_time@>&f=3&n=2?>&
+		  x=<@left+col_max+margin+1.5@>&
+		  y=<@shifted_y+margin@>&
+		  size=3&
+		?>
+	?>
+
+	<?if&cond=<@arrival_time@>&then=
+		<?if&
+		  cond=<@!with_reservation@>&
+		  then=<?pdf_text&
+			  t=X&
+			  x=<@left+col_d+margin@>&
+			  y=<@shifted_y+margin@>&
+			  color=(0,0,0)&
+			?>&
+		?>&
+	  else=<?pdf_rectangle&
+	         x1=<@left+col_d@>&
+	         y1=<@shifted_y@>&
+	         x2=<@col_number-col_d@>&
+	         y2=<@row_height@>&
+	         background_color=(128,128,128)&
+	       ?>
+	?>
+	
+
+
+	<?pdf_text&
+	  t=<@row@>&
+	  x=<@left+col_number+margin@>&
+	  y=<@shifted_y+margin@>&
+	  color=(0,0,0)&
+	?>
+	
+	<@shifted_y=<@shifted_y-row_height@>@>
+	<@row=<@row+1@>@>
+	
+	<?if&cond=<@(row==65)||(row==193)@>&then=<@left=<@left2@>@><@shifted_y=266@>?>
+	<?if&
+	  cond=<@(row==129)||(row==257)@>&
+	  then=<#pdf_vehiclejourney/page#>
+
+               <?pdf_text&
+                 t=Suite de la page précédente&
+                 x=30&
+                 y=280&
+                 size=6&
+                 color=(255,255,255)&
+               ?>
+
+	       <@left=<@left1@>@>
+	       <@shifted_y=266@>
+	?>
+
+	<@last_city=<@city_name@>@>
+}>?>
+
+
+@>

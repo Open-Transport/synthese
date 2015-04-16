@@ -1,0 +1,8 @@
+<?places_list&
+  text=<@term@>&
+  number=10&
+  sorted=1&
+  template=[<{stops.stop&template=
+  <@item_rank?",":""@> {"id":"<@id@>", "value":"<@key@>", "label":"<@key@>"}
+  }>]
+?>

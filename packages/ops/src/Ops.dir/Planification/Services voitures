@@ -1,0 +1,91 @@
+<@vehicle_services:=<?VehicleServicesList&with_detail=0&operation_unit_id=<@unit@>?>@>
+<div class="row-fluid">
+ <div class="span3" id="tree">
+   <ul class="nav nav-list well">
+    <li<@roid?"":" class=\"active\""@>>
+    <?link&
+      target=<@p@>&
+      unit=<@unit@>&
+      text=Voitures
+           <div class="pull-right" id="add_vehicle_service_link"><i class="icon-plus <@roid?"":"icon-white"@>"></i></div>
+    ?>
+    </li>
+    <{vehicle_services.vehicleService&template=
+      <li class="tree_1 <@(id==roid)?"active":""@>">
+      <?link&
+  	target=<@p@>&
+   	roid=<@id@>&
+   	unit=<@unit@>&
+  	text=<@name?name:id@>
+   	     <@(id==roid)?("<div class=\"pull-right\" id=\"mt_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>
+      ?>
+      </li>
+    }>
+   </ul>
+ </div><div class="span9">
+ <?if&cond=<@roid@>&then=
+ <?object&roid=<@roid@>&additional_parameters=1&template=
+
+  <h3 class="well">
+   <span id="displayed_title"><@name?name:roid@></span>
+   <div class="btn-group pull-right">
+    <a href="#" id="edit_link" class="btn btn-primary">Propriétés</a>
+    <?link&target=/plan/vehicle_services/vehicle_service.pdf&service=<@roid@>&class=btn btn-primary&text=PDF?>
+    <a href="#" id="save_link" class="btn btn-primary hide" data-id="<@roid@>" data-name="<@name@>" data-unit_id="<@operation_unit_id@>">Enregistrer</a>
+   </div>
+  </h3>
+  
+  <table id="services" class="table table-striped table-condensed">
+   <thead>
+    <tr>
+     <th>heure</th>
+     <th>lieu</th>
+     <th>ligne</th>
+     <th>direction</th>
+     <th>course</th>
+     <th>détail</th>
+     <th>actions</th>
+     <th>agents</th>
+    </tr>
+   </thead><tbody>
+   </tbody><tfoot>
+    <tr><td colspan="6"></td>
+     <td><a href="#" id="add_service_link"><i class="icon icon-plus"></i></a></td>
+     <td></td>
+    </tr>
+   </tfoot>
+  </table>
+
+  <script>
+   $(function(){
+   add_services({"service":[
+   <{service&template=
+     <@service_detail:=<?services_list&roid=<@id@>?>@>
+     <{service_detail.service&template=
+       <@route_detail:=<?PTRouteDetailFunction&roid=<@journey_pattern_id@>?>@>
+         {
+         "id": "<@id@>",
+         "class": "<@class@>",
+         "departure_schedule": "<@departure_schedule@>",
+         "arrival_schedule": "<@arrival_schedule@>",
+         "number": "<@number@>",
+         "departure_place_name": "<@departure_place_name@>",
+         "arrival_place_name": "<@arrival_place_name@>",
+         "line": "<@route_detail.lineShortName@>",
+         "direction": "<@route_detail.direction@>"
+         },
+     }>
+   }>     
+   ]});
+   });
+  </script>
+
+ ?>?>
+ </div>
+</div>
+
+<#modal/add_vehicle_service#>
+<#modal/add_service#>
+<#modal/vehicle_service_properties#>
+
+<script src="/ops/js/vehicle_service.js"></script>

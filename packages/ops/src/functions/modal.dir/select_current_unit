@@ -1,0 +1,38 @@
+<#modal&
+  id=select_current_unit_modal&
+  title=Sélectionner l'unité d'exploitation courante&
+  body=
+  <form class="form-horizontal">
+   <div class="control-group">
+    <label class="control-label">Unité</label>
+    <div class="controls">
+     <@units:=<?operation_units?>@>
+     <table class="table table-striped table-condensed">
+      <tbody>
+       <tr><td><?link&target=<@p@>&roid=<@roid@>&text=(toutes)?></td><td></td></tr>
+       <{units.operation_unit&template=
+         <tr>
+          <td><?link&
+                target=<@p@>&
+                roid=<@roid@>&
+                unit=<@id@>&
+                text=<@name@>&
+              ?></td>
+          <td><?link&
+                target=/ressources/units&
+                roid=<@id@>&
+                unit=<@unit@>&
+                text=<i class="icon icon-edit"></i>&
+              ?></td>
+         </tr>
+       }>
+      </tbody>
+     </table>
+    </div>
+   </div>
+  </form>
+  
+  &
+  footer=
+    <a class="btn" data-dismiss="modal" aria-hidden="true">Fermer</a>
+#>
