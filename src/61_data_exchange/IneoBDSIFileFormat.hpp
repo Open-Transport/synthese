@@ -99,6 +99,7 @@ namespace synthese
 				static const std::string PARAMETER_AUTO_CREATE_STOPS;
 				static const std::string PARAMETER_DEFAULT_CITY_ID;
 				static const std::string PARAMETER_DEFAULT_TRANSFER_DURATION;
+				static const std::string PARAMETER_NON_COMMERCIAL;
 		
 			private:
 				// Vector to avoid reentrance and mutex to protect this vector
@@ -117,6 +118,7 @@ namespace synthese
 				bool _autoCreateStops;
 				boost::shared_ptr<const geography::City> _defaultCity;
 				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
+				bool _nonCommercial;
 
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;
