@@ -854,6 +854,8 @@ namespace synthese
 						_database +".HORAIRE "+
 						"INNER JOIN "+ _database +".ARRETCHN ON "+
 							_database +".HORAIRE.arretchn="+ _database +".ARRETCHN.ref AND "+ _database +".HORAIRE.jour="+ _database +".ARRETCHN.jour "+
+						"LEFT JOIN "+ _database +".COURSE ON "+
+							_database +".COURSE.ref="+ _database +".HORAIRE.course AND "+ _database +".COURSE.jour="+ _database +".ARRETCHN.jour "+
 					"WHERE "+
 						_database +".HORAIRE.jour="+ todayStr +
 					( _nonCommercial ? " AND "+ _database +".COURSE.type != 'H'" : "" ) +
