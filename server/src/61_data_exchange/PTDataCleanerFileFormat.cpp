@@ -261,7 +261,7 @@ namespace synthese
 				if(	itDriverService.second->hasLinkWithSource(dataSource) &&
 					(	itDriverService.second->getChunks().empty()
 				)	){
-					shared_ptr<DriverService> driverService(itDriverService.second);
+					boost::shared_ptr<DriverService> driverService(itDriverService.second);
 					_logWarning("removing driver service: " + lexical_cast<string>(driverService->getKey()));
 					_driverServicesToRemove.insert(itDriverService.second);
 				}
