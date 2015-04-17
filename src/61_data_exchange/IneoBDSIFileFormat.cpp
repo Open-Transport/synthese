@@ -1330,6 +1330,13 @@ namespace synthese
 
 					// This service must not be removed
 					servicesToRemove.erase(service);
+
+					// The service can be deactivated
+					if (!service->isActive(today))
+					{
+						service->setActive(today);
+						servicesToLink.push_back(&course);
+					}
 				}
 
 				// Search for existing services
