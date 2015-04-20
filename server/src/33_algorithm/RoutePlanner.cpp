@@ -140,7 +140,7 @@ namespace synthese
 				beginBound = _maxBeginTime;
 			}
 			else if (_planningOrder != DEPARTURE_FIRST &&
-				endBound > _maxBeginTime)
+				endBound < _maxBeginTime)
 			{
 				endBound = _maxBeginTime;
 			}
