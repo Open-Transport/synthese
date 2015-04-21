@@ -138,10 +138,13 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
   add_definitions(-D_DEBUG)
 endif()
 
+
 # Version info.
 include(FindGit)
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1 GIT_LAST_COMMIT_DATE)
+git_get_exact_tag(GIT_TAG)
+
 
 # Note: this is using a .h file and not defines, otherwise everything gets
 # rebuilt each time CMake is invoked.
@@ -200,8 +203,13 @@ set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_REV})
 set(CPACK_PACKAGE_CONTACT       "contact@rcsmobility.com")
 
-#if(NOT CPACK_PACKAGING_INSTALL_PREFIX)
-#  set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/rcs")
-#endif()
+# set CPack generation variables here to remove them from Jenkins jobs
+set(CMAKE_INSTALL_PREFIX /opt/rcs/synthese3)
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 0)
+
+# if the HEAD does not point to a tag, suffix the archive with 'snapshot'
+if("${GIT_TAG}" STREQUAL "")
+    set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-snapshot-${CPACK_SYSTEM_NAME}")
+endif()
 
 include(CPack)
