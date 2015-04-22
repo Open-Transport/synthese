@@ -1,0 +1,40 @@
+*** Settings ***
+Library           Process
+Library           Telnet
+Library           OperatingSystem
+Library           DatabaseLibrary
+Library           DateTime
+Resource          common.txt
+
+*** Variables ***
+
+*** Keywords ***
+
+
+Create Vehicle Call
+    [Arguments]    ${vehicle_id}    ${priority}
+    ${call_time}=   Get Current Date    
+    ${http_response}=    Create Synthese Object    ${VEHICLE_CALLS_TABLE_ID}    field_vehicle_id\=${vehicle_id}    field_priority\=${priority}    field_call_time\=${call_time}
+    Should Be Equal As Strings    ${http_response.status_code}    200
+
+
+# TODO Question de comportement onboard => ops, à eclaircir avec hugues  :
+# les boutons alerte normale et alerte urgente sont des boutons à poussoir à etat (restent enfoncés) exclusifs
+# precisions
+# si on fait demande de rappel normal puis annulation puis demande de rappel normal => 2 entrées vehicle call (1ere annulée avec closure time)
+# si on fait demande de rappel normal puis annulation puis demande de rappel urgente => 2 entrées vehicle call ou maj de la premiere ? si maj de la premiere sans maj du calltume, probleme car on a l'impression que le vehicle call a toujours été urgent!! A CONFIRMER
+Cancel Vehicle Call
+    ${vehicle_id}
+    ${closure_time}=   Get Current Date    
+    # TODO proper object id !!${http_response}=    Update Synthese Object    119    field_vehicle_id\=${vehicle_id}    field_closure_time\=${closure_time}
+    #Should Be Equal As Strings    ${http_response.status_code}    200
+    
+    
+Update Vehicle Position
+    [Arguments]    ${vehicle_id}    ${service_id}
+    ${http_response}=    Call Synthese Action    VehiclePositionUpdateAction    actionParamve\=${vehicle_id}    actionParamsi\=${service_id}
+    Should Be Equal As Strings    ${http_response.status_code}    200
+
+List Regulation Alerts
+    ${alert_list}=   Call Synthese Service    alert_list    of\=xml
+    [Return]    ${alert_list}

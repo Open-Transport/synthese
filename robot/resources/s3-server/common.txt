@@ -1,0 +1,98 @@
+*** Settings ***
+Library           OperatingSystem
+Library           RequestsLibrary
+Library           Process
+Library           Telnet
+Variables         variables.py
+    
+*** Variables ***
+${S3_SERVER_BINARY}      /opt/rcs/synthese3/bin/s3-server
+
+*** Keywords ***
+    
+On Node ${node_id}
+    Set Suite Variable   ${node}    ${NODES[${node_id}]}
+    Log Many  Now using node ${node.node_id}  ${node.db_file}  ${node.url}
+    
+Start Synthese
+    Start Synthese On Node ${node.node_id}
+
+Start Synthese On Node ${node_id}
+    ${tmp_node}=  Set Variable  ${NODES[${node_id}]}
+    Create Directory  ${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}
+    ${tmp_node.process_handle}=  Start Process  ${S3_SERVER_BINARY}  --pidfile  -  --dbconn\=sqlite://path=${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}/${tmp_node.db_file}  --param  port\=${tmp_node.port}  --param  log_level\=0  --param  auto_login_user\=root  stderr=${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}/${tmp_node.err_file}  stdout=${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}/${tmp_node.out_file}
+    Wait Until Keyword Succeeds    5 min    5 sec    Open Connection    localhost    ${None}    ${tmp_node.port}
+
+Stop Synthese
+    Stop Synthese On Node ${node.node_id}
+
+Stop Synthese On Node ${node_id}
+    ${tmp_node}=  Set Variable  ${NODES[${node_id}]}
+    Terminate Process  handle=${tmp_node.process_handle}
+    ${tmp_node.process_handle}=  Set Variable  None
+
+With Test Data
+    [Arguments]    ${test_data}
+    Copy File    ${test_data}    ${SUITE NAME}/${TEST NAME}/${node.node_dir}/${node.db_file}
+
+Create Synthese Object
+    [Arguments]    ${table_id}    @{varargs}
+    ${http_response}=    Call Synthese Service    objectcreate    table_id\=${table_id}  of\=xml  @{varargs}
+    Should Be Equal As Strings    ${http_response.status_code}    200
+    [Return]    ${http_response}
+
+Delete Synthese Object
+    [Arguments]    ${object_id}
+    ${http_response}=    Call Synthese Action    RemoveObjectAction    actionParam_object_id\=${object_id}
+    Should Be Equal As Strings    ${http_response.status_code}    200
+
+Update Synthese Object
+    [Arguments]    ${object_id}   @{varargs}
+    ${http_response}=    Call Synthese Action    ObjectUpdate    actionParam_object_id\=${object_id}    @{varargs}
+    Should Be Equal As Strings    ${http_response.status_code}    200
+
+Delete Synthese Objects
+    [Arguments]    ${table_name}
+    Connect To Database Using Custom Params    sqlite3   database="./${SUITE NAME}/${TEST NAME}/${node.node_dir}/${node.db_file}"
+    @{query_results}=   Query    SELECT id FROM ${table_name};
+    :FOR   ${id}   in    @{query_results}    
+    \   Delete Synthese Object   ${id[0]}
+    Disconnect From Database
+
+View Synthese Object
+    [Arguments]    ${object_id}
+    ${http_response}=    Call Synthese Service    object    roid\=${object_id}  of\=xml
+    Should Be Equal As Strings    ${http_response.status_code}    200
+    [Return]    ${http_response.content}    
+
+Check Synthese Object Exists
+    [Arguments]    ${object_id}
+    ${http_response}=    Call Synthese Service    object    roid\=${object_id}  of\=xml
+    Run Keyword Unless  ${http_response.status_code} == 200  Fail
+
+Check Synthese Object Field Equals
+    [Arguments]    ${object_id}  ${field_name}  ${value}
+    ${http_response}=    Call Synthese Service    object    roid\=${object_id}  of\=xml
+    ${field_value}=  Get Element Attribute  source=${http_response.content}  name=${field_name}
+    Should Be Equal As Strings    ${field_value}    ${value}
+
+
+Process Alerts
+    ${http_response}=    Call Synthese Action    ProcessAlertsAction
+    Should Be Equal As Strings    ${http_response.status_code}    200
+
+Call Synthese Service
+    [Arguments]    ${service_name}    @{varargs}
+    Create Session    synthese    ${node.url}
+    ${service_parameters}=    Catenate    SEPARATOR=&    @{varargs}
+    Log Many   ${node.url}?SERVICE=${service_name}&${service_parameters}
+    ${http_response}=    Get Request    synthese    ?SERVICE=${service_name}&${service_parameters}
+    [Return]    ${http_response}
+
+Call Synthese Action
+    [Arguments]    ${action_name}    @{varargs}
+    Create Session    synthese    ${node.url}
+    ${action_parameters}=    Catenate    SEPARATOR=&    @{varargs}
+    Log Many   ${node.url}?SERVICE=version&a=${action_name}&${action_parameters}
+    ${http_response}=    Get Request    synthese    ?SERVICE=version&a=${action_name}&${action_parameters}
+    [Return]    ${http_response}

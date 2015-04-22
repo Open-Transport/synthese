@@ -1,0 +1,63 @@
+*** Settings ***
+Resource          ../s3-server/inter_synthese.txt
+Library           Collections
+Library           XML
+
+*** Variables ***
+
+*** Keywords ***
+
+Empty Package "${package_name}" Is Created
+    ${package_id}=  Create InterSynthese Package    package_name=${package_name}
+    [Return]  ${package_id}
+
+Package "${package_name}" Containing Object ${object_id} Is Created
+    ${package_id}=  Create InterSynthese Package    package_name=${package_name}  object_ids=${object_id}
+    [Return]  ${package_id}
+
+Package ${package_id} Is Deleted
+    Delete InterSynthese Package    object_id=${package_id}
+
+Package "${package_name}" Is Visible In Package List
+    ${response}=          List InterSynthese Packages
+    Element Should Exist	${response.content}  xpath=package[@name='${package_name}']
+
+Package "${package_name}" Is Not Visible In Package List
+    ${response}=          List InterSynthese Packages
+    Element Should Not Exist	${response.content}  xpath=package[@name='${package_name}']
+
+
+Package "${package_name}" Is Updated From Node ${node_id}
+    Update InterSynthese Package    server_host=${NODES[${node_id}].host}  server_port=${NODES[${node_id}].port}  package_name=${package_name}
+
+Empty Config "${config_name}" Is Created
+    ${config_id}=  Create InterSynthese Config    config_name=${config_name}
+    [Return]  ${config_id}
+
+Config "${config_name}" Is Visible In Config List
+    ${response}=          List InterSynthese Configs
+    Element Should Exist	${response.content}  xpath=config[@name='${config_name}']
+
+Config "${config_name}" Containing Object ${object_id} Is Created
+    ${config_id}=  Create InterSynthese Config    config_name=${config_name}
+    ${config_item_id}=  Create InterSynthese Config Item    config_id=${config_id}  sync_perimeter=${object_id}
+    [Return]  ${config_id}
+
+Config "${config_name}" Contains Item "${item_id}" In Config List
+    ${response}=          List InterSynthese Configs
+    Log Many  ${response.content}
+    Element Should Exist	${response.content}  xpath=config[@name='${config_name}']
+    Element Should Exist	${response.content}  xpath=config[@name='${config_name}']/item[@perimeter='${item_id}']
+
+Slave "${slave_name}" Is Created On Config "${config_id}"
+    ${slave_id}=  Create InterSynthese Slave    config_id=${config_id}  slave_name=${slave_name}
+    [Return]  ${slave_id}
+
+Slave "${slave_name}" Is Visible In Slave List
+    ${response}=          List InterSynthese Slaves
+    Element Should Exist	${response.content}  xpath=slave[@name='${slave_name}']
+
+Import ${created_import_id} Is Executed With Parameters ${slave_id} ${address} ${port}
+    ${http_response}=    Call Synthese Service    ImportFunction    import_id\=${created_import_id}  slave_id=${slave_id}  address=${address}  port=${port}  di=1
+    Should Be Equal As Strings  ${http_response.status_code}  200
+    

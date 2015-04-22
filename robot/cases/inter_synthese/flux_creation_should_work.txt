@@ -1,0 +1,31 @@
+*** Settings ***
+Resource          ../../resources/s3-fakeclient/inter_synthese.txt    
+Test Setup        Start Synthese On Node 0
+Test Teardown     Stop Synthese On Node 0
+
+*** Test Cases ***
+
+Creating An Empty InterSynthese Config Should Work
+    On node 0
+    Empty Config "config1" Is Created
+    Config "config1" Is Visible In Config List
+
+
+Creating An InterSynthese Config With Single Table Content Should Work
+    On node 0
+    ${http_response}=    Create Synthese Object    table_id=${ALERTS_TABLE_ID}
+    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    Config "config2" Containing Object ${ALERTS_TABLE_ID} Is Created
+    Config "config2" Is Visible In Config List
+    Config "config2" Contains Item "${ALERTS_TABLE_ID}" In Config List
+
+Creating An InterSynthese Config With Single Slave Should Work
+    On node 0
+    ${http_response}=    Create Synthese Object    table_id=${ALERTS_TABLE_ID}
+    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    ${config_id}=    Config "config3" Containing Object ${ALERTS_TABLE_ID} Is Created
+    Config "config3" Is Visible In Config List
+    Config "config3" Contains Item "${ALERTS_TABLE_ID}" In Config List
+    Slave "slave1" Is Created On Config "${config_id}"
+    Slave "slave1" Is Visible In Slave List
+

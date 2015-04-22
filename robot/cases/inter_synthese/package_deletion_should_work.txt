@@ -1,0 +1,26 @@
+*** Settings ***
+Resource          ../../resources/s3-fakeclient/inter_synthese.txt    
+Test Setup        Start Synthese On Node 0
+Test Teardown     Stop Synthese On Node 0
+
+*** Test Cases ***
+
+Deleting An Empty InterSynthese Package Should Work
+    On node 0
+    ${packageId}=  Empty Package "package3" Is Created
+    Package ${package_id} Is Deleted
+    Package "package3" Is Not Visible In Package List
+
+    
+
+    
+
+    
+    
+
+
+
+
+
+
+

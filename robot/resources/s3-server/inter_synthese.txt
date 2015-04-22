@@ -1,0 +1,71 @@
+*** Settings ***
+Library           Process
+Resource          common.txt
+
+*** Variables ***
+
+*** Keywords ***
+
+Create InterSynthese Package
+    [Arguments]  ${package_name}  ${object_ids}=
+    ${http_response}=  Create Synthese Object    ${INTER_SYNTHESE_PACKAGES_TABLE_ID}  field_name\=${package_name}  field_object_ids\=${object_ids}  field_code\=${package_name}
+    Should Be Equal As Strings  ${http_response.status_code}  200
+    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    [Return]  ${created_object_id}
+
+Delete InterSynthese Package
+    [Arguments]  ${object_id}
+    Delete Synthese Object  ${object_id}
+
+List InterSynthese Packages
+    Create Session    synthese    ${node.url}
+    ${data}=  Create Dictionary  SERVICE  inter_synthese_packages  output_format  text/xml
+    ${headers}=  Create Dictionary  Content-Type  application/x-www-form-urlencoded
+    ${http_response}=    Post Request  alias=synthese   uri=/    data=${data}  headers=${headers}
+    Should Be Equal As Strings    ${http_response.status_code}    200
+    [Return]    ${http_response}
+
+Update InterSynthese Package
+    [Arguments]    ${server_host}  ${server_port}  ${package_name}
+    Log Many  ${server_host}/${server_port} 
+    Create Session    synthese    http://${server_host}/${server_port}
+    ${http_response}=    Call Synthese Service    packages    package_to_install\=http://${server_host}:${server_port}/${package_name}   password\=root  user\=root  repo_type\=0  repo_url\=${server_host}:${server_port}   
+    Sleep  3s    
+
+Create InterSynthese Config
+    [Arguments]  ${config_name}
+    ${http_response}=  Create Synthese Object    ${INTER_SYNTHESE_CONFIGS_TABLE_ID}  field_name\=${config_name}  field_link_break_minutes\=40000  field_max_queries_number\=5000  field_force_dump\=0  field_multimaster\=0
+    Should Be Equal As Strings  ${http_response.status_code}  200
+    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    [Return]  ${created_object_id}
+
+Create InterSynthese Config Item
+    [Arguments]  ${config_id}  ${sync_perimeter}
+    ${http_response}=  Create Synthese Object    ${INTER_SYNTHESE_CONFIG_ITEMS_TABLE_ID}  field_config_id\=${config_id}  field_sync_type\=db  field_perimeter\=${sync_perimeter}  field_non_persistent\=0
+    Should Be Equal As Strings  ${http_response.status_code}  200
+    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    [Return]  ${created_object_id}
+
+List InterSynthese Configs
+    Create Session    synthese    ${node.url}
+    ${data}=  Create Dictionary  SERVICE  inter_synthese_configs  output_format  text/xml
+    ${headers}=  Create Dictionary  Content-Type  application/x-www-form-urlencoded
+    ${http_response}=    Post Request  alias=synthese   uri=/    data=${data}  headers=${headers}
+    Should Be Equal As Strings    ${http_response.status_code}    200
+    [Return]    ${http_response}
+
+Create InterSynthese Slave
+    [Arguments]  ${config_id}  ${slave_name}
+    ${http_response}=  Create Synthese Object    ${INTER_SYNTHESE_SLAVES_TABLE_ID}  field_name\=${slave_name}  field_config_id\=${config_id}  field_active\=1
+    Should Be Equal As Strings  ${http_response.status_code}  200
+    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    [Return]  ${created_object_id}
+
+List InterSynthese Slaves
+    Create Session    synthese    ${node.url}
+    ${data}=  Create Dictionary  SERVICE  inter_synthese_slaves_view  output_format  text/xml
+    ${headers}=  Create Dictionary  Content-Type  application/x-www-form-urlencoded
+    ${http_response}=    Post Request  alias=synthese   uri=/    data=${data}  headers=${headers}
+    Should Be Equal As Strings    ${http_response.status_code}    200
+    [Return]    ${http_response}
+

@@ -1,0 +1,11 @@
+*** Settings ***
+
+*** Variables ***
+${DB}                ${CURDIR}/topical_messaging.db3
+${MESSAGE1}          7625
+${MESSAGE_TITRE1}     Message spontané 1
+${MESSAGE_CONTENT1}   Contenu 1
+${TYPE_BORNE1}      10133103456550913
+${BORNE1}           11540478340104771
+
+*** Keywords ***

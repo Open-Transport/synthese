@@ -1,0 +1,53 @@
+*** Settings ***
+Resource          ../s3-server/operations_control.txt
+Library           Collections
+Library           XML
+
+*** Variables ***
+
+*** Keywords ***
+
+Vehicle ${vehicle_id} Operates Service ${service_id} On Commercial Line ${commercialLineId}
+    Update Vehicle Position    vehicle_id=${vehicle_id}    service_id=${service_id}
+
+Vehicle ${vehicle_id} Relays A Normal Callback Request To Operations Control Center
+    Vehicle ${BUS1} Operates Service ${SERVICE1} On Commercial Line ${LINE1}
+    Create Vehicle Call    vehicle_id=${vehicle_id}    priority=0
+
+Vehicle ${vehicle_id} Cancels Its Callback Request
+    Cancel Vehicle Call    vehicle_id=${vehicle_id}
+    No Operation
+
+Vehicle ${vehicle_id} Relays An Urgent Callback Request To Operations Control Center
+    Vehicle ${BUS1} Operates Service ${SERVICE1} On Commercial Line ${LINE1}
+    Create Vehicle Call    vehicle_id=${vehicle_id}    priority=1
+
+On Operations Control Center Screen
+    Process Alerts
+    ${response}=          List Regulation Alerts
+    Set Test Variable   ${alert_index}   1
+    Set Test Variable   ${alerts}   ${response.content}
+
+A Callback Request Is Displayed
+    [Arguments]    ${service_id}   ${commercial_line_id}   ${priority}
+    Log Many         ${alerts}    
+    Element Attribute Should Be	${alerts}	service_id	${service_id}	xpath=alert[${alert_index}]
+    Element Attribute Should Be	${alerts}	line_id	${commercial_line_id}	  xpath=alert[${alert_index}]
+    Element Attribute Should Be	${alerts}	kind	0	xpath=alert[${alert_index}]
+    Element Attribute Should Be	${alerts}	priority	${priority}	xpath=alert[${alert_index}]/extraData    
+
+No Callback Request Is Displayed
+    Element Should Not Exist	${alerts}	xpath=alert
+
+
+A Normal Callback Request From Service ${service_id} Of Commercial Line ${commercial_line_id} Is Displayed
+    A Callback Request Is Displayed   ${service_id}   ${commercial_line_id}   0
+
+
+An Urgent Callback Request From Service ${service_id} Of Commercial Line ${commercial_line_id} Is Displayed
+    A Callback Request Is Displayed   ${service_id}   ${commercial_line_id}   1
+
+
+
+
+

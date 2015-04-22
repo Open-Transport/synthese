@@ -1,0 +1,42 @@
+*** Settings ***
+Resource          ../../resources/s3-fakeclient/operations_control.txt    
+Resource          ../../resources/data/operations_control_data.txt    
+Test Setup        Run Keywords  On Node 0  AND  With Test Data  ${DB}  AND  Start Synthese On Node 0  AND  Vehicle ${BUS1} Operates Service ${SERVICE1} On Commercial Line ${LINE1}
+Test Teardown     Stop Synthese On Node 0
+
+*** Test Cases ***
+
+Normal Callback Request Should Be Relayed
+    Vehicle ${BUS1} Relays A Normal Callback Request To Operations Control Center
+    On Operations Control Center Screen
+    A Normal Callback Request From Service ${SERVICE1} Of Commercial Line ${LINE1} Is Displayed
+
+Normal Callback Request Done Twice Should Be Relayed Once
+    Vehicle ${BUS1} Relays A Normal Callback Request To Operations Control Center
+    Vehicle ${BUS1} Relays A Normal Callback Request To Operations Control Center
+    On Operations Control Center Screen
+    A Normal Callback Request From Service ${SERVICE1} Of Commercial Line ${LINE1} Is Displayed
+
+Urgent Callback Request Should Be Relayed
+    Vehicle ${BUS1} Relays An Urgent Callback Request To Operations Control Center
+    On Operations Control Center Screen
+    An Urgent Callback Request From Service ${SERVICE1} Of Commercial Line ${LINE1} Is Displayed
+
+Normal Callback Request Becoming Urgent Should Be Relayed
+    Vehicle ${BUS1} Relays A Normal Callback Request To Operations Control Center
+    Vehicle ${BUS1} Relays An Urgent Callback Request To Operations Control Center
+    On Operations Control Center Screen
+    An Urgent Callback Request From Service ${SERVICE1} Of Commercial Line ${LINE1} Is Displayed
+
+Urgent Callback Request Becoming Normal Should Be Relayed
+    Vehicle ${BUS1} Relays An Urgent Callback Request To Operations Control Center
+    Vehicle ${BUS1} Relays A Normal Callback Request To Operations Control Center
+    On Operations Control Center Screen
+    A Normal Callback Request From Service ${SERVICE1} Of Commercial Line ${LINE1} Is Displayed
+
+# Cancelled Callback Request Should Not Be Displayed
+#     Vehicle ${BUS1} Relays A Normal Callback Request To Operations Control Center
+#     Vehicle ${BUS1} Cancels Its Callback Request
+#     On Operations Control Center Screen
+#     No Callback Request Is Displayed
+

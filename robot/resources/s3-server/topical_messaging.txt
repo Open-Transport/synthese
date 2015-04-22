@@ -1,0 +1,11 @@
+*** Settings ***
+Resource          common.txt
+
+*** Variables ***
+
+*** Keywords ***
+List Display Screen Messages 
+    [Arguments]    ${display_screen_id}
+    ${messages_list}=   Call Synthese Service    messages   r\=${display_screen_id}   of\=xml
+    [Return]    ${messages_list}
+

@@ -1,0 +1,36 @@
+*** Settings ***
+Resource          ../s3-server/topical_messaging.txt
+Library           String
+Library           XML
+
+*** Variables ***
+
+*** Keywords ***
+
+Topical Message ${message_id} Is Created With Title "${message_title}" And Content "${message_content}"
+    Set Test Variable   ${message.id}   ${message_id}
+    Set Test Variable   ${message.title}   ${message_title}
+    Set Test Variable   ${message.content}   ${message_content}
+
+    
+Topical Message ${message_id} Is Bounded To Broadcast Point Type ${broadcast_point_type_id}
+    Set Test Variable   ${broadcast_point_type_id}   ${broadcast_point_type_id}
+        
+Broadcast Of ${message_id} Is Enabled
+    Call Synthese Action   scenario_save   actionParamt\=0   actionParam_created_message_title\=${message.title}   actionParamme\=${message.content}   actionParamsid\=${message.id}   actionParamis\=16607027920896004   actionParamena\=1   actionParam_recipients_displayscreen\=${broadcast_point_type_id}   actionParamdv\=%20  actionParamnam\=00  
+
+    
+A Topical Message Is Broadcasted On Broadcast Point ${broadcast_point_id} 
+    ${response}=   List Display Screen Messages     ${broadcast_point_id} 
+    ${utf8_content}   Decode Bytes To String   ${response.content}   UTF-8    strict
+    ${messages_root}=   Parse XML   ${utf8_content}
+    Set Test Variable   ${messages}   ${messages_root}
+    Element Should Exist	${messages}	  xpath=message
+
+Content Of This Topical Message Is "${message_content}"
+    Element Attribute Should Be	 ${messages}  content  ${message_content}  xpath=message[1]
+        
+Title Of This Topical Message Is "${message_title}"
+    Element Attribute Should Be  ${messages}  title  ${message_title}  xpath=message[1]
+
+

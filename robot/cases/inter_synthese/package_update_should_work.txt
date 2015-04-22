@@ -1,0 +1,52 @@
+*** Settings ***
+Resource          ../../resources/s3-fakeclient/inter_synthese.txt    
+Test Setup        Run Keywords    Start Synthese On Node 0    Start Synthese On Node 1
+Test Teardown     Run Keywords    Stop Synthese On Node 1     Stop Synthese On Node 0
+
+*** Test Cases ***
+
+
+First Update Of An InterSynthese Package Should Work
+    On Node 0
+    ${http_response}=    Create Synthese Object    ${ALERTS_TABLE_ID}   field_kind\=1 
+    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    Package "package2" Containing Object ${created_object_id} Is Created
+    On Node 1
+    Package "package2" Is Updated From Node 0
+    Check Synthese Object Exists  ${created_object_id}    
+
+Second Update Of An InterSynthese Package Should Work
+    On Node 0
+    ${http_response}=  Create Synthese Object  ${ALERTS_TABLE_ID}  field_kind\=1
+    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    Package "package4" Containing Object ${created_object_id} Is Created
+    On Node 1
+    Package "package4" Is Updated From Node 0
+    Check Synthese Object Field Equals  object_id=${created_object_id}  field_name=kind  value=1
+    On Node 0
+    ${http_response}=  Update Synthese Object  ${created_object_id}  actionParam_field_kind\=2
+    On Node 1
+    Package "package4" Is Updated From Node 0
+    Check Synthese Object Field Equals  object_id=${created_object_id}  field_name=kind  value=2
+    
+First Update Of An InterSynthese Package With Only One Default Object Should Work
+    On Node 0
+    ${http_response}=    Create Synthese Object    ${ALERTS_TABLE_ID} 
+    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    Package "package2" Containing Object ${created_object_id} Is Created
+    On Node 1
+    Package "package2" Is Updated From Node 0
+    Check Synthese Object Exists  ${created_object_id}    
+
+
+    
+
+    
+    
+
+
+
+
+
+
+
