@@ -74,7 +74,7 @@ if(WITH_MYSQL)
   add_definitions(-DWITH_MYSQL)
 endif(WITH_MYSQL)
 
-# Curl is used in the mysql UDF library and the s3-proxy.
+# Curl is used in the mysql UDF library.
 include(FindCURL)
 # TODO: win32 support not implemented yet.
 if(NOT CURL_FOUND AND NOT WIN32)
