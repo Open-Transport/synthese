@@ -3,9 +3,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-Sorry for this change log to start from version 3.9.0 ; there was no
-proper tracking of major changes from one version to another so far.
-To track what happened before 3.9.0, git log is your friend.
+Prior to 3.9.0 no changelog was published with SYNTHESE releases, 
+therefore this changelog only tracks changes between 3.8.0 and 3.9.0. 
+To track what happened before 3.8.0, git log is your friend.
 
 ## [3.9.0] - 2015-04-27
 ### Added
