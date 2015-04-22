@@ -3,8 +3,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-Prior to 3.9.0 no changelog was published with SYNTHESE releases, 
-therefore this changelog only tracks changes between 3.8.0 and 3.9.0. 
+Prior to 3.9.0 no changelog was published with SYNTHESE releases,
+therefore this changelog only tracks changes between 3.8.0 and
+3.9.0.
 To track what happened before 3.8.0, git log is your friend.
 
 ## [3.9.0] - 2015-04-27
@@ -17,6 +18,7 @@ To track what happened before 3.8.0, git log is your friend.
 onboard, ops, terminus) to source tree.
 - A* search algorithm implemented as an alternative shortest road approach.
 - Parking friendly criterion in road approach.
+- Added robotframework functional tests
 
 ### Changed
 - Migrated Boost dependency to 1.57 version.
