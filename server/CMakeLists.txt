@@ -143,7 +143,7 @@ endif()
 include(FindGit)
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1 GIT_LAST_COMMIT_DATE)
-git_get_exact_tag(GIT_TAG)
+git_get_exact_tag(GIT_TAG --tags)
 
 
 # Note: this is using a .h file and not defines, otherwise everything gets
