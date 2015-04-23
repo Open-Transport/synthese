@@ -93,6 +93,6 @@ Call Synthese Action
     [Arguments]    ${action_name}    @{varargs}
     Create Session    synthese    ${node.url}
     ${action_parameters}=    Catenate    SEPARATOR=&    @{varargs}
-    Log Many   ${node.url}?SERVICE=version&a=${action_name}&${action_parameters}
-    ${http_response}=    Get Request    synthese    ?SERVICE=version&a=${action_name}&${action_parameters}
+    Log Many   ${node.url}?SERVICE=action&of=xml&action_name=${action_name}&${action_parameters}
+    ${http_response}=    Get Request    synthese    ?SERVICE=action&of=xml&action_name=${action_name}&${action_parameters}
     [Return]    ${http_response}

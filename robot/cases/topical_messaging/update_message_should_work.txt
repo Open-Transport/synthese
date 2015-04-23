@@ -1,0 +1,36 @@
+*** Settings ***
+Resource          ../../resources/s3-fakeclient/topical_messaging.txt
+Resource          ../../resources/data/topical_messaging_data.txt
+Test Setup        Run Keywords  On Node 0  AND  With Test Data  ${DB}  AND  Start Synthese On Node 0
+Test Teardown     Stop Synthese On Node 0
+
+
+*** Keyword ***
+
+A Scenario Template "${scenario_template_name}" Containing One Message With Title "${message_title}" And Content "${message_content}" Is Instantiated As "${scenario_name}"
+    ${scenario_template_id}=  Scenario Template "${scenario_template_name}" Is Created Containing One Message With Title "${message_title}" And Content "${message_content}"
+    ${scenario_id}=  Scenario "${scenario_name}" Is Instanciated From ${scenario_template_id}
+    [Return]   ${scenario_id}
+
+
+A Scenario Template "${scenario_template_name}" Containing One Message With Title "${message_title}" And Content "${message_content}" Is Instantiated
+	${scenario_id}=   A Scenario Template "${scenario_template_name}" Containing One Message With Title "${message_title}" And Content "${message_content}" Is Instantiated As "UNUSED" 
+    [Return]   ${scenario_id}
+
+
+*** Test Cases ***
+
+Instanciating A Scenario Template Should Work
+    ${scenario_template_id}=  Scenario Template "${SCENARIO_TEMPLATE_NAME}" Is Created Containing One Message With Title "${MESSAGE_TITLE1}" And Content "${MESSAGE_CONTENT1}"
+    ${scenario_id}=  Scenario "${SCENARIO_NAME1}" Is Instanciated From ${scenario_template_id}
+    Scenario ${scenario_id} Is Requested
+    This Scenario Is Named "${SCENARIO_NAME1}" 
+	This Scenario Contains One Message With Title "${MESSAGE_TITLE1}" And Content "${MESSAGE_CONTENT1}"
+
+
+Updating A Message From An Instanciated Scenario Template Should Work
+    ${scenario_id}=   A Scenario Template "${SCENARIO_TEMPLATE_NAME}" Containing One Message With Title "${MESSAGE_TITLE1}" And Content "${MESSAGE_CONTENT1}" Is Instantiated
+	Single Message Of Scenario ${scenario_id} Is Updated With Title "${MESSAGE_TITLE2}" And Content "${MESSAGE_CONTENT2}"
+    Scenario ${scenario_id} Is Requested
+    This Scenario Contains One Message With Title "${MESSAGE_TITLE2}" And Content "${MESSAGE_CONTENT2}"
+

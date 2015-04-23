@@ -605,12 +605,33 @@ namespace synthese
 
 				if (!sentAlarm.getTemplate()) continue;
 
-				alarm->setShortMessage(
-					ScenarioTemplate::WriteTextFromVariables(sentAlarm.getTemplate()->getShortMessage(), values)
-				);
-				alarm->setLongMessage(
-					ScenarioTemplate::WriteTextFromVariables(sentAlarm.getTemplate()->getLongMessage(), values)
-				);
+				// Retrieve the texts from both the alarm and its template :
+				// If the alarm has non-empty texts, then they could have been modified since its instanciation
+				// We want to preserve these modifications, so we apply the parameters to the alarm texts instead of the template texts
+				const std::string& alarmShortMsg = alarm->getShortMessage();
+				const std::string& alarmLongMsg  = alarm->getLongMessage();
+
+				const std::string& templateShortMsg = sentAlarm.getTemplate()->getShortMessage();
+				const std::string& templateLongMsg  = sentAlarm.getTemplate()->getLongMessage();
+
+				std::string newShortMsg = "";
+				std::string newLongMsg  = "";
+
+				if(!alarmShortMsg.empty() || !alarmLongMsg.empty())
+				{
+					newShortMsg = ScenarioTemplate::WriteTextFromVariables(alarmShortMsg, values);
+					newLongMsg  = ScenarioTemplate::WriteTextFromVariables(alarmLongMsg, values);
+				}
+
+				else
+				{
+					newShortMsg = ScenarioTemplate::WriteTextFromVariables(templateShortMsg, values);
+					newLongMsg  = ScenarioTemplate::WriteTextFromVariables(templateLongMsg, values);
+				}
+
+				// Update the alarm texts and write it into database
+				alarm->setShortMessage(newShortMsg);
+				alarm->setLongMessage(newLongMsg);
 
 				AlarmTableSync::Save(alarm.get());
 			}

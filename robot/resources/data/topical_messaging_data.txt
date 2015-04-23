@@ -1,11 +1,22 @@
 *** Settings ***
 
 *** Variables ***
-${DB}                ${CURDIR}/topical_messaging.db3
-${MESSAGE1}          7625
-${MESSAGE_TITRE1}     Message spontané 1
-${MESSAGE_CONTENT1}   Contenu 1
-${TYPE_BORNE1}      10133103456550913
-${BORNE1}           11540478340104771
+${DB}                 ${CURDIR}/topical_messaging.db3
+${MESSAGE1}           7625
+${TYPE_BORNE1}        10133103456550913
+${BORNE1}             11540478340104771
+
+${MESSAGE1}           844429225099265
+${MESSAGE2}           844429225099266
+${SCENARIO1}          10977528386682881
+${SCENARIO2}          10977528386682882
+
+${SCENARIO_TEMPLATE_NAME}  Template scénario
+${SCENARIO_NAME1}          Scénario 1
+${MESSAGE_TITLE1}          Titre 1
+${MESSAGE_CONTENT1}        Contenu 1
+${MESSAGE_TITLE2}          Titre 2
+${MESSAGE_CONTENT2}        Contenu 2
 
 *** Keywords ***
+
