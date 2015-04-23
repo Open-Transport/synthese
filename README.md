@@ -18,3 +18,5 @@ https://extranet.rcsmobility.com/projects/synthese/wiki/Home
 Developer documentation :  
 https://extranet.rcsmobility.com/projects/synthese/wiki/Developer_documentation
 
+Public releases and snapshot builds :  
+http://ci.rcsmobility.com/~build/
