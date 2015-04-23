@@ -572,6 +572,7 @@ namespace synthese
 				istringstream ss(map.get<string>(PARAMETER_JSON));
 				read_json(ss, *_messagesAndCalendars);
 			}
+
 			else // Simplified method
 			{
 				// Load of existing messages
@@ -1252,8 +1253,10 @@ namespace synthese
 				}
 			}
 
-			if(_creation && request.getActionWillCreateObject())
+			if(_creation)
 			{
+				// Store the roid of the newly created scenario so that it can be returned to the requester
+				request.setActionWillCreateObject();
 				request.setActionCreatedId(_scenario->getKey());
 			}
 
