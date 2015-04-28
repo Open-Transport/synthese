@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 2.8.4)
 
 # Version:
 set(VERSION_MAJOR 3)
-set(VERSION_MINOR 9)
-set(VERSION_REV 4)
+set(VERSION_MINOR 10)
+set(VERSION_REV 0)
 set(SYNTHESE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REV}")
 
 # This variable sets the RPATH for SYNTHESE binary
