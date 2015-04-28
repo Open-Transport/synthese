@@ -122,15 +122,7 @@ namespace synthese
 
 			HTMLForm f(addRequest.getHTMLForm("add"));
 
-			HTMLTable::ColsVector c;
-			c.push_back(string());
-			c.push_back("Texte affiché");
-			c.push_back("Code");
-			c.push_back(string());
-			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
-
-			stream << f.open();
-			stream << t.open();
+			AdminFunctionRequest<DestinationsAdmin> searchRequest(request, *this);
 
 			DestinationTableSync::SearchResult destinations(
 				DestinationTableSync::Search(
@@ -140,6 +132,20 @@ namespace synthese
 					_requestParameters.orderField == PARAM_SEARCH_NAME,
 					_requestParameters.raisingOrder
 			)	);
+
+			ResultHTMLTable::HeaderVector cols;
+			cols.push_back(make_pair(string(), string()));
+			cols.push_back(make_pair(PARAM_SEARCH_NAME, "Texte affiché"));
+			cols.push_back(make_pair(string(), "Code"));
+			cols.push_back(make_pair(string(), string()));
+			ResultHTMLTable t(
+				cols,
+				searchRequest.getHTMLForm(),
+				_requestParameters,
+				destinations
+			);
+			stream << t.open();
+
 			BOOST_FOREACH(const boost::shared_ptr<Destination>& destination, destinations)
 			{
 				// Row init
