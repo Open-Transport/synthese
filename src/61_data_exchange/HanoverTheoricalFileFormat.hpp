@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// Ineo BDSI file format class header.
-///	@file VMCVFileFormat.hpp
+/// HanoverTheorical file format class header.
+///	@file HanoverTheoricalFileFormat.hpp
 ///	@author Thomas Puigt
 ///	@date 2015
 ///
@@ -22,8 +22,8 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_VMCVFileFormat_H__
-#define SYNTHESE_VMCVFileFormat_H__
+#ifndef SYNTHESE_HanoverTheoricalFileFormat_H__
+#define SYNTHESE_HanoverTheoricalFileFormat_H__
 
 #include "DatabaseReadImporter.hpp"
 #include "FactorableTemplate.h"
@@ -71,16 +71,16 @@ namespace synthese
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// VMCV file format.
+		/// HanoverTheorical file format.
 		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m61File refFile
-		class VMCVFileFormat:
-			public impex::FileFormatTemplate<VMCVFileFormat>
+		class HanoverTheoricalFileFormat:
+			public impex::FileFormatTemplate<HanoverTheoricalFileFormat>
 		{
 		public:
 
 			class Importer_:
-				public impex::DatabaseReadImporter<VMCVFileFormat>,
+				public impex::DatabaseReadImporter<HanoverTheoricalFileFormat>,
 				public PTFileFormat
 			{
 			public:
@@ -89,21 +89,11 @@ namespace synthese
 				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
-				static const std::string PARAMETER_HYSTERESIS;
-				static const std::string PARAMETER_DELAY_BUS_STOP;
-				static const std::string PARAMETER_DAY_BREAK_TIME;
 
 			private:
-				// Vector to avoid reentrance and mutex to protect this vector
-				static boost::recursive_mutex _tabRunningVmcvDBMutex;
-				static std::set<util::RegistryKeyType> _runningVmcvDB;
-
 				boost::optional<std::string> _dbConnString;
 				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
-				boost::posix_time::time_duration _hysteresis;
-				boost::posix_time::time_duration _delay_bus_stop;
-				boost::posix_time::time_duration _dayBreakTime;
 				boost::shared_ptr<const geography::City> _defaultCity;
 				boost::shared_ptr<pt::TransportNetwork> _network;
 
@@ -112,16 +102,15 @@ namespace synthese
 				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stopPoints;
 				mutable impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync> _lines;
 
-				struct VMCVPoint
+				struct HanoverTheoricalPoint
 				{
 					int id; /* PNT_Id */
 					boost::shared_ptr<geos::geom::Point> geometry;
 					const pt::StopPoint* syntheseStop;
-//					pt_operation::Depot* syntheseDepot;
 				};
-				typedef std::map<int, VMCVPoint> VMCVPoints;
+				typedef std::map<int, HanoverTheoricalPoint> HanoverTheoricalPoints;
 
-				struct VMCVLineStop
+				struct HanoverTheoricalLineStop
 				{
 					int id; /* PNT_Id */
 					boost::shared_ptr<geos::geom::Point> geometry;
@@ -133,23 +122,23 @@ namespace synthese
 				/*
 				 * A link is a couple of physical stops bounded by
 				 * a sequence of waypoints (i.e. points with no stop associated).
-				 * Only the physical stops (VMCVStops) are registered in
+				 * Only the physical stops (HanoverTheoricalStops) are registered in
 				 * this temporary object.
 				 */
 				struct Link
 				{
 					int id; /* LNK_Id */
-					typedef std::vector<VMCVLineStop> VMCVLineStops;
-					VMCVLineStops stops;
+					typedef std::vector<HanoverTheoricalLineStop> HanoverTheoricalLineStops;
+					HanoverTheoricalLineStops stops;
 					boost::shared_ptr<geos::geom::LineString> lineString;
 				};
 				typedef std::map<int /* LNK_Id */, Link> LinksMap;
 
 				void _selectAndLoadLink(
-						LinksMap& links,
-						int id,
-						const Link::VMCVLineStops& stops,
-						boost::shared_ptr<geos::geom::LineString> lineString
+					LinksMap& links,
+					int id,
+					const Link::HanoverTheoricalLineStops& stops,
+					boost::shared_ptr<geos::geom::LineString> lineString
 				) const;
 
 				struct Route
@@ -158,7 +147,6 @@ namespace synthese
 					std::string name;
 					pt::CommercialLine* line;
 					bool direction;
-					// Destination dest;
 					typedef std::vector<Link> Links;
 					Links links;
 				};
@@ -168,21 +156,21 @@ namespace synthese
 
 
 				void _selectAndLoadRoute(
-						RoutesMap& routes,
-						const Route::Links& links,
-						pt::CommercialLine* line,
-						const std::string& name,
-						bool direction,
-						int id
+					RoutesMap& routes,
+					const Route::Links& links,
+					pt::CommercialLine* line,
+					const std::string& name,
+					bool direction,
+					int id
 				) const;
 
-				struct VMCVSchedule
+				struct HanoverTheoricalSchedule
 				{
 					boost::posix_time::time_duration dept; /* departure time */
 				};
-				typedef std::vector<VMCVSchedule> VMCVSchedules;
-				typedef std::map<int /* ROU_Id */, VMCVSchedules> VMCVSchedulesMap;
-				mutable VMCVSchedulesMap _vmcvSchedules;
+				typedef std::vector<HanoverTheoricalSchedule> HanoverTheoricalSchedules;
+				typedef std::map<int /* ROU_Id */, HanoverTheoricalSchedules> HanoverTheoricalSchedulesMap;
+				mutable HanoverTheoricalSchedulesMap _hanoverTheoricalSchedules;
 
 				typedef std::map<int /* HTY_Id */, calendar::Calendar> Calendars;
 				mutable Calendars _calendars;
@@ -193,18 +181,18 @@ namespace synthese
 					Route* route;
 					std::string service_number;
 					calendar::Calendar calendar;
-					VMCVSchedules schedules;
+					HanoverTheoricalSchedules schedules;
 				};
 				typedef std::map<int /* RUN_Id */, Run> RunsMap;
 				mutable RunsMap _runs;
 
 				void _selectAndLoadRun(
-						RunsMap& runs,
-						int runId,
-						Route& route,
-						const calendar::Calendar& calendar,
-						const VMCVSchedules& schedules,
-						const std::string& service_number
+					RunsMap& runs,
+					int runId,
+					Route& route,
+					const calendar::Calendar& calendar,
+					const HanoverTheoricalSchedules& schedules,
+					const std::string& service_number
 				) const;
 
 
@@ -252,7 +240,6 @@ namespace synthese
 					const std::string& newValue,
 					const std::string& remarks
 				) const;
-				const boost::posix_time::time_duration& getHysteresis() const { return _hysteresis; }
 
 
 			protected:
@@ -280,7 +267,6 @@ namespace synthese
 				);
 
 
-				db::DBTransaction saveNow() const;
 				virtual db::DBTransaction _save() const;
 
 
@@ -291,9 +277,9 @@ namespace synthese
 			};
 
 
-			typedef impex::NoExportPolicy<VMCVFileFormat> Exporter_;
+			typedef impex::NoExportPolicy<HanoverTheoricalFileFormat> Exporter_;
 		};
 }	}
 
-#endif // SYNTHESE_VMCVFileFormat_H__
+#endif // SYNTHESE_HanoverTheoricalFileFormat_H__
 

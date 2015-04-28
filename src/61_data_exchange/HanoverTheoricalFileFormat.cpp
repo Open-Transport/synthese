@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// VMCVFileFormat class implementation.
-/// @file VMCVFileFormat.cpp
+/// HanoverTheoricalFileFormat class implementation.
+/// @file HanoverTheoricalFileFormat.cpp
 /// @author Thomas Puigt
 /// @date 2015
 ///
@@ -22,7 +22,7 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "VMCVFileFormat.hpp"
+#include "HanoverTheoricalFileFormat.hpp"
 
 #include "CityTableSync.h"
 #include "TransportNetworkTableSync.h"
@@ -66,24 +66,18 @@ namespace synthese
 	using namespace util;
 
 	template<>
-	const string FactorableTemplate<FileFormat, data_exchange::VMCVFileFormat>::FACTORY_KEY = "VMCV";
+	const string FactorableTemplate<FileFormat, data_exchange::HanoverTheoricalFileFormat>::FACTORY_KEY = "HanoverTheorical";
 
 	namespace data_exchange
 	{
-		const string VMCVFileFormat::Importer_::PARAMETER_DB_CONN_STRING("conn_string");
-		const string VMCVFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY = "default_city";
-		const string VMCVFileFormat::Importer_::PARAMETER_NETWORK_ID = "ni";
-		const string VMCVFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION = "sa_td";
-		const string VMCVFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
-		const string VMCVFileFormat::Importer_::PARAMETER_DELAY_BUS_STOP = "delay_bus_stop";
-		const string VMCVFileFormat::Importer_::PARAMETER_DAY_BREAK_TIME = "day_break_time";
-
-		recursive_mutex VMCVFileFormat::Importer_::_tabRunningVmcvDBMutex;
-		set<RegistryKeyType> VMCVFileFormat::Importer_::_runningVmcvDB;
+		const string HanoverTheoricalFileFormat::Importer_::PARAMETER_DB_CONN_STRING("conn_string");
+		const string HanoverTheoricalFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY = "default_city";
+		const string HanoverTheoricalFileFormat::Importer_::PARAMETER_NETWORK_ID = "ni";
+		const string HanoverTheoricalFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION = "sa_td";
 
 
 
-		VMCVFileFormat::Importer_::Importer_(
+		HanoverTheoricalFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::Import& import,
 			impex::ImportLogLevel minLogLevel,
@@ -91,9 +85,8 @@ namespace synthese
 			boost::optional<std::ostream&> outputStream,
 			util::ParametersMap& pm
 		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
-			DatabaseReadImporter<VMCVFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			DatabaseReadImporter<HanoverTheoricalFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
 			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
-			_hysteresis(seconds(0)),
 			_stopAreas(*import.get<DataSource>(), env),
 			_stopPoints(*import.get<DataSource>(), env),
 			_lines(*import.get<DataSource>(), env)
@@ -101,7 +94,7 @@ namespace synthese
 
 
 
-		ParametersMap VMCVFileFormat::Importer_::getParametersMap() const
+		ParametersMap HanoverTheoricalFileFormat::Importer_::getParametersMap() const
 		{
 			ParametersMap map;
 			if (_network.get() != NULL)
@@ -121,7 +114,7 @@ namespace synthese
 
 
 
-		void VMCVFileFormat::Importer_::_setFromParametersMap(const ParametersMap& map)
+		void HanoverTheoricalFileFormat::Importer_::_setFromParametersMap(const ParametersMap& map)
 		{
 			_dbConnString = map.getOptional<string>(PARAMETER_DB_CONN_STRING);
 
@@ -140,32 +133,17 @@ namespace synthese
 			}
 
 			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
-
-			// Hysteresis
-			_hysteresis = seconds(
-				map.getDefault<long>(PARAMETER_HYSTERESIS, 0)
-			);
-
-			// Delay for bus at stop
-			_delay_bus_stop = seconds(
-				map.getDefault<long>(PARAMETER_DELAY_BUS_STOP, 35)
-			);
-
-			// Day break time
-			_dayBreakTime = duration_from_string(
-				map.getDefault<string>(PARAMETER_DAY_BREAK_TIME, "03:00:00")
-			);
 		}
 
 
 
-		void VMCVFileFormat::Importer_::_selectAndLoadRun(
-				RunsMap& runs,
-				int runId,
-				Route& route,
-				const calendar::Calendar& calendar,
-				const VMCVSchedules& schedules,
-				const std::string& service_number
+		void HanoverTheoricalFileFormat::Importer_::_selectAndLoadRun(
+			RunsMap& runs,
+			int runId,
+			Route& route,
+			const calendar::Calendar& calendar,
+			const HanoverTheoricalSchedules& schedules,
+			const std::string& service_number
 		) const {
 
 			// Jump over courses with incomplete chainages
@@ -205,11 +183,11 @@ namespace synthese
 			}
 		}
 
-		void VMCVFileFormat::Importer_::_selectAndLoadLink(
-				LinksMap& links,
-				int id,
-				const Link::VMCVLineStops& stops,
-				boost::shared_ptr<geos::geom::LineString> lineString
+		void HanoverTheoricalFileFormat::Importer_::_selectAndLoadLink(
+			LinksMap& links,
+			int id,
+			const Link::HanoverTheoricalLineStops& stops,
+			boost::shared_ptr<geos::geom::LineString> lineString
 		) const {
 			if(stops.size() < 2)
 			{
@@ -236,13 +214,13 @@ namespace synthese
 
 
 
-		void VMCVFileFormat::Importer_::_selectAndLoadRoute(
-				RoutesMap& routes,
-				const Route::Links& links,
-				pt::CommercialLine* line,
-				const std::string& name,
-				bool direction,
-				int id
+		void HanoverTheoricalFileFormat::Importer_::_selectAndLoadRoute(
+			RoutesMap& routes,
+			const Route::Links& links,
+			pt::CommercialLine* line,
+			const std::string& name,
+			bool direction,
+			int id
 		) const {
 			if(links.size() == 0)
 			{
@@ -275,7 +253,7 @@ namespace synthese
 
 
 
-		bool VMCVFileFormat::Importer_::_read(
+		bool HanoverTheoricalFileFormat::Importer_::_read(
 		) const {
 			DataSource& dataSource(*_import.get<DataSource>());
 			boost::shared_ptr<DB> db;
@@ -288,62 +266,9 @@ namespace synthese
 				db = DBModule::GetDBSPtr();
 			}
 
-			const time_duration dayBreakTime(hours(3));
-			date today(day_clock::local_day());
-			ptime now(second_clock::local_time());
-			if(now.time_of_day() < dayBreakTime)
-			{
-				today -= days(1);
-			}
-			ptime nextDayBreak(now.date(), dayBreakTime);
-			if(now.time_of_day() >= dayBreakTime)
-			{
-				nextDayBreak += hours(24);
-			}
-
-			boost::unique_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
-			if(!lock.owns_lock())
-			{
-				// If another VMCV import running, we can do this one if it is really another
-				recursive_mutex::scoped_lock scoped_lock(_tabRunningVmcvDBMutex);
-				if (_runningVmcvDB.empty())
-				{
-					// No VMCV import is running, another thread owns the baseWriterMutex so
-					// we don't make import
-					throw RequestException("VMCVFileFormat: Another action forbids to run VMCVFileFormat");
-				}
-
-				if (_runningVmcvDB.find(getImport().getKey()) != _runningVmcvDB.end())
-				{
-					// Another VMCV import is running and it is the same
-					throw RequestException("VMCVFileFormat: Already running");
-				}
-
-				// Another VMCV import is running but it is not the same
-				_runningVmcvDB.insert(getImport().getKey());
-			}
-			else
-			{
-				// We check that import is not running (it could be in the save method)
-				recursive_mutex::scoped_lock scoped_lock(_tabRunningVmcvDBMutex);
-				if (!_runningVmcvDB.empty())
-				{
-					if (_runningVmcvDB.find(getImport().getKey()) != _runningVmcvDB.end())
-					{
-						// Another VMCV import is running and it is the same
-						throw RequestException("VMCVFileFormat: Already running");
-					}
-				}
-
-				// Another VMCV import may be running but it is not the same
-				_runningVmcvDB.insert(getImport().getKey());
-			}
-
-//			boost::shared_lock<boost::shared_mutex> lockVDV(ServerModule::VMCVAgainstVDVDataSupplyMutex);
-
 
 			//////////////////////////////////////////////////////////////////////////
-			// Pre-loading objects from VMCV
+			// Pre-loading objects from HanoverTheorical
 			LinksMap _links;
 
 			// Stop areas
@@ -359,14 +284,14 @@ namespace synthese
 					string ref(result->get<string>("sgr_short_name"));
 
 					_createOrUpdateStopAreas(
-								_stopAreas,
-								ref,
-								name,
-								_defaultCity.get(),
-								false,
-								_stopAreaDefaultTransferDuration,
-								dataSource
-								);
+						_stopAreas,
+						ref,
+						name,
+						_defaultCity.get(),
+						false,
+						_stopAreaDefaultTransferDuration,
+						dataSource
+					);
 				}
 			}
 
@@ -413,14 +338,14 @@ namespace synthese
 					}
 
 					_createOrUpdateStop(
-								_stopPoints,
-								ref,
-								name,
-								optional<const RuleUser::Rules&>(),
-								stopArea,
-								geometry.get(),
-								dataSource
-								);
+						_stopPoints,
+						ref,
+						name,
+						optional<const RuleUser::Rules&>(),
+						stopArea,
+						geometry.get(),
+						dataSource
+					);
 				}
 			}
 
@@ -455,12 +380,11 @@ namespace synthese
 			// Links and Points
 			{
 				string query(
-					"SELECT * FROM " + _database + ".v_rcs_link"
-							+ " ORDER BY lnk_id ASC, ptl_order ASC"
+					"SELECT * FROM " + _database + ".v_rcs_link" + " ORDER BY lnk_id ASC, ptl_order ASC"
 				);
 				DBResultSPtr result(db->execQuery(query));
 				int lastLinkId(0);
-				Link::VMCVLineStops linkStops;
+				Link::HanoverTheoricalLineStops linkStops;
 				graph::MetricOffset offsetSum(0);
 				geos::geom::CoordinateSequence* sequence(NULL);
 				while(result->next())
@@ -468,7 +392,7 @@ namespace synthese
 					int id(result->get<int>("lnk_id"));
 					if(lastLinkId > 0 && id > lastLinkId)
 					{
-						// Register last built VMCV Link
+						// Register last built HanoverTheorical Link
 						_selectAndLoadLink(
 							_links,
 							lastLinkId,
@@ -489,9 +413,9 @@ namespace synthese
 					MetricOffset lg(result->get<MetricOffset>("ptl_length"));
 					boost::shared_ptr<geos::geom::Point> geometry;
 					geometry = dataSource.getActualCoordinateSystem().createPoint(
-								lexical_cast<double>(result->get<string>("pnt_longitude")) / static_cast<double>(3600000),
-								lexical_cast<double>(result->get<string>("pnt_latitude")) / static_cast<double>(3600000)
-								);
+						lexical_cast<double>(result->get<string>("pnt_longitude")) / static_cast<double>(3600000),
+						lexical_cast<double>(result->get<string>("pnt_latitude")) / static_cast<double>(3600000)
+					);
 					offsetSum += lg;
 
 					const StopPoint* stop(NULL);
@@ -501,23 +425,23 @@ namespace synthese
 					}
 					if(stop)
 					{
-						VMCVLineStop& vs(*linkStops.insert(linkStops.end(),VMCVLineStop()));
+						HanoverTheoricalLineStop& vs(*linkStops.insert(linkStops.end(),HanoverTheoricalLineStop()));
 						vs.id = pntId;
 						vs.syntheseStop = const_cast<StopPoint*>(stop);
 						vs.geometry = geometry;
 						vs.offsetFromPreviousStop = offsetSum;
 						sequence->add(geos::geom::Coordinate(
-										  result->get<double>("pnt_longitude") / static_cast<double>(3600000),
-										  result->get<double>("pnt_latitude") / static_cast<double>(3600000)
-								  ));
+							result->get<double>("pnt_longitude") / static_cast<double>(3600000),
+							result->get<double>("pnt_latitude") / static_cast<double>(3600000)
+						)	);
 					}
 					else
 					{
 						// Putting waypoints coordinates in the sequence
 						sequence->add(geos::geom::Coordinate(
-										  result->get<double>("pnt_longitude"),
-										  result->get<double>("pnt_latitude")
-								  ));
+							result->get<double>("pnt_longitude"),
+							result->get<double>("pnt_latitude")
+						)	);
 					}
 				}
 				// Register last link
@@ -533,9 +457,7 @@ namespace synthese
 			// Routes
 			{
 				string query(
-							string("SELECT * FROM ")
-							+ _database + ".v_rcs_route "
-							+ "ORDER BY rou_id ASC, rol_order ASC"
+					string("SELECT * FROM ") + _database + ".v_rcs_route " + "ORDER BY rou_id ASC, rol_order ASC"
 				);
 				DBResultSPtr result(db->execQuery(query));
 				int lastRouteId(0);
@@ -573,8 +495,8 @@ namespace synthese
 						if(!_lines.contains(commercialLineRef))
 						{
 							_logWarning(
-										"Inconsistent line id "+ lexical_cast<string>(commercialLineRef) +" in ROUTE "+ lexical_cast<string>(id)
-										);
+								"Inconsistent line id "+ lexical_cast<string>(commercialLineRef) +" in ROUTE "+ lexical_cast<string>(id)
+							);
 							continue;
 						}
 						commercialLine = *_lines.get(commercialLineRef).begin();
@@ -639,10 +561,7 @@ namespace synthese
 			// Calendars
 			{
 				string query(
-							string("SELECT * FROM ")
-							+ _database + ".v_rcs_calendar"
-//							+ " WHERE CAL_Day>=" + todayStr
-							+ " ORDER BY HTY_Id"
+					string("SELECT * FROM ") + _database + ".v_rcs_calendar" + " ORDER BY HTY_Id"
 				);
 				DBResultSPtr result(db->execQuery(query));
 				int lastHtyId(0);
@@ -671,16 +590,14 @@ namespace synthese
 			// Services
 			{
 				string query(
-							string("SELECT * FROM ")
-							+ _database +".v_rcs_passing_time "
-							+ "WHERE run_number_ext NOT LIKE 'HLP%' "
-							+ "ORDER BY rou_id ASC, run_id ASC, pti_rank ASC"
+					string("SELECT * FROM ") + _database +".v_rcs_passing_time " + "WHERE run_number_ext NOT LIKE 'HLP%' " + 
+						"ORDER BY rou_id ASC, run_id ASC, pti_rank ASC"
 				);
 				DBResultSPtr result(db->execQuery(query));
 				int lastRunId(0);
 				const Route* route(NULL);
 				Calendar calendar;
-				VMCVSchedules schedules;
+				HanoverTheoricalSchedules schedules;
 				string service_number;
 				int htyId(0);
 
@@ -730,11 +647,11 @@ namespace synthese
 						continue;
 					}
 					// Getting the schedule
-					VMCVSchedule& schedule(
-								*schedules.insert(
-									schedules.end(),
-									VMCVSchedule()
-									)	);
+					HanoverTheoricalSchedule& schedule(
+						*schedules.insert(
+							schedules.end(),
+							HanoverTheoricalSchedule()
+					)	);
 					schedule.dept = duration_from_string(result->get<string>("pti_scheduled"));
 
 					// Getting calendar
@@ -753,13 +670,13 @@ namespace synthese
 				if(route)
 				{
 					_selectAndLoadRun(
-								_runs,
-								lastRunId,
-								*const_cast<Route*>(route),
-								calendar,
-								schedules,
-								service_number
-								);
+						_runs,
+						lastRunId,
+						*const_cast<Route*>(route),
+						calendar,
+						schedules,
+						service_number
+					);
 				}
 			}
 
@@ -777,13 +694,13 @@ namespace synthese
 						bool isArrival = rank > 0;
 						sps.insert(link.stops.front().syntheseStop);
 						JourneyPattern::StopWithDepartureArrivalAuthorization stop(
-								sps,
-								nextOffset,
-								isDeparture,
-								isArrival,
-								1 /* with times */,
-								link.lineString
-								);
+							sps,
+							nextOffset,
+							isDeparture,
+							isArrival,
+							1 /* with times */,
+							link.lineString
+						);
 						stops.push_back(stop);
 						// make the stop points set begin by the stop point associated to the next link point
 						sps.clear();
@@ -795,12 +712,12 @@ namespace synthese
 							isArrival = rank > 0;
 							sps.insert(link.stops.back().syntheseStop);
 							JourneyPattern::StopWithDepartureArrivalAuthorization stop(
-										sps,
-										link.stops[1].offsetFromPreviousStop,
-									isDeparture,
-									isArrival,
-									1 /* with times = 1 and no line string given as last arg */
-									);
+								sps,
+								link.stops[1].offsetFromPreviousStop,
+								isDeparture,
+								isArrival,
+								1 /* with times = 1 and no line string given as last arg */
+							);
 							stops.push_back(stop);
 							sps.clear();
 						}
@@ -809,46 +726,46 @@ namespace synthese
 					}
 
 					JourneyPattern* journeyPattern(
-								_createOrUpdateRoute(
-									*run.second.route->line,
-									lexical_cast<string>(run.second.route->id),
-									run.second.route->name,
-									optional<const string&>(),
-									optional<Destination*>(),
-									optional<const RuleUser::Rules&>(),
-									run.second.route->direction,
-									NULL,
-									stops,
-									dataSource,
-									true,
-									true,
-									true,
-									true
-									)	);
+						_createOrUpdateRoute(
+							*run.second.route->line,
+							lexical_cast<string>(run.second.route->id),
+							run.second.route->name,
+							optional<const string&>(),
+							optional<Destination*>(),
+							optional<const RuleUser::Rules&>(),
+							run.second.route->direction,
+							NULL,
+							stops,
+							dataSource,
+							true,
+							true,
+							true,
+							true
+					)	);
 
 					// Service
 					ScheduledService::Schedules departures;
 					ScheduledService::Schedules arrivals;
 					time_duration nextArrivalTime = run.second.schedules.front().dept;
-					BOOST_FOREACH(const VMCVSchedule& vmcvSchedule, run.second.schedules)
+					BOOST_FOREACH(const HanoverTheoricalSchedule& schedule, run.second.schedules)
 					{
 						arrivals.push_back(nextArrivalTime);
-						departures.push_back(vmcvSchedule.dept);
-						nextArrivalTime = vmcvSchedule.dept;
+						departures.push_back(schedule.dept);
+						nextArrivalTime = schedule.dept;
 					}
 
 					ScheduledService* service(
-								_createOrUpdateService(
-									*journeyPattern,
-									departures,
-									arrivals,
-									run.second.service_number,
-									dataSource,
-									optional<const string&>(),
-									optional<const RuleUser::Rules&>(),
-									optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(stops),
-									run.second.service_number
-									)	);
+						_createOrUpdateService(
+							*journeyPattern,
+							departures,
+							arrivals,
+							run.second.service_number,
+							dataSource,
+							optional<const string&>(),
+							optional<const RuleUser::Rules&>(),
+							optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(stops),
+							run.second.service_number
+					)	);
 					if(service)
 					{
 						*service |= run.second.calendar;
@@ -856,24 +773,12 @@ namespace synthese
 				}
 			} // end of registering data in ENV
 
-
-			// Release lock
-			{
-				recursive_mutex::scoped_lock scoped_lock(_tabRunningVmcvDBMutex);
-
-				// Release lock
-				_runningVmcvDB.erase(getImport().getKey());
-			}
-
-
-//			saveNow().run();
-
 			return true;
 		}
 
 
 
-		void VMCVFileFormat::Importer_::_logLoadDetail(
+		void HanoverTheoricalFileFormat::Importer_::_logLoadDetail(
 			const std::string& table,
 			const std::string& localId,
 			const std::string& locaName,
@@ -900,7 +805,7 @@ namespace synthese
 
 
 
-		void VMCVFileFormat::Importer_::_logWarningDetail(
+		void HanoverTheoricalFileFormat::Importer_::_logWarningDetail(
 			const std::string& table,
 			const std::string& localId,
 			const std::string& locaName,
@@ -927,7 +832,7 @@ namespace synthese
 
 
 
-		void VMCVFileFormat::Importer_::_logDebugDetail(
+		void HanoverTheoricalFileFormat::Importer_::_logDebugDetail(
 			const std::string& table,
 			const std::string& localId,
 			const std::string& locaName,
@@ -954,7 +859,7 @@ namespace synthese
 
 
 
-		void VMCVFileFormat::Importer_::_logTraceDetail(
+		void HanoverTheoricalFileFormat::Importer_::_logTraceDetail(
 			const std::string& table,
 			const std::string& localId,
 			const std::string& locaName,
@@ -981,33 +886,16 @@ namespace synthese
 
 
 
-		string VMCVFileFormat::Importer_::VMCVLineStop::getStopName() const
+		string HanoverTheoricalFileFormat::Importer_::HanoverTheoricalLineStop::getStopName() const
 		{
 			return syntheseStop->getName();
 		}
 
 
 
-		DBTransaction VMCVFileFormat::Importer_::_save() const
+		DBTransaction HanoverTheoricalFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
-			// We check that import is not running
-			{
-				recursive_mutex::scoped_lock scoped_lock(_tabRunningVmcvDBMutex);
-				if (!_runningVmcvDB.empty())
-				{
-					if (_runningVmcvDB.find(getImport().getKey()) != _runningVmcvDB.end())
-					{
-						// Another VMCV import is running and it is the same
-						throw RequestException("VMCVFileFormat: Already running");
-					}
-				}
-
-				// Another VMCV import may be running but it is not the same
-				_runningVmcvDB.insert(getImport().getKey());
-			}
-
-//			boost::shared_lock<boost::shared_mutex> lockVDV(ServerModule::VMCVAgainstVDVDataSupplyMutex);
 
 			BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
 			{
@@ -1039,87 +927,6 @@ namespace synthese
 			BOOST_FOREACH(const ScheduledService::Registry::value_type& service, _env.getRegistry<ScheduledService>())
 			{
 				ScheduledServiceTableSync::Save(service.second.get(), transaction);
-			}
-
-			// Release lock
-			{
-				recursive_mutex::scoped_lock scoped_lock(_tabRunningVmcvDBMutex);
-
-				// Another VMCV import is running but it is not the same
-				_runningVmcvDB.erase(getImport().getKey());
-			}
-
-			return transaction;
-		}
-
-		DBTransaction VMCVFileFormat::Importer_::saveNow() const
-		{
-			DBTransaction transaction;
-			// We check that import is not running
-			{
-				recursive_mutex::scoped_lock scoped_lock(_tabRunningVmcvDBMutex);
-				if (!_runningVmcvDB.empty())
-				{
-					if (_runningVmcvDB.find(getImport().getKey()) != _runningVmcvDB.end())
-					{
-						// Another VMCV import is running and it is the same
-						throw RequestException("VMCVFileFormat: Already running");
-					}
-				}
-
-				// Another VMCV import may be running but it is not the same
-				_runningVmcvDB.insert(getImport().getKey());
-			}
-
-//			boost::shared_lock<boost::shared_mutex> lockVDV(ServerModule::VMCVAgainstVDVDataSupplyMutex);
-
-			BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
-			{
-				StopAreaTableSync::Save(cstop.second.get(), transaction);
-			}
-			BOOST_FOREACH(Registry<StopPoint>::value_type stop, _env.getRegistry<StopPoint>())
-			{
-				StopPointTableSync::Save(stop.second.get(), transaction);
-			}
-
-			BOOST_FOREACH(Registry<CommercialLine>::value_type cline, _env.getRegistry<CommercialLine>())
-			{
-				CommercialLineTableSync::Save(cline.second.get(), transaction);
-			}
-
-			// Created journey patterns
-			BOOST_FOREACH(const JourneyPattern::Registry::value_type& journeyPattern, _env.getRegistry<JourneyPattern>())
-			{
-				JourneyPatternTableSync::Save(journeyPattern.second.get(), transaction);
-			}
-
-			// Created line stops
-			BOOST_FOREACH(const LineStop::Registry::value_type& lineStop, _env.getRegistry<LineStop>())
-			{
-				LineStopTableSync::Save(lineStop.second.get(), transaction);
-			}
-
-			// Created services
-			BOOST_FOREACH(const ScheduledService::Registry::value_type& service, _env.getRegistry<ScheduledService>())
-			{
-				ScheduledServiceTableSync::Save(service.second.get(), transaction);
-			}
-
-			// Output of SQL queries in trace mode
-//			if (_minLogLevel < IMPORT_LOG_DEBG)
-//			{
-//				BOOST_FOREACH(const DBTransaction::ModifiedRows::value_type& query, transaction.getUpdatedRows())
-//				{
-//					_logTrace(query.first +" "+ lexical_cast<string>(query.second));
-//				}
-//			}
-
-			// Release lock
-			{
-				recursive_mutex::scoped_lock scoped_lock(_tabRunningVmcvDBMutex);
-
-				// Another VMCV import is running but it is not the same
-				_runningVmcvDB.erase(getImport().getKey());
 			}
 
 			return transaction;
