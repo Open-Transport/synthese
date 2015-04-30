@@ -407,7 +407,7 @@ namespace synthese
 				if (_runningBdsi.find(getImport().getKey()) != _runningBdsi.end())
 				{
 					// Another BDSI import is running and it is the same
-					throw RequestException("IneoBDSIFileFormat: Already running");
+					throw RequestException("IneoBDSIFileFormat: Already running for import " + getImport().get<Name>());
 				}
 				
 				// Another BDSI import is running but it is not the same
@@ -422,7 +422,7 @@ namespace synthese
 					if (_runningBdsi.find(getImport().getKey()) != _runningBdsi.end())
 					{
 						// Another BDSI import is running and it is the same
-						throw RequestException("IneoBDSIFileFormat: Already running");
+						throw RequestException("IneoBDSIFileFormat: Already running for import " + getImport().get<Name>());
 					}
 				}
 				
@@ -430,8 +430,6 @@ namespace synthese
 				_runningBdsi.insert(getImport().getKey());
 			}
 			
-			boost::shared_lock<boost::shared_mutex> lockVDV(ServerModule::IneoBDSIAgainstVDVMutex);
-
 
 			//////////////////////////////////////////////////////////////////////////
 			// Pre-loading objects from BDSI
@@ -448,6 +446,8 @@ namespace synthese
 			);
 			bool saveStops = false;
 
+			try
+			{
 			// Arrets
 			{
 				string query(
@@ -1589,7 +1589,19 @@ namespace synthese
 				_logInfo("Courses créées : "+ lexical_cast<string>(createdServices));
 				_logInfo("Courses supprimées : "+ lexical_cast<string>(servicesToRemove.size()));
 			}
-			
+			}
+
+			catch(const std::exception& ex)
+			{
+				// If an exception occurred during the processing, unlock the import and rethrow the exception
+				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
+
+				// Release lock
+				_runningBdsi.erase(getImport().getKey());
+
+				throw ex;
+			}
+
 			// Release lock
 			{
 				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);

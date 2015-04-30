@@ -27,6 +27,7 @@
 #include "ImportTableSync.hpp"
 #include "FileFormat.h"
 #include "DBTransaction.hpp"
+#include "ServerModule.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
@@ -205,6 +206,7 @@ namespace synthese
 				DBModule::DeactivateConditionalTablesUpdate();
 				try
 				{
+					boost::shared_lock<boost::shared_mutex> lockVDV(ServerModule::IneoBDSIAgainstVDVMutex);
 					_importer->save().run();
 				}
 				catch(...)
