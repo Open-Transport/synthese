@@ -2152,11 +2152,17 @@ namespace synthese
 */
 					// Registration of the line stop into the temporary environment, to be saved after the import
 					temporaryEnvironment.getEditableRegistry<LineStop>().add(ls);
+					// ...and in the official because there is link with dataSource in the official env
+					// and ls should not be deleted with temporaryEnvironment
+					Env::GetOfficialEnv().getEditableRegistry<LineStop>().add(ls);
 					++rank;
 				}
 
 				// Registration of the journey pattern in the temporary environment, to be saved after the import
 				temporaryEnvironment.getEditableRegistry<JourneyPattern>().add(jp);
+				// ...and in the official because there is link with dataSource in the official env
+				// and jp should not be deleted with temporaryEnvironment
+				Env::GetOfficialEnv().getEditableRegistry<JourneyPattern>().add(jp);
 
 				// Registration of the created journey pattern in the cache
 				syntheseJourneyPatterns.push_back(jp.get());
