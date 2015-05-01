@@ -446,8 +446,6 @@ namespace synthese
 			);
 			bool saveStops = false;
 
-			try
-			{
 			// Arrets
 			{
 				string query(
@@ -1588,18 +1586,6 @@ namespace synthese
 				_logInfo("Courses sans mise à jour des horaires temps réel : "+ lexical_cast<string>(servicesToUpdate.size() - updated));
 				_logInfo("Courses créées : "+ lexical_cast<string>(createdServices));
 				_logInfo("Courses supprimées : "+ lexical_cast<string>(servicesToRemove.size()));
-			}
-			}
-
-			catch(const std::exception& ex)
-			{
-				// If an exception occurred during the processing, unlock the import and rethrow the exception
-				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
-
-				// Release lock
-				_runningBdsi.erase(getImport().getKey());
-
-				throw ex;
 			}
 
 			// Release lock
