@@ -306,6 +306,11 @@ namespace synthese
 				const boost::posix_time::time_duration& getHysteresis() const { return _hysteresis; }
 
 
+				db::DBTransaction _saveNow(
+					bool saveStops = false
+				) const;
+
+
 			protected:
 				//////////////////////////////////////////////////////////////////////////
 				/// Generates a generic parameters map from the action parameters.
@@ -329,11 +334,6 @@ namespace synthese
 					boost::optional<std::ostream&> outputStream,
 					util::ParametersMap& pm
 				);
-
-
-				db::DBTransaction saveNow(
-					bool saveStops = false
-				) const;
 				virtual db::DBTransaction _save() const;
 
 

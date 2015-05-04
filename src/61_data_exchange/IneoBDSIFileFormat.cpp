@@ -1315,12 +1315,20 @@ namespace synthese
 					);
 					if(!service)
 					{
+						if(_dbConnString)
+						{
+							Log::GetInstance().debug("IneoBDSIFileFormat : on ne trouve pas la course : " + course.ref);
+						}
 						continue;
 					}
 						
 					// Checks if the service and the course are matching
 					if(course != *service)
 					{
+						if(_dbConnString)
+						{
+							Log::GetInstance().debug("IneoBDSIFileFormat : on a trouvé une course qui ne match pas : " + course.ref);
+						}
 						continue;
 					}
 
@@ -1589,14 +1597,15 @@ namespace synthese
 			}
 
 			// Release lock
-			{
+			/*{
 				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
 				
 				// Release lock
 				_runningBdsi.erase(getImport().getKey());
-			}
+			}*/
+			// We do not release lock, we keep it for the _saveNow method
 
-			saveNow(saveStops).run();
+			_saveNow(saveStops).run();
 
 			return true;
 		}
@@ -1734,11 +1743,11 @@ namespace synthese
 			return DBTransaction();
 		}
 
-		DBTransaction IneoBDSIFileFormat::Importer_::saveNow(bool saveStops) const
+		DBTransaction IneoBDSIFileFormat::Importer_::_saveNow(bool saveStops) const
 		{
 			DBTransaction transaction;
 			// We check that import is not running
-			{
+			/*{
 				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
 				if (!_runningBdsi.empty())
 				{
@@ -1751,7 +1760,8 @@ namespace synthese
 				
 				// Another BDSI import may be running but it is not the same
 				_runningBdsi.insert(getImport().getKey());
-			}
+			}*/
+			// We do not check for the lock, we know we have it as the only caller for _saveNow is read method
 			
 			boost::shared_lock<boost::shared_mutex> lockVDV(ServerModule::IneoBDSIAgainstVDVMutex);
 
