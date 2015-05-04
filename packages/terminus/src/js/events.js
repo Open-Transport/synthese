@@ -223,21 +223,48 @@ function activate_filter(isOnAllSections)
     s += '<th>sections</th></tr></thead>';
   }
   $('#scenarios_on_tab').addClass('hide');
+  var use_and_filter = ($('#filter_operator').val() == 0);
   for(var i in theevent)
   {
+    var matchedAndFilter = true;
+    var matchedOrFilter = true;
     theevent[i].filtered = 0;
     if (filters['displayscreen_recipient'].length > 0)
     {
-      match_filter(i, 'displayscreen_recipient');
+        match_filter(i, 'displayscreen_recipient');
+        if (theevent[i].filtered == 0) {
+            matchedAndFilter = false;
+        } else {
+            matchedOrFilter = true;
+        }
     }
+    theevent[i].filtered = 0;
     if (filters['line_recipient'].length > 0)
     {
-      match_filter(i, 'line_recipient');
+        match_filter(i, 'line_recipient');
+        if (theevent[i].filtered == 0) {
+            matchedAndFilter = false;
+        } else {
+            matchedOrFilter = true;
+        }        
     }
+    theevent[i].filtered = 0;
     if (filters['stoparea_recipient'].length > 0)
     {
-      match_filter(i, 'stoparea_recipient');
+        match_filter(i, 'stoparea_recipient');
+        if (theevent[i].filtered == 0) {
+            matchedAndFilter = false;
+        } else {
+            matchedOrFilter = true;
+        }
     }
+      
+    if (use_and_filter) {
+        theevent[i].filtered = matchedAndFilter ? 1 : 0;
+    } else {
+        theevent[i].filtered = matchedOrFilter ? 1 : 0;          
+    }
+
     if(theevent[i].filtered == 1)
     {
       var dates = [];

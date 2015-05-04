@@ -30,7 +30,13 @@
 
 <div class="hero-unit-recipient_filters" id="mFilters">
   <div class="row-fluid">
-     <div class="span2">Filtres</div>
+     <div class="span1">Filtres</div>
+     <div class="span2">
+       <select id="filter_operator">
+         <option value="0">ET</option>
+         <option value="1">OU</option>
+       </select>
+     </div>
      <div class="span3">>Lignes<a href="#" class="btn btn-primary btn-mini" factory="line">Editer</a></div>
      <div class="span3">>Arrêts<a href="#" class="btn btn-primary btn-mini" factory="stoparea">Editer</a></div>
      <div class="span2">>Diffuseurs<a href="#" class="btn btn-primary btn-mini" factory="displayscreen">Editer</a></div>

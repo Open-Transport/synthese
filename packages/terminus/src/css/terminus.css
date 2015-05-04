@@ -245,3 +245,7 @@ th {
     height: 160px;
   }
 }
+
+#filter_operator {
+ width: 80px;   
+}
