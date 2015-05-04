@@ -2127,6 +2127,7 @@ namespace synthese
 				jp->setWayBack(sens);
 				jp->setName(nom);
 				jp->addCodeBySource(realTimeDataSource, ref);
+				ligne->syntheseLine->addPath(route.get());
 
 				// Stops
 				size_t rank(0);
