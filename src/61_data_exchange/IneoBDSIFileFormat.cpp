@@ -210,8 +210,17 @@ namespace synthese
 				Chainage::ArretChns arretChns;
 				// Loop on horaires to create arretChns
 				std::size_t horaireCount(0);
+				bool firstStopFound(false);
 				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, chainage.arretChns)
 				{
+					if (!firstStopFound && it.ref != horaires.at(0).arretchn)
+					{
+						continue;
+					}
+					else if (it.ref == horaires.at(0).arretchn)
+					{
+						firstStopFound = true;
+					}
 					ArretChn& arretChn(
 						*arretChns.insert(
 							arretChns.end(),
@@ -847,6 +856,7 @@ namespace synthese
 						_database +".HORAIRE.etat_harr,"+
 						_database +".HORAIRE.etat_hdep,"+
 						_database +".HORAIRE.course,"+
+						_database +".HORAIRE.arretchn,"+
 						_database +".ARRETCHN.chainage "+
 					"FROM "+
 						_database +".HORAIRE "+
@@ -928,6 +938,7 @@ namespace synthese
 					horaire.hra = duration_from_string(horaireResult->getText("hra"));
 					horaire.htd = duration_from_string(horaireResult->getText("htd"));
 					horaire.hta = duration_from_string(horaireResult->getText("hta"));
+					horaire.arretchn = horaireResult->getText("arretchn");
 
 					// Patch for schedules after midnight
 					if(horaire.hrd < dayBreakTime)

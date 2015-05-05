@@ -197,6 +197,7 @@ namespace synthese
 					boost::posix_time::time_duration hta;
 					boost::posix_time::time_duration hrd;
 					boost::posix_time::time_duration hra;
+					std::string arretchn;
 				};
 
 
