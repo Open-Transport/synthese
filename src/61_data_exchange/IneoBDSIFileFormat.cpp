@@ -2055,6 +2055,8 @@ namespace synthese
 			}
 			service->setDataSchedules(departureSchedules, arrivalSchedules);
 
+			const_cast<JourneyPattern*>(route)->addService(*service, false);
+
 			// Registration of the service in the temporary environment
 			temporaryEnvironment.getEditableRegistry<ScheduledService>().add(service);
 			// ...and in the official because there is link with dataSource in the official env
