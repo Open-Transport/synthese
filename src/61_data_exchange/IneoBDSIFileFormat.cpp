@@ -2111,7 +2111,7 @@ namespace synthese
 					bool ok(true);
 					for(size_t i(0); i<arretChns.size(); ++i)
 					{
-						if(jp.getEdge(i)->getFromVertex() != arretChns[i].arret->syntheseStop)
+						if(dynamic_cast<const StopPoint*>(jp.getEdge(i)->getFromVertex())->getKey() != arretChns[i].arret->syntheseStop->getKey())
 						{
 							ok = false;
 							break;
