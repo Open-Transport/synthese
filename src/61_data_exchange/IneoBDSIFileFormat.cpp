@@ -2141,6 +2141,8 @@ namespace synthese
 				jp->setName(nom);
 				jp->addCodeBySource(realTimeDataSource, ref);
 				ligne->syntheseLine->addPath(jp.get());
+				
+				Log::GetInstance().debug("IneoBDSIFileFormat : Creation of JourneyPattern " + ref);
 
 				// Stops
 				size_t rank(0);
