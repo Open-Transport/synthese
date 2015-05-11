@@ -48,7 +48,7 @@ namespace synthese
 			BroadcastPoints r;
 			BOOST_FOREACH(boost::shared_ptr<BroadcastPoint> item, Factory<BroadcastPoint>::GetNewCollection())
 			{
-				item->getBrodcastPoints(r);
+				item->getBroadcastPoints(r);
 			}
 			return r;
 		}

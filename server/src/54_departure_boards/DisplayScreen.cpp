@@ -753,7 +753,7 @@ namespace synthese
 
 
 
-		void DisplayScreen::getBrodcastPoints(
+		void DisplayScreen::getBroadcastPoints(
 			BroadcastPoint::BroadcastPoints& result
 		) const	{
 			BOOST_FOREACH(const DisplayScreen::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<DisplayScreen>())

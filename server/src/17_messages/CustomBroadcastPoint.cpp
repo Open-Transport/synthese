@@ -149,7 +149,7 @@ namespace synthese
 
 
 
-		void CustomBroadcastPoint::getBrodcastPoints( BroadcastPoints& result ) const
+		void CustomBroadcastPoint::getBroadcastPoints( BroadcastPoints& result ) const
 		{
 			BOOST_FOREACH(
 				const CustomBroadcastPoint::Registry::value_type& it,
