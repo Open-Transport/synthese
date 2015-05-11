@@ -137,6 +137,13 @@ namespace synthese
 				SerializationFormat format = FORMAT_INTERNAL
 			);
 
+
+
+                        /// Virtual destructor for polymorphism delete
+			virtual ~ParametersMap() { }
+
+
+
 			//! \name Getters
 			//@{
 				const Map& getMap() const { return _map; }
