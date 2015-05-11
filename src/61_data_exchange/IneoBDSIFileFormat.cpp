@@ -2007,8 +2007,9 @@ namespace synthese
 			syntheseService->setRealTimeSchedules(departureSchedules, arrivalSchedules);
 			for(size_t i(0); i<chainage->arretChns.size(); ++i)
 			{
-				if(chainage->arretChns[i].arret->syntheseStop->getKey() != syntheseService->getRealTimeVertex(i)->getKey())
-				{
+				if(chainage->arretChns[i].arret->syntheseStop->getKey() != 
+					(syntheseService->getRealTimeVertex(i) ? syntheseService->getRealTimeVertex(i)->getKey() : syntheseService->getVertex(i)->getKey())
+				) {
 					syntheseService->setRealTimeVertex(i, chainage->arretChns[i].arret->syntheseStop);
 				}
 			}
