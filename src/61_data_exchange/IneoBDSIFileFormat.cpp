@@ -1883,7 +1883,7 @@ namespace synthese
 			{
 				const graph::Edge* edge(jp.getEdge(i));
 				if(	!dynamic_cast<const DesignatedLinePhysicalStop*>(edge) ||
-					chainage->arretChns[i].arret->syntheseStop->getHub() != jp.getEdge(i)->getFromVertex()->getHub())
+					dynamic_cast<const StopArea*>(chainage->arretChns[i].arret->syntheseStop->getHub())->getKey() != dynamic_cast<const StopArea*>(jp.getEdge(i)->getFromVertex()->getHub())->getKey())
 				{
 					return false;
 				}
@@ -2119,7 +2119,7 @@ namespace synthese
 					bool ok(true);
 					for(size_t i(0); i<arretChns.size(); ++i)
 					{
-						if(jp.getEdge(i)->getFromVertex()->getHub() != arretChns[i].arret->syntheseStop->getHub())
+						if(dynamic_cast<const StopArea*>(jp.getEdge(i)->getFromVertex()->getHub())->getKey() != dynamic_cast<const StopArea*>(arretChns[i].arret->syntheseStop->getHub())->getKey())
 						{
 							ok = false;
 							break;
