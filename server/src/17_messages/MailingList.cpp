@@ -206,7 +206,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Builds the list of the broadcast points for displaying in admin pages.
 		/// @retval result the list to populate
-		void MailingList::getBrodcastPoints( BroadcastPoints& result ) const
+		void MailingList::getBroadcastPoints( BroadcastPoints& result ) const
 		{
 			BOOST_FOREACH(
 				const MailingList::Registry::value_type& it,

@@ -60,8 +60,6 @@ MessageApplicationPeriodTableSync.cpp
 MessageApplicationPeriodTableSync.hpp
 MessagesAdmin.cpp
 MessagesAdmin.h
-MessagesAdvancedSelectTableSync.cpp
-MessagesAdvancedSelectTableSync.h
 MessagesLibraryAdmin.cpp
 MessagesLibraryAdmin.h
 MessagesLibraryLog.cpp

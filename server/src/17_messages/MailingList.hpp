@@ -95,7 +95,7 @@ namespace synthese
 					const util::ParametersMap& parameters
 				) const;
 
-				virtual void getBrodcastPoints(BroadcastPoints& result) const;
+				virtual void getBroadcastPoints(BroadcastPoints& result) const;
 			//@}
 		};
 	}
