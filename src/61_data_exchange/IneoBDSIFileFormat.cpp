@@ -1883,7 +1883,7 @@ namespace synthese
 			{
 				const graph::Edge* edge(jp.getEdge(i));
 				if(	!dynamic_cast<const DesignatedLinePhysicalStop*>(edge) ||
-					chainage->arretChns[i].arret->syntheseStop->getKey() != jp.getEdge(i)->getFromVertex()->getKey())
+					chainage->arretChns[i].arret->syntheseStop->getHub() != jp.getEdge(i)->getFromVertex()->getHub())
 				{
 					return false;
 				}
@@ -1974,18 +1974,18 @@ namespace synthese
 					break;
 				}
 			}
+			for(size_t i(0); i<chainage->arretChns.size(); ++i)
+			{
+				if(chainage->arretChns[i].arret->syntheseStop->getKey() != 
+					(syntheseService->getRealTimeVertex(i) ? syntheseService->getRealTimeVertex(i)->getKey() : syntheseService->getVertex(i)->getKey())
+				) {
+					syntheseService->setRealTimeVertex(i, chainage->arretChns[i].arret->syntheseStop);
+				}
+			}
 			if(!updated && !syntheseService->hasRealTimeData())
 			{
 				// No update is needed but we do it anyway so that RT schedule will be set
 				syntheseService->setRealTimeSchedules(departureSchedules, arrivalSchedules);
-				for(size_t i(0); i<chainage->arretChns.size(); ++i)
-				{
-					if(chainage->arretChns[i].arret->syntheseStop->getKey() != 
-						(syntheseService->getRealTimeVertex(i) ? syntheseService->getRealTimeVertex(i)->getKey() : syntheseService->getVertex(i)->getKey())
-					) {
-						syntheseService->setRealTimeVertex(i, chainage->arretChns[i].arret->syntheseStop);
-					}
-				}
 			}
 			else if(!updated)
 			{
@@ -2006,14 +2006,6 @@ namespace synthese
 				arrivalSchedules[i] = horaires[i].hra;
 			}
 			syntheseService->setRealTimeSchedules(departureSchedules, arrivalSchedules);
-			for(size_t i(0); i<chainage->arretChns.size(); ++i)
-			{
-				if(chainage->arretChns[i].arret->syntheseStop->getKey() != 
-					(syntheseService->getRealTimeVertex(i) ? syntheseService->getRealTimeVertex(i)->getKey() : syntheseService->getVertex(i)->getKey())
-				) {
-					syntheseService->setRealTimeVertex(i, chainage->arretChns[i].arret->syntheseStop);
-				}
-			}
 			return make_pair(minDelta, maxDelta);
 		}
 
