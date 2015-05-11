@@ -1978,6 +1978,13 @@ namespace synthese
 			{
 				// No update is needed but we do it anyway so that RT schedule will be set
 				syntheseService->setRealTimeSchedules(departureSchedules, arrivalSchedules);
+				for(size_t i(0); i<chainage->arretChns.size(); ++i)
+				{
+					if(chainage->arretChns[i].arret->syntheseStop->getKey() != syntheseService->getRealTimeVertex(i)->getKey())
+					{
+						syntheseService->setRealTimeVertex(i, chainage->arretChns[i].arret->syntheseStop);
+					}
+				}
 			}
 			else if(!updated)
 			{
@@ -1998,6 +2005,13 @@ namespace synthese
 				arrivalSchedules[i] = horaires[i].hra;
 			}
 			syntheseService->setRealTimeSchedules(departureSchedules, arrivalSchedules);
+			for(size_t i(0); i<chainage->arretChns.size(); ++i)
+			{
+				if(chainage->arretChns[i].arret->syntheseStop->getKey() != syntheseService->getRealTimeVertex(i)->getKey())
+				{
+					syntheseService->setRealTimeVertex(i, chainage->arretChns[i].arret->syntheseStop);
+				}
+			}
 			return make_pair(minDelta, maxDelta);
 		}
 
@@ -2111,7 +2125,7 @@ namespace synthese
 					bool ok(true);
 					for(size_t i(0); i<arretChns.size(); ++i)
 					{
-						if(dynamic_cast<const StopPoint*>(jp.getEdge(i)->getFromVertex())->getKey() != arretChns[i].arret->syntheseStop->getKey())
+						if(jp.getEdge(i)->getFromVertex()->getHub() != arretChns[i].arret->syntheseStop->getHub())
 						{
 							ok = false;
 							break;
