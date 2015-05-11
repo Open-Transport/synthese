@@ -50,6 +50,8 @@ namespace synthese
 
 			BroadcastPoint() {}
 
+			virtual ~BroadcastPoint() {}
+
 			virtual MessageType* getMessageType() const = 0;
 
 			virtual bool displaysScenario(const Scenario& scenario) const;
@@ -67,7 +69,7 @@ namespace synthese
 
 			typedef std::vector<BroadcastPoint*> BroadcastPoints;
 			
-			virtual void getBrodcastPoints(BroadcastPoints& result) const = 0;
+			virtual void getBroadcastPoints(BroadcastPoints& result) const = 0;
 
 			static BroadcastPoints GetBroadcastPoints();
 
