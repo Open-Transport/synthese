@@ -1974,14 +1974,6 @@ namespace synthese
 					break;
 				}
 			}
-			for(size_t i(0); i<chainage->arretChns.size(); ++i)
-			{
-				if(chainage->arretChns[i].arret->syntheseStop->getKey() != 
-					(syntheseService->getRealTimeVertex(i) ? syntheseService->getRealTimeVertex(i)->getKey() : syntheseService->getVertex(i)->getKey())
-				) {
-					syntheseService->setRealTimeVertex(i, chainage->arretChns[i].arret->syntheseStop);
-				}
-			}
 			if(!updated && !syntheseService->hasRealTimeData())
 			{
 				// No update is needed but we do it anyway so that RT schedule will be set
@@ -1990,6 +1982,14 @@ namespace synthese
 			else if(!updated)
 			{
 				return UpdateDeltas();
+			}
+			for(size_t i(0); i<chainage->arretChns.size(); ++i)
+			{
+				if(chainage->arretChns[i].arret->syntheseStop->getKey() != 
+					(syntheseService->getRealTimeVertex(i) ? syntheseService->getRealTimeVertex(i)->getKey() : syntheseService->getVertex(i)->getKey())
+				) {
+					syntheseService->setRealTimeVertex(i, chainage->arretChns[i].arret->syntheseStop);
+				}
 			}
 			
 			// if course is ended, don't update it because it may have been cleaned by RTDataCleaner
