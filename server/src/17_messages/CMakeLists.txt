@@ -34,6 +34,8 @@ CustomBroadcastPointTableSync.cpp
 CustomBroadcastPointTableSync.hpp
 CustomBroadcastPointsService.cpp
 CustomBroadcastPointsService.hpp
+FileNotificationProvider.hpp
+FileNotificationProvider.cpp
 GetMessagesFunction.cpp
 GetMessagesFunction.hpp
 MailingList.cpp
@@ -100,6 +102,11 @@ MessageTypeTableSync.cpp
 MessageTypeTableSync.hpp
 NewMessageAction.cpp
 NewMessageAction.h
+NotificationProvider.hpp
+NotificationProvider.cpp
+NotificationProvidersService.cpp
+NotificationProvidersService.hpp
+NotificationProviderTemplate.hpp
 Scenario.cpp
 Scenario.h
 ScenarioAutopilot.hpp

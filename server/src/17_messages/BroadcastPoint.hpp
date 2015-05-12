@@ -1,4 +1,3 @@
-
 /** BroadcastPoint class header.
 	@file BroadcastPoint.hpp
 
@@ -54,6 +53,13 @@ namespace synthese
 
 			virtual MessageType* getMessageType() const = 0;
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Checks if the broadcast point displays the specified scenario.
+			///
+			/// @param scenario the scenario to test
+			/// @param the display parameters
+			/// @return true if at least one message of the specified scenario is currently displayed on the broadcast point.
+			/// Note : if the scenario is a template the check is a simulation
 			virtual bool displaysScenario(const Scenario& scenario) const;
 
 			//////////////////////////////////////////////////////////////////////////
@@ -78,8 +84,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Function to run when the message display begins.
 			/// Default implementation does nothing.
-			/// @param linkedObjects the objects linked to the message
-			/// @param the display parameters
+			/// @param message the SentAlarm to display
 			virtual void onDisplayStart(
 				const SentAlarm& message
 			) const {}
@@ -89,8 +94,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Function to run when the message display ends.
 			/// Default implementation does nothing.
-			/// @param linkedObjects the objects linked to the message
-			/// @param the display parameters
+			/// @param message the SentAlarm to hide
 			virtual void onDisplayEnd(
 				const SentAlarm& message
 			) const {}
@@ -98,4 +102,3 @@ namespace synthese
 }	}
 
 #endif // SYNTHESE_messages_BroadcastPoint_hpp__
-

@@ -1,4 +1,3 @@
-
 #include "MessagesModule.h"
 
 #include "AlarmObjectLinkTableSync.h"
@@ -39,6 +38,7 @@
 #include "ScenariosListFunction.hpp"
 #include "ScenarioDisplayFunction.hpp"
 #include "ScenarioFoldersService.hpp"
+#include "NotificationProvidersService.hpp"
 
 #include "ClearAllBroadcastCachesAction.hpp"
 #include "MailingListSendAction.hpp"
@@ -60,6 +60,7 @@
 // Registries
 #include "AlarmObjectLink.h"
 #include "CustomBroadcastPoint.hpp"
+#include "NotificationProvider.hpp"
 #include "MailingList.hpp"
 #include "MailingListSubscription.hpp"
 #include "MessageAlternative.hpp"
@@ -109,6 +110,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::CustomBroadcastPointsService::integrate();
 	synthese::messages::GetMessagesFunction::integrate();
 	synthese::messages::MailingListsService::integrate();
+	synthese::messages::NotificationProvidersService::integrate();
 	synthese::messages::MessagesSectionsService::integrate();
 	synthese::messages::MessageTagsService::integrate();
 	synthese::messages::MessageTypesService::integrate();
@@ -134,12 +136,12 @@ void synthese::messages::moduleRegister()
 	synthese::messages::ScenarioFolderUpdateAction::integrate();
 
 	synthese::messages::CustomBroadcastPoint::integrate();
-	synthese::messages::MailingList::integrate();
 
 	synthese::messages::BroadcastPointAlarmRecipient::integrate();
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::messages::AlarmObjectLink>();
+	synthese::util::Env::Integrate<synthese::messages::NotificationProvider>();
 	synthese::util::Env::Integrate<synthese::messages::MailingList>();
 	synthese::util::Env::Integrate<synthese::messages::MailingListSubscription>();
 	synthese::util::Env::Integrate<synthese::messages::MessageAlternative>();
