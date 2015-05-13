@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<DBTableSync, NotificationEventTableSync>::FACTORY_KEY("17.121 Notification Events");
+		template<> const string FactorableTemplate<DBTableSync, NotificationEventTableSync>::FACTORY_KEY("17.10 Notification Events");
 	}
 
 	namespace db
@@ -98,10 +98,9 @@ namespace synthese
 			Env& env,
 			boost::optional<util::RegistryKeyType> alarmId = boost::optional<util::RegistryKeyType>(),
 			boost::optional<util::RegistryKeyType> notificationProviderId = boost::optional<util::RegistryKeyType>(),
-			boost::optional<util::RegistryKeyType> messageTypeId = boost::optional<util::RegistryKeyType>(),
 			int first /*= 0*/,
 			boost::optional<std::size_t> number,
-			bool orderByName,
+			bool orderByLastAttempt,
 			bool raisingOrder,
 			LinkLevel linkLevel
 		){
@@ -113,11 +112,7 @@ namespace synthese
 			}
 			if (notificationProviderId)
 			{
-				query.addWhereField(Diffuser::FIELD.name, *notificationProviderId);
-			}
-			if (messageTypeId)
-			{
-				query.addWhereField(TypeOfMessage::FIELD.name, *messageTypeId);
+				query.addWhereField(NotificationProvider::FIELD.name, *notificationProviderId);
 			}
 			if (orderByLastAttempt)
 			{
