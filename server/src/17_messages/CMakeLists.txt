@@ -100,6 +100,10 @@ NewMessageAction.cpp
 NewMessageAction.h
 NotificationChannel.hpp
 NotificationChannel.cpp
+NotificationEvent.cpp
+NotificationEvent.hpp
+NotificationEventTableSync.cpp
+NotificationEventTableSync.hpp
 NotificationProvider.hpp
 NotificationProvider.cpp
 NotificationProvidersService.cpp
