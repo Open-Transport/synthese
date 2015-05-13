@@ -23,6 +23,7 @@
 
 #include <NotificationProvider.hpp>
 #include <NotificationChannel.hpp>
+#include <NotificationEvent.hpp>
 
 #include <Alarm.h>
 #include <AlarmObjectLink.h>
@@ -30,6 +31,7 @@
 #include <Env.h>
 #include <Factory.h>
 #include <Field.hpp>
+#include <ParametersMap.h>
 #include <Registry.h>
 #include <UtilTypes.h>
 
@@ -59,7 +61,7 @@ namespace synthese
 		const std::string FactorableTemplate<BroadcastPoint, NotificationProvider>::FACTORY_KEY = "NotificationProvider";
 	}
 
-	CLASS_DEFINITION(NotificationProvider, "t107_notification_providers", 999)  // TODO Change to 107 at mailing list removal
+	CLASS_DEFINITION(messages::NotificationProvider, "t199_notification_providers", 199)  // TODO Change to 107 at mailing list removal
 
 	namespace messages {
 		FIELD_DEFINITION_OF_OBJECT(NotificationProvider, "notification_provider_id", "notification_provider_ids")
@@ -67,9 +69,8 @@ namespace synthese
 		FIELD_DEFINITION_OF_TYPE(NotificationChannelKey, "channel", SQL_TEXT)
 		FIELD_DEFINITION_OF_TYPE(SubscribeAllBegin, "subscribe_all_begin", SQL_BOOLEAN)
 		FIELD_DEFINITION_OF_TYPE(SubscribeAllEnd, "subscribe_all_end", SQL_BOOLEAN)
-		FIELD_DEFINITION_OF_TYPE(RetryAttemptDelay, "retry_attempt_delayms", SQL_INTEGER)
-		FIELD_DEFINITION_OF_TYPE(MaximumRetryAttempts, "maximum_retry_attempt", SQL_INTEGER)
-
+		FIELD_DEFINITION_OF_TYPE(RetryAttemptDelay, "retry_attempt_delay", SQL_INTEGER)
+		FIELD_DEFINITION_OF_TYPE(MaximumRetryAttempts, "maximum_retry_attempts", SQL_INTEGER)
 
 
 		// Get list of registered notification providers, implementation of NotificationProvider
@@ -95,8 +96,9 @@ namespace synthese
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
-					FIELD_DEFAULT_CONSTRUCTOR(SubscribeAllBegin),
-					FIELD_DEFAULT_CONSTRUCTOR(SubscribeAllEnd),
+					FIELD_DEFAULT_CONSTRUCTOR(NotificationChannelKey),
+					FIELD_VALUE_CONSTRUCTOR(SubscribeAllBegin, false),
+					FIELD_VALUE_CONSTRUCTOR(SubscribeAllEnd, false),
 					FIELD_DEFAULT_CONSTRUCTOR(RetryAttemptDelay),
 					FIELD_DEFAULT_CONSTRUCTOR(MaximumRetryAttempts),
 					FIELD_DEFAULT_CONSTRUCTOR(MessageType),
@@ -105,6 +107,13 @@ namespace synthese
 		{}
 
 
+
+		void NotificationProvider::addAdditionalParameters(
+			util::ParametersMap& map,
+			std::string prefix) const
+		{
+			map.merge(get<Parameters>());
+		}
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -175,6 +184,18 @@ namespace synthese
 			// The notification provider was not found
 			return false;
 		}
+
+
+		/*
+			Notify the event according to NotificationProvider parameters
+			available with "channel" prefix.
+		*/
+		bool notify(const NotificationEvent& event) {
+			// Create corresponding NotificationChannel
+			// Invoke attemptNotification(event)
+			// return true only if completely successful
+		}
+
 	}
 }
 

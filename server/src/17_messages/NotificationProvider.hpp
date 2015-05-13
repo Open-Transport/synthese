@@ -32,6 +32,7 @@
 #include <PointerField.hpp>
 #include <SchemaMacros.hpp>
 #include <StringField.hpp>
+#include <NotificationChannel.hpp>
 #include <string>
 #include <vector>
 
@@ -51,6 +52,9 @@ namespace synthese
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Name),
+
+			// Notification channel key, aka protocol
+			FIELD(NotificationChannelKey),
 
 			// Flag to force processing of all sent alarms for begin events
 			FIELD(SubscribeAllBegin),
@@ -103,26 +107,29 @@ namespace synthese
 				public util::FactorableTemplate<BroadcastPoint, NotificationProvider>
 		{
 		public:
-			/**
-			 * NotificationProvider key in parameters map
-			 */
-			static const std::string ATTR_KEY;
-
 			NotificationProvider(util::RegistryKeyType id=0);
 
 			virtual ~NotificationProvider() {};
 
 			/**
-			 * Map of notification providers:
-			 * - provider name as key
-			 * - NotificationBroadcastPoint implementation as value
-			 */
+				Map of notification providers:
+				- provider name as key
+				- NotificationBroadcastPoint implementation as value
+			*/
 			typedef std::vector<std::string> NotificationChannelsList;
 
 			/**
-			 * Provides the list of registered NotificationBroadcastPoint implementation
-			 */
+				Provides the list of registered NotificationBroadcastPoint implementation
+			*/
 			static NotificationChannelsList GetNotificationChannels();
+
+			/**
+				Support for NotificationChannel specific parameters
+			*/
+			virtual void addAdditionalParameters(
+				util::ParametersMap& map,
+				std::string prefix = std::string()
+			) const;
 
 			/// @name BroadcastPoint virtual methods
 			//@{
@@ -135,6 +142,18 @@ namespace synthese
 
 				virtual void getBroadcastPoints(BroadcastPoints& result) const;
 			//@}
+
+			class NotificationEvent;	// Forward declaration
+
+			/**
+				Notify the event according to NotificationProvider parameters
+				available with "channel" prefix.
+
+				@event NotificationEvent to process
+				@return true only if notification succeeded
+			*/
+			bool notify(const NotificationEvent& event);
+
 		};
 	}
 }

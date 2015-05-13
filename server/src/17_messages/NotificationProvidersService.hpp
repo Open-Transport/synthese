@@ -62,27 +62,12 @@ namespace synthese
 			/// Notification provider service tag
 			static const std::string TAG_NOTIFICATION_PROVIDER;
 
-			/// Service parameter for "subscribe_all_begin" check box
-			static const std::string PARAMETER_SUBSCRIBE_ALL_BEGIN;
-
-			/// Service parameter for "subscribe_all_end" check box
-			static const std::string PARAMETER_SUBSCRIBE_ALL_END;
-
-			/// Service parameter for "retry_attempt_delay" integer value in milliseconds
-			static const std::string PARAMETER_RETRY_ATTEMPT_DELAY;
-
-			/// Service parameter for "maximum_retry_attempts" integer value
-			static const std::string PARAMETER_MAXIMUM_RETRY_ATTEMPTS;
-
 			/// Service parameter to list channels,
 			/// aka notification provider key (previously known as protocol)
 			static const std::string PARAMETER_LIST_CHANNELS;
 
 			/// Channel tag with provider instances to list their key
 			static const std::string TAG_CHANNEL;
-
-			/// Key attribute for provider instances and channels
-			static const std::string ATTR_KEY;
 
 
 		protected:
