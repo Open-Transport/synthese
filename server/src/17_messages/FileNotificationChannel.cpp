@@ -1,5 +1,5 @@
-/** FileNotificationProvider class header
-	@file FileNotificationProvider.hpp
+/** FileNotificationChannel implementation
+	@file FileNotificationChannel.cpp
 	@author Yves Martin
 	@date 2015
 
@@ -20,23 +20,25 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-#ifndef SYNTHESE_messages_FileNotificationProvider_hpp__
-#define SYNTHESE_messages_FileNotificationProvider_hpp__
 
-#include <NotificationProviderTemplate.hpp>
+#include <FactorableTemplate.h>
+#include <FileNotificationChannel.hpp>
+#include <string>
 
 namespace synthese
 {
-	namespace messages {
-		class FileNotificationProvider:
-				public NotificationProviderTemplate<NotificationProvider>
-		{
-		public:
-			FileNotificationProvider();
+	using namespace messages;
 
-			virtual ~FileNotificationProvider();
+	namespace util
+	{
+		template<> const std::string FactorableTemplate<NotificationChannel, FileNotificationChannel>::FACTORY_KEY("File");
+	}
+
+	namespace messages
+	{
+		FileNotificationChannel::FileNotificationChannel()
+		{
+			// Prepare internal state for notifications
 		};
 	}
 }
-
-#endif /* SYNTHESE_messages_FileNotificationProvider_hpp__ */

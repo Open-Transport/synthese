@@ -1,5 +1,5 @@
-/** NotificationProviderTemplate template header
-	@file NotificationProviderTemplate.hpp
+/** FileNotificationChannel class header
+	@file FileNotificationChannel.hpp
 	@author Yves Martin
 	@date 2015
 
@@ -20,28 +20,24 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#ifndef SYNTHESE_messages_FileNotificationChannel_hpp__
+#define SYNTHESE_messages_FileNotificationChannel_hpp__
 
-#ifndef SYNTHESE_messages_NotificationProviderTemplate_hpp__
-#define SYNTHESE_messages_NotificationProviderTemplate_hpp__
-
+#include <NotificationChannel.hpp>
 #include <FactorableTemplate.h>
-#include <NotificationProvider.hpp>
 
 namespace synthese
 {
-	namespace messages
-	{
-		/**
-			Notification provider template.
-		*/
-		template<class NP>
-		class NotificationProviderTemplate:
-			public util::FactorableTemplate<NotificationProvider,NP>
+	namespace messages {
+		class FileNotificationChannel:
+			public util::FactorableTemplate<NotificationChannel,FileNotificationChannel>
 		{
 		public:
-			// TODO nothing for the moment
+			FileNotificationChannel();
+
+			virtual ~FileNotificationChannel() { };
 		};
 	}
 }
 
-#endif /* SYNTHESE_messages_NotificationProviderTemplate_hpp__ */
+#endif /* SYNTHESE_messages_FileNotificationChannel_hpp__ */
