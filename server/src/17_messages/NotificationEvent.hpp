@@ -21,8 +21,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_messages_NotificationEvent_h__
-#define SYNTHESE_messages_NotificationEvent_h__
+#ifndef SYNTHESE_messages_NotificationEvent_hpp__
+#define SYNTHESE_messages_NotificationEvent_hpp__
 
 #include "Object.hpp"
 
@@ -96,9 +96,9 @@ namespace synthese
 
 			NotificationEvent(
 				util::RegistryKeyType id,
-				const Alarm& alarm,
+				Alarm& alarm,
 				const boost::posix_time::ptime& expiration,
-				const NotificationProvider& notificationProvider
+				NotificationProvider& notificationProvider
 				);
 
 			virtual ~NotificationEvent() { };
@@ -106,4 +106,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_messages_NotificationEvent_h__
+#endif // SYNTHESE_messages_NotificationEvent_hpp__
