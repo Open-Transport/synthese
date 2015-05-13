@@ -22,6 +22,7 @@
 */
 
 #include <NotificationProvider.hpp>
+#include <NotificationChannel.hpp>
 
 #include <Alarm.h>
 #include <AlarmObjectLink.h>
@@ -58,11 +59,12 @@ namespace synthese
 		const std::string FactorableTemplate<BroadcastPoint, NotificationProvider>::FACTORY_KEY = "NotificationProvider";
 	}
 
-	CLASS_DEFINITION(NotificationProvider, "t107_notification_providers", 107)
+	CLASS_DEFINITION(NotificationProvider, "t107_notification_providers", 999)  // TODO Change to 107 at mailing list removal
 
 	namespace messages {
 		FIELD_DEFINITION_OF_OBJECT(NotificationProvider, "notification_provider_id", "notification_provider_ids")
 
+		FIELD_DEFINITION_OF_TYPE(NotificationChannelKey, "channel", SQL_TEXT)
 		FIELD_DEFINITION_OF_TYPE(SubscribeAllBegin, "subscribe_all_begin", SQL_BOOLEAN)
 		FIELD_DEFINITION_OF_TYPE(SubscribeAllEnd, "subscribe_all_end", SQL_BOOLEAN)
 		FIELD_DEFINITION_OF_TYPE(RetryAttemptDelay, "retry_attempt_delayms", SQL_INTEGER)
@@ -71,11 +73,11 @@ namespace synthese
 
 
 		// Get list of registered notification providers, implementation of NotificationProvider
-		NotificationProvider::NotificationProvidersKeyList NotificationProvider::GetNotificationProviders()
+		NotificationProvider::NotificationChannelsList NotificationProvider::GetNotificationChannels()
 		{
-			Factory<NotificationProvider>::Keys keys(Factory<NotificationProvider>::GetKeys());
-			NotificationProvider::NotificationProvidersKeyList vec;
-			BOOST_FOREACH(const Factory<NotificationProvider>::Keys::value_type& key, keys)
+			Factory<NotificationChannel>::Keys keys(Factory<NotificationChannel>::GetKeys());
+			NotificationProvider::NotificationChannelsList vec;
+			BOOST_FOREACH(const Factory<NotificationChannel>::Keys::value_type& key, keys)
 			{
 				vec.push_back(key);
 			}
