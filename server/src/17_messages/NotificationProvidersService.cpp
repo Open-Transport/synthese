@@ -59,26 +59,31 @@ namespace synthese
 
 	namespace messages
 	{
-		const string NotificationProvidersService::TAG_NOTIFICATION_PROVIDER = "notification_provider";
-		const string NotificationProvidersService::PARAMETER_SUBSCRIBE_ALL_BEGIN = "subscribe_all_begin";
-		const string NotificationProvidersService::PARAMETER_SUBSCRIBE_ALL_END = "subscribe_all_end";
-		const string NotificationProvidersService::PARAMETER_RETRY_ATTEMPT_DELAY = "retry_attempt_delay";
-		const string NotificationProvidersService::PARAMETER_MAXIMUM_RETRY_ATTEMPTS = "maximum_retry_attempts";
+		const string NotificationProvidersService::TAG_NOTIFICATION_PROVIDER = "provider";
 		const string NotificationProvidersService::PARAMETER_LIST_CHANNELS = "list_channels";
 		const string NotificationProvidersService::TAG_CHANNEL = "channel";
-
-		const string NotificationProvidersService::ATTR_KEY = "key";
-
 
 		ParametersMap NotificationProvidersService::_getParametersMap() const
 		{
 			ParametersMap map;
 
 			// If unique notification provider with ID
+			/*
 			if(_notificationProvider)
 			{
 				map.insert(Request::PARAMETER_OBJECT_ID, _notificationProvider->getKey());
 			}
+			*/
+			/*
+			std::string filePath = (get<Parameters>()).get<std::string>("file_path");
+			if(filePath) {
+				map.insert("file_path", filePath);
+			}
+			std::string fileContent = (get<Parameters>()).get<std::string>("file_content");
+			if(fileContent) {
+				map.insert("file_content", fileContent);
+			}
+			*/
 			return map;
 		}
 
@@ -117,10 +122,11 @@ namespace synthese
 			// List channels, aka notification provider keys
 			if(_listChannels) {
 				Factory<NotificationChannel>::Keys keys(Factory<NotificationChannel>::GetKeys());
+				// Do not use GetNewCollections for only a key list
 				BOOST_FOREACH(const Factory<NotificationChannel>::Keys::value_type& channelKey, keys)
 				{
 					boost::shared_ptr<ParametersMap> channelPM(new ParametersMap);
-					channelPM->insert(ATTR_KEY, channelKey);
+					channelPM->insert(NotificationChannel::ATTR_KEY, channelKey);
 					map.insert(TAG_CHANNEL, channelPM);
 				}
 				return map;

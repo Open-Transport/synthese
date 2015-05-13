@@ -40,14 +40,14 @@ namespace synthese
 	namespace util
 	{
 		template<> const std::string FactorableTemplate<db::DBTableSync,NotificationProviderTableSync>::FACTORY_KEY(
-			"17_NotificationProviders"
+			"17.10 Notification providers"
 		);
 	}
 
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<NotificationProviderTableSync>::TABLE(
-			"t107_notification_providers"
+			"t199_notification_providers"
 		);
 
 		template<> const Field DBTableSyncTemplate<NotificationProviderTableSync>::_FIELDS[] = { Field() }; // Defined by the record
@@ -65,6 +65,8 @@ namespace synthese
 			util::RegistryKeyType object_id
 		){
 			//TODO Check user rights
+			//TODO Prevent removal if NotificationEvent instances still exist
+			//with reference to it
 			return true;
 		}
 
