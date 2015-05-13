@@ -21,8 +21,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "NotificationEvent.hpp"
+#include <NotificationEvent.hpp>
+#include <Field.hpp>
+#include <PointerField.hpp>
+#include <Registry.h>
+#include <UtilTypes.h>
 
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/fusion/support/pair.hpp>
+#include <boost/optional/optional.hpp>
+
+using namespace boost;
 using namespace std;
 
 namespace synthese
@@ -39,8 +48,6 @@ namespace synthese
 		FIELD_DEFINITION_OF_TYPE(Expiration, "expiration", SQL_DATETIME)
 		FIELD_DEFINITION_OF_TYPE(LastAttempt, "last_attempt", SQL_DATETIME)
 		FIELD_DEFINITION_OF_TYPE(Attempts, "attempts", SQL_INTEGER)
-		FIELD_DEFINITION_OF_TYPE(Diffuser, "notification_provider_id", SQL_INTEGER)
-		FIELD_DEFINITION_OF_TYPE(TypeOfMessage, "message_type_id", SQL_INTEGER)
 		FIELD_DEFINITION_OF_TYPE(Status, "status", SQL_INTEGER)
 
 		/// Default constructor as a Registrable
@@ -55,11 +62,10 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Expiration, posix_time::not_a_date_time),
 					FIELD_VALUE_CONSTRUCTOR(LastAttempt, posix_time::not_a_date_time),
 					FIELD_VALUE_CONSTRUCTOR(Attempts, 0),
-					FIELD_DEFAULT_CONSTRUCTOR(Diffuser),
-					FIELD_DEFAULT_CONSTRUCTOR(TypeOfMessage),
-					FIELD_DEFAULT_CONSTRUCTOR(Status, NotificationStatus.READY)
+					FIELD_DEFAULT_CONSTRUCTOR(NotificationProvider),
+					FIELD_VALUE_CONSTRUCTOR(Status, READY)
 				)	)
-		{}
+		{ };
 
 		NotificationEvent::NotificationEvent(
 			RegistryKeyType id,
@@ -74,11 +80,10 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Expiration, expiration),
 					FIELD_VALUE_CONSTRUCTOR(LastAttempt, posix_time::not_a_date_time),
 					FIELD_VALUE_CONSTRUCTOR(Attempts, 0),
-					FIELD_VALUE_CONSTRUCTOR(Diffuser, &notificationProvider),
-					FIELD_VALUE_CONSTRUCTOR(TypeOfMessage, notificationProvider->getMessageType()),
-					FIELD_DEFAULT_CONSTRUCTOR(Status, READY)
+					FIELD_DEFAULT_CONSTRUCTOR(NotificationProvider),
+					FIELD_VALUE_CONSTRUCTOR(Status, READY)
 				)	)
-		{}
+		{ };
 	
 	}
 }
