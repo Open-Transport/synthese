@@ -48,8 +48,7 @@ namespace synthese
 		FIELD_DEFINITION_OF_TYPE(LastAttempt, "last_attempt", SQL_DATETIME)
 		FIELD_DEFINITION_OF_TYPE(Attempts, "attempts", SQL_INTEGER)
 		FIELD_DEFINITION_OF_TYPE(Status, "status", SQL_INTEGER)
-		FIELD_DEFINITION_OF_TYPE(Type, "type", SQL_INTEGER)
-		FIELD_DEFINITION_OF_TYPE(Reminder, "reminder", SQL_INTEGER)
+		FIELD_DEFINITION_OF_TYPE(EventType, "type", SQL_INTEGER)
 
 		/// Default constructor as a Registrable
 		/// @param id registry key type
@@ -65,8 +64,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Attempts, 0),
 					FIELD_DEFAULT_CONSTRUCTOR(NotificationProvider),
 					FIELD_VALUE_CONSTRUCTOR(Status, READY),
-					FIELD_VALUE_CONSTRUCTOR(Type, NONE),
-					FIELD_VALUE_CONSTRUCTOR(Reminder, NONE)
+					FIELD_VALUE_CONSTRUCTOR(EventType, NONE)
 				)	)
 		{ };
 
@@ -85,8 +83,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Attempts, 0),
 					FIELD_VALUE_CONSTRUCTOR(NotificationProvider, boost::optional<NotificationProvider&>(notificationProvider)),
 					FIELD_VALUE_CONSTRUCTOR(Status, READY),
-					FIELD_VALUE_CONSTRUCTOR(Type, NONE),
-					FIELD_VALUE_CONSTRUCTOR(Reminder, NONE)
+					FIELD_VALUE_CONSTRUCTOR(EventType, NONE)
 				)	)
 		{ };
 

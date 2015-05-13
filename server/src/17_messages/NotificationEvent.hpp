@@ -50,15 +50,15 @@ namespace synthese
 		{
 			NONE = 0,
 			BEGIN = 1,
-			END = 2
+			END = 2,
+			REMINDER = 3
 		} NotificationType;
 
 		FIELD_PTIME(Expiration)
 		FIELD_PTIME(LastAttempt)
 		FIELD_INT(Attempts)
 		FIELD_ENUM(Status, NotificationStatus)
-		FIELD_ENUM(Type, NotificationType)
-		FIELD_ENUM(Reminder, NotificationType)
+		FIELD_ENUM(EventType, NotificationType)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -82,10 +82,7 @@ namespace synthese
 			FIELD(Status),
 
 			// Type of notification: begin or end
-			FIELD(Type),
-
-			// Reminder  // TODO: to be redefined later on
-			FIELD(Reminder)
+			FIELD(EventType)
 		> NotificationEventRecord;
 
 		/**
