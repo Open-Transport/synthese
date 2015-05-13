@@ -44,7 +44,6 @@ namespace synthese
 	namespace messages {
 		FIELD_DEFINITION_OF_OBJECT(NotificationEvent, "notification_event_id", "notification_event_ids")
 
-		// FIELD_DEFINITION_OF_TYPE(AlarmMessage, "alarm_id", SQL_INTEGER)
 		FIELD_DEFINITION_OF_TYPE(Expiration, "expiration", SQL_DATETIME)
 		FIELD_DEFINITION_OF_TYPE(LastAttempt, "last_attempt", SQL_DATETIME)
 		FIELD_DEFINITION_OF_TYPE(Attempts, "attempts", SQL_INTEGER)
@@ -58,7 +57,7 @@ namespace synthese
 			Object<NotificationEvent, NotificationEventRecord>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
-					FIELD_DEFAULT_CONSTRUCTOR(AlarmMessage),
+					FIELD_DEFAULT_CONSTRUCTOR(Alarm),
 					FIELD_VALUE_CONSTRUCTOR(Expiration, posix_time::not_a_date_time),
 					FIELD_VALUE_CONSTRUCTOR(LastAttempt, posix_time::not_a_date_time),
 					FIELD_VALUE_CONSTRUCTOR(Attempts, 0),
@@ -76,7 +75,7 @@ namespace synthese
 			Object<NotificationEvent, NotificationEventRecord>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
-					FIELD_VALUE_CONSTRUCTOR(AlarmMessage, boost::optional<Alarm&>(alarm)),
+					FIELD_VALUE_CONSTRUCTOR(Alarm, boost::optional<Alarm&>(alarm)),
 					FIELD_VALUE_CONSTRUCTOR(Expiration, expiration),
 					FIELD_VALUE_CONSTRUCTOR(LastAttempt, posix_time::not_a_date_time),
 					FIELD_VALUE_CONSTRUCTOR(Attempts, 0),
