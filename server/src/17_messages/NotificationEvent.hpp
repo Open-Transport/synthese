@@ -28,6 +28,7 @@
 
 #include "NumericField.hpp"
 #include "StringField.hpp"
+#include "EnumObjectField.hpp"
 #include "SchemaMacros.hpp"
 #include "Alarm.h"
 #include "NotificationProvider.hpp"
@@ -49,8 +50,6 @@ namespace synthese
 		FIELD_PTIME(Expiration)
 		FIELD_PTIME(LastAttempt)
 		FIELD_INT(Attempts)
-		FIELD_POINTER(Diffuser, messages::NotificationProvider)
-		FIELD_POINTER(TypeOfMessage, messages::MessageType)
 		FIELD_ENUM(Status, messages::NotificationStatus)
 
 		typedef boost::fusion::map<
@@ -69,10 +68,7 @@ namespace synthese
 			FIELD(Attempts),
 
 			// Reference to the provider responsible for notification
-			FIELD(Diffuser),
-
-			// Reference to the type of message
-			FIELD(TypeOfMessage),
+			FIELD(NotificationProvider),
 
 			// Technical status of the notification
 			FIELD(Status)
@@ -105,7 +101,7 @@ namespace synthese
 				const NotificationProvider& notificationProvider
 				);
 
-			virtual ~NotificationEvent() {};
+			virtual ~NotificationEvent() { };
 		};
 	}
 }

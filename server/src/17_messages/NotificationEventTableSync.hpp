@@ -21,8 +21,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_messages_NotificationEventTableSync_h__
-#define SYNTHESE_messages_NotificationEventTableSync_h__
+#ifndef SYNTHESE_messages_NotificationEventTableSync_hpp__
+#define SYNTHESE_messages_NotificationEventTableSync_hpp__
 
 #include "NotificationEvent.hpp"
 
@@ -40,9 +40,16 @@ namespace synthese
 		{
 		public:
 			/** Notification event search.
+
+			The size of the vector is less or equal to number, then all
+			sections are returned despite of the number limit. If the size is
+			greater than number (actually equal to number + 1) then there are
+			others sections to show.
+			Test it to know if the situation needs a "click for more" button.
+
 			@param first First Message type to answer
-			@param number Number of Message types to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-			@return Found message types.
+			@param number Number of Message sections to answer (0 = all). Test after return to know if more results are available.
+			@return Found message events, from first, limited to number.
 			@author Ivan Ivanov
 			@date 2015
 			*/
@@ -50,7 +57,6 @@ namespace synthese
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> alarmId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<util::RegistryKeyType> notificationProviderId = boost::optional<util::RegistryKeyType>(),
-				boost::optional<util::RegistryKeyType> messageTypeId = boost::optional<util::RegistryKeyType>(),
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByLastAttempt = true,
@@ -62,4 +68,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_messages_NotificationEventTableSync_h__
+#endif // SYNTHESE_messages_NotificationEventTableSync_hpp__
