@@ -1,5 +1,5 @@
-/** FileNotificationProvider implementation
-	@file FileNotificationProvider.cpp
+/** NotificationProviderTableSync class header.
+	@file NotificationProviderTableSync.hpp
 	@author Yves Martin
 	@date 2015
 
@@ -20,22 +20,25 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#ifndef SYNTHESE_messages_NotificationProviderTableSync_hpp__
+#define SYNTHESE_messages_NotificationProviderTableSync_hpp__
 
-#include <FactorableTemplate.h>
-#include <FileNotificationProvider.hpp>
-#include <string>
+#include <DBDirectTableSyncTemplate.hpp>
+#include <NotificationProvider.hpp>
 
 namespace synthese
 {
-	using namespace messages;
-
-	namespace util
-	{
-		template<> const std::string FactorableTemplate<NotificationProvider, FileNotificationProvider>::FACTORY_KEY("File");
-	}
-
 	namespace messages
 	{
+		class NotificationProviderTableSync:
+			public db::DBDirectTableSyncTemplate<NotificationProviderTableSync, NotificationProvider>
+		{
+		public:
+			NotificationProviderTableSync();
+			virtual ~NotificationProviderTableSync();
+		};
 
-	}
-}
+	} /* namespace messages */
+} /* namespace synthese */
+
+#endif /* SYNTHESE_messages_NotificationProviderTableSync_hpp__ */

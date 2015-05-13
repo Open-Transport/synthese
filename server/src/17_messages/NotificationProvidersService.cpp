@@ -22,6 +22,7 @@
 */
 
 #include <NotificationProvidersService.hpp>
+#include <NotificationChannel.hpp>
 
 #include <Env.h>
 #include <MailingList.hpp>
@@ -58,12 +59,15 @@ namespace synthese
 
 	namespace messages
 	{
+		const string NotificationProvidersService::TAG_NOTIFICATION_PROVIDER = "notification_provider";
 		const string NotificationProvidersService::PARAMETER_SUBSCRIBE_ALL_BEGIN = "subscribe_all_begin";
 		const string NotificationProvidersService::PARAMETER_SUBSCRIBE_ALL_END = "subscribe_all_end";
 		const string NotificationProvidersService::PARAMETER_RETRY_ATTEMPT_DELAY = "retry_attempt_delay";
 		const string NotificationProvidersService::PARAMETER_MAXIMUM_RETRY_ATTEMPTS = "maximum_retry_attempts";
-		const string NotificationProvidersService::TAG_NOTIFICATION_PROVIDER = "notification_provider";
+		const string NotificationProvidersService::PARAMETER_LIST_CHANNELS = "list_channels";
+		const string NotificationProvidersService::TAG_CHANNEL = "channel";
 
+		const string NotificationProvidersService::ATTR_KEY = "key";
 
 
 		ParametersMap NotificationProvidersService::_getParametersMap() const
@@ -95,6 +99,10 @@ namespace synthese
 					throw RequestException("No such notification provider : "+ lexical_cast<string>(objectId));
 				}
 			}
+			else
+			{
+				_listChannels = map.getDefault<bool>(PARAMETER_LIST_CHANNELS, false);
+			}
 		}
 
 
@@ -103,6 +111,20 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
+			// Result
+			ParametersMap map;
+
+			// List channels, aka notification provider keys
+			if(_listChannels) {
+				Factory<NotificationChannel>::Keys keys(Factory<NotificationChannel>::GetKeys());
+				BOOST_FOREACH(const Factory<NotificationChannel>::Keys::value_type& channelKey, keys)
+				{
+					boost::shared_ptr<ParametersMap> channelPM(new ParametersMap);
+					channelPM->insert(ATTR_KEY, channelKey);
+					map.insert(TAG_CHANNEL, channelPM);
+				}
+				return map;
+			}
 
 			// Build the list of objects to export
 			typedef multimap<string, const NotificationProvider*> NotificationProviderLists;
@@ -124,9 +146,6 @@ namespace synthese
 					);
 				}
 			}
-
-			// Populate the map
-			ParametersMap map;
 
 			// Loop on notification providers
 			BOOST_FOREACH(const NotificationProviderLists::value_type& it, providers)
@@ -163,6 +182,7 @@ namespace synthese
 
 
 		NotificationProvidersService::NotificationProvidersService():
+			_listChannels(false),
 			_notificationProvider(NULL)
 		{
 

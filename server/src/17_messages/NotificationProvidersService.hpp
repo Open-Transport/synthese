@@ -42,18 +42,26 @@ namespace synthese
 
 	namespace messages
 	{
-		//////////////////////////////////////////////////////////////////////////
-		///	17.15 Function : NotificationProvidersService.
-		/// TODO See https://projects.open-transport.org/projects/terminus/wiki/NotificationProviders
-		//////////////////////////////////////////////////////////////////////////
-		///	@ingroup m17Functions refFunctions
-		///	@author yves.martin
-		///	@date 2015
-		/// @since TODO
+		/**
+			17.15 Function : NotificationProvidersService.
+			TODO See https://projects.open-transport.org/projects/terminus/wiki/NotificationProviders
+			@ingroup m17Functions refFunctions
+			@author yves.martin
+			@date 2015
+			@since TODO
+
+			This "notification_providers" service provides support to
+			- list channels aka provider keys / protocols
+			- list notification provider registered instances
+			- create or update a notification provider instance
+		*/
 		class NotificationProvidersService:
 			public util::FactorableTemplate<server::Function,NotificationProvidersService>
 		{
 		public:
+			/// Notification provider service tag
+			static const std::string TAG_NOTIFICATION_PROVIDER;
+
 			/// Service parameter for "subscribe_all_begin" check box
 			static const std::string PARAMETER_SUBSCRIBE_ALL_BEGIN;
 
@@ -66,13 +74,21 @@ namespace synthese
 			/// Service parameter for "maximum_retry_attempts" integer value
 			static const std::string PARAMETER_MAXIMUM_RETRY_ATTEMPTS;
 
-			/// Notification provider admin page tag
-			static const std::string TAG_NOTIFICATION_PROVIDER;
+			/// Service parameter to list channels,
+			/// aka notification provider key (previously known as protocol)
+			static const std::string PARAMETER_LIST_CHANNELS;
+
+			/// Channel tag with provider instances to list their key
+			static const std::string TAG_CHANNEL;
+
+			/// Key attribute for provider instances and channels
+			static const std::string ATTR_KEY;
 
 
 		protected:
 			//! \name Page parameters
 			//@{
+				bool _listChannels;
 				const NotificationProvider* _notificationProvider;
 			//@}
 

@@ -35,14 +35,14 @@
 #include <string>
 #include <vector>
 
-/** @defgroup refFile 17 Notification providers
+/** @defgroup refFile 17 Notification provider broadcast point
 	@ingroup ref
 */
 
 namespace synthese
 {
-	namespace messages {
-
+	namespace messages
+	{
 		FIELD_BOOL(SubscribeAllBegin)
 		FIELD_BOOL(SubscribeAllEnd)
 		FIELD_INT(RetryAttemptDelay)
@@ -71,30 +71,33 @@ namespace synthese
 			FIELD(Parameters)
 		> NotificationProviderRecord;
 
-		/**
-			@class NotificationProvider
-			@ingroup m17
+/**
+	@class NotificationProvider
+	@ingroup m17
 
-			Notification provider factorable base class.
+	A NotificationProvider broadcasts message out of Synthese system. It is
+	BroadcastPoint implementation that can be associated to alarms.
 
-			Each NotificationProvider subclass provides a way to
-			broadcast message out of Synthese system.
+        The SubscribeAllBegin and SubscribeAllEnd flags allow to subscribe all
+        alarms even if user does not enlist the registered provider
+        specifically.
 
-			Message broadcasting
+	Message broadcasting
 
-			Each provider is notify by MessagesActivationThread
-			about begin and end period for each active SentAlarm.
+	Each registered provider is notified by MessagesActivationThread about
+	begin and end period for each active SentAlarm.
 
-			It has to create a NotificationEvent which will persist for
-			relevant event (begin or end).
+	NotificationProvider creates a NotificationEvent which will persist for
+	relevant event (begin or end).
 
-			The NotificationThread will submit back events to NotificationProvider
-			so that the technical job of broadcasting is achieved. In case of
-			failure an exception must be thrown.
+	The NotificationThread will submit back events to corresponding
+	NotificationChannel implementation so that the technical job of
+	broadcasting is achieved. In case of failure an exception must be
+	thrown.
 
-			The NotificationThread implements error handling and retry mechanism
-			for all notification providers.
-		 */
+	The NotificationThread implements error handling and retry mechanism
+	for all notification providers.
+ */
 		class NotificationProvider:
 				public Object<NotificationProvider, NotificationProviderRecord>,
 				public util::FactorableTemplate<BroadcastPoint, NotificationProvider>
@@ -114,12 +117,12 @@ namespace synthese
 			 * - provider name as key
 			 * - NotificationBroadcastPoint implementation as value
 			 */
-			typedef std::vector<std::string> NotificationProvidersKeyList;
+			typedef std::vector<std::string> NotificationChannelsList;
 
 			/**
 			 * Provides the list of registered NotificationBroadcastPoint implementation
 			 */
-			static NotificationProvidersKeyList GetNotificationProviders();
+			static NotificationChannelsList GetNotificationChannels();
 
 			/// @name BroadcastPoint virtual methods
 			//@{

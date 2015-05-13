@@ -14,6 +14,7 @@
 #include "ScenarioCalendarTableSync.hpp"
 #include "ScenarioFolderTableSync.h"
 #include "TextTemplateTableSync.h"
+#include "NotificationProviderTableSync.hpp"
 
 #include "BroadcastPointAlarmRecipient.hpp"
 
@@ -71,6 +72,8 @@
 #include "ScenarioFolder.h"
 #include "Scenario.h"
 #include "ScenarioCalendar.hpp"
+#include "FileNotificationChannel.hpp"
+#include "HttpNotificationChannel.hpp"
 
 
 #include "MessagesModule.inc.cpp"
@@ -83,6 +86,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::AlarmObjectLinkTableSync::integrate();
 	synthese::messages::AlarmTableSync::integrate();
 	synthese::messages::CustomBroadcastPointTableSync::integrate();
+	synthese::messages::NotificationProviderTableSync::integrate();
 	synthese::messages::MailingListTableSync::integrate();
 	synthese::messages::MailingListSubscriptionTableSync::integrate();
 	synthese::messages::MessageAlternativeTableSync::integrate();
@@ -136,6 +140,9 @@ void synthese::messages::moduleRegister()
 	synthese::messages::ScenarioFolderUpdateAction::integrate();
 
 	synthese::messages::CustomBroadcastPoint::integrate();
+	synthese::messages::NotificationProvider::integrate();
+	synthese::messages::FileNotificationChannel::integrate();
+	synthese::messages::HttpNotificationChannel::integrate();
 
 	synthese::messages::BroadcastPointAlarmRecipient::integrate();
 
