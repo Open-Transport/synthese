@@ -46,17 +46,16 @@ namespace synthese
 			SUCCESS = 3
 		} NotificationStatus;
 
-		FIELD_POINTER(AlarmMessage, messages::Alarm)
 		FIELD_PTIME(Expiration)
 		FIELD_PTIME(LastAttempt)
 		FIELD_INT(Attempts)
-		FIELD_ENUM(Status, messages::NotificationStatus)
+		FIELD_ENUM(Status, NotificationStatus)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
 
 			// Reference to the alarm message
-			FIELD(AlarmMessage),
+			FIELD(Alarm),
 
 			// Expiration timestamp of the notification
 			FIELD(Expiration),
