@@ -55,3 +55,24 @@
   label=Transmettre les annulations de course par inter_synthese&
   name=send_deactivations_by_inter_synthese&
 #>
+
+<#forms/yes_no_input&
+  label=Lire le champ DEST.SMS&
+  name=read_dest_sms&
+#>
+
+<#forms/text_input&
+  label=Codes des lignes à charger non présentes dans la BDSI&
+  name=overload_lines&
+  unit=(séparés par des virgules)&
+#>
+
+<#forms/yes_no_input&
+  label=Lire les champs HORAIRE.etat_harr et etat_hdep&
+  name=read_etat_horaire&
+#>
+
+<#forms/yes_no_input&
+  label=Lire la table PROGRAMMATION&
+  name=read_programmations&
+#>
