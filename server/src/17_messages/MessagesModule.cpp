@@ -27,6 +27,8 @@
 #include "CommercialLine.h"
 #include "Env.h"
 #include "MessagesSection.hpp"
+#include "NotificationEvent.hpp"
+#include "NotificationEventTableSync.hpp"
 #include "SentScenario.h"
 #include "ServerModule.h"
 #include "ScenarioTemplate.h"
@@ -72,6 +74,10 @@ namespace synthese
 				&MessagesModule::ScenariiActivationThread,
 				"ScenariiActivation"
 			);
+			ServerModule::AddThread(
+				&MessagesModule::NotificationThread,
+				"Notification"
+				);
 		}
 
 		template<> void ModuleClassTemplate<MessagesModule>::Start()
@@ -291,6 +297,55 @@ namespace synthese
 
 
 
+		//////////////////////////////////////////////////////////////////////////
+		/// This thread handles every minute the notification events.
+		void MessagesModule::NotificationThread()
+		{
+			while (true)
+			{
+				// Check if a new minute has begun
+				ptime now(second_clock::local_time());
+				if (now.time_of_day().minutes() != _lastMinute)
+				{
+					// Change the thread status
+					ServerModule::SetCurrentThreadRunningAction();
+
+					// Handle notification events
+					HandleNotificationEvents();
+
+					// Update the last seconds cache
+					_lastMinute = now.time_of_day().minutes();
+
+					// Change the thread status
+					ServerModule::SetCurrentThreadWaiting();
+				}
+
+				// Wait 500 ms
+				this_thread::sleep(milliseconds(500));
+			}
+
+		}
+		
+		//////////////////////////////////////////////////////////////////////////
+		/// Management of the notification events
+		void MessagesModule::HandleNotificationEvents()
+		{
+			// Loop on all notification events
+			NotificationEventTableSync::SearchResult events;
+
+			events = NotificationEventTableSync::Search(
+				Env::GetOfficialEnv()
+				);
+			BOOST_FOREACH(const boost::shared_ptr<NotificationEvent>& notificationEvent, events)
+			{
+				// Notify NotificationProvider if the event has FAILED
+				if (notificationEvent->get<Status>() == FAILED)
+				{
+					notificationEvent->get<NotificationProvider>()->notify(notificationEvent);
+				}
+			}
+		}
+		
 		bool MessagesModule::_selectMessagesToActivate( const Alarm& object )
 		{
 			// Now

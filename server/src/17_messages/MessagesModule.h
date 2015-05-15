@@ -95,10 +95,12 @@ namespace synthese
 
 			static bool _selectMessagesToActivate(const Alarm& object);
 			static bool _selectSentAlarm(const Alarm& object);
+			static bool _enableScenarioIfAutoActivation(SentScenario* sscenario);
 
 		public:
 			static void UpdateActivatedMessages();
 			static void UpdateAutomaticallyManagedScenarii();
+			static void HandleNotificationEvents();
 
 			static ActivatedMessages GetActivatedMessages(
 				const BroadcastPoint& broadcastPoint,
@@ -154,6 +156,8 @@ namespace synthese
 			static void MessagesActivationThread();
 
 			static void ScenariiActivationThread();
+
+			static void NotificationThread();
 
 			static void ClearAllBroadcastCaches();
 		};
