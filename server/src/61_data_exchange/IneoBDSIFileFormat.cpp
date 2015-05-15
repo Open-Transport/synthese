@@ -641,7 +641,7 @@ namespace synthese
 						_database +".CHAINAGE.nom,"+
 						_database +".CHAINAGE.sens,"+
 						_database +".CHAINAGE.ligne "+
-						(_readDestSMS ? ","+ _database +".DEST.destsms " : "")+
+						(_readDestSMS ? _database +".DEST.destsms " : "")+
 					" FROM "+
 						(_readDestSMS ? _database +".DEST, " : "")+
 						_database +".ARRETCHN "+
