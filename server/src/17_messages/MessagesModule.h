@@ -100,6 +100,7 @@ namespace synthese
 		public:
 			static void UpdateActivatedMessages();
 			static void UpdateEnabledScenarii();
+			static void HandleNotificationEvents();
 
 			static ActivatedMessages GetActivatedMessages(
 				const BroadcastPoint& broadcastPoint,
@@ -155,6 +156,8 @@ namespace synthese
 			static void MessagesActivationThread();
 
 			static void ScenariiActivationThread();
+
+			static void NotificationThread();
 
 			static void ClearAllBroadcastCaches();
 		};
