@@ -80,6 +80,7 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DB_CONN_STRING("conn_string");
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID = "mr_ds";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID = "th_ds";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_STOP_CODE_PREFIX = "stop_code_prefix";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DELAY_BUS_STOP = "delay_bus_stop";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DAY_BREAK_TIME = "day_break_time";
@@ -90,6 +91,10 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_NEUTRALIZED = "neutralized";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_NON_COMMERCIAL = "non_commercial";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_READ_DEST_SMS = "read_dest_sms";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_OVERLOAD_LINES = "overload_lines";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_READ_ETAT_HORAIRE = "read_etat_horaire";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_READ_PROGRAMMATIONS = "read_programmations";
 		
 		recursive_mutex IneoBDSIFileFormat::Importer_::_tabRunningBdsiMutex;
 		set<RegistryKeyType> IneoBDSIFileFormat::Importer_::_runningBdsi;
@@ -118,6 +123,9 @@ namespace synthese
 			{
 				throw RequestException("No such planned data source");
 			}
+
+			// Stop code prefix
+			_stopCodePrefix = map.getOptional<string>(PARAMETER_STOP_CODE_PREFIX);
 
 			// Messages recipients datasource
 			try
@@ -190,6 +198,16 @@ namespace synthese
 
 			// Eliminate non-commercial services
 			_nonCommercial = map.getDefault<bool>(PARAMETER_NON_COMMERCIAL, false);
+
+			// Read destSMS ?
+			_readDestSMS = map.getDefault<bool>(PARAMETER_READ_DEST_SMS, false);
+			_strOverloadLines = map.getDefault<string>(PARAMETER_OVERLOAD_LINES);
+
+			// Read etat horaire ?
+			_readEtatHoraire = map.getDefault<bool>(PARAMETER_READ_ETAT_HORAIRE, true);
+
+			// Read programmations ?
+			_readProgrammations = map.getDefault<bool>(PARAMETER_READ_PROGRAMMATIONS, true);
 		}
 
 
@@ -237,7 +255,7 @@ namespace synthese
 					}
 				}
 				
-				newChainage = _createAndReturnChainage(chainages,arretChns,*(chainage.ligne),chainage.nom,chainage.sens,chainage.ref + "-" + lexical_cast<string>(horaires.size()));
+				newChainage = _createAndReturnChainage(chainages,arretChns,*(chainage.ligne),chainage.nom,chainage.sens,chainage.destsms,chainage.ref + "-" + lexical_cast<string>(horaires.size()));
 				
 				// Jump over dead runs
 				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, arretChns)
@@ -306,6 +324,7 @@ namespace synthese
 			const Ligne& ligne,
 			const std::string& nom,
 			bool sens,
+			const std::string& destsms,
 			const std::string& ref
 		) const	{
 
@@ -329,6 +348,7 @@ namespace synthese
 			chainage.ligne = &ligne;
 			chainage.nom = nom;
 			chainage.sens = sens;
+			chainage.destsms = destsms;
 			chainage.arretChns = arretchns;
 			_logLoadDetail(
 				"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"OK"
@@ -342,6 +362,7 @@ namespace synthese
 			const Ligne& ligne,
 			const std::string& nom,
 			bool sens,
+			const std::string& destsms,
 			const std::string& ref
 		) const	{
 		
@@ -365,6 +386,7 @@ namespace synthese
 			chainage.ligne = &ligne;
 			chainage.nom = nom;
 			chainage.sens = sens;
+			chainage.destsms = destsms;
 			chainage.arretChns = arretchns;
 			_logLoadDetail(
 				"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"OK"
@@ -472,7 +494,7 @@ namespace synthese
 
 					// SYNTHESE stop point
 					StopPoint* stopPoint(
-						_plannedDataSource->getObjectByCode<StopPoint>(mnemol)
+						_plannedDataSource->getObjectByCode<StopPoint>(_stopCodePrefix ? *_stopCodePrefix + mnemol : mnemol)
 					);
 					Depot* depot(NULL);
 					if(stopPoint)
@@ -559,7 +581,48 @@ namespace synthese
 					ligne.syntheseLine = line;
 				}
 			}
-			
+
+			// Extra line overload ?
+			if (!_strOverloadLines.empty())
+			{
+				vector<string> overloadLines;
+				split(overloadLines, _strOverloadLines, is_any_of(","));
+				BOOST_FOREACH(string overload, overloadLines)
+				{
+					CommercialLine* line(
+						_plannedDataSource->getObjectByCode<CommercialLine>(overload)
+					);
+					if(line)
+					{
+						_logLoadDetail(
+							"LINE",overload,overload,line->getKey(),line->getName(),string(), string(), "OK"
+						);
+					}
+					else
+					{
+						Log::GetInstance().warn("No such line : " + overload);
+						_logWarningDetail(
+							"LINE",overload,overload,0,string(), string(),string(), "NOT FOUND"
+						);
+						continue;
+					}
+
+					// Registration
+					Ligne& ligne(
+						lignes.insert(
+							make_pair(
+								overload,
+								Ligne()
+						)	).first->second
+					);
+
+					// Copy of values
+					ligne.ref = overload;
+					ligne.syntheseLine = line;
+					_logLoad("OVERLOAD BY DESTSMS " + overload + " => " + line->getName());
+				}
+			}
+
 			if(_dbConnString)
 			{
 				Log::GetInstance().debug("IneoBDSIFileFormat : on en a lu " + lexical_cast<string>(lignes.size()));
@@ -578,12 +641,15 @@ namespace synthese
 						_database +".CHAINAGE.nom,"+
 						_database +".CHAINAGE.sens,"+
 						_database +".CHAINAGE.ligne "+
+						(_readDestSMS ? _database +".DEST.destsms " : "")+
 					" FROM "+
+						(_readDestSMS ? _database +".DEST, " : "")+
 						_database +".ARRETCHN "+
 						" INNER JOIN "+ _database +".CHAINAGE ON "+
 							_database +".CHAINAGE.ref="+ _database +".ARRETCHN.chainage AND "+ _database +".CHAINAGE.jour="+ _database +".ARRETCHN.jour "+
 					"WHERE "+
 						_database +".CHAINAGE.jour="+ todayStr +
+						(_readDestSMS ? " AND "+ _database +".CHAINAGE.dest="+ _database +".DEST.ref "+"AND "+ _database +".CHAINAGE.jour="+ _database +".DEST.jour " : "")+
 					" ORDER BY "+
 						_database +".ARRETCHN.chainage, "+
 						_database +".ARRETCHN.pos"
@@ -593,6 +659,7 @@ namespace synthese
 				const Ligne* ligne(NULL);
 				Chainage::ArretChns arretChns;
 				bool sens(false);
+				string destsms;
 				string nom;
 				while(chainageResult->next())
 				{
@@ -609,6 +676,7 @@ namespace synthese
 							*ligne,
 							nom,
 							sens,
+							destsms,
 							lastRef
 						);
 					}
@@ -618,6 +686,21 @@ namespace synthese
 					{
 						string ligneRef(chainageResult->get<string>("ligne"));
 						nom = chainageResult->getText("nom");
+						if (_readDestSMS)
+						{
+							destsms = chainageResult->getText("destsms");
+							vector<string> overloadLines;
+							split(overloadLines, _strOverloadLines, is_any_of(","));
+							BOOST_FOREACH(string overload, overloadLines)
+							{
+								if (destsms == overload)
+								{
+									ligneRef = destsms;
+									_logLoad("OVERLOAD LOAD FOR " + destsms);
+									break;
+								}
+							}
+						}
 
 						// Check of the ligne
 						Lignes::const_iterator it(
@@ -683,6 +766,7 @@ namespace synthese
 						*ligne,
 						nom,
 						sens,
+						destsms,
 						lastRef
 					);
 				}
@@ -696,8 +780,8 @@ namespace synthese
 						_database +".HORAIRE.hrd,"+
 						_database +".HORAIRE.hta,"+
 						_database +".HORAIRE.htd,"+
-						_database +".HORAIRE.etat_harr,"+
-						_database +".HORAIRE.etat_hdep,"+
+						(_readEtatHoraire ? _database +".HORAIRE.etat_harr," : "")+
+						(_readEtatHoraire ? _database +".HORAIRE.etat_hdep," : "")+
 						_database +".HORAIRE.course,"+
 						_database +".ARRETCHN.chainage, "+
 						// The if in the next line is here because it looks like there is no way in Synthese to do the difference
@@ -827,15 +911,18 @@ namespace synthese
 					}
 
 					// Patch for bad schedules when the bus is at stop
-					if(	(	(	horaireResult->getText("etat_harr") == "R" &&
-								horaireResult->getText("etat_hdep") == "E"
-							) || (
-								horaire.hrd > nowDuration
-							)
-						) &&
-						horaire.hrd <= nowPlusDelay
-					){
-						horaire.hrd = nowPlusDelay;
+					if (_readEtatHoraire)
+					{
+						if(	(	(	horaireResult->getText("etat_harr") == "R" &&
+									horaireResult->getText("etat_hdep") == "E"
+								) || (
+									horaire.hrd > nowDuration
+								)
+							) &&
+							horaire.hrd <= nowPlusDelay
+						){
+							horaire.hrd = nowPlusDelay;
+						}
 					}
 
 					// Trace
@@ -869,6 +956,7 @@ namespace synthese
 			}
 
 			// Programmations
+			if (_readProgrammations)
 			{
 				string query(
 					"SELECT * FROM "+ _database +".PROGRAMMATION WHERE nature_dst LIKE 'BORNE%'"
@@ -1490,7 +1578,10 @@ namespace synthese
 		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
 			DatabaseReadImporter<IneoBDSIFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
 			_hysteresis(seconds(0)),
-			_stopCodeToLower(false)
+			_stopCodeToLower(false),
+			_readDestSMS(false),
+			_readEtatHoraire(true),
+			_readProgrammations(true)
 		{}
 
 
