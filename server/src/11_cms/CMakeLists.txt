@@ -159,10 +159,13 @@ WebsitesService.hpp
 
 set_source_files_properties(CMSModule.gen.cpp CMSModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
+include_directories(${PYTHON_INCLUDE_DIR})
+
 add_library(11_cms ${cms_SRCS})
 
 target_link_libraries(
   11_cms
+  ${PYTHON_LIBRARY}
   103_db_svn
   12_security
   15_server
