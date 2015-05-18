@@ -44,6 +44,8 @@ namespace synthese
 {
 	namespace messages
 	{
+		class NotificationEvent;	// Forward declaration
+
 		FIELD_BOOL(SubscribeAllBegin)
 		FIELD_BOOL(SubscribeAllEnd)
 		FIELD_INT(RetryAttemptDelay)
@@ -143,8 +145,6 @@ namespace synthese
 				virtual void getBroadcastPoints(BroadcastPoints& result) const;
 			//@}
 
-			class NotificationEvent;	// Forward declaration
-
 			/**
 				Notify the event according to NotificationProvider parameters
 				available with "channel" prefix.
@@ -152,7 +152,7 @@ namespace synthese
 				@event NotificationEvent to process
 				@return true only if notification succeeded
 			*/
-			bool notify(const NotificationEvent& event);
+			bool notify(const boost::shared_ptr<NotificationEvent>& event);
 
 		};
 	}
