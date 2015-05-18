@@ -96,9 +96,9 @@ namespace synthese
 	{
 		NotificationEventTableSync::SearchResult NotificationEventTableSync::Search(
 			Env& env,
-			boost::optional<util::RegistryKeyType> alarmId = boost::optional<util::RegistryKeyType>(),
-			boost::optional<util::RegistryKeyType> notificationProviderId = boost::optional<util::RegistryKeyType>(),
-			int first /*= 0*/,
+			boost::optional<util::RegistryKeyType> alarmId,
+			boost::optional<util::RegistryKeyType> notificationProviderId,
+			int first,
 			boost::optional<std::size_t> number,
 			bool orderByLastAttempt,
 			bool raisingOrder,
@@ -108,7 +108,7 @@ namespace synthese
 
 			if (alarmId)
 			{
-				query.addWhereField(AlarmMessage::FIELD.name, *alarmId);
+				query.addWhereField(Alarm::FIELD.name, *alarmId);
 			}
 			if (notificationProviderId)
 			{
