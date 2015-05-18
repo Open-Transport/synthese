@@ -137,12 +137,12 @@ namespace synthese
 				}
 				else
 				{
-					_logWarning("GPSdFileFormat failed to open GPS connection socket");
+					Log::GetInstance().error("GPSdFileFormat failed to open GPS connection socket");
 				}
 			}
 			catch (std::exception const& e)
 			{
-				_logWarning(e.what());
+				Log::GetInstance().error(e.what());
 			}	
 		}
 
@@ -322,7 +322,7 @@ namespace synthese
 			}
 			catch(bad_lexical_cast&)
 			{
-				_logWarning("Bad cast in JSON properties reading. Current position was not updated by GPSd import");
+				Log::GetInstance().error("Bad cast in JSON properties reading. Current position was not updated by GPSd import");
 				return;
 			}
 		}
@@ -358,7 +358,7 @@ namespace synthese
 				// Request a POLL to gpsd
 				if(boost::asio::write(_socket, boost::asio::buffer("?POLL;")) == 0)
 				{
-					_logWarning("GPSdFileFormat failed to request a poll");
+					Log::GetInstance().error("GPSdFileFormat failed to request a poll");
 					return false;
 				}
 
@@ -371,7 +371,7 @@ namespace synthese
 			}
 			catch (std::exception const& e)
 			{
-				_logWarning("GPSdFileFormat updateFromGps: " + string(e.what()));
+				Log::GetInstance().error("GPSdFileFormat updateFromGps: " + string(e.what()));
 			}
 			return false;
 		}
@@ -412,7 +412,7 @@ namespace synthese
 							// gpsd mode 1 means it has no valid data
 							if(pt.get_child("mode").front().second.get<int>("mode") == 1)
 							{
-								_logWarning("GPSdFileFormat invalid position");
+								Log::GetInstance().error("GPSdFileFormat invalid position");
 								return false;
 							}
 
@@ -420,7 +420,7 @@ namespace synthese
 						}
 						else
 						{
-							_logWarning("GPSdFileFormat got no tpv position");
+							Log::GetInstance().error("GPSdFileFormat got no tpv position");
 							return false;
 						}
 
@@ -428,11 +428,11 @@ namespace synthese
 				}
 				catch (std::exception const& e)
 				{
-					_logWarning("GPSdFileFormat failed to parse json: " + string(e.what()));
+					Log::GetInstance().error("GPSdFileFormat failed to parse json: " + string(e.what()));
 				}
 			} 
 			
-			_logWarning("GPSdFileFormat failed to parse json");
+			Log::GetInstance().error("GPSdFileFormat failed to parse json");
 			return false;
 		}
 }	}
