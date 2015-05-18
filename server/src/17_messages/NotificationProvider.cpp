@@ -190,10 +190,11 @@ namespace synthese
 			Notify the event according to NotificationProvider parameters
 			available with "channel" prefix.
 		*/
-		bool notify(const NotificationEvent& event) {
+		bool NotificationProvider::notify(const boost::shared_ptr<NotificationEvent>& event) {
 			// Create corresponding NotificationChannel
 			// Invoke attemptNotification(event)
 			// return true only if completely successful
+			return true;
 		}
 
 	}
