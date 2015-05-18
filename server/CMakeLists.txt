@@ -154,7 +154,7 @@ configure_file(
 )
 
 
-# Python
+# Python 2.7
 find_package(PythonLibs 2.7 REQUIRED)
 if(NOT PYTHONLIBS_FOUND)
   message(FATAL_ERROR "Unable to find PythonLibs.")
