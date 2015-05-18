@@ -364,7 +364,7 @@ namespace synthese
 								}
 							}
 							Log::GetInstance().debug("VDVDataSupply : HaltID " + haltID);
-							Log::GetInstance().debug("VDVDataSupply : Betriebstag " + to_iso_extended_string(sp.getOriginDateTime().date()));
+							Log::GetInstance().debug("VDVDataSupply : Betriebstag " + to_iso_extended_string((sp.getOriginDateTime() - diff_from_utc).date()));
 							try {
 								Log::GetInstance().debug("VDVDataSupply : LinienID " + line.getACodeBySource(*_vdvClient->get<DataSource>()));
 							}
@@ -420,7 +420,7 @@ namespace synthese
 								"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
 								"<FahrtID>" <<
 								"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
-								"<Betriebstag>" << to_iso_extended_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
+								"<Betriebstag>" << to_iso_extended_string((sp.getOriginDateTime() - diff_from_utc).date()) << "</Betriebstag>" << 
 								"</FahrtID>" <<
 								"<HstSeqZaehler>1</HstSeqZaehler>" <<
 								"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
@@ -551,7 +551,7 @@ namespace synthese
 								"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
 								"<FahrtID>" <<
 								"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
-								"<Betriebstag>" << to_iso_extended_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
+								"<Betriebstag>" << to_iso_extended_string((sp.getOriginDateTime() - diff_from_utc).date()) << "</Betriebstag>" << 
 								"</FahrtID>" <<
 								"<HstSeqZaehler>1</HstSeqZaehler>" <<
 								"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
