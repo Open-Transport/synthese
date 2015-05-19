@@ -73,7 +73,7 @@ namespace synthese
 				util::RegistryKeyType id = 0
 			);
 
-			virtual MessageType* getMessageType() const;
+			virtual std::set<MessageType*> getMessageTypes() const;
 
 			virtual bool displaysMessage(
 				const Alarm::LinkedObjects& recipients,

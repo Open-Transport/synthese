@@ -419,7 +419,7 @@ namespace synthese
 
 			//! @name BroadcastPoint virtual methods
 			//@{
-				virtual messages::MessageType* getMessageType() const;
+				virtual std::set<messages::MessageType*> getMessageTypes() const;
 
 				virtual bool displaysMessage(
 					const messages::Alarm::LinkedObjects& linkedObjects,
