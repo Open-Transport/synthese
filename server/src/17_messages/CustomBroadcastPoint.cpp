@@ -71,11 +71,12 @@ namespace synthese
 
 		std::set<MessageType*> CustomBroadcastPoint::getMessageTypes() const
 		{
-			return
-				get<MessageType>() ?
-				&*get<MessageType>() :
-				NULL
-			;
+			std::set<MessageType*> result;
+			if(get<MessageType>())
+			{
+				result.insert(&(*(get<MessageType>())));
+			}
+			return result;
 		}
 
 
