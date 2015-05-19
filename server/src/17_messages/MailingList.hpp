@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_pt_website_MailingList_hpp__
-#define SYNTHESE_pt_website_MailingList_hpp__
+#ifndef SYNTHESE_messages_MailingList_hpp__
+#define SYNTHESE_messages_MailingList_hpp__
 
 #include "BroadcastPoint.hpp"
 #include "FactorableTemplate.h"
@@ -56,7 +56,7 @@ namespace synthese
 		class MailingListSubscription;
 
 		/** MailingList class.
-			@ingroup m57
+			@ingroup m17
 		*/
 		class MailingList:
 			public Object<MailingList, MailingListRecord>,
@@ -88,7 +88,7 @@ namespace synthese
 
 			/// @name BroadcastPoint virtual methods
 			//@{
-				virtual messages::MessageType* getMessageType() const;
+				virtual std::set<MessageType*> getMessageTypes() const;
 
 				virtual bool displaysMessage(
 					const messages::Alarm::LinkedObjects& recipients,
@@ -101,5 +101,5 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_pt_website_MailingList_hpp__
+#endif // SYNTHESE_messages_MailingList_hpp__
 

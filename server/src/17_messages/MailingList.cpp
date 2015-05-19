@@ -156,9 +156,14 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Check which message type should be used in the mailing list
-		MessageType* MailingList::getMessageType() const
+		std::set<MessageType*> MailingList::getMessageTypes() const
 		{
-			return get<MessageType>() ? &*get<MessageType>() : NULL;
+			std::set<MessageType*> result;
+			if(get<MessageType>())
+			{
+				result.insert(&(*(get<MessageType>())));
+			}
+			return result;
 		}
 
 
