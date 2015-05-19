@@ -40,6 +40,25 @@ required).
 
 ### Security
 
+## [3.9.1] - ????-??-??
+### Added
+- ...
+
+### Changed
+- ...
+
+### Deprecated
+- ...
+
+### Removed
+- ...
+
+### Fixed
+- tc-72 : The DestinationsAdmin page could only display 200 first destinations
+- tc-150 : Admin could not display non concurrency rules for commercial lines in subfolders
+
+### Security
+
 
 
 
