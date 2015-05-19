@@ -140,15 +140,13 @@ namespace synthese
 			if(orderByPriorityLine)
 			{
 				query <<
-					" INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " c ON c." << TABLE_COL_ID << "=" << TABLE.NAME << "." << PriorityLine::FIELD.name <<
-					" INNER JOIN " << TransportNetworkTableSync::TABLE.NAME << " n ON n." << TABLE_COL_ID << "=c." << CommercialLineTableSync::COL_NETWORK_ID
+					" INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " c ON c." << TABLE_COL_ID << "=" << TABLE.NAME << "." << PriorityLine::FIELD.name
 				;
 			}
 			else if(orderByHiddenLine)
 			{
 				query <<
-					" INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " c ON c." << TABLE_COL_ID << "=" << TABLE.NAME << "." << HiddenLine::FIELD.name <<
-					" INNER JOIN " << TransportNetworkTableSync::TABLE.NAME << " n ON n." << TABLE_COL_ID << "=c." << CommercialLineTableSync::COL_NETWORK_ID
+					" INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " c ON c." << TABLE_COL_ID << "=" << TABLE.NAME << "." << HiddenLine::FIELD.name
 				;
 			}
 			query
@@ -167,8 +165,7 @@ namespace synthese
 			if(orderByPriorityLine || orderByHiddenLine)
 			{
 				query <<
-					" ORDER BY n." << TransportNetworkTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC") << "," <<
-					" c." << CommercialLineTableSync::COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC")
+					" ORDER BY c." << CommercialLineTableSync::COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC")
 				;
 			}
 			else if(orderByDelay)
