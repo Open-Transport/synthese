@@ -381,6 +381,11 @@ namespace synthese
 			double &lat,
 			double &lon) const {
 
+
+			/* Just keep the original answer for debug purpose */
+			boost::asio::streambuf::const_buffers_type bufs = ss.data();
+			std::string answer(boost::asio::buffers_begin(bufs), boost::asio::buffers_end(bufs));
+
 			std::string token;
 			std::istream str(&ss); 
 
@@ -429,6 +434,7 @@ namespace synthese
 				catch (std::exception const& e)
 				{
 					Log::GetInstance().error("GPSdFileFormat failed to parse json: " + string(e.what()));
+					Log::GetInstance().error("GPSdFileFormat gpsd answer: " + answer);
 				}
 			} 
 			
