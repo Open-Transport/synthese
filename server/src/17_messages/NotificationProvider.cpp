@@ -119,7 +119,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Check which message type should be used when publishing
 		/// an notification event
-		MessageType* NotificationProvider::getMessageType() const
+		std::set<messages::MessageType*> NotificationProvider::getMessageTypes() const
 		{
 			return get<MessageType>() ? &*get<MessageType>() : NULL;
 		}

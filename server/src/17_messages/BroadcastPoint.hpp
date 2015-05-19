@@ -51,7 +51,7 @@ namespace synthese
 
 			virtual ~BroadcastPoint() {}
 
-			virtual MessageType* getMessageType() const = 0;
+			virtual std::set<MessageType*> getMessageTypes() const = 0;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Checks if the broadcast point displays the specified scenario.
