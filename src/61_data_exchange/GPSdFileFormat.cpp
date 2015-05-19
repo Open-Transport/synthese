@@ -415,7 +415,7 @@ namespace synthese
 							lat = pt.get_child("tpv").front().second.get<double>("lat");
 							lon = pt.get_child("tpv").front().second.get<double>("lon");
 							// gpsd mode 1 means it has no valid data
-							if(pt.get_child("mode").front().second.get<int>("mode") == 1)
+							if(pt.get_child("tpv").front().second.get<int>("mode") == 1)
 							{
 								Log::GetInstance().error("GPSdFileFormat invalid position");
 								return false;
