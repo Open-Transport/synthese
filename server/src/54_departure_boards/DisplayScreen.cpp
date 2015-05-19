@@ -743,7 +743,7 @@ namespace synthese
 
 
 
-		messages::MessageType* DisplayScreen::getMessageType() const
+		std::set<messages::MessageType*> DisplayScreen::getMessageTypes() const
 		{
 			return
 				get<DisplayTypePtr>() ?

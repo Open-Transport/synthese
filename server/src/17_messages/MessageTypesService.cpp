@@ -137,20 +137,21 @@ namespace synthese
 				ParametersMap fakeParameters;
 				BOOST_FOREACH(BroadcastPoint* broadcastPoint, BroadcastPoint::GetBroadcastPoints())
 				{
-					MessageType* messageType(broadcastPoint->getMessageType());
+					BOOST_FOREACH(MessageType* messageType, broadcastPoint->getMessageTypes())
+					{
+						// Jump over null or already selected message type 
+						if (messageType == NULL ||
+							messageTypes.find(messageType) != messageTypes.end()
+							){
+							continue;
+						}
 
-					// Jump over null or already selected message type 
-					if(messageType == NULL ||
-						messageTypes.find(messageType) != messageTypes.end()
-					){
-						continue;
-					}
-
-					// Search if a message of the scenario have to be displayed on the broadcast point
-					if(	(_scenario && broadcastPoint->displaysScenario(*_scenario)) ||
-						(_message && _message->isOnBroadcastPoint(*broadcastPoint, fakeParameters))
-					){
-						messageTypes.insert(broadcastPoint->getMessageType());
+						// Search if a message of the scenario have to be displayed on the broadcast point
+						if ((_scenario && broadcastPoint->displaysScenario(*_scenario)) ||
+							(_message && _message->isOnBroadcastPoint(*broadcastPoint, fakeParameters))
+							){
+							messageTypes.insert(messageType);
+						}
 					}
 				}
 
