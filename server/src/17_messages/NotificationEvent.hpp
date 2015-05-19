@@ -24,15 +24,18 @@
 #ifndef SYNTHESE_messages_NotificationEvent_hpp__
 #define SYNTHESE_messages_NotificationEvent_hpp__
 
-#include "Object.hpp"
+#include <Alarm.h>
+#include <boost/fusion/container/map.hpp>
+#include <boost/fusion/support/pair.hpp>
+#include <EnumObjectField.hpp>
+#include <NotificationProvider.hpp>
+#include <NumericField.hpp>
+#include <Object.hpp>
+#include <PointerField.hpp>
+#include <PtimeField.hpp>
+#include <SchemaMacros.hpp>
 
-#include "NumericField.hpp"
-#include "StringField.hpp"
-#include "EnumObjectField.hpp"
-#include "SchemaMacros.hpp"
-#include "Alarm.h"
-#include "NotificationProvider.hpp"
-#include "MessageType.hpp"
+#include <string>
 
 namespace synthese
 {

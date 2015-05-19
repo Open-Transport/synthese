@@ -74,7 +74,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				bool _listChannels;
-				const NotificationProvider* _notificationProvider;
+				NotificationProvider* _notificationProvider;
 			//@}
 
 

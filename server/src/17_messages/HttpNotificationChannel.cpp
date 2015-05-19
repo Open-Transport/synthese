@@ -23,15 +23,18 @@
 
 #include <FactorableTemplate.h>
 #include <HttpNotificationChannel.hpp>
+#include <ParametersMap.h>
+
 #include <string>
 
 namespace synthese
 {
+	using namespace util;
 	using namespace messages;
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<NotificationChannel, HttpNotificationChannel>::FACTORY_KEY("Http");
+		template<> const std::string FactorableTemplate<NotificationChannel, HttpNotificationChannel>::FACTORY_KEY("HTTP");
 	}
 
 	namespace messages
@@ -41,9 +44,18 @@ namespace synthese
 			// Prepare internal state for notifications
 		};
 
+
+
+		bool HttpNotificationChannel::notify(const boost::shared_ptr<NotificationEvent> event)
+		{
+			// TODO notify
+			return true;
+		}
+
 		// Use curl to establish a connection with connection timeout
 		// Create HTTP URL and body from parameters
 		// Send request with read timeout
 		// Intercept exception and ask for retry
+
 	}
 }

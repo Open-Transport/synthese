@@ -63,6 +63,9 @@ namespace synthese
 
 	CLASS_DEFINITION(messages::NotificationProvider, "t199_notification_providers", 199)  // TODO Change to 107 at mailing list removal
 
+	template<> const Field SimpleObjectFieldDefinition<MessageTypeBegin>::FIELD = Field("begin_message_type_id", SQL_INTEGER);
+	template<> const Field SimpleObjectFieldDefinition<MessageTypeEnd>::FIELD = Field("end_message_type_id", SQL_INTEGER);
+
 	namespace messages {
 		FIELD_DEFINITION_OF_OBJECT(NotificationProvider, "notification_provider_id", "notification_provider_ids")
 
@@ -87,6 +90,16 @@ namespace synthese
 
 
 
+		void NotificationProvider::addAdditionalParameters(
+			util::ParametersMap& map,
+			std::string prefix)
+		const {
+			// Make Parameters available for direct CMS rendering
+			map.merge(get<Parameters>());
+		}
+
+
+
 		/// Default constructor as a Registrable
 		/// @param id registry key type
 		NotificationProvider::NotificationProvider(
@@ -101,19 +114,13 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(SubscribeAllEnd, false),
 					FIELD_DEFAULT_CONSTRUCTOR(RetryAttemptDelay),
 					FIELD_DEFAULT_CONSTRUCTOR(MaximumRetryAttempts),
-					FIELD_DEFAULT_CONSTRUCTOR(MessageType),
+					FIELD_DEFAULT_CONSTRUCTOR(MessageTypeBegin),
+					FIELD_DEFAULT_CONSTRUCTOR(MessageTypeEnd),
 					FIELD_DEFAULT_CONSTRUCTOR(Parameters)
-			)	)
+			)	),
+			_notificationChannel(NULL)
 		{}
 
-
-
-		void NotificationProvider::addAdditionalParameters(
-			util::ParametersMap& map,
-			std::string prefix) const
-		{
-			map.merge(get<Parameters>());
-		}
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -121,7 +128,17 @@ namespace synthese
 		/// an notification event
 		std::set<messages::MessageType*> NotificationProvider::getMessageTypes() const
 		{
-			return get<MessageType>() ? &*get<MessageType>() : NULL;
+			std::set<MessageType*> result;
+			if(get<MessageTypeBegin>())
+			{
+				result.insert(&(*(get<MessageTypeBegin>())));
+			}
+			if(get<MessageTypeEnd>())
+			{
+				result.insert(&(*(get<MessageTypeEnd>())));
+			}
+			return result;
+
 		}
 
 
@@ -184,6 +201,31 @@ namespace synthese
 			// The notification provider was not found
 			return false;
 		}
+
+
+
+		/**
+			Get or create the notification channel instance
+			to
+		 */
+		messages::NotificationChannel* NotificationProvider::getNotificationChannel()
+		{
+			std::string channelKey = get<NotificationChannelKey>();
+			if (!Factory<NotificationChannel>::contains(channelKey))
+			{
+				// Inconsistent runtime and database
+				// NotificationChannel implementation is lacking
+				// TODO insert log entry !?
+				return NULL;
+			}
+
+			if (!_notificationChannel) {
+				_notificationChannel = Factory<NotificationChannel>::create(channelKey);
+			}
+
+			return _notificationChannel;
+		}
+
 
 
 		/*

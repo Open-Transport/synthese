@@ -25,17 +25,34 @@
 
 #include <NotificationChannel.hpp>
 #include <FactorableTemplate.h>
+#include <ParametersMap.h>
+
+#include <string>
+#include <vector>
 
 namespace synthese
 {
 	namespace messages {
+		class NotificationEvent;	// Forward declaration
+
 		class FileNotificationChannel:
 			public util::FactorableTemplate<NotificationChannel,FileNotificationChannel>
 		{
 		public:
+			/// Parameter name for CMS field with file path
+			static const std::string PARAMETER_FILE_PATH;
+
+			/// Parameter name for CMS field with file content
+			static const std::string PARAMETER_FILE_CONTENT;
+
+		public:
 			FileNotificationChannel();
 
 			virtual ~FileNotificationChannel() { };
+
+			virtual std::vector<std::string> _getScriptParameterNames() const;
+
+			virtual bool notify(const boost::shared_ptr<NotificationEvent> event);
 		};
 	}
 }

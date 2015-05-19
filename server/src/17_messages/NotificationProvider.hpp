@@ -32,7 +32,6 @@
 #include <PointerField.hpp>
 #include <SchemaMacros.hpp>
 #include <StringField.hpp>
-#include <NotificationChannel.hpp>
 #include <string>
 #include <vector>
 
@@ -44,7 +43,12 @@ namespace synthese
 {
 	namespace messages
 	{
+		class NotificationChannel;	// Forward declaration
 		class NotificationEvent;	// Forward declaration
+
+		FIELD_STRING(NotificationChannelKey)
+		FIELD_POINTER(MessageTypeBegin, MessageType)
+		FIELD_POINTER(MessageTypeEnd, MessageType)
 
 		FIELD_BOOL(SubscribeAllBegin)
 		FIELD_BOOL(SubscribeAllEnd)
@@ -70,8 +74,11 @@ namespace synthese
 			// Maximum number of retry attemps before giving up notify the event
 			FIELD(MaximumRetryAttempts),
 
-			// Message type for content... TODO requires one for begin, another for end
-			FIELD(MessageType),
+			// Message type content for begin event
+			FIELD(MessageTypeBegin),
+
+			// Message type content for end event
+			FIELD(MessageTypeEnd),
 
 			// Implementation specific parameters
 			FIELD(Parameters)
@@ -154,6 +161,10 @@ namespace synthese
 			*/
 			bool notify(const boost::shared_ptr<NotificationEvent>& event);
 
+		private:
+			NotificationChannel* _notificationChannel;
+
+			NotificationChannel* getNotificationChannel();
 		};
 	}
 }

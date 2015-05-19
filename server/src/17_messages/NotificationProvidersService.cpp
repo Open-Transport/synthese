@@ -63,27 +63,11 @@ namespace synthese
 		const string NotificationProvidersService::PARAMETER_LIST_CHANNELS = "list_channels";
 		const string NotificationProvidersService::TAG_CHANNEL = "channel";
 
+
+
 		ParametersMap NotificationProvidersService::_getParametersMap() const
 		{
 			ParametersMap map;
-
-			// If unique notification provider with ID
-			/*
-			if(_notificationProvider)
-			{
-				map.insert(Request::PARAMETER_OBJECT_ID, _notificationProvider->getKey());
-			}
-			*/
-			/*
-			std::string filePath = (get<Parameters>()).get<std::string>("file_path");
-			if(filePath) {
-				map.insert("file_path", filePath);
-			}
-			std::string fileContent = (get<Parameters>()).get<std::string>("file_content");
-			if(fileContent) {
-				map.insert("file_content", fileContent);
-			}
-			*/
 			return map;
 		}
 
@@ -97,7 +81,7 @@ namespace synthese
 			{
 				try
 				{
-					_notificationProvider = Env::GetOfficialEnv().get<NotificationProvider>(objectId).get();
+					_notificationProvider = Env::GetOfficialEnv().getEditable<NotificationProvider>(objectId).get();
 				}
 				catch (ObjectNotFoundException<NotificationProvider>&)
 				{
