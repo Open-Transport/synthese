@@ -268,7 +268,16 @@ namespace synthese
 								ptime(not_a_date_time)
 							);
 							if (!arrivalDateTime.is_not_a_date_time())
+							{
 								arrivalDateTime -= diff_from_utc;
+								// Patch for arrivals after midnight (not managed by DEPARTURE board)
+								// arrival can not be after departure !!
+								if (!departureDateTime.is_not_a_date_time() &&
+									arrivalDateTime.date() > departureDateTime.date())
+								{
+									arrivalDateTime -= days(1);
+								}
+							}
 							ptime plannedArrivalDateTime(
 								(sp.getDepartureEdge() && sp.getDepartureEdge()->isArrival() && sp.getDepartureEdge()->getRankInPath()) ?
 								ptime(
@@ -280,7 +289,16 @@ namespace synthese
 								ptime(not_a_date_time)
 							);
 							if (!plannedArrivalDateTime.is_not_a_date_time())
+							{
 								plannedArrivalDateTime -= diff_from_utc;
+								// Patch for arrivals after midnight (not managed by DEPARTURE board)
+								// arrival can not be after departure !!
+								if (!plannedDepartureDateTime.is_not_a_date_time() &&
+									plannedArrivalDateTime.date() > plannedDepartureDateTime.date())
+								{
+									plannedArrivalDateTime -= days(1);
+								}
+							}
 							Log::GetInstance().debug("VDVDataSupply : Network " + lexical_cast<string>(network.getKey()));
 							string networkId = "";
 							try {
