@@ -31,6 +31,7 @@
 #include "Website.hpp"
 #include "CMSScript.hpp"
 #include "StaticFunctionRequest.h"
+#include "PythonInterpreter.hpp"
 
 #include <boost/test/auto_unit_test.hpp>
 
@@ -48,6 +49,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 	StrLenFunction::integrate();
 	StrFillFunction::integrate();
 	VersionService::integrate();
+	PythonInterpreter::Initialize();
 
 	StaticFunctionRequest<WebPageDisplayFunction> request;
 	ParametersMap additionalParametersMap;
@@ -1107,6 +1109,33 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
 		string eval(wpc.eval(request, additionalParametersMap, page, variables));
 		BOOST_CHECK_EQUAL(eval, "testtest4");
+	}
+
+	{ // Python script with simple output to stream
+		string code("#!/bin/python\r\nprint 'Hello World!'");
+		CMSScript wpc(code, true);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), true);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		// Python 'print' appends new line character(s)
+		ostringstream stream;
+		stream << "Hello World!" << std::endl;
+		BOOST_CHECK_EQUAL(eval, stream.str());
+	}
+
+	{ // Python script with input and output parameters
+		string code("#!/bin/python\r\nc=int(a)+int(b)");
+		CMSScript wpc(code, true);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), true);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		additionalParametersMap.insert("a", 1);
+		additionalParametersMap.insert("b", 2);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(variables.get<int>("a"), 1);
+		BOOST_CHECK_EQUAL(variables.get<int>("b"), 2);
+		BOOST_CHECK_EQUAL(variables.get<int>("c"), 3);
 	}
 }
 
