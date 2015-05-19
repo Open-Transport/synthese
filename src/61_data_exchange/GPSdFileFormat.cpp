@@ -142,7 +142,7 @@ namespace synthese
 			}
 			catch (std::exception const& e)
 			{
-				Log::GetInstance().error(e.what());
+				Log::GetInstance().error("GPSdFileFormat: " + string(e.what()));
 			}	
 		}
 
@@ -322,7 +322,7 @@ namespace synthese
 			}
 			catch(bad_lexical_cast&)
 			{
-				Log::GetInstance().error("Bad cast in JSON properties reading. Current position was not updated by GPSd import");
+				Log::GetInstance().error("GPSdFileFormat: Bad cast in JSON properties reading. Current position was not updated by GPSd import");
 				return;
 			}
 		}
