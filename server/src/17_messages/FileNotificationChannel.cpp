@@ -21,24 +21,52 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <FactorableTemplate.h>
 #include <FileNotificationChannel.hpp>
+#include <ParametersMap.h>
+
 #include <string>
+
+using namespace std;
 
 namespace synthese
 {
+	using namespace util;
 	using namespace messages;
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<NotificationChannel, FileNotificationChannel>::FACTORY_KEY("File");
+		template<> const string FactorableTemplate<NotificationChannel, FileNotificationChannel>::FACTORY_KEY("File");
 	}
 
 	namespace messages
 	{
+		const string FileNotificationChannel::PARAMETER_FILE_PATH = "file_path";
+		const string FileNotificationChannel::PARAMETER_FILE_CONTENT = "file_content";
+
+
+
 		FileNotificationChannel::FileNotificationChannel()
 		{
 			// Prepare internal state for notifications
 		};
+
+
+
+		// Provide its own script fields list
+		std::vector<std::string> FileNotificationChannel::_getScriptParameterNames() const
+		{
+			vector<string> result;
+			result.push_back(PARAMETER_FILE_PATH);
+			result.push_back(PARAMETER_FILE_CONTENT);
+			return result;
+		}
+
+
+
+		bool FileNotificationChannel::notify(const boost::shared_ptr<NotificationEvent> event)
+		{
+			// TODO notify
+			return true;
+		}
 	}
 }

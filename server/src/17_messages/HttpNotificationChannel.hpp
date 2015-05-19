@@ -29,6 +29,8 @@
 namespace synthese
 {
 	namespace messages {
+		class NotificationEvent;	// Forward declaration
+
 		class HttpNotificationChannel:
 				public util::FactorableTemplate<NotificationChannel,HttpNotificationChannel>
 		{
@@ -36,6 +38,8 @@ namespace synthese
 			HttpNotificationChannel();
 
 			virtual ~HttpNotificationChannel() { };
+
+			virtual bool notify(const boost::shared_ptr<NotificationEvent> event);
 		};
 	}
 }
