@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - tc-72 : The DestinationsAdmin page could only display 200 first destinations
+- tc-150 : Admin could not display non concurrency rules for commercial lines in subfolders
 
 ### Security
 
