@@ -641,7 +641,7 @@ namespace synthese
 						_database +".CHAINAGE.nom,"+
 						_database +".CHAINAGE.sens,"+
 						_database +".CHAINAGE.ligne "+
-						(_readDestSMS ? _database +".DEST.destsms " : "")+
+						(_readDestSMS ? ","+ _database +".DEST.destsms " : "")+
 					" FROM "+
 						(_readDestSMS ? _database +".DEST, " : "")+
 						_database +".ARRETCHN "+
@@ -783,20 +783,20 @@ namespace synthese
 						(_readEtatHoraire ? _database +".HORAIRE.etat_harr," : "")+
 						(_readEtatHoraire ? _database +".HORAIRE.etat_hdep," : "")+
 						_database +".HORAIRE.course,"+
-						_database +".ARRETCHN.chainage, "+
+						_database +".ARRETCHN.chainage "+
 						// The if in the next line is here because it looks like there is no way in Synthese to do the difference
 						// between a empty string and a NULL value (resulting from the LEFT JOIN)
-						"IF("+ _database +".VEHICULE.Symb IS NULL, 'NULL', "+ _database +".VEHICULE.Symb) As Symb "+
+						( _neutralized ? ",IF("+ _database +".VEHICULE.Symb IS NULL, 'NULL', "+ _database +".VEHICULE.Symb) As Symb " : "")+
 					"FROM "+
 						_database +".HORAIRE "+
 						"INNER JOIN "+ _database +".ARRETCHN ON "+
 							_database +".HORAIRE.arretchn="+ _database +".ARRETCHN.ref AND "+ _database +".HORAIRE.jour="+ _database +".ARRETCHN.jour "+
 						"LEFT JOIN "+ _database +".COURSE ON "+
 							_database +".COURSE.ref="+ _database +".HORAIRE.course AND "+ _database +".COURSE.jour="+ _database +".ARRETCHN.jour "+
-						"LEFT JOIN "+ _database +".VEHICULE ON "+
+						( _neutralized ? "LEFT JOIN "+ _database +".VEHICULE ON "+
 							_database +".VEHICULE.Course="+ _database +".COURSE.ref AND "+
 							_database +".VEHICULE.ligne="+ _database +".COURSE.ligne AND "+
-							_database +".VEHICULE.jour="+ _database +".ARRETCHN.jour "+
+							_database +".VEHICULE.jour="+ _database +".ARRETCHN.jour " : ""+
 					"WHERE "+
 						_database +".HORAIRE.jour="+ todayStr +
 						// Eliminate neutralized courses if asked
@@ -858,18 +858,17 @@ namespace synthese
 						horaires.clear();
 
 						// Handicaped flag (linked to the course)
-
-						std::string hstr = horaireResult->getText("Symb");
-						if( hstr != "NULL" )
+						handicapped = 0;
+						if (_neutralized)
 						{
-							handicapped =
-								(hstr == ">H" || hstr == "¸")
-								? _handicappedPTAllowedUseRuleId
-								: _handicappedForbiddenPTUseRuleId;
-						}
-						else
-						{
-							handicapped = 0;
+							std::string hstr = horaireResult->getText("Symb");
+							if( hstr != "NULL" )
+							{
+								handicapped =
+									(hstr == ">H" || hstr == "¸")
+									? _handicappedPTAllowedUseRuleId
+									: _handicappedForbiddenPTUseRuleId;
+							}
 						}
 					}
 
