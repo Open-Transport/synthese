@@ -49,6 +49,7 @@ namespace synthese
 	
 		const string SpecificPostInstall::PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID = "post_install_passive_import_id";
 		const string SpecificPostInstall::PARAMETER_POST_INSTALL_SLAVE_ID = "post_install_slave_id";
+		const string SpecificPostInstall::PARAMETER_POST_INSTALL_SLAVE_TO_MASTER_IP = "post_install_slave_to_master_ip";
 
 		ParametersMap SpecificPostInstall::getParametersMap() const
 		{
@@ -62,6 +63,7 @@ namespace synthese
 		{
 			_passiveImportId = map.get<RegistryKeyType>(PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID);
 			_slaveId = map.get<RegistryKeyType>(PARAMETER_POST_INSTALL_SLAVE_ID);
+			_slaveToMasterIp = map.get<RegistryKeyType>(PARAMETER_POST_INSTALL_SLAVE_TO_MASTER_IP);
 		}
 
 
@@ -103,7 +105,7 @@ namespace synthese
 
 				InterSYNTHESESlave slave;
 				slave.set<Name>("__SAE__");
-				slave.set<ServerAddress>("37.187.26.148");
+				slave.set<ServerAddress>(_slaveToMasterIp);
 				slave.set<ServerPort>("80");
 				slave.set<InterSYNTHESEConfig>(newConfig);
 				slave.set<Active>(true);

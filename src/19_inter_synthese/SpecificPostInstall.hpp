@@ -40,6 +40,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID;
 			static const std::string PARAMETER_POST_INSTALL_SLAVE_ID;
+			static const std::string PARAMETER_POST_INSTALL_SLAVE_TO_MASTER_IP;
 
 		private:
 			const boost::shared_ptr<InterSYNTHESEConfig> getMyConfig();
@@ -48,6 +49,7 @@ namespace synthese
 
 			util::RegistryKeyType _passiveImportId;
 			util::RegistryKeyType _slaveId;
+			std::string _slaveToMasterIp;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
