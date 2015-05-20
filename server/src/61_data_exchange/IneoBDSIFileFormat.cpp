@@ -641,7 +641,7 @@ namespace synthese
 						_database +".CHAINAGE.nom,"+
 						_database +".CHAINAGE.sens,"+
 						_database +".CHAINAGE.ligne "+
-						(_readDestSMS ? _database +".DEST.destsms " : "")+
+						(_readDestSMS ? ","+ _database +".DEST.destsms " : "")+
 					" FROM "+
 						(_readDestSMS ? _database +".DEST, " : "")+
 						_database +".ARRETCHN "+
@@ -796,7 +796,7 @@ namespace synthese
 						( _neutralized ? "LEFT JOIN "+ _database +".VEHICULE ON "+
 							_database +".VEHICULE.Course="+ _database +".COURSE.ref AND "+
 							_database +".VEHICULE.ligne="+ _database +".COURSE.ligne AND "+
-							_database +".VEHICULE.jour="+ _database +".ARRETCHN.jour " : "")+
+							_database +".VEHICULE.jour="+ _database +".ARRETCHN.jour " : ""+
 					"WHERE "+
 						_database +".HORAIRE.jour="+ todayStr +
 						// Eliminate neutralized courses if asked
