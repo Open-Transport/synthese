@@ -65,6 +65,8 @@ namespace synthese
 		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID = "inter_synthese_slave_id";
 		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL = "post_install";
 		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_PASSIVE_IMPORT_ID = "post_install_passive_import_id";
+		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_SLAVE_TO_MASTER_IP = "post_install_slave_to_master_ip";
+		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_TABLES = "post_install_tables";
 		const RegistryKeyType InterSYNTHESEModule::FAKE_IMPORT_ID = 1;
 
 		string InterSYNTHESEModule::_masterHost;
@@ -72,6 +74,8 @@ namespace synthese
 		bool InterSYNTHESEModule::_slaveActive(true);
 		bool InterSYNTHESEModule::_postInstall(false);
 		RegistryKeyType InterSYNTHESEModule::_postInstallPassiveImportId(0);
+		string InterSYNTHESEModule::_postInstallSlaveToMasterIp;
+		string InterSYNTHESEModule::_postInstallTables;
 		time_duration InterSYNTHESEModule::_syncWaitingTime(seconds(5));
 		RegistryKeyType InterSYNTHESEModule::_slaveId(0);
 		InterSYNTHESEModule::PackagesBySmartURL InterSYNTHESEModule::_packagesBySmartURL;
@@ -90,6 +94,8 @@ namespace synthese
 			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_WAITING_TIME, "5", &InterSYNTHESEModule::ParameterCallback);
 			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL, "0", &InterSYNTHESEModule::ParameterCallback);
 			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_PASSIVE_IMPORT_ID, "0", &InterSYNTHESEModule::ParameterCallback);
+			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_SLAVE_TO_MASTER_IP, "", &InterSYNTHESEModule::ParameterCallback);
+			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_TABLES, "", &InterSYNTHESEModule::ParameterCallback);
 		}
 
 
@@ -215,6 +221,28 @@ namespace synthese
 				try
 				{
 					_postInstallPassiveImportId = lexical_cast<RegistryKeyType>(value);
+				}
+				catch(bad_lexical_cast&)
+				{
+					// Log
+				}
+			}
+			else if(name == MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_SLAVE_TO_MASTER_IP)
+			{
+				try
+				{
+					_postInstallSlaveToMasterIp = lexical_cast<string>(value);
+				}
+				catch(bad_lexical_cast&)
+				{
+					// Log
+				}
+			}
+			else if(name == MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_TABLES)
+			{
+				try
+				{
+					_postInstallTables = lexical_cast<string>(value);
 				}
 				catch(bad_lexical_cast&)
 				{
@@ -442,6 +470,8 @@ namespace synthese
 				ParametersMap pm;
 				pm.insert(SpecificPostInstall::PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID, _postInstallPassiveImportId);
 				pm.insert(SpecificPostInstall::PARAMETER_POST_INSTALL_SLAVE_ID, _slaveId);
+				pm.insert(SpecificPostInstall::PARAMETER_POST_INSTALL_SLAVE_TO_MASTER_IP, _postInstallSlaveToMasterIp);
+				pm.insert(SpecificPostInstall::PARAMETER_POST_INSTALL_TABLES, _postInstallTables);
 				action->_setFromParametersMap(pm);
 				action->run(request);
 			}

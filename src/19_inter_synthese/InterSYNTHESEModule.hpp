@@ -94,6 +94,8 @@ namespace synthese
 			static const std::string MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID;
 			static const std::string MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL;
 			static const std::string MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_PASSIVE_IMPORT_ID;
+			static const std::string MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_SLAVE_TO_MASTER_IP;
+			static const std::string MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_TABLES;
 			static const util::RegistryKeyType FAKE_IMPORT_ID;
 
 			typedef std::map<std::string, InterSYNTHESEPackage*> PackagesBySmartURL;
@@ -106,6 +108,8 @@ namespace synthese
 			static bool _postInstall;
 			static util::RegistryKeyType _slaveId;
 			static util::RegistryKeyType _postInstallPassiveImportId;
+			static std::string _postInstallSlaveToMasterIp;
+			static std::string _postInstallTables;
 			static PackagesBySmartURL _packagesBySmartURL;
 			static bool _passiveSlaveUpdaterSelector(const InterSYNTHESESlave& object);
 
