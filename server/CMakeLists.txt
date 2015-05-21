@@ -212,6 +212,7 @@ set(CPACK_PACKAGE_CONTACT       "contact@rcsmobility.com")
 
 # set CPack generation variables here to remove them from Jenkins jobs
 set(CMAKE_INSTALL_PREFIX /opt/rcs/synthese3)
+set(CPACK_PACKAGING_INSTALL_PREFIX /opt/rcs/synthese3)
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 0)
 
 # if the HEAD does not point to a tag, suffix the archive with 'snapshot'
