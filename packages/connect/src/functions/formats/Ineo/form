@@ -131,12 +131,10 @@
   value2=code_commune&
 #>
 
-<?if&cond=<@stop_city_code_field==""@>&then=
-	<#forms/text_input&
-	  label=ID commune pour les nouveaux arrêts commerciaux&
-	  name=sadc&
-	#>
-?>
+<#forms/text_input&
+  label=ID commune pour les nouveaux arrêts commerciaux&
+  name=sadc&
+#>
 
 <h3>Retraitements sur les données</h3>
 
