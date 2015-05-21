@@ -861,7 +861,12 @@ namespace synthese
 			// Max depth
 			if(map.getOptional<size_t>(PARAMETER_MAX_DEPTH))
 			{
-				_accessParameters.setMaxtransportConnectionsCount(map.getOptional<size_t>(PARAMETER_MAX_DEPTH));
+				optional<size_t> maxDepth = map.getOptional<size_t>(PARAMETER_MAX_DEPTH);
+				if (*maxDepth > 0)
+				{
+					*maxDepth -= 1; // max depth (number of journeys) is number of connections + 1
+				}
+				_accessParameters.setMaxtransportConnectionsCount(maxDepth);
 			}
 
 			// Filter on waiting time
