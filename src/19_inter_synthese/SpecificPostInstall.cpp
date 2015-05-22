@@ -22,6 +22,7 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "DBTransaction.hpp"
 #include "SpecificPostInstall.hpp"
 #include "InterSYNTHESEConfigTableSync.hpp"
 #include "InterSYNTHESEConfigItem.hpp"
@@ -37,6 +38,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace util;
 	using namespace server;
 	using namespace security;
@@ -119,6 +121,23 @@ namespace synthese
 			slave.set<LastActivityReport>(now);
 			InterSYNTHESESlaveTableSync::Save(&slave);
 
+
+			// Remove previous entries
+			InterSYNTHESEConfigItemTableSync::SearchResult allConfigs(InterSYNTHESEConfigItemTableSync::Search(*_env));
+
+			DBTransaction transaction;
+			DB& db(*DBModule::GetDB());
+			BOOST_FOREACH(InterSYNTHESEConfigItemTableSync::SearchResult::value_type configItem, allConfigs)
+			{
+
+				if(configItem->get<InterSYNTHESEConfig>()->getKey() == myConfig->getKey())
+				{
+					db.deleteStmt(configItem->getKey(), transaction);
+				}
+			}
+			transaction.run();
+
+			// Add new entries
 			vector<string> tablesId;
 			split(tablesId, _tables, is_any_of(", "));
 			for(std::vector<std::string>::iterator it = tablesId.begin(); it != tablesId.end(); ++it)
