@@ -1010,7 +1010,11 @@ namespace synthese
 				);
 				DBResultSPtr result(db->execQuery(query));
 				DBResultSPtr destResult(db->execQuery(destQuery));
-				destResult->next();
+				bool readDestResult(false);
+				if (destResult->next())
+				{
+					readDestResult = true;
+				}
 				while(result->next())
 				{
 					int ref(result->getInt("ref"));
@@ -1070,7 +1074,12 @@ namespace synthese
 							dest
 						);
 
-					} while(destResult->next());
+						if (!destResult->next())
+						{
+							readDestResult = false;
+						}
+
+					} while(readDestResult);
 				}
 			}
 
