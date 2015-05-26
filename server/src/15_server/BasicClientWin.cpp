@@ -18,6 +18,7 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
+#include <boost/optional.hpp>
 
 using namespace std;
 using namespace boost;
@@ -42,6 +43,19 @@ namespace synthese
 			_acceptGzip(acceptGzip)
 		{}
 
+	    BasicClient (
+			const std::string& serverHost,
+			const std::string serverPort,
+			boost::optional<int> connectionTimeout,
+			boost::optional<int> readTimeout,
+			bool outputHTTPHeaders = false,
+			bool acceptGzip = true
+		):	_serverHost (serverHost),
+			_serverPort (serverPort),
+			_timeOut (connectionTimeout == boost::none ? 0, connectionTimeout),
+			_outputHTTPHeaders(outputHTTPHeaders),
+			_acceptGzip(acceptGzip)
+		{}
 
 
 		string BasicClient::get(

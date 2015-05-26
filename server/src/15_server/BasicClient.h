@@ -24,7 +24,8 @@ namespace synthese
 
 		    const std::string _serverHost;      //!< Server host.
 			const std::string _serverPort;		//!< Server port.
-		    const int _timeOut;                 //!< TCP time out in milliseconds. 0 means no timeout.
+		    const boost::optional<int> _connectionTimeout; //!< TCP connection timeout in milliseconds
+		    const boost::optional<int> _readTimeout;	//!< TCP read timeout in milliseconds
 			const bool _outputHTTPHeaders;
 			const bool _acceptGzip;
 
@@ -33,14 +34,6 @@ namespace synthese
 				const std::string& postData,
 				const std::string& contentType
 			) const;
-			void set_result(boost::optional<boost::system::error_code>* a,
-				const boost::system::error_code b
-			) const;
-			void read_until_with_timeout(boost::asio::ip::tcp::socket& sock,
-				boost::asio::streambuf &buffer,
-				const std::string &delim,
-				const boost::posix_time::time_duration &expiry_time) const;
-			void checkDeadline();
 
 		public:
 
@@ -48,6 +41,15 @@ namespace synthese
 				const std::string& serverHost,
 				const std::string serverPort = "8080",
 				int timeOut = 0,
+				bool outputHTTPHeaders = false,
+				bool acceptGzip = true
+			);
+
+		    BasicClient (
+				const std::string& serverHost,
+				const std::string serverPort,
+				boost::optional<int> connectionTimeout,
+				boost::optional<int> readTimeout,
 				bool outputHTTPHeaders = false,
 				bool acceptGzip = true
 			);

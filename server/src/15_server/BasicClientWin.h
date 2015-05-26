@@ -3,7 +3,7 @@
 
 #include <string>
 #include <map>
-
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -37,6 +37,15 @@ namespace synthese
 				const std::string& serverHost,
 				const std::string serverPort = "8080",
 				int timeOut = 0,
+				bool outputHTTPHeaders = false,
+				bool acceptGzip = true
+			);
+
+		    BasicClient (
+				const std::string& serverHost,
+				const std::string serverPort,
+				boost::optional<int> connectionTimeout,	// used as timeOut
+				boost::optional<int> readTimeout,	// ignored
 				bool outputHTTPHeaders = false,
 				bool acceptGzip = true
 			);

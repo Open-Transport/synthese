@@ -74,10 +74,10 @@
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 
-// Connect Timeout in seconds after which we cancel the HTTP request
-#define CLIENT_CONNECT_TIMEOUT_S 15
-// Read Timeout in seconds after which we cancel the HTTP request
-#define CLIENT_READ_TIMEOUT_S 300
+// Connect Timeout in milliseconds after which we cancel the HTTP request
+#define CLIENT_CONNECT_TIMEOUT_MS 15000
+// Read Timeout in milliseconds after which we cancel the HTTP request
+#define CLIENT_READ_TIMEOUT_MS 300000
 
 using boost::asio::deadline_timer;
 using boost::asio::ip::tcp;
@@ -96,7 +96,10 @@ namespace synthese
 			const string& postData,
 			const string& contentType,
 			const bool acceptGzip,
-			string &payload)
+			string &payload,
+			const boost::optional<int> connectionTimeout,
+			const boost::optional<int> readTimeout
+			)
 		: stopped_(false),
 		  socket_(io_service),
 		  deadline_(io_service),
@@ -108,7 +111,13 @@ namespace synthese
 		  _acceptGzip(acceptGzip),
 		  _gotHeader(false),
 		  _payload(payload),
-		  _announcedContentLength(0)
+		  _announcedContentLength(0),
+		  _connectionTimeout(
+			connectionTimeout == boost::none ? CLIENT_CONNECT_TIMEOUT_MS : connectionTimeout.get()
+		  ),
+		  _readTimeout(
+			readTimeout == boost::none ? CLIENT_READ_TIMEOUT_MS : readTimeout.get()
+		  )
 		{
 		}
 
@@ -144,7 +153,7 @@ namespace synthese
 				);
 
 				// Set a deadline for the connect operation.
-				deadline_.expires_from_now(boost::posix_time::seconds(CLIENT_CONNECT_TIMEOUT_S));
+				deadline_.expires_from_now(boost::posix_time::milliseconds(_connectionTimeout));
 
 				// Start the asynchronous connect operation.
 				socket_.async_connect(endpoint_iter->endpoint(),
@@ -222,8 +231,8 @@ namespace synthese
 		void HTTPClient::startRead()
 		{
 			// Set a deadline for the read operation.
-			deadline_.expires_from_now(boost::posix_time::seconds(CLIENT_READ_TIMEOUT_S +
-																  _request.size() / 10000));
+			deadline_.expires_from_now(
+					boost::posix_time::milliseconds(_readTimeout));
 
 			// Start an asynchronous operation to read a newline-delimited message.
 			boost::asio::async_read_until(socket_, input_buffer_, '\n',

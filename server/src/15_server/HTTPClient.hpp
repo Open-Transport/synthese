@@ -4,6 +4,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/asio/streambuf.hpp>
+#include <boost/optional.hpp>
 
 #include <map>
 
@@ -35,6 +36,9 @@ namespace synthese
 			std::string &_payload;
 			size_t _announcedContentLength;
 
+			const int _connectionTimeout;
+			const int _readTimeout;
+
 			boost::asio::streambuf _request;
 
 		public:
@@ -45,7 +49,9 @@ namespace synthese
 				const std::string& postData,
 				const std::string& contentType,
 				const bool acceptGzip,
-				std::string &payload /* Will contain the body or the http response */
+				std::string &payload, /* Will contain the body or the http response */
+				const boost::optional<int> connectionTimeout = boost::none,
+				const boost::optional<int> readTimeout = boost::none
 			);
 
 			// Called by the user of the client class to initiate the connection process.
