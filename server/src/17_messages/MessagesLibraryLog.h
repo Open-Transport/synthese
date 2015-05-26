@@ -124,7 +124,7 @@ namespace synthese
 				, const security::User* user
 			);
 
-			std::string getObjectName(
+			virtual std::string getObjectName(
 				util::RegistryKeyType id,
 				const server::Request& searchRequest
 			) const;
