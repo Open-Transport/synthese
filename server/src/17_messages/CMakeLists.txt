@@ -104,6 +104,8 @@ NotificationEvent.cpp
 NotificationEvent.hpp
 NotificationEventTableSync.cpp
 NotificationEventTableSync.hpp
+NotificationLog.cpp
+NotificationLog.hpp
 NotificationProvider.hpp
 NotificationProvider.cpp
 NotificationProvidersService.cpp
