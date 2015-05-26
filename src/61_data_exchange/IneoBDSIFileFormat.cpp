@@ -1066,6 +1066,11 @@ namespace synthese
 						if(!dest.syntheseDisplayBoard)
 						{
 							_logWarning("No such display screen : " + dest.destinataire);
+
+							if (!destResult->next())
+							{
+								readDestResult = false;
+							}
 							continue;
 						}
 
