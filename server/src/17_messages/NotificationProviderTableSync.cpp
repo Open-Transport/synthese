@@ -98,13 +98,8 @@ namespace synthese
 
 	namespace messages
 	{
-		NotificationProviderTableSync::NotificationProviderTableSync() {
-			// TODO Auto-generated constructor stub
-		}
-
-		NotificationProviderTableSync::~NotificationProviderTableSync() {
-			// TODO Auto-generated destructor stub
-		}
+		NotificationProviderTableSync::~NotificationProviderTableSync()
+		{ }
 
 	} /* namespace messages */
 } /* namespace synthese */

@@ -34,7 +34,6 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<NotificationProviderTableSync, NotificationProvider>
 		{
 		public:
-			NotificationProviderTableSync();
 			virtual ~NotificationProviderTableSync();
 		};
 
