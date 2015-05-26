@@ -35,7 +35,25 @@ namespace synthese
 			bool acceptGzip
 		):	_serverHost (serverHost),
 			_serverPort (serverPort),
-			_timeOut (timeOut),
+			_connectionTimeout (timeOut == 0 ? boost::none : boost::optional<int>(timeOut)),
+			_readTimeout (timeOut == 0 ? boost::none : boost::optional<int>(timeOut)),
+			_outputHTTPHeaders(outputHTTPHeaders),
+			_acceptGzip(acceptGzip)
+		{}
+
+
+
+		BasicClient::BasicClient(
+			const std::string& serverHost,
+			const std::string serverPort,
+			boost::optional<int> connectionTimeout,
+			boost::optional<int> readTimeout,
+			bool outputHTTPHeaders,
+			bool acceptGzip
+		) : _serverHost (serverHost),
+			_serverPort (serverPort),
+			_connectionTimeout (connectionTimeout),
+			_readTimeout (readTimeout),
 			_outputHTTPHeaders(outputHTTPHeaders),
 			_acceptGzip(acceptGzip)
 		{}
@@ -71,7 +89,8 @@ namespace synthese
 
 			HTTPClient client(io_service, _serverHost, _serverPort,
 				url, postData, contentType, _acceptGzip,
-				result /* out value */
+				result, /* out value */
+				_connectionTimeout, _readTimeout
 			);
 
 			client.start(r.resolve(tcp::resolver::query(_serverHost, _serverPort)));
