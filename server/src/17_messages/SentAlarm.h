@@ -145,7 +145,7 @@ namespace synthese
 				@return start date for the application period or not_a_date_time if no end date
 			*/
 			boost::posix_time::ptime getApplicationStart(
-				boost::posix_time::ptime& when
+				const boost::posix_time::ptime& when
 			) const;
 
 			/**
@@ -156,7 +156,7 @@ namespace synthese
 				@return end date for the application period or not_a_date_time if no end date
 			*/
 			boost::posix_time::ptime getApplicationEnd(
-				boost::posix_time::ptime& when
+				const boost::posix_time::ptime& when
 			) const;
 
 			/// @name Alarm virtual methods

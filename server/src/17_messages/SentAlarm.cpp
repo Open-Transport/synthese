@@ -157,7 +157,7 @@ namespace synthese
 
 
 		boost::posix_time::ptime SentAlarm::getApplicationStart(
-			boost::posix_time::ptime& when
+			const boost::posix_time::ptime& when
 		) const {
 			posix_time::ptime result = posix_time::not_a_date_time;
 
@@ -197,7 +197,7 @@ namespace synthese
 
 
 		boost::posix_time::ptime SentAlarm::getApplicationEnd(
-			boost::posix_time::ptime& when
+			const boost::posix_time::ptime& when
 		) const {
 			posix_time::ptime result = posix_time::not_a_date_time;
 
