@@ -73,6 +73,14 @@ namespace synthese
 			) const;
 
 
+			/// Structure to hold URI parsing result
+			struct Uri
+			{
+			public:
+				std::string protocol, host, port, path, queryString;
+				static Uri parseUri(const std::string url);
+			};
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Simple HTTP GET request helper.
 			/// @warning Only HTTP is supported, not HTTPS
