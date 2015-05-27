@@ -23,8 +23,8 @@
 #ifndef SYNTHESE_messages_NotificationProvider_hpp__
 #define SYNTHESE_messages_NotificationProvider_hpp__
 
-#include <FactorableTemplate.h>
 #include <BroadcastPoint.hpp>
+#include <FactorableTemplate.h>
 #include <MessageType.hpp>
 #include <NumericField.hpp>
 #include <Object.hpp>
@@ -32,6 +32,13 @@
 #include <PointerField.hpp>
 #include <SchemaMacros.hpp>
 #include <StringField.hpp>
+
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/fusion/container/map.hpp>
+#include <boost/fusion/support/pair.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
+
+#include <set>
 #include <string>
 #include <vector>
 
@@ -43,8 +50,10 @@ namespace synthese
 {
 	namespace messages
 	{
-		class NotificationChannel;	// Forward declaration
-		class NotificationEvent;	// Forward declaration
+		// Forward declarations
+		class NotificationChannel;
+		class NotificationEvent;
+		class AlarmObjectLink;
 
 		FIELD_STRING(NotificationChannelKey)
 		FIELD_POINTER(MessageTypeBegin, MessageType)
@@ -62,23 +71,23 @@ namespace synthese
 			// Notification channel key, aka protocol
 			FIELD(NotificationChannelKey),
 
+			// Message type content for begin event
+			FIELD(MessageTypeBegin),
+
+			// Message type content for end event
+			FIELD(MessageTypeEnd),
+
 			// Flag to force processing of all sent alarms for begin events
 			FIELD(SubscribeAllBegin),
 
 			// Flag to force processing of all sent alarms for end events
 			FIELD(SubscribeAllEnd),
 
-			// Delay in milliseconds between notification event retry
+			// Delay in seconds between notification event retry
 			FIELD(RetryAttemptDelay),
 
 			// Maximum number of retry attemps before giving up notify the event
 			FIELD(MaximumRetryAttempts),
-
-			// Message type content for begin event
-			FIELD(MessageTypeBegin),
-
-			// Message type content for end event
-			FIELD(MessageTypeEnd),
 
 			// Implementation specific parameters
 			FIELD(Parameters)
@@ -150,21 +159,56 @@ namespace synthese
 				) const;
 
 				virtual void getBroadcastPoints(BroadcastPoints& result) const;
+
+				virtual void onDisplayStart(const SentAlarm& message) const;
+
+				virtual void onDisplayEnd(const SentAlarm& message) const;
 			//@}
+
+			/**
+				Generates channel's script fields values based on an alarm
+				@param message source message to generate fields
+				@param type notification type
+				@return map with field name and generated values
+			 */
+			boost::optional<util::ParametersMap> generateScriptFields(
+				const Alarm* message,
+				const int type
+			);
+
+			/**
+				Computes next attempt timestamp for a NotificationEvent.
+				Value posix_time::not_a_date_time means no more attempt is expected.
+
+				@param event NotificationEvent to process
+				@return time stamp for next attempt or posix_time::not_a_date_time if none
+			*/
+			boost::posix_time::ptime nextAttemptTime(
+				const boost::shared_ptr<NotificationEvent>& event
+			) const;
 
 			/**
 				Notify the event according to NotificationProvider parameters
 				available with "channel" prefix.
 
-				@event NotificationEvent to process
+				@param event NotificationEvent to process
 				@return true only if notification succeeded
 			*/
 			bool notify(const boost::shared_ptr<NotificationEvent>& event);
 
-		private:
-			NotificationChannel* _notificationChannel;
 
-			NotificationChannel* getNotificationChannel();
+		private:
+			/// Reference to a notification channel instance
+			boost::shared_ptr<NotificationChannel> _notificationChannel;
+
+			/// Factory for notification channel instance based on provider type
+			boost::shared_ptr<NotificationChannel> getNotificationChannel();
+
+			/// Copy of Alarm::LinkedObjects because of circular ref declarations
+			typedef std::map<std::string, std::set<const AlarmObjectLink*> > AlarmLinkedObjects;
+
+			/// Test if this instance is recipient of an alarm
+			bool isRecipient(const AlarmLinkedObjects& recipients) const;
 		};
 	}
 }

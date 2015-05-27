@@ -21,11 +21,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <Alarm.h>
 #include <FileNotificationChannel.hpp>
+#include <NotificationEvent.hpp>
+#include <NotificationProvider.hpp>
 #include <ParametersMap.h>
 
+#include <boost/filesystem.hpp>
+
+#include <iostream>
+#include <fstream>
 #include <string>
 
+using namespace boost;
 using namespace std;
 
 namespace synthese
@@ -45,13 +53,6 @@ namespace synthese
 
 
 
-		FileNotificationChannel::FileNotificationChannel()
-		{
-			// Prepare internal state for notifications
-		};
-
-
-
 		// Provide its own script fields list
 		std::vector<std::string> FileNotificationChannel::_getScriptParameterNames() const
 		{
@@ -63,9 +64,40 @@ namespace synthese
 
 
 
-		bool FileNotificationChannel::notify(const boost::shared_ptr<NotificationEvent> event)
+		bool FileNotificationChannel::notifyEvent(const boost::shared_ptr<NotificationEvent> event)
 		{
-			// TODO notify
+			const NotificationProvider* provider = &(*(event->get<NotificationProvider>()));
+			const Alarm* alarm = &(*(event->get<Alarm>()));
+			// Generate field values
+			ParametersMap fields = generateScriptFields(provider, alarm, event->get<EventType>());
+
+			if (!fields.isDefined(PARAMETER_FILE_PATH)
+				|| !fields.isDefined(PARAMETER_FILE_CONTENT))
+			{
+				return true;	// Explicitly nothing to notify
+			}
+
+			string content = fields.get<string>(PARAMETER_FILE_CONTENT);
+			if (content.empty())
+			{
+				return true;	// Explicitly nothing to notify
+			}
+
+			// Create file system structure
+			boost::filesystem::path filePath(fields.get<string>(PARAMETER_FILE_PATH));
+
+			if (filePath.has_parent_path() && !filesystem::exists(filePath.parent_path()))
+			{
+				filesystem::create_directories(filePath.parent_path());
+			}
+
+			// Write file content or raise exception
+			ofstream stream(filePath.string().c_str(), ios::out | ios::trunc);
+			stream.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+
+			stream << content;
+			stream.close();
+
 			return true;
 		}
 	}

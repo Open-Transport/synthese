@@ -21,20 +21,21 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <NotificationProvider.hpp>
-#include <NotificationChannel.hpp>
-#include <NotificationEvent.hpp>
-
 #include <Alarm.h>
 #include <AlarmObjectLink.h>
 #include <BroadcastPointAlarmRecipient.hpp>
-#include <Env.h>
 #include <Factory.h>
 #include <Field.hpp>
+#include <NotificationChannel.hpp>
+#include <NotificationEvent.hpp>
+#include <NotificationLog.hpp>
 #include <ParametersMap.h>
 #include <Registry.h>
+#include <SentAlarm.h>
+#include <SimpleObjectFieldDefinition.hpp>
 #include <UtilTypes.h>
 
+#include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/foreach.hpp>
 #include <boost/fusion/container/map.hpp>
 #include <boost/fusion/support/pair.hpp>
@@ -42,13 +43,15 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <map>
+#include <set>
 #include <utility>
-
 
 /**
 	@defgroup refFile 17 Notification providers
 	@ingroup ref
 */
+
+using namespace boost;
 
 namespace synthese
 {
@@ -95,7 +98,7 @@ namespace synthese
 			std::string prefix)
 		const {
 			// Make Parameters available for direct CMS rendering
-			map.merge(get<Parameters>());
+			map.merge(get<Parameters>(), prefix);
 		}
 
 
@@ -110,15 +113,14 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
 					FIELD_DEFAULT_CONSTRUCTOR(NotificationChannelKey),
+					FIELD_DEFAULT_CONSTRUCTOR(MessageTypeBegin),
+					FIELD_DEFAULT_CONSTRUCTOR(MessageTypeEnd),
 					FIELD_VALUE_CONSTRUCTOR(SubscribeAllBegin, false),
 					FIELD_VALUE_CONSTRUCTOR(SubscribeAllEnd, false),
 					FIELD_DEFAULT_CONSTRUCTOR(RetryAttemptDelay),
 					FIELD_DEFAULT_CONSTRUCTOR(MaximumRetryAttempts),
-					FIELD_DEFAULT_CONSTRUCTOR(MessageTypeBegin),
-					FIELD_DEFAULT_CONSTRUCTOR(MessageTypeEnd),
 					FIELD_DEFAULT_CONSTRUCTOR(Parameters)
-			)	),
-			_notificationChannel(NULL)
+			)	)
 		{}
 
 
@@ -157,25 +159,10 @@ namespace synthese
 		}
 
 
-
-		//////////////////////////////////////////////////////////////////////////
-		/// Check of a message should be sent to the mailing list according to its recipients.
-		/// A notification can only be sent if it is explicitly linked to the message.
-		/// @param recipients the recipients list to check
-		/// @param parameters the broadcast parameters
-		bool NotificationProvider::displaysMessage(
-			const Alarm::LinkedObjects& recipients,
-			const util::ParametersMap& parameters
-		) const	{
-
-			// if global subscribe all options is set
-			if(get<SubscribeAllBegin>() || get<SubscribeAllEnd>())
-			{
-				return true;
-			}
-
+		bool NotificationProvider::isRecipient(const AlarmLinkedObjects& recipients) const
+		{
 			// in broad cast points recipients
-			Alarm::LinkedObjects::const_iterator it(
+			AlarmLinkedObjects::const_iterator it(
 				recipients.find(
 					BroadcastPointAlarmRecipient::FACTORY_KEY
 			)	);
@@ -188,7 +175,7 @@ namespace synthese
 
 			// Loop on each recipient
 			BOOST_FOREACH(
-				const Alarm::LinkedObjects::mapped_type::value_type& link,
+				const AlarmLinkedObjects::mapped_type::value_type& link,
 				it->second
 			){
 				// Search for explicitly specified notification provider
@@ -197,30 +184,76 @@ namespace synthese
 					return true;
 				}
 			}
-
-			// The notification provider was not found
 			return false;
+		}
+
+		/**
+			Check of a message should be notified according to its recipients.
+			A notification can be sent if it is explicitly linked to the message
+
+			@param recipients the recipients list to check
+			@param parameters the broadcast parameters
+		*/
+		bool NotificationProvider::displaysMessage(
+			const Alarm::LinkedObjects& recipients,
+			const util::ParametersMap& parameters
+		) const	{
+			// if global subscribe all options is set
+			if(get<SubscribeAllBegin>() || get<SubscribeAllEnd>())
+			{
+				return true;
+			}
+			// Look for notification provider in recipients
+			return isRecipient(recipients);
+		}
+
+
+
+		boost::posix_time::ptime NotificationProvider::nextAttemptTime(
+			const boost::shared_ptr<NotificationEvent>& event
+		) const {
+			// Already failed or success, or maximum retry attempts reached
+			if (event->get<Status>() >= FAILED
+				|| event->get<Attempts>() >= this->get<MaximumRetryAttempts>())
+			{
+				return posix_time::not_a_date_time;
+			}
+			else
+			{
+				if (!event->get<LastAttempt>().is_not_a_date_time())
+				{
+					return event->get<LastAttempt>() + posix_time::seconds(this->get<RetryAttemptDelay>());
+				}
+				else
+				{
+					return posix_time::second_clock::local_time();
+				}
+			}
 		}
 
 
 
 		/**
-			Get or create the notification channel instance
-			to
+			Get or create the notification channel instance.
+
+			@return a pointer to NotificationChannel derived class instance or NULL
 		 */
-		messages::NotificationChannel* NotificationProvider::getNotificationChannel()
+		boost::shared_ptr<NotificationChannel> NotificationProvider::getNotificationChannel()
 		{
 			std::string channelKey = get<NotificationChannelKey>();
 			if (!Factory<NotificationChannel>::contains(channelKey))
 			{
 				// Inconsistent runtime and database
 				// NotificationChannel implementation is lacking
-				// TODO insert log entry !?
-				return NULL;
+				NotificationLog::AddNotificationProviderFailure(this,
+					"No channel available for key " + channelKey
+				);
 			}
-
-			if (!_notificationChannel) {
-				_notificationChannel = Factory<NotificationChannel>::create(channelKey);
+			else if (!_notificationChannel)
+			{
+				_notificationChannel = boost::shared_ptr<NotificationChannel>(
+					Factory<NotificationChannel>::create(channelKey)
+				);
 			}
 
 			return _notificationChannel;
@@ -228,15 +261,65 @@ namespace synthese
 
 
 
+		boost::optional<util::ParametersMap> NotificationProvider::generateScriptFields(
+			const Alarm* message,
+			const int type
+		) {
+			boost::optional<ParametersMap> result;
+			// Create corresponding NotificationChannel if not available
+			if (getNotificationChannel()) {
+				// Invoke attemptNotification(event)
+				// return true only if completely successful
+				result = _notificationChannel->generateScriptFields(this, message, (NotificationType)type);
+			}
+			return result;
+		}
+
 		/*
 			Notify the event according to NotificationProvider parameters
 			available with "channel" prefix.
 		*/
 		bool NotificationProvider::notify(const boost::shared_ptr<NotificationEvent>& event) {
-			// Create corresponding NotificationChannel
-			// Invoke attemptNotification(event)
-			// return true only if completely successful
-			return true;
+			// Create corresponding NotificationChannel if not available
+			if (getNotificationChannel()) {
+				// Invoke attemptNotification(event)
+				// return true only if completely successful
+				return _notificationChannel->notifyEvent(event);
+
+				// TODO: discard notification channel after successive failures
+			}
+			// if NULL channel key / protocol is not available
+			return false;
+		}
+
+
+
+		/// Function invoked when the message display ends.
+		/// @param message the SentAlarm to hide
+		void NotificationProvider::onDisplayStart(
+			const SentAlarm& message
+		) const {
+			// From FactorableTemplate<AlarmRecipient, BroadcastPointAlarmRecipient>::FACTORY_KEY
+			//Alarm::LinkedObjects recipients = message.getLinkedObjects("displayscreen");
+			// if global subscribe or explicit recipient
+			if(get<SubscribeAllBegin>() || isRecipient(message.getLinkedObjects()))
+			{
+				NotificationEvent::findOrCreateEvent(message, this, BEGIN);
+			}
+		}
+
+
+
+		/// Function invoked when the message display ends.
+		/// @param message the SentAlarm to hide
+		void NotificationProvider::onDisplayEnd(
+			const SentAlarm& message
+		) const {
+			// if global subscribe or explicit recipient
+			if(get<SubscribeAllEnd>() || isRecipient(message.getLinkedObjects()))
+			{
+				NotificationEvent::findOrCreateEvent(message, this, END);
+			}
 		}
 
 	}
