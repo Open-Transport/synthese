@@ -118,10 +118,6 @@ namespace synthese
 
 
 
-		//////////////////////////////////////////////////////////////////////////
-		/// Checks if the current message is active at the specified time.
-		/// @param when the time to check
-		/// @return true if the message must be displayed at the specified time
 		bool SentAlarm::isApplicable( boost::posix_time::ptime& when ) const
 		{
 			// Check if the event is active first
@@ -156,6 +152,86 @@ namespace synthese
 					(getScenario()->getPeriodEnd().is_not_a_date_time() || getScenario()->getPeriodEnd() >= when)
 				;
 			}
+		}
+
+
+
+		boost::posix_time::ptime SentAlarm::getApplicationStart(
+			boost::posix_time::ptime& when
+		) const {
+			posix_time::ptime result = posix_time::not_a_date_time;
+
+			// Check if the event is active first
+			if( !getScenario() ||
+				!getScenario()->getIsEnabled()
+			){
+				return result;
+			}
+
+			// Then check if specific application periods are defined for the current message
+			if(_calendar)
+			{
+				// Search for an application period including the checked date
+				BOOST_FOREACH(
+					const ScenarioCalendar::ApplicationPeriods::value_type& period,
+					_calendar->getApplicationPeriods()
+				){
+					if(period->getValue(when))
+					{
+						result = period->getStart(when);
+					}
+				}
+			}
+			else
+			{
+				// Then refer to the simple start/end date of the scenario
+				if ((getScenario()->getPeriodStart().is_not_a_date_time() || getScenario()->getPeriodStart() >= when) &&
+					(getScenario()->getPeriodEnd().is_not_a_date_time() || getScenario()->getPeriodEnd() <= when))
+				{
+					result = getScenario()->getPeriodStart();
+				}
+			}
+			return result;
+		}
+
+
+
+		boost::posix_time::ptime SentAlarm::getApplicationEnd(
+			boost::posix_time::ptime& when
+		) const {
+			posix_time::ptime result = posix_time::not_a_date_time;
+
+			// Check if the event is active first
+			if( !getScenario() ||
+				!getScenario()->getIsEnabled()
+			){
+				return result;
+			}
+
+			// Then check if specific application periods are defined for the current message
+			if(_calendar)
+			{
+				// Search for an application period including the checked date
+				BOOST_FOREACH(
+					const ScenarioCalendar::ApplicationPeriods::value_type& period,
+					_calendar->getApplicationPeriods()
+				){
+					if(period->getValue(when))
+					{
+						result = period->getEnd(when);
+					}
+				}
+			}
+			else
+			{
+				// Then refer to the simple start/end date of the scenario
+				if ((getScenario()->getPeriodStart().is_not_a_date_time() || getScenario()->getPeriodStart() >= when) &&
+					(getScenario()->getPeriodEnd().is_not_a_date_time() || getScenario()->getPeriodEnd() <= when))
+				{
+					result = getScenario()->getPeriodEnd();
+				}
+			}
+			return result;
 		}
 
 
