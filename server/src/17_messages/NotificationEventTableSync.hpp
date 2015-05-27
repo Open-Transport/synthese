@@ -57,12 +57,35 @@ namespace synthese
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> alarmId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<util::RegistryKeyType> notificationProviderId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<NotificationType> eventType =  boost::optional<NotificationType>(),
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByLastAttempt = true,
 				bool raisingOrder = false,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
-				);
+			);
+
+			/** Active notification event search.
+			Return events with status READY or IN_PROGRESS (< FAILED).
+
+			The size of the vector is less or equal to number, then all
+			sections are returned despite of the number limit. If the size is
+			greater than number (actually equal to number + 1) then there are
+			others sections to show.
+			Test it to know if the situation needs a "click for more" button.
+
+			@param first First Message type to answer
+			@param number Number of Message sections to answer (0 = all). Test after return to know if more results are available.
+			@return Found message events, from first, limited to number.
+			*/
+			static SearchResult GetPendingEvents(
+				util::Env& env,
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				bool orderByLastAttempt = true,
+				bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
 
 		};
 	}
