@@ -27,10 +27,14 @@
 
 #include <string>
 
+using namespace boost;
+using namespace std;
+
 namespace synthese
 {
 	using namespace util;
 	using namespace messages;
+	using namespace server;
 
 	namespace util
 	{
@@ -39,23 +43,79 @@ namespace synthese
 
 	namespace messages
 	{
-		HttpNotificationChannel::HttpNotificationChannel()
+		const std::string HttpNotificationChannel::PARAMETER_METHOD = "http_method";
+		const std::string HttpNotificationChannel::PARAMETER_URL = "http_url";
+		const std::string HttpNotificationChannel::PARAMETER_BODY = "http_body";
+		const std::string HttpNotificationChannel::PARAMETER_CONNECTION_TIMEOUT = "http_connection_timeout";
+		const std::string HttpNotificationChannel::PARAMETER_READ_TIMEOUT = "http_read_timeout";
+
+
+
+		// Provide its own script fields list
+		std::vector<std::string> HttpNotificationChannel::_getScriptParameterNames() const
 		{
-			// Prepare internal state for notifications
-		};
-
-
-
-		bool HttpNotificationChannel::notify(const boost::shared_ptr<NotificationEvent> event)
-		{
-			// TODO notify
-			return true;
+			vector<string> result;
+			result.push_back(PARAMETER_URL);
+			result.push_back(PARAMETER_BODY);
+			return result;
 		}
 
-		// Use curl to establish a connection with connection timeout
-		// Create HTTP URL and body from parameters
-		// Send request with read timeout
-		// Intercept exception and ask for retry
+
+
+		bool HttpNotificationChannel::notifyEvent(const boost::shared_ptr<NotificationEvent> event)
+		{
+			const NotificationProvider* provider = &(*(event->get<NotificationProvider>()));
+			const Alarm* alarm = &(*(event->get<Alarm>()));
+
+			// Create HTTP URL and body from parameters
+			ParametersMap fields = generateScriptFields(provider, alarm, event->get<EventType>());
+
+			string httpMethod = fields.getDefault<string>(PARAMETER_METHOD, "GET");
+
+			if (!fields.isDefined(PARAMETER_URL)
+				|| (httpMethod == "POST" && !fields.isDefined(PARAMETER_BODY)))
+			{
+				return true;	// Explicitly nothing to notify
+			}
+
+			string httpUrl = fields.get<string>(PARAMETER_URL);
+			string httpBody = fields.get<string>(PARAMETER_BODY);
+			if (httpUrl.empty()
+				|| (httpMethod == "POST" && httpBody.empty()))
+			{
+				return true;	// Explicitly nothing to notify
+			}
+
+			boost::optional<int> connectionTimeout;
+			boost::optional<int> readTimeout;
+
+			BasicClient::Uri uri = BasicClient::Uri::parseUri(httpUrl);
+
+			// Send request with read timeout
+			BasicClient httpClient(
+				uri.host,
+				uri.port,
+				connectionTimeout,
+				readTimeout
+			);
+			// TODO performance improvement: reuse BasicClient if
+			// constructor parameters have not changed
+
+			if (httpMethod == "GET")
+			{
+				httpClient.get(uri.path);
+			}
+			else if (httpMethod == "POST")
+			{
+				httpClient.post(uri.path, httpBody);
+			}
+			else
+			{
+				throw Exception("Unsupported HTTP method" + httpMethod);
+			}
+
+			return true;
+		}
 
 	}
 }

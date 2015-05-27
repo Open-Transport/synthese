@@ -582,34 +582,16 @@ template=<{display_type&template=
 }>?>
           </div>
         </div>
-        <div>
-          <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" value="107"> Listes de diffusion</label>
-          <div style="padding-left:30px;" class="hide">
-            <div>
-              <i class="icon-chevron-right openclose"></i> <label class="checkbox">Listes à envoi automatique</label>
-              <div style="padding-left:30px;" class="hide">
-<?mailing_lists&
-manual_sending=0&
-template=<{mailing_list&template=
-                <div>
-                  <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> Liste <@name@></label>
-                </div>
-}>?>
-              </div>
-            </div>
-            <div>
-              <i class="icon-chevron-right openclose"></i> <label class="checkbox">Listes à envoi manuel</label>
-              <div style="padding-left:30px;" class="hide">
-<?mailing_lists&
-manual_sending=1&
-template=<{mailing_list&template=
-                <div>
-                  <label class="checkbox"><input type="checkbox" factory="displayscreen" manual_sending="1" noparam="1" value="<@id@>"> Liste <@name@></label>
-                </div>
-}>?>
-              </div>
-            </div>
-          </div>
+      </div>
+      <div>
+        <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" value="107"> Fournisseurs de notifications</label>
+        <div style="padding-left:30px;" class="hide">
+           <?notification_providers&
+	     template=<{provider&template=
+	   <div>
+             <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> <@name@> (<@channel@>)</label>
+           </div>
+           }>?>
         </div>
         <div>
           <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="106"> Autres diffuseurs</label>
@@ -740,7 +722,7 @@ template=<{
         }>?>
   ],
   section:[
-    <{section&template={id: "<@id@>"}}>
+    <{section&template={id: "<@id@>"}&}>
   ],
   <{recipients&template=
       line_recipient:[ <{line&template=

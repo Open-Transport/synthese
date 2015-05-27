@@ -6,6 +6,7 @@
  <#tab_title&default=1&id=message_types&title=Types de messages#>
  <#tab_title&id=message_tags&title=Mots clefs (tags de messages)#>
  <#tab_title&id=display_types&title=Types de bornes#>
+ <#tab_title&id=notification_providers&title=Fournisseurs de notifications#>
  <#tab_title&id=mailing_lists&title=Listes de diffusion#>
  <#tab_title&id=broadcast_points&title=Autres diffuseurs#>
  <#tab_title&id=sections&title=Sections#>
@@ -213,6 +214,171 @@ then=
    ?>
   </div>
  </div>
+
+</div><#tab_div&id=notification_providers#>
+
+ <@np_id=<@(tab=="notification_providers")?roid:""@>@>
+ <div class="row-fluid">
+  <div class="span3" id="tree">
+   <ul class="nav nav-list well">
+    <li<@np_id?"":" class=\"active\""@>>
+     <?link&
+       target=<@p@>&
+       tab=notification_providers&
+       text=Fournisseurs de notifications<div class="pull-right" id="np_new_link"><i class="icon-plus <@np_id?"":"icon-white"@>"></i></div>
+     ?>
+    </li>
+    <?notification_providers&
+      template=<{provider&template=
+	<li class="tree_1 <@(id==np_id)?"active":""@>">
+ 	 <?link&
+  	   target=<@p@>&
+   	   tab=notification_providers&
+   	   roid=<@id@>&
+  	   text=<@name@>
+   	      <@(id==np_id)?("<div class=\"pull-right\" id=\"np_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
+      	 ?>
+	</li>
+    }>?>
+    <li>
+   </ul>
+  </div><div class="span6">
+   <?if&
+     cond=<@np_id@>&
+     else=<div class="alert alert-info">Sélectionnez un fournisseur de notification dans le menu ci-contre</div>&
+     then=<?form&
+            target=<@p@>&
+            tab=notification_providers&
+            a=ObjectUpdate&
+            actionParam_object_id=<@np_id@>&
+            class=form-horizontal&
+            roid=<@np_id@>&
+            form_id=np_update_parameters&
+            name=np_update_parameters&
+            actionParam_field_parameters=<@parameters@>
+          ?><?notification_providers&
+              roid=<@np_id@>&
+              template=<{provider&template=
+              
+		 <div class="control-group">
+		  <label class="control-label">Nom</label>
+		  <div class="controls">
+		   <input type="text" name="actionParam_field_name" value="<@name@>" />
+		  </div>
+		 </div>
+
+		 <div class="control-group">
+		  <label class="control-label">Type de notification</label>
+		  <div class="controls">
+		   <input type="text" name="channel_type" value="<@channel@>" disabled="true"/>
+		  </div>
+		 </div>
+
+               <h4>Paramètres génériques</h4>
+               
+  	   <div class="control-group">
+	    <label class="control-label">Type de message en début de période</label>
+	    <div class="controls">
+	     <select name="actionParam_field_begin_message_type_id">
+	      <option value="0">Message principal</option>
+	      <?message_types&template=<{type&template=<option value="<@id@>" <?if&cond=<@begin_message_type_id==id@>&then=selected="true"?>><@name@></option>}>?>
+	     </select>
+	    </div>
+	   </div>
+
+	   <div class="control-group">
+	    <label class="control-label">Notifier tout évènement en début de période</label>
+	    <div class="controls">
+	     <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_begin" <@subscribe_all_begin?"checked=\"true\"":""@> value="1" /> Oui</label>
+	     <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_begin" <@subscribe_all_begin?"":"checked=\"true\""@> value="0" /> Non</label>
+	    </div>
+	   </div>
+           
+  	   <div class="control-group">
+	    <label class="control-label">Type de message en fin de période</label>
+	    <div class="controls">
+	     <select name="actionParam_field_end_message_type_id">
+	      <option value="0">Message principal</option>
+	      <?message_types&template=<{type&template=<option value="<@id@>" <?if&cond=<@end_message_type_id==id@>&then=selected="true"?>><@name@></option>}>?>
+	     </select>
+	    </div>
+	   </div>
+
+	   <div class="control-group">
+	    <label class="control-label">Notifier tout évènement en fin de période</label>
+	    <div class="controls">
+	     <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_end" <@subscribe_all_end?"checked=\"true\"":""@> value="1" /> Oui</label>
+	     <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_end" <@subscribe_all_end?"":"checked=\"true\""@> value="0" /> Non</label>
+	    </div>
+	   </div>
+
+	   <div class="control-group">
+	    <label class="control-label">Délai entre tentatives</label>
+	    <div class="controls">
+	     <input type="text" name="actionParam_field_retry_attempt_delay" value="<@retry_attempt_delay@>" />
+             <span class="add-on">ms</span>
+	    </div>
+	   </div>
+
+	   <div class="control-group">
+	    <label class="control-label">Nombre maximum de tentatives</label>
+	    <div class="controls">
+	     <input type="text" name="actionParam_field_maximum_retry_attempts" value="<@maximum_retry_attempts@>" />
+	    </div>
+	   </div>
+
+           <#channels/<@channel@>/form&for=template#>
+
+		 <div class="control-group">
+		  <div class="controls">
+		   <button type="submit" class="btn btn-warning">Enregistrer</button>
+		  </div>
+		 </div>}>
+          ?>
+          </form>
+   ?>
+  </div><div class="span3">
+   <?if&cond=<@np_id@>&then=
+	   <div class="well">
+	    <h4>Abonnés</h4>
+	    <p>Cette liste <@subscriptions?"":"ne "@>contient <a href="#" id="np_subscription_link"><strong><@subscriptions?subscriptions:"aucun"@></strong> abonné<@(subscriptions>1)?"s":""@></a>.</p>
+	   </div>
+   ?>
+  </div>
+  <div class="span3">
+   <?form&
+   name=np_test&
+   target=<@p@>&
+   tab=notification_providers&
+   a=test_parameters&
+   provider_id=<@np_id@>&
+   actionParam_field_channel_parameters=<@parameters@>&
+   actionParam_scenario_template=0&
+   class=form-horizontal
+   ?>
+   <div class="controls"><ul class="nav nav-list well">
+     <li class="folder_element" element_id="0"><a>Bibliothèque</a></li>
+     <?scenarii&
+       t=1&
+       template=<{scenario&template=
+	<li class="np_template_element" style="padding-left:15px;" element_id="<@scenario_id@>"><a href="#"><@name@></a></li>
+     }>?>
+     <?ScenarioFoldersService&
+      root_id=0&
+      template=<{folder&recursive=1&template=
+	<li class="folder_element" style="padding-left:<@15+(depth*15)@>px;" element_id="<@id@>"><a><@name@></a></li>
+	<@recursive_content@>
+	<@folder_depth=<@depth@>@>
+	<?scenarii&
+	  t=1&
+	  f=<@id@>&
+	  template=<{scenario&template=
+		<li class="np_template_element" style="padding-left:<@15+(folder_depth*15)@>px;" element_id="<@scenario_id@>" <@(folder_id==id)?"active=\"1\"":""@>><a href="#"><@name@></a></li>
+	}>?>
+     }>?>
+    </ul></div>
+  </div>
+</div>
 
 </div><#tab_div&id=mailing_lists#>
 
@@ -679,6 +845,44 @@ then=
 
 </div>
 
+</div>
+
+
+<div class="modal hide fade" id="np_new_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Nouveau fournisseur de notification</h3>
+ </div>
+ <?form&
+   name=np_new_form&
+   a=ObjectCreate&
+   actionParam_table_id=199&
+   target=<@p@>&
+   tab=notification_providers&
+   co=1&
+   class=form-horizontal
+ ?>
+  <div class="modal-body">
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls">
+     <input type="text" name="actionParam_field_name" />
+    </div>
+    <br/>
+    <label class="control-label">Type de notification</label>
+    <div class="controls">
+      <select name="actionParam_field_channel">
+        <?notification_providers&list_channels=1&template=<{channel&template=
+        	<option value="<@key@>"><@key@></option>
+        }>?>
+       </select>
+      </div>
+   </div>
+  </div><div class="modal-footer">
+   <button class="btn btn-warning" type="submit">Créer le fournisseur</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+  </div>
+ </form>
 </div>
 
 

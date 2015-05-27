@@ -100,7 +100,7 @@ namespace synthese
 		public:
 			static void UpdateActivatedMessages();
 			static void UpdateAutomaticallyManagedScenarii();
-			static void HandleNotificationEvents();
+			static int HandleNotificationEvents();
 
 			static ActivatedMessages GetActivatedMessages(
 				const BroadcastPoint& broadcastPoint,

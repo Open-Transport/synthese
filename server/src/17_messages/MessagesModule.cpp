@@ -29,6 +29,7 @@
 #include "MessagesSection.hpp"
 #include "NotificationEvent.hpp"
 #include "NotificationEventTableSync.hpp"
+#include "NotificationLog.hpp"
 #include "SentScenario.h"
 #include "ServerModule.h"
 #include "ScenarioTemplate.h"
@@ -303,22 +304,15 @@ namespace synthese
 		{
 			while (true)
 			{
-				// Check if a new minute has begun
-				ptime now(second_clock::local_time());
-				if (now.time_of_day().minutes() != _lastMinute)
-				{
-					// Change the thread status
-					ServerModule::SetCurrentThreadRunningAction();
+				// Change the thread status
+				ServerModule::SetCurrentThreadRunningAction();
 
-					// Handle notification events
-					HandleNotificationEvents();
+				// Handle notification events.
+				// Loop over events until nothing to process.
+				while (HandleNotificationEvents() > 0);
 
-					// Update the last seconds cache
-					_lastMinute = now.time_of_day().minutes();
-
-					// Change the thread status
-					ServerModule::SetCurrentThreadWaiting();
-				}
+				// Change the thread status
+				ServerModule::SetCurrentThreadWaiting();
 
 				// Wait 500 ms
 				this_thread::sleep(milliseconds(500));
@@ -328,22 +322,85 @@ namespace synthese
 		
 		//////////////////////////////////////////////////////////////////////////
 		/// Management of the notification events
-		void MessagesModule::HandleNotificationEvents()
+		/// @return number of attempts for processed events
+		int MessagesModule::HandleNotificationEvents()
 		{
-			// Loop on all notification events
-			NotificationEventTableSync::SearchResult events;
+			int processedEvents = 0;
 
-			events = NotificationEventTableSync::Search(
-				Env::GetOfficialEnv()
-				);
-			BOOST_FOREACH(const boost::shared_ptr<NotificationEvent>& notificationEvent, events)
+			// Loop on notification events in READY or IN_PROGRESS status
+			Env env = Env::GetOfficialEnv();
+			NotificationEventTableSync::SearchResult pendingEvents(
+				NotificationEventTableSync::GetPendingEvents(env)
+			);
+
+			Log::GetInstance().trace("NotificationThread pending events: "
+					+ boost::lexical_cast<string>(pendingEvents.size()));
+
+			BOOST_FOREACH(const boost::shared_ptr<NotificationEvent>& event, pendingEvents)
 			{
-				// Notify NotificationProvider if the event has FAILED
-				if (notificationEvent->get<Status>() == FAILED)
+				NotificationProvider& eventProvider = *(event->get<NotificationProvider>());
+				bool to_process = false;
+
+				// Provider evaluates next attempt timestamp or expiry
+				posix_time::ptime nextAttempt = eventProvider.nextAttemptTime(event);
+
+				Log::GetInstance().trace("NotificationThread event "
+						+ boost::lexical_cast<string>(event->get<Key>())
+						+ " next attempt "
+						+ posix_time::to_iso_string(nextAttempt));
+
+				if (nextAttempt.is_not_a_date_time())
 				{
-					notificationEvent->get<NotificationProvider>()->notify(notificationEvent);
+					event->set<Status>(FAILED);
+					// expired or maximum attempts reach
+					NotificationLog::AddNotificationEventEntry(event);
+				}
+				else
+				{
+					posix_time::ptime now = posix_time::second_clock::local_time();
+					if (nextAttempt <= now)
+					{
+						event->set<Status>(IN_PROGRESS);
+						event->set<LastAttempt>(now);
+						event->set<Attempts>(event->get<Attempts>() + 1);
+						to_process = true;
+					}
+				}
+				// Check point before attempt
+				NotificationEventTableSync::Save(event.get());
+
+				if (!to_process) continue;	// attempt in future, check next event
+
+				processedEvents++;
+				try
+				{
+					// Notify NotificationProvider
+					if (eventProvider.notify(event)) {
+						// Succeeded
+						event->markSuccessful();
+						NotificationEventTableSync::Save(event.get());
+
+						NotificationLog::AddNotificationEventEntry(event);
+					}
+				}
+				catch(const std::exception& e)
+				{
+					NotificationLog::AddNotificationProviderFailure(
+						const_cast<NotificationProvider*>(&eventProvider),
+						std::string("Exception ") + e.what(),
+						const_cast<Alarm*>(&(event->get<Alarm>().get()))
+					);
+				}
+				catch(...)
+				{
+					NotificationLog::AddNotificationProviderFailure(
+						const_cast<NotificationProvider*>(&eventProvider),
+						"Unknown exception",
+						const_cast<Alarm*>(&(event->get<Alarm>().get()))
+					);
 				}
 			}
+			return processedEvents;
 		}
 		
 		bool MessagesModule::_selectMessagesToActivate( const Alarm& object )
@@ -378,8 +435,8 @@ namespace synthese
 			// Wait for the availability of the cache
 			mutex::scoped_lock(_activatedMessagesMutex);
 
-			// Duplicate the cache to run deactivation triggers
-			ActivatedMessages decativatedMessages(_activatedMessages);
+			// Duplicate the cache to run unactivation triggers
+			ActivatedMessages unactivatedMessages(_activatedMessages);
 
 			// Loop on all messages
 			Alarm::Registry::Vector messagesToUpdate(
@@ -395,8 +452,8 @@ namespace synthese
 					dynamic_pointer_cast<SentAlarm, Alarm>(message)
 				);
 
-				// Remove the message as deactivated one
-				decativatedMessages.erase(sentMessage);
+				// Remove the message as unactivated one
+				unactivatedMessages.erase(sentMessage);
 
 				// Check if the message was already activated
 				if(_activatedMessages.find(sentMessage) == _activatedMessages.end())
@@ -415,7 +472,7 @@ namespace synthese
 			}
 
 			// Erase deactivated messages
-			BOOST_FOREACH(const ActivatedMessages::value_type& sentMessage, decativatedMessages)
+			BOOST_FOREACH(const ActivatedMessages::value_type& sentMessage, unactivatedMessages)
 			{
 				// Remove from cache
 				_activatedMessages.erase(sentMessage);
