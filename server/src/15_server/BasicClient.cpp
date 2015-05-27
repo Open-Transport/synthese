@@ -15,6 +15,8 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/lambda/lambda.hpp>
 
+#include <string>
+
 using namespace boost::asio;
 using namespace boost::asio::ip;
 using namespace boost::asio;
@@ -106,12 +108,11 @@ namespace synthese
 		}
 
 
-		std::string BasicClient::Get( const std::string url )
+		BasicClient::Uri BasicClient::Uri::parseUri(const std::string url)
 		{
-			// Parsing of the url
-			string host;
-			string port("80");
-			string path("/");
+			Uri result;
+			result.port = "80";
+			result.path = "/";
 			size_t pos(0);
 			for(; pos+1<url.size() && (url[pos] != '/' || url[pos+1] != '/'); ++pos) ;
 			if(pos + 1 == url.size())
@@ -120,7 +121,7 @@ namespace synthese
 			}
 			size_t pos2(pos+2);
 			for(; pos2<url.size() && url[pos2]!=':' && url[pos2]!='/'; ++pos2) ;
-			host = url.substr(pos+2, pos2 - pos - 2);
+			result.host = url.substr(pos+2, pos2 - pos - 2);
 			if(pos2 < url.size())
 			{
 				if(url[pos2] == ':')
@@ -128,13 +129,21 @@ namespace synthese
 					++pos2;
 					pos = pos2;
 					for(; pos2<url.size() && url[pos2]!='/'; ++pos2) ;
-					port = url.substr(pos, pos2-pos);
+					result.port = url.substr(pos, pos2-pos);
 				}
-				path = url.substr(pos2);
+				result.path = url.substr(pos2);
 			}
 
-			BasicClient c(host, port);
-			return c.get(path);
+			return result;
+		}
+
+
+
+		std::string BasicClient::Get( const std::string url )
+		{
+			Uri parsedUri = Uri::parseUri(url);
+			BasicClient c(parsedUri.host, parsedUri.port);
+			return c.get(parsedUri.path);
 		}
 }	}
 
