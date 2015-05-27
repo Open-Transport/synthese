@@ -45,7 +45,7 @@ namespace synthese
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<NotificationEventTableSync>::TABLE(
-			"t121_notification_events"
+			"t122_notification_events"
 			);
 
 		template<> const Field DBTableSyncTemplate<NotificationEventTableSync>::_FIELDS[] = { Field() }; // Defined by the record
@@ -98,6 +98,7 @@ namespace synthese
 			Env& env,
 			boost::optional<util::RegistryKeyType> alarmId,
 			boost::optional<util::RegistryKeyType> notificationProviderId,
+			boost::optional<NotificationType> eventType,
 			int first,
 			boost::optional<std::size_t> number,
 			bool orderByLastAttempt,
@@ -114,6 +115,10 @@ namespace synthese
 			{
 				query.addWhereField(NotificationProvider::FIELD.name, *notificationProviderId);
 			}
+			if (eventType)
+			{
+				query.addWhereField(SimpleObjectFieldDefinition<EventType>::FIELD.name, *eventType);
+			}
 			if (orderByLastAttempt)
 			{
 				query.addOrderField(SimpleObjectFieldDefinition<LastAttempt>::FIELD.name, raisingOrder);
@@ -129,5 +134,37 @@ namespace synthese
 
 			return LoadFromQuery(query, env, linkLevel);
 		}
+
+
+
+		NotificationEventTableSync::SearchResult NotificationEventTableSync::GetPendingEvents(
+			util::Env& env,
+			int first, /* = 0 */
+			boost::optional<std::size_t> number, /* = boost::optional<std::size_t>() */
+			bool orderByLastAttempt, /* = true */
+			bool raisingOrder, /* = false */
+			util::LinkLevel linkLevel /* = util::UP_LINKS_LOAD_LEVEL */
+		) {
+			SelectQuery<NotificationEventTableSync> query;
+
+			// Select READY and IN_PROGRESS NotificationStatus
+			query.addWhereField(SimpleObjectFieldDefinition<Status>::FIELD.name, FAILED, ComposedExpression::OP_INF);
+
+			if (orderByLastAttempt)
+			{
+				query.addOrderField(SimpleObjectFieldDefinition<LastAttempt>::FIELD.name, raisingOrder);
+			}
+			if (number)
+			{
+				query.setNumber(*number + 1);
+			}
+			if (first > 0)
+			{
+				query.setFirst(first);
+			}
+
+			return LoadFromQuery(query, env, linkLevel);
+		}
+
 	}
 }
