@@ -390,7 +390,10 @@ namespace synthese
 
 			BOOST_FOREACH(const NodeMap::value_type& node, nodeMap)
 			{
-				nodes.insert(node.second);
+				if (node.second->getLink())
+				{
+					nodes.insert(node.second);
+				}
 			}
 
 			BOOST_FOREACH(const OrderedNodes::value_type& node, nodes)
@@ -419,6 +422,10 @@ namespace synthese
 			ResultPath& result,
 			boost::shared_ptr<AStarNode> curNode
 		) const {
+			if (!curNode->getParent())
+			{
+				result.insert(result.begin(), curNode->getLink());
+			}
 			std::vector<util::RegistryKeyType> vectKey;
 			bool alreadyVisited(false);
 			while(curNode->getParent() && curNode != curNode->getParent() && !alreadyVisited)
@@ -474,7 +481,7 @@ namespace synthese
 					static_cast<Geometry*>(customChunk->getRoadChunk()->getGeometry().get())
 				);
 				double chunkLength = customChunk->getRoadChunk()->getGeometry()->getLength();
-				double geometryOffset = customOffset - customChunk->getMetricOffset();
+				double geometryOffset = customOffset;
 
 				// If the start chunk length is not null (otherwise don't need to insert anything)
 				if(chunkLength > 0)
@@ -491,11 +498,11 @@ namespace synthese
 						{
 							// Build a custom geometry according to their offsets
 							resultGeometry = boost::shared_ptr<LineString>(
-								static_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, chunkOffset - chunk->getMetricOffset())
+								static_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, chunkOffset)
 							));
 
 							// If the offset of the start is bigger than the one from the end, use the reverse chunk
-							if(customOffset > chunkOffset)
+							if(customOffset + customChunk->getMetricOffset() > chunkOffset)
 							{
 								useReverseChunk = true;
 							}
@@ -614,7 +621,7 @@ namespace synthese
 			_reconstructPath(path, lastNode);
 
 			/* SYNTHESE doesn't know how to build each extremity of the geometry
-				representing chunks taken by the origin vam et departure vam.
+				representing chunks taken by the origin vam and departure vam.
 				This issue is visible in some cases when drawing the full path
 				of a journey. We're adding a departureChunk and an arrivalChunk when needed
 				in the code below.
@@ -624,7 +631,7 @@ namespace synthese
 				will return ServicePointer::getGeometry->getLength(). This way it's totally transparent for
 				classes above.
 
-				Geometries are build based on offsets of places and the right chunk is added by looking at
+				Geometries are built based on offsets of places and the right chunk is added by looking at
 				the first vertex of the path, places and stops are indeed always projected on a MainRoadChunk,
 				but we something want the reverse one
 			*/
@@ -664,190 +671,194 @@ namespace synthese
 				optional<Edge::ArrivalServiceIndex::Value> arrivalIndex;
 				
 				const RoadChunkEdge* startChunk = *it;
-
-				// A road is supposed to have one and only one service collection
-				const ChronologicalServicesCollection& collection(**startChunk->getParentPath()->getServiceCollections().begin());
-	
-				/*
-					Retrieve the first, or last, edge of the path.
-					There is a little difference between SYNTHESE's representation of a path and the vector we have.
-					
-					o------------> o---------------> o // This is internal SYNTHESE's reprensentation, 3 edges, the last one just carry the information of the end crossing
-
-					In the result vector, we just have :
-
-					o------------> o--------------->
-
-					And the end crossing will be the crossing of the next edge in the vector.
-				*/
-				if(_direction == algorithm::ARRIVAL_TO_DEPARTURE) // Here, we want the last edge
+				
+				if (startChunk)
 				{
-					startChunk = static_cast<const RoadChunkEdge*>(startChunk->getNext());
-				}
 
-				ServicePointer service(
-					(_direction == algorithm::DEPARTURE_TO_ARRIVAL) ?
-					startChunk->getNextService(
-						collection,
-						_accessParameters,
-						departure,
-						departure,
-						true,
-						departureIndex,
-						false,
-						true,
-						true
-					) :
-					startChunk->getPreviousService(
-						collection,
-						_accessParameters,
-						departure,
-						departure,
-						true,
-						arrivalIndex,
-						false,
-						true,
-						true
-					)
-				);
+					// A road is supposed to have one and only one service collection
+					const ChronologicalServicesCollection& collection(**startChunk->getParentPath()->getServiceCollections().begin());
+		
+					/*
+						Retrieve the first, or last, edge of the path.
+						There is a little difference between SYNTHESE's representation of a path and the vector we have.
+						
+						o------------> o---------------> o // This is internal SYNTHESE's reprensentation, 3 edges, the last one just carry the information of the end crossing
 
-				// Standing on the current path as long as we can (the path don't change and we aren't at the end of the vector yet)
-				Path* currentPath = startChunk->getParentPath();
-				MetricOffset startMetricOffset = startChunk->getMetricOffset();
-				CoordinateSequence* customSequence(CoordinatesSystem::GetDefaultGeometryFactory().getCoordinateSequenceFactory()->create(0, 2));
+						In the result vector, we just have :
 
-				do {
-					// Build custom geometry for the service
-					boost::shared_ptr<LineString> currentGeometry((*it)->getRealGeometry());
+						o------------> o--------------->
 
-					// In DEPARTURE_TO_ARRIVAL push new geometry at the back of the coordinate sequence
-					if(_direction == DEPARTURE_TO_ARRIVAL)
+						And the end crossing will be the crossing of the next edge in the vector.
+					*/
+					if(_direction == algorithm::ARRIVAL_TO_DEPARTURE) // Here, we want the last edge
 					{
-						CoordinateSequence* cs;
-						// use startGeometry if it exists and we are at the beginning of the path
-						if(startGeometry && !startGeometry->isEmpty() && it == path.begin())
+						startChunk = static_cast<const RoadChunkEdge*>(startChunk->getNext());
+					}
+
+					ServicePointer service(
+						(_direction == algorithm::DEPARTURE_TO_ARRIVAL) ?
+						startChunk->getNextService(
+							collection,
+							_accessParameters,
+							departure,
+							departure,
+							true,
+							departureIndex,
+							false,
+							true,
+							true
+						) :
+						startChunk->getPreviousService(
+							collection,
+							_accessParameters,
+							departure,
+							departure,
+							true,
+							arrivalIndex,
+							false,
+							true,
+							true
+						)
+					);
+
+					// Standing on the current path as long as we can (the path don't change and we aren't at the end of the vector yet)
+					Path* currentPath = startChunk->getParentPath();
+					MetricOffset startMetricOffset = startChunk->getMetricOffset();
+					CoordinateSequence* customSequence(CoordinatesSystem::GetDefaultGeometryFactory().getCoordinateSequenceFactory()->create(0, 2));
+
+					do {
+						// Build custom geometry for the service
+						boost::shared_ptr<LineString> currentGeometry((*it)->getRealGeometry());
+
+						// In DEPARTURE_TO_ARRIVAL push new geometry at the back of the coordinate sequence
+						if(_direction == DEPARTURE_TO_ARRIVAL)
 						{
-							cs = startGeometry->getCoordinates();
+							CoordinateSequence* cs;
+							// use startGeometry if it exists and we are at the beginning of the path
+							if(startGeometry && !startGeometry->isEmpty() && it == path.begin())
+							{
+								cs = startGeometry->getCoordinates();
+							}
+							// use endGeometry if it exists and we are at the end of the path
+							else if(endGeometry && !endGeometry->isEmpty() && (it + 1) == path.end())
+							{
+								cs = endGeometry->getCoordinates();
+							}
+							else
+							{
+								cs = currentGeometry->getCoordinates();
+							}
+							customSequence->add(cs, false, true);
+
+							delete cs;
 						}
-						// use endGeometry if it exists and we are at the end of the path
-						else if(endGeometry && !endGeometry->isEmpty() && (it + 1) == path.end())
+						// In ARRIVAL_TO_DEPARTURE push new geometry at the front of the coordinate sequence
+						else
 						{
-							cs = endGeometry->getCoordinates();
+							CoordinateSequence* cs;
+							if(startGeometry && !startGeometry->isEmpty() && it == path.begin())
+							{
+								cs = startGeometry->getCoordinates();
+							}
+							else if(endGeometry && !endGeometry->isEmpty() && (it + 1) == path.end())
+							{
+								cs = endGeometry->getCoordinates();
+							}
+							else
+							{
+								cs = currentGeometry->getCoordinates();
+							}
+							cs->add(customSequence, false, true);
+
+							delete customSequence;
+							customSequence = cs;
+						}
+
+						it++;
+					}
+					while(
+						it != path.end() &&
+						currentPath == (*it)->getParentPath() &&
+						(_direction == algorithm::DEPARTURE_TO_ARRIVAL ? startMetricOffset < (*it)->getMetricOffset() : startMetricOffset > (*it)->getMetricOffset())
+					);
+					it--;
+
+					// Create custom LineString if necessary
+					boost::shared_ptr<LineString> customGeometry;
+					if(customSequence->size() > 1)
+					{
+						customGeometry = boost::shared_ptr<LineString>(
+							CoordinatesSystem::GetDefaultGeometryFactory().createLineString(customSequence->clone())
+						);
+					}
+					delete customSequence;
+
+					// Retrieving the last edge of the path if we are on the common direction
+					const RoadChunkEdge* endChunk = *it;
+					if(_direction == algorithm::DEPARTURE_TO_ARRIVAL)
+					{
+						endChunk = static_cast<const RoadChunkEdge*>(endChunk->getNext());
+					}
+
+					ServicePointer completeService(
+						service,
+						*endChunk,
+						_accessParameters
+					);
+
+					// If we have a custom geometry and it's different from the original geometry
+					boost::shared_ptr<LineString> originGeometry = completeService.getGeometry();
+					if(customGeometry && customGeometry->getLength() != originGeometry->getLength())
+					{
+						// Set geometry and compute the time difference between the two length
+						completeService.setCustomGeometry(customGeometry);
+						posix_time::time_duration durationDifference = posix_time::seconds(
+							ceil((originGeometry->getLength() - customGeometry->getLength()) / _accessParameters.getApproachSpeed())
+						);
+
+						// Set departure / arrival times according to that difference
+						if(_direction == DEPARTURE_TO_ARRIVAL)
+						{
+							completeService.setArrivalInformations(
+								*(completeService.getArrivalEdge()),
+								completeService.getArrivalDateTime() - durationDifference,
+								completeService.getTheoreticalArrivalDateTime() - durationDifference,
+								*(completeService.getRealTimeArrivalVertex())
+							);
 						}
 						else
 						{
-							cs = currentGeometry->getCoordinates();
+							completeService.setDepartureInformations(
+								*(completeService.getDepartureEdge()),
+								completeService.getDepartureDateTime() + durationDifference,
+								completeService.getTheoreticalDepartureDateTime() + durationDifference,
+								*(completeService.getRealTimeDepartureVertex())
+							);
 						}
-						customSequence->add(cs, false, true);
-
-						delete cs;
-					}
-					// In ARRIVAL_TO_DEPARTURE push new geometry at the front of the coordinate sequence
-					else
-					{
-						CoordinateSequence* cs;
-						if(startGeometry && !startGeometry->isEmpty() && it == path.begin())
-						{
-							cs = startGeometry->getCoordinates();
-						}
-						else if(endGeometry && !endGeometry->isEmpty() && (it + 1) == path.end())
-						{
-							cs = endGeometry->getCoordinates();
-						}
-						else
-						{
-							cs = currentGeometry->getCoordinates();
-						}
-						cs->add(customSequence, false, true);
-
-						delete customSequence;
-						customSequence = cs;
 					}
 
-					it++;
-				}
-				while(
-					it != path.end() &&
-					currentPath == (*it)->getParentPath() &&
-					(_direction == algorithm::DEPARTURE_TO_ARRIVAL ? startMetricOffset < (*it)->getMetricOffset() : startMetricOffset > (*it)->getMetricOffset())
-				);
-				it--;
-
-				// Create custom LineString if necessary
-				boost::shared_ptr<LineString> customGeometry;
-				if(customSequence->size() > 1)
-				{
-					customGeometry = boost::shared_ptr<LineString>(
-						CoordinatesSystem::GetDefaultGeometryFactory().createLineString(customSequence->clone())
-					);
-				}
-				delete customSequence;
-
-				// Retrieving the last edge of the path if we are on the common direction
-				const RoadChunkEdge* endChunk = *it;
-				if(_direction == algorithm::DEPARTURE_TO_ARRIVAL)
-				{
-					endChunk = static_cast<const RoadChunkEdge*>(endChunk->getNext());
-				}
-
-				ServicePointer completeService(
-					service,
-					*endChunk,
-					_accessParameters
-				);
-
-				// If we have a custom geometry and it's different from the original geometry
-				boost::shared_ptr<LineString> originGeometry = completeService.getGeometry();
-				if(customGeometry && customGeometry->getLength() != originGeometry->getLength())
-				{
-					// Set geometry and compute the time difference between the two length
-					completeService.setCustomGeometry(customGeometry);
-					posix_time::time_duration durationDifference = posix_time::seconds(
-						ceil((originGeometry->getLength() - customGeometry->getLength()) / _accessParameters.getApproachSpeed())
-					);
-
-					// Set departure / arrival times according to that difference
-					if(_direction == DEPARTURE_TO_ARRIVAL)
+					// Handle necessary time to park a car before taking public transports
+					if(_direction == algorithm::DEPARTURE_TO_ARRIVAL && (it + 1 == path.end()) && (_accessParameters.getUserClass() == USER_CAR))
 					{
 						completeService.setArrivalInformations(
 							*(completeService.getArrivalEdge()),
-							completeService.getArrivalDateTime() - durationDifference,
-							completeService.getTheoreticalArrivalDateTime() - durationDifference,
+							completeService.getArrivalDateTime() + posix_time::minutes(4),
+							completeService.getTheoreticalArrivalDateTime() + posix_time::minutes(4),
 							*(completeService.getRealTimeArrivalVertex())
 						);
 					}
+
+					// And adding the new service to the journey
+					if(_direction == algorithm::DEPARTURE_TO_ARRIVAL)
+					{
+						result.append(completeService);
+						departure = completeService.getArrivalDateTime();
+					}
 					else
 					{
-						completeService.setDepartureInformations(
-							*(completeService.getDepartureEdge()),
-							completeService.getDepartureDateTime() + durationDifference,
-							completeService.getTheoreticalDepartureDateTime() + durationDifference,
-							*(completeService.getRealTimeDepartureVertex())
-						);
+						result.prepend(completeService);
+						departure = completeService.getDepartureDateTime();
 					}
-				}
-
-				// Handle necessary time to park a car before taking public transports
-				if(_direction == algorithm::DEPARTURE_TO_ARRIVAL && (it + 1 == path.end()) && (_accessParameters.getUserClass() == USER_CAR))
-				{
-					completeService.setArrivalInformations(
-						*(completeService.getArrivalEdge()),
-						completeService.getArrivalDateTime() + posix_time::minutes(4),
-						completeService.getTheoreticalArrivalDateTime() + posix_time::minutes(4),
-						*(completeService.getRealTimeArrivalVertex())
-					);
-				}
-
-				// And adding the new service to the journey
-				if(_direction == algorithm::DEPARTURE_TO_ARRIVAL)
-				{
-					result.append(completeService);
-					departure = completeService.getArrivalDateTime();
-				}
-				else
-				{
-					result.prepend(completeService);
-					departure = completeService.getDepartureDateTime();
 				}
 			}
 
