@@ -90,10 +90,6 @@ namespace synthese
 
 
 
-		//////////////////////////////////////////////////////////////////////////
-		/// Checks if the specified time is in the defined period.
-		/// @param time the time to check
-		/// @return true if the time is in the defined period
 		bool MessageApplicationPeriod::getValue( const boost::posix_time::ptime& time ) const
 		{
 			// If dates are defined, the current time must belong to the dates list
@@ -124,6 +120,70 @@ namespace synthese
 
 			// No filter has been activated, then the message must be displayed
 			return true;
+		}
+
+
+
+		boost::posix_time::ptime MessageApplicationPeriod::getStart(
+			const boost::posix_time::ptime& date /* = boost::posix_time::not_a_date_time */
+		) const
+		{
+			posix_time::ptime result = posix_time::not_a_date_time;
+
+			if (!get<StartTime>().is_not_a_date_time())
+			{
+				result = get<StartTime>();
+			}
+			if (!get<StartHour>().is_not_a_date_time())
+			{
+				if (result.is_not_a_date_time())
+				{
+					if (date.is_not_a_date_time())
+					{
+						// Get today date
+						result = posix_time::second_clock::local_time();
+					}
+					else
+					{
+						result = date;
+					}
+				}
+				// Append { StartTime or date or today } and StartHour
+				result = posix_time::ptime(result.date(), get<StartHour>());
+			}
+			return result;
+		}
+
+
+
+		boost::posix_time::ptime MessageApplicationPeriod::getEnd(
+			const boost::posix_time::ptime& date /* = boost::posix_time::not_a_date_time */
+		) const
+		{
+			posix_time::ptime result = posix_time::not_a_date_time;
+
+			if (!get<EndTime>().is_not_a_date_time())
+			{
+				result = get<EndTime>();
+			}
+			if (!get<EndHour>().is_not_a_date_time())
+			{
+				if (result.is_not_a_date_time())
+				{
+					if (date.is_not_a_date_time())
+					{
+						// Get today date
+						result = posix_time::second_clock::local_time();
+					}
+					else
+					{
+						result = date;
+					}
+				}
+				// Append { EndTime or date or today } and EndHour
+				result = posix_time::ptime(result.date(), get<EndHour>());
+			}
+			return result;
 		}
 
 
