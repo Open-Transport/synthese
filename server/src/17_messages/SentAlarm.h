@@ -128,15 +128,44 @@ namespace synthese
 				bool withRecipients = false
 			) const;
 
-
+			/**
+				Checks if the current message is active at the specified time.
+				@param when the time to check
+				@return true if the message must be displayed at the specified time
+			*/
 			bool isApplicable(
 				boost::posix_time::ptime& when
 			) const;
 
+			/**
+				Returns the start timestamp for the alarm period active at the specified time.
+				If alarm is not applicable at "when", posix_time::not_a_date_time is returned.
+
+				@param when the time to check
+				@return start date for the application period or not_a_date_time if no end date
+			*/
+			boost::posix_time::ptime getApplicationStart(
+				boost::posix_time::ptime& when
+			) const;
+
+			/**
+				Returns the end timestamp for the alarm period active at the specified time.
+				If alarm is not applicable at "when", posix_time::not_a_date_time is returned.
+
+				@param when the time to check
+				@return end date for the application period or not_a_date_time if no end date
+			*/
+			boost::posix_time::ptime getApplicationEnd(
+				boost::posix_time::ptime& when
+			) const;
+
+			/// @name Alarm virtual methods
+			//@{
 			virtual bool isOnBroadcastPoint(
 				const BroadcastPoint& point,
 				const util::ParametersMap& parameters
 			) const;
+			//@}
 
 			void clearBroadcastPointsCache() const;
 		};

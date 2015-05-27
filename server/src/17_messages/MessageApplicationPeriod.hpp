@@ -74,18 +74,45 @@ namespace synthese
 
 			/// @name Services
 			//@{
-				//////////////////////////////////////////////////////////////////////////
-				/// Checks if the specified time is in the defined period.
-				/// @param time the time to check
-				/// @return true if the time is in the defined period
-				bool isInside(const boost::posix_time::ptime& time) const;
+				/**
+					Checks if the specified time is in the defined period.
+					@param time the time to check
+					@return true if the time is in the defined period
+				 */
+				bool getValue(const boost::posix_time::ptime& time) const;
 
-				//////////////////////////////////////////////////////////////////////////
-				/// Checks if the specified time is in the defined period.
-				/// @param time the time to check
-				/// @return true if the time is in the defined period
-				bool isAfter(const boost::posix_time::ptime& time) const;
+				/**
+					Return start timestamp for the specified date
+					or posix_time::not_a_date_time if none.
 
+					getValue must be invoked first to known if the period is
+					active for that date+time.
+
+					@param date date of interest or today if not set
+					@result start timestamp (date and time) or posix_time::not_a_date_time if none
+				 */
+				boost::posix_time::ptime getStart(
+					const boost::posix_time::ptime& date = boost::posix_time::not_a_date_time
+				) const;
+
+				/**
+					Return end timestamp for the specified date
+					or posix_time::not_a_date_time if none.
+
+					getValue must be invoked first to known if the period is
+					active for that date+time.
+
+					@param date date of interest or today if not set
+					@result end timestamp (date and time) or posix_time::not_a_date_time if none
+				 */
+				boost::posix_time::ptime getEnd(
+					const boost::posix_time::ptime& date = boost::posix_time::not_a_date_time
+				) const;
+
+				virtual void addAdditionalParameters(
+					util::ParametersMap& map,
+					std::string prefix = std::string()
+				) const;
 			//@}
 		};
 }	}

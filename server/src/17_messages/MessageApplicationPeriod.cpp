@@ -84,7 +84,7 @@ namespace synthese
 
 
 
-		bool MessageApplicationPeriod::isInside( const boost::posix_time::ptime& time ) const
+		bool MessageApplicationPeriod::getValue( const boost::posix_time::ptime& time ) const
 		{
 			// If start time is defined, the current time must be after it
 			if(	!get<StartTime>().is_not_a_date_time() && time < get<StartTime>())
@@ -111,9 +111,78 @@ namespace synthese
 			return true;
 		}
 
-		bool MessageApplicationPeriod::isAfter( const boost::posix_time::ptime& time ) const
+
+
+		boost::posix_time::ptime MessageApplicationPeriod::getStart(
+			const boost::posix_time::ptime& date /* = boost::posix_time::not_a_date_time */
+		) const
 		{
-			if(time > get<EndTime>())
+			posix_time::ptime result = posix_time::not_a_date_time;
+
+			if (!get<StartTime>().is_not_a_date_time())
+			{
+				result = get<StartTime>();
+			}
+			if (!get<StartHour>().is_not_a_date_time())
+			{
+				if (result.is_not_a_date_time())
+				{
+					if (date.is_not_a_date_time())
+					{
+						// Get today date
+						result = posix_time::second_clock::local_time();
+					}
+					else
+					{
+						result = date;
+					}
+				}
+				// Append { StartTime or date or today } and StartHour
+				result = posix_time::ptime(result.date(), get<StartHour>());
+			}
+			return result;
+		}
+
+
+
+		boost::posix_time::ptime MessageApplicationPeriod::getEnd(
+			const boost::posix_time::ptime& date /* = boost::posix_time::not_a_date_time */
+		) const
+		{
+			posix_time::ptime result = posix_time::not_a_date_time;
+
+			if (!get<EndTime>().is_not_a_date_time())
+			{
+				result = get<EndTime>();
+			}
+			if (!get<EndHour>().is_not_a_date_time())
+			{
+				if (result.is_not_a_date_time())
+				{
+					if (date.is_not_a_date_time())
+					{
+						// Get today date
+						result = posix_time::second_clock::local_time();
+					}
+					else
+					{
+						result = date;
+					}
+				}
+				// Append { EndTime or date or today } and EndHour
+				result = posix_time::ptime(result.date(), get<EndHour>());
+			}
+			return result;
+		}
+
+
+
+		void MessageApplicationPeriod::addAdditionalParameters(
+			util::ParametersMap& map,
+			std::string prefix /*= std::string() */
+		) const	{
+
+			BOOST_FOREACH(const date& d, getActiveDates())
 			{
 				return true;
 			}
