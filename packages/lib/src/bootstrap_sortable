@@ -1,0 +1,22 @@
+<tr>
+<td>Bootstrap Sortable</td>
+<td>1.11.2</td>
+<td>Adding sorting ability to bootstrap table</td>
+<td><a class="btn btn-primary btn-mini" href="https://github.com/drvic10k/bootstrap-sortable" target="_new">www</a></td>
+<td><a class="btn btn-primary btn-mini" href="https://github.com/drvic10k/bootstrap-sortable" target="_new">doc</a></td>
+<td>
+    <div id="bootstrap_sortable_code" class="modal hide fade">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>bootstrap-sortbale.js code</h3>
+    </div>
+    <div class="modal-body">
+    <pre>&lt;script type="text/javascript" src="/lib/bootstrap_sortable/js/bootstrap-sortable.js"></script></pre>
+    </div>
+    <div class="modal-footer">
+    <button data-dismiss="modal" class="btn btn-primary">Close</button>
+    </div>
+    </div>
+    <a href="#bootstrap_sortable_code" class="btn btn-primary btn-mini" data-toggle="modal">code</a>
+</td>
+</tr>
