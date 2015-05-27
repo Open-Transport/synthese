@@ -151,7 +151,7 @@ namespace synthese
 				content.push_back(string());
 			}
 			stringstream text;
-			text << "Echec depuis '" << provider->getName();
+			text << "Echec depuis '" << provider->get<Name>();
 			if (alarm) {
 				text << "' pour le message '" << alarm->getShortMessage();
 				if (alarm->getScenario())
