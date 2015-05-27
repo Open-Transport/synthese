@@ -23,8 +23,14 @@
 #ifndef SYNTHESE_messages_HttpNotificationChannel_hpp__
 #define SYNTHESE_messages_HttpNotificationChannel_hpp__
 
-#include <NotificationChannel.hpp>
+#include <BasicClient.h>
 #include <FactorableTemplate.h>
+#include <NotificationChannel.hpp>
+#include <NotificationEvent.hpp>
+
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <string>
+#include <vector>
 
 namespace synthese
 {
@@ -34,12 +40,30 @@ namespace synthese
 		class HttpNotificationChannel:
 				public util::FactorableTemplate<NotificationChannel,HttpNotificationChannel>
 		{
+		private:
+			// boost::shared_ptr<server::BasicClient> _httpClient;
+
 		public:
-			HttpNotificationChannel();
+			/// Parameter name for method GET or POST
+			static const std::string PARAMETER_METHOD;
+
+			/// Parameter name for CMS field with URL
+			static const std::string PARAMETER_URL;
+
+			/// Parameter name for CMS field with body
+			static const std::string PARAMETER_BODY;
+
+			/// Parameter name for tcp connection timeout
+			static const std::string PARAMETER_CONNECTION_TIMEOUT;
+
+			/// Parameter name for answer's read timeout
+			static const std::string PARAMETER_READ_TIMEOUT;
 
 			virtual ~HttpNotificationChannel() { };
 
-			virtual bool notify(const boost::shared_ptr<NotificationEvent> event);
+			virtual std::vector<std::string> _getScriptParameterNames() const;
+
+			virtual bool notifyEvent(const boost::shared_ptr<NotificationEvent> event);
 		};
 	}
 }

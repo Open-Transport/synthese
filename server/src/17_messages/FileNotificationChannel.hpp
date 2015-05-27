@@ -46,13 +46,11 @@ namespace synthese
 			static const std::string PARAMETER_FILE_CONTENT;
 
 		public:
-			FileNotificationChannel();
-
 			virtual ~FileNotificationChannel() { };
 
 			virtual std::vector<std::string> _getScriptParameterNames() const;
 
-			virtual bool notify(const boost::shared_ptr<NotificationEvent> event);
+			virtual bool notifyEvent(const boost::shared_ptr<NotificationEvent> event);
 		};
 	}
 }
