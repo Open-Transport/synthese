@@ -1,8 +1,17 @@
 #!/bin/bash
 
-if [ "$#" -ne 3 ]
+# This script is aimed at synchronizing a local filesystem directory
+# with a remote synthese cms package. Since it uses connect to do its
+# job, connect must have been installed first through service 'Package'.
+
+# Presence of metadata.json in execution dir preserves special
+# properties assigned to pages.
+# Consequently, a trick to reimport everything from scratch
+# is to delete everything but the site part in metadata.json.
+
+if [ "$#" -lt 2 ]
 then
-  echo "Usage: cms_sync_package.sh HOST PORT CONTAINER"
+  echo "Usage: cms_sync_package.sh HOST PORT [CONTAINER]"
   exit 1
 fi
 
@@ -16,6 +25,11 @@ TMP_PACKAGE_NAME=`mktemp -u package_XXXXXXXX`
 TMP_COOKIE="/tmp/cookie_$TMP_PACKAGE_NAME"
 TMP_PACKAGE_DIR="/tmp/$TMP_PACKAGE_NAME"
 REMOTE_TMP_PACKAGE_DIR="/var/lib/lxc/$CONTAINER/rootfs/tmp/$TMP_PACKAGE_NAME"
+
+if [ -z "$CONTAINER" ]
+then
+  REMOTE_TMP_PACKAGE_DIR="/tmp/$TMP_PACKAGE_NAME"
+fi
 
 echo "-----------------------------------------"
 echo "Host               : $HOST"
