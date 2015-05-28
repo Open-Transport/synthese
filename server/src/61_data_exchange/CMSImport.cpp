@@ -133,6 +133,7 @@ namespace synthese
 				return;
 			}
 
+            
 			if(path.empty())
 			{
 				path = page->getName();
@@ -246,7 +247,7 @@ namespace synthese
 				MimeType mimeType;
 				string fullPagePath;
 				_getPageFullPath(parent, fullPagePath);
-
+                
 				if(fullPagePath.empty())
 				{
 					fullPagePath = pageName;
@@ -277,7 +278,8 @@ namespace synthese
 					_env.getEditableRegistry<Webpage>().add(boost::shared_ptr<Webpage>(page));
 					_logLoad("Creation of new page: " + pageName + " " + lexical_cast<string>(page->getKey()));
 					page->set<Title>(pageName);
-					page->set<SmartURLPath>(string("/") + relPath.string());
+
+					page->set<SmartURLPath>(string("/") + fullPagePath);
 					page->set<RawEditor>(true);
 					page->set<MaxAge>(_maxAge);
 					page->setRoot(site.get());
