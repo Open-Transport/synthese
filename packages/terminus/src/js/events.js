@@ -213,16 +213,17 @@ function activate_filter_all()
 function activate_filter(isOnAllSections)
 {
   var s = '';
- // s += '<script src="/terminus/js/events.js"></script>';
-  s += '<table class="table table-striped">';
-  s += '<thead><tr><th></th><th>début</th><th>fin</th><th>nom</th><th>destinataires</th><th>statut</th>';
+  s += '<table class="table table-striped sortable">';
+  s += '<thead><tr><th data-defaultsort="disabled"></th><th data-dateformat="DD-MM-YYYY hh:mm">début</th><th data-dateformat="DD-MM-YYYY hh:mm">fin</th><th data-defaultsort="asc">nom</th><th data-defaultsort="disabled">destinataires</th><th data-defaultsort="disabled">statut</th>';
   if(isOnAllSections == 0) {
-    s += '<th>archivage</th><th></th></tr></thead>';
+    s += '<th data-defaultsort="disabled">archivage</th><th></th></tr></thead>';
   }
   else {
     s += '<th>sections</th></tr></thead>';
   }
-  $('#scenarios_on_tab').addClass('hide');
+    $('#scenarios_on_tab').addClass('hide');
+    s += "<tbody>";
+    
   var use_and_filter = ($('#filter_operator').val() == 0);
   for(var i in theevent)
   {
@@ -442,10 +443,11 @@ function activate_filter(isOnAllSections)
        s += '</tr>';
     }
   }
-  s += '</thead>';
+  s += '</tbody>';
   s += '</table>';
   $('#scenarios_filt').html(s);
-  $('#scenarios_filt').removeClass('hide');
+    $('#scenarios_filt').removeClass('hide');
+    $.bootstrapSortable(true);
 }
 // FIN AJOUT TERMINUS 2.2
 
