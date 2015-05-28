@@ -1,0 +1,48 @@
+<h4>Paramètres spécifiques</h4>
+
+<div class="control-group">
+  <label class="control-label" id="label_http_method">Méthode</label>
+  <div class="controls">
+    <select id="http_method_select" name="http_method" is_parameter="true">
+      <option value="GET" <?if&cond=<@http_method!="POST"@>&then=selected="true"?>>GET</option>
+      <option value="POST" <?if&cond=<@http_method=="POST"@>&then=selected="true"?>>POST</option>
+    </select>
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_http_url">URL cible</label>
+  <div class="controls">
+    <textarea type="text" name="http_url" is_parameter="true"><@http_url@></textarea>
+  </div>
+</div>
+
+<div class="control-group" id="control_http_body">
+  <label class="control-label" id="label_http_body">Contenu à soumettre</label>
+  <div class="controls">
+    <textarea type="text" name="http_body" is_parameter="true"><@http_body@></textarea>
+  </div>
+</div>
+
+<script>
+  $('#control_http_body').toggle($('#http_method_select').val() == "POST");
+  $('#http_method_select').change(function (e) {
+    $('#control_http_body').toggle($(e.target).val() == "POST");
+  });
+</script>
+
+<div class="control-group">
+  <label class="control-label" id="label_http_connection_timeout">Attente limite de connexion</label>
+  <div class="controls">
+    <input type="text" name="http_connection_timeout" is_parameter="true" value="<@http_connection_timeout?<@http_connection_timeout@>:1000@>" />
+    <span class="add-on">ms</span>
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_http_read_timeout">Attente limite de réponse</label>
+  <div class="controls">
+    <input type="text" name="http_read_timeout" is_parameter="true" value="<@http_read_timeout?<@http_read_timeout@>:2000@>" />
+    <span class="add-on">ms</span>
+  </div>
+</div>
