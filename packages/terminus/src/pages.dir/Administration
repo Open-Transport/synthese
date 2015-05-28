@@ -315,7 +315,7 @@ then=
 	   <div class="control-group">
 	    <label class="control-label">Délai entre tentatives</label>
 	    <div class="controls">
-	     <input type="text" name="actionParam_field_retry_attempt_delay" value="<@retry_attempt_delay@>" />
+	     <input type="text" name="actionParam_field_retry_attempt_delay" value="<@retry_attempt_delay?<@retry_attempt_delay@>:20@>" />
              <span class="add-on">s</span>
 	    </div>
 	   </div>
@@ -323,7 +323,7 @@ then=
 	   <div class="control-group">
 	    <label class="control-label">Nombre maximum de tentatives</label>
 	    <div class="controls">
-	     <input type="text" name="actionParam_field_maximum_retry_attempts" value="<@maximum_retry_attempts@>" />
+	     <input type="text" name="actionParam_field_maximum_retry_attempts" value="<@maximum_retry_attempts?<@maximum_retry_attempts@>:5@>" />
 	    </div>
 	   </div>
 

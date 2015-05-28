@@ -1,0 +1,15 @@
+<h4>Paramètres spécifiques</h4>
+
+<div class="control-group">
+  <label class="control-label" id="label_file_path">Chemin du fichier</label>
+  <div class="controls">
+    <textarea type="text" name="file_path" is_parameter="true"><@file_path@></textarea>
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_file_content">Contenu du fichier</label>
+  <div class="controls">
+    <textarea type="text" name="file_content" is_parameter="true"><@file_content@></textarea>
+  </div>
+</div>
