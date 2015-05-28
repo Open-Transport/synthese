@@ -1,0 +1,15 @@
+<?if&
+   cond=<@notification_provider_id&&scenario_id&&test_parameters@>&
+   then= <?notification_provider_test&
+   notification_provider_id=<@notification_provider_id@>&
+   test_scenario_id=<@scenario_id@>&
+   template=<{test_field&template=
+<div class="control-group">
+  <label class="control-label test_label" field_name="<@field_name@>"><@field_name@></label>
+  <div class="controls">
+    <textarea type="text" name="test_field_<@field_name@>" readonly="true"><@field_value@></textarea>
+  </div>
+</div>
+}>&
+?>&
+?>

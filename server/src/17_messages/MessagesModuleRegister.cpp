@@ -39,6 +39,7 @@
 #include "ScenarioDisplayFunction.hpp"
 #include "ScenarioFoldersService.hpp"
 #include "NotificationProvidersService.hpp"
+#include "NotificationProviderTestService.hpp"
 
 #include "ClearAllBroadcastCachesAction.hpp"
 #include "MailingListSendAction.hpp"
@@ -115,6 +116,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::GetMessagesFunction::integrate();
 	synthese::messages::MailingListsService::integrate();
 	synthese::messages::NotificationProvidersService::integrate();
+	synthese::messages::NotificationProviderTestService::integrate();
 	synthese::messages::MessagesSectionsService::integrate();
 	synthese::messages::MessageTypesService::integrate();
 	synthese::messages::ScenariosListFunction::integrate();
