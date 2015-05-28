@@ -5,7 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [3.10.0] - 2015-04-27
 ### Added
-- server command line parameter trace_sql added to trace execution of SQL statements (only implemented for SQLite)
+- server command line parameter sql_trace added to trace execution of SQL statements (only implemented for SQLite)
 	
 ### Changed
 
