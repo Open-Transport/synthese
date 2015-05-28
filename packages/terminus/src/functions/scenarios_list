@@ -1,7 +1,23 @@
-<table class="table table-striped">
- <thead><tr><th></th><th>début</th><th>fin</th>
- <@archivingAuthorizedOnCurrentSection=<#has_section_right&level=DELETE_RIGHT&sectionid=<@section@>#>@>
- <th>nom</th><th>destinataires</th><?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&then=<th>statut</th>?><?if&cond=<@archivingAuthorizedOnCurrentSection@>&then=<th>archivage</th>&?><th></th></tr></thead>
+<table class="table table-striped sortable">
+  <thead>
+    
+    <tr>
+      <th data-defaultsort='disabled'></th>
+      <th data-dateformat="DD-MM-YYYY hh:mm">début</th>
+      <th data-dateformat="DD-MM-YYYY hh:mm">fin</th>
+      <@archivingAuthorizedOnCurrentSection=<#has_section_right&level=DELETE_RIGHT&sectionid=<@section@>#>@>
+      <th data-defaultsort="asc">nom</th>
+      <th data-defaultsort='disabled'>destinataires</th>
+      <?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&then=
+        <th data-defaultsort='disabled'>statut</th>
+      ?>
+      <?if&cond=<@archivingAuthorizedOnCurrentSection@>&then=
+        <th data-defaultsort='disabled'>archivage</th>
+      &?>
+      <th data-defaultsort='disabled'></th>
+    </tr>
+  </thead>
+  
  <div class="hide" id="event_category" value="<@cat@>"></div>
  <tbody>
  <@hasWriteRights=<@0||<#has_section_right&level=WRITE&sectionid=<@section@>#>@>@>

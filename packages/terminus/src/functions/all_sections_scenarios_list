@@ -1,6 +1,17 @@
-<table class="table table-striped">
- <thead><tr><th></th><th>début</th><th>fin</th>
- <th>nom</th><th>destinataires</th><th>statut</th><th>sections</th></tr></thead>
+<table class="table table-striped sortable">
+  <thead>
+    
+    <tr>
+      <th data-defaultsort='disabled'></th>
+      <th data-dateformat="DD-MM-YYYY hh:mm">début</th>
+      <th data-dateformat="DD-MM-YYYY hh:mm">fin</th>
+      <th data-defaultsort="asc">nom</th>
+      <th data-defaultsort='disabled'>destinataires</th>
+      <th data-defaultsort='disabled'>statut</th>
+      <th>sections</th>
+    </tr>
+  </thead>
+
  <div class="hide" id="event_category" value="<@cat@>"></div>
  <tbody>
  <?scenarii&
