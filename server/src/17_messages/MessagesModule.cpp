@@ -655,10 +655,9 @@ namespace synthese
 					if(leftId.first != "line")continue;
 					BOOST_FOREACH(const AlarmObjectLink* link, leftId.second)
 					{
-						boost::shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
-						if(line.get())
+						if(Env::GetOfficialEnv().contains<pt::CommercialLine>(link->getObjectId()))
 						{
-							firstLineLeft = line;
+							firstLineLeft = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
 							break;
 						}
 					}
@@ -669,10 +668,9 @@ namespace synthese
 					if(rightId.first != "line")continue;
 					BOOST_FOREACH(const AlarmObjectLink* link, rightId.second)
 					{
-						boost::shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
-						if(line.get())
+						if(Env::GetOfficialEnv().contains<pt::CommercialLine>(link->getObjectId()))
 						{
-							firstLineRight = line;
+							firstLineRight = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
 							break;
 						}
 					}
