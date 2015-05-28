@@ -203,11 +203,11 @@ namespace synthese
 
 			if (eventType == BEGIN)
 			{
-				scriptParameters.insert(VARIABLE_EVENT_TYPE, "BEGIN");
+				scriptParameters.insert(VARIABLE_EVENT_TYPE, string("BEGIN"));
 			}
 			else if (eventType == END)
 			{
-				scriptParameters.insert(VARIABLE_EVENT_TYPE, "END");
+				scriptParameters.insert(VARIABLE_EVENT_TYPE, string("END"));
 			}
 
 			scriptParameters.insert(VARIABLE_SHORT_MESSAGE, alarm->getShortMessage());
