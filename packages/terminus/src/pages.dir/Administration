@@ -270,7 +270,7 @@ then=
 		 <div class="control-group">
 		  <label class="control-label">Type de notification</label>
 		  <div class="controls">
-		   <input type="text" name="channel_type" value="<@channel@>" disabled="true"/>
+		   <input type="text" name="channel_type" value="<@channel@>" readonly="true"/>
 		  </div>
 		 </div>
 
@@ -316,7 +316,7 @@ then=
 	    <label class="control-label">Délai entre tentatives</label>
 	    <div class="controls">
 	     <input type="text" name="actionParam_field_retry_attempt_delay" value="<@retry_attempt_delay@>" />
-             <span class="add-on">ms</span>
+             <span class="add-on">s</span>
 	    </div>
 	   </div>
 
@@ -345,18 +345,11 @@ then=
 	   </div>
    ?>
   </div>
-  <div class="span3">
-   <?form&
-   name=np_test&
-   target=<@p@>&
-   tab=notification_providers&
-   a=test_parameters&
-   provider_id=<@np_id@>&
-   actionParam_field_channel_parameters=<@parameters@>&
-   actionParam_scenario_template=0&
-   class=form-horizontal
-   ?>
-   <div class="controls"><ul class="nav nav-list well">
+<?if&cond=<@np_id@>&then=
+  <div id="np_templates" class="span3 well">
+    <h4>Test des champs générés</h4>
+    <p>Sélectionner un scénario</p>
+    <div class="controls"><ul class="nav nav-list well">
      <li class="folder_element" element_id="0"><a>Bibliothèque</a></li>
      <?scenarii&
        t=1&
@@ -377,7 +370,25 @@ then=
 	}>?>
      }>?>
     </ul></div>
-  </div>
+        <div class="control-group">
+          <label class="control-label">Type de message</label>
+          <div class="controls">
+            <select id="np_generate_type" >
+              <option value="1" selected="true">Début</option>
+              <option value="2">Fin</option>
+            </select>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <button id="np_generate" class="btn btn-warning" disabled="true">Générer les champs</button>
+            <p><strong>Attention:</strong> les paramètres ne sont pas sauvegardés</p>
+          </div>
+        </div>
+        <div id="np_test_results"/>
+     </div>
+   </div>
+?>
 </div>
 
 </div><#tab_div&id=mailing_lists#>

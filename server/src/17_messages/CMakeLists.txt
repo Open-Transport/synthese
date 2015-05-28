@@ -118,6 +118,8 @@ NotificationProvidersService.cpp
 NotificationProvidersService.hpp
 NotificationProviderTableSync.hpp
 NotificationProviderTableSync.cpp
+NotificationProviderTestService.cpp
+NotificationProviderTestService.hpp
 Scenario.cpp
 Scenario.h
 ScenarioAutopilot.hpp
