@@ -67,7 +67,9 @@ namespace synthese
 
 		time_duration DBModule::DURATION_BETWEEN_CONDITONAL_SYNCS = minutes(1);
 		const string DBModule::PARAMETER_NODE_ID = "node_id";
+		const string DBModule::PARAMETER_SQL_TRACE = "sql_trace";
 		RegistryNodeType DBModule::_nodeId = 1;
+        bool DBModule::_sqlTrace = false;
 		unsigned int DBModule::_thrCount = 0;
 		bool DBModule::_conditionalTablesUpdateActive = true;
 	}
@@ -87,6 +89,7 @@ namespace synthese
 			DBModule::_Db.reset(util::Factory<DB>::create(DBModule::_ConnectionInfo->backend));
 
 			RegisterParameter(DBModule::PARAMETER_NODE_ID, "1", &DBModule::ParameterCallback);
+			RegisterParameter(DBModule::PARAMETER_SQL_TRACE, "0", &DBModule::ParameterCallback);
 
 			DBModule::GetDB()->setConnectionInfo(DBModule::_ConnectionInfo);
 			DBModule::GetDB()->preInit();
@@ -129,6 +132,7 @@ namespace synthese
 		template<> void ModuleClassTemplate<DBModule>::End()
 		{
 			UnregisterParameter(DBModule::PARAMETER_NODE_ID);
+			UnregisterParameter(DBModule::PARAMETER_SQL_TRACE);
 			DBModule::_ConnectionInfo.reset();
 
 			// Wait for all the thread to call CloseThread
@@ -385,6 +389,16 @@ namespace synthese
 				{
 				}
 			}
+            else if (name == PARAMETER_SQL_TRACE)
+            {
+				try
+				{
+					_sqlTrace = (lexical_cast<int>(value) > 0);
+				}
+				catch(bad_lexical_cast&)
+				{
+				}
+            }
 		}
 
 

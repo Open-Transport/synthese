@@ -85,6 +85,7 @@ namespace synthese
 			typedef std::set<boost::shared_ptr<ConditionalSynchronizationPolicyBase> > ConditionalTableSyncsToReload;
 
 			static const std::string PARAMETER_NODE_ID;
+			static const std::string PARAMETER_SQL_TRACE;
 
 		private:
 			static boost::posix_time::time_duration DURATION_BETWEEN_CONDITONAL_SYNCS;
@@ -96,6 +97,7 @@ namespace synthese
 			static TablesByIdMap	_idTableSyncMap;
 			static ConditionalTableSyncsToReload _conditionalTableSyncsToReload;
 			static util::RegistryNodeType _nodeId;
+			static bool _sqlTrace;
 			static unsigned int _thrCount;
 			static bool _conditionalTablesUpdateActive;
 
@@ -108,6 +110,7 @@ namespace synthese
 
 			static void SetConnectionString(const std::string& connectionString);
 			static util::RegistryNodeType GetNodeId(){ return _nodeId; }
+			static bool IsSqlTraceActive(){ return _sqlTrace; }
 
 
 			static DB* GetDB();
