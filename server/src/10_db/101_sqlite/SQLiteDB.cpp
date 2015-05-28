@@ -140,7 +140,12 @@ namespace synthese
 			throw SQLiteException(message + " (errmsg='" + sqlite3_errmsg(handle) + "' code=" + lexical_cast<string>(retCode) + ")");
 		}
 
-
+        
+        void trace_callback( void* udp, const char* sql )
+        {
+			Log::GetInstance().trace(sql);
+        }
+        
 		void SQLiteDB::initForStandaloneUse()
 		{
 			if (_connInfo->path.empty())
@@ -183,6 +188,10 @@ namespace synthese
 #endif
 
 				tss->handle = handle;
+                if (DBModule::IsSqlTraceActive())
+                {
+                    sqlite3_trace(tss->handle, trace_callback, 0);
+                }
 				_tss.reset(tss);
 			}
 			return _tss.get();
