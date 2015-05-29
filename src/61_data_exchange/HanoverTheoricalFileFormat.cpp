@@ -684,13 +684,6 @@ namespace synthese
 			{
 				BOOST_FOREACH(const RunsMap::value_type& run, _runs)
 				{
-					if (run.second.route->links.size() == 0 || run.second.route->links.size() == 1)
-					{
-						_logWarning(
-							"Run with size 0 or 1 stop ("+ lexical_cast<string>(run.first) +")"
-						);
-						continue;
-					}
 					JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
 					std::set<StopPoint*> sps;
 					size_t rank(0);
@@ -713,7 +706,7 @@ namespace synthese
 						sps.clear();
 
 						// Only for last link, get the second stop point of the link too
-						if(rank == run.second.route->links.size())
+						if(rank + 1 == run.second.route->links.size())
 						{
 							isDeparture = false;//last stop is never departure
 							isArrival = true;//last stop is always arrival
