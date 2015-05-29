@@ -12,6 +12,7 @@
 #include "GPSSimuFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
 #include "HafasFileFormat.hpp"
+#include "HanoverTheoricalFileFormat.hpp"
 #include "HastusCSVFileFormat.hpp"
 #include "RTMFileFormat.hpp"
 #include "HastusInterfaceFileFormat.hpp"
@@ -87,6 +88,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::GPSSimuFileFormat::integrate();
 	synthese::data_exchange::GTFSFileFormat::integrate();
 	synthese::data_exchange::HafasFileFormat::integrate();
+	synthese::data_exchange::HanoverTheoricalFileFormat::integrate();
 	synthese::data_exchange::HastusCSVFileFormat::integrate();
 	synthese::data_exchange::RTMFileFormat::integrate();
 	synthese::data_exchange::HastusInterfaceFileFormat::integrate();
@@ -100,7 +102,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::CalendarOGTFileFormat::integrate();
 	synthese::data_exchange::ObitiFileFormat::integrate();
 	synthese::data_exchange::PegaseFileFormat::integrate();
-    synthese::data_exchange::POICSVFileFormat::integrate();
+	synthese::data_exchange::POICSVFileFormat::integrate();
 	synthese::data_exchange::RSSFileFormat::integrate();
 	synthese::data_exchange::TridentFileFormat::integrate();
 	synthese::data_exchange::StopsShapeFileFormat::integrate();
