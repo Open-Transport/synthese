@@ -38,6 +38,7 @@
 #include "WebsiteTableSync.hpp"
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
+#include "PythonInterpreter.hpp"
 
 #include <boost/algorithm/string/trim.hpp>
 
@@ -71,6 +72,7 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<CMSModule>::Init()
 		{
+			PythonInterpreter::Initialize();
 		}
 
 		template<> void ModuleClassTemplate<CMSModule>::Start()
@@ -79,6 +81,7 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<CMSModule>::End()
 		{
+			PythonInterpreter::End();
 		}
 
 

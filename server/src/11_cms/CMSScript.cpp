@@ -33,9 +33,13 @@
 #include "ServiceExpression.hpp"
 #include "StaticFunctionRequest.h"
 #include "VariableUpdateNode.hpp"
+#include "EmbeddedScriptNode.hpp"
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
 #include "Website.hpp"
+
+#include <boost/algorithm/string.hpp>
+
 
 using namespace boost;
 using namespace std;
@@ -69,7 +73,6 @@ namespace synthese
 		}
 
 
-
 		//////////////////////////////////////////////////////////////////////////
 		/// Constructor by string part parsing.
 		CMSScript::CMSScript(
@@ -83,7 +86,6 @@ namespace synthese
 		{
 			_parse(it, end, termination);
 		}
-
 
 
 		bool CMSScript::operator==(const CMSScript& other) const
@@ -108,8 +110,38 @@ namespace synthese
 			}
 			else
 			{
-				string::const_iterator it(_code.begin());
-				_parse(it, _code.end(), set<string>());
+				// Read the first line of the code : if it starts with '#!' this is an embedded script, else it is a CMS page
+				std::istringstream codeStream(_code);
+				std::string firstLine;
+
+				std::getline(codeStream, firstLine);
+				boost::algorithm::trim_copy_if(firstLine, is_any_of(" \t"));
+
+				if(boost::algorithm::starts_with(firstLine, "#!"))
+				{
+					// The script interpreter declaration is the content of the first line (e.g. #!/bin/python)
+					std::string scriptInterpreter = firstLine;
+					std::string scriptCode("");
+					size_t startIndex = _code.find(scriptInterpreter);
+
+					// The script code is everything after the interpreter declaration
+					startIndex += scriptInterpreter.size();
+					scriptCode = _code.substr(startIndex);
+
+					// Clear node list and push a single EmbeddedScriptNode
+					_nodes.clear();
+					_nodes.push_back(
+						boost::shared_ptr<WebpageContentNode>(
+							new EmbeddedScriptNode(scriptInterpreter, scriptCode)
+					)	);
+				}
+
+				else
+				{
+					// Interpret the code as CMS language
+					string::const_iterator it(_code.begin());
+					_parse(it, _code.end(), set<string>());
+				}
 			}
 		}
 
