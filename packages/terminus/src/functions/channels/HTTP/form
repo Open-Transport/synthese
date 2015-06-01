@@ -13,14 +13,14 @@
 <div class="control-group">
   <label class="control-label" id="label_http_url">URL cible</label>
   <div class="controls">
-    <textarea type="text" name="http_url" is_parameter="true"><@http_url@></textarea>
+    <textarea id="editarea_http_url" type="text" name="http_url" is_parameter="true"><@http_url@></textarea>
   </div>
 </div>
 
 <div class="control-group" id="control_http_body">
   <label class="control-label" id="label_http_body">Contenu à soumettre</label>
   <div class="controls">
-    <textarea type="text" name="http_body" is_parameter="true"><@http_body@></textarea>
+    <textarea id="editarea_http_body" type="text" name="http_body" is_parameter="true"><@http_body@></textarea>
   </div>
 </div>
 
@@ -46,3 +46,25 @@
     <span class="add-on">ms</span>
   </div>
 </div>
+
+<script src="/lib/edit_area/edit_area_full.js"></script>
+<script language="javascript" type="text/javascript">
+function updateTextArea(id)
+{
+  $('#' + id).val(editAreaLoader.getValue(id));
+}
+editAreaLoader.init({
+  id : "editarea_http_url",
+  browsers : "all",
+  language : "fr",
+  toolbar : "search, go_to_line, fullscreen, |, undo, redo, |, word_wrap, |, help",
+  change_callback: "updateTextArea"
+});
+editAreaLoader.init({
+  id : "editarea_http_body",
+  browsers : "all",
+  language : "fr",
+  toolbar : "search, go_to_line, fullscreen, |, undo, redo, |, word_wrap, |, help",
+  change_callback: "updateTextArea"
+});
+</script>
