@@ -40,18 +40,6 @@ GetMessagesFunction.cpp
 GetMessagesFunction.hpp
 HttpNotificationChannel.hpp
 HttpNotificationChannel.cpp
-MailingList.cpp
-MailingList.hpp
-MailingListSendAction.cpp
-MailingListSendAction.hpp
-MailingListsService.cpp
-MailingListsService.hpp
-MailingListSubscription.cpp
-MailingListSubscription.hpp
-MailingListSubscriptionTableSync.cpp
-MailingListSubscriptionTableSync.hpp
-MailingListTableSync.cpp
-MailingListTableSync.hpp
 MessageAdmin.cpp
 MessageAdmin.h
 MessageAlternative.cpp
@@ -159,6 +147,8 @@ SentScenario.cpp
 SentScenario.h
 SimpleMessageCreationAction.cpp
 SimpleMessageCreationAction.hpp
+SmtpNotificationChannel.hpp
+SmtpNotificationChannel.cpp
 TextTemplate.cpp
 TextTemplate.h
 TextTemplateAddAction.cpp

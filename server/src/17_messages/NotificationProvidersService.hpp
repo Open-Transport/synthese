@@ -36,7 +36,7 @@
 namespace synthese
 {
 	namespace server {
-		class Request;
+		class Request;		// Forward declaration
 		class Session;
 	}
 
@@ -48,7 +48,6 @@ namespace synthese
 			@ingroup m17Functions refFunctions
 			@author yves.martin
 			@date 2015
-			@since TODO
 
 			This "notification_providers" service provides support to
 			- list channels aka provider keys / protocols
@@ -68,7 +67,6 @@ namespace synthese
 
 			/// Channel tag with provider instances to list their key
 			static const std::string TAG_CHANNEL;
-
 
 		protected:
 			//! \name Page parameters

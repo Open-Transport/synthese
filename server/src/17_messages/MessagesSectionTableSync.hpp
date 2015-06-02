@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_MessagesSectionTableSync_H__
-#define SYNTHESE_MessagesSectionTableSync_H__
+#ifndef SYNTHESE_messages_MessagesSectionTableSync_hpp__
+#define SYNTHESE_messages_MessagesSectionTableSync_hpp__
 
 #include "MessagesSection.hpp"
 
@@ -32,8 +32,8 @@ namespace synthese
 	namespace messages
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// 56.10 Table : Mailing list.
-		///	@ingroup m56LS refLS
+		/// 56.10 Table : Message section
+		///	@ingroup m17LS refLS
 		/// @author Hugues Romain
 		/// @date 2013
 		/// @since 3.7.0
@@ -42,12 +42,19 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<MessagesSectionTableSync, MessagesSection>
 		{
 		public:
-			/** Message type search.
-				@param first First mailing list to answer
-				@param number Number of Message types to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return Found mailing lists.
-				@author Hugues Romain
-				@date 2013
+			/** Message sections search.
+			*
+			* The size of the vector is less or equal to number, then all
+			* sections are returned despite of the number limit. If the size is
+			* greater than number (actually equal to number + 1) then there are
+			* others sections to show.
+			* Test it to know if the situation needs a "click for more" button.
+			*
+			* @param first First message section to answer
+			* @param number Number of Message sections to answer (0 = all). Test after return to know if more results are available.
+			* @return Found message sections, from first, limited to number.
+			* @author Hugues Romain
+			* @date 2013
 			*/
 			static SearchResult Search(
 				util::Env& env,
@@ -59,4 +66,4 @@ namespace synthese
 		};
 }	}
 
-#endif
+#endif // SYNTHESE_messages_MessagesSectionTableSync_hpp__

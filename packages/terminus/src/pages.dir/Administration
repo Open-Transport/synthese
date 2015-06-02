@@ -7,7 +7,6 @@
  <#tab_title&id=message_tags&title=Mots clefs (tags de messages)#>
  <#tab_title&id=display_types&title=Types de bornes#>
  <#tab_title&id=notification_providers&title=Fournisseurs de notifications#>
- <#tab_title&id=mailing_lists&title=Listes de diffusion#>
  <#tab_title&id=broadcast_points&title=Autres diffuseurs#>
  <#tab_title&id=sections&title=Sections#>
  <#tab_title&id=log&title=Journal#>
@@ -286,6 +285,7 @@ then=
 	    </div>
 	   </div>
 
+<!-- Disabled until business need requires it
 	   <div class="control-group">
 	    <label class="control-label">Notifier tout évènement en début de période</label>
 	    <div class="controls">
@@ -293,7 +293,7 @@ then=
 	     <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_begin" <@subscribe_all_begin?"":"checked=\"true\""@> value="0" /> Non</label>
 	    </div>
 	   </div>
-           
+-->
   	   <div class="control-group">
 	    <label class="control-label">Type de message en fin de période</label>
 	    <div class="controls">
@@ -304,6 +304,7 @@ then=
 	    </div>
 	   </div>
 
+<!-- Disabled until business need requires it
 	   <div class="control-group">
 	    <label class="control-label">Notifier tout évènement en fin de période</label>
 	    <div class="controls">
@@ -311,6 +312,7 @@ then=
 	     <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_end" <@subscribe_all_end?"":"checked=\"true\""@> value="0" /> Non</label>
 	    </div>
 	   </div>
+-->
 
 	   <div class="control-group">
 	    <label class="control-label">Délai entre tentatives</label>
@@ -336,13 +338,6 @@ then=
 		 </div>}>
           ?>
           </form>
-   ?>
-  </div><div class="span3">
-   <?if&cond=<@np_id@>&then=
-	   <div class="well">
-	    <h4>Abonnés</h4>
-	    <p>Cette liste <@subscriptions?"":"ne "@>contient <a href="#" id="np_subscription_link"><strong><@subscriptions?subscriptions:"aucun"@></strong> abonné<@(subscriptions>1)?"s":""@></a>.</p>
-	   </div>
    ?>
   </div>
 <?if&cond=<@np_id@>&then=
@@ -381,8 +376,8 @@ then=
         </div>
         <div class="control-group">
           <div class="controls">
-            <button id="np_generate" class="btn btn-warning" disabled="true">Générer les champs</button>
             <p><strong>Attention:</strong> les paramètres ne sont pas sauvegardés</p>
+            <button id="np_generate" class="btn btn-warning" disabled="true">Générer les champs</button>            
           </div>
         </div>
         <div id="np_test_results"/>
@@ -390,139 +385,6 @@ then=
    </div>
 ?>
 </div>
-
-</div><#tab_div&id=mailing_lists#>
-
- <@ml_id=<@(tab=="mailing_lists")?roid:""@>@>
- <div class="row-fluid">
-  <div class="span3" id="tree">
-   <ul class="nav nav-list well">
-    <li<@ml_id?"":" class=\"active\""@>>
-     <?link&
-       target=<@p@>&
-       tab=mailing_lists&
-       text=Listes de diffusion&
-     ?>
-    </li>
-    <@has_ml=<?mailing_lists&manual_sending=0&template=<{mailing_list&template=1}>?>@>
-    <li class="tree_1">
-     <a>Listes à envoi automatique
-     <div class="pull-right link" id="ml_new_auto_link"><i class="icon-plus"></i></div></a>
-    </li>
-    <?mailing_lists&
-      manual_sending=0&
-      template=<{mailing_list&template=
-	<li class="tree_2 <@(id==ml_id)?"active":""@>">
- 	 <?link&
-  	   target=<@p@>&
-   	   tab=mailing_lists&
-   	   roid=<@id@>&
-  	   text=<@name@>
-   	      <@(id==ml_id)?("<div class=\"pull-right\" id=\"ml_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
-      	 ?>
-	</li>
-    }>?>
-    <li>
-    <li class="tree_1">
-     <a>Listes à envoi manuel
-     <div class="pull-right link" id="ml_new_manu_link"><i class="icon-plus"></i></div></a>
-    </li>
-    <?mailing_lists&
-      manual_sending=1&
-      template=<{mailing_list&template=
- 	<li class="tree_2 <@(id==ml_id)?"active":""@>">
- 	 <?link&
-  	   target=<@p@>&
-   	   tab=mailing_lists&
-   	   roid=<@id@>&
-  	   text=<@name@>
-   	      <@(id==ml_id)?("<div class=\"pull-right\" id=\"ml_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
-      	 ?>
-	</li>
-    }>?>
-   </ul>
-  </div><div class="span6">
-   <?if&
-     cond=<@ml_id@>&
-     else=<div class="alert alert-info">Sélectionnez une liste de diffusion dans le menu ci-contre</div>&
-     then=<?form&
-            target=<@p@>&
-            tab=mailing_lists&
-            a=ObjectUpdate&
-            actionParam_object_id=<@ml_id@>&
-            class=form-horizontal&
-            roid=<@ml_id@>&
-          ?><?mailing_lists&
-              roid=<@ml_id@>&
-              with_subscriptions=1&
-              template=<{mailing_list&template=
-              
-              	<@subscriptions=<{subscription&template=<@rank?"":items_count@>}>@>
-              
-		 <div class="control-group">
-		  <label class="control-label">Nom</label>
-		  <div class="controls">
-		   <input type="text" name="actionParam_field_name" value="<@name@>" />
-		  </div>
-		 </div>
-		  
-  	   <div class="control-group">
-	    <label class="control-label">Type de message</label>
-	    <div class="controls">
-	     <select name="actionParam_field_message_type_id">
-	      <option value="0">Message principal</option>
-	      <?message_types&template=<{type&template=<option value="<@id@>" <?if&cond=<@message_type_id==id@>&then=selected="true"?>><@name@></option>}>?>
-	     </select>
-	    </div>
-	   </div>
-
-	   <div class="control-group">
-	    <label class="control-label">Libellé expéditeur</label>
-	    <div class="controls">
-	     <input type="text" name="actionParam_field_sender_name" value="<@sender_name@>" />
-	    </div>
-	   </div>
-
-	   <div class="control-group">
-	    <label class="control-label">E-mail expéditeur</label>
-	    <div class="controls">
-	     <input type="text" name="actionParam_field_sender" value="<@sender@>" />
-	    </div>
-	   </div>
-
-	   <div class="control-group">
-	    <label class="control-label">Format technique e-mail</label>
-	    <div class="controls">
-	     <label class="radio inline"><input type="radio" name="actionParam_field_format" <@format?"":"checked=\"true\""@> value="0" /> Texte</label>
-	     <label class="radio inline"><input type="radio" name="actionParam_field_format" <@(format==1)?"checked=\"true\"":""@> value="1" /> HTML</label>
-	    </div>
-	   </div>
-
-	   <div class="control-group">
-	    <label class="control-label">Envoi manuel des messages</label>
-	    <div class="controls">
-	     <label class="radio inline"><input type="radio" name="actionParam_field_manual_sending" <@manual_sending?"checked=\"true\"":""@> value="1" /> Oui</label>
-	     <label class="radio inline"><input type="radio" name="actionParam_field_manual_sending" <@manual_sending?"":"checked=\"true\""@> value="0" /> Non</label>
-	    </div>
-	   </div>
-		  
-		 <div class="control-group">
-		  <div class="controls">
-		   <button type="submit" class="btn btn-warning">Enregistrer</button>
-		  </div>
-		 </div>}>
-          ?>
-          </form>
-   ?>
-  </div><div class="span3">
-   <?if&cond=<@ml_id@>&then=
-	   <div class="well">
-	    <h4>Abonnés</h4>
-	    <p>Cette liste <@subscriptions?"":"ne "@>contient <a href="#" id="ml_subscription_link"><strong><@subscriptions?subscriptions:"aucun"@></strong> abonné<@(subscriptions>1)?"s":""@></a>.</p>
-	   </div>
-   ?>
-  </div>
- </div>
 
 </div><#tab_div&id=broadcast_points#>
 
@@ -867,7 +729,7 @@ then=
  <?form&
    name=np_new_form&
    a=ObjectCreate&
-   actionParam_table_id=199&
+   actionParam_table_id=107&
    target=<@p@>&
    tab=notification_providers&
    co=1&
@@ -1106,29 +968,6 @@ then=
  ?>
   <div class="modal-body">
    <p>Etes-vous sûr de vouloir supprimer <span id="remove_name"></span> ?</p>
-  </div><div class="modal-footer">
-   <button class="btn btn-danger" type="submit">Oui</button>
-   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Non</button>
-  </div>
- </form>
-</div>
-
-<div class="modal hide fade" id="mail_remove_modal">
- <div class="modal-header">
-  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-  <h3>Suppression d'abonné de liste de diffusion</h3>
- </div>
- <?form&
-   name=mail_remove_form&
-   a=RemoveObjectAction&
-   target=<@p@>&
-   roid=<@ml_id@>&
-   tab=mailing_lists&
-   open_subscriptions=1&
-   actionParamoi=0&
- ?>
-  <div class="modal-body">
-   <p>Etes-vous sûr de vouloir supprimer <span id="mail_remove_name"></span> ?</p>
   </div><div class="modal-footer">
    <button class="btn btn-danger" type="submit">Oui</button>
    <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Non</button>

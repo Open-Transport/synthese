@@ -45,7 +45,7 @@ namespace synthese
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<NotificationEventTableSync>::TABLE(
-			"t122_notification_events"
+			"t108_notification_events"
 			);
 
 		template<> const Field DBTableSyncTemplate<NotificationEventTableSync>::_FIELDS[] = { Field() }; // Defined by the record

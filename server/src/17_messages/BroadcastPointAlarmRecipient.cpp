@@ -24,7 +24,6 @@
 
 #include "AlarmTestOnDisplayScreenFunction.h"
 #include "ArrivalDepartureTableRight.h"
-#include "CustomBroadcastPoint.hpp"
 #include "DeparturesTableModule.h"
 #include "DisplaySearchAdmin.h"
 #include "DisplayScreenTableSync.h"
