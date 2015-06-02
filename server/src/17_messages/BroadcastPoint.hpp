@@ -74,12 +74,15 @@ namespace synthese
 			) const = 0;
 
 			typedef std::vector<BroadcastPoint*> BroadcastPoints;
-			
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Feed broadcast point instances for each derived class
+			/// @param result vector of BroadcastPoint pointers
 			virtual void getBroadcastPoints(BroadcastPoints& result) const = 0;
 
+			/// Complete list of broadcast point instances for all derived classes
+			/// @return vector of BroadcastPoint pointers
 			static BroadcastPoints GetBroadcastPoints();
-
-
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Function to run when the message display begins.
