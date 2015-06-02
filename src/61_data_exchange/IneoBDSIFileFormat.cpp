@@ -234,7 +234,7 @@ namespace synthese
 					}
 				}
 				
-				newChainage = _createAndReturnChainage(chainages,arretChns,*(chainage.ligne),chainage.nom,chainage.sens,chainage.ref + "-" + lexical_cast<string>(horaires.size()));
+				newChainage = _createAndReturnChainage(chainages,arretChns,*(chainage.ligne),chainage.nom,chainage.direction,chainage.sens,chainage.ref + "-" + lexical_cast<string>(horaires.size()));
 				
 				// Jump over dead runs
 				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, arretChns)
@@ -303,6 +303,7 @@ namespace synthese
 			const Chainage::ArretChns& arretchns,
 			const Ligne& ligne,
 			const std::string& nom,
+			const string &direction,
 			bool sens,
 			const std::string& ref
 		) const	{
@@ -326,6 +327,7 @@ namespace synthese
 			chainage.ref = ref;
 			chainage.ligne = &ligne;
 			chainage.nom = nom;
+			chainage.direction = direction;
 			chainage.sens = sens;
 			chainage.arretChns = arretchns;
 			_logLoadDetail(
@@ -339,6 +341,7 @@ namespace synthese
 			const Chainage::ArretChns& arretchns,
 			const Ligne& ligne,
 			const std::string& nom,
+			const string &direction,
 			bool sens,
 			const std::string& ref
 		) const	{
@@ -362,6 +365,7 @@ namespace synthese
 			chainage.ref = ref;
 			chainage.ligne = &ligne;
 			chainage.nom = nom;
+			chainage.direction = direction;
 			chainage.sens = sens;
 			chainage.arretChns = arretchns;
 			_logLoadDetail(
@@ -522,11 +526,14 @@ namespace synthese
 						_database +".ARRETCHN.chainage,"+
 						_database +".CHAINAGE.nom,"+
 						_database +".CHAINAGE.sens,"+
-						_database +".CHAINAGE.ligne "+
+						_database +".CHAINAGE.ligne, "+
+						_database +".DEST.nom AS direction "+
 					" FROM "+
 						_database +".ARRETCHN "+
 						" INNER JOIN "+ _database +".CHAINAGE ON "+
 							_database +".CHAINAGE.ref="+ _database +".ARRETCHN.chainage AND "+ _database +".CHAINAGE.jour="+ _database +".ARRETCHN.jour "+
+						" INNER JOIN "+ _database +".DEST ON "+
+							_database +".DEST.ref="+_database +".CHAINAGE.Dest AND "+ _database +".CHAINAGE.jour="+ _database +".DEST.jour "+
 					"WHERE "+
 						_database +".CHAINAGE.jour="+ todayStr +
 					" ORDER BY "+
@@ -539,6 +546,7 @@ namespace synthese
 				Chainage::ArretChns arretChns;
 				bool sens(false);
 				string nom;
+				string direction;
 				while(chainageResult->next())
 				{
 					// Fields load
@@ -553,6 +561,7 @@ namespace synthese
 							arretChns,
 							*ligne,
 							nom,
+							direction,
 							sens,
 							lastRef
 						);
@@ -563,6 +572,7 @@ namespace synthese
 					{
 						string ligneRef(chainageResult->get<string>("ligne"));
 						nom = chainageResult->getText("nom");
+						direction = chainageResult->getText("direction");
 
 						// Check of the ligne
 						Lignes::const_iterator it(
@@ -627,6 +637,7 @@ namespace synthese
 						arretChns,
 						*ligne,
 						nom,
+						direction,
 						sens,
 						lastRef
 					);
@@ -1876,6 +1887,7 @@ namespace synthese
 				jp->setWayBack(sens);
 				jp->setName(nom);
 				jp->addCodeBySource(realTimeDataSource, ref);
+				jp->setDirection(direction);
 
 				// Stops
 				size_t rank(0);

@@ -149,6 +149,7 @@ namespace synthese
 				{
 					std::string ref;
 					std::string nom;
+					std::string direction;
 					const Ligne* ligne;
 					bool sens;
 					typedef std::vector<ArretChn> ArretChns;
@@ -169,6 +170,7 @@ namespace synthese
 					const Chainage::ArretChns& arretchns,
 					const Ligne& ligne,
 					const std::string& nom,
+					const std::string& direction,
 					bool sens,
 					const std::string& chainageRef
 				) const;
@@ -177,6 +179,7 @@ namespace synthese
 					const Chainage::ArretChns& arretchns,
 					const Ligne& ligne,
 					const std::string& nom,
+					const std::string& direction,
 					bool sens,
 					const std::string& chainageRef
 				) const;
