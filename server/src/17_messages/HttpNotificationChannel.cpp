@@ -70,7 +70,8 @@ namespace synthese
 			// Create HTTP URL and body from parameters
 			ParametersMap fields = generateScriptFields(provider, alarm, event->get<EventType>());
 
-			string httpMethod = fields.getDefault<string>(PARAMETER_METHOD, "GET");
+			string httpMethod = provider->get<Parameters>()
+					.getDefault<string>(PARAMETER_METHOD, "GET");
 
 			if (!fields.isDefined(PARAMETER_URL)
 				|| (httpMethod == "POST" && !fields.isDefined(PARAMETER_BODY)))

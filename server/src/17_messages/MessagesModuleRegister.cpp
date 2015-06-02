@@ -3,8 +3,6 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTableSync.h"
 #include "CustomBroadcastPointTableSync.hpp"
-#include "MailingListTableSync.hpp"
-#include "MailingListSubscriptionTableSync.hpp"
 #include "MessageAlternativeTableSync.hpp"
 #include "MessageApplicationPeriodTableSync.hpp"
 #include "MessagesSectionTableSync.hpp"
@@ -32,7 +30,6 @@
 
 #include "CustomBroadcastPointsService.hpp"
 #include "GetMessagesFunction.hpp"
-#include "MailingListsService.hpp"
 #include "MessagesSectionsService.hpp"
 #include "MessageTypesService.hpp"
 #include "ScenariosListFunction.hpp"
@@ -42,7 +39,6 @@
 #include "NotificationProviderTestService.hpp"
 
 #include "ClearAllBroadcastCachesAction.hpp"
-#include "MailingListSendAction.hpp"
 #include "ScenarioSaveAction.h"
 #include "SimpleMessageCreationAction.hpp"
 #include "UpdateAlarmMessagesFromTemplateAction.h"
@@ -63,8 +59,6 @@
 #include "CustomBroadcastPoint.hpp"
 #include "NotificationEvent.hpp"
 #include "NotificationProvider.hpp"
-#include "MailingList.hpp"
-#include "MailingListSubscription.hpp"
 #include "MessageAlternative.hpp"
 #include "MessagesTypes.h"
 #include "MessagesSection.hpp"
@@ -75,6 +69,7 @@
 #include "ScenarioCalendar.hpp"
 #include "FileNotificationChannel.hpp"
 #include "HttpNotificationChannel.hpp"
+#include "SmtpNotificationChannel.hpp"
 
 
 #include "MessagesModule.inc.cpp"
@@ -88,8 +83,6 @@ void synthese::messages::moduleRegister()
 	synthese::messages::AlarmTableSync::integrate();
 	synthese::messages::CustomBroadcastPointTableSync::integrate();
 	synthese::messages::NotificationProviderTableSync::integrate();
-	synthese::messages::MailingListTableSync::integrate();
-	synthese::messages::MailingListSubscriptionTableSync::integrate();
 	synthese::messages::MessageAlternativeTableSync::integrate();
 	synthese::messages::MessageApplicationPeriodTableSync::integrate();
 	synthese::messages::MessagesSectionTableSync::integrate();
@@ -114,7 +107,6 @@ void synthese::messages::moduleRegister()
 
 	synthese::messages::CustomBroadcastPointsService::integrate();
 	synthese::messages::GetMessagesFunction::integrate();
-	synthese::messages::MailingListsService::integrate();
 	synthese::messages::NotificationProvidersService::integrate();
 	synthese::messages::NotificationProviderTestService::integrate();
 	synthese::messages::MessagesSectionsService::integrate();
@@ -124,7 +116,6 @@ void synthese::messages::moduleRegister()
 	synthese::messages::ScenarioFoldersService::integrate();
 
 	synthese::messages::ClearAllBroadcastCachesAction::integrate();
-	synthese::messages::MailingListSendAction::integrate();
 	synthese::messages::ScenarioSaveAction::integrate();
 	synthese::messages::SimpleMessageCreationAction::integrate();
 	synthese::messages::ScenarioStopAction::integrate();
@@ -143,6 +134,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::NotificationProvider::integrate();
 	synthese::messages::FileNotificationChannel::integrate();
 	synthese::messages::HttpNotificationChannel::integrate();
+	synthese::messages::SmtpNotificationChannel::integrate();
 
 	synthese::messages::BroadcastPointAlarmRecipient::integrate();
 
@@ -150,8 +142,6 @@ void synthese::messages::moduleRegister()
 	synthese::util::Env::Integrate<synthese::messages::AlarmObjectLink>();
 	synthese::util::Env::Integrate<synthese::messages::NotificationEvent>();
 	synthese::util::Env::Integrate<synthese::messages::NotificationProvider>();
-	synthese::util::Env::Integrate<synthese::messages::MailingList>();
-	synthese::util::Env::Integrate<synthese::messages::MailingListSubscription>();
 	synthese::util::Env::Integrate<synthese::messages::MessageAlternative>();
 	synthese::util::Env::Integrate<synthese::messages::MessageApplicationPeriod>();
 	synthese::util::Env::Integrate<synthese::messages::MessageType>();

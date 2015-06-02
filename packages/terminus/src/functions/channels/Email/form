@@ -1,0 +1,73 @@
+<h4>Paramètres spécifiques</h4>
+
+<div class="control-group">
+  <label class="control-label" id="label_email_sender_name">Libellé expéditeur</label>
+  <div class="controls">
+    <input type="text" name="email_sender_name" is_parameter="true" value="<@email_sender_name@>" />
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_email_sender_address">Email expéditeur</label>
+  <div class="controls">
+    <input type="text" name="email_sender_address" is_parameter="true" value="<@email_sender_address@>" />
+  </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Format technique e-mail</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="email_content_type" <@email_content_type?"":"checked=\"true\""@> value="0" is_parameter="true"/> Texte</label>
+  <label class="radio inline"><input type="radio" name="email_content_type" <@(email_content_type==1)?"checked=\"true\"":""@> value="1" is_parameter="true"/> HTML</label>
+ </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_email_recipients">Addresses des destinataires</label>
+  <div class="controls">
+    <textarea id="editarea_email_recipients" type="text" name="email_recipients" is_parameter="true"><@email_recipients@></textarea>
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_email_subject">Sujet de l'email</label>
+  <div class="controls">
+    <textarea id="editarea_email_subject" type="text" name="email_subject" is_parameter="true"><@email_subject@></textarea>
+  </div>
+</div>
+
+<div class="control-group" id="control_email_content">
+  <label class="control-label" id="label_email_content">Contenu de l'email</label>
+  <div class="controls">
+    <textarea id="editarea_email_content" type="text" name="email_content" is_parameter="true"><@email_content@></textarea>
+  </div>
+</div>
+
+<script src="/lib/edit_area/edit_area_full.js"></script>
+<script language="javascript" type="text/javascript">
+function updateTextArea(id)
+{
+  $('#' + id).val(editAreaLoader.getValue(id));
+}
+editAreaLoader.init({
+  id : "editarea_email_recipients",
+  browsers : "all",
+  language : "fr",
+  toolbar : "search, go_to_line, fullscreen, |, undo, redo, |, word_wrap, |, help",
+  change_callback: "updateTextArea"
+});
+editAreaLoader.init({
+  id : "editarea_email_subject",
+  browsers : "all",
+  language : "fr",
+  toolbar : "search, go_to_line, fullscreen, |, undo, redo, |, word_wrap, |, help",
+  change_callback: "updateTextArea"
+});
+editAreaLoader.init({
+  id : "editarea_email_content",
+  browsers : "all",
+  language : "fr",
+  toolbar : "search, go_to_line, fullscreen, |, undo, redo, |, word_wrap, |, help",
+  change_callback: "updateTextArea"
+});
+</script>
