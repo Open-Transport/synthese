@@ -21,27 +21,23 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <NotificationProvidersService.hpp>
-#include <NotificationChannel.hpp>
-
 #include <Env.h>
-#include <MailingList.hpp>
+#include <Factory.h>
+#include <NotificationChannel.hpp>
+#include <NotificationProvidersService.hpp>
 #include <Object.hpp>
 #include <ObjectNotFoundException.h>
-#include <ParametersMap.h>
 #include <Registry.h>
 #include <Request.h>
 #include <RequestException.h>
-#include <Session.h>
 #include <StringField.hpp>
+#include <UtilTypes.h>
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 
-#include <iostream>
 #include <map>
-#include <string>
 #include <utility>
 
 using namespace boost;
@@ -88,10 +84,8 @@ namespace synthese
 					throw RequestException("No such notification provider : "+ lexical_cast<string>(objectId));
 				}
 			}
-			else
-			{
-				_listChannels = map.getDefault<bool>(PARAMETER_LIST_CHANNELS, false);
-			}
+
+			_listChannels = map.getDefault<bool>(PARAMETER_LIST_CHANNELS, false);
 		}
 
 
@@ -174,7 +168,6 @@ namespace synthese
 		NotificationProvidersService::NotificationProvidersService():
 			_listChannels(false),
 			_notificationProvider(NULL)
-		{
+		{ }
 
-		}
 }	}

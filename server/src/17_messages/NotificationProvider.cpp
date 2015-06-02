@@ -64,7 +64,7 @@ namespace synthese
 		const std::string FactorableTemplate<BroadcastPoint, NotificationProvider>::FACTORY_KEY = "NotificationProvider";
 	}
 
-	CLASS_DEFINITION(messages::NotificationProvider, "t199_notification_providers", 199)  // TODO Change to 107 at mailing list removal
+	CLASS_DEFINITION(messages::NotificationProvider, "t107_notification_providers", 107)
 
 	template<> const Field SimpleObjectFieldDefinition<MessageTypeBegin>::FIELD = Field("begin_message_type_id", SQL_INTEGER);
 	template<> const Field SimpleObjectFieldDefinition<MessageTypeEnd>::FIELD = Field("end_message_type_id", SQL_INTEGER);
@@ -274,6 +274,8 @@ namespace synthese
 			}
 			return result;
 		}
+
+
 
 		/*
 			Notify the event according to NotificationProvider parameters

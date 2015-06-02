@@ -51,7 +51,7 @@ namespace synthese
 	using namespace messages;
 	using namespace util;
 
-	CLASS_DEFINITION(NotificationEvent, "t122_notification_events", 122)
+	CLASS_DEFINITION(NotificationEvent, "t108_notification_events", 108)
 
 	namespace messages {
 		FIELD_DEFINITION_OF_OBJECT(NotificationEvent, "notification_event_id", "notification_event_ids")
