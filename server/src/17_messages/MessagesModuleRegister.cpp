@@ -27,6 +27,7 @@
 
 #include "MessagesLog.h"
 #include "MessagesLibraryLog.h"
+#include "NotificationLog.hpp"
 
 #include "CustomBroadcastPointsService.hpp"
 #include "GetMessagesFunction.hpp"
@@ -105,6 +106,7 @@ void synthese::messages::moduleRegister()
 
 	synthese::messages::MessagesLog::integrate();
 	synthese::messages::MessagesLibraryLog::integrate();
+	synthese::messages::NotificationLog::integrate();
 
 	synthese::messages::CustomBroadcastPointsService::integrate();
 	synthese::messages::GetMessagesFunction::integrate();
