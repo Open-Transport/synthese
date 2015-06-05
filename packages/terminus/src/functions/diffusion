@@ -736,7 +736,7 @@ template=<{
         }>?>
   ],
   section:[
-    <{section&template={id: "<@id@>"}&}>
+    <{section&template={id: "<@id@>"}}>
   ],
   <{recipients&template=
       line_recipient:[ <{line&template=
