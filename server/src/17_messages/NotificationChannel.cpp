@@ -67,6 +67,7 @@ namespace synthese
 		const string NotificationChannel::VARIABLE_STOP_IDS = "stop_ids";
 		const string NotificationChannel::VARIABLE_LINE_IDS = "line_ids";
 		const string NotificationChannel::VARIABLE_ID_SEPARATOR = ",";
+		const string NotificationChannel::VARIABLE_URL = "url";
 		const string NotificationChannel::VARIABLE_APPLICATION_BEGIN = "application_begin";
 		const string NotificationChannel::VARIABLE_APPLICATION_BEGIN_ISO = "application_begin_iso";
 		const string NotificationChannel::VARIABLE_APPLICATION_END = "application_end";
@@ -212,6 +213,7 @@ namespace synthese
 			}
 
 			scriptParameters.insert(VARIABLE_SHORT_MESSAGE, alarm->getShortMessage());
+			scriptParameters.insert(VARIABLE_URL, alarm->getDigitizedVersion());
 
 			// Use begin message by default
 			boost::optional<MessageType&> type = provider->get<MessageTypeBegin>();
