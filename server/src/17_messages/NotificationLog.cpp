@@ -57,7 +57,7 @@ namespace synthese
 	{
 		string NotificationLog::getName() const
 		{
-				return "Notifications";
+				return "Notification de messages";
 		}
 
 
