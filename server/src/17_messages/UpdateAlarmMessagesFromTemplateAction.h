@@ -39,7 +39,6 @@ namespace synthese
 	namespace messages
 	{
 		class Alarm;
-		class TextTemplate;
 
 		/** UpdateAlarmMessagesFromTemplateAction action class.
 			@ingroup m17Actions refActions
@@ -51,8 +50,8 @@ namespace synthese
 			static const std::string PARAMETER_TEMPLATE_ID;
 
 		private:
-			boost::shared_ptr<const TextTemplate>	_template;
-			boost::shared_ptr<Alarm>				_message;
+			boost::shared_ptr<const Alarm>	_template;
+			boost::shared_ptr<Alarm>		_message;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

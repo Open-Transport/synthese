@@ -149,7 +149,6 @@ namespace synthese
 			static Labels GetLevelLabelsWithScenarios(
 				bool withAll
 			);
-			static Labels			getTextTemplateLabels(const AlarmLevel& level);
 
 			static std::string							getLevelLabel(const AlarmLevel& level);
 

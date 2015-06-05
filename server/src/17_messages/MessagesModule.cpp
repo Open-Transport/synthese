@@ -36,8 +36,6 @@
 #include "ScenarioTableSync.h"
 #include "ScenarioFolder.h"
 #include "ScenarioFolderTableSync.h"
-#include "TextTemplateTableSync.h"
-#include "TextTemplate.h"
 
 #include <boost/foreach.hpp>
 
@@ -208,20 +206,6 @@ namespace synthese
 		}
 
 
-
-		MessagesModule::Labels MessagesModule::getTextTemplateLabels(const AlarmLevel& level)
-		{
-			Env env;
-			Labels m;
-			TextTemplateTableSync::SearchResult templates(
-				TextTemplateTableSync::Search(env, level)
-			);
-			BOOST_FOREACH(const boost::shared_ptr<TextTemplate>& text, templates)
-			{
-				m.push_back(make_pair(text->getKey(), text->getName()));
-			}
-			return m;
-		}
 
 		std::string MessagesModule::getLevelLabel( const AlarmLevel& level )
 		{

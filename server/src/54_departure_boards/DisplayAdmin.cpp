@@ -65,7 +65,6 @@
 #include "LinePhysicalStop.hpp"
 #include "LineStopTableSync.h"
 #include "MessageAdmin.h"
-#include "MessagesScenarioAdmin.h"
 #include "Profile.h"
 #include "PropertiesHTMLTable.h"
 #include "PTPlaceAdmin.h"
