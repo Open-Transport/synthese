@@ -61,6 +61,7 @@ namespace synthese
 
 		FIELD_BOOL(SubscribeAllBegin)
 		FIELD_BOOL(SubscribeAllEnd)
+		FIELD_BOOL(SetEventsHold)
 		FIELD_INT(RetryAttemptDelay)
 		FIELD_INT(MaximumRetryAttempts)
 
@@ -82,6 +83,9 @@ namespace synthese
 
 			// Flag to force processing of all sent alarms for end events
 			FIELD(SubscribeAllEnd),
+
+			// Flag to force events to be set to HOLD state for manual confirmation
+			FIELD(SetEventsHold),
 
 			// Delay in seconds between notification event retry
 			FIELD(RetryAttemptDelay),

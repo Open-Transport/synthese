@@ -90,6 +90,8 @@ NotificationChannel.hpp
 NotificationChannel.cpp
 NotificationEvent.cpp
 NotificationEvent.hpp
+NotificationEventsService.cpp
+NotificationEventsService.hpp
 NotificationEventTableSync.cpp
 NotificationEventTableSync.hpp
 NotificationLog.cpp

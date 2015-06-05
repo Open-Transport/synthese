@@ -141,9 +141,9 @@ namespace synthese
 			util::ParametersMap& variables,
 			const SentAlarm* alarm,
 			const NotificationType eventType,
-			const ptime& now
+			const ptime& eventTime
 		) {
-			const ptime begin = alarm->getApplicationStart(now);
+			const ptime begin = alarm->getApplicationStart(eventTime);
 
 			if (!begin.is_not_a_date_time())
 			{
@@ -158,7 +158,7 @@ namespace synthese
 				}
 			}
 
-			const ptime end = alarm->getApplicationEnd(now);
+			const ptime end = alarm->getApplicationEnd(eventTime);
 			if (!end.is_not_a_date_time())
 			{
 				const string endTime = _formatTime(end);
@@ -176,17 +176,17 @@ namespace synthese
 
 
 		void NotificationChannel::_setTestApplicationDateVariables(
-			util::ParametersMap& variables
+			util::ParametersMap& variables,
+			const boost::posix_time::ptime& eventTime
 		) {
-			ptime begin = second_clock::local_time();
-			string beginTime = _formatTime(begin);
-			string beginIso = to_iso_string(begin);
+			string beginTime = _formatTime(eventTime);
+			string beginIso = to_iso_string(eventTime);
 			variables.insert(VARIABLE_APPLICATION_BEGIN, beginTime);
 			variables.insert(VARIABLE_APPLICATION_BEGIN_ISO, beginIso);
 			variables.insert(VARIABLE_EVENT_TIME, beginTime);
 			variables.insert(VARIABLE_EVENT_TIME_ISO, beginIso);
 
-			ptime end = begin + minutes(30);
+			ptime end = eventTime + minutes(30);
 			variables.insert(VARIABLE_APPLICATION_END, _formatTime(end));
 			variables.insert(VARIABLE_APPLICATION_END_ISO, to_iso_string(end));
 		}
@@ -196,7 +196,8 @@ namespace synthese
 		util::ParametersMap NotificationChannel::generateScriptFields(
 			const NotificationProvider* provider,
 			const Alarm* alarm,
-			const NotificationType eventType
+			const NotificationType eventType,
+			const boost::posix_time::ptime& eventTime
 		) const {
 			// Generate variables for rendering
 			ParametersMap scriptParameters;
@@ -270,23 +271,21 @@ namespace synthese
 			// ApplicationPeriod only available for SentAlarm, not for library template
 			if (dynamic_cast<const SentAlarm*>(alarm))
 			{
-				ptime now = second_clock::local_time();
-				if (eventType == END)
-				{
-					now = now - seconds(65);
-					// now is already out of period, message activation waits for next minute
-					// In case of trouble, last attempt in NotificationEvent may be more accurate
-				}
+				// for END notifications, event time is already out of period,
+				// message activation waits for next minute, so go back few seconds
+				ptime variablesTime =
+					(eventType == END) ? eventTime - seconds(65) : eventTime;
+
 				_setApplicationDateVariables(
 					scriptParameters,
 					static_cast<const SentAlarm*>(alarm),
 					eventType,
-					now
+					variablesTime
 				);
 			}
 			else
 			{
-				_setTestApplicationDateVariables(scriptParameters);
+				_setTestApplicationDateVariables(scriptParameters, eventTime);
 			}
 
 			// Insert point for derived classes to add their own script parameters
