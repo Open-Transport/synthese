@@ -78,6 +78,10 @@ if(WITH_SCOM)
   add_definitions(-DWITH_SCOM)
 endif()
 
+if (WITH_INEO_TERMINUS)
+  list(APPEND MODULES 61_ineo_terminus)
+endif()
+
 include_directories(${PROJ_INCLUDE_DIRS})
 include_directories(${GEOS_INCLUDE_DIRS})
 
