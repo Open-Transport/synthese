@@ -99,6 +99,7 @@ namespace synthese
 			static const std::string VARIABLE_STOP_IDS;
 			static const std::string VARIABLE_LINE_IDS;
 			static const std::string VARIABLE_ID_SEPARATOR;
+			static const std::string VARIABLE_URL;
 			static const std::string VARIABLE_APPLICATION_BEGIN;
 			static const std::string VARIABLE_APPLICATION_BEGIN_ISO;
 			static const std::string VARIABLE_APPLICATION_END;
