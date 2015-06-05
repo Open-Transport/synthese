@@ -223,7 +223,6 @@ template=
               then=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&then=<?link&target=<@p@>&a=scenario_save&actionParamsid=<@scenario_id@>&roid=<@scenario_id@>&actionParamena=0&class=btn btn-warning btn-mini btn-inactive&text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>?>&
               else=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&then=<?link&target=<@p@>&a=scenario_save&actionParamsid=<@scenario_id@>&roid=<@scenario_id@>&actionParamena=1&class=btn btn-success btn-mini btn-inactive&text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>?>&
             ?>
-            <?if&cond=<@active@>&then=<?link&target=<@p@>&roid=<@roid@>&text=Envoyer SMS/E-mails&class=btn btn-primary btn-mini?>?>
           </td><td>
             <@archivingAuthorized=1@>
             <{section&template=
@@ -232,6 +231,21 @@ template=
             <?if&cond=<@archivingAuthorized@>&then=<?link&target=<@p@>&a=scenariostop&actionParams=<@scenario_id@>&actionParam_archive=1&roid=<@scenario_id@>&class=btn btn-danger btn-mini&text=<i class="icon-eject icon-white"></i>&confirm=Etes-vous sûr de vouloir clore et archiver l'événement ??>&
             else=Archivage non autorisé?>
           </td>
+          <?notification_events&scenario_id=<@scenario_id@>&template=
+             <?if&cond=<@0<<@hold_count@>||<@0<<@failed_count@>@>@>&then=
+               <tr><td><h4>Notifications</h4>
+               <span id="scenario_events_flags" scenario_id="<@scenario_id@>">
+               <?if&cond=<@0<<@failed_count@>@>&then=<p><i class="icon-warning-sign"></i>
+                 <@failed_count@> émission<?if&cond=<@1<<@failed_count@>@>&then=s?> en échec</p>
+               ?>
+               <?if&cond=<@0<<@hold_count@>@>&then=<p><i class="icon-flag"></i>
+                 <@hold_count@> émission<?if&cond=<@1<<@hold_count_count@>@>&then=s retenues&else= retenue?></p>
+               ?>
+               <?if&cond=<@hold_count@>&then=
+                 <?link&target=<@p@>&roid=<@scenario_id@>&text=Emettre les notifications (<@hold_count@>)&class=btn btn-primary btn-mini unhold_events_link?>
+               ?>
+               </span></td></tr>&
+          ?>?>
           </tr>&
       ?>?>
     </table>

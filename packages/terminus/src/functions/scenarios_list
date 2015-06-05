@@ -44,6 +44,10 @@ belongs_to_an_auto_section: <@belongs_to_an_auto_section@>,
 manual_override: <@manual_override@>,
 filtered: 0,
 current_section: '<@section@>',
+<?notification_events&scenario_id=<@scenario_id@>&template=
+hold_count: <@hold_count@>,
+failed_count: <@failed_count@>,
+?>
 <@canArchive=1@>
 section: [<{section&template=
 <@canArchive=<@<@canArchive@>&&<#has_section_right&level=DELETE_RIGHT&sectionid=<@id@>#>@>@>
@@ -175,6 +179,10 @@ calendar: [<{calendar&template=
     ?>
 
 
+           <?notification_events&scenario_id=<@scenario_id@>&template=
+             <?if&cond=<@0<<@failed_count@>@>&then=<i class="icon-warning-sign"></i>?>
+             <?if&cond=<@0<<@hold_count@>@>&then=<i class="icon-flag"></i>?>
+           ?>
 	  </td>
 	  <td>
 	  <@archivingAuthorized=1@>

@@ -75,6 +75,8 @@ namespace synthese
 		FIELD_DEFINITION_OF_TYPE(NotificationChannelKey, "channel", SQL_TEXT)
 		FIELD_DEFINITION_OF_TYPE(SubscribeAllBegin, "subscribe_all_begin", SQL_BOOLEAN)
 		FIELD_DEFINITION_OF_TYPE(SubscribeAllEnd, "subscribe_all_end", SQL_BOOLEAN)
+		FIELD_DEFINITION_OF_TYPE(SetEventsHold, "set_events_hold", SQL_BOOLEAN)
+
 		FIELD_DEFINITION_OF_TYPE(RetryAttemptDelay, "retry_attempt_delay", SQL_INTEGER)
 		FIELD_DEFINITION_OF_TYPE(MaximumRetryAttempts, "maximum_retry_attempts", SQL_INTEGER)
 
@@ -117,6 +119,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(MessageTypeEnd),
 					FIELD_VALUE_CONSTRUCTOR(SubscribeAllBegin, false),
 					FIELD_VALUE_CONSTRUCTOR(SubscribeAllEnd, false),
+					FIELD_VALUE_CONSTRUCTOR(SetEventsHold, false),
 					FIELD_DEFAULT_CONSTRUCTOR(RetryAttemptDelay),
 					FIELD_DEFAULT_CONSTRUCTOR(MaximumRetryAttempts),
 					FIELD_DEFAULT_CONSTRUCTOR(Parameters)
@@ -270,7 +273,12 @@ namespace synthese
 			if (getNotificationChannel()) {
 				// Invoke attemptNotification(event)
 				// return true only if completely successful
-				result = _notificationChannel->generateScriptFields(this, message, (NotificationType)type);
+				result = _notificationChannel->generateScriptFields(
+						this,
+						message,
+						(NotificationType)type,
+						boost::posix_time::second_clock::local_time()
+				);
 			}
 			return result;
 		}
@@ -306,7 +314,8 @@ namespace synthese
 			// if global subscribe or explicit recipient
 			if(get<SubscribeAllBegin>() || isRecipient(message.getLinkedObjects()))
 			{
-				NotificationEvent::findOrCreateEvent(message, this, BEGIN);
+				const bool holdEvent = this->get<SetEventsHold>();
+				NotificationEvent::findOrCreateEvent(message, this, BEGIN, holdEvent);
 			}
 		}
 
@@ -320,7 +329,8 @@ namespace synthese
 			// if global subscribe or explicit recipient
 			if(get<SubscribeAllEnd>() || isRecipient(message.getLinkedObjects()))
 			{
-				NotificationEvent::findOrCreateEvent(message, this, END);
+				const bool holdEvent = this->get<SetEventsHold>();
+				NotificationEvent::findOrCreateEvent(message, this, END, holdEvent);
 			}
 		}
 

@@ -173,6 +173,10 @@ calendar: [<{calendar&template=
                          text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>&
               ?>&
       ?>
+           <?notification_events&scenario_id=<@scenario_id@>&template=
+             <?if&cond=<@0<<@failed_count@>@>&then=<i class="icon-warning-sign"></i>?>
+             <?if&cond=<@0<<@hold_count@>@>&then=<i class="icon-flag"></i>?>
+           ?>
 	  </td>
 	  <td>
 	    <@sectionNames@>

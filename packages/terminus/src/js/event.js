@@ -159,10 +159,6 @@ function update_object_preview(recipient, message)
       {
         var input = $('input[factory="'+recipient+'"][value="'+ link.recipient_id +'"][noparam]');
         s += input.closest('label').text();
-        if(input.attr('manual_sending'))
-        {
-          s += ' <a class="btn btn-warning btn-mini" href="#" data-message="'+ message.id +'" id="send_mail'+ link.recipient_id +'">Envoyer</a>';
-        }
       }
     }
   }
@@ -171,17 +167,6 @@ function update_object_preview(recipient, message)
     s = "Aucun";
   }
   $('#preview_recipients_'+ recipient).html(s);
-
-  for(var i=0; i<links.length; ++i)
-  {
-    var link = links[i];
-    if(link.parameter) continue;
-    var input = $('input[factory="'+recipient+'"][value="'+ link.recipient_id +'"][noparam]');
-    if(input.attr('manual_sending'))
-    {
-      $('#send_mail'+ link.recipient_id).click(send_mail_click);
-    }
-  }
 }
 
 function update_tags_preview(message)
@@ -191,12 +176,12 @@ function update_tags_preview(message)
 }
 
 function send_mail_click()
+function unhold_events_click()
 {
-  if(!confirm("Etes-vous sûr de vouloir envoyer le message à la liste ?")) return false;
-  var recipient = $(this).attr('id').substr(9);
-  var msg = $(this).attr('data-message');
-  $.get('/terminus/ajax/send_mail?message='+ msg +'&recipient='+ recipient, function(data){
-    alert("Message envoyé");
+  if(!confirm("Etes-vous sûr de vouloir libérer les notifications retenues de l\'événement ?")) return false;
+  var scenario = $("#scenario_events_flags").attr('scenario_id');
+  $.get('/terminus/ajax/free_hold_events?scenario_id='+ scenario, function(data) {
+    setTimeout(function() { window.location.reload() }, 200);
   });
 }
 
@@ -1260,6 +1245,8 @@ $(function(){
   $('#change_calendar').click(change_calendar_click);
   $('.modal').bind('shown', focus_on_input);
 
+  $('.unhold_events_link').attr('href', '#');
+  $('.unhold_events_link').click(unhold_events_click);
 
   // Diffusion page behaviors.
   var diffusionForm = $('#diffusion-properties');

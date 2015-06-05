@@ -120,12 +120,14 @@ namespace synthese
 				@param provider reference to source notification provider
 				@param alarm to use for test
 				@param eventType notification type
+				@param eventTime notificaction event creation time
 				@return generated fields
 			*/
 			util::ParametersMap generateScriptFields(
 				const NotificationProvider* provider,
 				const Alarm* alarm,
-				const NotificationType eventType
+				const NotificationType eventType,
+				const boost::posix_time::ptime& eventTime
 			) const;
 
 			/**
@@ -180,21 +182,25 @@ namespace synthese
 				Set application date variables from sent alarm.
 				@param variables parameters map to feed with date variables
 				@param alarm the sent alarm with application dates
+				@param eventType type of the notification event (begin/end)
+				@param eventTime notification event creation time
 			*/
 			static void _setApplicationDateVariables(
 				util::ParametersMap& variables,
 				const SentAlarm* alarm,
 				const NotificationType eventType,
-				const boost::posix_time::ptime& now
+				const boost::posix_time::ptime& eventTime
 			);
 
 
 			/**
 				Set fake application date variables for testing script fields.
 				@param variables parameters map to feed with date variables
+				@param eventTime notification event creation time
 			*/
 			static void _setTestApplicationDateVariables(
-				util::ParametersMap& variables
+				util::ParametersMap& variables,
+				const boost::posix_time::ptime& eventTime
 			);
 
 		};

@@ -74,6 +74,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(NotificationProvider),
 					FIELD_VALUE_CONSTRUCTOR(EventType, NONE),
 					FIELD_VALUE_CONSTRUCTOR(Status, READY),
+					FIELD_VALUE_CONSTRUCTOR(Time, posix_time::second_clock::local_time()),
 					FIELD_VALUE_CONSTRUCTOR(Expiration, posix_time::not_a_date_time),
 					FIELD_VALUE_CONSTRUCTOR(Attempts, 0),
 					FIELD_VALUE_CONSTRUCTOR(LastAttempt, posix_time::not_a_date_time)
@@ -94,6 +95,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(NotificationProvider, boost::optional<NotificationProvider&>(notificationProvider)),
 					FIELD_VALUE_CONSTRUCTOR(EventType, eventType),
 					FIELD_VALUE_CONSTRUCTOR(Status, READY),
+					FIELD_VALUE_CONSTRUCTOR(Time, posix_time::second_clock::local_time()),
 					FIELD_VALUE_CONSTRUCTOR(Expiration, expiration),
 					FIELD_VALUE_CONSTRUCTOR(Attempts, 0),
 					FIELD_VALUE_CONSTRUCTOR(LastAttempt, posix_time::not_a_date_time)
@@ -151,7 +153,8 @@ namespace synthese
 		boost::shared_ptr<NotificationEvent> NotificationEvent::findOrCreateEvent(
 			const SentAlarm& alarm,
 			const NotificationProvider* provider,
-			const NotificationType type
+			const NotificationType type,
+			const bool hold_event /* = false */
 		) {
 			boost::shared_ptr<NotificationEvent> result;
 			Env env = Env::GetOfficialEnv();
@@ -196,6 +199,11 @@ namespace synthese
 				{
 					result->set<Expiration>(alarm.getApplicationEnd(now));
 				}
+			}
+
+			if (hold_event)
+			{
+				result->set<Status>(HOLD);
 			}
 
 			NotificationEventTableSync::Save(result.get());

@@ -89,7 +89,12 @@ namespace synthese
 			const NotificationProvider* provider = &(*(event->get<NotificationProvider>()));
 			const Alarm* alarm = &(*(event->get<Alarm>()));
 			// Generate field values
-			ParametersMap scriptFields = generateScriptFields(provider, alarm, event->get<EventType>());
+			ParametersMap scriptFields = generateScriptFields(
+				provider,
+				alarm,
+				event->get<EventType>(),
+				event->get<Time>()
+			);
 
 			if (!(provider->get<Parameters>().isDefined(PARAMETER_EMAIL_SENDER_ADDRESS))
 				|| !scriptFields.isDefined(PARAMETER_EMAIL_RECIPIENTS)

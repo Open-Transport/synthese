@@ -68,7 +68,12 @@ namespace synthese
 			const Alarm* alarm = &(*(event->get<Alarm>()));
 
 			// Create HTTP URL and body from parameters
-			ParametersMap fields = generateScriptFields(provider, alarm, event->get<EventType>());
+			ParametersMap fields = generateScriptFields(
+				provider,
+				alarm,
+				event->get<EventType>(),
+				event->get<Time>()
+			);
 
 			string httpMethod = provider->get<Parameters>()
 					.getDefault<string>(PARAMETER_METHOD, "GET");

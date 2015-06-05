@@ -1,0 +1,5 @@
+<?if&cond=<@scenario_id@>&then=
+  <?notification_events&unhold_events=1&scenario_id=<@scenario_id@>&template=
+  { "hold_count": <@hold_count@>, "failed_count": <@failed_count@> }
+  ?>
+?>

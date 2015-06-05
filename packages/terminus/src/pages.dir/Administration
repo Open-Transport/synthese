@@ -329,6 +329,14 @@ then=
 	    </div>
 	   </div>
 
+	   <div class="control-group">
+	    <label class="control-label">Obliger une quittance manuelle</label>
+	    <div class="controls">
+	     <label class="radio inline"><input type="radio" name="actionParam_field_set_events_hold" <@set_events_hold?"checked=\"true\"":""@> value="1" /> Oui</label>
+	     <label class="radio inline"><input type="radio" name="actionParam_field_set_events_hold" <@set_events_hold?"":"checked=\"true\""@> value="0" /> Non</label>
+	    </div>
+	   </div>
+
            <#channels/<@channel@>/form&for=template#>
 
 		 <div class="control-group">
@@ -377,7 +385,7 @@ then=
         <div class="control-group">
           <div class="controls">
             <p><strong>Attention:</strong> les paramètres ne sont pas sauvegardés</p>
-            <button id="np_generate" class="btn btn-warning" disabled="true">Générer les champs</button>            
+            <button id="np_generate" class="btn btn-warning" disabled="true">Générer les champs</button>
           </div>
         </div>
         <div id="np_test_results"/>
