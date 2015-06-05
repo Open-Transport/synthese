@@ -61,6 +61,7 @@ namespace synthese
 			IN_PROGRESS: since first attempt and during retry attempt periods.
 			FAILED: after maximum attempt count has been reached.
 			SUCCESS: notification event has been processed successfully.
+			HOLD: notification event should be manually confirmed first.
 
 			Order is relevant. Event with status < FAILED is considered active.
 			Event with status >= FAILED is considered over.
@@ -70,7 +71,9 @@ namespace synthese
 			READY = 0,
 			IN_PROGRESS = 1,
 			FAILED = 2,
-			SUCCESS = 3
+			SUCCESS = 3,
+			HOLD = 4
+
 		} NotificationStatus;
 
 		// Specific field declarations
@@ -96,7 +99,10 @@ namespace synthese
 			// Technical status of the notification
 			FIELD(Status),
 
-			// Expiration timestamp of the notification
+			// Event creation timestamp
+			FIELD(Time),
+
+			// Expiration timestamp of the notification event
 			FIELD(Expiration),
 
 			// Number of performed attempts
@@ -193,11 +199,13 @@ namespace synthese
 				@param reference to notified alarm
 				@param provider reference to source provider
 				@param type event type
+				@param hold_event set the event to the HOLD status
 			*/
 			static boost::shared_ptr<NotificationEvent> findOrCreateEvent(
 				const SentAlarm& alarm,
 				const NotificationProvider* provider,
-				const NotificationType type
+				const NotificationType type,
+				const bool hold_event = false
 			);
 
 		};
