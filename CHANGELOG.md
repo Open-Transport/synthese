@@ -40,27 +40,24 @@ required).
 
 ### Security
 
-## [3.9.1] - ????-??-??
+## [3.9.1] - 2015-06-08
 ### Added
-- ...
 
 ### Changed
-- ...
+- tc-74 : Display client IP address in synthese logs
 
 ### Deprecated
-- ...
 
 ### Removed
-- ...
 
 ### Fixed
 - tc-72 : The DestinationsAdmin page could only display 200 first destinations
 - tc-150 : Admin could not display non concurrency rules for commercial lines in subfolders
+- #56104 : Fixes on pedestrian journey using AStar
 - In RoutePlannerFunction and PTJourneyPlannerService : max depth (number of journeys) is number of connections + 1
 - In HeuresFileFormat : bugfix on creation/update of commercial lines, short name is read in itinerai file instead of long name
 
 ### Security
-
 
 
 
