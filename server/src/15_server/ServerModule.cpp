@@ -273,7 +273,7 @@ namespace synthese
 		){
 			try
 			{
-				Log::GetInstance ().debug ("Received request : " +
+				Log::GetInstance ().debug (req.ipaddr +  " # Received request : " +
 					req.uri + " (" + lexical_cast<string>(req.uri.size()) + " bytes)" +
 					(req.postData.empty() ?
 						string() :
