@@ -389,6 +389,8 @@ namespace synthese
 					of.reset();
 				}
 
+				time_duration td = microsec_clock::local_time() - now;
+				Log::GetInstance ().debug ("request duration (ms): " + lexical_cast<string>(td.total_milliseconds()));
 			}
 			catch(Request::RedirectException& e)
 			{
