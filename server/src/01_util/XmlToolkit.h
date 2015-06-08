@@ -118,6 +118,10 @@ namespace synthese
 			boost::posix_time::ptime GetXsdDateTime(
 				const std::string& str
 			);
+
+			boost::posix_time::ptime GetIneoDateTime(
+				const std::string& str
+			);
 }	}	}
 
 #endif
