@@ -85,6 +85,13 @@ namespace synthese
 
 				boost::asio::ip::tcp::socket _socket;
 				boost::shared_ptr<boost::asio::streambuf> _buf;
+
+				// Response generators
+				std::string _getXMLHeader();
+
+				std::string _checkStatusRequest(
+					XMLNode node
+				);
 			};
 
 			class tcp_server

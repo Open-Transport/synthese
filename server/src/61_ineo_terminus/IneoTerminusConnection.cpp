@@ -24,6 +24,7 @@
 
 #include "Log.h"
 #include "ServerModule.h"
+#include "XmlToolkit.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/bind/bind.hpp>
@@ -146,7 +147,28 @@ namespace synthese
 				string singleLine(bufStr);
 				// Log for debug
 				util::Log::GetInstance().debug("Ineo Terminus : on a recu ca : " + singleLine);
+				bufStr = bufStr.substr(43, bufStr.size() - 43); // Remove XML header (<?xml ... ?>)
+
+				// Parsing
+				XMLNode node(ParseInput(bufStr));
+				if(node.isEmpty())
+				{
+					util::Log::GetInstance().warn("Ineo Terminus : Message XML vide");
+					return;
+				}
+				XMLNode childNode(node.getChildNode(0));
+				if(childNode.isEmpty())
+				{
+					util::Log::GetInstance().warn("Ineo Terminus : Message XML vide sans node 0");
+					return;
+				}
+				string tagName(childNode.getName());
 				string message("Message pour Ineo");
+
+				if (tagName == "CheckStatusRequest")
+				{
+					message = _checkStatusRequest(childNode);
+				}
 				boost::asio::async_write(
 					_socket,
 					boost::asio::buffer(message),
@@ -227,6 +249,52 @@ namespace synthese
 			}
 
 			start_accept();
+		}
+
+		// Response generators
+		string IneoTerminusConnection::tcp_connection::_getXMLHeader()
+		{
+			return "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>";
+		}
+
+		string IneoTerminusConnection::tcp_connection::_checkStatusRequest(XMLNode node)
+		{
+			string tagName(node.getName());
+			if (tagName != "CheckStatusRequest")
+			{
+				// tagName is not CheckStatusRequest, this method should not have been called
+				return "";
+			}
+
+			XMLNode IDNode = node.getChildNode("ID", 0);
+			string idStr = IDNode.getText();
+			XMLNode RequestTimeStampNode = node.getChildNode("RequestTimeStamp", 0);
+			ptime requestTimeStamp(
+				XmlToolkit::GetIneoDateTime(
+					RequestTimeStampNode.getText()
+			)	);
+			XMLNode RequestorRefNode = node.getChildNode("RequestorRef", 0);
+			string requestorRefStr = RequestorRefNode.getText();
+
+			util::Log::GetInstance().debug("IneoTerminusConnection::_checkStatusRequest : id " +
+				idStr +
+				" ; timestamp " +
+				RequestTimeStampNode.getText() +
+				" ; de " +
+				requestorRefStr
+			);
+
+			stringstream message(_getXMLHeader());
+			message << "<CheckStatusResponse><ID>" <<
+				idStr <<
+				"</ID><RequestID>" <<
+				idStr <<
+				"</RequestID><ResponseTimeStamp>";
+			XmlToolkit::ToXsdDateTime(message, requestTimeStamp); // page 12 de la spec INEO : Horodatage de la demande
+			message << "</ResponseTimeStamp><ResponseRef>Terminus</ResponseRef></CheckStatusResponse>" <<
+				char(0);
+
+			return message.str();
 		}
 }	}
 

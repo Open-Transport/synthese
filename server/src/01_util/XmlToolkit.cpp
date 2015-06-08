@@ -313,4 +313,28 @@ namespace synthese
 			}
 			return result;
 		}
+
+
+		boost::posix_time::ptime XmlToolkit::GetIneoDateTime(
+			const std::string& str
+		){
+			vector<string> parts;
+			split(parts, str, is_any_of(" "));
+			if(parts.size() < 2)
+			{
+				throw Exception("Malformed Ineo date time (less than 2 parts)");
+			}
+			vector<string> dateParts;
+			split(dateParts, parts[0], is_any_of("/"));
+			if(dateParts.size() != 3)
+			{
+				throw Exception("Malformed Ineo date time (date not in 3 parts)");
+			}
+
+			ptime result(
+				from_string(dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0]),
+				duration_from_string(parts[1])
+			);
+			return result;
+		}
 }	}
