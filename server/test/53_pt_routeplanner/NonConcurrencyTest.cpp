@@ -235,7 +235,7 @@ void checkJourneyEquals(size_t i, PTRoutePlannerResult::Journeys& journeys,
 	//cout << "leg.getArrivalEdge()->getKey() = " << leg.getArrivalEdge()->getKey() << endl;
 	//BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getKey(), NB_STOP-1);
 }
-//#if 0
+#if 0
 /**
  * We test that scheduled services with a non concurrency rule are
  * properly exculed (or accepted) against scheduled services.
@@ -572,3 +572,83 @@ BOOST_AUTO_TEST_CASE (continuousVScontinuous)
 	checkJourneyEquals(i++, result.getJourneys(), "CONTI2", start_time + time_duration(4,10, 0), time_duration(0,50, 0));
 
 }
+#endif
+
+/**
+ * We test the performance of a scheduled services with a non concurrency rule
+ */
+BOOST_AUTO_TEST_CASE (scheduledPerfWithSeveralLines)
+{
+    ScopedRegistrable<FreeDRTArea> scopedFreeDRTAreaRegistrable;
+
+    TestAreaMap testAreaMap(NB_STOP);
+
+    JourneyPattern jp1;
+    CommercialLine cl1;
+    cl1.addPath(&jp1);
+    cl1.setShortName("CL1");
+    jp1.setCommercialLine(&cl1);
+    TestJourney tj1(jp1, testAreaMap);
+
+    JourneyPattern jp2;
+    CommercialLine cl2;
+    cl2.addPath(&jp2);
+    cl2.setShortName("CL2");
+    jp2.setCommercialLine(&cl2);
+    TestJourney tj2(jp2, testAreaMap);
+    // Set a non concurrency rule
+    NonConcurrencyRule ncr2(123456);
+    ncr2.set<Delay>(time_duration(0, 5, 0));
+    ncr2.set<PriorityLine>(cl1);
+    CommercialLine::NonConcurrencyRules ncrs2;
+    ncrs2.insert(&ncr2);
+    cl2.setNonConcurrencyRules(ncrs2);
+    //
+
+    for(int i=1; i<=24; i++)
+    {
+        vector<boost::shared_ptr<TestScheduledService> > tssVector;
+        for(time_duration t(0,0,0); t < hours(i); t+=minutes(1))
+        {
+            tssVector.push_back(boost::shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp1, t)));
+            tssVector.push_back(boost::shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp2, t)));
+        }
+        // The schedules of the non priority line CL2
+        TestScheduledService tss2(0, "", jp2, time_duration(2,30,0));
+        TestScheduledService tss3(0, "", jp2, time_duration(3,0,4));
+        TestScheduledService tss4(0, "", jp2, time_duration(4,30,0));
+        TestScheduledService tss5(0, "", jp2, time_duration(4,56,0));
+
+        AlgorithmLogger logger;
+        AccessParameters::AllowedPathClasses pc;
+        AccessParameters ap(
+                    USER_PEDESTRIAN, false, false, 1000, boost::posix_time::minutes(23), 1.11, 10, pc
+                    );
+
+        ptime start_time(day_clock::local_day(), minutes(0));
+        ptime end_time(day_clock::local_day(), hours(24));
+
+        PTTimeSlotRoutePlanner r(
+                    testAreaMap.getStopAreas()[0].get(),
+                testAreaMap.getStopAreas()[NB_STOP-1].get(),
+                start_time,
+                end_time,
+                start_time,
+                end_time,
+                boost::optional<std::size_t>(),
+                ap,
+                DEPARTURE_FIRST,
+                false,
+                logger
+                );
+        ptime test_start_time(microsec_clock::local_time());
+        PTRoutePlannerResult result(r.run());
+        ptime test_end_time(microsec_clock::local_time());
+        time_duration td = test_end_time - test_start_time;
+        cout << i << " " << tssVector.size() << " " << td.total_milliseconds() << endl;
+
+    }
+
+    cout << "END" << endl;
+}
+
