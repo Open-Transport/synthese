@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<CheckStatusRequest>
+  <ID>${ID}</ID>
+  <RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+  <RequestorRef>${REQUESTOR_REF}</RequestorRef>
+</CheckStatusRequest>

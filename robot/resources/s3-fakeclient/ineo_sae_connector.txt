@@ -1,0 +1,48 @@
+*** Settings ***
+Library           ineo_saeiv_protocol
+Library           DateTime
+Library           XML
+
+*** Variables ***
+
+*** Keywords ***
+
+Ineo SAEIV Establishes Connection
+    [Arguments]  ${host}  ${port}
+    ${client_socket}=  Connect On  ${host}  ${port}
+    Set Test Variable  ${saeiv_connection}  ${client_socket}
+    Set Test Variable  ${ID}  1   
+
+Create Message From Ineo SAEIV
+    [Arguments]  ${request_template}
+    ${request}=  Get File	path=${CURDIR}/../data/ineo_sae_connector/${request_template}.xml  encoding=UTF-8
+    ${date}=  Get Current Date
+    ${TIMESTAMP}=  Convert Date	 ${date}  result_format=%d/%m/%Y %H:%M:%S
+    ${REQUESTOR_REF}=  Set Variable  SAE
+    ${request}=  Replace Variables  ${request}
+    [Return]  ${request}
+    
+
+Ineo SAEIV Sends 
+    [Arguments]  ${request_message}
+    ${response}=  Send Sync  ${saeiv_connection}  ${request}
+    [Return]  ${response}
+    
+
+Response Should Match Request  
+    [Arguments]  ${response}  ${request}
+    ${request_id}  Get Element  source=${request}  xpath=ID
+    ${response_id}  Get Element  source=${response}  xpath=RequestID
+    Should Be Equal  ${request_id.text}  ${response_id.text}
+    ${response_ref}  Get Element  source=${response}  xpath=ResponseRef
+    Should Be Equal  Terminus  ${response_ref.text}
+    ${request_timestamp}  Get Element  source=${request}  xpath=RequestTimeStamp
+    ${response_timestamp}  Get Element  source=${response}  xpath=ResponseTimeStamp
+    Should Be Equal  ${request_timestamp.text}  ${response_timestamp.text}
+
+
+
+
+
+
+

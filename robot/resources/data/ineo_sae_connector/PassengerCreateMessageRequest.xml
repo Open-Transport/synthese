@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<PassengerCreateMessageRequest>
+  <ID>8</ID>
+  <RequestTimeStamp>20/01/2015 10:07:00</RequestTimeStamp>
+  <RequestorRef>Terminus</RequestorRef>
+  <Messaging>
+    <Name>0006 MessagePassager1</Name>
+    <Dispatching>Repete</Dispatching>
+    <StartDate>20/01/2015</StartDate>
+    <StopDate>21/01/2015</StopDate>
+    <StartTime>11:00:00</StartTime>
+    <StopTime>19:00:00</StopTime>
+    <RepeatPeriod>5</RepeatPeriod>
+    <Inhibition>non</Inhibition>
+    <Color= Vert />
+    <Text>
+      <Line>Message à l attention </Line>
+      <Line>de tous les passagers</Line>
+    </Text>
+    <Recipients>
+      <AllNetwork />
+    </Recipients>
+  </Messaging>
+</PassengerCreateMessageRequest >
