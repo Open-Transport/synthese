@@ -297,8 +297,10 @@ namespace synthese
 				idStr <<
 				"</ID><RequestID>" <<
 				idStr <<
-				"</RequestID><ResponseTimeStamp>";
-			XmlToolkit::ToXsdDateTime(response, requestTimeStamp); // page 12 de la spec INEO : Horodatage de la demande
+				"</RequestID><ResponseTimeStamp>" <<
+				_writeIneoDate(requestTimeStamp) <<
+				" " <<
+				_writeIneoTime(requestTimeStamp); // page 12 de la spec INEO : Horodatage de la demande
 			response << "</ResponseTimeStamp><ResponseRef>Terminus</ResponseRef></CheckStatusResponse>" <<
 				char(0);
 
@@ -402,8 +404,10 @@ namespace synthese
 				idStr <<
 				"</ID><RequestID>" <<
 				idStr <<
-				"</RequestID><ResponseTimeStamp>";
-			XmlToolkit::ToXsdDateTime(response, requestTimeStamp); // page 12 de la spec INEO : Horodatage de la demande
+				"</RequestID><ResponseTimeStamp>" <<
+				_writeIneoDate(requestTimeStamp) <<
+				" " <<
+				_writeIneoTime(requestTimeStamp); // page 12 de la spec INEO : Horodatage de la demande
 			response << "</ResponseTimeStamp><ResponseRef>Terminus</ResponseRef>";
 			BOOST_FOREACH(const Messaging& message, messages)
 			{
