@@ -29,6 +29,7 @@
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
+#include <set>
 #include <string>
 
 namespace synthese
@@ -87,11 +88,43 @@ namespace synthese
 				boost::shared_ptr<boost::asio::streambuf> _buf;
 
 				// Response generators
-				std::string _getXMLHeader();
-
 				std::string _checkStatusRequest(
 					XMLNode node
 				);
+				std::string _passengerCreateMessageRequest(
+					XMLNode node
+				);
+
+				// generic parsers
+				std::string _getXMLHeader();
+				std::set<std::string> _readRecipients(XMLNode node);
+
+				//generic writers
+				std::string _writeIneoRecipients(std::set<std::string>);
+				std::string _writeIneoDate(boost::posix_time::ptime date);
+				std::string _writeIneoTime(boost::posix_time::ptime date);
+
+				//generic enums
+				typedef enum
+				{
+					Immediat = 0,
+					Differe = 1,
+					Repete = 2
+				} Dispatching;
+
+				// generic structs
+				struct Messaging
+				{
+					std::string name;
+					Dispatching dispatching;
+					boost::posix_time::ptime startDate;
+					boost::posix_time::ptime stopDate;
+					int repeatPeriod;
+					bool inhibition;
+					std::string color;
+					std::string content;
+					std::set<std::string> recipients; // TO-DO use real recipients
+				};
 			};
 
 			class tcp_server
