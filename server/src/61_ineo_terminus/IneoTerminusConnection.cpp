@@ -169,6 +169,14 @@ namespace synthese
 				{
 					message = _checkStatusRequest(childNode);
 				}
+				else if (tagName == "PassengerCreateMessageRequest")
+				{
+					message = _passengerCreateMessageRequest(childNode);
+				}
+				else
+				{
+					util::Log::GetInstance().warn("Ineo Terminus : Parser non codé pour " + tagName);
+				}
 				boost::asio::async_write(
 					_socket,
 					boost::asio::buffer(message),
@@ -284,17 +292,227 @@ namespace synthese
 				requestorRefStr
 			);
 
-			stringstream message(_getXMLHeader());
-			message << "<CheckStatusResponse><ID>" <<
+			stringstream response(_getXMLHeader());
+			response << "<CheckStatusResponse><ID>" <<
 				idStr <<
 				"</ID><RequestID>" <<
 				idStr <<
 				"</RequestID><ResponseTimeStamp>";
-			XmlToolkit::ToXsdDateTime(message, requestTimeStamp); // page 12 de la spec INEO : Horodatage de la demande
-			message << "</ResponseTimeStamp><ResponseRef>Terminus</ResponseRef></CheckStatusResponse>" <<
+			XmlToolkit::ToXsdDateTime(response, requestTimeStamp); // page 12 de la spec INEO : Horodatage de la demande
+			response << "</ResponseTimeStamp><ResponseRef>Terminus</ResponseRef></CheckStatusResponse>" <<
 				char(0);
 
-			return message.str();
+			return response.str();
+		}
+
+		string IneoTerminusConnection::tcp_connection::_passengerCreateMessageRequest(XMLNode node)
+		{
+			string tagName(node.getName());
+			if (tagName != "PassengerCreateMessageRequest")
+			{
+				// tagName is not PassengerCreateMessageRequest, this method should not have been called
+				return "";
+			}
+
+			XMLNode IDNode = node.getChildNode("ID", 0);
+			string idStr = IDNode.getText();
+			XMLNode RequestTimeStampNode = node.getChildNode("RequestTimeStamp", 0);
+			ptime requestTimeStamp(
+				XmlToolkit::GetIneoDateTime(
+					RequestTimeStampNode.getText()
+			)	);
+			XMLNode RequestorRefNode = node.getChildNode("RequestorRef", 0);
+			string requestorRefStr = RequestorRefNode.getText();
+
+			int numMessagingNode = node.nChildNode("Messaging");
+			vector<Messaging> messages;
+			for (int cptMessagingNode = 0;cptMessagingNode<numMessagingNode;cptMessagingNode++)
+			{
+				Messaging message;
+				XMLNode MessagingNode = node.getChildNode("Messaging", cptMessagingNode);
+				XMLNode nameNode = MessagingNode.getChildNode("Name", 0);
+				message.name = nameNode.getText();
+				XMLNode dispatchingNode = MessagingNode.getChildNode("Dispatching", 0);
+				if ((string)(dispatchingNode.getText()) == "Immediat")
+				{
+					message.dispatching = Immediat;
+				}
+				else if ((string)(dispatchingNode.getText()) == "Differe")
+				{
+					message.dispatching = Differe;
+				}
+				else if ((string)(dispatchingNode.getText()) == "Repete")
+				{
+					message.dispatching = Repete;
+				}
+				else
+				{
+					util::Log::GetInstance().warn("IneoTerminusConnection : Message avec Dispatching inconnu : ");
+				}
+				XMLNode startDateNode = MessagingNode.getChildNode("StartDate", 0);
+				string startDateStr = startDateNode.getText();
+				XMLNode stopDateNode = MessagingNode.getChildNode("StopDate", 0);
+				string stopDateStr = stopDateNode.getText();
+				XMLNode startTimeNode = MessagingNode.getChildNode("StartTime", 0);
+				string startTimeStr = startTimeNode.getText();
+				XMLNode stopTimeNode = MessagingNode.getChildNode("StopTime", 0);
+				string stopTimeStr = stopTimeNode.getText();
+				message.startDate =  XmlToolkit::GetIneoDateTime(
+					startDateStr + " " + startTimeStr
+				);
+				message.stopDate =  XmlToolkit::GetIneoDateTime(
+					stopDateStr + " " + stopTimeStr
+				);
+				XMLNode repeatPeriodNode = MessagingNode.getChildNode("RepeatPeriod", 0);
+				message.repeatPeriod = lexical_cast<int>(repeatPeriodNode.getText());
+				XMLNode inhibitionNode = MessagingNode.getChildNode("Inhibition", 0);
+				message.inhibition = ((string)(inhibitionNode.getText()) == "oui");
+				XMLNode colorNode = MessagingNode.getChildNode("Color", 0);
+				message.color = colorNode.getText();
+				XMLNode textNode = MessagingNode.getChildNode("Text", 0);
+				int numLineNode = textNode.nChildNode("Line");
+				for (int cptLineNode = 0;cptLineNode<numLineNode;cptLineNode++)
+				{
+					XMLNode LineNode = textNode.getChildNode("Line", cptLineNode);
+					if (cptLineNode > 0)
+					{
+						message.content += "\n";
+					}
+					message.content += LineNode.getText();
+				}
+				XMLNode RecipientsNode = MessagingNode.getChildNode("Recipients", 0);
+				message.recipients = _readRecipients(RecipientsNode);
+
+				messages.push_back(message);
+			}
+
+			util::Log::GetInstance().debug("IneoTerminusConnection::_passengerCreateMessageRequest : id " +
+				idStr +
+				" ; timestamp " +
+				RequestTimeStampNode.getText() +
+				" ; de " +
+				requestorRefStr +
+				" avec " +
+				lexical_cast<string>(messages.size()) +
+				" message(s)"
+			);
+
+			stringstream response(_getXMLHeader());
+			response << "<PassengerCreateMessageResponse><ID>" <<
+				idStr <<
+				"</ID><RequestID>" <<
+				idStr <<
+				"</RequestID><ResponseTimeStamp>";
+			XmlToolkit::ToXsdDateTime(response, requestTimeStamp); // page 12 de la spec INEO : Horodatage de la demande
+			response << "</ResponseTimeStamp><ResponseRef>Terminus</ResponseRef>";
+			BOOST_FOREACH(const Messaging& message, messages)
+			{
+				response << "<Messaging><Name>" <<
+					message.name <<
+					"</Name><Dispatching>";
+				if (message.dispatching == Immediat)
+				{
+					response << "Immediat";
+				}
+				else if (message.dispatching == Differe)
+				{
+					response << "Differe";
+				}
+				else if (message.dispatching == Repete)
+				{
+					response << "Repete";
+				}
+				response << "</Dispatching><StartDate>" <<
+					_writeIneoDate(message.startDate) <<
+					"</StartDate><StopDate>" <<
+					_writeIneoDate(message.stopDate) <<
+					"</StopDate><StartTime>" <<
+					_writeIneoTime(message.startDate) <<
+					"</StartTime><StopTime>" <<
+					_writeIneoTime(message.stopDate) <<
+					"</StopTime><RepeatPeriod>" <<
+					lexical_cast<string>(message.repeatPeriod) <<
+					"</RepeatPeriod><Inhibition>" <<
+					(message.inhibition ? "oui" : "non") <<
+					"</Inhibition><Color>" <<
+					message.color <<
+					"</Color><Text>";
+				set<string> lines;
+				split(lines, message.content, is_any_of("\n"));
+				BOOST_FOREACH(const string& line, lines)
+				{
+					response << "<Line>" << line << "</Line>";
+				}
+				response << "</Text><Recipients>" <<
+					_writeIneoRecipients(message.recipients) <<
+					"</Recipients></Messaging>";
+			}
+			response << "</PassengerCreateMessageResponse>";
+
+			return response.str();
+		}
+
+		set<string> IneoTerminusConnection::tcp_connection::_readRecipients(XMLNode node)
+		{
+			set<string> recipients;
+			int nChildNode = node.nChildNode();
+			for (int cptChildNode = 0;cptChildNode<nChildNode;cptChildNode++)
+			{
+				XMLNode recipientNode = node.getChildNode(cptChildNode);
+				string recipientType(recipientNode.getName());
+				if (recipientType == "AllNetwork")
+				{
+					recipients.insert("AllNetwork");
+				}
+				else
+				{
+					util::Log::GetInstance().warn("_readRecipients : Recipient non codé : " + recipientType);
+				}
+			}
+
+			return recipients;
+		}
+
+		string IneoTerminusConnection::tcp_connection::_writeIneoRecipients(set<string> recipients)
+		{
+			stringstream strRecipients;
+			BOOST_FOREACH(const string& recipient, recipients)
+			{
+				if (recipient == "AllNetwork")
+				{
+					strRecipients << "<AllNetwork />";
+				}
+				else
+				{
+					util::Log::GetInstance().warn("_writeIneoRecipients : Recipient non codé : " + recipient);
+				}
+			}
+
+			return strRecipients.str();
+		}
+
+		string IneoTerminusConnection::tcp_connection::_writeIneoDate(ptime date)
+		{
+			stringstream str;
+			str <<
+				date.date().day() << "/" <<
+				setw( 2 ) << setfill ( '0' ) <<
+				static_cast<long>(date.date().month()) << "/" <<
+				setw( 2 ) << setfill ( '0' ) <<
+				date.date().year();
+			return str.str();
+		}
+
+		string IneoTerminusConnection::tcp_connection::_writeIneoTime(ptime date)
+		{
+			stringstream str;
+			str <<
+				date.time_of_day().hours() << ":" <<
+				setw( 2 ) << setfill ( '0' ) <<
+				date.time_of_day().minutes () << ":" <<
+				setw( 2 ) << setfill ( '0' ) <<
+				date.time_of_day().seconds();
+			return str.str();
 		}
 }	}
 
