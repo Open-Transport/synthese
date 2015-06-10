@@ -7,6 +7,7 @@
 
 #include "ObjectCreateService.hpp"
 #include "ObjectViewService.hpp"
+#include "ObjectListService.hpp"
 #include "TablesViewService.hpp"
 #include "SQLService.hpp"
 
@@ -24,6 +25,7 @@ void synthese::db::moduleRegister()
 
 	synthese::db::ObjectCreateService::integrate();
 	synthese::db::ObjectViewService::integrate();
+	synthese::db::ObjectListService::integrate();
 	synthese::db::TablesViewService::integrate();
 	synthese::db::SQLService::integrate();
 
