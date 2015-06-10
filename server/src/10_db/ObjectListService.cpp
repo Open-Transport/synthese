@@ -118,12 +118,6 @@ namespace synthese
 				throw Exception("Incompatible table");
 			}
 
-			// New value
-			_value = dynamic_pointer_cast<ObjectBase, Registrable>(_tableSync->newObject());
-			if(!_value.get())
-			{
-				throw Exception("Incompatible table");
-			}
 		}
 
 
