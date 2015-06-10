@@ -203,6 +203,17 @@ namespace synthese
 			void setScenarioId(
 				const util::RegistryKeyType id
 			) throw(server::ActionException);
+
+			// Setters
+			void setMessagesAndCalendars(
+				boost::optional<boost::property_tree::ptree> messagesAndCalendars
+			);
+			void setScenario(
+				boost::shared_ptr<Scenario>	scenario
+			);
+			void setSScenario(
+				boost::shared_ptr<SentScenario> sscenario
+			);
 		};
 	}
 }

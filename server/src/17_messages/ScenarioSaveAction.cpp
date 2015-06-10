@@ -1430,4 +1430,22 @@ namespace synthese
 				throw ActionException(PARAMETER_SCENARIO_ID, e, *this);
 			}
 		}
+
+		void ScenarioSaveAction::setMessagesAndCalendars(
+			boost::optional<boost::property_tree::ptree> messagesAndCalendars
+		) {
+			_messagesAndCalendars = messagesAndCalendars;
+		}
+
+		void ScenarioSaveAction::setScenario(
+			boost::shared_ptr<Scenario>	scenario
+		) {
+			_scenario = scenario;
+		}
+
+		void ScenarioSaveAction::setSScenario(
+			boost::shared_ptr<SentScenario>	sscenario
+		) {
+			_sscenario = sscenario;
+		}
 }	}

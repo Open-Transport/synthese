@@ -24,6 +24,8 @@
 #define SYNTHESE_pt_IneoTerminusConnection_hpp__
 
 #include "IConv.hpp"
+#include "ParametersMap.h"
+#include "UtilTypes.h"
 #include "XmlParser.h"
 
 #include <boost/asio.hpp>
@@ -44,6 +46,7 @@ namespace synthese
 		{
 		public:
 			static const std::string MODULE_PARAM_INEO_TERMINUS_PORT;
+			static const std::string MODULE_PARAM_INEO_TERMINUS_NETWORK;
 
 			enum Status
 			{
@@ -56,6 +59,7 @@ namespace synthese
 			static boost::shared_ptr<IneoTerminusConnection> _theConnection;
 
 			std::string _ineoPort;
+			util::RegistryKeyType _ineoNetworkID;
 
 			mutable Status _status;
 
@@ -68,7 +72,11 @@ namespace synthese
 			class tcp_connection : public boost::enable_shared_from_this<tcp_connection>
 			{
 			public:
-				tcp_connection(boost::asio::io_service& io_service) : _socket(io_service) {}
+				tcp_connection(
+					boost::asio::io_service& io_service,
+					util::RegistryKeyType network_id
+				) :	_socket(io_service),
+					_network_id(network_id) {}
 
 				boost::asio::ip::tcp::socket& socket();
 
@@ -85,6 +93,7 @@ namespace synthese
 				);
 
 				boost::asio::ip::tcp::socket _socket;
+				util::RegistryKeyType _network_id;
 				boost::shared_ptr<boost::asio::streambuf> _buf;
 
 				// Response generators
@@ -103,6 +112,7 @@ namespace synthese
 				std::string _writeIneoRecipients(std::set<std::string>);
 				std::string _writeIneoDate(boost::posix_time::ptime date);
 				std::string _writeIneoTime(boost::posix_time::ptime date);
+				void _addRecipientsPM(util::ParametersMap& pm, std::set<std::string>);
 
 				//generic enums
 				typedef enum
@@ -130,7 +140,11 @@ namespace synthese
 			class tcp_server
 			{
 			public:
-				tcp_server(boost::asio::io_service& io_service, std::string port);
+				tcp_server(
+					boost::asio::io_service& io_service,
+					std::string port,
+					util::RegistryKeyType network_id
+				);
 
 			private:
 				void start_accept();
@@ -141,6 +155,7 @@ namespace synthese
 				);
 
 				boost::asio::io_service& _io_service;
+				util::RegistryKeyType _network_id;
 				boost::asio::ip::tcp::acceptor _acceptor;
 			};
 
@@ -152,12 +167,14 @@ namespace synthese
 			/// @name Setters
 			//@{
 				void setIneoPort(const std::string& value){ _ineoPort = value; }
+				void setIneoNetworkID(const util::RegistryKeyType& value){ _ineoNetworkID = value; }
 				void setStatus(const Status& value){ _status = value; }
 			//@}
 
 			/// @name Getters
 			//@{
 				const std::string& getIneoPort() const { return _ineoPort; }
+				const util::RegistryKeyType& getIneoNetworkID() const { return _ineoNetworkID; }
 				const Status& getStatus() const { return _status; }
 			//@}
 
