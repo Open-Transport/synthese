@@ -23,6 +23,8 @@
 #include "IneoTerminusConnection.hpp"
 
 #include "Log.h"
+#include "Request.h"
+#include "ScenarioSaveAction.h"
 #include "ServerModule.h"
 #include "XmlToolkit.h"
 
@@ -31,6 +33,7 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/lambda/lambda.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 using namespace boost;
 using namespace boost::algorithm;
@@ -44,12 +47,14 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace messages;
 	using namespace util;
 	using namespace server;
 	
 	namespace ineo_terminus
 	{
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PORT = "ineo_terminus_port";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK = "ineo_terminus_network";
 
 		boost::shared_ptr<IneoTerminusConnection> IneoTerminusConnection::_theConnection(new IneoTerminusConnection);
 		
@@ -64,7 +69,11 @@ namespace synthese
 		{
 			// Open the server socket
 			boost::asio::io_service ioService;
-			IneoTerminusConnection::tcp_server tcpServer(ioService, _theConnection->getIneoPort());
+			IneoTerminusConnection::tcp_server tcpServer(
+				ioService,
+				_theConnection->getIneoPort(),
+				_theConnection->getIneoNetworkID()
+			);
 			ioService.run();
 		}
 
@@ -92,6 +101,11 @@ namespace synthese
 			{
 				changed = (_theConnection->_ineoPort != value);
 				_theConnection->_ineoPort = value;
+			}
+			if(name == MODULE_PARAM_INEO_TERMINUS_NETWORK)
+			{
+				changed = (_theConnection->_ineoNetworkID != lexical_cast<RegistryKeyType>(value));
+				_theConnection->_ineoNetworkID = lexical_cast<RegistryKeyType>(value);
 			}
 
 			if(	changed
@@ -220,16 +234,18 @@ namespace synthese
 
 		IneoTerminusConnection::tcp_server::tcp_server(
 			boost::asio::io_service& ioService,
-			string port
-		): _io_service(ioService),
-		   _acceptor(ioService, tcp::endpoint(tcp::v4(), lexical_cast<int>(port)))
+			string port,
+			RegistryKeyType network_id
+		):	_io_service(ioService),
+			_network_id(network_id),
+			_acceptor(ioService, tcp::endpoint(tcp::v4(), lexical_cast<int>(port)))
 		{
 			start_accept();
 		}
 
 		void IneoTerminusConnection::tcp_server::start_accept()
 		{
-			IneoTerminusConnection::tcp_connection* new_connection = new IneoTerminusConnection::tcp_connection(_io_service);
+			IneoTerminusConnection::tcp_connection* new_connection = new IneoTerminusConnection::tcp_connection(_io_service, _network_id);
 
 			_acceptor.async_accept(
 				new_connection->socket(),
@@ -388,6 +404,56 @@ namespace synthese
 				messages.push_back(message);
 			}
 
+			// Creation of a scenario and a message using ScenarioSaveAction
+			boost::shared_ptr<ParametersMap> messagesAndCalendarsPM(new ParametersMap);
+			BOOST_FOREACH(const Messaging& message, messages)
+			{
+				boost::shared_ptr<ParametersMap> periodPM(new ParametersMap);
+				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()) +" "+ boost::posix_time::to_simple_string(message.startDate.time_of_day()));
+				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()) +" "+ boost::posix_time::to_simple_string(message.stopDate.time_of_day()));
+				periodPM->insert("date", "");
+				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
+				messagePM->insert("title", message.name);
+				messagePM->insert("content", message.content);
+				messagePM->insert("color", message.color);
+				if (message.dispatching == Immediat)
+				{
+					messagePM->insert("dispatching", "Immediat");
+				}
+				else if (message.dispatching == Differe)
+				{
+					messagePM->insert("dispatching", "Differe");
+				}
+				else if (message.dispatching == Repete)
+				{
+					messagePM->insert("dispatching", "Repete");
+				}
+				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod));
+				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
+				messagePM->insert("section", "");
+				messagePM->insert("alternative", "");
+				_addRecipientsPM(*messagePM, message.recipients);
+				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+				calendarPM->insert("period", periodPM);
+				calendarPM->insert("message", messagePM);
+				messagesAndCalendarsPM->insert("calendar", calendarPM);
+			}
+
+			stringstream stream;
+			messagesAndCalendarsPM->outputJSON(stream, "");
+			boost::property_tree::ptree messagesAndCalendars;
+			boost::property_tree::json_parser::read_json(stream, messagesAndCalendars);
+			ScenarioSaveAction scenarioSaveAction;
+			scenarioSaveAction.setMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
+			boost::shared_ptr<Scenario>	scenario;
+			boost::shared_ptr<SentScenario> sscenario;
+			sscenario.reset(new SentScenario);
+			scenario = static_pointer_cast<Scenario, SentScenario>(sscenario);
+			scenarioSaveAction.setSScenario(sscenario);
+			scenarioSaveAction.setScenario(scenario);
+			Request fakeRequest;
+			scenarioSaveAction.run(fakeRequest);
+
 			util::Log::GetInstance().debug("IneoTerminusConnection::_passengerCreateMessageRequest : id " +
 				idStr +
 				" ; timestamp " +
@@ -498,7 +564,7 @@ namespace synthese
 		string IneoTerminusConnection::tcp_connection::_writeIneoDate(ptime date)
 		{
 			stringstream str;
-			str <<
+			str << setw( 2 ) << setfill ( '0' ) <<
 				date.date().day() << "/" <<
 				setw( 2 ) << setfill ( '0' ) <<
 				static_cast<long>(date.date().month()) << "/" <<
@@ -510,13 +576,30 @@ namespace synthese
 		string IneoTerminusConnection::tcp_connection::_writeIneoTime(ptime date)
 		{
 			stringstream str;
-			str <<
+			str << setw( 2 ) << setfill ( '0' ) <<
 				date.time_of_day().hours() << ":" <<
 				setw( 2 ) << setfill ( '0' ) <<
 				date.time_of_day().minutes () << ":" <<
 				setw( 2 ) << setfill ( '0' ) <<
 				date.time_of_day().seconds();
 			return str.str();
+		}
+
+		void IneoTerminusConnection::tcp_connection::_addRecipientsPM(ParametersMap& pm, set<string> recipients)
+		{
+			BOOST_FOREACH(const string& recipient, recipients)
+			{
+				if (recipient == "AllNetwork")
+				{
+					pm.insert("line_recipient", _network_id);
+				}
+				else
+				{
+					util::Log::GetInstance().warn("_addRecipientsPM : Recipient non codé : " + recipient);
+				}
+			}
+			pm.insert("displayscreen_recipient", "");
+			pm.insert("stoparea_recipient", "");
 		}
 }	}
 
