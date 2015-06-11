@@ -76,7 +76,8 @@ namespace synthese
 					boost::asio::io_service& io_service,
 					util::RegistryKeyType network_id
 				) :	_socket(io_service),
-					_network_id(network_id) {}
+					_network_id(network_id),
+					_iconv("ISO-8859-1","UTF-8") {}
 
 				boost::asio::ip::tcp::socket& socket();
 
@@ -94,6 +95,7 @@ namespace synthese
 
 				boost::asio::ip::tcp::socket _socket;
 				util::RegistryKeyType _network_id;
+				util::IConv _iconv;
 				boost::shared_ptr<boost::asio::streambuf> _buf;
 
 				// Response generators
