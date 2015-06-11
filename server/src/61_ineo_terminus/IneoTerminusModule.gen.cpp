@@ -1,1 +1,1 @@
-﻿synthese::ineo_terminus::moduleRegister();
+synthese::ineo_terminus::moduleRegister();
