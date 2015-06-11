@@ -349,7 +349,7 @@ namespace synthese
 				Messaging message;
 				XMLNode MessagingNode = node.getChildNode("Messaging", cptMessagingNode);
 				XMLNode nameNode = MessagingNode.getChildNode("Name", 0);
-				message.name = nameNode.getText();
+				message.name = _iconv.convert(nameNode.getText());
 				XMLNode dispatchingNode = MessagingNode.getChildNode("Dispatching", 0);
 				if ((string)(dispatchingNode.getText()) == "Immediat")
 				{
@@ -394,9 +394,9 @@ namespace synthese
 					XMLNode LineNode = textNode.getChildNode("Line", cptLineNode);
 					if (cptLineNode > 0)
 					{
-						message.content += "\n";
+						message.content += "<br />";
 					}
-					message.content += LineNode.getText();
+					message.content += _iconv.convert(LineNode.getText());
 				}
 				XMLNode RecipientsNode = MessagingNode.getChildNode("Recipients", 0);
 				message.recipients = _readRecipients(RecipientsNode);
@@ -508,7 +508,8 @@ namespace synthese
 					message.color <<
 					"</Color><Text>";
 				set<string> lines;
-				split(lines, message.content, is_any_of("\n"));
+				string lineFeed("<br />");
+				split(lines, message.content, is_any_of(lineFeed));
 				BOOST_FOREACH(const string& line, lines)
 				{
 					response << "<Line>" << line << "</Line>";
