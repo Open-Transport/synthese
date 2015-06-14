@@ -76,7 +76,7 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					Dates::FIELD.name.c_str(),
+					Date::FIELD.name.c_str(),
 					VehicleService::FIELD.name.c_str(),
 					""
 			)	);

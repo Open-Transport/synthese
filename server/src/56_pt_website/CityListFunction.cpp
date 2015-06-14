@@ -23,7 +23,6 @@
 #include "CityListFunction.h"
 
 #include "Webpage.h"
-#include "Types.h"
 #include "PTServiceConfigTableSync.hpp"
 #include "RequestException.h"
 #include "City.h"
@@ -38,7 +37,6 @@ namespace synthese
 {
 	using namespace geography;
 	using namespace server;
-	using namespace interfaces;
 	using namespace util;
 	using namespace lexical_matcher;
 	using namespace pt_website;

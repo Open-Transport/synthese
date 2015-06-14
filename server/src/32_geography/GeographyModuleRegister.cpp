@@ -2,7 +2,6 @@
 // 14 Geography
 
 // Factories
-#include "CityNameValueInterfaceElement.h"
 #include "GeographyModule.h"
 
 #include "CityTableSync.h"
@@ -34,8 +33,6 @@ namespace synthese
 		void moduleRegister()
 		{
 			// Factories
-			CityNameValueInterfaceElement::integrate();
-
 			GeographyModule::integrate();
 
 			CityTableSync::integrate();

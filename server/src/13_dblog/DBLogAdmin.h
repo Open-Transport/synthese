@@ -48,8 +48,8 @@ namespace synthese
 			@image latex cap_admin_logviewer.png "Maquette de l'écran de visualisation de journal" width=14cm
 
 			<i>Barre de navigation</i> :
-				- Lien vers synthese::interfaces::AdminInterfaceElement
-				- Lien vers synthese::interfaces::DBLogList
+				- Lien vers synthese::admin::HomeAdmin
+				- Lien vers synthese::dblog::DBLogList
 				- Nom du journal affiché
 
 			<i>Zone de contenus</i> :
@@ -73,7 +73,7 @@ namespace synthese
 						- <tt>Warning</tt> : l'entrée correspond à un événement susceptible de constituer une anomalie sans conséquence majeure sur la continuité de service en dehors de l'anomalie constatée elle-même (Exemple : erreur de cohérence sur un tableau d'affichage : l'arrêt physique de sélection des départs n'existe plus)
 						- <tt>Error</tt> : l'entrée correspond à un événement constituant une anomalie (Exemple : un terminal d'affichage ne fonctionne plus)
 					-# <tt>Date</tt> : Date de l'entrée
-					-# <tt>Utilisateur</tt> : Utilisateur ayant généré l'entrée. Attention, ne pas confondre cet utilisateur avec un éventuel utilisateur sur lequel porterait l'entrée (Exemple : utilisateur Paul créé par Jacques : l'utilisateur ayant généré l'entrée est Jacques). Un clic sur le nom de l'utilisateur conduit vers la page synthese::interfaces::UserAdmin si l'utilisateur dispose des habilitations nécessaires.
+					-# <tt>Utilisateur</tt> : Utilisateur ayant généré l'entrée. Attention, ne pas confondre cet utilisateur avec un éventuel utilisateur sur lequel porterait l'entrée (Exemple : utilisateur Paul créé par Jacques : l'utilisateur ayant généré l'entrée est Jacques). Un clic sur le nom de l'utilisateur conduit vers la page synthese::security::UserAdmin si l'utilisateur dispose des habilitations nécessaires.
 					-# <tt>Entrée</tt> : Ensemble de colonnes définissant le contenu de l'entrée. La liste des colonnes dépend du journal affiché (voir documentation individuelle des classes dérivées)
 					-# Un clic sur les titres de colonne effectue un tri selon la colonne sélectionnée
 				-# Un maximum de 50 entrées est affiché à l'écran. En cas de dépassement de ce nombre d'après les critères de recherche, un lien <tt>Entrées suivantes</tt> apparait et permet de visualiser les entrées suivantes. A partir de la seconde page, un lien <tt>Entrées précédentes</tt> apparait également.

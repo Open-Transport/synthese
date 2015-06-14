@@ -47,7 +47,7 @@ namespace synthese
 				- SYNTHESE Admin - Messages
 
 			<i>Barre de navigation</i> :
-				- Lien vers synthese::interfaces::AdminHome
+				- Lien vers synthese::admin::HomeAdmin
 				- Texte <tt>Messages</tt>
 
 			<i>Zone de contenu</i> :
@@ -81,7 +81,7 @@ namespace synthese
 						- Message en cours de diffusion avec date de fin : fond vert clair
 						- Message en cours de diffusion sans date de fin : fond rose
 						- Message à diffuser ultérieurement : fond bleu clair
-					-# <tt>Message</tt> : extrait des messages diffusés. Un clic sur l'extrait conduit à la page synthese::interfaces::MessageAdmin sur le message sélectionné
+					-# <tt>Message</tt> : extrait des messages diffusés. Un clic sur l'extrait conduit à la page synthese::messages::MessageAdmin sur le message sélectionné
 					-# <tt>Type</tt> : type de message diffusé
 						- <tt>Complémentaire</tt> : Message complémentaire
 						- <tt>Prioritaire</tt> : Message prioritaire
@@ -94,13 +94,13 @@ namespace synthese
 						- Pastille verte : le message est en conflit sur aucun afficheur
 						- Pastille orange : le message prioritaire "écrase" un message complémentaire
 						- Pastille rouge : le message entre en conflit avec un message de même niveau
-					-# Bouton <tt>Editer</tt> : conduit à la page synthese::interfaces::MessageAdmin sur le message correspondant à la ligne où est présent le bouton
+					-# Bouton <tt>Editer</tt> : conduit à la page synthese::messages::MessageAdmin sur le message correspondant à la ligne où est présent le bouton
 					-# Bouton <tt>Arrêter</tt> : stoppe la diffusion du message sélectionné (disponible pour les messages dont la date de fin de diffusion n'est pas atteinte, ou pour les messages sans date de fin de diffusion)
 					-# Un clic sur les titres de colonnes effectue un tri croissant puis décroissant sur la colonne sélectionnée
-				-# Bouton <b>Nouvelle diffusion de message</b> : ouvre la page synthese::interfaces::MessageAdmin :
+				-# Bouton <b>Nouvelle diffusion de message</b> : ouvre la page synthese::messages::MessageAdmin :
 					- sur un message vierge si aucun message n'est sélectionné dans la colonne <tt>Sel</tt>
 					- sur un message recopié sur un autre, sélectionné dans la colonne <tt>Sel</tt>
-				-# Bouton <b>Nouvelle diffusion de scénario</b> : ouvre la page synthese::interfaces::MessagesScenarioSendAdmin sur le scénario sélectionné dans la liste déroulante. Le contenu du scénario est recopié pour être diffusé après possible modification
+				-# Bouton <b>Nouvelle diffusion de scénario</b> : ouvre la page synthese::messages::MessagesScenarioSendAdmin sur le scénario sélectionné dans la liste déroulante. Le contenu du scénario est recopié pour être diffusé après possible modification
 				-# Un maximum de 50 messages est affiché à l'écran. En cas de dépassement de ce nombre d'après les critères de recherche, un lien <tt>Messages suivants</tt> apparait et permet de visualiser les entrées suivantes. A partir de la seconde page, un lien <tt>Messages précédents</tt> apparait également.
 
 

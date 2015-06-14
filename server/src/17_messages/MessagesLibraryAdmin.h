@@ -42,8 +42,8 @@ namespace synthese
 				- SYNTHESE Admin - Messages - Bibliothèque
 
 			<i>Barre de navigation</i> :
-				- Lien vers synthese::interfaces::AdminHome
-				- Lien vers synthese::interfaces::MessagesAdmin
+				- Lien vers synthese::admin::HomeAdmin
+				- Lien vers synthese::messages::MessagesAdmin
 				- Texte <tt>Bibliothèque</tt>
 
 			<i>Zone de contenu</i> :

@@ -36,11 +36,6 @@ namespace synthese
 		class Webpage;
 	}
 
-	namespace interfaces
-	{
-		class Interface;
-	}
-
 	namespace messages
 	{
 		class MessageType;
@@ -59,9 +54,6 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_ID;
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_INTERFACE_ID;
-			static const std::string PARAMETER_AUDIO_INTERFACE_ID;
-			static const std::string PARAMETER_MONITORING_INTERFACE_ID;
 			static const std::string PARAMETER_ROWS_NUMBER;
 			static const std::string PARAMETER_MAX_STOPS_NUMBER;
 			static const std::string PARAMETER_TIME_BETWEEN_CHECKS;
@@ -76,9 +68,6 @@ namespace synthese
 		private:
 			boost::shared_ptr<DisplayType> _dt;
 			boost::optional<std::string> _name;
-			boost::optional<boost::shared_ptr<const interfaces::Interface> >	_interface;
-			boost::optional<boost::shared_ptr<const interfaces::Interface> >	_monitoringInterface;
-			boost::optional<boost::shared_ptr<const interfaces::Interface> >	_audioInterface;
 			boost::optional<size_t>	_rows_number;
 			boost::optional<boost::optional<size_t> >	_max_stops_number;
 			boost::optional<boost::posix_time::time_duration>	_timeBetweenChecks;

@@ -32,15 +32,11 @@ using namespace std;
 namespace synthese
 {
 	using namespace departure_boards;
-	using namespace interfaces;
 	using namespace util;
 
 	CLASS_DEFINITION(DisplayType, "t036_display_types", 36)
 	FIELD_DEFINITION_OF_OBJECT(DisplayType, "display_type_id", "display_type_ids")
 	
-	FIELD_DEFINITION_OF_TYPE(DisplayInterface, "interface_id", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(AudioInterface, "audio_interface_id", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(MonitoringInterface, "monitoring_interface_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(RowsNumber, "rows_number", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(MaxStopsNumber, "max_stops_number", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(TimeBetweenChecks, "time_between_checks", SQL_INTEGER)
@@ -59,7 +55,6 @@ namespace synthese
 		const string DisplayType::ATTR_NAME = "name";
 		const string DisplayType::ATTR_MESSAGE_TYPE_ID = "message_type_id";
 		const string DisplayType::ATTR_ROWS_NUMBER = "rows_number";
-		const string DisplayType::ATTR_MONITORING_PAGE_ID = "monitoring_page_id";
 		const string DisplayType::ATTR_MESSAGE_IS_DISPLAYED_PAGE_ID = "message_is_displayed_page_id";
 
 
@@ -70,9 +65,6 @@ namespace synthese
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
-					FIELD_DEFAULT_CONSTRUCTOR(DisplayInterface),
-					FIELD_DEFAULT_CONSTRUCTOR(AudioInterface),
-					FIELD_DEFAULT_CONSTRUCTOR(MonitoringInterface),
 					FIELD_VALUE_CONSTRUCTOR(RowsNumber, 1),
 					FIELD_VALUE_CONSTRUCTOR(MaxStopsNumber, 0),
 					FIELD_VALUE_CONSTRUCTOR(TimeBetweenChecks, minutes(0)),

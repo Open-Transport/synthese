@@ -37,11 +37,7 @@
 #include "User.h"
 #include "UpdateDisplayTypeAction.h"
 #include "AdminInterfaceElement.h"
-#include "Interface.h"
 #include "ArrivalDepartureTableRight.h"
-#include "DeparturesTableInterfacePage.h"
-#include "ParseDisplayReturnInterfacePage.h"
-#include "InterfaceTableSync.h"
 #include "Webpage.h"
 #include "WebPageTableSync.h"
 #include "RemoveObjectAction.hpp"
@@ -51,7 +47,6 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace interfaces;
 	using namespace admin;
 	using namespace server;
 	using namespace util;
@@ -128,15 +123,6 @@ namespace synthese
 			stream << t.title("Paramètres d'affichage");
 			stream <<
 				t.cell(
-					"Interface d'affichage",
-					t.getForm().getSelectInput(
-						UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID,
-						InterfaceTableSync::GetInterfaceLabels<DeparturesTableInterfacePage>(optional<string>()),
-						optional<RegistryKeyType>(_type->get<DisplayInterface>() ? _type->get<DisplayInterface>()->getKey() : 0)
-				)	)
-			;
-			stream <<
-				t.cell(
 					"Page CMS principale",
 					t.getForm().getTextInputAutoCompleteFromTableSync(
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_MAIN_PAGE_ID,
@@ -185,18 +171,6 @@ namespace synthese
 			;
 			stream <<
 				t.cell(
-					"Page CMS pour parser les résultats de monitoring",
-					t.getForm().getTextInputAutoCompleteFromTableSync(
-						UpdateDisplayTypeAction::PARAMETER_MONITORING_PARSER_PAGE_ID,
-						_type->get<MonitoringParserPage>() ? lexical_cast<string>(_type->get<MonitoringParserPage>()->getKey()) : string(),
-						_type->get<MonitoringParserPage>() ? lexical_cast<string>(_type->get<MonitoringParserPage>()->getName()) : string(),
-						lexical_cast<string>(WebPageTableSync::TABLE.ID),
-						string(),string(),
-						true, true, true, true
-				)	)
-			;
-			stream <<
-				t.cell(
 					"Rangées",
 					t.getForm().getSelectNumberInput(
 						UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER,
@@ -213,20 +187,17 @@ namespace synthese
 					1,
 					"(pas de limite)"
 			)	);
-			stream << t.title("Paramètres sonores");
-			stream << t.cell("Interface vocale", t.getForm().getSelectInput(
-					UpdateDisplayTypeAction::PARAMETER_AUDIO_INTERFACE_ID,
-					InterfaceTableSync::_GetInterfaceLabels(optional<string>(), string("(aucune)"), string("undefined")),
-					optional<RegistryKeyType>(_type->get<AudioInterface>().get_ptr() ? _type->get<AudioInterface>()->getKey() : 0)
-			)	);
 			stream << t.title("Paramètres de supervision");
 			stream <<
 				t.cell(
-					"Protocole de supervision",
-					t.getForm().getSelectInput(
-						UpdateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID,
-						InterfaceTableSync::GetInterfaceLabels<ParseDisplayReturnInterfacePage>(optional<string>()),
-						optional<RegistryKeyType>(_type->get<MonitoringInterface>().get_ptr() ? _type->get<MonitoringInterface>()->getKey() : 0)
+					"Page CMS pour parser les résultats de monitoring",
+					t.getForm().getTextInputAutoCompleteFromTableSync(
+						UpdateDisplayTypeAction::PARAMETER_MONITORING_PARSER_PAGE_ID,
+						_type->get<MonitoringParserPage>() ? lexical_cast<string>(_type->get<MonitoringParserPage>()->getKey()) : string(),
+						_type->get<MonitoringParserPage>() ? lexical_cast<string>(_type->get<MonitoringParserPage>()->getName()) : string(),
+						lexical_cast<string>(WebPageTableSync::TABLE.ID),
+						string(),string(),
+						true, true, true, true
 				)	)
 			;
 			stream <<
@@ -241,6 +212,8 @@ namespace synthese
 				);
 			stream << t.close();
 		}
+
+
 
 		bool DisplayTypeAdmin::isAuthorized(
 			const security::User& user

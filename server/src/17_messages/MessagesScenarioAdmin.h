@@ -44,9 +44,9 @@ namespace synthese
 				- SYNTHESE Admin - Messages - Bibliothèque - Scénarios - Interruption métro
 
 			<i>Barre de navigation</i> :
-				- Lien vers synthese::interfaces::AdminHome
-				- Lien vers synthese::interfaces::MessagesAdmin
-				- Lien vers synthese::interfaces::MessagesLibraryAdmin
+				- Lien vers synthese::admin::HomeAdmin
+				- Lien vers synthese::messages::MessagesAdmin
+				- Lien vers synthese::messages::MessagesLibraryAdmin
 				- Texte <tt>Scénario</tt>
 				- Texte [Nom]
 

@@ -141,7 +141,6 @@ target_link_libraries(61_data_exchange
   00_framework
   01_util
   10_db
-  11_interfaces
   12_security
   16_impex
   17_messages

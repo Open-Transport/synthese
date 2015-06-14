@@ -25,7 +25,6 @@
 #include "DBException.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
-#include "InterfaceTableSync.h"
 #include "WebPageTableSync.h"
 #include "ReplaceQuery.h"
 #include "ReservationContact.h"
@@ -43,7 +42,6 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 	using namespace pt;
-	using namespace interfaces;
 	using namespace cms;
 
 	namespace util
@@ -67,7 +65,6 @@ namespace synthese
 		const string OnlineReservationRuleTableSync::COL_THRESHOLDS = "thresholds";
 		const string OnlineReservationRuleTableSync::COL_SENDER_EMAIL("sender_email");
 		const string OnlineReservationRuleTableSync::COL_SENDER_NAME("sender_name");
-		const string OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID("email_interface_id");
 		const string OnlineReservationRuleTableSync::COL_CONFIRMATION_EMAIL_CMS_ID("confirmation_email_cms_id");
 		const string OnlineReservationRuleTableSync::COL_CANCELLATION_EMAIL_CMS_ID("cancellation_email_cms_id");
 		const string OnlineReservationRuleTableSync::COL_PASSWORD_EMAIL_CMS_ID("password_email_cms_id");
@@ -95,7 +92,6 @@ namespace synthese
 			Field(OnlineReservationRuleTableSync::COL_THRESHOLDS, SQL_TEXT),
 			Field(OnlineReservationRuleTableSync::COL_SENDER_EMAIL, SQL_TEXT),
 			Field(OnlineReservationRuleTableSync::COL_SENDER_NAME, SQL_TEXT),
-			Field(OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID, SQL_TEXT),
 			Field(OnlineReservationRuleTableSync::COL_CONFIRMATION_EMAIL_CMS_ID, SQL_TEXT),
 			Field(OnlineReservationRuleTableSync::COL_CANCELLATION_EMAIL_CMS_ID, SQL_TEXT),
 			Field(OnlineReservationRuleTableSync::COL_PASSWORD_EMAIL_CMS_ID, SQL_TEXT),
@@ -145,23 +141,6 @@ namespace synthese
 				{
 					Log::GetInstance().warn("Reservation rule not found for online reservation rule "+ lexical_cast<string>(object->getKey()));
 				}
-
-				bool warningToDisplayForEmail(true);
-				try
-				{
-					object->setEMailInterface(
-						InterfaceTableSync::GetEditable(
-							rows->getLongLong(OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID),
-							env,
-							linkLevel
-						).get()
-					);
-					warningToDisplayForEmail = false;
-                }
-                catch (...)
-                {
-                    Log::GetInstance().info("E-Mail interface not found for online reservation rule "+ lexical_cast<string>(object->getKey()));
-                }
 
 				bool warningToDisplayForEmailCMS(true);
                 try
@@ -225,9 +204,9 @@ namespace synthese
 					warningToDisplayForEmailCMS = true;
 				}
 
-				if (warningToDisplayForEmail && warningToDisplayForEmailCMS)
+				if (warningToDisplayForEmailCMS)
 				{
-					Log::GetInstance().warn("E-Mail not found for online reservation rule (no interface, no CMS) "+ lexical_cast<string>(object->getKey()));
+					Log::GetInstance().warn("E-Mail not found for online reservation rule "+ lexical_cast<string>(object->getKey()));
 				}
 
 			}
@@ -261,7 +240,10 @@ namespace synthese
 			query.addField(string(""));
 			query.addField(object->getSenderEMail());
 			query.addField(object->getSenderName());
-			query.addField(object->getEMailInterface() ? object->getEMailInterface()->getKey() : RegistryKeyType(0));
+			query.addField(object->getConfirmationEMailCMS() ? object->getConfirmationEMailCMS()->getKey() : RegistryKeyType(0));
+			query.addField(object->getCancellationEMailCMS() ? object->getCancellationEMailCMS()->getKey() : RegistryKeyType(0));
+			query.addField(object->getPasswordEMailCMS() ? object->getPasswordEMailCMS()->getKey() : RegistryKeyType(0));
+			query.addField(object->getMultiReservationsEMailCMS() ? object->getMultiReservationsEMailCMS()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 		}
 

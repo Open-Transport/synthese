@@ -27,7 +27,6 @@
 
 #include "Object.hpp"
 
-#include "Interface.h"
 #include "MessageType.hpp"
 #include "MinutesField.hpp"
 #include "Registrable.h"
@@ -43,9 +42,6 @@ namespace synthese
 {
 	namespace departure_boards
 	{
-		FIELD_POINTER(DisplayInterface, interfaces::Interface)
-		FIELD_POINTER(AudioInterface, interfaces::Interface)
-		FIELD_POINTER(MonitoringInterface, interfaces::Interface)
 		FIELD_SIZE_T(RowsNumber)
 		FIELD_SIZE_T(MaxStopsNumber)
 		FIELD_MINUTES(TimeBetweenChecks)
@@ -60,9 +56,6 @@ namespace synthese
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Name),
-			FIELD(DisplayInterface),
-			FIELD(AudioInterface),
-			FIELD(MonitoringInterface),
 			FIELD(RowsNumber),
 			FIELD(MaxStopsNumber),
 			FIELD(TimeBetweenChecks),//!< Time between monitoring checks (0 = no value)
@@ -79,11 +72,6 @@ namespace synthese
 	namespace cms
 	{
 		class Webpage;
-	}
-
-	namespace interfaces
-	{
-		class Interface;
 	}
 
 	namespace messages
@@ -113,7 +101,6 @@ namespace synthese
 			static const std::string ATTR_MESSAGE_TYPE_ID;
 			static const std::string ATTR_ROWS_NUMBER;
 			static const std::string ATTR_DISPLAY_PAGE;
-			static const std::string ATTR_MONITORING_PAGE_ID;
 			static const std::string ATTR_MESSAGE_IS_DISPLAYED_PAGE_ID;
 
 			/// Chosen registry class.

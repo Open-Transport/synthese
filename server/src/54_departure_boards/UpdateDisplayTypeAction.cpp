@@ -29,8 +29,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "MessageTypeTableSync.hpp"
 #include "WebPageTableSync.h"
 #include "Webpage.h"
-#include "Interface.h"
-#include "InterfaceTableSync.h"
 #include "ObjectNotFoundException.h"
 #include "ActionException.h"
 #include "Request.h"
@@ -52,7 +50,6 @@ namespace synthese
 	using namespace cms;
 	using namespace db;
 	using namespace dblog;
-	using namespace interfaces;
 	using namespace messages;
 	using namespace security;
 	using namespace server;
@@ -68,9 +65,6 @@ namespace synthese
 	{
 		const string UpdateDisplayTypeAction::PARAMETER_ID = Action_PARAMETER_PREFIX + "dtu_id";
 		const string UpdateDisplayTypeAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "dtu_na";
-		const string UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "dtu_di";
-		const string UpdateDisplayTypeAction::PARAMETER_AUDIO_INTERFACE_ID(Action_PARAMETER_PREFIX + "dtu_ai");
-		const string UpdateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID(Action_PARAMETER_PREFIX + "dtu_mi");
 		const string UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action_PARAMETER_PREFIX + "dtu_ro";
 		const string UpdateDisplayTypeAction::PARAMETER_MAX_STOPS_NUMBER(Action_PARAMETER_PREFIX + "dtu_st");
 		const string UpdateDisplayTypeAction::PARAMETER_TIME_BETWEEN_CHECKS(Action_PARAMETER_PREFIX + "dtu_tc");
@@ -94,17 +88,6 @@ namespace synthese
 			if(_name)
 			{
 				map.insert(PARAMETER_NAME, *_name);
-			}
-			if(_interface)
-			{
-				if (_interface->get())
-				{
-					map.insert(PARAMETER_INTERFACE_ID, (*_interface)->getKey());
-				}
-				else
-				{
-					map.insert(PARAMETER_INTERFACE_ID, 0);
-				}
 			}
 			if(_rows_number)
 			{
@@ -170,7 +153,7 @@ namespace synthese
 
 						Env env;
 						DisplayTypeTableSync::SearchResult v(
-							DisplayTypeTableSync::Search(env, *_name, optional<RegistryKeyType>(), 0, 2)
+							DisplayTypeTableSync::Search(env, *_name, 0, 2)
 						);
 						BOOST_FOREACH(boost::shared_ptr<DisplayType> t, v)
 						{
@@ -187,20 +170,6 @@ namespace synthese
 				if(map.isDefined(PARAMETER_ROWS_NUMBER))
 				{
 					_rows_number = map.get<size_t>(PARAMETER_ROWS_NUMBER);
-				}
-
-				// Interface
-				if(map.isDefined(PARAMETER_INTERFACE_ID))
-				{
-					RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID));
-					if (id)
-					{
-						_interface = InterfaceTableSync::Get(id, *_env);
-					}
-					else
-					{
-						_interface = boost::shared_ptr<const Interface>();
-					}
 				}
 
 				if(map.isDefined(PARAMETER_DISPLAY_MAIN_PAGE_ID))
@@ -303,36 +272,6 @@ namespace synthese
 					}
 				}
 
-				if(map.isDefined(PARAMETER_AUDIO_INTERFACE_ID))
-				{
-					RegistryKeyType id(
-						map.getDefault<RegistryKeyType>(PARAMETER_AUDIO_INTERFACE_ID, 0)
-					);
-					if (id)
-					{
-						_audioInterface = InterfaceTableSync::Get(id, *_env);
-					}
-					else
-					{
-						_audioInterface = boost::shared_ptr<const Interface>();
-					}
-				}
-
-				if(map.isDefined(PARAMETER_MONITORING_INTERFACE_ID))
-				{
-					RegistryKeyType id(
-						map.getDefault<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID, 0)
-					);
-					if (id)
-					{
-						_monitoringInterface = InterfaceTableSync::Get(id, *_env);
-					}
-					else
-					{
-						_monitoringInterface = boost::shared_ptr<const Interface>();
-					}
-				}
-
 				// Max stops number
 				if(map.isDefined(PARAMETER_MAX_STOPS_NUMBER))
 				{
@@ -383,10 +322,6 @@ namespace synthese
 					}
 				}
 			}
-			catch(ObjectNotFoundException<Interface>& e)
-			{
-				throw ActionException("Interface not found / "+ e.getMessage());
-			}
 			catch(ObjectNotFoundException<MessageType>& e)
 			{
 				throw ActionException("Message type not found"+ e.getMessage());
@@ -401,39 +336,6 @@ namespace synthese
 			{
 				_dt->set<Name>(*_name);
 				DBLogModule::appendToLogIfChange(log, "Nom", _dt->get<Name>(), *_name);
-			}
-
-			if(_interface)
-			{
-				_dt->set<DisplayInterface>(*(const_cast<Interface*>(_interface->get())));
-				DBLogModule::appendToLogIfChange(
-					log,
-					"Interface d'affichage",
-					(_dt->get<DisplayInterface>().get_ptr() != NULL) ? _dt->get<DisplayInterface>()->getName() : "(aucune)",
-					(_interface->get() != NULL) ? (*_interface)->getName() : "(aucune)"
-				);
-			}
-
-			if(_monitoringInterface)
-			{
-				_dt->set<MonitoringInterface>(*(const_cast<Interface*>(_monitoringInterface->get())));
-				DBLogModule::appendToLogIfChange(
-					log,
-					"Interface de supervision",
-					(_dt->get<MonitoringInterface>().get_ptr() != NULL) ? _dt->get<MonitoringInterface>()->getName() : "(aucune)",
-					(_interface->get() != NULL) ? (*_interface)->getName() : "(aucune)"
-				);
-			}
-
-			if(_audioInterface)
-			{
-				_dt->set<AudioInterface>(*(const_cast<Interface*>(_audioInterface->get())));
-				DBLogModule::appendToLogIfChange(
-					log,
-					"Interface audio",
-					(_dt->get<AudioInterface>().get_ptr() != NULL) ? _dt->get<AudioInterface>()->getName() : "(aucune)",
-					(_interface->get() != NULL) ? (*_interface)->getName() : "(aucune)"
-				);
 			}
 
 			if(_rows_number)

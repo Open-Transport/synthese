@@ -30,7 +30,6 @@
 #include "CommercialLineTableSync.h"
 #include "Conversion.h"
 #include "DBModule.h"
-#include "DeparturesTableInterfacePage.h"
 #include "DeparturesTableModule.h"
 #include "DisplayMaintenanceLog.h"
 #include "DisplayMonitoringStatus.h"
@@ -41,8 +40,6 @@
 #include "DisplayTypeTableSync.h"
 #include "DisplayTypeTableSync.h"
 #include "ImportableTableSync.hpp"
-#include "Interface.h"
-#include "InterfacePageException.h"
 #include "JourneyPattern.hpp"
 #include "LineAlarmRecipient.hpp"
 #include "LinePhysicalStop.hpp"
@@ -75,7 +72,6 @@ namespace synthese
 	using namespace departure_boards;
 	using namespace geography;
 	using namespace graph;
-	using namespace interfaces;
 	using namespace messages;
 	using namespace pt;
 	using namespace pt_journey_planner;
@@ -661,8 +657,7 @@ namespace synthese
 			return get<MaintenanceIsOnline>() &&
 				get<DisplayTypePtr>() &&
 				get<DisplayTypePtr>().get_ptr() != NULL &&
-				get<DisplayTypePtr>()->get<MonitoringInterface>() &&
-				get<DisplayTypePtr>()->get<MonitoringInterface>().get_ptr() != NULL &&
+				get<DisplayTypePtr>()->get<MonitoringParserPage>() &&
 				get<DisplayTypePtr>()->get<TimeBetweenChecks>().minutes() > 0
 			;
 		}

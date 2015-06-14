@@ -57,8 +57,6 @@ namespace synthese
 			///	@param env Environment to populate
 			/// @param nameLike SQL LIKE mask to filter on display type name (do
 			///		not forget the % command) (default/% = deactivate the filter)
-			/// @param interfaceId id of display interface to use as filter
-			///		(default = deactivate the filter)
 			/// @param first First user to answer
 			///	@param number Number of users to answer (default = all)
 			///		The size of the result registry is less or equal to number, then all
@@ -80,11 +78,9 @@ namespace synthese
 			static SearchResult Search(
 				util::Env& env,
 				boost::optional<std::string> nameLike = boost::optional<std::string>(),
-				boost::optional<util::RegistryKeyType> interfaceId = boost::optional<util::RegistryKeyType>(),
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByName = true,
-				bool orderByInterfaceName = false,
 				bool orderByRows = false,
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL

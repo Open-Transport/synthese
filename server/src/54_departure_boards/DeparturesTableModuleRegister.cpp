@@ -11,16 +11,6 @@
 // Factories
 #include "DeparturesTableModule.h"
 
-#include "DeparturesTableInterfaceElement.h"
-#include "DeparturesTableLineContentInterfaceElement.h"
-#include "DeparturesTableDestinationContentInterfaceElement.h"
-
-#include "DepartureTableRowInterfacePage.h"
-#include "ParseDisplayReturnInterfacePage.h"
-#include "DeparturesTableInterfacePage.h"
-#include "DeparturesTableDestinationInterfacepage.h"
-#include "DeparturesTableTransferDestinationInterfacePage.h"
-
 #include "DisplaySearchAdmin.h"
 #include "DisplayTypesAdmin.h"
 #include "BroadcastPointsAdmin.h"
@@ -80,16 +70,6 @@ void synthese::departure_boards::moduleRegister()
 {
 
 	synthese::departure_boards::DeparturesTableModule::integrate();
-
-	synthese::departure_boards::DeparturesTableInterfaceElement::integrate();
-	synthese::departure_boards::DeparturesTableLineContentInterfaceElement::integrate();
-	synthese::departure_boards::DeparturesTableDestinationContentInterfaceElement::integrate();
-
-	synthese::departure_boards::DeparturesTableInterfacePage::integrate();
-	synthese::departure_boards::DepartureTableRowInterfacePage::integrate();
-	synthese::departure_boards::ParseDisplayReturnInterfacePage::integrate();
-	synthese::departure_boards::DeparturesTableTransferDestinationInterfacePage::integrate();
-	synthese::departure_boards::DeparturesTableDestinationInterfacepage::integrate();
 
 	synthese::departure_boards::DisplaySearchAdmin::integrate();
 	synthese::departure_boards::DisplayTypesAdmin::integrate();

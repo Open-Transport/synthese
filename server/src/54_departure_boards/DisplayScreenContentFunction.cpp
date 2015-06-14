@@ -32,9 +32,7 @@
 #include "DisplayScreenTableSync.h"
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
-#include "DeparturesTableInterfacePage.h"
 #include "StopAreaTableSync.hpp"
-#include "Interface.h"
 #include "Env.h"
 #include "LinePhysicalStop.hpp"
 #include "PTModule.h"
@@ -58,7 +56,6 @@
 #endif
 #include "RoutePlanningTableGenerator.h"
 #include "ServerModule.h"
-#include "InterfacePageException.h"
 #include "MimeTypes.hpp"
 #include "TransportNetwork.h"
 #ifdef WITH_SCOM
@@ -81,7 +78,6 @@ namespace synthese
 	using namespace vehicle;
 	using namespace pt;
 	using namespace pt_website;
-	using namespace interfaces;
 	using namespace db;
 	using namespace geography;
 	using namespace departure_boards;
@@ -639,20 +635,7 @@ namespace synthese
 					_splitContinuousServices = map.getDefault<bool>(PARAMETER_SPLIT_CONTINUOUS_SERVICES, false);
 					
 					screen->set<DisplayTypePtr>(*(_type.get()));
-					//If request contains an interface : build a screen, else prepare custom xml answer
-					optional<RegistryKeyType> idReg(map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID));
-					if(idReg)
-					{
-						try
-						{
-							_type->set<DisplayInterface>(*(const_cast<Interface*>(Env::GetOfficialEnv().getRegistry<Interface>().get(*idReg).get())));
-						}
-						catch (ObjectNotFoundException<Interface>&)
-						{
-							throw RequestException("No such screen type");
-						}
-					}
-					else if(_mainPage.get() && !_useSAEDirectConnection && !_timetableGroupedByArea)
+					if(_mainPage.get() && !_useSAEDirectConnection && !_timetableGroupedByArea)
 					{
 						_type->set<DisplayMainPage>(*(const_cast<Webpage*>(_mainPage.get())));
 						_type->set<DisplayRowPage>(*(const_cast<Webpage*>(_rowPage.get())));
@@ -1035,7 +1018,7 @@ namespace synthese
 			{
 				return ParametersMap();
 			}
-			if(_screen->get<DisplayTypePtr>()->get<DisplayInterface>() || _screen->get<DisplayTypePtr>()->get<DisplayMainPage>()
+			if(	_screen->get<DisplayTypePtr>()->get<DisplayMainPage>()
 			){
 				ptime date(_date ? *_date : second_clock::local_time());
 				if(!_screen->get<MaintenanceIsOnline>() ||
@@ -1044,92 +1027,62 @@ namespace synthese
 					return ParametersMap();
 				}
 
-				try
+				// Start time
+				ptime realStartDateTime(date);
+				realStartDateTime -= minutes(_screen->get<ClearingDelay>());
+
+				// End time
+				ptime endDateTime(realStartDateTime);
+				endDateTime += minutes(_screen->get<MaxDelay>());
+
+				if(_screen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING)
 				{
-					// Start time
-					ptime realStartDateTime(date);
-					realStartDateTime -= minutes(_screen->get<ClearingDelay>());
+					RoutePlanningTableGenerator generator(
+						*_screen->get<BroadCastPoint>(),
+						_screen->getDisplayedPlaces(),
+						realStartDateTime,
+						endDateTime,
+						_screen->get<RoutePlanningWithTransfer>()
+					);
 
-					// End time
-					ptime endDateTime(realStartDateTime);
-					endDateTime += minutes(_screen->get<MaxDelay>());
-
-					VariablesMap variables;
-
-					if(_screen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING)
+					RoutePlanningList displayedObject(generator.run());
+					if(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>())
 					{
-						RoutePlanningTableGenerator generator(
-							*_screen->get<BroadCastPoint>(),
-							_screen->getDisplayedPlaces(),
+						_displayRoutePlanningBoard(
+							stream,
+							request,
+							Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>().get_ptr()),
+							Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayRowPage>().get_ptr()),
+							Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayDestinationPage>().get_ptr()),
 							realStartDateTime,
-							endDateTime,
-							_screen->get<RoutePlanningWithTransfer>()
+							displayedObject,
+							*_screen
 						);
-
-						RoutePlanningList displayedObject(generator.run());
-						if(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>())
-						{
-							_displayRoutePlanningBoard(
-								stream,
-								request,
-								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>().get_ptr()),
-								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayRowPage>().get_ptr()),
-								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayDestinationPage>().get_ptr()),
-								realStartDateTime,
-								displayedObject,
-								*_screen
-							);
-						}
-					}
-					else if(_screen->getGenerationMethod() == DisplayScreen::DISPLAY_CHILDREN_ONLY)
-					{
-						// computes nothing, children will be called by the cms method
-					}
-					else
-					{
-						ArrivalDepartureList displayedObject(
-							_screen->generateStandardScreen(realStartDateTime, endDateTime, true, _scom)
-						);
-
-						if(_screen->get<DisplayTypePtr>()->get<DisplayInterface>() &&
-							_screen->get<DisplayTypePtr>()->get<DisplayInterface>()->getPage<DeparturesTableInterfacePage>()
-						){
-							_screen->get<DisplayTypePtr>()->get<DisplayInterface>()->getPage<DeparturesTableInterfacePage>()->display(
-								stream,
-								variables,
-								_screen->get<Title>(),
-								_screen->get<WiringCode>(),
-								_screen->get<ServiceNumberDisplay>(),
-								_screen->get<TrackNumberDisplay>(),
-								_screen->get<DisplayTeam>(),
-								_screen->get<DisplayTypePtr>()->get<MaxStopsNumber>(),
-								_screen->get<BlinkingDelay>(),
-								_screen->get<DisplayClock>(),
-								_screen->get<BroadCastPoint>().get_ptr(),
-								displayedObject,
-								&request
-							);
-						}
-						else
-						{
-							assert(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>());
-
-							_displayDepartureBoard(
-								stream,
-								request,
-								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>().get_ptr()),
-								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayRowPage>().get_ptr()),
-								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayDestinationPage>().get_ptr()),
-								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayTransferDestinationPage>().get_ptr()),
-								realStartDateTime,
-								displayedObject,
-								*_screen
-							);
-						}
 					}
 				}
-				catch (InterfacePageException&)
+				else if(_screen->getGenerationMethod() == DisplayScreen::DISPLAY_CHILDREN_ONLY)
 				{
+					// computes nothing, children will be called by the cms method
+				}
+				else
+				{
+					ArrivalDepartureList displayedObject(
+						_screen->generateStandardScreen(realStartDateTime, endDateTime, true, _scom)
+					);
+
+					assert(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>());
+
+					_displayDepartureBoard(
+						stream,
+						request,
+						Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>().get_ptr()),
+						Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayRowPage>().get_ptr()),
+						Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayDestinationPage>().get_ptr()),
+						Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayTransferDestinationPage>().get_ptr()),
+						realStartDateTime,
+						displayedObject,
+						*_screen
+					);
 				}
 
 				return util::ParametersMap();
@@ -2390,19 +2343,6 @@ namespace synthese
 
 		std::string DisplayScreenContentFunction::getOutputMimeType() const
 		{
-			if(_screen->get<DisplayTypePtr>()->get<DisplayInterface>())
-			{
-				return
-					(   _screen.get() &&
-						_screen->get<DisplayTypePtr>() &&
-						_screen->get<DisplayTypePtr>()->get<DisplayInterface>() &&
-						_screen->getGenerationMethod() != DisplayScreen::ROUTE_PLANNING &&
-						_screen->get<DisplayTypePtr>()->get<DisplayInterface>()->hasPage<DeparturesTableInterfacePage>()
-					) ?
-						_screen->get<DisplayTypePtr>()->get<DisplayInterface>()->getPage<DeparturesTableInterfacePage>()->getMimeType() :
-					"text/plain"
-				;
-			}
 			if(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>())
 			{
 				return _screen->get<DisplayTypePtr>()->get<DisplayMainPage>()->getMimeType();

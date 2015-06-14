@@ -24,7 +24,6 @@
 
 #include "AdminInterfaceElement.h"
 #include "HTMLForm.h"
-#include "Interface.h"
 #include "Profile.h"
 #include "StaticActionFunctionRequest.h"
 #include "User.h"
@@ -41,9 +40,6 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "SearchFormHTMLTable.h"
 #include "ActionResultHTMLTable.h"
-#include "DeparturesTableInterfacePage.h"
-#include "ParseDisplayReturnInterfacePage.h"
-#include "InterfaceTableSync.h"
 #include "Profile.h"
 
 #include <boost/foreach.hpp>
@@ -53,7 +49,6 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace interfaces;
 	using namespace admin;
 	using namespace server;
 	using namespace util;
@@ -76,7 +71,6 @@ namespace synthese
 	namespace departure_boards
 	{
 		const string DisplayTypesAdmin::PARAMETER_NAME("na");
-		const string DisplayTypesAdmin::PARAMETER_INTERFACE_ID("ii");
 
 
 
@@ -88,7 +82,6 @@ namespace synthese
 			{
 				_searchName = map.getOptional<string>(PARAMETER_NAME);
 			}
-			_searchInterfaceId = map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID);
 		}
 
 
@@ -97,7 +90,6 @@ namespace synthese
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			if(_searchName) m.insert(PARAMETER_NAME, *_searchName);
-			if(_searchInterfaceId) m.insert(PARAMETER_INTERFACE_ID, *_searchInterfaceId);
 			return m;
 		}
 
@@ -131,14 +123,6 @@ namespace synthese
 			SearchFormHTMLTable f(searchRequest.getHTMLForm());
 			stream << f.open();
 			stream << f.cell("Nom", f.getForm().getTextInput(PARAMETER_NAME, _searchName ? *_searchName : string()));
-			stream << f.cell(
-				"Interface d'affichage",
-				f.getForm().getSelectInput(
-					PARAMETER_INTERFACE_ID,
-					InterfaceTableSync::GetInterfaceLabels<DeparturesTableInterfacePage>(),
-					_searchInterfaceId
-				)
-			);
 			stream << f.close();
 
 			stream << "<h1>Résultat de la recherche</h1>";
@@ -147,21 +131,16 @@ namespace synthese
 				DisplayTypeTableSync::Search(
 					Env::GetOfficialEnv(),
 					_searchName ? optional<string>("%"+ *_searchName +"%") : _searchName,
-					_searchInterfaceId,
 					_requestParameters.first,
 					_requestParameters.maxSize,
 					_requestParameters.orderField == Name::FIELD.name,
-					_requestParameters.orderField == DisplayInterface::FIELD.name,
 					_requestParameters.orderField == RowsNumber::FIELD.name,
-					_requestParameters.raisingOrder,
-					UP_LINKS_LOAD_LEVEL
+					_requestParameters.raisingOrder
 			)	);
 
 			ResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(Name::FIELD.name, "Nom"));
-			v.push_back(make_pair(DisplayInterface::FIELD.name, "Interface d'affichage"));
 			v.push_back(make_pair(RowsNumber::FIELD.name, "Nombre de rangées"));
-			v.push_back(make_pair(DisplayInterface::FIELD.name, "Protocole supervision"));
 			v.push_back(make_pair(string(), "Actions"));
 			if (writeRight)
 			{
@@ -185,17 +164,7 @@ namespace synthese
 
 				stream << t.row();
 				stream << t.col() << dt->get<Name>();
-				stream << t.col() << (!(dt->get<DisplayInterface>()) ? "(aucune)" : dt->get<DisplayInterface>()->getName());
 				stream << t.col() << dt->get<RowsNumber>();
-
-				stream << t.col();
-				if(	dt->get<MonitoringInterface>() &&
-					dt->get<TimeBetweenChecks>().minutes() > 0
-				){
-					stream << dt->get<MonitoringInterface>()->getName();
-				} else {
-					stream << "(non supervisé)";
-				}
 
 				stream <<
 					t.col() <<
@@ -229,25 +198,9 @@ namespace synthese
 				;
 				stream <<
 					t.col() <<
-					t.getActionForm().getSelectInput(
-						CreateDisplayTypeAction::PARAMETER_INTERFACE_ID,
-						InterfaceTableSync::GetInterfaceLabels<DeparturesTableInterfacePage>(optional<string>()),
-						optional<RegistryKeyType>(0)
-					)
-				;
-				stream <<
-					t.col() <<
 					t.getActionForm().getSelectNumberInput(
 						CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER,
 						1, 99
-					)
-				;
-				stream <<
-					t.col() <<
-					t.getActionForm().getSelectInput(
-						CreateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID,
-						InterfaceTableSync::GetInterfaceLabels<ParseDisplayReturnInterfacePage>(optional<string>()),
-						optional<RegistryKeyType>(0)
 					)
 				;
 				stream << t.col(2) << t.getActionForm().getSubmitButton("Ajouter");
@@ -302,16 +255,7 @@ namespace synthese
 
 			DisplayTypeTableSync::SearchResult types(
 				DisplayTypeTableSync::Search(
-					Env::GetOfficialEnv(),
-					optional<string>(),
-					optional<RegistryKeyType>(),
-					0,
-					optional<size_t>(),
-					true,
-					false,
-					false,
-					true,
-					UP_LINKS_LOAD_LEVEL
+					Env::GetOfficialEnv()
 			)	);
 			AdminInterfaceElement::PageLinks links;
 			BOOST_FOREACH(const boost::shared_ptr<DisplayType>& displayType, types)

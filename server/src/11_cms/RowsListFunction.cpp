@@ -24,7 +24,6 @@
 
 #include "RowsListFunction.hpp"
 #include "HTMLModule.h"
-#include "Types.h"
 #include "RequestException.h"
 #include "MimeTypes.hpp"
 

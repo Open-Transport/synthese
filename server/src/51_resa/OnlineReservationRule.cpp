@@ -27,16 +27,9 @@
 #include "Registry.h"
 #include "ResaModule.h"
 #include "PTModule.h"
-#include "ReservationConfirmationEMailInterfacePage.h"
-#include "ReservationConfirmationEMailSubjectInterfacePage.h"
-#include "Interface.h"
-#include "CustomerPasswordEMailContentInterfacePage.h"
-#include "CustomerPasswordEMailSubjectInterfacePage.h"
 #include "User.h"
 #include "UserTableSync.h"
 #include "LoginToken.hpp"
-#include "ReservationCancellationEMailContentInterfacePage.h"
-#include "ReservationCancellationEMailSubjectInterfacePage.h"
 #include "ReservationContact.h"
 #include "Webpage.h"
 #include "Reservation.h"
@@ -51,7 +44,6 @@ namespace synthese
 	using namespace pt;
 	using namespace util;
 	using namespace server;
-	using namespace interfaces;
 	using namespace security;
 	using namespace pt;
 	using namespace cms;
@@ -105,8 +97,7 @@ namespace synthese
 		OnlineReservationRule::OnlineReservationRule(
 			RegistryKeyType key
 		):	Registrable(key),
-			_reservationRule(NULL),
-			_eMailInterface(NULL)
+			_reservationRule(NULL)
 		{
 		}
 
@@ -230,153 +221,110 @@ namespace synthese
 			const ReservationTransaction& resa
 		) const {
 
-			if((	_eMailInterface == NULL ||
-				_eMailInterface->getPage<ReservationConfirmationEMailInterfacePage>() == NULL ||
-				_eMailInterface->getPage<ReservationConfirmationEMailSubjectInterfacePage>() == NULL) &&
-				(!_cmsConfirmationEMail.get())
+			if(	!_cmsConfirmationEMail.get()
 			){
 				return false;
 			}
 
-			if (!_cmsConfirmationEMail.get())
+			// Use CMS to display EMail
+			try
 			{
-				// Use interface to display EMail (old school)
-				try
-				{
-					EMail email(ServerModule::GetEMailSender());
+				EMail email(ServerModule::GetEMailSender());
+
+				// MIME type
+				string mimeType = _cmsConfirmationEMail.get()->getMimeType();
+				if (mimeType == "text/html") {
 					email.setFormat(EMail::EMAIL_HTML);
-					email.setSender(_senderEMail);
-					email.setSenderName(_senderName);
-
-					stringstream subject;
-					VariablesMap v;
-					_eMailInterface->getPage<ReservationConfirmationEMailSubjectInterfacePage>()->display(
-						subject,
-						resa,
-						v
-					);
-					email.setSubject(subject.str());
-
-					email.addRecipient(resa.getCustomerEMail(), resa.getCustomerName());
-
-					stringstream content;
-					_eMailInterface->getPage<ReservationConfirmationEMailInterfacePage>()->display(
-						content,
-						resa,
-						v
-					);
-					email.setContent(content.str());
-
-					email.send();
-					return true;
 				}
-				catch(boost::system::system_error)
+				else
 				{
-					return false;
+					email.setFormat(EMail::EMAIL_TEXT);
 				}
-			}
-			else
-			{
-				// Use CMS to display EMail
-				try
-				{
-					EMail email(ServerModule::GetEMailSender());
+				email.setSender(_senderEMail);
+				email.setSenderName(_senderName);
 
-					// MIME type
-					string mimeType = _cmsConfirmationEMail.get()->getMimeType();
-					if (mimeType == "text/html") {
-						email.setFormat(EMail::EMAIL_HTML);
+				stringstream subject;
+				ParametersMap subjectMap;
+
+				subjectMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_SUBJECT);
+				subjectMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
+				subjectMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->getDepartureCityName());
+				subjectMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceNameNoCity());
+				subjectMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
+				subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
+
+				_cmsConfirmationEMail.get()->display(subject, subjectMap);
+
+				email.setSubject(subject.str());
+
+				email.addRecipient(resa.getCustomerEMail(), resa.getCustomerName());
+
+				stringstream content;
+				ParametersMap contentMap;
+
+				contentMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_CONTENT);
+				boost::shared_ptr<ParametersMap> roadResaMap(new ParametersMap);
+				BOOST_FOREACH(const Reservation* r, resa.getReservations())
+				{
+					boost::shared_ptr<ParametersMap> resaMap(new ParametersMap);
+					resaMap->insert(DATA_DEPARTURE_TIME, to_simple_string(r->getDepartureTime().time_of_day()));
+					resaMap->insert(DATA_DEPARTURE_CITY_NAME, r->getDepartureCityName());
+					resaMap->insert(DATA_DEPARTURE_PLACE_NAME, r->getDeparturePlaceNameNoCity());
+					resaMap->insert(DATA_ARRIVAL_TIME, to_simple_string(r->getArrivalTime().time_of_day()));
+					resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->getArrivalCityName());
+					resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->getArrivalPlaceNameNoCity());
+					resaMap->insert(DATA_LINE_CODE, r->getLineCode());
+					resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
+					roadResaMap->insert(DATA_ROAD_RESA, resaMap);
+				}
+
+				contentMap.insert(DATA_ROAD_RESAS, roadResaMap);
+				contentMap.insert(DATA_KEY_RESA, lexical_cast<string>(resa.getKey()));
+				contentMap.insert(DATA_CUSTOMER_ID, lexical_cast<string>(resa.getCustomerUserId()));
+				contentMap.insert(DATA_RESERVATION_DEAD_LINE_DATE, to_simple_string(resa.getReservationDeadLine().date()));
+				contentMap.insert(DATA_RESERVATION_DEAD_LINE_TIME, to_simple_string(resa.getReservationDeadLine().time_of_day()));
+				contentMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->getDepartureCityName());
+				contentMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceNameNoCity());
+				contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
+				contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
+				contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
+				contentMap.insert(DATA_CUSTOMER_PHONE, resa.getCustomerPhone());
+				contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
+
+				if (resa.getCustomer())
+				{
+					security::User* customer = resa.getCustomer();
+
+					contentMap.insert(DATA_USER_NAME, customer->getName());
+					contentMap.insert(DATA_USER_SURNAME, customer->getSurname());
+					contentMap.insert(DATA_USER_KEY, lexical_cast<string>(customer->getKey()));
+					contentMap.insert(DATA_USER_PHONE, customer->getPhone());
+					contentMap.insert(DATA_USER_EMAIL, customer->getEMail());
+					contentMap.insert(DATA_USER_LOGIN, customer->getLogin());
+
+					if(!customer->getPassword().empty())
+					{
+						contentMap.insert(DATA_USER_PASSWORD, customer->getPassword());
 					}
 					else
 					{
-						email.setFormat(EMail::EMAIL_TEXT);
-					}
-					email.setSender(_senderEMail);
-					email.setSenderName(_senderName);
-
-					stringstream subject;
-					ParametersMap subjectMap;
-
-					subjectMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_SUBJECT);
-					subjectMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
-					subjectMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->getDepartureCityName());
-					subjectMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceNameNoCity());
-					subjectMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
-					subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
-
-					_cmsConfirmationEMail.get()->display(subject, subjectMap);
-
-					email.setSubject(subject.str());
-
-					email.addRecipient(resa.getCustomerEMail(), resa.getCustomerName());
-
-					stringstream content;
-					ParametersMap contentMap;
-
-					contentMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_CONTENT);
-					boost::shared_ptr<ParametersMap> roadResaMap(new ParametersMap);
-					BOOST_FOREACH(const Reservation* r, resa.getReservations())
-					{
-						boost::shared_ptr<ParametersMap> resaMap(new ParametersMap);
-						resaMap->insert(DATA_DEPARTURE_TIME, to_simple_string(r->getDepartureTime().time_of_day()));
-						resaMap->insert(DATA_DEPARTURE_CITY_NAME, r->getDepartureCityName());
-						resaMap->insert(DATA_DEPARTURE_PLACE_NAME, r->getDeparturePlaceNameNoCity());
-						resaMap->insert(DATA_ARRIVAL_TIME, to_simple_string(r->getArrivalTime().time_of_day()));
-						resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->getArrivalCityName());
-						resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->getArrivalPlaceNameNoCity());
-						resaMap->insert(DATA_LINE_CODE, r->getLineCode());
-						resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
-						roadResaMap->insert(DATA_ROAD_RESA, resaMap);
+						contentMap.insert(DATA_USER_PASSWORD, TYPE_UNCHANGED_PASSWORD);
 					}
 
-					contentMap.insert(DATA_ROAD_RESAS, roadResaMap);
-					contentMap.insert(DATA_KEY_RESA, lexical_cast<string>(resa.getKey()));
-					contentMap.insert(DATA_CUSTOMER_ID, lexical_cast<string>(resa.getCustomerUserId()));
-					contentMap.insert(DATA_RESERVATION_DEAD_LINE_DATE, to_simple_string(resa.getReservationDeadLine().date()));
-					contentMap.insert(DATA_RESERVATION_DEAD_LINE_TIME, to_simple_string(resa.getReservationDeadLine().time_of_day()));
-					contentMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->getDepartureCityName());
-					contentMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceNameNoCity());
-					contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
-					contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
-					contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
-					contentMap.insert(DATA_CUSTOMER_PHONE, resa.getCustomerPhone());
-					contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
-
-					if (resa.getCustomer())
-					{
-						security::User* customer = resa.getCustomer();
-
-						contentMap.insert(DATA_USER_NAME, customer->getName());
-						contentMap.insert(DATA_USER_SURNAME, customer->getSurname());
-						contentMap.insert(DATA_USER_KEY, lexical_cast<string>(customer->getKey()));
-						contentMap.insert(DATA_USER_PHONE, customer->getPhone());
-						contentMap.insert(DATA_USER_EMAIL, customer->getEMail());
-						contentMap.insert(DATA_USER_LOGIN, customer->getLogin());
-
-						if(!customer->getPassword().empty())
-						{
-							contentMap.insert(DATA_USER_PASSWORD, customer->getPassword());
-						}
-						else
-						{
-							contentMap.insert(DATA_USER_PASSWORD, TYPE_UNCHANGED_PASSWORD);
-						}
-
-						LoginToken token(LoginToken(customer->getLogin(), customer->getPasswordHash(), resa.getKey()));
-						contentMap.insert(DATA_TOKEN_CANCELLATION, token.toString());
-					}
-
-					_cmsConfirmationEMail.get()->display(content, contentMap);
-
-					email.setContent(content.str());
-
-					email.send();
-					return true;
+					LoginToken token(LoginToken(customer->getLogin(), customer->getPasswordHash(), resa.getKey()));
+					contentMap.insert(DATA_TOKEN_CANCELLATION, token.toString());
 				}
-				catch(boost::system::system_error)
-				{
-					return false;
-				}
+
+				_cmsConfirmationEMail.get()->display(content, contentMap);
+
+				email.setContent(content.str());
+
+				email.send();
+				return true;
+			}
+			catch(boost::system::system_error)
+			{
+				return false;
 			}
 		}
 
@@ -386,7 +334,7 @@ namespace synthese
 			const std::vector<ReservationTransaction>& resas
 		) const {
 
-			if(( _eMailInterface == NULL || !_cmsMultiReservationsEMail.get())
+			if( !_cmsMultiReservationsEMail.get()
 			){
 				return false;
 			}
@@ -517,111 +465,70 @@ namespace synthese
 
 		bool OnlineReservationRule::sendCustomerEMail( const security::User& customer ) const
 		{
-			if((	_eMailInterface == NULL ||
-				_eMailInterface->getPage<ReservationConfirmationEMailInterfacePage>() == NULL ||
-				_eMailInterface->getPage<ReservationConfirmationEMailSubjectInterfacePage>() == NULL ||
-				customer.getEMail().empty()) &&
-				(!_cmsPasswordEMail.get() ||
-				customer.getEMail().empty())
+			if(	!_cmsPasswordEMail.get() ||
+				customer.getEMail().empty()
 			){
 				return false;
 			}
 
-			if (!_cmsPasswordEMail.get())
+			// Use CMS to display EMail
+			try
 			{
-				try
-				{
-					EMail email(ServerModule::GetEMailSender());
+				EMail email(ServerModule::GetEMailSender());
+				string mimeType = _cmsPasswordEMail.get()->getMimeType();
+				if (mimeType == "text/html") {
 					email.setFormat(EMail::EMAIL_HTML);
-					email.setSender(_senderEMail);
-					email.setSenderName(_senderName);
-
-					VariablesMap v;
-					stringstream subject;
-					_eMailInterface->getPage<CustomerPasswordEMailSubjectInterfacePage>()->display(
-						subject,
-						customer,
-						v
-					);
-					email.setSubject(subject.str());
-					email.addRecipient(customer.getEMail(), customer.getFullName());
-
-					stringstream content;
-					_eMailInterface->getPage<CustomerPasswordEMailContentInterfacePage>()->display(
-						content,
-						customer,
-						v
-					);
-					email.setContent(content.str());
-
-					email.send();
-					return true;
 				}
-				catch(boost::system::system_error)
+				else
 				{
-					return false;
+					email.setFormat(EMail::EMAIL_TEXT);
 				}
+				email.setSender(_senderEMail);
+				email.setSenderName(_senderName);
+
+				stringstream subject;
+				ParametersMap subjectMap;
+
+				subjectMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_SUBJECT);
+				subjectMap.insert(DATA_USER_LOGIN, customer.getLogin());
+
+				_cmsPasswordEMail.get()->display(subject, subjectMap);
+
+				email.setSubject(subject.str());
+				email.addRecipient(customer.getEMail(), customer.getFullName());
+
+				stringstream content;
+				ParametersMap contentMap;
+
+				contentMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_CONTENT);
+				contentMap.insert(DATA_USER_SURNAME, customer.getSurname());
+				contentMap.insert(DATA_USER_NAME, customer.getName());
+				contentMap.insert(DATA_USER_KEY, lexical_cast<string>(customer.getKey()));
+				contentMap.insert(DATA_USER_PHONE, customer.getPhone());
+				contentMap.insert(DATA_USER_EMAIL, customer.getEMail());
+				contentMap.insert(DATA_USER_LOGIN, customer.getLogin());
+				if(!customer.getPassword().empty())
+				{
+					contentMap.insert(DATA_USER_PASSWORD, customer.getPassword());
+				}
+				else
+				{
+					contentMap.insert(DATA_USER_PASSWORD, TYPE_UNCHANGED_PASSWORD);
+				}
+
+				_cmsPasswordEMail.get()->display(content, contentMap);
+
+				email.setContent(content.str());
+
+				email.send();
+				return true;
 			}
-			else
+			catch(boost::system::system_error)
 			{
-				// Use CMS to display EMail
-				try
-				{
-					EMail email(ServerModule::GetEMailSender());
-					string mimeType = _cmsPasswordEMail.get()->getMimeType();
-					if (mimeType == "text/html") {
-						email.setFormat(EMail::EMAIL_HTML);
-					}
-					else
-					{
-						email.setFormat(EMail::EMAIL_TEXT);
-					}
-					email.setSender(_senderEMail);
-					email.setSenderName(_senderName);
-
-					stringstream subject;
-					ParametersMap subjectMap;
-
-					subjectMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_SUBJECT);
-					subjectMap.insert(DATA_USER_LOGIN, customer.getLogin());
-
-					_cmsPasswordEMail.get()->display(subject, subjectMap);
-
-					email.setSubject(subject.str());
-					email.addRecipient(customer.getEMail(), customer.getFullName());
-
-					stringstream content;
-					ParametersMap contentMap;
-
-					contentMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_CONTENT);
-					contentMap.insert(DATA_USER_SURNAME, customer.getSurname());
-					contentMap.insert(DATA_USER_NAME, customer.getName());
-					contentMap.insert(DATA_USER_KEY, lexical_cast<string>(customer.getKey()));
-					contentMap.insert(DATA_USER_PHONE, customer.getPhone());
-					contentMap.insert(DATA_USER_EMAIL, customer.getEMail());
-					contentMap.insert(DATA_USER_LOGIN, customer.getLogin());
-					if(!customer.getPassword().empty())
-					{
-						contentMap.insert(DATA_USER_PASSWORD, customer.getPassword());
-					}
-					else
-					{
-						contentMap.insert(DATA_USER_PASSWORD, TYPE_UNCHANGED_PASSWORD);
-					}
-
-					_cmsPasswordEMail.get()->display(content, contentMap);
-
-					email.setContent(content.str());
-
-					email.send();
-					return true;
-				}
-				catch(boost::system::system_error)
-				{
-					return false;
-				}
+				return false;
 			}
 		}
+
 
 
 		void OnlineReservationRule::setSenderEMail( const std::string& value )
@@ -652,11 +559,6 @@ namespace synthese
 
 
 
-		void OnlineReservationRule::setEMailInterface( interfaces::Interface* value )
-		{
-			_eMailInterface = value;
-		}
-
 		void OnlineReservationRule::setConfirmationEMailCMS( boost::shared_ptr<const cms::Webpage> value )
 		{
 			_cmsConfirmationEMail = value;
@@ -679,157 +581,108 @@ namespace synthese
 
 
 
-		interfaces::Interface* OnlineReservationRule::getEMailInterface() const
-		{
-			return _eMailInterface;
-		}
-
-
-
 		bool OnlineReservationRule::sendCustomerCancellationEMail(
 			const ReservationTransaction& resa,
 			bool isBecauseOfAbsence
 		) const	{
-			if((	_eMailInterface == NULL ||
-				_eMailInterface->getPage<ReservationCancellationEMailSubjectInterfacePage>() == NULL ||
-				_eMailInterface->getPage<ReservationCancellationEMailContentInterfacePage>() == NULL) &&
-				(!_cmsCancellationEMail.get())
+			if(	!_cmsCancellationEMail.get()
 			){
 				return false;
 			}
 
-			if (!_cmsCancellationEMail.get())
+			// Use CMS to display EMail
+			try
 			{
-				// Use of interface page (old school)
-				try
-				{
-					EMail email(ServerModule::GetEMailSender());
+				EMail email(ServerModule::GetEMailSender());
+				string mimeType = _cmsCancellationEMail.get()->getMimeType();
+				if (mimeType == "text/html") {
 					email.setFormat(EMail::EMAIL_HTML);
-					email.setSender(_senderEMail);
-					email.setSenderName(_senderName);
-
-					stringstream subject;
-					VariablesMap v;
-					_eMailInterface->getPage<ReservationCancellationEMailSubjectInterfacePage>()->display(
-						subject,
-						resa,
-						v
-						);
-					email.setSubject(subject.str());
-					email.addRecipient(resa.getCustomerEMail(), resa.getCustomerName());
-
-					stringstream content;
-					_eMailInterface->getPage<ReservationCancellationEMailContentInterfacePage>()->display(
-						content,
-						resa,
-						v
-						);
-					email.setContent(content.str());
-
-					email.send();
-					return true;
 				}
-				catch(boost::system::system_error)
+				else
 				{
-					return false;
+					email.setFormat(EMail::EMAIL_TEXT);
 				}
-			}
-			else
-			{
-				// Use CMS to display EMail
-				try
+				email.setSender(_senderEMail);
+				email.setSenderName(_senderName);
+
+				stringstream subject;
+				ParametersMap subjectMap;
+
+				subjectMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_SUBJECT);
+				subjectMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
+				subjectMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->getDepartureCityName());
+				subjectMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceNameNoCity());
+				subjectMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
+				subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
+				subjectMap.insert(DATA_CANCELLATION_BECAUSE_OF_ABSENCE, isBecauseOfAbsence);
+
+				_cmsCancellationEMail.get()->display(subject, subjectMap);
+					
+				email.setSubject(subject.str());
+				email.addRecipient(resa.getCustomerEMail(), resa.getCustomerName());
+
+				stringstream content;
+				ParametersMap contentMap;
+
+				contentMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_CONTENT);
+				boost::shared_ptr<ParametersMap> roadResaMap(new ParametersMap);
+				BOOST_FOREACH(const Reservation* r, resa.getReservations())
 				{
-					EMail email(ServerModule::GetEMailSender());
-					string mimeType = _cmsCancellationEMail.get()->getMimeType();
-					if (mimeType == "text/html") {
-						email.setFormat(EMail::EMAIL_HTML);
+					boost::shared_ptr<ParametersMap> resaMap(new ParametersMap);
+					resaMap->insert(DATA_DEPARTURE_TIME, to_simple_string(r->getDepartureTime().time_of_day()));
+					resaMap->insert(DATA_DEPARTURE_CITY_NAME, r->getDepartureCityName());
+					resaMap->insert(DATA_DEPARTURE_PLACE_NAME, r->getDeparturePlaceNameNoCity());
+					resaMap->insert(DATA_ARRIVAL_TIME, to_simple_string(r->getArrivalTime().time_of_day()));
+					resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->getArrivalCityName());
+					resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->getArrivalPlaceNameNoCity());
+					resaMap->insert(DATA_LINE_CODE, r->getLineCode());
+					resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
+					roadResaMap->insert(DATA_ROAD_RESA, resaMap);
+				}
+				contentMap.insert(DATA_ROAD_RESAS, roadResaMap);
+				contentMap.insert(DATA_KEY_RESA, lexical_cast<string>(resa.getKey()));
+				contentMap.insert(DATA_CUSTOMER_ID, lexical_cast<string>(resa.getCustomerUserId()));
+				contentMap.insert(DATA_RESERVATION_DEAD_LINE_DATE, to_simple_string(resa.getReservationDeadLine().date()));
+				contentMap.insert(DATA_RESERVATION_DEAD_LINE_TIME, to_simple_string(resa.getReservationDeadLine().time_of_day()));
+				contentMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->getDepartureCityName());
+				contentMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceNameNoCity());
+				contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
+				contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
+				contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
+				contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
+
+				if (resa.getCustomer())
+				{
+					security::User* customer = resa.getCustomer();
+
+					contentMap.insert(DATA_USER_NAME, customer->getName());
+					contentMap.insert(DATA_USER_SURNAME, customer->getSurname());
+					contentMap.insert(DATA_USER_KEY, lexical_cast<string>(customer->getKey()));
+					contentMap.insert(DATA_USER_PHONE, customer->getPhone());
+					contentMap.insert(DATA_USER_EMAIL, customer->getEMail());
+					contentMap.insert(DATA_USER_LOGIN, customer->getLogin());
+
+					if(!customer->getPassword().empty())
+					{
+						contentMap.insert(DATA_USER_PASSWORD, customer->getPassword());
 					}
 					else
 					{
-						email.setFormat(EMail::EMAIL_TEXT);
+						contentMap.insert(DATA_USER_PASSWORD, TYPE_UNCHANGED_PASSWORD);
 					}
-					email.setSender(_senderEMail);
-					email.setSenderName(_senderName);
-
-					stringstream subject;
-					ParametersMap subjectMap;
-
-					subjectMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_SUBJECT);
-					subjectMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
-					subjectMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->getDepartureCityName());
-					subjectMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceNameNoCity());
-					subjectMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
-					subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
-					subjectMap.insert(DATA_CANCELLATION_BECAUSE_OF_ABSENCE, isBecauseOfAbsence);
-
-					_cmsCancellationEMail.get()->display(subject, subjectMap);
-					
-					email.setSubject(subject.str());
-					email.addRecipient(resa.getCustomerEMail(), resa.getCustomerName());
-
-					stringstream content;
-					ParametersMap contentMap;
-
-					contentMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_CONTENT);
-					boost::shared_ptr<ParametersMap> roadResaMap(new ParametersMap);
-					BOOST_FOREACH(const Reservation* r, resa.getReservations())
-					{
-						boost::shared_ptr<ParametersMap> resaMap(new ParametersMap);
-						resaMap->insert(DATA_DEPARTURE_TIME, to_simple_string(r->getDepartureTime().time_of_day()));
-						resaMap->insert(DATA_DEPARTURE_CITY_NAME, r->getDepartureCityName());
-						resaMap->insert(DATA_DEPARTURE_PLACE_NAME, r->getDeparturePlaceNameNoCity());
-						resaMap->insert(DATA_ARRIVAL_TIME, to_simple_string(r->getArrivalTime().time_of_day()));
-						resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->getArrivalCityName());
-						resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->getArrivalPlaceNameNoCity());
-						resaMap->insert(DATA_LINE_CODE, r->getLineCode());
-						resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
-						roadResaMap->insert(DATA_ROAD_RESA, resaMap);
-					}
-					contentMap.insert(DATA_ROAD_RESAS, roadResaMap);
-					contentMap.insert(DATA_KEY_RESA, lexical_cast<string>(resa.getKey()));
-					contentMap.insert(DATA_CUSTOMER_ID, lexical_cast<string>(resa.getCustomerUserId()));
-					contentMap.insert(DATA_RESERVATION_DEAD_LINE_DATE, to_simple_string(resa.getReservationDeadLine().date()));
-					contentMap.insert(DATA_RESERVATION_DEAD_LINE_TIME, to_simple_string(resa.getReservationDeadLine().time_of_day()));
-					contentMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->getDepartureCityName());
-					contentMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceNameNoCity());
-					contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
-					contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
-					contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
-					contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
-
-					if (resa.getCustomer())
-					{
-						security::User* customer = resa.getCustomer();
-
-						contentMap.insert(DATA_USER_NAME, customer->getName());
-						contentMap.insert(DATA_USER_SURNAME, customer->getSurname());
-						contentMap.insert(DATA_USER_KEY, lexical_cast<string>(customer->getKey()));
-						contentMap.insert(DATA_USER_PHONE, customer->getPhone());
-						contentMap.insert(DATA_USER_EMAIL, customer->getEMail());
-						contentMap.insert(DATA_USER_LOGIN, customer->getLogin());
-
-						if(!customer->getPassword().empty())
-						{
-							contentMap.insert(DATA_USER_PASSWORD, customer->getPassword());
-						}
-						else
-						{
-							contentMap.insert(DATA_USER_PASSWORD, TYPE_UNCHANGED_PASSWORD);
-						}
-					}
-
-					contentMap.insert(DATA_CANCELLATION_BECAUSE_OF_ABSENCE, isBecauseOfAbsence);
-
-					_cmsCancellationEMail.get()->display(content, contentMap);
-					email.setContent(content.str());
-
-					email.send();
-					return true;
 				}
-				catch(boost::system::system_error)
-				{
-					return false;
-				}
+
+				contentMap.insert(DATA_CANCELLATION_BECAUSE_OF_ABSENCE, isBecauseOfAbsence);
+
+				_cmsCancellationEMail.get()->display(content, contentMap);
+				email.setContent(content.str());
+
+				email.send();
+				return true;
+			}
+			catch(boost::system::system_error)
+			{
+				return false;
 			}
 		}
 	}

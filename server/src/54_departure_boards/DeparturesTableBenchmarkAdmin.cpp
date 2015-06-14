@@ -21,7 +21,6 @@
 */
 
 #include "HTMLForm.h"
-#include "Interface.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminInterfaceElement.h"
@@ -36,7 +35,6 @@
 #include "DisplayScreenCPUTableSync.h"
 #include "ArrivalDepartureTableRight.h"
 #include "ActionResultHTMLTable.h"
-#include "InterfaceTableSync.h"
 #include "UpdateDisplayPreselectionParametersAction.h"
 #include "CPUGetWiredScreensFunction.h"
 #include "Profile.h"

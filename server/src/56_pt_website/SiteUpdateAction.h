@@ -33,11 +33,6 @@
 
 namespace synthese
 {
-	namespace interfaces
-	{
-		class Interface;
-	}
-
 	namespace cms
 	{
 	    class Webpage;
