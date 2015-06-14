@@ -52,7 +52,6 @@
 #include "DisplayScreenCPUAdmin.h"
 #include "DisplayScreenCPUCreateAction.h"
 #include "DisplayScreenCPUTableSync.h"
-#include "Interface.h"
 #include "Profile.h"
 
 #include <boost/foreach.hpp>
@@ -259,12 +258,6 @@ namespace synthese
 					}
 					updateRequest.getPage()->setScreen(screen);
 					viewRequest.getFunction()->setScreen(screen);
-					if(	screen->get<DisplayTypePtr>() &&
-						screen->get<DisplayTypePtr>()->get<DisplayInterface>() &&
-						!screen->get<DisplayTypePtr>()->get<DisplayInterface>()->getDefaultClientURL().empty()
-					){
-						viewRequest.setClientURL(screen->get<DisplayTypePtr>()->get<DisplayInterface>()->getDefaultClientURL());
-					}
 
 					vector<boost::shared_ptr<Alarm> > alarms(
 						DisplayScreenTableSync::GetCurrentDisplayedMessage(_getEnv(), screen->getKey(), 1)

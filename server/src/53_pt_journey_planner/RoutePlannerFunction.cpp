@@ -26,6 +26,7 @@
 #include "AlgorithmLogger.hpp"
 #include "Edge.h"
 #include "HourPeriod.h"
+#include "LineMarkerInterfacePage.h"
 #include "ObjectNotFoundException.h"
 #include "ReservationRuleInterfacePage.h"
 #include "SentScenario.h"

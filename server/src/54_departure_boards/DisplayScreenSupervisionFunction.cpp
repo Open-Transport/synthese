@@ -22,14 +22,12 @@
 
 #include "RequestException.h"
 #include "DisplayScreenSupervisionFunction.h"
-#include "ParseDisplayReturnInterfacePage.h"
 #include "DisplayScreen.h"
 #include "DisplayType.h"
 #include "DisplayScreenTableSync.h"
 #include "DisplayMaintenanceLog.h"
 #include "DisplayMonitoringStatus.h"
 #include "DisplayMonitoringStatusTableSync.h"
-#include "Interface.h"
 #include "Webpage.h"
 
 #include <assert.h>
@@ -43,7 +41,6 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace dblog;
-	using namespace interfaces;
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,departure_boards::DisplayScreenSupervisionFunction>::FACTORY_KEY("tds");
@@ -89,13 +86,9 @@ namespace synthese
 				throw RequestException("Unknown error");
 			}
 
-			if (_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>().get_ptr() == NULL)
+			if (!_displayScreen->get<DisplayTypePtr>()->get<MonitoringParserPage>())
 			{
-				throw RequestException("This screen cannot be monitored because its type do not have monitoring interface");
-			}
-			if (_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>()->getPage<ParseDisplayReturnInterfacePage>() == NULL)
-			{
-				throw RequestException("This screen cannot be monitored because its monitoring interface does not contain the parsing rules");
+				throw RequestException("This screen cannot be monitored because its type do not have monitoring parser page");
 			}
 		}
 
@@ -105,9 +98,8 @@ namespace synthese
 		{
 			// Assertions
 			assert(_displayScreen.get() != NULL);
-			assert(_displayScreen->get<DisplayTypePtr>().get_ptr() != NULL);
-			assert(_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>().get_ptr() != NULL);
-			assert(_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>()->getPage<ParseDisplayReturnInterfacePage>() != NULL);
+			assert(_displayScreen->get<DisplayTypePtr>());
+			assert(_displayScreen->get<DisplayTypePtr>()->get<MonitoringParserPage>());
 
 
 			// Last monitoring status
@@ -117,9 +109,10 @@ namespace synthese
 
 			// Parsing
 			stringstream s;
-			const ParseDisplayReturnInterfacePage* page(_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>()->getPage<ParseDisplayReturnInterfacePage>());
-			VariablesMap v;
-			page->display(s, _text, v, &request);
+			Webpage& page(*_displayScreen->get<DisplayTypePtr>()->get<MonitoringParserPage>());
+			ParametersMap pm;
+			pm.insert(PARAMETER_STATUS, _text);
+			page.display(s, pm);
 
 			// Standard status object creation
 			DisplayMonitoringStatus status(s.str(), _displayScreen.get());

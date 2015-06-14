@@ -41,8 +41,8 @@ namespace synthese
 				- SYNTHESE Admin - Utilisateurs - [Prénom] [Nom]
 
 			<i>Barre de navigation</i> :
-				- Lien vers synthese::interfaces::HomeAdmin
-				- Lien vers synthese::interfaces::UsersAdmin
+				- Lien vers synthese::admin::HomeAdmin
+				- Lien vers synthese::security::UsersAdmin
 				- Prénom et Nom de l'utilisateur
 
 			<i>Zone de contenus</i> : Il s'agit d'un <b>Formulaire d'édition</b>.

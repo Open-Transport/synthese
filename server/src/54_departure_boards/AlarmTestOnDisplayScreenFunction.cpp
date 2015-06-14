@@ -38,7 +38,6 @@
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
 #include "DeparturesTableTypes.h"
-#include "Interface.h"
 #include "StopArea.hpp"
 #include "ServicePointer.h"
 #include "JourneyPattern.hpp"
@@ -61,8 +60,6 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace messages;
-	using namespace pt;
-	using namespace interfaces;
 	using namespace security;
 	using namespace graph;
 	using namespace geography;

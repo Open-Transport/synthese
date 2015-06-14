@@ -33,11 +33,6 @@
 
 namespace synthese
 {
-	namespace interfaces
-	{
-		class Interface;
-	}
-
 	namespace pt
 	{
 		class ReservationContact;
@@ -129,7 +124,6 @@ namespace synthese
 			//@{
 				std::string _senderEMail;
 				std::string _senderName;
-				interfaces::Interface*	_eMailInterface;
 				boost::shared_ptr<const cms::Webpage> _cmsConfirmationEMail;
 				boost::shared_ptr<const cms::Webpage> _cmsMultiReservationsEMail;
 				boost::shared_ptr<const cms::Webpage> _cmsCancellationEMail;
@@ -169,7 +163,11 @@ namespace synthese
 				const CapacityThresholds&		getThresholds()				const;
 				const std::string&				getSenderEMail()			const;
 				const std::string&				getSenderName()				const;
-				interfaces::Interface*			getEMailInterface()			const;
+				boost::shared_ptr<const cms::Webpage> getConfirmationEMailCMS() const { return _cmsConfirmationEMail; }
+				boost::shared_ptr<const cms::Webpage> getMultiReservationsEMailCMS() const{ return _cmsMultiReservationsEMail; }
+				boost::shared_ptr<const cms::Webpage> getCancellationEMailCMS() const { return _cmsCancellationEMail; }
+				boost::shared_ptr<const cms::Webpage> getPasswordEMailCMS() const{ return _cmsPasswordEMail; }
+
 			//@}
 
 			//! \name Setters
@@ -186,7 +184,6 @@ namespace synthese
 				void	setThresholds(const CapacityThresholds& thresholds);
 				void	setSenderEMail(const std::string& value);
 				void	setSenderName(const std::string& value);
-				void	setEMailInterface(interfaces::Interface* value);
 				void	setConfirmationEMailCMS(boost::shared_ptr<const cms::Webpage> value);
 				void	setMultiReservationsEMailCMS(boost::shared_ptr<const cms::Webpage> value);
 				void	setCancellationEMailCMS(boost::shared_ptr<const cms::Webpage> value);

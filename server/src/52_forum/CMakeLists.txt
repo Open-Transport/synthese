@@ -40,7 +40,6 @@ target_link_libraries(52_forum
   01_util
   10_db
   11_cms
-  11_interfaces
   12_security
 )
 

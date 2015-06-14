@@ -46,18 +46,12 @@ UserAdmin.cpp
 UserAdmin.h
 UserException.cpp
 UserException.h
-UserIdInterfaceElement.cpp
-UserIdInterfaceElement.h
-UserNameInterfaceElement.cpp
-UserNameInterfaceElement.h
 UserPasswordUpdateAction.cpp
 UserPasswordUpdateAction.h
 UserPasswordRecoveryAction.cpp
 UserPasswordRecoveryAction.hpp
 UserPasswordChangeAction.cpp
 UserPasswordChangeAction.hpp
-UserPhoneInterfaceElement.cpp
-UserPhoneInterfaceElement.h
 UserPrefPanel.h
 UserPrefPanelTemplate.h
 UsersAdmin.cpp
@@ -78,7 +72,6 @@ target_link_libraries(12_security
   01_util
   05_html
   10_db
-  11_interfaces
   16_impex
   # Forward dependencies:
   #13_dblog

@@ -29,7 +29,6 @@
 #include "StopArea.hpp"
 #include "LineStop.h"
 #include "ScheduledService.h"
-#include "Interface.h"
 #include "JourneyPattern.hpp"
 #include "Webpage.h"
 #include "ScheduleRealTimeUpdateAction.h"
@@ -50,7 +49,6 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace pt;
-	using namespace interfaces;
 	using namespace cms;
 	using namespace graph;
 

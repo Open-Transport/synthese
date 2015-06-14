@@ -27,7 +27,6 @@
 #include "ReservableService.hpp"
 #include "SchedulesBasedService.h"
 
-#include "Types.h"
 #include "Registry.h"
 
 #include <string>

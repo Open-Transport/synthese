@@ -60,7 +60,6 @@
 #include "HTMLForm.h"
 #include "HTMLTable.h"
 #include "HTMLList.h"
-#include "Interface.h"
 #include "JourneyPattern.hpp"
 #include "LinePhysicalStop.hpp"
 #include "LineStopTableSync.h"
@@ -1003,13 +1002,7 @@ namespace synthese
 				// Requests
 				StaticFunctionRequest<DisplayScreenContentFunction> viewRequest(_request, true);
 				viewRequest.getFunction()->setScreen(_displayScreen);
-				if(	_displayScreen->get<DisplayTypePtr>() &&
-					_displayScreen->get<DisplayTypePtr>()->get<DisplayInterface>() &&
-					!_displayScreen->get<DisplayTypePtr>()->get<DisplayInterface>()->getDefaultClientURL().empty()
-				){
-					viewRequest.setClientURL(_displayScreen->get<DisplayTypePtr>()->get<DisplayInterface>()->getDefaultClientURL());
-				}
-
+				
 				// Output
 				stream << "<h1>Contenus actifs</h1>";
 

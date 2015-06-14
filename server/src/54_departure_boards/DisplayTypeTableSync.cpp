@@ -31,7 +31,6 @@
 #include "DBResult.hpp"
 #include "DBException.hpp"
 #include "DisplayScreenTableSync.h"
-#include "InterfaceTableSync.h"
 #include "MessageTypeTableSync.hpp"
 #include "Profile.h"
 #include "ReplaceQuery.h"
@@ -49,7 +48,6 @@ namespace synthese
 {
 	using namespace db;
 	using namespace departure_boards;
-	using namespace interfaces;
 	using namespace messages;
 	using namespace util;
 	using namespace cms;
@@ -143,11 +141,9 @@ namespace synthese
 		DisplayTypeTableSync::SearchResult DisplayTypeTableSync::Search(
 			Env& env,
 			optional<string> likeName,
-			boost::optional<util::RegistryKeyType> interfaceId,
 			int first, /*= 0*/
 			boost::optional<std::size_t> number, /*= 0*/
 			bool orderByName,
-			bool orderByInterfaceName,
 			bool orderByRows,
 			bool raisingOrder,
 			LinkLevel linkLevel
@@ -156,31 +152,16 @@ namespace synthese
 			query
 				<< " SELECT t.*"
 				<< " FROM " << TABLE.NAME << " AS t";
-			if (orderByInterfaceName)
-			{
-				query <<
-					" LEFT JOIN " << InterfaceTableSync::TABLE.NAME << " AS i ON i." << TABLE_COL_ID  <<
-					"=t." << DisplayInterface::FIELD.name
-				;
-			}
 
 			query << " WHERE 1";
 			if (likeName)
 			{
 				query << " AND t." << Name::FIELD.name << " LIKE " << Conversion::ToDBString(*likeName);
 			}
-			if(interfaceId)
-			{
-				query << " AND t." << DisplayInterface::FIELD.name << "=" << *interfaceId;
-			}
 
 			if (orderByName)
 			{
 				query << " ORDER BY t." << Name::FIELD.name << (raisingOrder ? " ASC" : " DESC");
-			}
-			else if(orderByInterfaceName)
-			{
-				query << " ORDER BY i." << InterfaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			}
 			else if(orderByRows)
 			{

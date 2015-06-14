@@ -49,7 +49,7 @@ namespace synthese
 				- SYNTHESE Admin - Emplacements
 
 			<i>Barre de navigation</i> :
-				- Lien vers synthese::interfaces::AdminHome
+				- Lien vers synthese::admin::HomeAdmin
 				- Texte <tt>Emplacements</tt>
 
 			<i>Zone de contenu</i> :
@@ -62,7 +62,7 @@ namespace synthese
 				-# <b>Tableau des résultats</b> : les emplacements trouvés sont décrits dans les colonnes suivantes :
 					-# <tt>Commune</tt> : Nom de la commune auquel appartient l'emplacement
 					-# <tt>Nom</tt> : Nom de l'emplacement
-					-# Bouton <tt>Editer</tt> : Conduit vers la page synthese::interfaces::PlaceAdmin sur l'emplacement sélectionné
+					-# Bouton <tt>Editer</tt> : Conduit vers la page synthese::pt::PTPlaceAdmin sur l'emplacement sélectionné
 				-# Un maximum de 50 emplacements est affiché à l'écran. En cas de dépassement de ce nombre d'après les critères de recherche, un lien <tt>Emplacements suivants</tt> apparait et permet de visualiser les entrées suivantes. A partir de la seconde page, un lien <tt>Emplacements précédents</tt> apparait également.
 
 			<i>Sécurité</i>

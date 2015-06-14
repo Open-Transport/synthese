@@ -10,8 +10,6 @@ macro(set_source_groups)
   source_group("01 Module" REGULAR_EXPRESSION ".*Module\\..*|.*ModuleRegister\\..*|.*\\gen\\.cpp|.*Types\\.(cpp|h|hpp)|.*Constants\\.(cpp|h|hpp).*")
   source_group("01 Exceptions" REGULAR_EXPRESSION ".*Exception\\..*")
   source_group("10 Table Syncs" REGULAR_EXPRESSION ".*TableSync\\..*")
-  source_group("11 Interface Elements" REGULAR_EXPRESSION ".*InterfaceElement\\..*")
-  source_group("11 Interface Pages" REGULAR_EXPRESSION ".*InterfacePage\\..*")
   source_group("12 Rights" REGULAR_EXPRESSION ".*Right\\..*|RightTemplate\\.h")
   source_group("13 DB Logs" REGULAR_EXPRESSION ".*Log\\..*")
   source_group("14 Admin" REGULAR_EXPRESSION ".*Admin\\..*")
@@ -35,7 +33,6 @@ set(MODULES
 10_db/101_sqlite
 10_db/103_svn
 11_cms
-11_interfaces
 12_security
 13_dblog
 14_admin

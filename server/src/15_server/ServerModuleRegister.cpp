@@ -11,14 +11,6 @@
 #include "ThreadKillAction.h"
 #include "LoginToken.hpp"
 
-#include "HtmlFormInterfaceElement.h"
-#include "ValidSessionInterfaceElement.h"
-#include "HtmlFormCalendarFieldInterfaceElement.h"
-#include "HtmlFormFieldInterfaceElement.h"
-#include "ServerModuleVersionInterfaceElement.h"
-
-#include "LoginInterfacePage.h"
-
 #include "ServerAdminRight.h"
 
 #include "MemoryStatisticsAdmin.hpp"
@@ -42,8 +34,6 @@ void synthese::server::moduleRegister()
 
 	synthese::server::ServerModule::integrate();
 
-	synthese::server::LoginInterfacePage::integrate();
-
 	synthese::server::GlobalVariableUpdateAction::integrate();
 	synthese::server::GlobalVariableUpdateService::integrate();
 	synthese::server::HardwareInformationService::integrate();
@@ -53,12 +43,6 @@ void synthese::server::moduleRegister()
 	synthese::server::SetSessionVariableAction::integrate();
 	synthese::server::SuicidalAction::integrate();
 	synthese::server::ThreadKillAction::integrate();
-
-	synthese::server::HtmlFormInterfaceElement::integrate();
-	synthese::server::ValidSessionInterfaceElement::integrate();
-	synthese::server::HtmlFormCalendarFieldInterfaceElement::integrate();
-	synthese::server::HtmlFormFieldInterfaceElement::integrate();
-	synthese::server::ServerModuleVersionInterfaceElement::integrate();
 
 	synthese::server::DbModuleConfigTableSync::integrate();
 

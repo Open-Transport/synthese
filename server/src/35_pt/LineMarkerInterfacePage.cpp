@@ -35,13 +35,10 @@ using namespace boost;
 namespace synthese
 {
 	using namespace util;
-	using namespace interfaces;
 	using namespace server;
 	using namespace cms;
 	using namespace server;
 
-
-	template<> const string util::FactorableTemplate<InterfacePage,pt::LineMarkerInterfacePage>::FACTORY_KEY("line_marker");
 
 	namespace pt
 	{
@@ -55,35 +52,6 @@ namespace synthese
 		const string LineMarkerInterfacePage::DATA_RANK_IS_ODD("rank_is_odd");
 		const string LineMarkerInterfacePage::DATA_NETWORK_ID("network_id");
 		const string LineMarkerInterfacePage::DATA_NETWORK_NAME("network_name");
-
-		void LineMarkerInterfacePage::display(
-			ostream& stream
-			, VariablesMap& vars
-			, const string& tableOpeningHTML
-			, const string& tableClosingHTML
-			, int pixelWidth
-			, int pixelHeight
-			, const CommercialLine& line
-			, const Request* request /*= NULL */
-		) const {
-			ParametersVector pv;
-			pv.push_back(tableOpeningHTML);
-			pv.push_back(tableClosingHTML);
-			pv.push_back(lexical_cast<string>(pixelWidth));
-			pv.push_back(lexical_cast<string>(pixelHeight));
-			pv.push_back(line.getStyle());
-			pv.push_back(line.getImage());
-			pv.push_back(line.getShortName());
-			pv.push_back(lexical_cast<string>(line.getKey()));
-
-			InterfacePage::_display(stream, pv, vars, static_cast<const void*>(&line), request);
-		}
-
-
-
-		LineMarkerInterfacePage::LineMarkerInterfacePage(
-		):	Registrable(0)
-		{}
 
 
 

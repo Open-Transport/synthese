@@ -24,7 +24,6 @@
 #define SYNTHESE_ENV_CONTINUOUSSERVICE_H
 
 #include "SchedulesBasedService.h"
-#include "Types.h"
 #include "Registry.h"
 
 #include <string>

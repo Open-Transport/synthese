@@ -37,7 +37,6 @@
 #include "StopArea.hpp"
 #include "ProfileTableSync.h"
 #include "DisplayMaintenanceRight.h"
-#include "Interface.h"
 #include "DisplayGetNagiosStatusFunction.h"
 #include "Env.h"
 #include "PlainCharFilter.h"
@@ -55,7 +54,6 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace pt;
-	using namespace interfaces;
 	using namespace db;
 	using namespace security;
 	using namespace departure_boards;
