@@ -49,6 +49,8 @@ ObjectCreateAction.cpp
 ObjectCreateAction.hpp
 ObjectCreateService.cpp
 ObjectCreateService.hpp
+ObjectListService.cpp
+ObjectListService.hpp
 ObjectUpdateAction.cpp
 ObjectUpdateAction.hpp
 ObjectViewService.cpp
