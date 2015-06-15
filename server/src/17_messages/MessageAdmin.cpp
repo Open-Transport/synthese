@@ -35,11 +35,10 @@
 #include "UpdateAlarmMessagesAction.h"
 #include "AlarmAddLinkAction.h"
 #include "AlarmRemoveLinkAction.h"
-#include "AlarmTemplate.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "ScenarioTemplate.h"
 #include "SentScenario.h"
-#include "AlarmTableSync.h"
+#include "DBDirectTableSync.hpp"
 #include "MessagesAdmin.h"
 #include "MessagesLibraryAdmin.h"
 #include "MessagesScenarioAdmin.h"
@@ -90,11 +89,15 @@ namespace synthese
 		){
 			try
 			{
-				_alarm = AlarmTableSync::Get(
-					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-					_getEnv(),
-					UP_LINKS_LOAD_LEVEL
-				);
+				RegistryKeyType objectId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+				boost::shared_ptr<db::DBDirectTableSync> tableSync =
+					dynamic_pointer_cast<db::DBDirectTableSync, db::DBTableSync>(
+						db::DBModule::GetTableSync(util::decodeTableId(objectId)));
+				
+				_alarm = dynamic_pointer_cast<const Alarm, const Registrable>(tableSync->getRegistrable(
+																	  map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+																	  _getEnv(),
+																	  UP_LINKS_LOAD_LEVEL));
 			}
 			catch(...)
 			{
@@ -103,7 +106,6 @@ namespace synthese
 
 			_parameters = map;
 		}
-
 
 
 
@@ -220,6 +222,7 @@ namespace synthese
 				// Source id
 				StaticActionRequest<UpdateAlarmMessagesAction> updateOnlyRequest(_request);
 				updateOnlyRequest.getAction()->setAlarmId(_alarm->getKey());
+				
 				ImportableAdmin::DisplayDataSourcesTab(stream, *_alarm, updateOnlyRequest);
 			}
 
@@ -254,9 +257,9 @@ namespace synthese
 
 		bool MessageAdmin::isAuthorized(
 			const security::User& user
- 		) const {
+		) const {
 			if (_alarm.get() == NULL) return false;
-			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() == NULL)
+			if (_alarm->belongsToTemplate())
 				return user.getProfile()->isAuthorized<MessagesRight>(READ);
 			return user.getProfile()->isAuthorized<MessagesLibraryRight>(READ);
 		}

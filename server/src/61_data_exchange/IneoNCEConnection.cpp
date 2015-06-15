@@ -27,7 +27,7 @@
 #include "BroadcastPointAlarmRecipient.hpp"
 #include "DBTransaction.hpp"
 #include "LineAlarmRecipient.hpp"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
 #include "ScenarioFolderTableSync.h"
 #include "MessagesLog.h"
 #include "Env.h"
@@ -908,7 +908,7 @@ namespace synthese
 				if(scenario)
 				{
 					DBTransaction transaction;
-					ScenarioTableSync::Remove(NULL, scenario->getKey(), transaction, false);
+					SentScenarioTableSync::Remove(NULL, scenario->getKey(), transaction, false);
 					transaction.run();
 				}
 				return;
@@ -953,7 +953,7 @@ namespace synthese
 				// No existing message, create a new one
 				if(message == NULL)
 				{
-					SentAlarm newMessage;
+					Alarm newMessage;
 					newMessage.setScenario(scenario.get());
 					newMessage.setShortMessage(it.first);
 					newMessage.setLevel(ALARM_LEVEL_WARNING);
@@ -1022,8 +1022,8 @@ namespace synthese
 			boost::shared_ptr<messages::SentScenario> result;
 
 			// Get the current scenario if not already in the cache
-			ScenarioTableSync::SearchResult scenarios(
-				ScenarioTableSync::SearchSentScenarios(
+			SentScenarioTableSync::SearchResult scenarios(
+				SentScenarioTableSync::Search(
 					Env::GetOfficialEnv(),
 					boost::optional<string>(INEO_NCE_SCENARIO_NAME),
 					boost::optional<bool>(),
@@ -1047,12 +1047,12 @@ namespace synthese
 					Env env;
 					SentScenario* updatedScenario(
 						static_cast<SentScenario*>(
-							ScenarioTableSync::GetEditable(result->getKey(), env).get()
+							SentScenarioTableSync::GetEditable(result->getKey(), env).get()
 					)	);
 					updatedScenario->setIsEnabled(true);
 					updatedScenario->setPeriodEnd(ptime(not_a_date_time));
 					updatedScenario->setPeriodStart(ptime(not_a_date_time));
-					ScenarioTableSync::Save(updatedScenario);
+					SentScenarioTableSync::Save(updatedScenario);
 				}
 			}
 			else
@@ -1061,10 +1061,10 @@ namespace synthese
 				{
 					SentScenario scenario;
 					scenario.setIsEnabled(true);
-					scenario.setName(INEO_NCE_SCENARIO_NAME);
-					ScenarioTableSync::Save(&scenario);
+					scenario.set<Name>(INEO_NCE_SCENARIO_NAME);
+					SentScenarioTableSync::Save(&scenario);
 					result = static_pointer_cast<SentScenario, Scenario>(
-						Env::GetOfficialEnv().getEditable<Scenario>(scenario.getKey())
+						Env::GetOfficialEnv().getEditable<SentScenario>(scenario.getKey())
 					);
 				}
 			}

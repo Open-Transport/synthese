@@ -27,10 +27,9 @@
 #include "SentScenario.h"
 #include "DBModule.h"
 #include "Profile.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "Session.h"
 #include "User.h"
-#include "AlarmTemplate.h"
 #include "AlarmRecipient.h"
 #include "AlarmObjectLink.h"
 #include "AlarmObjectLinkTableSync.h"
@@ -107,24 +106,18 @@ namespace synthese
 			AlarmObjectLinkTableSync::Save(aol.get());
 
 			// Log
-			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get()
-			){
-				boost::shared_ptr<const AlarmTemplate> alarmTemplate(
-					dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm)
-				);
+			if (_alarm->belongsToTemplate())
+			{
 				MessagesLibraryLog::addUpdateEntry(
-					alarmTemplate.get(),
+					_alarm.get(),
 					"Ajout de destinataire " + _recipientKey + " #" + lexical_cast<string>(_objectId),
 					request.getUser().get()
 				);
 			}
 			else
 			{
-				boost::shared_ptr<const SentAlarm> sentAlarm(
-					dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm)
-				);
 				MessagesLog::addUpdateEntry(
-					sentAlarm.get(),
+					_alarm.get(),
 					"Ajout de destinataire à message diffusé " + _recipientKey + " #" + lexical_cast<string>(_objectId),
 					request.getUser().get()
 				);
@@ -144,7 +137,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm = AlarmTableSync::GetEditable(id, *_env);
+				_alarm = dynamic_pointer_cast<Alarm, util::Registrable>(DBModule::GetEditableObject(id, *_env));
 			}
 			catch (ObjectNotFoundException<Alarm>)
 			{
@@ -163,7 +156,7 @@ namespace synthese
 
 		bool AlarmAddLinkAction::isAuthorized(const Session* session
 		) const {
-			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() != NULL)
+			if (_alarm->belongsToTemplate())
 			{
 				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(WRITE);
 			}

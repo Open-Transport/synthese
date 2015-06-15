@@ -64,12 +64,11 @@ void synthese::road::moduleRegister()
 	synthese::road::PublicPlaceAdmin::integrate();
 
 	// Registries
-
-	synthese::util::Env::Integrate<synthese::road::Crossing>();
+	INTEGRATE(synthese::road::Crossing);
 	synthese::util::Env::Integrate<synthese::road::House>();
 	synthese::util::Env::Integrate<synthese::road::RoadChunk>();
-	synthese::util::Env::Integrate<synthese::road::Road>();
-	synthese::util::Env::Integrate<synthese::road::PublicPlace>();
-	synthese::util::Env::Integrate<synthese::road::PublicPlaceEntrance>();
+	INTEGRATE(synthese::road::Road);
+	INTEGRATE(synthese::road::PublicPlace);
+	INTEGRATE(synthese::road::PublicPlaceEntrance);
 	synthese::util::Env::Integrate<synthese::road::RoadPlace>();
 }

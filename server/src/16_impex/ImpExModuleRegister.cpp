@@ -56,7 +56,7 @@ void synthese::impex::moduleRegister()
 
 	// Registries
 
-	synthese::util::Env::Integrate<synthese::impex::DataSource>();
-	synthese::util::Env::Integrate<synthese::impex::Export>();
-	synthese::util::Env::Integrate<synthese::impex::Import>();
+	INTEGRATE(synthese::impex::DataSource);
+	INTEGRATE(synthese::impex::Export);
+	INTEGRATE(synthese::impex::Import);
 }

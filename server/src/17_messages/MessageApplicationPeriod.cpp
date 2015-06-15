@@ -22,7 +22,7 @@
 
 #include "MessageApplicationPeriod.hpp"
 
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "SentScenario.h"
 
 using namespace boost;

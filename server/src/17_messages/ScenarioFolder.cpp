@@ -30,66 +30,33 @@ namespace synthese
 {
 	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<messages::ScenarioFolder>::KEY("ScenarioFolder");
-	}
-
+	CLASS_DEFINITION(messages::ScenarioFolder, "t051_scenario_folder", 51)
+	FIELD_DEFINITION_OF_TYPE(messages::Parent, "parent_id", SQL_INTEGER)
+	
 	namespace messages
 	{
-		const string ScenarioFolder::ATTR_ID = "id";
-		const string ScenarioFolder::ATTR_NAME= "name";
-
-
-
-		ScenarioFolder* ScenarioFolder::getParent() const
-		{
-			return _parent;
-		}
-
-		std::string ScenarioFolder::getName() const
-		{
-			return _name;
-		}
-
-		void ScenarioFolder::setName( const std::string& value )
-		{
-			_name = value;
-		}
-
-		void ScenarioFolder::setParent(ScenarioFolder* value)
-		{
-			_parent = value;
-		}
-
+		
 		ScenarioFolder::ScenarioFolder(RegistryKeyType key)
 		:	Registrable(key),
-			_parent(NULL)
+			Object<ScenarioFolder, ScenarioFolderRecord>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(Parent)
+					)
+				)
 		{
 
 		}
-
-
 
 		std::string ScenarioFolder::getFullName() const
 		{
 			string result;
-			for(const ScenarioFolder* folder(this); folder != NULL; folder = folder->getParent())
+			for(const ScenarioFolder* folder(this); folder != NULL; folder = &folder->get<Parent>().get())
 			{
 				result = "/" + folder->getName() + result;
 			}
 			return result;
 		}
 
-
-
-		void ScenarioFolder::toParametersMap(
-			util::ParametersMap& pm,
-			bool withAdditionalParameters,
-			boost::logic::tribool withFiles,
-			std::string prefix
-		) const	{
-			pm.insert(ATTR_ID, getKey());
-			pm.insert(ATTR_NAME, getName());
-		}
 }	}

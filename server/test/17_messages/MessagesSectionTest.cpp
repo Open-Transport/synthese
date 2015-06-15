@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE (testMessagesSectionAutoActivation)
 	scenario1->setEventStart(now - days(1));
 	scenario1->setEventEnd(now + days(1));
 	scenario1->setIsEnabled(false);
-	Scenario::Sections sections1;
+	Sections::Type sections1;
 	sections1.insert(messageSectionWithoutAutoActivation);
 	scenario1->setSections(sections1);
 
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE (testMessagesSectionAutoActivation)
 	scenario2->setEventStart(now - days(1));
 	scenario2->setEventEnd(now + days(1));
 	scenario2->setIsEnabled(false);
-	Scenario::Sections sections2;
+	Sections::Type sections2;
 	sections2.insert(messageSectionWithAutoActivation);
 	scenario2->setSections(sections2);
 

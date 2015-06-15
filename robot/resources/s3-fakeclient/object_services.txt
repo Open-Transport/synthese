@@ -1,0 +1,21 @@
+*** Settings ***
+Resource          ../s3-server/object_services.txt
+Library           Collections
+Library           XML
+
+*** Variables ***
+
+*** Keywords ***
+
+There Is No Object In Table 
+    [Arguments]  ${table_id}
+    ${response}=  List Synthese Objects  table_id=${table_id}
+    Element Should Not Exist	${response.content}  xpath=object
+
+There Is One Object In Table 
+    [Arguments]  ${table_id}
+    ${response}=  List Synthese Objects  table_id=${table_id}
+    ${object_count}=  Get Element Count	 ${response.content}  xpath=object
+    Should Be Equal As Numbers  1  ${object_count}
+
+    

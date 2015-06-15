@@ -32,7 +32,7 @@
 #include <NotificationProviderTableSync.hpp>
 #include <Registrable.h>
 #include <Registry.h>
-#include <SentAlarm.h>
+#include <Alarm.h>
 #include <StandardLoadSavePolicy.hpp>
 #include <UtilTypes.h>
 
@@ -122,7 +122,7 @@ namespace synthese
 
 		boost::shared_ptr<NotificationEvent> NotificationEvent::createEvent(
 			Env& env,
-			const SentAlarm& alarm,
+			const Alarm& alarm,
 			const NotificationProvider* provider,
 			const NotificationType type,
 			const bool saveNow /* = true */
@@ -151,7 +151,7 @@ namespace synthese
 
 
 		boost::shared_ptr<NotificationEvent> NotificationEvent::findOrCreateEvent(
-			const SentAlarm& alarm,
+			const Alarm& alarm,
 			const NotificationProvider* provider,
 			const NotificationType type,
 			const bool hold_event /* = false */

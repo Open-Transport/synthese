@@ -77,7 +77,6 @@ namespace synthese
 		public:
 			static const std::string	TAB_MESSAGES;
 			static const std::string	TAB_PARAMETERS;
-			static const std::string	TAB_VARIABLES;
 			static const std::string	TAB_LOG;
 			static const std::string	TAB_DATASOURCES;
 
@@ -133,7 +132,6 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const server::Request& request
 			) const;
-
 			virtual std::string getTitle() const;
 
 			virtual void _buildTabs(

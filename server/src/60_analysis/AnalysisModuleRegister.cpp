@@ -50,11 +50,11 @@ void synthese::analysis::moduleRegister()
 	synthese::analysis::ServiceDensityService::integrate();
 	synthese::analysis::VehicleServiceUsagesListService::integrate();
 
-	synthese::util::Env::Integrate<synthese::analysis::VehicleServiceUsage>();
+	INTEGRATE(synthese::analysis::VehicleServiceUsage);
 
 //	synthese::analysis::OpeningTimeTableSync::integrate();
 //	synthese::analysis::TrafficForecastTableSync::integrate();
 
-//	synthese::util::Env::Integrate<synthese::analysis::OpeningTime>();
-//	synthese::util::Env::Integrate<synthese::analysis::TrafficForecast>();
+//	INTEGRATE(synthese::analysis::OpeningTime);
+//	INTEGRATE(synthese::analysis::TrafficForecast);
 }

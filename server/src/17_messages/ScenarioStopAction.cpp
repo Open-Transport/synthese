@@ -27,7 +27,7 @@
 #include "DataSource.h"
 #include "DBTransaction.hpp"
 #include "Profile.h"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
 #include "SentScenario.h"
 #include "Session.h"
 #include "User.h"
@@ -35,6 +35,7 @@
 #include "MessagesLog.h"
 #include "MessagesRight.h"
 #include "MessagesSection.hpp"
+#include "MessageApplicationPeriod.hpp"
 #include "Profile.h"
 #include "Session.h"
 #include "User.h"
@@ -95,7 +96,7 @@ namespace synthese
 			if(_dataSource)
 			{
 				_scenario = dynamic_cast<SentScenario*>(
-					_dataSource->getObjectByCode<Scenario>(map.get<string>(PARAMETER_SCENARIO_ID))
+					_dataSource->getObjectByCode<SentScenario>(map.get<string>(PARAMETER_SCENARIO_ID))
 				);
 				if(!_scenario)
 				{
@@ -106,7 +107,7 @@ namespace synthese
 			{
 				try
 				{
-					_scenario = ScenarioTableSync::GetCastEditable<SentScenario>(
+					_scenario = SentScenarioTableSync::GetCastEditable<SentScenario>(
 							map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID),
 							*_env
 						).get();
@@ -127,7 +128,7 @@ namespace synthese
 			if(_remove)
 			{
 				DBTransaction transaction;
-				ScenarioTableSync::Remove(NULL, _scenario->getKey(), transaction, false);
+				SentScenarioTableSync::Remove(NULL, _scenario->getKey(), transaction, false);
 				transaction.run();
 			}
 			else
@@ -136,7 +137,7 @@ namespace synthese
 				_scenario->setPeriodEnd(_stopDateTime);
 				_scenario->setIsEnabled(false);
 
-				ScenarioTableSync::Save(_scenario);
+				SentScenarioTableSync::Save(_scenario);
 
 				// Log
 				MessagesLog::addUpdateEntry(_scenario, "Diffusion arrêtée le " + to_simple_string(_stopDateTime), request.getUser().get());
@@ -184,9 +185,9 @@ namespace synthese
 			if (messagesAndCalendars)
 			{
 				// Loop on events
-				ScenarioTableSync::SearchResult scenarios;
+				SentScenarioTableSync::SearchResult scenarios;
 
-				scenarios = ScenarioTableSync::SearchSentScenarios(
+				scenarios = SentScenarioTableSync::Search(
 					Env::GetOfficialEnv(),
 					boost::optional<std::string>()
 				);

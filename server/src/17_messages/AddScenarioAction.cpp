@@ -26,7 +26,8 @@
 
 #include "Profile.h"
 #include "ScenarioTemplate.h"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
+#include "ScenarioTemplateTableSync.h"
 #include "Session.h"
 #include "User.h"
 #include "MessagesLibraryLog.h"
@@ -78,7 +79,7 @@ namespace synthese
 			{
 				try
 				{
-					_template = ScenarioTableSync::GetCast<ScenarioTemplate>(*id, *_env);
+					_template = ScenarioTemplateTableSync::GetCast<ScenarioTemplate>(*id, *_env);
 				}
 				catch(...)
 				{
@@ -107,45 +108,29 @@ namespace synthese
 				throw ActionException("Le scénario doit avoir un nom.");
 			}
 			Env env;
-			ScenarioTableSync::SearchResult r(
-				ScenarioTableSync::SearchTemplates(env, _folder.get() ? _folder->getKey() : 0, _name, NULL, 0, 1)
+			ScenarioTemplateTableSync::SearchResult r(
+				ScenarioTemplateTableSync::Search(env, _folder.get() ? _folder->getKey() : 0, _name, NULL, 0, 1)
 			);
 			if (!r.empty())
 			{
 				throw ActionException("Un scénario de même nom existe déjà");
 			}
 		}
-
+	   
 
 
 		void AddScenarioAction::run(Request& request)
 		{
 			if (_template.get())
 			{
-				ScenarioTemplate scenario(*_template, _name);
-
-				ScenarioTableSync::Save(&scenario);
-
-				ScenarioTableSync::CopyMessages(
-					_template->getKey(),
-					scenario
-				);
-
-				// Remember of the id of created object to view it after the action
-				request.setActionCreatedId(scenario.getKey());
-
-				// Log
-				MessagesLibraryLog::addCreateEntry(
-					scenario, *_template, request.getUser().get()
-				);
+				// Not implemented
 
 			} else {
-				ScenarioTemplate scenario(
-					_name,
-					_folder.get()
-				);
+				ScenarioTemplate scenario;
+				scenario.set<Name>(_name);
+				scenario.setFolder(_folder.get());
 
-				ScenarioTableSync::Save(&scenario);
+				ScenarioTemplateTableSync::Save(&scenario);
 
 				// Remember of the id of created object to view it after the action
 				request.setActionCreatedId(scenario.getKey());

@@ -1,0 +1,40 @@
+*** Settings ***
+Resource          ../../resources/s3-fakeclient/object_services.txt    
+Test Setup        Start Synthese On Node 0
+Test Teardown     Stop Synthese On Node 0
+
+*** Test Cases ***
+
+Singleton Object List Should Work For Any Table
+    [Template]    Singleton Object List Should Work
+    ${ALARMS_TABLE_ID}
+    ${SCENARIOS_TABLE_ID}
+    ${CITIES_TABLE_ID}
+    ${SCENARIO_FOLDER_TABLE_ID}
+    
+
+Empty Object List Should Work For Any Table
+    [Template]    Empty Object List Should Work
+    ${ALARMS_TABLE_ID}
+    ${SCENARIOS_TABLE_ID}
+    ${CITIES_TABLE_ID}
+    ${SCENARIO_FOLDER_TABLE_ID}
+    
+
+*** Keywords ***
+
+Singleton Object List Should Work
+    [Arguments]  ${table_id}
+    On node 0
+    Create Synthese Object  table_id=${table_id}
+    There Is One Object In Table  table_id=${table_id}
+
+Empty Object List Should Work
+    [Arguments]  ${table_id}
+    On node 0
+    There Is No Object In Table  ${table_id}
+
+
+
+
+

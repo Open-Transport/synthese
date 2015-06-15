@@ -80,10 +80,10 @@ void synthese::pt_operation::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt_operation::Depot>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DeadRun>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DeadRunEdge>();
-	synthese::util::Env::Integrate<synthese::pt_operation::DriverActivity>();
-	synthese::util::Env::Integrate<synthese::pt_operation::DriverAllocation>();
-	synthese::util::Env::Integrate<synthese::pt_operation::DriverAllocationTemplate>();
+	INTEGRATE(synthese::pt_operation::DriverActivity);
+	INTEGRATE(synthese::pt_operation::DriverAllocation);
+	INTEGRATE(synthese::pt_operation::DriverAllocationTemplate);
 	synthese::util::Env::Integrate<synthese::pt_operation::DriverService>();
-	synthese::util::Env::Integrate<synthese::pt_operation::OperationUnit>();
-	synthese::util::Env::Integrate<synthese::pt_operation::VehicleService>();
+	INTEGRATE(synthese::pt_operation::OperationUnit);
+	INTEGRATE(synthese::pt_operation::VehicleService);
 }

@@ -24,14 +24,19 @@
 #define SYNTHESE_messages_ScenarioCalendar_hpp__
 
 #include "Object.hpp"
-
-#include "Scenario.h"
+#include "PointerField2.hpp"
 #include "SchemaMacros.hpp"
 #include "StringField.hpp"
 
 namespace synthese
 {
-	FIELD_POINTER(ScenarioPointer, messages::Scenario)
+
+	namespace messages
+	{
+		class Scenario;
+	}
+	
+	FIELD_POINTER2(ScenarioPointer, messages::Scenario)
 
 	typedef boost::fusion::map<
 		FIELD(Key),

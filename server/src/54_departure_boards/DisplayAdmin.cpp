@@ -75,7 +75,7 @@
 #include "StopAreaTableSync.hpp"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "SentScenario.h"
 #include "UpdateAllStopsDisplayScreenAction.h"
 #include "UpdateDisplayMaintenanceAction.h"
@@ -1034,19 +1034,22 @@ namespace synthese
 					stream << t.col() << getTabLinkButton(TAB_MAINTENANCE);
 				}
 
-				vector<boost::shared_ptr<SentAlarm> > alarms(DisplayScreenTableSync::GetCurrentDisplayedMessage(Env::GetOfficialEnv(), _displayScreen->getKey()));
+				vector<boost::shared_ptr<Alarm> > alarms(DisplayScreenTableSync::GetCurrentDisplayedMessage(Env::GetOfficialEnv(), _displayScreen->getKey()));
 				AdminFunctionRequest<MessageAdmin> viewMessageRequest(_request);
-				BOOST_FOREACH(const boost::shared_ptr<SentAlarm>& alarm, alarms)
+				BOOST_FOREACH(const boost::shared_ptr<Alarm>& alarm, alarms)
 				{
 					// Avoid malformed message
 					if(alarm->getScenario() == NULL) continue;
+					if(alarm->belongsToTemplate()) continue;
+					const SentScenario* scenario = dynamic_cast<const SentScenario*>
+						(alarm->getScenario());
 
 					stream << t.row();
 					stream << t.col() << priority++;
 					stream << t.col() << HTMLModule::getHTMLImage("/admin/img/" + (alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
 					stream << t.col() << "Message : " + alarm->getShortMessage();
 					stream << t.col() <<
-						(alarm->getScenario()->getPeriodEnd().is_not_a_date_time() ? "(illimité)" : to_simple_string(alarm->getScenario()->getPeriodEnd()))
+						(scenario->getPeriodEnd().is_not_a_date_time() ? "(illimité)" : to_simple_string(scenario->getPeriodEnd()))
 					;
 					stream << t.col();
 
@@ -1076,7 +1079,7 @@ namespace synthese
 
 				stream << "<h1>Contenus en attente</h1>";
 
-				vector<boost::shared_ptr<SentAlarm> > futures(DisplayScreenTableSync::GetFutureDisplayedMessages(
+				vector<boost::shared_ptr<Alarm> > futures(DisplayScreenTableSync::GetFutureDisplayedMessages(
 					Env::GetOfficialEnv(),
 					_displayScreen->getKey()
 				)	);
@@ -1090,13 +1093,17 @@ namespace synthese
 					h2.push_back("Admin");
 					HTMLTable t2(h2, ResultHTMLTable::CSS_CLASS);
 					stream << t2.open();
-					BOOST_FOREACH(const boost::shared_ptr<SentAlarm>& alarm, futures)
+					BOOST_FOREACH(const boost::shared_ptr<Alarm>& alarm, futures)
 					{
+						if(alarm->belongsToTemplate()) continue;
+						const SentScenario* scenario = dynamic_cast<const SentScenario*>
+						(alarm->getScenario());
+						
 						stream << t2.row();
 						stream << t2.col() << HTMLModule::getHTMLImage("/admin/img/" + (alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
 						stream << t2.col() << "Message : " + alarm->getShortMessage();
-						stream << t2.col() << alarm->getScenario()->getPeriodStart();
-						stream << t2.col() << (alarm->getScenario()->getPeriodEnd().is_not_a_date_time() ? "(illimité)" : to_simple_string(alarm->getScenario()->getPeriodEnd()));
+						stream << t2.col() << scenario->getPeriodStart();
+						stream << t2.col() << (scenario->getPeriodEnd().is_not_a_date_time() ? "(illimité)" : to_simple_string(scenario->getPeriodEnd()));
 						stream << t2.col();
 
 						viewMessageRequest.getPage()->setMessage(alarm);

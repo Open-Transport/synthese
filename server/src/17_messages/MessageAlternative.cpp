@@ -21,6 +21,7 @@
 */
 
 #include "MessageAlternative.hpp"
+#include "Alarm.h"
 
 using namespace std;
 
@@ -49,6 +50,7 @@ namespace synthese
 		{}
 
 
+		
 
 
 		void MessageAlternative::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )

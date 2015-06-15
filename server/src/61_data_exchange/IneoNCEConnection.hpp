@@ -33,7 +33,7 @@
 #include "AlarmObjectLink.h"
 #include "CommercialLine.h"
 #include "SentScenario.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 
 namespace synthese
 {

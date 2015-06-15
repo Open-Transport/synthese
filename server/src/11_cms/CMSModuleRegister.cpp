@@ -65,9 +65,9 @@
 void synthese::cms::moduleRegister()
 {
 	// Registries
-	synthese::util::Env::Integrate<synthese::cms::Website>();
-	synthese::util::Env::Integrate<synthese::cms::Webpage>();
-	synthese::util::Env::Integrate<synthese::cms::WebsiteConfig>();
+	INTEGRATE(synthese::cms::Website);
+	INTEGRATE(synthese::cms::Webpage);
+	INTEGRATE(synthese::cms::WebsiteConfig);
 
 	// 36 CMS
 	synthese::cms::AddService::integrate();

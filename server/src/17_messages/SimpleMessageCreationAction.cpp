@@ -36,8 +36,8 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "DBTransaction.hpp"
 #include "SentScenario.h"
-#include "ScenarioTableSync.h"
-#include "SentAlarm.h"
+#include "SentScenarioTableSync.h"
+#include "Alarm.h"
 #include "AlarmTableSync.h"
 
 using namespace std;
@@ -109,12 +109,12 @@ namespace synthese
 
 			SentScenario scenario;
 			scenario.setIsEnabled(true);
-			scenario.setName("Short message");
+			scenario.set<Name>("Short message");
 			scenario.setTemplate(NULL);
 			scenario.setPeriodStart(time);
-			ScenarioTableSync::Save(&scenario, transaction);
+			SentScenarioTableSync::Save(&scenario, transaction);
 
-			SentAlarm alarm;
+			Alarm alarm;
 			alarm.setLevel(_level);
 			alarm.setShortMessage("Short message");
 			alarm.setLongMessage(_content);

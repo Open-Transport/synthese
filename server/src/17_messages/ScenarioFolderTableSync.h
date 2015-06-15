@@ -45,23 +45,17 @@ namespace synthese
 		class ScenarioFolderTableSync:
 			public db::DBDirectTableSyncTemplate<
 				ScenarioFolderTableSync,
-				ScenarioFolder,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				ScenarioFolder
 			>
 		{
 		public:
-			static const std::string COL_NAME;
-			static const std::string COL_PARENT_ID;
 
-
-
-			/**  search.
+			/**	 search.
 				@param env Environment to populate
 				@param parentFolderId ID of the parent folder of the result
 				@param name Name of the folders
-				@param first First  object to answer
-				@param number Number of  objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@param first First	object to answer
+				@param number Number of	 objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				@return Found objects.
 				@author Hugues Romain
 				@date 2006

@@ -65,9 +65,9 @@ void synthese::inter_synthese::moduleRegister()
 
 	synthese::inter_synthese::SpecificPostInstall::integrate();
 
-	synthese::util::Env::Integrate<synthese::inter_synthese::InterSYNTHESEConfig>();
-	synthese::util::Env::Integrate<synthese::inter_synthese::InterSYNTHESEConfigItem>();
-	synthese::util::Env::Integrate<synthese::inter_synthese::InterSYNTHESESlave>();
-	synthese::util::Env::Integrate<synthese::inter_synthese::InterSYNTHESEQueue>();
-	synthese::util::Env::Integrate<synthese::inter_synthese::InterSYNTHESEPackage>();
+	INTEGRATE(synthese::inter_synthese::InterSYNTHESEConfig);
+	INTEGRATE(synthese::inter_synthese::InterSYNTHESEConfigItem);
+	INTEGRATE(synthese::inter_synthese::InterSYNTHESESlave);
+	INTEGRATE(synthese::inter_synthese::InterSYNTHESEQueue);
+	INTEGRATE(synthese::inter_synthese::InterSYNTHESEPackage);
 }

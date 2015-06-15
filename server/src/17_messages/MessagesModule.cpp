@@ -27,13 +27,15 @@
 #include "CommercialLine.h"
 #include "Env.h"
 #include "MessagesSection.hpp"
+#include "MessageApplicationPeriod.hpp"
 #include "NotificationEvent.hpp"
 #include "NotificationEventTableSync.hpp"
 #include "NotificationLog.hpp"
 #include "SentScenario.h"
 #include "ServerModule.h"
 #include "ScenarioTemplate.h"
-#include "ScenarioTableSync.h"
+#include "ScenarioTemplateTableSync.h"
+#include "SentScenarioTableSync.h"
 #include "ScenarioFolder.h"
 #include "ScenarioFolderTableSync.h"
 #include "TextTemplateTableSync.h"
@@ -125,10 +127,10 @@ namespace synthese
 			}
 
 			Env env;
-			ScenarioTableSync::SearchResult templates(
-				ScenarioTableSync::SearchTemplates(env, folderId)
+			ScenarioTemplateTableSync::SearchResult templates(
+				ScenarioTemplateTableSync::Search(env, folderId)
 			);
-			BOOST_FOREACH(const boost::shared_ptr<Scenario>& st, templates)
+			BOOST_FOREACH(const boost::shared_ptr<ScenarioTemplate>& st, templates)
 			{
 				m.push_back(make_pair(st->getKey(), prefix + st->getName()));
 			}
@@ -151,7 +153,7 @@ namespace synthese
 
 		MessagesModule::Labels MessagesModule::GetScenarioFoldersLabels(
 			RegistryKeyType folderId /*= 0 */
-			, std::string prefix /*= std::string()  */
+			, std::string prefix /*= std::string()	*/
 			, optional<RegistryKeyType> forbiddenFolderId
 		){
 			Labels m;
@@ -405,17 +407,8 @@ namespace synthese
 			// Now
 			ptime now(second_clock::local_time());
 
-			// Avoid library messages
-			const SentAlarm* sentMessage(
-				dynamic_cast<const SentAlarm*>(&object)
-			);
-			if(!sentMessage)
-			{
-				return false;
-			}
-
 			// Record active message
-			if(!sentMessage->isApplicable(now))
+			if(!object.isApplicable(now))
 			{
 				return false;
 			}
@@ -445,8 +438,8 @@ namespace synthese
 				const Alarm::Registry::Vector::value_type& message,
 				messagesToUpdate
 			){
-				boost::shared_ptr<SentAlarm> sentMessage(
-					dynamic_pointer_cast<SentAlarm, Alarm>(message)
+				boost::shared_ptr<Alarm> sentMessage(
+					dynamic_pointer_cast<Alarm, Alarm>(message)
 				);
 
 				// Remove the message as unactivated one
@@ -489,13 +482,13 @@ namespace synthese
 		void MessagesModule::UpdateEnabledScenarii()
 		{
 			// Loop on all sent scenarii
-			ScenarioTableSync::SearchResult scenarios;
+			SentScenarioTableSync::SearchResult scenarios;
 
-			scenarios = ScenarioTableSync::SearchSentScenarios(
+			scenarios = SentScenarioTableSync::Search(
 				Env::GetOfficialEnv(),
 				boost::optional<std::string>()
 			);
-			BOOST_FOREACH(const boost::shared_ptr<Scenario>& scenario, scenarios)
+			BOOST_FOREACH(const boost::shared_ptr<SentScenario>& scenario, scenarios)
 			{
 				if(!dynamic_cast<const SentScenario*>(scenario.get()))
 				{
@@ -504,7 +497,7 @@ namespace synthese
 				SentScenario* sscenario = static_cast<SentScenario*>(scenario.get());
 				if (_enableScenarioIfAutoActivation(sscenario))
 				{
-					ScenarioTableSync::Save(sscenario);
+					SentScenarioTableSync::Save(sscenario);
 				}
 			}
 		}
@@ -513,7 +506,7 @@ namespace synthese
 		{
 			// Is the scenario associated to an auto_activation section ?
 			bool autoChange(false);
-			BOOST_FOREACH(const Scenario::Sections::value_type& section, sscenario->getSections())
+			BOOST_FOREACH(const MessagesSection* section, sscenario->get<Sections>())
 			{
 				if (section->get<AutoActivation>())
 				{
@@ -572,7 +565,7 @@ namespace synthese
 			ActivatedMessages result;
 
 			// Check each message
-			BOOST_FOREACH(boost::shared_ptr<SentAlarm> message, _activatedMessages)
+			BOOST_FOREACH(boost::shared_ptr<Alarm> message, _activatedMessages)
 			{
 				// Check the message
 				if(message->isOnBroadcastPoint(
@@ -588,9 +581,9 @@ namespace synthese
 
 
 
-		bool MessagesModule::_selectSentAlarm( const Alarm& object )
+		bool MessagesModule::_selectAlarm( const Alarm& object )
 		{
-			if(!dynamic_cast<const SentAlarm*>(&object))
+			if(!dynamic_cast<const Alarm*>(&object))
 			{
 				return false;
 			}
@@ -604,12 +597,12 @@ namespace synthese
 		{
 			recursive_mutex::scoped_lock registryLock(Env::GetOfficialEnv().getRegistry<Alarm>().getMutex());
 			Alarm::Registry::Vector sentAlarms(
-				Env::GetOfficialEnv().getRegistry<Alarm>().getVector(&_selectSentAlarm)
+				Env::GetOfficialEnv().getRegistry<Alarm>().getVector(&_selectAlarm)
 			);
 			BOOST_FOREACH(const Alarm::Registry::Vector::value_type& alarm, sentAlarms)
 			{
 				// Jump over scenarios
-				SentAlarm& sentAlarm(static_cast<SentAlarm&>(*alarm));
+				Alarm& sentAlarm(static_cast<Alarm&>(*alarm));
 				
 				// Clear the cache
 				sentAlarm.clearBroadcastPointsCache();
@@ -618,9 +611,9 @@ namespace synthese
 
 
 
-		bool MessagesModule::SentAlarmLess::operator()(
-			boost::shared_ptr<SentAlarm> left,
-			boost::shared_ptr<SentAlarm> right
+		bool MessagesModule::AlarmLess::operator()(
+			boost::shared_ptr<Alarm> left,
+			boost::shared_ptr<Alarm> right
 		) const {
 			assert(left.get() && right.get());
 
@@ -628,27 +621,29 @@ namespace synthese
 			{
 				return left->getLevel() > right->getLevel();
 			}
-
+			const SentScenario* leftScenario =
+				dynamic_cast<const SentScenario*>(left->getScenario());
+			const SentScenario* rightScenario = 
+				dynamic_cast<const SentScenario*>(right->getScenario());
+			if (!leftScenario) return 0;
+			if (!rightScenario) return 0;
 			
-			if(left->getScenario() && right->getScenario())
+			if(!leftScenario->getPeriodStart().is_not_a_date_time())
 			{
-				if(!left->getScenario()->getPeriodStart().is_not_a_date_time())
+				if(rightScenario->getPeriodStart().is_not_a_date_time())
 				{
-					if(right->getScenario()->getPeriodStart().is_not_a_date_time())
-					{
-						return true;
-					}
-					if(left->getScenario()->getPeriodStart() != right->getScenario()->getPeriodStart())
-					{
-						return left->getScenario()->getPeriodStart() > right->getScenario()->getPeriodStart();
-					}
+					return true;
 				}
-				else
+				if(leftScenario->getPeriodStart() != rightScenario->getPeriodStart())
 				{
-					if(!right->getScenario()->getPeriodStart().is_not_a_date_time())
-					{
-						return false;
-					}
+					return leftScenario->getPeriodStart() > rightScenario->getPeriodStart();
+				}
+			}
+			else
+			{
+				if(!rightScenario->getPeriodStart().is_not_a_date_time())
+				{
+					return false;
 				}
 			}
 

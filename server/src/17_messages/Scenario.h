@@ -25,18 +25,24 @@
 #ifndef SYNTHESE_Scenario_h__
 #define SYNTHESE_Scenario_h__
 
+#include "Object.hpp"
+#include "PointersSetField.hpp"
+#include "DataSourceLinksField.hpp"
 #include "ImportableTemplate.hpp"
-#include "Registrable.h"
-#include "Registry.h"
 
 namespace synthese
 {
+
+	
 	namespace messages
 	{
-		class Alarm;
 		class MessagesSection;
+		class Alarm;
 		class ScenarioCalendar;
 
+		FIELD_DATASOURCE_LINKS(DataSourceLinksWithoutUnderscore)
+		FIELD_POINTERS_SET(Sections, MessagesSection)
+		
 		////////////////////////////////////////////////////////////////////
 		/// Scenario of alarms diffusion.
 		///	@ingroup m17
@@ -46,50 +52,46 @@ namespace synthese
 		///		- the template scenario
 		///		- the sent scenario
 		class Scenario:
-			public virtual util::Registrable,
-			public impex::ImportableTemplate<Scenario>
+			public virtual util::Registrable
 		{
+		protected:
+
 		public:
-			typedef std::set<const MessagesSection*> Sections;
+
+			Scenario(util::RegistryKeyType id=0);
+			virtual ~Scenario();
+
 			typedef std::set<const Alarm*> Messages;
 			typedef std::set<ScenarioCalendar*> ScenarioCalendars;
 
 		private:
-
-			mutable Sections _sections;
-			std::string _name;
+			
 			mutable Messages _messages;
 			mutable ScenarioCalendars _calendars;
 
-		protected:
-			Scenario(const std::string name = std::string());
-
 		public:
-			/// Chosen registry class.
-			typedef util::Registry<Scenario>	Registry;
-
-
-			virtual ~Scenario();
-
+			
 			void addMessage(const Alarm& message) const;
 			void removeMessage(const Alarm& message) const;
 			void addSection(const MessagesSection& section) const;
 
 			/// @name Setters
 			//@{
-				void setSections(const Sections& value){ _sections = value; }
-				void setCalendars(const ScenarioCalendars& value) const { _calendars = value; }
-				void setName(const std::string& value){ _name = value; }
+			void setCalendars(const ScenarioCalendars& value) const { _calendars = value; }
 			//@}
-
+			
 			/// @name Getters
 			//@{
-				const Messages& getMessages() const { return _messages; }
-				const ScenarioCalendars& getCalendars() const { return _calendars; }
-				const Sections& getSections() const { return _sections; }
-				virtual std::string getName() const { return _name; }
+			const Messages& getMessages() const { return _messages; }
+			const ScenarioCalendars& getCalendars() const { return _calendars; }
+			virtual Sections::Type& getSections() const {
+				throw "TODO : necessary because boost:optional on an abstract type is not possible"; }
 			//@}
+							   
 		};
+		
+		typedef std::vector<boost::shared_ptr<Scenario> > Scenarios;
+		
 	}
 }
 

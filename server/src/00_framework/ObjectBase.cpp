@@ -29,6 +29,10 @@ using namespace std;
 
 namespace synthese
 {
+
+	std::map<util::RegistryTableType, std::string>
+	ObjectBase::REGISTRY_NAMES_BY_TABLE_ID;
+	
 	ObjectBase::IntegrityException::IntegrityException(
 		const ObjectBase& object,
 		const std::string& field,

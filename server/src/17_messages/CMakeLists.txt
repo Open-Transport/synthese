@@ -20,8 +20,6 @@ AlarmRemoveLinkAction.cpp
 AlarmRemoveLinkAction.h
 AlarmTableSync.cpp
 AlarmTableSync.h
-AlarmTemplate.cpp
-AlarmTemplate.h
 BroadcastPoint.cpp
 BroadcastPoint.hpp
 BroadcastPointAlarmRecipient.cpp
@@ -130,10 +128,12 @@ ScenarioStopAction.cpp
 ScenarioStopAction.h
 ScenarioTableSync.cpp
 ScenarioTableSync.h
+SentScenarioTableSync.cpp
+SentScenarioTableSync.h
+ScenarioTemplateTableSync.cpp
+ScenarioTemplateTableSync.h
 ScenarioTemplate.cpp
 ScenarioTemplate.h
-SentAlarm.cpp
-SentAlarm.h
 SentScenario.cpp
 SentScenario.h
 SimpleMessageCreationAction.cpp

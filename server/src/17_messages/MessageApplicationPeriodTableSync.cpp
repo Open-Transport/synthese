@@ -22,7 +22,7 @@
 
 #include "MessageApplicationPeriodTableSync.hpp"
 
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "SentScenario.h"
 #include "DBResult.hpp"
 #include "SelectQuery.hpp"

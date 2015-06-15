@@ -33,7 +33,7 @@
 #include "DBException.hpp"
 #include "Profile.h"
 #include "ReplaceQuery.h"
-#include "ScenarioTableSync.h"
+#include "ScenarioTemplateTableSync.h"
 #include "MessagesLibraryRight.h"
 #include "Session.h"
 #include "User.h"
@@ -54,12 +54,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,ScenarioFolderTableSync>::FACTORY_KEY("17 ScenarioFolder");
 	}
 
-	namespace messages
-	{
-		const string ScenarioFolderTableSync::COL_NAME("name");
-		const string ScenarioFolderTableSync::COL_PARENT_ID("parent_id");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<ScenarioFolderTableSync>::TABLE(
@@ -68,9 +62,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<ScenarioFolderTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(ScenarioFolderTableSync::COL_NAME, SQL_TEXT),
-			Field(ScenarioFolderTableSync::COL_PARENT_ID, SQL_INTEGER),
 			Field()
 		};
 
@@ -78,59 +69,9 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<ScenarioFolderTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(ScenarioFolderTableSync::COL_PARENT_ID.c_str(), ""));
+			r.push_back(DBTableSync::Index(Parent::FIELD.name.c_str(), ""));
 			return r;
 		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<ScenarioFolderTableSync,ScenarioFolder>::Load(
-			ScenarioFolder* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			object->setName(rows->getText(ScenarioFolderTableSync::COL_NAME));
-
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				RegistryKeyType id(rows->getLongLong(ScenarioFolderTableSync::COL_PARENT_ID));
-
-				if(id > 0)
-				{
-					object->setParent(
-						ScenarioFolderTableSync::GetEditable(
-							id,
-							env,
-							linkLevel
-						).get()
-					);
-				}
-			}
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<ScenarioFolderTableSync,ScenarioFolder>::Save(
-			ScenarioFolder* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<ScenarioFolderTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(object->getParent() ? object->getParent()->getKey() : RegistryKeyType(0));
-			query.execute(transaction);
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<ScenarioFolderTableSync,ScenarioFolder>::Unlink(
-			ScenarioFolder* obj
-		){
-		}
-
 
 
 		template<> bool DBTableSyncTemplate<ScenarioFolderTableSync>::CanDelete(
@@ -138,8 +79,8 @@ namespace synthese
 			util::RegistryKeyType object_id
 		){
 			Env env;
-			ScenarioTableSync::SearchResult r(
-				ScenarioTableSync::SearchTemplates(
+			ScenarioTemplateTableSync::SearchResult r(
+				ScenarioTemplateTableSync::Search(
 					env,
 					object_id,
 					string(),
@@ -201,13 +142,13 @@ namespace synthese
 			;
 			if(parentFolderId)
 			{
-				query << " AND " << COL_PARENT_ID << "=" << *parentFolderId;
+				query << " AND " << Parent::FIELD.name << "=" << *parentFolderId;
 			}
 			if(name)
 			{
-				query << " AND " << COL_NAME << " LIKE " << Conversion::ToDBString(*name);
+				query << " AND " << Name::FIELD.name << " LIKE " << Conversion::ToDBString(*name);
 			}
-			query << " ORDER BY " << COL_NAME << " ASC";
+			query << " ORDER BY " << Name::FIELD.name << " ASC";
 			if (number)
 				query << " LIMIT " << (*number + 1);
 			if (first > 0)

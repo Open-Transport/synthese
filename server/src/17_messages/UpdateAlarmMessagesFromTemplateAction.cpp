@@ -39,7 +39,6 @@
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
-#include "AlarmTemplate.h"
 
 using namespace std;
 using namespace boost;
@@ -102,6 +101,7 @@ namespace synthese
 			_message->setLongMessage(_template->getLongMessage());
 
 			AlarmTableSync::Save(_message.get());
+
 		}
 
 
@@ -112,7 +112,10 @@ namespace synthese
 
 			try
 			{
-				_message = AlarmTableSync::GetEditable(id, *_env);
+				_message = AlarmTableSync::GetEditable(
+					id,
+					*_env
+					);
 			}
 			catch (ObjectNotFoundException<Alarm>& e)
 			{
@@ -124,7 +127,7 @@ namespace synthese
 
 		bool UpdateAlarmMessagesFromTemplateAction::isAuthorized(const Session* session
 		) const {
-			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_message).get() != NULL)
+			if (_message->belongsToTemplate())
 			{
 				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(WRITE);
 			}

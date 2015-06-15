@@ -27,11 +27,12 @@
 #include "ScenarioDisplayFunction.hpp"
 #include "Webpage.h"
 #include "ScenarioTemplate.h"
+#include "MessagesSection.hpp"
 #include "SentScenario.h"
-#include "AlarmTemplate.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "ScenarioFolder.h"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
+#include "ScenarioTemplateTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -99,18 +100,32 @@ namespace synthese
 			// Output format
 			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
 
+			util::RegistryKeyType id(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+			util::RegistryTableType tableId(util::decodeTableId(id));
+			
 			// Scenario
-			try
+			if (tableId == ScenarioTemplateTableSync::TABLE.ID)
 			{
-				_scenario = ScenarioTableSync::Get(
-					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-					*_env,
-					UP_LINKS_LOAD_LEVEL
-				);
+				try
+				{
+					_scenario = ScenarioTemplateTableSync::Get(id, *_env, UP_LINKS_LOAD_LEVEL);
+				}
+				catch(ObjectNotFoundException<ScenarioTemplate>& e)
+				{
+					throw RequestException("No such scenario");
+				}
+
 			}
-			catch(ObjectNotFoundException<Scenario>&)
+			else
 			{
-				throw RequestException("No such scenario");
+				try
+				{
+					_scenario = SentScenarioTableSync::Get(id, *_env, UP_LINKS_LOAD_LEVEL);
+				}
+				catch(ObjectNotFoundException<SentScenario>& e)
+				{
+					throw RequestException("No such scenario");
+				}
 			}
 
 			// Main CMS template

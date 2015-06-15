@@ -25,11 +25,14 @@
 #include "MessageTypesService.hpp"
 
 #include "Alarm.h"
+#include "AlarmTableSync.h"
 #include "BroadcastPoint.hpp"
 #include "MessageType.hpp"
 #include "RequestException.h"
 #include "Request.h"
 #include "Scenario.h"
+#include "ScenarioTemplateTableSync.h"
+#include "SentScenarioTableSync.h"
 
 using namespace boost;
 using namespace std;
@@ -88,13 +91,28 @@ namespace synthese
 				);
 				if(scenarioId > 0)
 				{
-					try
+					util::RegistryTableType tableId(util::decodeTableId(scenarioId));
+					if (tableId == SentScenarioTableSync::TABLE.ID)
 					{
-						_scenario = Env::GetOfficialEnv().get<Scenario>(scenarioId).get();
+						try
+						{
+							_scenario = Env::GetOfficialEnv().get<SentScenario>(scenarioId).get();
+						}
+						catch (ObjectNotFoundException<SentScenario>&)
+						{
+							throw RequestException("No such scenario");
+						}
 					}
-					catch (ObjectNotFoundException<Scenario>&)
+					else
 					{
-						throw RequestException("No such scenario");
+						try
+						{
+							_scenario = Env::GetOfficialEnv().get<ScenarioTemplate>(scenarioId).get();
+						}
+						catch (ObjectNotFoundException<ScenarioTemplate>&)
+						{
+							throw RequestException("No such scenario");
+						}
 					}
 				}
 

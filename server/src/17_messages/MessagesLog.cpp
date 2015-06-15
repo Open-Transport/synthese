@@ -21,10 +21,9 @@
 */
 
 #include "MessagesLog.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "SentScenario.h"
-#include "AlarmTableSync.h"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
 #include "Env.h"
 #include "MessagesRight.h"
 #include "Request.h"
@@ -120,7 +119,7 @@ namespace synthese
 		}
 
 		void MessagesLog::addUpdateEntry(
-			const SentAlarm* alarm
+			const Alarm* alarm
 			, const std::string& text
 			, const security::User* user
 		){
@@ -144,11 +143,11 @@ namespace synthese
 				if (tableId == AlarmTableSync::TABLE.ID)
 				{
 					boost::shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
-					return alarm->getShortMessage();
+					return alarm->getName();
 				}
-				else if (tableId == ScenarioTableSync::TABLE.ID)
+				else if (tableId == SentScenarioTableSync::TABLE.ID)
 				{
-					boost::shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					boost::shared_ptr<const SentScenario> scenario(SentScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return scenario->getName();
 				}
 			}
@@ -164,7 +163,7 @@ namespace synthese
 			return "Diffusion de messages";
 		}
 
-		void MessagesLog::AddDeleteEntry( const SentAlarm* alarm , const security::User* user )
+		void MessagesLog::AddDeleteEntry( const Alarm* alarm , const security::User* user )
 		{
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(alarm->getKey()));

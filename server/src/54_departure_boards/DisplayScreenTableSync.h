@@ -36,7 +36,7 @@ namespace synthese
 {
 	namespace messages
 	{
-		class SentAlarm;
+		class Alarm;
 	}
 
 	namespace departure_boards
@@ -134,7 +134,7 @@ namespace synthese
 			/// @warning The message is returned even if the screen is deactivated.
 			/// If there is no message, a null pointer is returned.
 			////////////////////////////////////////////////////////////////////
-			static std::vector<boost::shared_ptr<messages::SentAlarm> > GetCurrentDisplayedMessage(
+			static std::vector<boost::shared_ptr<messages::Alarm> > GetCurrentDisplayedMessage(
 				util::Env& env,
 				util::RegistryKeyType screenId,
 				boost::optional<int> number = boost::optional<int>()
@@ -153,7 +153,7 @@ namespace synthese
 			/// @warning The message is returned even if the screen is deactivated.
 			/// If there is no message, a null pointer is returned.
 			////////////////////////////////////////////////////////////////////
-			static std::vector<boost::shared_ptr<messages::SentAlarm> > GetFutureDisplayedMessages(
+			static std::vector<boost::shared_ptr<messages::Alarm> > GetFutureDisplayedMessages(
 				util::Env& env,
 				util::RegistryKeyType screenId,
 				boost::optional<int> number = boost::optional<int>()

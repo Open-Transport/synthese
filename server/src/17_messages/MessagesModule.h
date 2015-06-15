@@ -69,7 +69,6 @@ namespace synthese
 	namespace messages
 	{
 		class BroadcastPoint;
-		class SentAlarm;
 		class Alarm;
 		class SentScenario;
 
@@ -79,13 +78,13 @@ namespace synthese
 			public server::ModuleClassTemplate<MessagesModule>
 		{
 		public:
-			struct SentAlarmLess : public std::binary_function<boost::shared_ptr<SentAlarm>, boost::shared_ptr<SentAlarm>, bool>
+			struct AlarmLess : public std::binary_function<boost::shared_ptr<Alarm>, boost::shared_ptr<Alarm>, bool>
 			{
 				//////////////////////////////////////////////////////////////////////////
 				/// Order by decreasing priority level, then by line number, then by start date, then by address
-				bool operator()(boost::shared_ptr<SentAlarm> left, boost::shared_ptr<SentAlarm> right) const;
+				bool operator()(boost::shared_ptr<Alarm> left, boost::shared_ptr<Alarm> right) const;
 			};
-			typedef std::set<boost::shared_ptr<SentAlarm>, SentAlarmLess> ActivatedMessages;
+			typedef std::set<boost::shared_ptr<Alarm>, AlarmLess> ActivatedMessages;
 
 		private:
 			static ActivatedMessages _activatedMessages;
@@ -94,7 +93,7 @@ namespace synthese
 			static long _lastMinuteScenario;
 
 			static bool _selectMessagesToActivate(const Alarm& object);
-			static bool _selectSentAlarm(const Alarm& object);
+			static bool _selectAlarm(const Alarm& object);
 			static bool _enableScenarioIfAutoActivation(SentScenario* sscenario);
 
 		public:

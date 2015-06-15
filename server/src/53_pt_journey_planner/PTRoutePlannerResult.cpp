@@ -40,7 +40,7 @@
 #include "JunctionStop.hpp"
 #include "MessagesModule.h"
 #include "SentScenario.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 
 using namespace std;
 using namespace boost;

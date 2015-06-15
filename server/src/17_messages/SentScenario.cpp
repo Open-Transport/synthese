@@ -25,7 +25,7 @@
 #include "MessagesSection.hpp"
 #include "ScenarioCalendar.hpp"
 #include "ScenarioTemplate.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "ParametersMap.h"
 #include "Registry.h"
 #include "Request.h"
@@ -38,7 +38,17 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace messages;
 
+	CLASS_DEFINITION(SentScenario, "t039_scenarios", 39)
+	FIELD_DEFINITION_OF_TYPE(Enabled, "is_enabled", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(PeriodStart, "period_start", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(PeriodEnd, "period_end", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(Template, "template_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(EventStart, "event_start", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(EventEnd, "event_end", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(Archived, "archived", SQL_BOOLEAN)
+	
 	namespace messages
 	{
 		const std::string SentScenario::DATA_ID = "id";
@@ -63,68 +73,53 @@ namespace synthese
 
 		SentScenario::SentScenario(
 			util::RegistryKeyType key
-		):	Registrable(key),
-			Scenario(),
-			_isEnabled(false),
-			_periodStart(second_clock::local_time()),
-			_periodEnd(not_a_date_time),
-			_template(NULL),
-			_archived(false)
+		):	Scenario(key),
+			Object<SentScenario, SentScenarioRecord>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_VALUE_CONSTRUCTOR(Enabled, false),
+					FIELD_VALUE_CONSTRUCTOR(PeriodStart, second_clock::local_time()),
+					FIELD_VALUE_CONSTRUCTOR(PeriodEnd, not_a_date_time),
+					FIELD_DEFAULT_CONSTRUCTOR(Template),
+					FIELD_DEFAULT_CONSTRUCTOR(DataSourceLinksWithoutUnderscore),
+					FIELD_DEFAULT_CONSTRUCTOR(Sections),
+					FIELD_DEFAULT_CONSTRUCTOR(EventStart),
+					FIELD_DEFAULT_CONSTRUCTOR(EventEnd),
+					FIELD_VALUE_CONSTRUCTOR(Archived, false)
+					))
 		{}
-
-
-
-		SentScenario::SentScenario(
-			const ScenarioTemplate& source
-		):	Registrable(0),
-			Scenario(source.getName()),
-			_isEnabled(false),
-			_periodStart(second_clock::local_time()),
-			_periodEnd(not_a_date_time),
-			_template(&source),
-			_archived(false)
-		{}
-
-
-
-		SentScenario::SentScenario(
-			const SentScenario& source
-		):	Registrable(0),
-			Scenario(source._template ? source._template->getName() : source.getName()),
-			_isEnabled(false),
-			_periodStart(second_clock::local_time()),
-			_periodEnd(not_a_date_time),
-			_template(source._template),
-			_variables(source._variables),
-			_archived(false)
-		{
-		}
-
-
-
-		void SentScenario::setPeriodStart( const ptime& periodStart )
-		{
-			_periodStart = periodStart;
-		}
-
-
-
-		void SentScenario::setPeriodEnd( const ptime& periodEnd )
-		{
-			_periodEnd = periodEnd;
-		}
-
 
 
 		SentScenario::~SentScenario()
 		{}
 
 
+		SentScenario::SentScenario(const SentScenario& source)
+			: Registrable(0)
+			, Scenario(0)
+			, Object<SentScenario, SentScenarioRecord>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, 0),
+					FIELD_VALUE_CONSTRUCTOR(Name, source.get<Name>()),
+					FIELD_VALUE_CONSTRUCTOR(Enabled, false),
+					FIELD_VALUE_CONSTRUCTOR(PeriodStart, second_clock::local_time()),
+					FIELD_VALUE_CONSTRUCTOR(PeriodEnd, not_a_date_time),
+					FIELD_VALUE_CONSTRUCTOR(Template, source.get<Template>()),
+					FIELD_DEFAULT_CONSTRUCTOR(DataSourceLinksWithoutUnderscore),
+					FIELD_DEFAULT_CONSTRUCTOR(Sections),
+					FIELD_DEFAULT_CONSTRUCTOR(EventStart),
+					FIELD_DEFAULT_CONSTRUCTOR(EventEnd),
+					FIELD_VALUE_CONSTRUCTOR(Archived, false)
+					))
+		{
+		}
 
+		
 		bool SentScenario::isApplicable( const ptime& start, const ptime& end ) const
 		{
 			// Archived event is never applicable
-			if(_archived)
+			if(getArchived())
 			{
 				return false;
 			}
@@ -157,20 +152,17 @@ namespace synthese
 			return isApplicable(date, date);
 		}
 
-
-
-		void SentScenario::setTemplate(
-			const ScenarioTemplate* value
-		){
-			_template = value;
+		ScenarioTemplate* SentScenario::getTemplate() const
+		{
+			return get<Template>().get_ptr();
 		}
 
 
-
-		void SentScenario::setVariables(
-			const VariablesMap& value
-		){
-			_variables = value;
+		void SentScenario::setTemplate(const ScenarioTemplate* value )
+		{
+			set<Template>(value
+						  ? boost::optional<ScenarioTemplate&>(*const_cast<ScenarioTemplate*>(value))
+						  : boost::none);
 		}
 
 
@@ -194,30 +186,6 @@ namespace synthese
 				boost::shared_ptr<ParametersMap> templatePM(new ParametersMap);
 				getTemplate()->toParametersMap(*templatePM, true);
 				pm.insert(TAG_TEMPLATE_SCENARIO, templatePM);
-
-				// Variables
-				const ScenarioTemplate::VariablesMap& variables(
-					getTemplate()->getVariables()
-				);
-				BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
-				{
-					boost::shared_ptr<ParametersMap> variablePM(new ParametersMap);
-					string value;
-					const SentScenario::VariablesMap& values(getVariables());
-					SentScenario::VariablesMap::const_iterator it(values.find(variable.first));
-					if(it != values.end())
-					{
-						value = it->second;
-					}
-					
-					// code
-					variablePM->insert(DATA_CODE, variable.first);
-
-					// value
-					variablePM->insert(DATA_VALUE, value);
-
-					pm.insert(TAG_VARIABLE, variablePM);
-				}
 			}
 
 			// Calendars
@@ -280,7 +248,7 @@ namespace synthese
 			}
 
 			// Sections
-			BOOST_FOREACH(const MessagesSection* section, getSections())
+			BOOST_FOREACH(const MessagesSection* section, get<Sections>())
 			{
 				boost::shared_ptr<ParametersMap> sectionPM(new ParametersMap);
 				section->toParametersMap(*sectionPM, true);
@@ -314,4 +282,16 @@ namespace synthese
 			// active
 			pm.insert(DATA_ACTIVE, getIsEnabled());
 		}
+
+		void SentScenario::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+
+		}
+
+
+		void SentScenario::unlink()
+		{
+			cleanDataSourceLinks(true);
+		}
+		
 }	}

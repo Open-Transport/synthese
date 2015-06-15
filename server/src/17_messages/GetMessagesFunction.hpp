@@ -46,7 +46,6 @@ namespace synthese
 	{
 		class AlarmRecipient;
 		class BroadcastPoint;
-		class SentAlarm;
 
 		//////////////////////////////////////////////////////////////////////////
 		///	17.15 Service : Messages list.

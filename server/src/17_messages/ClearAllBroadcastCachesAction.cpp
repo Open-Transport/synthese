@@ -28,7 +28,6 @@
 #include "MessagesModule.h"
 #include "ParametersMap.h"
 #include "Request.h"
-#include "SentAlarm.h"
 
 using namespace std;
 

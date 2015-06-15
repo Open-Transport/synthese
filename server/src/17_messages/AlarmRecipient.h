@@ -51,7 +51,6 @@ namespace synthese
 	{
 		class Alarm;
 		class AlarmObjectLink;
-		class SentAlarm;
 		class AlarmAddLinkAction;
 		class AlarmRemoveLinkAction;
 

@@ -29,7 +29,7 @@
 #include "BroadcastPointAlarmRecipient.hpp"
 #include "Import.hpp"
 #include "LineAlarmRecipient.hpp"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
 #include "StopAreaAlarmRecipient.hpp"
 #include "XmlToolkit.h"
 
@@ -140,7 +140,7 @@ namespace synthese
 
 				// Scenarios
 				DataSource::LinkedObjects existingScenarios(
-					dataSource.getLinkedObjects<Scenario>()
+					dataSource.getLinkedObjects<SentScenario>()
 				);
 				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingScenario, existingScenarios)
 				{
@@ -154,7 +154,7 @@ namespace synthese
 					boost::shared_ptr<Alarm> updatedMessage;
 					SentScenario* scenario(
 						static_cast<SentScenario*>(
-							dataSource.getObjectByCode<Scenario>(lexical_cast<string>(item.guid))
+							dataSource.getObjectByCode<SentScenario>(lexical_cast<string>(item.guid))
 					)	);
 					Alarm* message(NULL);
 					if(!scenario)
@@ -162,18 +162,18 @@ namespace synthese
 						// Creation of the scenario
 						updatedScenario.reset(
 							new SentScenario(
-								ScenarioTableSync::getId()
+								SentScenarioTableSync::getId()
 						)	);
 						updatedScenario->addCodeBySource(
 							dataSource,
 							lexical_cast<string>(item.guid)
 						);
 						updatedScenario->setIsEnabled(true);
-						_env.getEditableRegistry<Scenario>().add(updatedScenario);
+						_env.getEditableRegistry<SentScenario>().add(updatedScenario);
 
 						// Creation of the message
 						updatedMessage.reset(
-							new SentAlarm(
+							new Alarm(
 								AlarmTableSync::getId()
 						)	);
 						updatedMessage->setScenario(updatedScenario.get());
@@ -217,14 +217,14 @@ namespace synthese
 						_scenariosToRemove.erase(scenario->getKey());
 
 						// Message content
-						const Scenario::Messages& messages(scenario->getMessages());
+						const std::set<const Alarm*>& messages(scenario->getMessages());
 						if(messages.size() != 1)
 						{
 							Log::GetInstance().warn(
 								"Corrupted message : scenario should contain one message : " + lexical_cast<string>(scenario->getKey())
 							);
 							
-							SentScenario::Messages::const_iterator it(messages.begin());
+							std::set<const Alarm*>::const_iterator it(messages.begin());
 							for(++it; it != messages.end(); ++it)
 							{
 								_messagesToRemove.insert((*it)->getKey());
@@ -234,7 +234,7 @@ namespace synthese
 						if(	message->getLongMessage() != item.content ||
 							message->getShortMessage() != item.title
 						){
-							updatedMessage = AlarmTableSync::GetCastEditable<SentAlarm>(
+							updatedMessage = AlarmTableSync::GetCastEditable<Alarm>(
 								message->getKey(),
 								_env
 							);
@@ -244,7 +244,7 @@ namespace synthese
 						if(	scenario->getName() != item.title ||
 							scenario->getPeriodStart() != item.startDate
 						){
-							updatedScenario = ScenarioTableSync::GetCastEditable<SentScenario>(
+							updatedScenario = SentScenarioTableSync::GetCastEditable<SentScenario>(
 								scenario->getKey(),
 								_env
 							);
@@ -258,7 +258,7 @@ namespace synthese
 					}
 					if(updatedScenario.get())
 					{
-						updatedScenario->setName(item.title);
+						updatedScenario->set<Name>(item.title);
 						updatedScenario->setPeriodStart(item.startDate);
 					}
 

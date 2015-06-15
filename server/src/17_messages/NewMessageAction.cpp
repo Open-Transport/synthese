@@ -28,12 +28,12 @@
 #include "Profile.h"
 #include "ScenarioTemplate.h"
 #include "SentScenario.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "Session.h"
 #include "User.h"
-#include "AlarmTemplate.h"
 #include "AlarmTableSync.h"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
+#include "ScenarioTemplateTableSync.h"
 #include "MessagesModule.h"
 #include "ActionException.h"
 #include "Request.h"
@@ -84,7 +84,8 @@ namespace synthese
 		) throw(ActionException) {
 			if (_scenarioTemplate.get())
 			{
-				AlarmTemplate alarm(0, _scenarioTemplate.get());
+				Alarm alarm;
+				alarm.setScenario(_scenarioTemplate.get());
 				AlarmTableSync::Save(&alarm);
 
 				request.setActionCreatedId(alarm.getKey());
@@ -97,8 +98,8 @@ namespace synthese
 			}
 			else
 			{
-				SentAlarm alarm(0, _sentScenario.get());
-
+				Alarm alarm;
+				alarm.setScenario(_sentScenario.get());
 				AlarmTableSync::Save(&alarm);
 
 				request.setActionCreatedId(alarm.getKey());
@@ -115,15 +116,30 @@ namespace synthese
 
 		void NewMessageAction::setScenarioId(RegistryKeyType key)
 		{
-			try
+			util::RegistryTableType tableId(util::decodeTableId(key));
+			if (tableId == ScenarioTemplateTableSync::TABLE.ID)
 			{
-				boost::shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(key, *_env));
-				_sentScenario = dynamic_pointer_cast<const SentScenario, const Scenario>(scenario);
-				_scenarioTemplate = dynamic_pointer_cast<const ScenarioTemplate, const Scenario>(scenario);
+				try
+				{
+					_scenarioTemplate = ScenarioTemplateTableSync::Get(key, *_env);
+					_sentScenario.reset();
+				}
+				catch(ObjectNotFoundException<ScenarioTemplate>& e)
+				{
+					throw ActionException("Scenario", e, *this);
+				}
 			}
-			catch(ObjectNotFoundException<Scenario>& e)
+			else if (tableId == SentScenarioTableSync::TABLE.ID)
 			{
-				throw ActionException("Scenario", e, *this);
+				try
+				{
+					_sentScenario = SentScenarioTableSync::Get(key, *_env);
+					_scenarioTemplate.reset();
+				}
+				catch(ObjectNotFoundException<SentScenario>& e)
+				{
+					throw ActionException("Scenario", e, *this);
+				}
 			}
 		}
 

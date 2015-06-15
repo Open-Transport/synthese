@@ -30,6 +30,8 @@
 #include <Registrable.h>
 #include <RequestException.h>
 #include <Scenario.h>
+#include "ScenarioTemplateTableSync.h"
+#include "SentScenarioTableSync.h"
 #include <UtilTypes.h>
 
 #include <iostream>
@@ -69,17 +71,29 @@ namespace synthese
 
 		void NotificationEventsService::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
+			util::RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_SCENARIO_ID));
+			util::RegistryTableType tableId(util::decodeTableId(id));
+			if (tableId == ScenarioTemplateTableSync::TABLE.ID)
 			{
-				// Reference to scenario
-				_scenario = Env::GetOfficialEnv().getEditable<Scenario>(
-					map.getDefault<RegistryKeyType>(PARAMETER_SCENARIO_ID)
-				).get();
-
+				try
+				{
+					_scenario = Env::GetOfficialEnv().getEditable<ScenarioTemplate>(id).get();
+				}
+				catch(ObjectNotFoundException<ScenarioTemplate>&)
+				{
+					_scenario = NULL;
+				}
 			}
-			catch(ObjectNotFoundException<Scenario>&)
+			else
 			{
-				_scenario = NULL;
+				try
+				{
+					_scenario = Env::GetOfficialEnv().getEditable<SentScenario>(id).get();
+				}
+				catch(ObjectNotFoundException<SentScenario>&)
+				{
+					_scenario = NULL;
+				}
 			}
 
 			_optionUnhold = map.getDefault<bool>(PARAMETER_UNHOLD_EVENTS, false);
@@ -99,7 +113,7 @@ namespace synthese
 				throw RequestException("Invalid parameters");
 			}
 
-			Scenario::Messages alarms = _scenario->getMessages();
+			std::set<const Alarm*> alarms = _scenario->getMessages();
 
 			Env env = Env::GetOfficialEnv();
 			size_t hold_count = 0;

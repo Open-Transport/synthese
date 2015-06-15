@@ -33,7 +33,8 @@
 #include "Scenario.h"
 #include "ScenarioTemplate.h"
 #include "SentScenario.h"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
+#include "ScenarioTemplateTableSync.h"
 #include "AlarmTableSync.h"
 #include "ScenarioSaveAction.h"
 #include "NewMessageAction.h"
@@ -42,7 +43,6 @@
 #include "MessagesRight.h"
 #include "MessagesLibraryRight.h"
 #include "ScenarioTableSync.h"
-#include "AlarmTableSync.h"
 #include "StaticActionFunctionRequest.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
@@ -87,33 +87,38 @@ namespace synthese
 	{
 		const string MessagesScenarioAdmin::TAB_MESSAGES("m");
 		const string MessagesScenarioAdmin::TAB_PARAMETERS("p");
-		const string MessagesScenarioAdmin::TAB_VARIABLES("v");
 		const string MessagesScenarioAdmin::TAB_LOG("l");
 		const string MessagesScenarioAdmin::TAB_DATASOURCES("s");
 
 		void MessagesScenarioAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
+			util::RegistryKeyType id(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+			util::RegistryTableType tableId(util::decodeTableId(id));
 			try
 			{
-				_scenario = ScenarioTableSync::Get(
-					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-					_getEnv(),
-					UP_LINKS_LOAD_LEVEL
-				);
+				if (tableId == ScenarioTemplateTableSync::TABLE.ID)
+				{
+					_scenario = ScenarioTemplateTableSync::Get(
+						id,
+						_getEnv(),
+						UP_LINKS_LOAD_LEVEL
+						);
+					_generalLogView.set(map, MessagesLibraryLog::FACTORY_KEY, _scenario->getKey());
+				}
+				else if (tableId == SentScenarioTableSync::TABLE.ID)
+				{
+					_scenario = SentScenarioTableSync::Get(
+						id,
+						_getEnv(),
+						UP_LINKS_LOAD_LEVEL
+						);
+					_generalLogView.set(map, MessagesLog::FACTORY_KEY, _scenario->getKey());
+				}
 			}
 			catch(...)
 			{
 				throw AdminParametersException("Specified scenario not found");
-			}
-
-			if(dynamic_cast<const SentScenario*>(_scenario.get()))
-			{
-				_generalLogView.set(map, MessagesLog::FACTORY_KEY, _scenario->getKey());
-			}
-			else
-			{
-				_generalLogView.set(map, MessagesLibraryLog::FACTORY_KEY, _scenario->getKey());
 			}
 		}
 
@@ -169,24 +174,6 @@ namespace synthese
 
 					stream << udt.cell("Actif", udt.getForm().getOuiNonRadioInput(ScenarioSaveAction::PARAMETER_ENABLED, _sentScenario->getIsEnabled()));
 
-					// Variables
-					if(	_sentScenario->getTemplate() &&
-						!_sentScenario->getTemplate()->getVariables().empty()
-					){
-						stream << udt.title("Variables (* = champ obligatoire)");
-						const ScenarioTemplate::VariablesMap& variables(_sentScenario->getTemplate()->getVariables());
-						BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type variable, variables)
-						{
-							string value;
-							SentScenario::VariablesMap::const_iterator it(_sentScenario->getVariables().find(variable.second.code));
-							if (it != _sentScenario->getVariables().end()) value = it->second;
-
-							stream << udt.cell(
-								variable.second.code + (variable.second.compulsory ? "*" : "") + (variable.second.helpMessage.empty() ? string() : (" "+ HTMLModule::getHTMLImage("/admin/img/information.png", "Info : " + variable.second.helpMessage))),
-								udt.getForm().getTextInput(ScenarioSaveAction::PARAMETER_VARIABLE + variable.second.code, value)
-							);
-						}
-					}
 				}
 				stream << udt.close();
 			}
@@ -204,12 +191,17 @@ namespace synthese
 
 				stream << "<h1>Messages</h1>";
 
-				AlarmTableSync::SearchResult v(
-					AlarmTableSync::Search(
-						*_env,
-						_sentScenario.get() ? _sentScenario->getKey() : _templateScenario->getKey()
-				)	);
 
+				Alarms v;
+				if (_sentScenario.get())
+				{
+					AlarmTableSync::Search(*_env, std::back_inserter(v), _sentScenario->getKey());
+				}
+				else
+				{
+					AlarmTableSync::Search(*_env, std::back_inserter(v), _templateScenario->getKey());
+				}
+					
 				ActionResultHTMLTable::HeaderVector h;
 				h.push_back(make_pair(string(), "Message"));
 				h.push_back(make_pair(string(), "Emplacement"));
@@ -243,38 +235,6 @@ namespace synthese
 				stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 				stream << t.col();
 				stream << t.close();
-			}
-
-			////////////////////////////////////////////////////////////////////
-			// TAB VARIABLES
-			if (openTabContent(stream, TAB_VARIABLES))
-			{
-				stream << "<h1>Récapitulatif des variables du scénario</h1>";
-
-				const ScenarioTemplate::VariablesMap& variables(_templateScenario->getVariables());
-
-				if(variables.empty())
-				{
-					stream << "<p>Aucune variable définie.</p>";
-				}
-				else
-				{
-					HTMLTable::ColsVector h;
-					h.push_back("Code");
-					h.push_back("Info");
-					h.push_back("Obligatoire");
-					HTMLTable t(h, ResultHTMLTable::CSS_CLASS);
-					stream << t.open();
-					BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type variable, variables)
-					{
-						string value;
-						stream << t.row();
-						stream << t.col() << variable.second.code;
-						stream << t.col() << variable.second.helpMessage;
-						stream << t.col() << (variable.second.compulsory ? "OUI" : "NON");
-					}
-					stream << t.close();
-				}
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -317,17 +277,18 @@ namespace synthese
 
 
 
+
 		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const server::Request& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
-			AlarmTableSync::SearchResult alarms(
-				AlarmTableSync::Search(
+			Alarms alarms;
+			AlarmTableSync::Search(
 					*_env,
-					_scenario->getKey()
-			)	);
+					std::back_inserter(alarms),
+					_scenario->getKey());
 			BOOST_FOREACH(const boost::shared_ptr<Alarm>& alarm, alarms)
 			{
 				boost::shared_ptr<MessageAdmin> p(
@@ -339,7 +300,6 @@ namespace synthese
 
 			return links;
 		}
-
 
 
 		std::string MessagesScenarioAdmin::getTitle() const
@@ -357,11 +317,6 @@ namespace synthese
 
 			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, true, "table.png"));
 			_tabs.push_back(Tab("Messages", TAB_MESSAGES, true, "note.png"));
-
-			if(dynamic_cast<const ScenarioTemplate*>(_scenario.get()))
-			{
-				_tabs.push_back(Tab("Variables", TAB_VARIABLES, true));
-			}
 			_tabs.push_back(Tab("Journal", TAB_LOG, true, "book.png"));
 
 			if(dynamic_cast<const SentScenario*>(_scenario.get()))

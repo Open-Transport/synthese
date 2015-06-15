@@ -32,7 +32,7 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "Webpage.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "StaticFunctionRequest.h"
 #include "SentScenario.h"
 
@@ -202,7 +202,7 @@ namespace synthese
 			optional<AlarmLevel> bestPriority;
 			if(_priorityOrder)
 			{
-				BOOST_FOREACH(boost::shared_ptr<const SentAlarm> message, messages)
+				BOOST_FOREACH(boost::shared_ptr<const Alarm> message, messages)
 				{
 					if(_maxMessagesNumber && number >= *_maxMessagesNumber)
 					{
@@ -223,12 +223,12 @@ namespace synthese
 			}
 			else
 			{
-				BOOST_FOREACH(boost::shared_ptr<SentAlarm> message, messages)
+				BOOST_FOREACH(boost::shared_ptr<Alarm> message, messages)
 				{
 					bestPriority = message->getLevel();
 					break;
 				}
-				BOOST_REVERSE_FOREACH(boost::shared_ptr<SentAlarm> message, messages)
+				BOOST_REVERSE_FOREACH(boost::shared_ptr<Alarm> message, messages)
 				{
 					if(_maxMessagesNumber && number >= *_maxMessagesNumber)
 					{

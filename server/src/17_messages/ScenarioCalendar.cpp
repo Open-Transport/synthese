@@ -24,7 +24,7 @@
 
 #include "MessageApplicationPeriodTableSync.hpp"
 #include "ParametersMap.h"
-#include "SentScenario.h"
+#include "Scenario.h"
 
 using namespace boost;
 using namespace std;
@@ -60,7 +60,7 @@ namespace synthese
 		{
 			if(get<ScenarioPointer>())
 			{
-				SentScenario::ScenarioCalendars ap(get<ScenarioPointer>()->getCalendars());
+				std::set<ScenarioCalendar*> ap(get<ScenarioPointer>()->getCalendars());
 				ap.insert(this);
 				get<ScenarioPointer>()->setCalendars(ap);
 			}
@@ -72,8 +72,8 @@ namespace synthese
 		{
 			if(get<ScenarioPointer>())
 			{
-				SentScenario::ScenarioCalendars ap(get<ScenarioPointer>()->getCalendars());
-				SentScenario::ScenarioCalendars::iterator it(ap.find(this));
+				std::set<ScenarioCalendar*> ap(get<ScenarioPointer>()->getCalendars());
+				std::set<ScenarioCalendar*>::iterator it(ap.find(this));
 				if(it != ap.end())
 				{
 					ap.erase(it);

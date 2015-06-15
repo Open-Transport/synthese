@@ -30,10 +30,9 @@ namespace synthese
 	namespace messages
 	{
 		class Alarm;
-		class SentAlarm;
+		class Alarm;
 		class ScenarioTemplate;
 		class SentScenario;
-		class SentAlarm;
 		class Scenario;
 
 		/** Journal des envois de messages.
@@ -91,7 +90,7 @@ namespace synthese
 				, const security::User* user
 				);
 			static void	addUpdateEntry(
-				const SentAlarm* alarm
+				const Alarm* alarm
 				, const std::string& text
 				, const security::User* user
 				);
@@ -105,7 +104,7 @@ namespace synthese
 				@date 2008
 			*/
 			static void	AddDeleteEntry(
-				const SentAlarm* alarm,
+				const Alarm* alarm,
 				const security::User* user
 			);
 

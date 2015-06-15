@@ -35,7 +35,7 @@
 #include <NotificationProviderTableSync.hpp>
 #include <Object.hpp>
 #include <Registrable.h>
-#include <Scenario.h>
+#include <SentScenario.h>
 
 #include <sstream>
 #include <vector>
