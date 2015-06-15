@@ -1058,6 +1058,14 @@ namespace synthese
 						std::set<string> tags;
 						boost::algorithm::split(tags, tagsString, is_any_of(","), token_compress_on );
 						message->setTags(tags);
+						message->setRepeatInterval(messageNode.second.get("repeat_interval", 0));
+						message->setWithAck(messageNode.second.get("with_ack", false));
+						message->setMultipleStops(messageNode.second.get("multiple_stops", false));
+						message->setPlayTts(messageNode.second.get("play_tts", false));
+						message->setLight(messageNode.second.get("light", false));
+						message->setDirectionSignCode(messageNode.second.get("direction_sign_code", 0));
+						message->setStartStopPoint(messageNode.second.get("start_stop_point", 0));
+						message->setEndStopPoint(messageNode.second.get("end_stop_point", 0));
 						BOOST_FOREACH(const ptree::value_type& sectionNode, messageNode.second.get_child("section"))
 						{
 							RegistryKeyType sectionId(sectionNode.second.get("id", RegistryKeyType(0)));

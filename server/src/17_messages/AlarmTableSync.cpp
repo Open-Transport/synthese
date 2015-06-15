@@ -81,6 +81,14 @@ namespace synthese
 		const string AlarmTableSync::COL_DISPLAY_DURATION = "display_duration";
 		const string AlarmTableSync::COL_DIGITIZED_VERSION = "digitized_version";
 		const string AlarmTableSync::COL_TAGS = "tags";
+		const string AlarmTableSync::COL_REPEAT_INTERVAL = "repeat_interval";
+		const string AlarmTableSync::COL_WITH_ACK = "with_ack";
+		const string AlarmTableSync::COL_MULTIPLE_STOPS = "multiple_stops";
+		const string AlarmTableSync::COL_PLAY_TTS = "play_tts";
+		const string AlarmTableSync::COL_LIGHT = "light";
+		const string AlarmTableSync::COL_DIRECTION_SIGN_CODE = "direction_sign_code";
+		const string AlarmTableSync::COL_START_STOP_POINT = "start_stop_point";
+		const string AlarmTableSync::COL_END_STOP_POINT = "end_stop_point";
 	}
 
 	namespace db
@@ -106,6 +114,14 @@ namespace synthese
 			Field(AlarmTableSync::COL_DISPLAY_DURATION, SQL_INTEGER),
 			Field(AlarmTableSync::COL_DIGITIZED_VERSION, SQL_TEXT),
 			Field(AlarmTableSync::COL_TAGS, SQL_TEXT),
+			Field(AlarmTableSync::COL_REPEAT_INTERVAL, SQL_INTEGER),
+			Field(AlarmTableSync::COL_WITH_ACK, SQL_BOOLEAN),
+			Field(AlarmTableSync::COL_MULTIPLE_STOPS, SQL_BOOLEAN),
+			Field(AlarmTableSync::COL_PLAY_TTS, SQL_BOOLEAN),
+			Field(AlarmTableSync::COL_LIGHT, SQL_BOOLEAN),
+			Field(AlarmTableSync::COL_DIRECTION_SIGN_CODE, SQL_INTEGER),
+			Field(AlarmTableSync::COL_START_STOP_POINT, SQL_INTEGER),
+			Field(AlarmTableSync::COL_END_STOP_POINT, SQL_INTEGER),
 			Field()
 		};
 
@@ -153,6 +169,14 @@ namespace synthese
 			boost::algorithm::split(tags, tagsString, is_any_of(","), token_compress_on );
 			alarm->setTags(tags);
 
+			alarm->setRepeatInterval(rows->getInt(AlarmTableSync::COL_REPEAT_INTERVAL));
+			alarm->setWithAck(rows->getBool(AlarmTableSync::COL_WITH_ACK));
+			alarm->setMultipleStops(rows->getBool(AlarmTableSync::COL_MULTIPLE_STOPS));
+			alarm->setPlayTts(rows->getBool(AlarmTableSync::COL_PLAY_TTS));
+			alarm->setLight(rows->getBool(AlarmTableSync::COL_LIGHT));
+			alarm->setDirectionSignCode(rows->getInt(AlarmTableSync::COL_DIRECTION_SIGN_CODE));
+			alarm->setStartStopPoint(rows->getInt(AlarmTableSync::COL_START_STOP_POINT));
+			alarm->setEndStopPoint(rows->getInt(AlarmTableSync::COL_END_STOP_POINT));
 			// Section
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -315,6 +339,15 @@ namespace synthese
 
 			string tagsString = boost::algorithm::join(object->getTags(), ",");
 			query.addField(tagsString);
+
+			query.addField(object->getRepeatInterval());
+			query.addField(object->getWithAck());
+			query.addField(object->getMultipleStops());
+			query.addField(object->getPlayTts());
+			query.addField(object->getLight());
+			query.addField(object->getDirectionSignCode());
+			query.addField(object->getStartStopPoint());
+			query.addField(object->getEndStopPoint());
 
 			query.execute(transaction);
 		}

@@ -99,6 +99,14 @@ namespace synthese
 			std::size_t			_displayDuration;
 			std::string			_digitizedVersion;
 			std::set<std::string> _tags;
+			int					_repeatInterval;
+			bool				_withAck;
+			bool				_multipleStops;
+			bool				_playTts;
+			bool				_light;
+			int					_directionSignCode;
+			int					_startStopPoint;
+			int					_endStopPoint;
 
 			// Links
 			//@{
@@ -140,6 +148,14 @@ namespace synthese
 				std::size_t				getDisplayDuration() const { return _displayDuration;}
 				const std::string&		getDigitizedVersion()	const { return _digitizedVersion; }
 				const std::set<std::string>& getTags() const { return _tags; }
+				int						getRepeatInterval() const { return _repeatInterval; }
+				bool					getWithAck() const { return _withAck; }
+				bool					getMultipleStops() const { return _multipleStops; }
+				bool					getPlayTts() const { return _playTts; }
+				bool					getLight() const { return _light; }
+				int						getDirectionSignCode() const { return _directionSignCode; }
+				int						getStartStopPoint() const { return _startStopPoint; }
+				int						getEndStopPoint() const { return _endStopPoint; }
 			//@}
 
 			//! @name Setters
@@ -158,6 +174,14 @@ namespace synthese
 				void setDisplayDuration(std::size_t value){ _displayDuration = value; }
 				void setDigitizedVersion( const std::string& value){ _digitizedVersion = value; }
 				void setTags(const std::set<std::string> tags) { _tags = tags; }
+				void setRepeatInterval(int value){ _repeatInterval = value; }
+				void setWithAck(bool value){ _withAck = value; }
+				void setMultipleStops(bool value){ _multipleStops = value; }
+				void setPlayTts(bool value){ _playTts = value; }
+				void setLight(bool value){ _light = value; }
+				void setDirectionSignCode(int value){ _directionSignCode = value; }
+				void setStartStopPoint(int value){ _startStopPoint = value; }
+				void setEndStopPoint(int value){ _endStopPoint = value; }
 			//@}
 
 			//! @name Services

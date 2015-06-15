@@ -78,6 +78,14 @@ namespace synthese
 			static const std::string COL_DISPLAY_DURATION;
 			static const std::string COL_DIGITIZED_VERSION;
 			static const std::string COL_TAGS;
+			static const std::string COL_REPEAT_INTERVAL;
+			static const std::string COL_WITH_ACK;
+			static const std::string COL_MULTIPLE_STOPS;
+			static const std::string COL_PLAY_TTS;
+			static const std::string COL_LIGHT;
+			static const std::string COL_DIRECTION_SIGN_CODE;
+			static const std::string COL_START_STOP_POINT;
+			static const std::string COL_END_STOP_POINT;
 
 			AlarmTableSync() {}
 			~AlarmTableSync() {}
