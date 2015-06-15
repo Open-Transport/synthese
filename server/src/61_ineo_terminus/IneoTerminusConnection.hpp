@@ -83,6 +83,10 @@ namespace synthese
 
 				void start();
 
+				void sendMessage(
+					std::string message
+				);
+
 			private:
 				void handle_write(
 					const boost::system::error_code& error
@@ -161,7 +165,7 @@ namespace synthese
 				boost::asio::ip::tcp::acceptor _acceptor;
 			};
 
-
+			std::set<IneoTerminusConnection::tcp_connection*> _livingConnections;
 			
 		public:
 			IneoTerminusConnection();
@@ -179,6 +183,9 @@ namespace synthese
 				const util::RegistryKeyType& getIneoNetworkID() const { return _ineoNetworkID; }
 				const Status& getStatus() const { return _status; }
 			//@}
+			
+			void addConnection(tcp_connection* new_connection);
+			void removeConnection(tcp_connection* connection_to_remove);
 
 //				static void test(const boost::system::error_code& error);
 			static void RunThread();
@@ -187,6 +194,8 @@ namespace synthese
 				const std::string& name,
 				const std::string& value
 			);
+
+			static void MessageSender();
 
 			static boost::shared_ptr<IneoTerminusConnection> GetTheConnection(){ return _theConnection; }
 		};

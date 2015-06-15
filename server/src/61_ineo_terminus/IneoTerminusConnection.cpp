@@ -77,6 +77,71 @@ namespace synthese
 			ioService.run();
 		}
 
+		void IneoTerminusConnection::addConnection(IneoTerminusConnection::tcp_connection* new_connection)
+		{
+			_livingConnections.insert(new_connection);
+		}
+
+		void IneoTerminusConnection::removeConnection(IneoTerminusConnection::tcp_connection* connection_to_remove)
+		{
+			_livingConnections.erase(connection_to_remove);
+		}
+
+		void IneoTerminusConnection::MessageSender()
+		{
+			// On consomme ici les messages PUSH vers Ineo SAE
+			// Pour l'instant on envoie juste un message vers le SAE pour test d'écriture
+			stringstream message;
+			stringstream dateMessage;
+			ptime now(second_clock::local_time());
+			dateMessage << setw( 2 ) << setfill ( '0' ) <<
+				now.date().day() << "/" <<
+				setw( 2 ) << setfill ( '0' ) <<
+				static_cast<long>(now.date().month()) << "/" <<
+				setw( 2 ) << setfill ( '0' ) <<
+				now.date().year();
+			stringstream heureMessage;
+			heureMessage << setw( 2 ) << setfill ( '0' ) <<
+				now.time_of_day().hours() << ":" <<
+				setw( 2 ) << setfill ( '0' ) <<
+				now.time_of_day().minutes () << ":" <<
+				setw( 2 ) << setfill ( '0' ) <<
+				now.time_of_day().seconds();
+			message << "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" <<
+				"<PassengerCreateMessageRequest><ID>1</ID><RequestTimeStamp>" <<
+				dateMessage <<
+				" " <<
+				heureMessage <<
+				"</RequestTimeStamp><RequestorRef>Terminus</RequestorRef>" <<
+				"<Messaging><Name>Message de test terminus vers SAE</Name><StartDate>" <<
+				dateMessage <<
+				"</StartDate><StopDate>" <<
+				dateMessage <<
+				"</StopDate><StartTime>07:00:00</StartTime><StopTime>20:30:00</StopTime><RepeatPeriod>8</RepeatPeriod>" <<
+				"<Inhibition>non</Inhibition><Color>Vert</Color><Text><Line>Ceci est un message de test</Line>" <<
+				"<Line>envoyé par Terminus dans le SAE</Line></Text><Recipients><AllNetwork /></Recipients>" <<
+				"</Messaging></PassengerCreateMessageRequest>";
+
+			bool testMessageSent(false);
+
+			// Main loop
+			while (true)
+			{
+				// If we have an active connection, we send the first message by this way
+				if (!_theConnection->_livingConnections.empty())
+				{
+					if (!testMessageSent)
+					{
+						util::Log::GetInstance().debug("IneoTerminusConnection : envoi du message de test à Ineo");
+						(*(_theConnection->_livingConnections.begin()))->sendMessage(message.str());
+						testMessageSent = true;
+					}
+				}
+
+				// Sleep one second
+				boost::this_thread::sleep(boost::posix_time::seconds(1));
+			}
+		}
 
 
 		XMLNode IneoTerminusConnection::ParseInput(
@@ -203,7 +268,7 @@ namespace synthese
 			}
 			else
 			{
-				delete this;
+				IneoTerminusConnection::GetTheConnection()->removeConnection(this);
 			}
 		}
 
@@ -228,8 +293,22 @@ namespace synthese
 			}
 			else
 			{
-				delete this;
+				IneoTerminusConnection::GetTheConnection()->removeConnection(this);
 			}
+		}
+
+		void IneoTerminusConnection::tcp_connection::sendMessage(
+			string message
+		)
+		{
+			boost::asio::async_write(
+				_socket,
+				boost::asio::buffer(message),
+				boost::bind(
+					&tcp_connection::handle_write,
+					this,
+					boost::asio::placeholders::error
+			)	);
 		}
 
 		IneoTerminusConnection::tcp_server::tcp_server(
@@ -266,6 +345,7 @@ namespace synthese
 			if (!error)
 			{
 				new_connection->start();
+				IneoTerminusConnection::GetTheConnection()->addConnection(new_connection);
 			}
 			else
 			{

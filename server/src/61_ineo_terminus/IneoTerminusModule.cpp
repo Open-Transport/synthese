@@ -63,6 +63,9 @@ namespace synthese
 		{
 			// Ineo Terminus connector
 			ServerModule::AddThread(&IneoTerminusConnection::RunThread, "IneoTerminusConnector");
+
+			// Ineo Terminus connector message sender
+			ServerModule::AddThread(&IneoTerminusConnection::MessageSender, "IneoTerminus Message sender");
 		}
 
 		template<> void ModuleClassTemplate<IneoTerminusModule>::End()
