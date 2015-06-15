@@ -1051,6 +1051,14 @@ namespace synthese
 						message->setLongMessage(messageNode.second.get("content", string()));
 						message->setDisplayDuration(messageNode.second.get("displayDuration", 0));
 						message->setDigitizedVersion(messageNode.second.get("digitized_version", string()));
+						message->setRepeatInterval(messageNode.second.get("repeat_interval", 0));
+						message->setWithAck(messageNode.second.get("with_ack", false));
+						message->setMultipleStops(messageNode.second.get("multiple_stops", false));
+						message->setPlayTts(messageNode.second.get("play_tts", false));
+						message->setLight(messageNode.second.get("light", false));
+						message->setDirectionSignCode(messageNode.second.get("direction_sign_code", 0));
+						message->setStartStopPoint(messageNode.second.get("start_stop_point", 0));
+						message->setEndStopPoint(messageNode.second.get("end_stop_point", 0));
 						BOOST_FOREACH(const ptree::value_type& sectionNode, messageNode.second.get_child("section"))
 						{
 							RegistryKeyType sectionId(sectionNode.second.get("id", RegistryKeyType(0)));
