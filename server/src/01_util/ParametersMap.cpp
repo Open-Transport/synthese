@@ -240,6 +240,8 @@ namespace synthese
 		{}
 
 
+		ParametersMap::~ParametersMap ()
+		{}
 
 		void ParametersMap::insert( const std::string& parameterName, const std::string& value )
 		{

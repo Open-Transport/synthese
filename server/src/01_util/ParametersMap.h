@@ -60,6 +60,9 @@ namespace synthese
 			public Record
 		{
 		public:
+
+			virtual ~ParametersMap ();
+
 			struct File
 			{
 				MimeType mimeType;
