@@ -29,7 +29,6 @@
 #ifndef SYNTHESE_ServerModule_H__
 #define SYNTHESE_ServerModule_H__
 
-#include <boost/asio.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/thread.hpp>
@@ -41,7 +40,6 @@
 
 #include "CallableByThread.hpp"
 #include "ModuleClassTemplate.hpp"
-#include "HTTPConnection.hpp"
 #include "ServerTypes.h"
 #ifdef __gnu_linux__
 #include <pthread.h> // For pthread_setname_np
@@ -88,8 +86,6 @@ namespace synthese
 	namespace server
 	{
 		class Session;
-		struct HTTPRequest;
-		struct HTTPReply;
 
 		/** 15 Server module class.
 		*/
@@ -119,7 +115,6 @@ namespace synthese
 				Status status;
 				std::string queryString;
 				std::string description;
-				bool isHTTPThread;
 				boost::posix_time::ptime lastChangeTime;
 			};
 
@@ -127,7 +122,6 @@ namespace synthese
 
 			//! DbModule parameters
 			static const std::string MODULE_PARAM_PORT;
-			static const std::string MODULE_PARAM_NB_THREADS;
 			static const std::string MODULE_PARAM_LOG_LEVEL;
 			static const std::string MODULE_PARAM_SMTP_SERVER;
 			static const std::string MODULE_PARAM_SMTP_PORT;
@@ -152,15 +146,6 @@ namespace synthese
 
 		private:
 
-			/// The io_service used to perform asynchronous operations.
-			static boost::asio::io_service _io_service;
-
-			/// Acceptor used to listen for incoming connections.
-			static boost::asio::ip::tcp::acceptor _acceptor;
-
-			/// The next connection to be accepted.
-			static connection_ptr _new_connection;
-
 			// Threads
 			static Threads _threads;
 			static boost::recursive_mutex _threadManagementMutex;
@@ -178,17 +163,14 @@ namespace synthese
 				const std::string &gitURL
 			);
 
-			static boost::thread::id AddHTTPThread();
-			
 			template<class Callable>
 			static boost::shared_ptr<boost::thread> AddThread(
 				Callable func,
-				const std::string& description,
-				bool isHTTPThread = false
+				const std::string& description
 			);
-			static void KillThread(const std::string& key, bool autoRestart=true);
+			static void KillThread(const std::string& key);
 			static void KillAllThreads();
-			static void KillAllHTTPThreads(bool autoRestart=true);
+			static void KillAllHTTPThreads();
 			static void Wait();
 			static const Threads& GetThreads();
 			static void SetCurrentThreadAnalysing(const std::string& queryString);
@@ -213,26 +195,6 @@ namespace synthese
 			);
 
 
-		public:
-			/// Handle completion of an asynchronous accept operation.
-			static void HandleAccept(
-				const boost::system::error_code& e
-			);
-
-			/// Handle a request and produce a reply.
-			/// @param req HTTP request to handle
-			/// @param rep HTTP Reply to write the result on
-			static void HandleRequest(
-				const HTTPRequest& req,
-				HTTPReply& rep
-			);
-
-		private:
-			/// Sets headers in the given HTTPReply from the cookies stored in cookiesMap.
-			static void _SetCookieHeaders(
-				HTTPReply& httpReply,
-				const CookiesMap& cookiesMap
-			);
 		};
 
 
@@ -240,8 +202,7 @@ namespace synthese
 		template<class Callable>
 		boost::shared_ptr<boost::thread> ServerModule::AddThread(
 			Callable func,
-			const std::string& description,
-			bool isHTTPThread /*= false */
+			const std::string& description
 		){
 
 			boost::recursive_mutex::scoped_lock lock(_threadManagementMutex);
@@ -257,7 +218,6 @@ namespace synthese
 			info.theThread = theThread;
 			info.lastChangeTime = boost::posix_time::microsec_clock::local_time();
 			info.description = description;
-			info.isHTTPThread = isHTTPThread;
 			_threads.insert(
 				std::make_pair(boost::lexical_cast<std::string>(theThread->get_id()), info)
 			);

@@ -35,11 +35,14 @@
 #include "UserException.h"
 #include "UserTableSync.h"
 #include "WebPageDisplayFunction.h"
+#include "Poco/StreamCopier.h"
 
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;
+using Poco::StreamCopier;
+using Poco::Net::NameValueCollection;
 
 namespace synthese
 {
@@ -178,10 +181,14 @@ namespace synthese
 
 
 
-		DynamicRequest::DynamicRequest( const HTTPRequest& httpRequest ):
-			Request()
+		DynamicRequest::DynamicRequest(
+			Poco::Net::HTTPServerRequest& request,
+			Poco::Net::HTTPServerResponse& response
+		):
+			Request(),
+			_response(response)
 		{
-			_ip = httpRequest.ipaddr;
+			_ip = request.clientAddress().host().toString();
 
 			// IP
 			if (_ip.empty())
@@ -191,29 +198,28 @@ namespace synthese
 			}
 
 			// Host
-			HTTPRequest::Headers::const_iterator it(httpRequest.headers.find("X-Forwarded-Host"));
-			if(it != httpRequest.headers.end() && !it->second.empty())
+			if(request.has("X-Forwarded-Host"))
 			{
+				string forwardedHost(request["X-Forwarded-Host"]);
 				// If there are multiple hosts in the x-forwarded-host chain, use the first one.
-				size_t commaPos = it->second.find(",");
+				size_t commaPos = forwardedHost.find(",");
 				if(commaPos != string::npos)
 				{
-					_hostName = it->second.substr(0, commaPos);
+					_hostName = forwardedHost.substr(0, commaPos);
 				}
 				else
 				{
-					_hostName = it->second;
+					_hostName = forwardedHost;
 				}
 			} else {
-				it = httpRequest.headers.find("Host");
-				if(it != httpRequest.headers.end())
+				if(request.has("Host"))
 				{
-					_hostName = it->second;
+					_hostName = request["Host"];
 				}
 			}
 
 			// Client URL
-			const string& uri(httpRequest.uri);
+			const string& uri(request.getURI());
 
 			size_t separator(uri.find_first_of(PARAMETER_STARTER));
 			if(separator == string::npos)
@@ -226,11 +232,11 @@ namespace synthese
 			}
 
 			// Parameters
-			it = httpRequest.headers.find("Content-Type");
-			if(it != httpRequest.headers.end())
+			if(request.has("Content-Type"))
 			{
+				string contentType(request["Content-Type"]);
 				vector<string> parts;
-				split(parts, it->second, is_any_of(";"));
+				split(parts, contentType, is_any_of(";"));
 				if(	parts.size() >= 2 &&
 					trim_copy(parts[0]) == "multipart/form-data"
 				){
@@ -238,8 +244,10 @@ namespace synthese
 					split(parts1, parts[1], is_any_of("="));
 					if(parts1.size() >= 2)
 					{
+						string postData;
+						StreamCopier::copyToString(request.stream(), postData);
 						_getPostParametersMap = ParametersMap(
-							httpRequest.postData,
+							postData,
 							parts1[1]
 						);
 					}
@@ -248,7 +256,9 @@ namespace synthese
 					parts.size() >= 1 &&
 					trim_copy(parts[0]) == "application/x-www-form-urlencoded"
 				){
-					_getPostParametersMap = ParametersMap(httpRequest.postData);
+					string postData;
+					StreamCopier::copyToString(request.stream(), postData);
+					_getPostParametersMap = ParametersMap(postData);
 				}
 				else
 				{
@@ -272,9 +282,11 @@ namespace synthese
 							);
 						}
 					}
+					string postData;
+					StreamCopier::copyToString(request.stream(), postData);
 					_getPostParametersMap.insert(
 						PARAMETER_POST_DATA,
-						httpRequest.postData
+						postData
 					);
 				}
 			}
@@ -285,29 +297,20 @@ namespace synthese
 			}
 			_getPostParametersMap.insert(
 				PARAMETER_CLIENT_ADDRESS,
-				httpRequest.ipaddr
+				_ip
 			);
 
 			// Cookies
 			_allParametersMap = _getPostParametersMap;
-			it = httpRequest.headers.find("Cookie");
-			if(it != httpRequest.headers.end())
+			NameValueCollection cookies;
+			request.getCookies(cookies);
+			if(!cookies.empty())
 			{
-				vector<string> cookies;
-				boost::algorithm::split(cookies, it->second, is_any_of(";"));
-				BOOST_FOREACH(const string& cookie, cookies)
+				NameValueCollection::ConstIterator it = cookies.begin();
+				NameValueCollection::ConstIterator end = cookies.end();
+				for (; it != end; ++it)
 				{
-					vector<string> nameValue;
-					string trimmedCookie(cookie);
-					boost::trim(trimmedCookie);
-					boost::algorithm::split(nameValue, trimmedCookie, is_any_of("="));
-
-					// Don't override existing parameters (GET and POST have precedence).
-					if (nameValue.size() != 2 || _allParametersMap.isDefined(nameValue[0]))
-						continue;
-
-					// TODO: proper unescaping of cookie values
-					_allParametersMap.insert(nameValue[0], nameValue[1]);
+					_allParametersMap.insert(it->first, it->second);
 				}
 			}
 
@@ -379,6 +382,12 @@ namespace synthese
 				}
 				_function = boost::shared_ptr<Function>(util::Factory<Function>::create(functionName));
 			}
+			std::cout << "_getPostParametersMap" << std::endl;
+			_getPostParametersMap.outputURI(std::cout, " ");
+
+			std::cout << std::endl << "_allParametersMap" << std::endl;
+			_allParametersMap.outputURI(std::cout, " ");
+			std::cout << std::endl;
 		}
 
 

@@ -94,6 +94,8 @@ if(CURL_FOUND)
   add_definitions(-DHAVE_CURL)
 endif()
 
+FIND_PACKAGE(Poco)
+
 if(WIN32)
   # NOTE: _MBCS WIN32 _WINDOWS are already set by cmake
   # TODO: should these defines be set (they are with scons)?:

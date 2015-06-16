@@ -31,6 +31,7 @@
 #include <ifaddrs.h>
 #endif
 #include <stdio.h>
+#include <boost/asio.hpp>
 
 using namespace std;
 

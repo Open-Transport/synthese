@@ -11,7 +11,6 @@
 #include "ThreadKillAction.h"
 #include "LoginToken.hpp"
 
-#include "HtmlFormInterfaceElement.h"
 #include "ValidSessionInterfaceElement.h"
 #include "HtmlFormCalendarFieldInterfaceElement.h"
 #include "HtmlFormFieldInterfaceElement.h"
@@ -54,7 +53,6 @@ void synthese::server::moduleRegister()
 	synthese::server::SuicidalAction::integrate();
 	synthese::server::ThreadKillAction::integrate();
 
-	synthese::server::HtmlFormInterfaceElement::integrate();
 	synthese::server::ValidSessionInterfaceElement::integrate();
 	synthese::server::HtmlFormCalendarFieldInterfaceElement::integrate();
 	synthese::server::HtmlFormFieldInterfaceElement::integrate();

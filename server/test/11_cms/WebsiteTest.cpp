@@ -22,7 +22,6 @@
 
 #include "CMSModule.hpp"
 #include "DynamicRequest.h"
-#include "HTTPRequest.hpp"
 #include "ParametersMap.h"
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
@@ -112,24 +111,6 @@ BOOST_AUTO_TEST_CASE (WebsiteTest)
 
 		Webpage* p(s4.getPageBySmartURL("/test.html"));
 		BOOST_CHECK_EQUAL(p, &p1s4);
-	}
-
-	{
-		HTTPRequest req;
-		req.headers.insert(make_pair("Host", "www.toto.com"));
-		req.uri = "/synthese/test.html";
-		req.ipaddr = "127.0.0.1";
-		DynamicRequest dr(req);
-
-		WebPageDisplayFunction* f(dynamic_cast<WebPageDisplayFunction*>(dr.getFunction().get()));
-		BOOST_CHECK(f);
-
-		if(f)
-		{
-			stringstream s;
-			dr.run(s);
-			BOOST_CHECK_EQUAL(f->getPage(), &p1s4);
-		}
 	}
 
 	Website s1;

@@ -34,9 +34,8 @@
 #include "CommercialLine.h"
 #include "ScheduledService.h"
 #include "ContinuousService.h"
-#include "DynamicRequest.h"
-#include "HTTPRequest.hpp"
 #include "InterSYNTHESEModuleRegister.cpp"
+#include "Function.h"
 
 #include "UtilConstants.h"
 
@@ -216,17 +215,20 @@ public:
 
 };
 
-void runScheduleRealTimeUpdateService(string sa, string ds, string se1, string at1, string dt1)
+void runScheduleRealTimeUpdateService(
+		boost::shared_ptr<Function> rtService,
+		string sa, string ds, string se1, string at1, string dt1)
 {
-	HTTPRequest req;
-	req.headers.insert(make_pair("Host", "www.toto.com"));
-	req.uri = string("?SERVICE=ScheduleRealTimeUpdateService&nr=1") +
-		"&sa=" + sa + "&ds=" + ds + "&se1=" + se1 + "&at1=" + at1 + "&dt1=" + dt1;
-	req.ipaddr = "127.0.0.1";
-	DynamicRequest dr(req);
+	ParametersMap map;
+	map.insert(Request::PARAMETER_NO_REDIRECT_AFTER_ACTION, "1");
+	map.insert(ScheduleRealTimeUpdateService::PARAMETER_STOP_AREA_ID, sa);
+	map.insert(ScheduleRealTimeUpdateService::PARAMETER_SERVICE_DATASOURCE_ID, ds);
+	map.insert(ScheduleRealTimeUpdateService::PARAMETER_SERVICE_ID + "1", se1);
+	map.insert(ScheduleRealTimeUpdateService::PARAMETER_ARRIVAL_TIME + "1", at1);
+	map.insert(ScheduleRealTimeUpdateService::PARAMETER_DEPARTURE_TIME + "1", dt1);
 
-	stringstream s;
-	dr.run(s);
+	rtService->_setFromParametersMap(map);
+	rtService->runWithoutOutput();
 }
 
 BOOST_AUTO_TEST_CASE (test1)
@@ -235,6 +237,13 @@ BOOST_AUTO_TEST_CASE (test1)
 	synthese::pt::moduleRegister();
 	synthese::impex::moduleRegister();
 	synthese::inter_synthese::moduleRegister();
+
+	if (!util::Factory<Function>::contains("ScheduleRealTimeUpdateService"))
+	{
+		throw RequestException("Function ScheduleRealTimeUpdateService not found");
+	}
+	boost::shared_ptr<Function> rtService =
+		boost::shared_ptr<Function>(util::Factory<Function>::create("ScheduleRealTimeUpdateService"));
 
 	boost::shared_ptr<DataSource> ds(new DataSource(TEST_SERVICE_DATASOURCE));
 	Env::GetOfficialEnv().getEditableRegistry<DataSource>().add(ds);
@@ -257,7 +266,9 @@ BOOST_AUTO_TEST_CASE (test1)
 	TestScheduledService tss4(4503599627370504ULL, "4", jp2, ds, time_duration(4,0,0));
 	TestScheduledService tss5(4503599627370505ULL, "5", jp, ds,  time_duration(5,0,0));
 
-	runScheduleRealTimeUpdateService("1970329131942223", "16607027920896001", "1", "03:20:00", "03:20:01");
+	runScheduleRealTimeUpdateService(rtService,
+		"1970329131942223", "16607027920896001", "1", "03:20:00", "03:20:01"
+	);
 
 	tss1.dump();
 	tss2.dump();
@@ -286,7 +297,10 @@ BOOST_AUTO_TEST_CASE (test1)
 
 	/// -------
 	cout << endl << "Test that the algo keeps the time stamps of requests" << endl;
-	runScheduleRealTimeUpdateService("1970329131942222", "16607027920896001", "1", "03:19:00", "03:19:01");
+	runScheduleRealTimeUpdateService(
+				rtService,
+				"1970329131942222", "16607027920896001", "1", "03:19:00", "03:19:01"
+	);
 
 	tss1.dump();
 	tss2.dump();

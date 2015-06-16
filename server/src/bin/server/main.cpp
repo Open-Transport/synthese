@@ -181,7 +181,7 @@ filesystem::path createCompletePath (const std::string& s)
 void quit(bool doExit)
 {
 	// End all threads
-	ServerModule::KillAllHTTPThreads(false);
+	ServerModule::KillAllHTTPThreads();
 	ServerModule::End();
 	ServerModule::KillAllThreads();
 

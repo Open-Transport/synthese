@@ -108,8 +108,7 @@ namespace synthese
 			if (_modifEventsThread)
 			{
 				server::ServerModule::KillThread(
-					lexical_cast<string>(_modifEventsThread->get_id()),
-					false
+					lexical_cast<string>(_modifEventsThread->get_id())
 				);
 				// The modifEvents thread might throw an exception if it is killed after
 				// this object is destroyed. Sleeping here should help with that issue.
@@ -170,8 +169,7 @@ namespace synthese
 			if (_modifEventsThread)
 			{
 				server::ServerModule::KillThread(
-					lexical_cast<string>(_modifEventsThread->get_id()),
-					false
+					lexical_cast<string>(_modifEventsThread->get_id())
 				);
 				// The modifEvents thread might throw an exception if it is killed after
 				// this object is destroyed. Sleeping here should help with that issue.

@@ -44,8 +44,8 @@
 #ifdef WIN32
   #define DEFAULT_TEMP_DIR "c:/temp"
 #endif
+#include "PocoHttpServer.h"
 
-#include "HTTPReply.hpp"
 #include "HTTPRequest.hpp"
 #include "Log.h"
 #include "DynamicRequest.h"
@@ -69,9 +69,6 @@ namespace synthese
 
 	namespace server
 	{
-		boost::asio::io_service ServerModule::_io_service;
-		boost::asio::ip::tcp::acceptor ServerModule::_acceptor(ServerModule::_io_service);
-		connection_ptr ServerModule::_new_connection(new HTTPConnection(ServerModule::_io_service, &ServerModule::HandleRequest));
 		ServerModule::Threads ServerModule::_threads;
 		recursive_mutex ServerModule::_threadManagementMutex;
 		time_duration ServerModule::_sessionMaxDuration(minutes(30));
@@ -81,7 +78,6 @@ namespace synthese
 		bool ServerModule::_forceGZip(false);
 
 		const string ServerModule::MODULE_PARAM_PORT ("port");
-		const string ServerModule::MODULE_PARAM_NB_THREADS ("nb_threads");
 		const string ServerModule::MODULE_PARAM_LOG_LEVEL ("log_level");
 		const string ServerModule::MODULE_PARAM_SMTP_SERVER ("smtp_server");
 		const string ServerModule::MODULE_PARAM_SMTP_PORT ("smtp_port");
@@ -105,7 +101,6 @@ namespace synthese
 		template<> void ModuleClassTemplate<ServerModule>::PreInit()
 		{
 			RegisterParameter(ServerModule::MODULE_PARAM_PORT, "8080", &ServerModule::ParameterCallback);
-			RegisterParameter(ServerModule::MODULE_PARAM_NB_THREADS, "5", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_LOG_LEVEL, "1", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_SMTP_SERVER, "smtp", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_SMTP_PORT, "mail", &ServerModule::ParameterCallback);
@@ -119,35 +114,6 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<ServerModule>::Init()
 		{
-			try
-			{
-				// Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
-				string address("0.0.0.0");
-				string port(GetParameter(ServerModule::MODULE_PARAM_PORT));
-
-				asio::ip::tcp::resolver resolver(ServerModule::_io_service);
-				asio::ip::tcp::resolver::query query(address, port);
-				asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
-
-				ServerModule::_acceptor.open(endpoint.protocol());
-				ServerModule::_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-				ServerModule::_acceptor.bind(endpoint);
-				ServerModule::_acceptor.listen();
-				ServerModule::UpdateStartingTime();
-				ServerModule::_acceptor.async_accept(
-					ServerModule::_new_connection->socket(),
-					boost::bind(&ServerModule::HandleAccept, asio::placeholders::error)
-				);
-			}
-
-			catch (std::exception& ex)
-			{
-				Log::GetInstance ().fatal ("Unexpected exception", ex);
-			}
-			catch (...)
-			{
-				Log::GetInstance ().fatal ("Unexpected exception");
-			}
 		}
 
 		template<> void ModuleClassTemplate<ServerModule>::Start()
@@ -156,27 +122,27 @@ namespace synthese
 
 		void ServerModule::RunHTTPServer()
 		{
-			// Create a pool of threads to run all of the io_services.
-			ServerModule::KillAllHTTPThreads();
+			PocoHttpServer app(
+						lexical_cast<unsigned short>(GetParameter(MODULE_PARAM_PORT))
+			);
 
 			Log::GetInstance().info(
-				"HTTP Server is now listening on port " + GetParameter(ServerModule::MODULE_PARAM_PORT) +
-				" with at least "+ GetParameter(ServerModule::MODULE_PARAM_NB_THREADS) + " threads ..."
+				"HTTP Server is now listening on port " + GetParameter(ServerModule::MODULE_PARAM_PORT)
 			);
+
+			const char *argv[1] = { "s3-server-http" };
+			app.run(1, (char **)argv);
 		}
 
 
 		template<> void ModuleClassTemplate<ServerModule>::End()
 		{
 			UnregisterParameter(ServerModule::MODULE_PARAM_PORT);
-			UnregisterParameter(ServerModule::MODULE_PARAM_NB_THREADS);
 			UnregisterParameter(ServerModule::MODULE_PARAM_LOG_LEVEL);
 			UnregisterParameter(ServerModule::MODULE_PARAM_SMTP_SERVER);
 			UnregisterParameter(ServerModule::MODULE_PARAM_SMTP_PORT);
 			UnregisterParameter(ServerModule::MODULE_PARAM_SESSION_MAX_DURATION);
 			UnregisterParameter(ServerModule::MODULE_PARAM_HTTP_TRACE_PATH);
-
-			ServerModule::_io_service.stop();
 		}
 
 
@@ -220,10 +186,6 @@ namespace synthese
 			{
 				Log::GetInstance ().setLevel (static_cast<Log::Level>(lexical_cast<int>(value)));
 			}
-			if(name == MODULE_PARAM_NB_THREADS)
-			{
-
-			}
 			if(name == MODULE_PARAM_SESSION_MAX_DURATION)
 			{
 				_sessionMaxDuration = minutes(lexical_cast<int>(value));
@@ -249,25 +211,7 @@ namespace synthese
 			}
 		}
 
-
-		void ServerModule::HandleAccept(
-			const boost::system::error_code& e
-		){
-			if (!e)
-			{
-				_new_connection->start();
-			}
-			_new_connection.reset(new HTTPConnection(_io_service, &ServerModule::HandleRequest));
-			_acceptor.async_accept(
-				_new_connection->socket(),
-				boost::bind(
-					&ServerModule::HandleAccept,
-					boost::asio::placeholders::error
-				)
-			);
-		}
-
-
+#if 0
 		void ServerModule::HandleRequest(
 			const HTTPRequest& req,
 			HTTPReply& rep
@@ -456,7 +400,7 @@ namespace synthese
 
 			SetCurrentThreadWaiting();
 		}
-
+#endif
 
 
 		const ServerModule::Threads& ServerModule::GetThreads()
@@ -466,7 +410,7 @@ namespace synthese
 
 
 
-		void ServerModule::KillThread(const string& key, bool autoRestart)
+		void ServerModule::KillThread(const string& key)
 		{
 			recursive_mutex::scoped_lock lock(_threadManagementMutex);
 			Threads::iterator it(_threads.find(key));
@@ -477,13 +421,6 @@ namespace synthese
 
 			theThread->interrupt();
 			Log::GetInstance ().info ("Attempted to kill the thread "+ key);
-			if(	autoRestart &&
-				GetThreadInfo(key).isHTTPThread &&
-				_threads.size() < lexical_cast<size_t>(GetParameter(ServerModule::MODULE_PARAM_NB_THREADS))
-			){
-				thread::id newId(AddHTTPThread());
-				Log::GetInstance ().info ("Create the thread "+ lexical_cast<string>(newId) +" because the minimum threads number was reached");
-			}
 		}
 
 
@@ -498,7 +435,7 @@ namespace synthese
 			}
 			BOOST_FOREACH(const string& threadId, threadsId)
 			{
-				ServerModule::KillThread(threadId, false);
+				ServerModule::KillThread(threadId);
 			}
 
 			Log::GetInstance ().info ("All threads are killed and HTTP Server is now stopped.");
@@ -506,31 +443,9 @@ namespace synthese
 
 
 
-		void ServerModule::KillAllHTTPThreads(bool autoRestart)
+		void ServerModule::KillAllHTTPThreads()
 		{
-			recursive_mutex::scoped_lock lock(_threadManagementMutex);
-			vector<string> threadsId;
-			BOOST_FOREACH(const ServerModule::Threads::value_type it, _threads)
-			{
-				if(it.second.isHTTPThread) threadsId.push_back(it.first);
-			}
-			BOOST_FOREACH(const string& threadId, threadsId)
-			{
-				ServerModule::KillThread(threadId, false);
-			}
-
-			if(autoRestart)
-			{
-				size_t threadsNumber(lexical_cast<size_t>(GetParameter(ServerModule::MODULE_PARAM_NB_THREADS)));
-				for (std::size_t i = 0; i < threadsNumber; ++i)
-				{
-					ServerModule::AddHTTPThread();
-				}
-			}
-			else
-			{
-				Log::GetInstance ().info ("HTTP Server is now stopped.");
-			}
+			Log::GetInstance ().info ("HTTP Server is now stopped.");
 		}
 
 
@@ -546,21 +461,6 @@ namespace synthese
 				}
 				theThread->join();
 			}
-		}
-
-
-
-		boost::thread::id ServerModule::AddHTTPThread()
-		{
-			recursive_mutex::scoped_lock lock(_threadManagementMutex);
-
-			boost::shared_ptr<thread> theThread(
-				AddThread(
-					boost::bind(&asio::io_service::run, &ServerModule::_io_service),
-					"HTTP",
-					true
-			)	);
-			return theThread->get_id();
 		}
 
 
@@ -674,24 +574,6 @@ namespace synthese
 		{
 			return "Current thread is unregistered. Cannot retrieve thread info.";
 		}
-
-
-
-		void ServerModule::_SetCookieHeaders(HTTPReply& httpReply, const CookiesMap& cookiesMap)
-		{
-			BOOST_FOREACH(const CookiesMap::value_type &cookie, cookiesMap)
-			{
-				// TODO: proper escaping of cookie values
-				httpReply.headers.insert(
-					make_pair(
-						"Set-Cookie",
-						cookie.first + "=" + cookie.second.first +
-						"; Max-Age=" + lexical_cast<string>(cookie.second.second) + "; Path=/; "
-					)
-				);
-			}
-		}
-
 
 
 		void ServerModule::UpdateStartingTime()

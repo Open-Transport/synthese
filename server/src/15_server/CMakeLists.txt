@@ -31,16 +31,10 @@ HtmlFormCalendarFieldInterfaceElement.cpp
 HtmlFormCalendarFieldInterfaceElement.h
 HtmlFormFieldInterfaceElement.cpp
 HtmlFormFieldInterfaceElement.h
-HtmlFormInterfaceElement.cpp
-HtmlFormInterfaceElement.h
 HTTPClient.cpp
 HTTPClient.hpp
-HTTPConnection.cpp
-HTTPConnection.hpp
 HTTPClient.cpp
 HTTPClient.hpp
-HTTPReply.cpp
-HTTPReply.hpp
 HTTPRequest.hpp
 HTTPRequestParser.cpp
 HTTPRequestParser.hpp
@@ -58,6 +52,8 @@ ModuleClass.cpp
 ModuleClass.h
 ModuleClassTemplate.hpp
 ModuleException.h
+PocoHttpServer.cpp
+PocoHttpServer.h
 QuitAction.cpp
 QuitAction.hpp
 RedirectService.cpp
@@ -113,6 +109,9 @@ XMLSessionIsValidFunction.h
 
 set_source_files_properties(ServerModule.gen.cpp ServerModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
+INCLUDE_DIRECTORIES(${Poco_INCLUDE_DIRS})
+LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
+
 add_library(15_server ${server_SRCS})
 
 if(UNIX)
@@ -127,6 +126,9 @@ target_link_libraries(15_server
   12_security
   13_dblog
   14_admin
+  PocoNet
+  PocoUtil
+  PocoFoundation
   ${PTHREAD}
 )
 

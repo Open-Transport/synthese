@@ -23,8 +23,10 @@
 #ifndef SYNTHESE_server_DynamicRequest_h__
 #define SYNTHESE_server_DynamicRequest_h__
 
-#include "Request.h"
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerResponse.h"
 #include "ParametersMap.h"
+#include "Request.h"
 
 namespace synthese
 {
@@ -58,10 +60,12 @@ namespace synthese
 		private:
 			util::ParametersMap _allParametersMap;
 			util::ParametersMap _getPostParametersMap;
+			Poco::Net::HTTPServerResponse &_response;
 
 		public:
 			DynamicRequest(
-				const HTTPRequest& httpRequest
+				Poco::Net::HTTPServerRequest& request,
+				Poco::Net::HTTPServerResponse& response
 			);
 
 			virtual util::ParametersMap getParametersMap() const;
