@@ -92,7 +92,7 @@ namespace synthese
 			static const std::string PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES;
 			static const std::string PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES;
 			static const std::string PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES;
-			static const std::string PARAMETER_IGNORE_LINE_SHORT_NAME;
+			static const std::string PARAMETER_IGNORE_LINE_SHORT_NAME; // DEPRECATED
 			static const std::string PARAMETER_LETTERS_BEFORE_NUMBERS;
 			static const std::string PARAMETER_NETWORK_ID;
 			static const std::string PARAMETER_OUTPUT_GEOMETRY;
@@ -114,6 +114,11 @@ namespace synthese
 			static const std::string PARAMETER_BROADCAST_POINT_ID;
 			static const std::string PARAMETER_WITH_DIRECTIONS;
 			static const std::string PARAMETER_SHORT_NAME_FILTER;
+			static const std::string PARAMETER_SORT_BY;
+
+			static const std::string SORT_SHORT_NAME;
+			static const std::string SORT_LONG_NAME;
+			static const std::string SORT_ID;
 
 			static const std::string FORMAT_WKT;
 
@@ -150,9 +155,9 @@ namespace synthese
 				bool _ignoreTimetableExcludedLines;
 				bool _ignoreJourneyPlannerExcludedLines;
 				bool _ignoreDeparturesBoardExcludedLines;
-				bool _ignoreLineShortName;
 				bool _withDirections;
 				bool _lettersBeforeNumbers;
+				std::string _sortBy;
 				std::string _outputGeometry;
 				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
 				typedef std::vector<boost::shared_ptr<const vehicle::RollingStock> > TransportModeSorting;

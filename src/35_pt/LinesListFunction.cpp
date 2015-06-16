@@ -106,7 +106,7 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES = "ittd";
 		const string LinesListFunction::PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES = "ijpd";
 		const string LinesListFunction::PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES = "idbd";
-		const string LinesListFunction::PARAMETER_IGNORE_LINE_SHORT_NAME = "ilsn";
+		const string LinesListFunction::PARAMETER_IGNORE_LINE_SHORT_NAME = "ilsn"; // DEPRECATED
 		const string LinesListFunction::PARAMETER_LETTERS_BEFORE_NUMBERS = "letters_before_numbers";
 		const string LinesListFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 		const string LinesListFunction::PARAMETER_SORT_BY_TRANSPORT_MODE = "sort_by_transport_mode";
@@ -122,6 +122,11 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_BROADCAST_POINT_ID = "broadcast_point_id";
 		const string LinesListFunction::PARAMETER_WITH_DIRECTIONS = "with_directions";
 		const string LinesListFunction::PARAMETER_SHORT_NAME_FILTER = "short_name_filter";
+		const string LinesListFunction::PARAMETER_SORT_BY = "sort_by";
+
+		const string LinesListFunction::SORT_SHORT_NAME("short_name");
+		const string LinesListFunction::SORT_LONG_NAME("long_name");
+		const string LinesListFunction::SORT_ID("id");
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 
@@ -210,7 +215,6 @@ namespace synthese
 			result.insert(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES, _ignoreDeparturesBoardExcludedLines);
 			result.insert(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES, _ignoreJourneyPlannerExcludedLines);
 			result.insert(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES, _ignoreTimetableExcludedLines);
-			result.insert(PARAMETER_IGNORE_LINE_SHORT_NAME, _ignoreLineShortName);
 
 			// Rolling stock filter
 			if(_rollingStockFilter.get() != NULL)
@@ -253,6 +257,13 @@ namespace synthese
 			{
 				result.insert(PARAMETER_RIGHT_LEVEL, static_cast<int>(*_rightLevel));
 			}
+
+			// Sort by
+			result.insert(PARAMETER_SORT_BY, _sortBy);
+
+			// DEPRECATED
+			// Considered at true if the sort is not by short name
+			result.insert(PARAMETER_IGNORE_LINE_SHORT_NAME, _sortBy != SORT_SHORT_NAME);
 
 			return result;
 		}
@@ -410,7 +421,6 @@ namespace synthese
 			_ignoreDeparturesBoardExcludedLines = map.isTrue(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES);
 			_ignoreJourneyPlannerExcludedLines = map.isTrue(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES);
 			_ignoreTimetableExcludedLines = map.isTrue(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES);
-			_ignoreLineShortName = map.isTrue(PARAMETER_IGNORE_LINE_SHORT_NAME);
 
 			// Rolling stock filter
 			optional<RegistryKeyType> rs_id(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
@@ -546,6 +556,22 @@ namespace synthese
 			}
 
 			_displayDurationBeforeFirstDepartureFilter = map.getDefault<bool>(PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE_FILTER, false);
+
+			// Sort by
+			_sortBy = map.getDefault<std::string>(PARAMETER_SORT_BY, SORT_SHORT_NAME);
+
+			if (_sortBy != SORT_SHORT_NAME && _sortBy != SORT_LONG_NAME && _sortBy != SORT_ID)
+			{
+				throw RequestException("Invalid sort index : " + _sortBy + ". Valid values : " + SORT_SHORT_NAME + "," + SORT_LONG_NAME + "," + SORT_ID);
+			}
+
+			// DEPRECATED
+			// If this parameters is at true and the "sort by" on is empty, use sort by ID
+			// This is the same behavior as before
+			if ( ! map.isDefined(PARAMETER_SORT_BY) && map.isTrue(PARAMETER_IGNORE_LINE_SHORT_NAME) )
+			{
+				_sortBy = SORT_ID;
+			}
 		}
 
 
@@ -807,10 +833,21 @@ namespace synthese
 							{
 								linesMap[tm.get()] = SortedItems(boost::bind(comparator, _1, _2));					
 							}
-							if(!_ignoreLineShortName)
+
+							// Sort using the map's key
+							if(_sortBy == SORT_LONG_NAME)
+							{
+								linesMap[tm.get()][line->getLongName()] = const_pointer_cast<const CommercialLine>(line);
+							}
+							else if(_sortBy == SORT_SHORT_NAME)
+							{
 								linesMap[tm.get()][line->getShortName()] = const_pointer_cast<const CommercialLine>(line);
+							}
 							else
+							{
 								linesMap[tm.get()][boost::lexical_cast<std::string>(line->getKey())] = const_pointer_cast<const CommercialLine>(line);
+							}
+
 							alreadyShownLines.insert(line.get());
 						}
 				}	}
@@ -1112,7 +1149,7 @@ namespace synthese
 			_ignoreTimetableExcludedLines(false),
 			_ignoreJourneyPlannerExcludedLines(false),
 			_ignoreDeparturesBoardExcludedLines(false),
-			_ignoreLineShortName(false),
+			_sortBy(SORT_SHORT_NAME),
 			_withDirections(false),
 			_lettersBeforeNumbers(true),
 			_displayDurationBeforeFirstDepartureFilter(false),
