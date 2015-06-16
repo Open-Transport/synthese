@@ -106,6 +106,7 @@ namespace synthese
 				ostr << "<body><p style=\"text-align: center; font-size: 48px;\">";
 				ostr << "Poco Raw Performance Test";
 				ostr << "</p></body></html>";
+				sleep(60);
 			}
 		};
 
@@ -140,6 +141,7 @@ namespace synthese
 
 				// GZip compression ?
 				bool gzipCompression(false);
+				if(request.has("Accept-Encoding"))
 				{
 					set<string> formats;
 					split(formats, request["Accept-Encoding"], is_any_of(","));
