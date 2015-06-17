@@ -122,7 +122,7 @@ namespace synthese
 		/// Checks if the current message is active at the specified time.
 		/// @param when the time to check
 		/// @return true if the message must be displayed at the specified time
-		bool SentAlarm::isApplicable( boost::posix_time::ptime& when ) const
+		bool SentAlarm::isApplicable( const boost::posix_time::ptime& when ) const
 		{
 			// Check if the event is active first
 			if( !getScenario() ||

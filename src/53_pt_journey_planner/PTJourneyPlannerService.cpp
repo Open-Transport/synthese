@@ -978,28 +978,18 @@ namespace synthese
 			ParametersMap messagesOnBroadCastPoint;
 			if(_broadcastPoint)
 			{
+				// Parameters map
 				ParametersMap parameters;
 
-				// Fetch all messages on the broadcast point and activated at the requested start date
-				BOOST_FOREACH(const Alarm::Registry::value_type& alarm, Env::GetOfficialEnv().getRegistry<Alarm>())
-				{
-					boost::shared_ptr<SentAlarm> message(
-						dynamic_pointer_cast<SentAlarm>(alarm.second)
-					);
-
-					if (
-						message
-						&&
-						message->isOnBroadcastPoint(*_broadcastPoint, parameters)
-						&&
-						message->isApplicable(startDate)
-					   )
-					{
-						boost::shared_ptr<ParametersMap> messagePM(new ParametersMap());
-						message->toParametersMap(*messagePM, true, string(), true);
-						messagesOnBroadCastPoint.insert(DATA_MESSAGE, messagePM);
-					}
-				}
+				GetMessagesFunction f(
+					_broadcastPoint,
+					parameters,
+					boost::optional<size_t>(),
+					true,
+					true,
+					startDate
+				);
+				messagesOnBroadCastPoint = f.run(stream, request);
 			}
 
 			// Schedule rows

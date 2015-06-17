@@ -130,7 +130,7 @@ namespace synthese
 
 
 			bool isApplicable(
-				boost::posix_time::ptime& when
+				const boost::posix_time::ptime& when
 			) const;
 
 			virtual bool isOnBroadcastPoint(
