@@ -290,6 +290,7 @@ namespace synthese
 				static const std::string DATA_WKT;
 				static const std::string TAG_LINE;
 				static const std::string DATA_IS_REAL_TIME;
+				static const std::string DATA_MESSAGE;
 			//@}
 
 			//! @name Result row

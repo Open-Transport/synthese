@@ -278,6 +278,7 @@ namespace synthese
 		const string PTJourneyPlannerService::DATA_WKT("wkt");
 		const string PTJourneyPlannerService::DATA_LINE_MARKERS("line_markers");
 		const string PTJourneyPlannerService::DATA_IS_REAL_TIME("realTime");
+		const string PTJourneyPlannerService::DATA_MESSAGE("message");
 
 		PTJourneyPlannerService::PTJourneyPlannerService(
 		):	_startDate(not_a_date_time),
@@ -977,14 +978,28 @@ namespace synthese
 			ParametersMap messagesOnBroadCastPoint;
 			if(_broadcastPoint)
 			{
-				// Parameters map
 				ParametersMap parameters;
-				
-				GetMessagesFunction f(
-					_broadcastPoint,
-					parameters
-				);
-				messagesOnBroadCastPoint = f.run(stream, request);
+
+				// Fetch all messages on the broadcast point and activated at the requested start date
+				BOOST_FOREACH(const Alarm::Registry::value_type& alarm, Env::GetOfficialEnv().getRegistry<Alarm>())
+				{
+					boost::shared_ptr<SentAlarm> message(
+						dynamic_pointer_cast<SentAlarm>(alarm.second)
+					);
+
+					if (
+						message
+						&&
+						message->isOnBroadcastPoint(*_broadcastPoint, parameters)
+						&&
+						message->isApplicable(startDate)
+					   )
+					{
+						boost::shared_ptr<ParametersMap> messagePM(new ParametersMap());
+						message->toParametersMap(*messagePM, true, string(), true);
+						messagesOnBroadCastPoint.insert(DATA_MESSAGE, messagePM);
+					}
+				}
 			}
 
 			// Schedule rows
@@ -2324,7 +2339,7 @@ namespace synthese
 
 			boost::shared_ptr<ParametersMap> pmMessages(new ParametersMap);
 			// Messages output
-			BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmMessage, messagesOnBroadCastPoint.getSubMaps("message"))
+			BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmMessage, messagesOnBroadCastPoint.getSubMaps(DATA_MESSAGE))
 			{
 				bool displayMessage(false);
 				if(pmMessage->hasSubMaps(Alarm::TAG_RECIPIENTS))
@@ -2348,7 +2363,7 @@ namespace synthese
 				}
 				if (displayMessage)
 				{
-					pmMessages->insert(string("message"), pmMessage);
+					pmMessages->insert(string(DATA_MESSAGE), pmMessage);
 				}
 			}
 
