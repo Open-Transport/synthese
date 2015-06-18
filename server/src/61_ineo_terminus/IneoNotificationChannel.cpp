@@ -23,11 +23,13 @@
 
 #include <FactorableTemplate.h>
 #include <IneoNotificationChannel.hpp>
+#include <IneoTerminusConnection.hpp>
 #include <ParametersMap.h>
 
 #include <string>
 
 using namespace boost;
+using namespace boost::posix_time;
 using namespace std;
 
 namespace synthese
