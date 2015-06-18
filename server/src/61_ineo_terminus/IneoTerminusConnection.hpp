@@ -57,6 +57,7 @@ namespace synthese
 
 		private:
 			static boost::shared_ptr<IneoTerminusConnection> _theConnection;
+			static int _idRequest;
 
 			std::string _ineoPort;
 			util::RegistryKeyType _ineoNetworkID;
@@ -166,6 +167,7 @@ namespace synthese
 			};
 
 			std::set<IneoTerminusConnection::tcp_connection*> _livingConnections;
+			std::set<std::string> _messagesToSend;
 			
 		public:
 			IneoTerminusConnection();
@@ -187,7 +189,8 @@ namespace synthese
 			void addConnection(tcp_connection* new_connection);
 			void removeConnection(tcp_connection* connection_to_remove);
 
-//				static void test(const boost::system::error_code& error);
+			void addMessage(std::string new_message);
+
 			static void RunThread();
 
 			static void ParameterCallback(
@@ -198,6 +201,7 @@ namespace synthese
 			static void MessageSender();
 
 			static boost::shared_ptr<IneoTerminusConnection> GetTheConnection(){ return _theConnection; }
+			static int GetNextRequestID(){ _idRequest++; return _idRequest; }
 		};
 }	}
 

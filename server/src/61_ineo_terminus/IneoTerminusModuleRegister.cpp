@@ -2,6 +2,7 @@
 // 36 MODULE - Ineo Terminus
 
 // Factories
+#include "IneoNotificationChannel.hpp"
 
 #include "IneoTerminusModule.hpp"
 
@@ -13,6 +14,7 @@ void synthese::ineo_terminus::moduleRegister()
 	// 36 MODULE - Ineo Terminus
 
 	// Factories
+	synthese::ineo_terminus::IneoNotificationChannel::integrate();
 
 	synthese::ineo_terminus::IneoTerminusModule::integrate();
 }

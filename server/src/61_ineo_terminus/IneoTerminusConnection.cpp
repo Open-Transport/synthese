@@ -57,6 +57,7 @@ namespace synthese
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK = "ineo_terminus_network";
 
 		boost::shared_ptr<IneoTerminusConnection> IneoTerminusConnection::_theConnection(new IneoTerminusConnection);
+		int IneoTerminusConnection::_idRequest(0);
 		
 
 		IneoTerminusConnection::IneoTerminusConnection(
@@ -87,54 +88,24 @@ namespace synthese
 			_livingConnections.erase(connection_to_remove);
 		}
 
+		void IneoTerminusConnection::addMessage(string new_message)
+		{
+			_messagesToSend.insert(new_message);
+		}
+
 		void IneoTerminusConnection::MessageSender()
 		{
 			// On consomme ici les messages PUSH vers Ineo SAE
-			// Pour l'instant on envoie juste un message vers le SAE pour test d'écriture
-			stringstream message;
-			stringstream dateMessage;
-			ptime now(second_clock::local_time());
-			dateMessage << setw( 2 ) << setfill ( '0' ) <<
-				now.date().day() << "/" <<
-				setw( 2 ) << setfill ( '0' ) <<
-				static_cast<long>(now.date().month()) << "/" <<
-				setw( 2 ) << setfill ( '0' ) <<
-				now.date().year();
-			stringstream heureMessage;
-			heureMessage << setw( 2 ) << setfill ( '0' ) <<
-				now.time_of_day().hours() << ":" <<
-				setw( 2 ) << setfill ( '0' ) <<
-				now.time_of_day().minutes () << ":" <<
-				setw( 2 ) << setfill ( '0' ) <<
-				now.time_of_day().seconds();
-			message << "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" <<
-				"<PassengerCreateMessageRequest><ID>1</ID><RequestTimeStamp>" <<
-				dateMessage <<
-				" " <<
-				heureMessage <<
-				"</RequestTimeStamp><RequestorRef>Terminus</RequestorRef>" <<
-				"<Messaging><Name>Message de test terminus vers SAE</Name><StartDate>" <<
-				dateMessage <<
-				"</StartDate><StopDate>" <<
-				dateMessage <<
-				"</StopDate><StartTime>07:00:00</StartTime><StopTime>20:30:00</StopTime><RepeatPeriod>8</RepeatPeriod>" <<
-				"<Inhibition>non</Inhibition><Color>Vert</Color><Text><Line>Ceci est un message de test</Line>" <<
-				"<Line>envoyé par Terminus dans le SAE</Line></Text><Recipients><AllNetwork /></Recipients>" <<
-				"</Messaging></PassengerCreateMessageRequest>";
-
-			bool testMessageSent(false);
-
 			// Main loop
 			while (true)
 			{
 				// If we have an active connection, we send the first message by this way
 				if (!_theConnection->_livingConnections.empty())
 				{
-					if (!testMessageSent)
+					if (!_theConnection->_messagesToSend.empty())
 					{
-						util::Log::GetInstance().debug("IneoTerminusConnection : envoi du message de test à Ineo");
-						(*(_theConnection->_livingConnections.begin()))->sendMessage(message.str());
-						testMessageSent = true;
+						(*(_theConnection->_livingConnections.begin()))->sendMessage(*(_theConnection->_messagesToSend.begin()));
+						_theConnection->_messagesToSend.erase(_theConnection->_messagesToSend.begin());
 					}
 				}
 
@@ -226,6 +197,25 @@ namespace synthese
 				string singleLine(bufStr);
 				// Log for debug
 				util::Log::GetInstance().debug("Ineo Terminus : on a recu ca : " + singleLine);
+				if (bufStr.substr(0,43) != "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>")
+				{
+					util::Log::GetInstance().warn("Ineo Terminus : message XML sans entete");
+					// TO-DO : insert char(10) (line feed) in error responses
+					string message("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><ResponseRef>Terminus</ResponseRef><ErrorType>ProtocolError</ErrorType><ErrorMessage>Syntaxe incorrecte</ErrorMessage><ErrorID>1</ErrorID>");
+					util::IConv iconv("UTF-8","ISO-8859-1");
+					message = iconv.convert(message);
+					message += char(0);
+					boost::asio::async_write(
+						_socket,
+						boost::asio::buffer(message),
+						boost::bind(
+							&tcp_connection::handle_write,
+							this,
+							boost::asio::placeholders::error
+						)
+					);
+					return;
+				}
 				bufStr = bufStr.substr(43, bufStr.size() - 43); // Remove XML header (<?xml ... ?>)
 
 				// Parsing
@@ -233,12 +223,40 @@ namespace synthese
 				if(node.isEmpty())
 				{
 					util::Log::GetInstance().warn("Ineo Terminus : Message XML vide");
+					// TO-DO : insert char(10) (line feed) in error responses
+					string message("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><ResponseRef>Terminus</ResponseRef><ErrorType>ProtocolError</ErrorType><ErrorMessage>Syntaxe incorrecte</ErrorMessage><ErrorID>1</ErrorID>");
+					util::IConv iconv("UTF-8","ISO-8859-1");
+					message = iconv.convert(message);
+					message += char(0);
+					boost::asio::async_write(
+						_socket,
+						boost::asio::buffer(message),
+						boost::bind(
+							&tcp_connection::handle_write,
+							this,
+							boost::asio::placeholders::error
+						)
+					);
 					return;
 				}
 				XMLNode childNode(node.getChildNode(0));
 				if(childNode.isEmpty())
 				{
 					util::Log::GetInstance().warn("Ineo Terminus : Message XML vide sans node 0");
+					// TO-DO : insert char(10) (line feed) in error responses
+					string message("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><ResponseRef>Terminus</ResponseRef><ErrorType>ProtocolError</ErrorType><ErrorMessage>Syntaxe incorrecte</ErrorMessage><ErrorID>1</ErrorID>");
+					util::IConv iconv("UTF-8","ISO-8859-1");
+					message = iconv.convert(message);
+					message += char(0);
+					boost::asio::async_write(
+						_socket,
+						boost::asio::buffer(message),
+						boost::bind(
+							&tcp_connection::handle_write,
+							this,
+							boost::asio::placeholders::error
+						)
+					);
 					return;
 				}
 				string tagName(childNode.getName());
@@ -256,6 +274,9 @@ namespace synthese
 				{
 					util::Log::GetInstance().warn("Ineo Terminus : Parser non codé pour " + tagName);
 				}
+				util::IConv iconv("UTF-8","ISO-8859-1");
+				message = iconv.convert(message);
+				message += char(0);
 				boost::asio::async_write(
 					_socket,
 					boost::asio::buffer(message),
@@ -301,6 +322,9 @@ namespace synthese
 			string message
 		)
 		{
+			util::IConv iconv("UTF-8","ISO-8859-1");
+			message = iconv.convert(message);
+			message += char(0);
 			boost::asio::async_write(
 				_socket,
 				boost::asio::buffer(message),
@@ -388,6 +412,7 @@ namespace synthese
 				requestorRefStr
 			);
 
+			// TO-DO : insert line feeds
 			stringstream response(_getXMLHeader());
 			response << "<CheckStatusResponse><ID>" <<
 				idStr <<
@@ -397,8 +422,7 @@ namespace synthese
 				_writeIneoDate(requestTimeStamp) <<
 				" " <<
 				_writeIneoTime(requestTimeStamp); // page 12 de la spec INEO : Horodatage de la demande
-			response << "</ResponseTimeStamp><ResponseRef>Terminus</ResponseRef></CheckStatusResponse>" <<
-				char(0);
+			response << "</ResponseTimeStamp><ResponseRef>Terminus</ResponseRef></CheckStatusResponse>";
 
 			return response.str();
 		}
@@ -545,6 +569,7 @@ namespace synthese
 				" message(s)"
 			);
 
+			// TO-DO : insert line feeds
 			stringstream response(_getXMLHeader());
 			response << "<PassengerCreateMessageResponse><ID>" <<
 				idStr <<

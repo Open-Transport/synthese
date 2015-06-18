@@ -1,6 +1,8 @@
 set_source_groups()
 
 set(ineo_terminus_SRCS
+  IneoNotificationChannel.cpp
+  IneoNotificationChannel.hpp
   IneoTerminusModule.cpp
   IneoTerminusModule.gen.cpp
   IneoTerminusModule.hpp
