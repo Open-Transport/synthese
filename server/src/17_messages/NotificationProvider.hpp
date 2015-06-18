@@ -200,6 +200,8 @@ namespace synthese
 			*/
 			bool notify(const boost::shared_ptr<NotificationEvent>& event);
 
+			virtual std::string getName() const { return get<Name>(); }
+
 
 		private:
 			/// Reference to a notification channel instance
