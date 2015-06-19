@@ -61,8 +61,20 @@ namespace synthese
 			/// Terminus log columns
 			DBLog::ColumnsVector getColumnNames() const;
 
-			/// Converts registry key into object name
+			/// Column name for object_id
+			virtual std::string getObjectColumnName() const;
+
+			/// Converts registry key (object_id) into object name
 			virtual std::string getObjectName(
+				util::RegistryKeyType id,
+				const server::Request& searchRequest
+			) const;
+
+			/// Column name for object2_id
+			virtual std::string getObject2ColumnName() const;
+
+			/// Converts registry key (object2_id) into object name
+			virtual std::string getObject2Name(
 				util::RegistryKeyType id,
 				const server::Request& searchRequest
 			) const;
