@@ -113,38 +113,42 @@ namespace synthese
 				requestName += "Delete";
 			}
 			requestName += "MessageRequest";
+			string longMessage(alarm->getLongMessage());
+			stringstream lineSeparator;
+			lineSeparator << "</Line>" << char(10) << char(9) << char(9) << char(9) << "<Line>";
+			replace_all(longMessage, "<br />", lineSeparator.str());
 			message << "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" << char(10) <<
 				"<" << requestName << ">" << char(10) <<
-				"<ID>" <<
+				char(9) << "<ID>" <<
 				lexical_cast<string>(IneoTerminusConnection::GetNextRequestID()) <<
 				"</ID>" << char(10) <<
-				"<RequestTimeStamp>" <<
+				char(9) << "<RequestTimeStamp>" <<
 				dateMessage.str() <<
 				" " <<
 				heureMessage.str() <<
 				"</RequestTimeStamp>" << char(10) <<
-				"<RequestorRef>Terminus</RequestorRef>" << char(10) <<
-				"<Messaging>" << char(10) <<
-				"<Name>" <<
+				char(9) << "<RequestorRef>Terminus</RequestorRef>" << char(10) <<
+				char(9) << "<Messaging>" << char(10) <<
+				char(9) << char(9) << "<Name>" <<
 				alarm->getShortMessage() <<
 				"</Name>" << char(10) <<
-				"<Dispatching>Repete</Dispatching>" << char(10) << // TO-DO : depends on the request
-				"<StartDate>01/01/1970</StartDate>" << char(10) <<
-				"<StopDate>31/12/2199</StopDate>" << char(10) <<
-				"<StartTime>00:00:00</StartTime>" << char(10) <<
-				"<StopTime>23:59:00</StopTime>" << char(10) <<
-				"<RepeatPeriod>" << // TO-DO : only write it if provider needs_repeat_interval
+				char(9) << char(9) << "<Dispatching>Repete</Dispatching>" << char(10) << // TO-DO : depends on the request
+				char(9) << char(9) << "<StartDate>01/01/1970</StartDate>" << char(10) <<
+				char(9) << char(9) << "<StopDate>31/12/2199</StopDate>" << char(10) <<
+				char(9) << char(9) << "<StartTime>00:00:00</StartTime>" << char(10) <<
+				char(9) << char(9) << "<StopTime>23:59:00</StopTime>" << char(10) <<
+				char(9) << char(9) << "<RepeatPeriod>" << // TO-DO : only write it if provider needs_repeat_interval
 				lexical_cast<string>(alarm->getRepeatInterval()) <<
 				"</RepeatPeriod>" << char(10) <<
-				"<Inhibition>non</Inhibition>" << char(10) << // TO-DO : depends on the request
-				"<Color>Vert</Color>" << char(10) << // TO-DO : extract from parameters and alarm
-				"<Text>" << char(10) <<
-				alarm->getLongMessage() << char(10) << //TO-DO : split it and write <Line></Line> tags (for the moment they must be written in the message)
-				"</Text>" << char(10) <<
-				"<Recipients>" << char(10) <<
-				"<AllNetwork />" << char(10) << // TO-DO : extract from alarm object links
-				"</Recipients>" << char(10) <<
-				"</Messaging>" << char(10) <<
+				char(9) << char(9) << "<Inhibition>non</Inhibition>" << char(10) << // TO-DO : depends on the request
+				char(9) << char(9) << "<Color>Vert</Color>" << char(10) << // TO-DO : extract from parameters and alarm
+				char(9) << char(9) << "<Text>" << char(10) <<
+				char(9) << char(9) << char(9) << "<Line>" << longMessage << "</Line>" << char(10) <<
+				char(9) << char(9) << "</Text>" << char(10) <<
+				char(9) << char(9) << "<Recipients>" << char(10) <<
+				char(9) << char(9) << char(9) << "<AllNetwork />" << char(10) << // TO-DO : extract from alarm object links
+				char(9) << char(9) << "</Recipients>" << char(10) <<
+				char(9) << "</Messaging>" << char(10) <<
 				"</" << requestName << ">";
 
 			IneoTerminusConnection::GetTheConnection()->addMessage(message.str());
