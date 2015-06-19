@@ -527,6 +527,11 @@ function open_message(message)
   tinyMCE.get('tinymce').setContent(message.content.replace(/\\\"/g,"\""));
   $('#message select[field=level]').val(message.level);
   $('#message [field=displayDuration]').val(message.displayDuration);
+  $('#message [field=repeat_interval]').val(message.repeat_interval);
+  $('#message [field=with_ack]').val(message.with_ack);
+  $('#message [field=multiple_stops]').val(message.multiple_stops);
+  $('#message [field=play_tts]').val(message.play_tts);
+  $('#message [field=light]').val(message.light);
   if (message.digitized_version != "")
   {
     $('#message input[field=digitized_version]').val(message.digitized_version);
@@ -605,6 +610,11 @@ function close_message()
     current_message.content = tinyMCE.get('tinymce').getContent().replace(/\"/g,"\\\"");
     current_message.level = $('#message select[field=level]').val();
     current_message.displayDuration = $('#message [field=displayDuration]').val();
+    current_message.repeat_interval = $('#message [field=repeat_interval]').val();
+    current_message.with_ack = $('#message [field=with_ack]').val();
+    current_message.multiple_stops = $('#message [field=multiple_stops]').val();
+    current_message.play_tts = $('#message [field=play_tts]').val();
+    current_message.light = $('#message [field=light]').val();
     if ($('#message [field=digitized_version]').val() == $('#message input[field=def_digital_msg_url]').val())
     {
       current_message.digitized_version = "";
@@ -651,6 +661,11 @@ function copy_message_click()
    level: message.level,
    tags: message.tags,
    displayDuration: message.displayDuration,
+   repeat_interval: message.repeat_interval,
+   with_ack: message.with_ack,
+   multiple_stops: message.multiple_stops,
+   play_tts: message.play_tts,
+   light: message.light,
    digitized_version: message.digitized_version,
    alternative:[],
    section: message.section,
@@ -726,6 +741,11 @@ function create_message_click()
    level:10,
    tags:"",
    displayDuration:"",
+   repeat_interval:"",
+   with_ack:"",
+   multiple_stops:"",
+   play_tts:"",
+   light:"",
    digitized_version: $('#message input[field=def_digital_msg_url]').val() != undefined ? $('#message input[field=def_digital_msg_url]').val() : "",
    alternative:[],
    section:[],
@@ -903,6 +923,51 @@ function change_message_displayduration()
   if (typeof $(this).val() != 'undefined') {
     var disp_dur = $(this).val();
     $('#message input[field=displayDuration]').val(disp_dur);
+    activateForm();
+  }
+}
+
+function change_message_repeat_interval()
+{
+  if (typeof $(this).val() != 'undefined') {
+    var disp_dur = $(this).val();
+    $('#message input[field=repeat_interval]').val(disp_dur);
+    activateForm();
+  }
+}
+
+function change_message_with_ack()
+{
+  if (typeof $(this).val() != 'undefined') {
+    var disp_dur = $(this).val();
+    $('#message input[field=with_ack]').val(disp_dur);
+    activateForm();
+  }
+}
+
+function change_message_multiple_stops()
+{
+  if (typeof $(this).val() != 'undefined') {
+    var disp_dur = $(this).val();
+    $('#message input[field=multiple_stops]').val(disp_dur);
+    activateForm();
+  }
+}
+
+function change_message_play_tts()
+{
+  if (typeof $(this).val() != 'undefined') {
+    var disp_dur = $(this).val();
+    $('#message input[field=play_tts]').val(disp_dur);
+    activateForm();
+  }
+}
+
+function change_message_light()
+{
+  if (typeof $(this).val() != 'undefined') {
+    var disp_dur = $(this).val();
+    $('#message input[field=light]').val(disp_dur);
     activateForm();
   }
 }
@@ -1234,6 +1299,21 @@ $(function(){
   $('#message input[field=displayDuration]').bind('keyup', change_message_displayduration);
   $('#message input[field=displayDuration]').bind('cut', change_message_displayduration);
   $('#message input[field=displayDuration]').bind('paste', change_message_displayduration);
+  $('#message input[field=repeat_interval]').bind('keyup', change_message_repeat_interval);
+  $('#message input[field=repeat_interval]').bind('cut', change_message_repeat_interval);
+  $('#message input[field=repeat_interval]').bind('paste', change_message_repeat_interval);
+  $('#message input[field=with_ack]').bind('keyup', change_message_with_ack);
+  $('#message input[field=with_ack]').bind('cut', change_message_with_ack);
+  $('#message input[field=with_ack]').bind('paste', change_message_with_ack);
+  $('#message input[field=multiple_stops]').bind('keyup', change_message_multiple_stops);
+  $('#message input[field=multiple_stops]').bind('cut', change_message_multiple_stops);
+  $('#message input[field=multiple_stops]').bind('paste', change_message_multiple_stops);
+  $('#message input[field=play_tts]').bind('keyup', change_message_play_tts);
+  $('#message input[field=play_tts]').bind('cut', change_message_play_tts);
+  $('#message input[field=play_tts]').bind('paste', change_message_play_tts);
+  $('#message input[field=light]').bind('keyup', change_message_light);
+  $('#message input[field=light]').bind('cut', change_message_light);
+  $('#message input[field=light]').bind('paste', change_message_light);
   $('#message input[field=digitized_version]').bind('keyup', change_message_digitized_version);
   $('#message input[field=digitized_version]').bind('cut', change_message_digitized_version);
   $('#message input[field=digitized_version]').bind('paste', change_message_digitized_version);

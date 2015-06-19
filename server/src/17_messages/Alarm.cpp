@@ -57,6 +57,14 @@ namespace synthese
 		const string Alarm::DATA_DISPLAY_DURATION("display_duration");
 		const string Alarm::DATA_DIGITIZED_VERSION("digitized_version");
 		const string Alarm::DATA_TAGS("tags");
+		const string Alarm::DATA_REPEAT_INTERVAL("repeat_interval");
+		const string Alarm::DATA_WITH_ACK("with_ack");
+		const string Alarm::DATA_MULTIPLE_STOPS("multiple_stops");
+		const string Alarm::DATA_PLAY_TTS("play_tts");
+		const string Alarm::DATA_LIGHT("light");
+		const string Alarm::DATA_DIRECTION_SIGN_CODE("direction_sign_code");
+		const string Alarm::DATA_START_STOP_POINT("start_stop_point");
+		const string Alarm::DATA_END_STOP_POINT("end_stop_point");
 
 		const string Alarm::TAG_MESSAGE_ALTERNATIVE = "message_alternative";
 		const string Alarm::TAG_RECIPIENTS = "recipients";
@@ -181,6 +189,16 @@ namespace synthese
 			}
 
 			pm.insert(ATTR_CALENDAR_ID, _calendar ? _calendar->getKey() : 0);
+
+			// Ineo Terminus parameters
+			pm.insert(prefix + DATA_REPEAT_INTERVAL, getRepeatInterval());
+			pm.insert(prefix + DATA_WITH_ACK, getWithAck());
+			pm.insert(prefix + DATA_MULTIPLE_STOPS, getMultipleStops());
+			pm.insert(prefix + DATA_PLAY_TTS, getPlayTts());
+			pm.insert(prefix + DATA_LIGHT, getLight());
+			pm.insert(prefix + DATA_DIRECTION_SIGN_CODE, getDirectionSignCode());
+			pm.insert(prefix + DATA_START_STOP_POINT, getStartStopPoint());
+			pm.insert(prefix + DATA_END_STOP_POINT, getEndStopPoint());
 
 			dataSourceLinksToParametersMap(pm);
 		}

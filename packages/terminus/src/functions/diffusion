@@ -751,6 +751,11 @@ template=<{
     level: "<@priority@>",
     tags: "<@tags@>",
     displayDuration :<?if&cond=<@display_duration@>&then="<@display_duration@>"&else=""?>,
+    repeat_interval :<?if&cond=<@repeat_interval@>&then="<@repeat_interval@>"&else=""?>,
+    with_ack :<?if&cond=<@with_ack@>&then="<@with_ack@>"&else="0"?>,
+    multiple_stops :<?if&cond=<@multiple_stops@>&then="<@multiple_stops@>"&else="0"?>,
+    play_tts :<?if&cond=<@play_tts@>&then="<@play_tts@>"&else="0"?>,
+    light :<?if&cond=<@light@>&then="<@light@>"&else="0"?>,
     digitized_version :"<@digitized_version@>",
     alternative:[
         <{message_alternative&template=

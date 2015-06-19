@@ -68,6 +68,11 @@ function copyContent(contentRank)
     content: tinyMCE.get('tinymce_'+ contentRank).getContent(),
     level: document.getElementById('level_'+ contentRank).value,
     displayDuration: document.getElementById('displayDuration_'+ contentRank).value,
+    repeat_interval: document.getElementById('repeat_interval_'+ contentRank).value,
+    with_ack: document.getElementById('with_ack_'+ contentRank).value,
+    multiple_stops: document.getElementById('multiple_stops_'+ contentRank).value,
+    play_tts: document.getElementById('play_tts_'+ contentRank).value,
+    light: document.getElementById('light_'+ contentRank).value,
     alternatives: {},
     recipients: {}
   });
