@@ -134,4 +134,13 @@ $(function(){
   $('#s_list li').disableSelection();
   
   $('[field=inputMediaId]').on("change", changeMediaId);
+
+  // Log tab
+  $(".logFilterField").keypress(function(event) {
+    if (event.which == 13 || event.which == 10) {
+        event.preventDefault();
+        $("#log_form").submit();
+    }
+  });
+
 });

@@ -157,6 +157,10 @@ namespace synthese
 					_upSort
 			)	);
 
+			// Return first/number values to improve pagination
+			map.insert(PARAMETER_FIRST, _first);
+			map.insert(PARAMETER_NUMBER, _number);
+
 			BOOST_FOREACH(const boost::shared_ptr<DBLogEntry>& dbe, entries)
 			{
 				boost::shared_ptr<ParametersMap> entryPM(new ParametersMap);
