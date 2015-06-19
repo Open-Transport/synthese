@@ -237,12 +237,15 @@ namespace synthese
 				boost::shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
 				if(line.get())
 				{
-					if(!firstLineInStream)
+					if(firstLineInStream)
 					{
-						linesStream << VARIABLE_ID_SEPARATOR;
 						firstLineInStream = false;
 					}
-					linesStream << line->getName();
+					else
+					{
+						linesStream << VARIABLE_ID_SEPARATOR;
+					}
+					linesStream << line->getShortName();
 				}
 			}
 			scriptParameters.insert(VARIABLE_LINE_IDS, linesStream.str());
@@ -255,10 +258,13 @@ namespace synthese
 				boost::shared_ptr<const pt::StopArea> stop = Env::GetOfficialEnv().get<pt::StopArea>(link->getObjectId());
 				if(stop.get())
 				{
-					if(!firstStopInStream)
+					if(firstStopInStream)
+					{
+						firstStopInStream = false;
+					}
+					else
 					{
 						stopsStream << VARIABLE_ID_SEPARATOR;
-						firstStopInStream = false;
 					}
 					stopsStream << stop->getName();
 				}
