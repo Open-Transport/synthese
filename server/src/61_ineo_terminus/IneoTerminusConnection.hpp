@@ -47,6 +47,7 @@ namespace synthese
 		public:
 			static const std::string MODULE_PARAM_INEO_TERMINUS_PORT;
 			static const std::string MODULE_PARAM_INEO_TERMINUS_NETWORK;
+			static const std::string MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL;
 
 			enum Status
 			{
@@ -61,6 +62,7 @@ namespace synthese
 
 			std::string _ineoPort;
 			util::RegistryKeyType _ineoNetworkID;
+			int _ineoTickInterval;
 
 			mutable Status _status;
 
@@ -176,6 +178,7 @@ namespace synthese
 			//@{
 				void setIneoPort(const std::string& value){ _ineoPort = value; }
 				void setIneoNetworkID(const util::RegistryKeyType& value){ _ineoNetworkID = value; }
+				void setIneoTickInterval(const int value) { _ineoTickInterval = value; }
 				void setStatus(const Status& value){ _status = value; }
 			//@}
 
@@ -183,6 +186,7 @@ namespace synthese
 			//@{
 				const std::string& getIneoPort() const { return _ineoPort; }
 				const util::RegistryKeyType& getIneoNetworkID() const { return _ineoNetworkID; }
+				int getIneoTickInterval() const { return _ineoTickInterval; }
 				const Status& getStatus() const { return _status; }
 			//@}
 			

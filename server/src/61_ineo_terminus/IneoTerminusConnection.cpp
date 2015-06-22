@@ -55,6 +55,7 @@ namespace synthese
 	{
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PORT = "ineo_terminus_port";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK = "ineo_terminus_network";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL = "ineo_terminus_tick_interval";
 
 		boost::shared_ptr<IneoTerminusConnection> IneoTerminusConnection::_theConnection(new IneoTerminusConnection);
 		int IneoTerminusConnection::_idRequest(0);
@@ -63,6 +64,9 @@ namespace synthese
 		IneoTerminusConnection::IneoTerminusConnection(
 		)
 		{
+			_ineoNetworkID = 0;
+			_ineoTickInterval = 0;
+			_ineoPort = "";
 		}
 
 
@@ -109,8 +113,8 @@ namespace synthese
 					}
 				}
 
-				// Sleep one second
-				boost::this_thread::sleep(boost::posix_time::seconds(1));
+				// Sleep
+				boost::this_thread::sleep(boost::posix_time::seconds(_theConnection->getIneoTickInterval()));
 			}
 		}
 
@@ -138,15 +142,24 @@ namespace synthese
 				changed = (_theConnection->_ineoPort != value);
 				_theConnection->_ineoPort = value;
 			}
-			if(name == MODULE_PARAM_INEO_TERMINUS_NETWORK)
+			if(name == MODULE_PARAM_INEO_TERMINUS_NETWORK &&
+				!value.empty())
 			{
 				changed = (_theConnection->_ineoNetworkID != lexical_cast<RegistryKeyType>(value));
 				_theConnection->_ineoNetworkID = lexical_cast<RegistryKeyType>(value);
 			}
+			if (name == MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL &&
+				!value.empty())
+			{
+				changed = (_theConnection->_ineoTickInterval != lexical_cast<int>(value));
+				_theConnection ->_ineoTickInterval = lexical_cast<int>(value);
+			}
 
 			if(	changed
 			){
-				if(	_theConnection->_ineoPort.empty()
+				if(	_theConnection->_ineoPort.empty() ||
+					_theConnection->_ineoNetworkID == 0 ||
+					_theConnection->_ineoTickInterval == 0
 				){
 					_theConnection->_status = connect;
 				}
