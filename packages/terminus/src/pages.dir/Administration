@@ -285,7 +285,7 @@ then=
 	    </div>
 	   </div>
 
-<!-- Disabled until business need requires it
+<!-- Disabled until business need requires it -->
 	   <div class="control-group">
 	    <label class="control-label">Notifier tout évènement en début de période</label>
 	    <div class="controls">
@@ -293,7 +293,7 @@ then=
 	     <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_begin" <@subscribe_all_begin?"":"checked=\"true\""@> value="0" /> Non</label>
 	    </div>
 	   </div>
--->
+<!-- -->
   	   <div class="control-group">
 	    <label class="control-label">Type de message en fin de période</label>
 	    <div class="controls">
@@ -717,6 +717,71 @@ then=
        <option value="0">NON</option>
        <option value="1" <?if&cond=<@~global("print_all_section_tab")==1@>&then= selected="selected"?>>OUI</option>
      </select>
+     <button type="submit" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="ineoTerminusPort">Port pour les sockets Ineo Terminus</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=system&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_port&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+     <input type="text" name="actionParam_value" value="<@~global("ineo_terminus_port")@>" />
+     <button type="submit" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="ineo_terminus_network">Réseau de transport concerné par la connexion Ineo Terminus</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=system&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_network&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+    <@networkFound=0@>
+     <?PTNetworksListFunction&
+       template=
+         <select name="ineo_terminus_network" field="inputIneoTerminusNetwork">
+           <option value="none">Aucun</option>
+           <{network&template=
+             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_network")==id@>&then= selected="selected"?>><@name@></option>
+             <?if&cond=<@~global("ineo_terminus_network")==id@>&then=<@networkFound=1@>?>
+           }>
+         </select>
+    ?>
+    <?if&cond=<@networkFound@>&then=
+    <input type="hidden" id="inputIneoTerminusNetwork" name="actionParam_value" value="<@~global("ineo_terminus_network")@>"/>
+    &else=<input type="hidden" id="inputIneoTerminusNetwork" name="actionParam_value" value="none"/>
+    ?>
+     <button type="submit" id="submitIneoTerminusNetwork" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="ineoTerminusTickInterval">Intervalle minimale pour l'envoi des messages à travers le socket Ineo Terminus (s)</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=system&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_tick_interval&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+     <input type="text" name="actionParam_value" value="<@~global("ineo_terminus_tick_interval")@>" />
      <button type="submit" class="btn btn-danger">Modifier</button>
     </form>
    </div>

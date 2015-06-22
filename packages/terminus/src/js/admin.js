@@ -88,6 +88,11 @@ function changeMediaId() {
   $('#' + field.attr('field')).val(field.val());
 }
 
+function changeIneoTerminusNetwork() {
+  var field = $(this);
+  $('#' + field.attr('field')).val(field.val());
+}
+
 function np_select_template_click()
 {
   $('.np_template_element').removeClass('active');
@@ -155,4 +160,6 @@ $(function(){
   $('#s_list li').disableSelection();
   
   $('[field=inputMediaId]').on("change", changeMediaId);
+  
+  $('[field=inputIneoTerminusNetwork]').on("change", changeIneoTerminusNetwork);
 });
