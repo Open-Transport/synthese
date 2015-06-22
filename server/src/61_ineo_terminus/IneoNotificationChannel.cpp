@@ -134,7 +134,7 @@ namespace synthese
 				"</Name>" << char(10) <<
 				char(9) << char(9) << "<Dispatching>Repete</Dispatching>" << char(10) << // TO-DO : depends on the request
 				char(9) << char(9) << "<StartDate>01/01/1970</StartDate>" << char(10) <<
-				char(9) << char(9) << "<StopDate>31/12/2199</StopDate>" << char(10) <<
+				char(9) << char(9) << "<StopDate>31/12/2037</StopDate>" << char(10) <<
 				char(9) << char(9) << "<StartTime>00:00:00</StartTime>" << char(10) <<
 				char(9) << char(9) << "<StopTime>23:59:00</StopTime>" << char(10) <<
 				char(9) << char(9) << "<RepeatPeriod>" << // TO-DO : only write it if provider needs_repeat_interval

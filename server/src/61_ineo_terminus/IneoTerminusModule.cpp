@@ -52,6 +52,8 @@ namespace synthese
 		template<> void ModuleClassTemplate<IneoTerminusModule>::PreInit()
 		{
 			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PORT, "", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK, "", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL, "", &IneoTerminusConnection::ParameterCallback);
 		}
 
 		template<> void ModuleClassTemplate<IneoTerminusModule>::Init()
