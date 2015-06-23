@@ -335,8 +335,7 @@ namespace synthese
 			string message
 		)
 		{
-			util::IConv iconv("UTF-8","ISO-8859-1");
-			message = iconv.convert(message);
+			// message is supposed to be in iso-8859-1
 			message += char(0);
 			boost::asio::async_write(
 				_socket,
