@@ -40,6 +40,7 @@ namespace synthese
 		private:
 
 		public:
+			static const std::string PARAMETER_CMS_INTERPRETER;
 			/// Parameters needs_
 			static const std::string PARAMETER_NEEDS_REPEAT_INTERVAL;
 			static const std::string PARAMETER_NEEDS_WITH_ACK;

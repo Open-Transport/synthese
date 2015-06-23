@@ -21,10 +21,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <CMSScript.hpp>
 #include <FactorableTemplate.h>
 #include <IneoNotificationChannel.hpp>
 #include <IneoTerminusConnection.hpp>
 #include <ParametersMap.h>
+#include "Webpage.h"
 
 #include <string>
 
@@ -34,6 +36,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace cms;
 	using namespace ineo_terminus;
 	using namespace util;
 	using namespace messages;
@@ -46,6 +49,7 @@ namespace synthese
 
 	namespace ineo_terminus
 	{
+		const std::string IneoNotificationChannel::PARAMETER_CMS_INTERPRETER = "cms_interpreter_id";
 		const std::string IneoNotificationChannel::PARAMETER_NEEDS_REPEAT_INTERVAL = "needs_repeat_interval";
 		const std::string IneoNotificationChannel::PARAMETER_NEEDS_WITH_ACK = "needs_with_ack";
 		const std::string IneoNotificationChannel::PARAMETER_NEEDS_MULTIPLE_STOPS = "needs_multiple_stops";
@@ -59,6 +63,7 @@ namespace synthese
 		std::vector<std::string> IneoNotificationChannel::_getScriptParameterNames() const
 		{
 			vector<string> result;
+			result.push_back(PARAMETER_CMS_INTERPRETER);
 			result.push_back(PARAMETER_NEEDS_REPEAT_INTERVAL);
 			result.push_back(PARAMETER_NEEDS_WITH_ACK);
 			result.push_back(PARAMETER_NEEDS_MULTIPLE_STOPS);
@@ -85,75 +90,36 @@ namespace synthese
 				event->get<Time>()
 			);
 
-			util::Log::GetInstance().debug("Ajout d'un message XML dans la pile à envoyer à Ineo");
-
-			stringstream message;
-			stringstream dateMessage;
-			ptime now(second_clock::local_time());
-			dateMessage << setw( 2 ) << setfill ( '0' ) <<
-				now.date().day() << "/" <<
-				setw( 2 ) << setfill ( '0' ) <<
-				static_cast<long>(now.date().month()) << "/" <<
-				setw( 2 ) << setfill ( '0' ) <<
-				now.date().year();
-			stringstream heureMessage;
-			heureMessage << setw( 2 ) << setfill ( '0' ) <<
-				now.time_of_day().hours() << ":" <<
-				setw( 2 ) << setfill ( '0' ) <<
-				now.time_of_day().minutes () << ":" <<
-				setw( 2 ) << setfill ( '0' ) <<
-				now.time_of_day().seconds();
-			string requestName = provider->getName();
+			shared_ptr<ParametersMap> messagePM(new ParametersMap);
+			alarm->toParametersMap(*messagePM, true, "", true);
+			fields.insert("message", messagePM);
 			if (event->get<EventType>() == BEGIN)
 			{
-				requestName += "Create";
+				fields.insert("type", string("Create"));
 			}
 			else if (event->get<EventType>() == END)
 			{
-				requestName += "Delete";
+				fields.insert("type", string("Delete"));
 			}
-			requestName += "MessageRequest";
-			string longMessage(alarm->getLongMessage());
-			stringstream lineSeparator;
-			lineSeparator << "</Line>" << char(10) << char(9) << char(9) << char(9) << "<Line>";
-			replace_all(longMessage, "<br />", lineSeparator.str());
-			message << "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" << char(10) <<
-				"<" << requestName << ">" << char(10) <<
-				char(9) << "<ID>" <<
-				lexical_cast<string>(IneoTerminusConnection::GetNextRequestID()) <<
-				"</ID>" << char(10) <<
-				char(9) << "<RequestTimeStamp>" <<
-				dateMessage.str() <<
-				" " <<
-				heureMessage.str() <<
-				"</RequestTimeStamp>" << char(10) <<
-				char(9) << "<RequestorRef>Terminus</RequestorRef>" << char(10) <<
-				char(9) << "<Messaging>" << char(10) <<
-				char(9) << char(9) << "<Name>" <<
-				alarm->getShortMessage() <<
-				"</Name>" << char(10) <<
-				char(9) << char(9) << "<Dispatching>Repete</Dispatching>" << char(10) << // TO-DO : depends on the request
-				char(9) << char(9) << "<StartDate>01/01/1970</StartDate>" << char(10) <<
-				char(9) << char(9) << "<StopDate>31/12/2037</StopDate>" << char(10) <<
-				char(9) << char(9) << "<StartTime>00:00:00</StartTime>" << char(10) <<
-				char(9) << char(9) << "<StopTime>23:59:00</StopTime>" << char(10) <<
-				char(9) << char(9) << "<RepeatPeriod>" << // TO-DO : only write it if provider needs_repeat_interval
-				lexical_cast<string>(alarm->getRepeatInterval()) <<
-				"</RepeatPeriod>" << char(10) <<
-				char(9) << char(9) << "<Inhibition>non</Inhibition>" << char(10) << // TO-DO : depends on the request
-				char(9) << char(9) << "<Color>Vert</Color>" << char(10) << // TO-DO : extract from parameters and alarm
-				char(9) << char(9) << "<Text>" << char(10) <<
-				char(9) << char(9) << char(9) << "<Line>" << longMessage << "</Line>" << char(10) <<
-				char(9) << char(9) << "</Text>" << char(10) <<
-				char(9) << char(9) << "<Recipients>" << char(10) <<
-				char(9) << char(9) << char(9) << "<AllNetwork />" << char(10) << // TO-DO : extract from alarm object links
-				char(9) << char(9) << "</Recipients>" << char(10) <<
-				char(9) << "</Messaging>" << char(10) <<
-				"</" << requestName << ">";
+			fields.insert("messagerie", provider->getName());
+			fields.insert("ID", lexical_cast<string>(IneoTerminusConnection::GetNextRequestID()));
 
-			IneoTerminusConnection::GetTheConnection()->addMessage(message.str());
+			if (provider->get<Parameters>().getDefault<RegistryKeyType>(PARAMETER_CMS_INTERPRETER, 0))
+			{
+				const cms::Webpage* interpreter = Env::GetOfficialEnv().get<Webpage>(provider->get<Parameters>().get<RegistryKeyType>(PARAMETER_CMS_INTERPRETER)).get();
+				stringstream message;
+				interpreter->display(message, fields);
 
-			return true;
+				IneoTerminusConnection::GetTheConnection()->addMessage(message.str());
+
+				return true;
+			}
+			else
+			{
+				// Il faut un interpreter
+				util::Log::GetInstance().warn("Interpreter n'existe pas pour cette messagerie (" + provider->getName() + ")");
+				return false;
+			}
 		}
 
 	}
