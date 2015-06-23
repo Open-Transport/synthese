@@ -59,6 +59,21 @@ required).
 
 ### Security
 
+## [3.9.1] - 2015-06-08
+### Added
+
+### Changed
+
+- Display Request duration, CPU time, HTTP Status and service called in the log
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
 
 
 
