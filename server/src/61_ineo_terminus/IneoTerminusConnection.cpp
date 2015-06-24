@@ -285,7 +285,11 @@ namespace synthese
 				}
 				else if (tagName == "PassengerCreateMessageRequest")
 				{
-					message = _passengerCreateMessageRequest(childNode);
+					message = _createMessageRequest(childNode);
+				}
+				else if (tagName == "DriverCreateMessageRequest")
+				{
+					message = _createMessageRequest(childNode);
 				}
 				else
 				{
@@ -441,13 +445,17 @@ namespace synthese
 			return response.str();
 		}
 
-		string IneoTerminusConnection::tcp_connection::_passengerCreateMessageRequest(XMLNode node)
+		string IneoTerminusConnection::tcp_connection::_createMessageRequest(XMLNode node)
 		{
 			string tagName(node.getName());
+			string messagerieName;
 			if (tagName != "PassengerCreateMessageRequest")
 			{
-				// tagName is not PassengerCreateMessageRequest, this method should not have been called
-				return "";
+				messagerieName = "Passenger";
+			}
+			else if (tagName != "DriverCreateMessageRequest")
+			{
+				messagerieName = "Driver";
 			}
 
 			XMLNode IDNode = node.getChildNode("ID", 0);
@@ -501,10 +509,18 @@ namespace synthese
 				);
 				XMLNode repeatPeriodNode = MessagingNode.getChildNode("RepeatPeriod", 0);
 				message.repeatPeriod = lexical_cast<int>(repeatPeriodNode.getText());
-				XMLNode inhibitionNode = MessagingNode.getChildNode("Inhibition", 0);
-				message.inhibition = ((string)(inhibitionNode.getText()) == "oui");
-				XMLNode colorNode = MessagingNode.getChildNode("Color", 0);
-				message.color = colorNode.getText();
+				if (messagerieName == "Passenger")
+				{
+					XMLNode inhibitionNode = MessagingNode.getChildNode("Inhibition", 0);
+					message.inhibition = ((string)(inhibitionNode.getText()) == "oui");
+					XMLNode colorNode = MessagingNode.getChildNode("Color", 0);
+					message.color = colorNode.getText();
+				}
+				else
+				{
+					message.inhibition = false;
+					message.color = "";
+				}
 				XMLNode textNode = MessagingNode.getChildNode("Text", 0);
 				int numLineNode = textNode.nChildNode("Line");
 				for (int cptLineNode = 0;cptLineNode<numLineNode;cptLineNode++)
@@ -587,7 +603,8 @@ namespace synthese
 			);
 
 			stringstream response(_getXMLHeader());
-			response << char(10) << "<PassengerCreateMessageResponse>" << char(10) <<
+			string responseName = messagerieName + "CreateMessageResponse";
+			response << char(10) << responseName << char(10) <<
 				"  <ID>" << idStr << "</ID>" << char(10) <<
 				"  <RequestID>" << idStr << "</RequestID>" << char(10) <<
 				"  <ResponseTimeStamp>" << _writeIneoDate(requestTimeStamp) << " " << _writeIneoTime(requestTimeStamp) << "</ResponseTimeStamp>" << char(10) <<
@@ -614,9 +631,14 @@ namespace synthese
 					"    <StopDate>" << _writeIneoDate(message.stopDate) << "</StopDate>" << char(10) <<
 					"    <StartTime>" << _writeIneoTime(message.startDate) << "</StartTime>" << char(10) <<
 					"    <StopTime>" << _writeIneoTime(message.stopDate) << "</StopTime>" << char(10) <<
-					"    <RepeatPeriod>" << lexical_cast<string>(message.repeatPeriod) << "</RepeatPeriod>" << char(10) <<
-					"    <Inhibition>" << (message.inhibition ? "oui" : "non") << "</Inhibition>" << char(10) <<
-					"    <Color>" << message.color << "</Color>" << char(10) <<
+					"    <RepeatPeriod>" << lexical_cast<string>(message.repeatPeriod) << "</RepeatPeriod>" << char(10);
+				if (messagerieName == "Passenger")
+				{
+					response <<
+						"    <Inhibition>" << (message.inhibition ? "oui" : "non") << "</Inhibition>" << char(10) <<
+						"    <Color>" << message.color << "</Color>" << char(10);
+				}
+				response <<
 					"    <Text>" << char(10);
 				string longMessage(message.content);
 				stringstream lineSeparator;
@@ -627,7 +649,7 @@ namespace synthese
 					"    <Recipients>" << char(10) << _writeIneoRecipients(message.recipients) << char(10) << "    </Recipients>" << char(10) <<
 					"  </Messaging>" << char(10);
 			}
-			response << "</PassengerCreateMessageResponse>";
+			response << responseName;
 
 			return response.str();
 		}
