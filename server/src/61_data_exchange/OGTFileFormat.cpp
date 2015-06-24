@@ -57,8 +57,8 @@ namespace synthese
 		) const {
 
 			ExpatParser parser(*_import.get<DataSource>(), *this);
-			ifstream inFile;
-			inFile.open(filePath.string().c_str());
+			// Open file to stream
+			ifstream inFile(filePath.string().c_str());
 			if(!inFile)
 			{
 				_logError(
@@ -302,9 +302,7 @@ namespace synthese
 			XML_SetElementHandler(p, ExpatParser::startElement,ExpatParser::endElement);
 			XML_SetCharacterDataHandler(p, ExpatParser::characters);
 
-			//user_data.curNode=NULL;
-			//user_data.curWay=NULL;
-			//user_data.curRelation=NULL;
+			user_data.importTrip = false;
 			XML_SetUserData(p,&user_data);
 			// straight from example
 			do {

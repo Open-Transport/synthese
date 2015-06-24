@@ -105,6 +105,7 @@ namespace synthese
 		):	_env(env),
 			_import(import),
 			_minLogLevel(minLogLevel),
+			_maxLoggedLevel(IMPORT_LOG_TRAC),
 			_outputStream(outputStream),
 			_pm(pm),
 			_logPath(logPath)
