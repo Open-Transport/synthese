@@ -754,7 +754,6 @@ namespace synthese
 				{
 					boost::shared_ptr<ParametersMap> lineRecipientPM(new ParametersMap);
 					lineRecipientPM->insert("recipient_id", _network_id);
-					lineRecipientPM->insert("parameter", "");
 					pm.insert("line_recipient", lineRecipientPM);
 				}
 				else if (recipient.type == "Line")
@@ -767,7 +766,6 @@ namespace synthese
 						{
 							boost::shared_ptr<ParametersMap> lineRecipientPM(new ParametersMap);
 							lineRecipientPM->insert("recipient_id", it.second->getKey());
-							lineRecipientPM->insert("parameter", "");
 							pm.insert("line_recipient", lineRecipientPM);
 							found = true;
 						}
