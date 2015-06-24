@@ -427,15 +427,13 @@ namespace synthese
 
 			// TO-DO : insert line feeds
 			stringstream response(_getXMLHeader());
-			response << "<CheckStatusResponse><ID>" <<
-				idStr <<
-				"</ID><RequestID>" <<
-				idStr <<
-				"</RequestID><ResponseTimeStamp>" <<
-				_writeIneoDate(requestTimeStamp) <<
-				" " <<
-				_writeIneoTime(requestTimeStamp); // page 12 de la spec INEO : Horodatage de la demande
-			response << "</ResponseTimeStamp><ResponseRef>Terminus</ResponseRef></CheckStatusResponse>";
+			response << char(10) <<
+				"<CheckStatusResponse>" << char(10) <<
+				"  <ID>" << idStr << "</ID>" << char(10) <<
+				"  <RequestID>" << idStr << "</RequestID>" << char(10) <<
+				"  <ResponseTimeStamp>" << _writeIneoDate(requestTimeStamp) << " " << _writeIneoTime(requestTimeStamp) << "</ResponseTimeStamp>" << char(10) <<
+				"  <ResponseRef>Terminus</ResponseRef>" << char(10) <<
+				"</CheckStatusResponse>";
 
 			return response.str();
 		}
@@ -587,20 +585,16 @@ namespace synthese
 
 			// TO-DO : insert line feeds
 			stringstream response(_getXMLHeader());
-			response << "<PassengerCreateMessageResponse><ID>" <<
-				idStr <<
-				"</ID><RequestID>" <<
-				idStr <<
-				"</RequestID><ResponseTimeStamp>" <<
-				_writeIneoDate(requestTimeStamp) <<
-				" " <<
-				_writeIneoTime(requestTimeStamp); // page 12 de la spec INEO : Horodatage de la demande
-			response << "</ResponseTimeStamp><ResponseRef>Terminus</ResponseRef>";
+			response << char(10) << "<PassengerCreateMessageResponse>" << char(10) <<
+				"  <ID>" << idStr << "</ID>" << char(10) <<
+				"  <RequestID>" << idStr << "</RequestID>" << char(10) <<
+				"  <ResponseTimeStamp>" << _writeIneoDate(requestTimeStamp) << " " << _writeIneoTime(requestTimeStamp) << "</ResponseTimeStamp>" << char(10) <<
+				"  <ResponseRef>Terminus</ResponseRef>" << char(10);
 			BOOST_FOREACH(const Messaging& message, messages)
 			{
-				response << "<Messaging><Name>" <<
-					message.name <<
-					"</Name><Dispatching>";
+				response << "  <Messaging>" << char(10) <<
+					"    <Name>" << message.name << "</Name>" << char(10) <<
+					"    <Dispatching>";
 				if (message.dispatching == Immediat)
 				{
 					response << "Immediat";
@@ -613,31 +607,23 @@ namespace synthese
 				{
 					response << "Repete";
 				}
-				response << "</Dispatching><StartDate>" <<
-					_writeIneoDate(message.startDate) <<
-					"</StartDate><StopDate>" <<
-					_writeIneoDate(message.stopDate) <<
-					"</StopDate><StartTime>" <<
-					_writeIneoTime(message.startDate) <<
-					"</StartTime><StopTime>" <<
-					_writeIneoTime(message.stopDate) <<
-					"</StopTime><RepeatPeriod>" <<
-					lexical_cast<string>(message.repeatPeriod) <<
-					"</RepeatPeriod><Inhibition>" <<
-					(message.inhibition ? "oui" : "non") <<
-					"</Inhibition><Color>" <<
-					message.color <<
-					"</Color><Text>";
-				set<string> lines;
-				string lineFeed("<br />");
-				split(lines, message.content, is_any_of(lineFeed));
-				BOOST_FOREACH(const string& line, lines)
-				{
-					response << "<Line>" << line << "</Line>";
-				}
-				response << "</Text><Recipients>" <<
-					_writeIneoRecipients(message.recipients) <<
-					"</Recipients></Messaging>";
+				response << "</Dispatching>" << char(10) <<
+					"    <StartDate>" << _writeIneoDate(message.startDate) << "</StartDate>" << char(10) <<
+					"    <StopDate>" << _writeIneoDate(message.stopDate) << "</StopDate>" << char(10) <<
+					"    <StartTime>" << _writeIneoTime(message.startDate) << "</StartTime>" << char(10) <<
+					"    <StopTime>" << _writeIneoTime(message.stopDate) << "</StopTime>" << char(10) <<
+					"    <RepeatPeriod>" << lexical_cast<string>(message.repeatPeriod) << "</RepeatPeriod>" << char(10) <<
+					"    <Inhibition>" << (message.inhibition ? "oui" : "non") << "</Inhibition>" << char(10) <<
+					"    <Color>" << message.color << "</Color>" << char(10) <<
+					"    <Text>";
+				string longMessage(message.content);
+				stringstream lineSeparator;
+				lineSeparator << "</Line>" << char(10) << "      <Line>";
+				replace_all(longMessage, "<br />", lineSeparator.str());
+				response << "      <Line>" << longMessage << "</Line>" << char(10) <<
+					"    </Text>" << char(10) <<
+					"    <Recipients>" << _writeIneoRecipients(message.recipients) << "</Recipients>" << char(10) <<
+					"  </Messaging>" << char(10);
 			}
 			response << "</PassengerCreateMessageResponse>";
 
