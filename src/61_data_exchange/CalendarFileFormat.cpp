@@ -221,11 +221,21 @@ namespace synthese
 				}
 			}
 
-			// Create a CalendarTemplateElement for lacking dates
-			const Calendar effectiveCalendar = result->getResult();
-			BOOST_FOREACH(const date aDate, dateList.get()) {
-				if (!effectiveCalendar.isActive(aDate)) {
+			// If the calendar template is now empty, activate all its dates
+			if (!result->isLimited())
+			{
+				BOOST_FOREACH(const date aDate, dateList.get()) {
 					_createCalendarTemplateElement(result, ++maxRank, aDate);
+				}
+			}
+			else
+			{
+				// Create a CalendarTemplateElement for lacking dates
+				const Calendar effectiveCalendar = result->getResult();
+				BOOST_FOREACH(const date aDate, dateList.get()) {
+					if (!effectiveCalendar.isActive(aDate)) {
+						_createCalendarTemplateElement(result, ++maxRank, aDate);
+					}
 				}
 			}
 
