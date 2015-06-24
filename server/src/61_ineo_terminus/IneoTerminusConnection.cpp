@@ -25,6 +25,7 @@
 #include "Log.h"
 #include "Request.h"
 #include "ScenarioSaveAction.h"
+#include "ScenarioTableSync.h"
 #include "ServerModule.h"
 #include "XmlToolkit.h"
 
@@ -569,6 +570,9 @@ namespace synthese
 			scenarioSaveAction.setScenario(scenario);
 			Request fakeRequest;
 			scenarioSaveAction.run(fakeRequest);
+			// Enable the scenario
+			sscenario->setIsEnabled(true);
+			ScenarioTableSync::Save(sscenario.get());
 
 			util::Log::GetInstance().debug("IneoTerminusConnection::_passengerCreateMessageRequest : id " +
 				idStr +
