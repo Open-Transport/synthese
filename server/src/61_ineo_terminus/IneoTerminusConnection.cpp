@@ -22,11 +22,13 @@
 
 #include "IneoTerminusConnection.hpp"
 
+#include "CommercialLine.h"
 #include "Log.h"
 #include "Request.h"
 #include "ScenarioSaveAction.h"
 #include "ScenarioTableSync.h"
 #include "ServerModule.h"
+#include "TransportNetwork.h"
 #include "XmlToolkit.h"
 
 #include <boost/algorithm/string.hpp>
@@ -49,6 +51,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace messages;
+	using namespace pt;
 	using namespace util;
 	using namespace server;
 	
@@ -583,7 +586,6 @@ namespace synthese
 				" message(s)"
 			);
 
-			// TO-DO : insert line feeds
 			stringstream response(_getXMLHeader());
 			response << char(10) << "<PassengerCreateMessageResponse>" << char(10) <<
 				"  <ID>" << idStr << "</ID>" << char(10) <<
@@ -615,14 +617,14 @@ namespace synthese
 					"    <RepeatPeriod>" << lexical_cast<string>(message.repeatPeriod) << "</RepeatPeriod>" << char(10) <<
 					"    <Inhibition>" << (message.inhibition ? "oui" : "non") << "</Inhibition>" << char(10) <<
 					"    <Color>" << message.color << "</Color>" << char(10) <<
-					"    <Text>";
+					"    <Text>" << char(10);
 				string longMessage(message.content);
 				stringstream lineSeparator;
 				lineSeparator << "</Line>" << char(10) << "      <Line>";
 				replace_all(longMessage, "<br />", lineSeparator.str());
 				response << "      <Line>" << longMessage << "</Line>" << char(10) <<
 					"    </Text>" << char(10) <<
-					"    <Recipients>" << _writeIneoRecipients(message.recipients) << "</Recipients>" << char(10) <<
+					"    <Recipients>" << char(10) << _writeIneoRecipients(message.recipients) << char(10) << "    </Recipients>" << char(10) <<
 					"  </Messaging>" << char(10);
 			}
 			response << "</PassengerCreateMessageResponse>";
@@ -630,9 +632,9 @@ namespace synthese
 			return response.str();
 		}
 
-		set<string> IneoTerminusConnection::tcp_connection::_readRecipients(XMLNode node)
+		vector<IneoTerminusConnection::Recipient> IneoTerminusConnection::tcp_connection::_readRecipients(XMLNode node)
 		{
-			set<string> recipients;
+			vector<IneoTerminusConnection::Recipient> recipients;
 			int nChildNode = node.nChildNode();
 			for (int cptChildNode = 0;cptChildNode<nChildNode;cptChildNode++)
 			{
@@ -640,7 +642,31 @@ namespace synthese
 				string recipientType(recipientNode.getName());
 				if (recipientType == "AllNetwork")
 				{
-					recipients.insert("AllNetwork");
+					IneoTerminusConnection::Recipient new_recipient;
+					new_recipient.type = "AllNetwork";
+					new_recipient.name = "AllNetwork";
+					recipients.push_back(new_recipient);
+				}
+				else if (recipientType == "Lines")
+				{
+					int nLineNode = recipientNode.nChildNode();
+					for (int cptLineNode = 0;cptLineNode<nLineNode;cptLineNode++)
+					{
+						XMLNode lineNode = recipientNode.getChildNode(cptLineNode);
+						string recipientLineType(lineNode.getName());
+						if (recipientLineType == "Line")
+						{
+							string lineShortName = lineNode.getText();
+							IneoTerminusConnection::Recipient new_recipient;
+							new_recipient.type = "Line";
+							new_recipient.name = lineShortName;
+							recipients.push_back(new_recipient);
+						}
+						else
+						{
+							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientLineType + " est fils d'un noeud Lines");
+						}
+					}
 				}
 				else
 				{
@@ -651,18 +677,45 @@ namespace synthese
 			return recipients;
 		}
 
-		string IneoTerminusConnection::tcp_connection::_writeIneoRecipients(set<string> recipients)
+		string IneoTerminusConnection::tcp_connection::_writeIneoRecipients(vector<IneoTerminusConnection::Recipient> recipients)
 		{
 			stringstream strRecipients;
-			BOOST_FOREACH(const string& recipient, recipients)
+			// All Network
+			BOOST_FOREACH(const IneoTerminusConnection::Recipient& recipient, recipients)
 			{
-				if (recipient == "AllNetwork")
+				if (recipient.type == "AllNetwork")
 				{
-					strRecipients << "<AllNetwork />";
+					strRecipients << "      <AllNetwork />";
 				}
-				else
+			}
+
+			// Lines
+			bool first(true);
+			BOOST_FOREACH(const IneoTerminusConnection::Recipient& recipient, recipients)
+			{
+				if (recipient.type == "Line" && first)
 				{
-					util::Log::GetInstance().warn("_writeIneoRecipients : Recipient non codé : " + recipient);
+					strRecipients << "      <Lines>" << char(10) <<
+						"        <Line>" << recipient.name << "</Line>" << char(10);
+					first = false;
+				}
+				else if (recipient.type == "Line")
+				{
+					strRecipients << "        <Line>" << recipient.name << "</Line>" << char(10);
+				}
+			}
+			if (!first)
+			{
+				strRecipients << "      </Lines>";
+			}
+
+			// Write warn for non coded recipients
+			BOOST_FOREACH(const IneoTerminusConnection::Recipient& recipient, recipients)
+			{
+				if (recipient.type != "AllNetwork" &&
+					recipient.type != "Line")
+				{
+					util::Log::GetInstance().warn("_writeIneoRecipients : Recipient non codé : " + recipient.type);
 				}
 			}
 
@@ -693,17 +746,41 @@ namespace synthese
 			return str.str();
 		}
 
-		void IneoTerminusConnection::tcp_connection::_addRecipientsPM(ParametersMap& pm, set<string> recipients)
+		void IneoTerminusConnection::tcp_connection::_addRecipientsPM(ParametersMap& pm, vector<IneoTerminusConnection::Recipient> recipients)
 		{
-			BOOST_FOREACH(const string& recipient, recipients)
+			BOOST_FOREACH(const IneoTerminusConnection::Recipient& recipient, recipients)
 			{
-				if (recipient == "AllNetwork")
+				if (recipient.type == "AllNetwork")
 				{
-					pm.insert("line_recipient", _network_id);
+					boost::shared_ptr<ParametersMap> lineRecipientPM(new ParametersMap);
+					lineRecipientPM->insert("recipient_id", _network_id);
+					lineRecipientPM->insert("parameter", "");
+					pm.insert("line_recipient", lineRecipientPM);
+				}
+				else if (recipient.type == "Line")
+				{
+					bool found(false);
+					BOOST_FOREACH(const CommercialLine::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<CommercialLine>())
+					{
+						if(it.second->getShortName() == recipient.name &&
+							it.second->getNetwork()->getKey())
+						{
+							boost::shared_ptr<ParametersMap> lineRecipientPM(new ParametersMap);
+							lineRecipientPM->insert("recipient_id", it.second->getKey());
+							lineRecipientPM->insert("parameter", "");
+							pm.insert("line_recipient", lineRecipientPM);
+							found = true;
+						}
+					}
+					if (!found)
+					{
+						util::Log::GetInstance().warn("Ineo Terminus : Ligne non trouvée " + recipient.name);
+						pm.insert("line_recipient", "");
+					}
 				}
 				else
 				{
-					util::Log::GetInstance().warn("_addRecipientsPM : Recipient non codé : " + recipient);
+					util::Log::GetInstance().warn("_addRecipientsPM : Recipient non codé : " + recipient.type);
 				}
 			}
 			pm.insert("displayscreen_recipient", "");

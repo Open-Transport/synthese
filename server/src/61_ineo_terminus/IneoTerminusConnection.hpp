@@ -67,6 +67,12 @@ namespace synthese
 			mutable Status _status;
 
 			typedef std::pair<XMLResults, XMLNode> XMLParserResult;
+
+			struct Recipient
+			{
+				std::string type;
+				std::string name;
+			};
 			
 			static XMLNode ParseInput(
 				const std::string& xml
@@ -115,13 +121,13 @@ namespace synthese
 
 				// generic parsers
 				std::string _getXMLHeader();
-				std::set<std::string> _readRecipients(XMLNode node);
+				std::vector<IneoTerminusConnection::Recipient> _readRecipients(XMLNode node);
 
 				//generic writers
-				std::string _writeIneoRecipients(std::set<std::string>);
+				std::string _writeIneoRecipients(std::vector<IneoTerminusConnection::Recipient>);
 				std::string _writeIneoDate(boost::posix_time::ptime date);
 				std::string _writeIneoTime(boost::posix_time::ptime date);
-				void _addRecipientsPM(util::ParametersMap& pm, std::set<std::string>);
+				void _addRecipientsPM(util::ParametersMap& pm, std::vector<IneoTerminusConnection::Recipient>);
 
 				//generic enums
 				typedef enum
@@ -142,7 +148,7 @@ namespace synthese
 					bool inhibition;
 					std::string color;
 					std::string content;
-					std::set<std::string> recipients; // TO-DO use real recipients
+					std::vector<IneoTerminusConnection::Recipient> recipients;
 				};
 			};
 
