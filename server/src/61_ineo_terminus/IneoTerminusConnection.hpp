@@ -115,7 +115,7 @@ namespace synthese
 				std::string _checkStatusRequest(
 					XMLNode node
 				);
-				std::string _passengerCreateMessageRequest(
+				std::string _createMessageRequest(
 					XMLNode node
 				);
 
