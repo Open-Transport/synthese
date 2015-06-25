@@ -690,6 +690,27 @@ namespace synthese
 						}
 					}
 				}
+				else if (recipientType == "Vehicles")
+				{
+					int nVehicleNode = recipientNode.nChildNode();
+					for (int cptVehicleNode = 0;cptVehicleNode<nVehicleNode;cptVehicleNode++)
+					{
+						XMLNode vehicleNode = recipientNode.getChildNode(cptVehicleNode);
+						string recipientVehicleType(vehicleNode.getName());
+						if (recipientVehicleType == "Vehicle")
+						{
+							string vehicleNumber = vehicleNode.getText();
+							IneoTerminusConnection::Recipient new_recipient;
+							new_recipient.type = "Vehicle";
+							new_recipient.name = vehicleNumber;
+							recipients.push_back(new_recipient);
+						}
+						else
+						{
+							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientVehicleType + " est fils d'un noeud Vehicles");
+						}
+					}
+				}
 				else
 				{
 					util::Log::GetInstance().warn("_readRecipients : Recipient non codé : " + recipientType);
@@ -731,11 +752,32 @@ namespace synthese
 				strRecipients << "      </Lines>";
 			}
 
+			// Vehicles
+			first = false;
+			BOOST_FOREACH(const IneoTerminusConnection::Recipient& recipient, recipients)
+			{
+				if (recipient.type == "Vehicle" && first)
+				{
+					strRecipients << "      <Vehicles>" << char(10) <<
+						"        <Vehicle>" << recipient.name << "</Vehicle>" << char(10);
+					first = false;
+				}
+				else if (recipient.type == "Vehicle")
+				{
+					strRecipients << "        <Vehicle>" << recipient.name << "</Vehicle>" << char(10);
+				}
+			}
+			if (!first)
+			{
+				strRecipients << "      </Vehicles>";
+			}
+
 			// Write warn for non coded recipients
 			BOOST_FOREACH(const IneoTerminusConnection::Recipient& recipient, recipients)
 			{
 				if (recipient.type != "AllNetwork" &&
-					recipient.type != "Line")
+					recipient.type != "Line" &&
+					recipient.type != "Vehicle")
 				{
 					util::Log::GetInstance().warn("_writeIneoRecipients : Recipient non codé : " + recipient.type);
 				}
@@ -797,6 +839,11 @@ namespace synthese
 						util::Log::GetInstance().warn("Ineo Terminus : Ligne non trouvée " + recipient.name);
 						pm.insert("line_recipient", "");
 					}
+				}
+				else if (recipient.type == "Vehicle")
+				{
+					// A priori on ne fait rien pour les recipient Vehicle dans Synthese
+					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient vehicle");
 				}
 				else
 				{
