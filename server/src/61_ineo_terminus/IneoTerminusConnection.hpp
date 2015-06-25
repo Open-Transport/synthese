@@ -118,6 +118,9 @@ namespace synthese
 				std::string _createMessageRequest(
 					XMLNode node
 				);
+				std::string _deleteMessageRequest(
+					XMLNode node
+				);
 
 				// generic parsers
 				std::string _getXMLHeader();
