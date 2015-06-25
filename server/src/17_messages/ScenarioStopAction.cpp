@@ -22,6 +22,8 @@
 
 #include "ScenarioStopAction.h"
 
+#include "AlarmObjectLink.h"
+#include "AlarmRecipient.h"
 #include "DataSource.h"
 #include "DBTransaction.hpp"
 #include "Profile.h"
@@ -43,6 +45,7 @@
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
+using namespace boost::property_tree;
 
 namespace synthese
 {
@@ -180,5 +183,137 @@ namespace synthese
 			return result;
 			*/
 			return true;
+		}
+
+
+		SentScenario* ScenarioStopAction::findScenarioByMessagesAndCalendars(
+			boost::optional<boost::property_tree::ptree> messagesAndCalendars
+		) {
+			if (messagesAndCalendars)
+			{
+				// Loop on events
+				ScenarioTableSync::SearchResult scenarios;
+
+				scenarios = ScenarioTableSync::SearchSentScenarios(
+					Env::GetOfficialEnv(),
+					boost::optional<std::string>()
+				);
+				BOOST_FOREACH(const boost::shared_ptr<Scenario>& scenario, scenarios)
+				{
+					if(!dynamic_cast<const SentScenario*>(scenario.get()))
+					{
+						continue;
+					}
+					SentScenario* sscenario = static_cast<SentScenario*>(scenario.get());
+					if (!sscenario->getIsEnabled())
+					{
+						continue;
+					}
+					// Loop on messages
+					bool allAlarmsFound(true);
+					Scenario::Messages alarms = sscenario->getMessages();
+					BOOST_FOREACH(const Alarm* alarm, alarms)
+					{
+						bool alarmFound(false);
+						BOOST_FOREACH(const ptree::value_type& calendarNode, messagesAndCalendars->get_child("calendar"))
+						{
+							// TO-DO ? Compare start date_time and end date_time
+							BOOST_FOREACH(const ptree::value_type& messageNode, calendarNode.second.get_child("message"))
+							{
+								if (alarm->getShortMessage() == messageNode.second.get("title", string())&&
+									alarm->getLongMessage() == messageNode.second.get("content", string()))
+								{
+									bool identicalRecipients(true);
+									// Content of message is equal, verify recipients
+									// Loop on all recipient factories
+									BOOST_FOREACH(boost::shared_ptr<AlarmRecipient> linkType, Factory<AlarmRecipient>::GetNewCollection())
+									{
+										// Existing links of this factory in the existent message
+										Alarm::LinkedObjects::mapped_type existingLinks(alarm->getLinkedObjects(linkType->getFactoryKey()));
+										BOOST_FOREACH(const AlarmObjectLink* link, existingLinks)
+										{
+											bool linkFound(false);
+											// Loop on recipients
+											BOOST_FOREACH(const ptree::value_type& linkNode, messageNode.second.get_child(linkType->getFactoryKey() + "_recipient"))
+											{
+												if (link->getObjectId() == linkNode.second.get("recipient_id", RegistryKeyType(0)) &&
+													link->getParameter() == linkNode.second.get("parameter", string()))
+												{
+													linkFound = true;
+													break;
+												}
+											}
+											if (!linkFound)
+											{
+												// Recipients are different
+												identicalRecipients = false;
+												break;
+											}
+										}
+
+										// It may be more recipients in the ptree, compare on number
+										size_t nbRecipientLinks(0);
+										BOOST_FOREACH(const ptree::value_type& linkNode, messageNode.second.get_child(linkType->getFactoryKey() + "_recipient"))
+										{
+											nbRecipientLinks++;
+										}
+										if (nbRecipientLinks != existingLinks.size())
+										{
+											identicalRecipients = false;
+										}
+
+										if (!identicalRecipients)
+										{
+											break; // to avoid loop on other recipient factories
+										}
+									} // Loop on recipient factories
+									if (identicalRecipients)
+									{
+										alarmFound = true;
+										break;
+									}
+								} // Comparison on content of message
+							} // Loop on messages of ptree calendar
+						} // Loop on calendars of ptree
+
+						if (!alarmFound)
+						{
+							// This is not the searched scenario
+							allAlarmsFound = false;
+							break;
+						}
+					} // Loop on messages of the scenario
+					if (!allAlarmsFound)
+					{
+						// Jump to following scenario
+						continue;
+					}
+					else
+					{
+						// It is possible to eliminate the scenario if ptree has more messages than scenario
+						size_t nbMessagesInPtree(0);
+						BOOST_FOREACH(const ptree::value_type& calendarNode, messagesAndCalendars->get_child("calendar"))
+						{
+							nbMessagesInPtree += calendarNode.second.count("message");
+						}
+						if (nbMessagesInPtree != alarms.size())
+						{
+							// Jump to following scenario
+							continue;
+						}
+						else
+						{
+							// This is the searched scenario !
+							return sscenario;
+						}
+					}
+				}// Loop on all scenarios
+
+				return NULL;
+			}
+			else
+			{
+				return NULL;
+			}
 		}
 }	}

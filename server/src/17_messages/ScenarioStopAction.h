@@ -26,6 +26,8 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 
+#include <boost/property_tree/ptree.hpp>
+
 namespace synthese
 {
 	namespace impex
@@ -75,6 +77,10 @@ namespace synthese
 			void run(server::Request& request);
 
 			virtual bool isAuthorized(const server::Session* session) const;
+
+			SentScenario* findScenarioByMessagesAndCalendars(
+				boost::optional<boost::property_tree::ptree> messagesAndCalendars
+			);
 
 			void setScenario(SentScenario* value){ _scenario = value; }
 		};

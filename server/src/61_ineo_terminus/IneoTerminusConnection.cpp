@@ -26,6 +26,7 @@
 #include "Log.h"
 #include "Request.h"
 #include "ScenarioSaveAction.h"
+#include "ScenarioStopAction.h"
 #include "ScenarioTableSync.h"
 #include "ServerModule.h"
 #include "TransportNetwork.h"
@@ -287,9 +288,17 @@ namespace synthese
 				{
 					message = _createMessageRequest(childNode);
 				}
+				else if (tagName == "PassengerDeleteMessageRequest")
+				{
+					message = _deleteMessageRequest(childNode);
+				}
 				else if (tagName == "DriverCreateMessageRequest")
 				{
 					message = _createMessageRequest(childNode);
+				}
+				else if (tagName == "DriverDeleteMessageRequest")
+				{
+					message = _deleteMessageRequest(childNode);
 				}
 				else
 				{
@@ -604,7 +613,7 @@ namespace synthese
 
 			stringstream response(_getXMLHeader());
 			string responseName = messagerieName + "CreateMessageResponse";
-			response << char(10) << responseName << char(10) <<
+			response << char(10) << "<" << responseName << ">" << char(10) <<
 				"  <ID>" << idStr << "</ID>" << char(10) <<
 				"  <RequestID>" << idStr << "</RequestID>" << char(10) <<
 				"  <ResponseTimeStamp>" << _writeIneoDate(requestTimeStamp) << " " << _writeIneoTime(requestTimeStamp) << "</ResponseTimeStamp>" << char(10) <<
@@ -649,7 +658,204 @@ namespace synthese
 					"    <Recipients>" << char(10) << _writeIneoRecipients(message.recipients) << char(10) << "    </Recipients>" << char(10) <<
 					"  </Messaging>" << char(10);
 			}
-			response << responseName;
+			response << "</" << responseName << ">";
+
+			return response.str();
+		}
+
+		string IneoTerminusConnection::tcp_connection::_deleteMessageRequest(XMLNode node)
+		{
+			string tagName(node.getName());
+			string messagerieName;
+			if (tagName != "PassengerDeleteMessageRequest")
+			{
+				messagerieName = "Passenger";
+			}
+			else if (tagName != "DriverDeleteMessageRequest")
+			{
+				messagerieName = "Driver";
+			}
+
+			XMLNode IDNode = node.getChildNode("ID", 0);
+			string idStr = IDNode.getText();
+			XMLNode RequestTimeStampNode = node.getChildNode("RequestTimeStamp", 0);
+			ptime requestTimeStamp(
+				XmlToolkit::GetIneoDateTime(
+					RequestTimeStampNode.getText()
+			)	);
+			XMLNode RequestorRefNode = node.getChildNode("RequestorRef", 0);
+			string requestorRefStr = RequestorRefNode.getText();
+
+			int numMessagingNode = node.nChildNode("Messaging");
+			vector<Messaging> messages;
+			for (int cptMessagingNode = 0;cptMessagingNode<numMessagingNode;cptMessagingNode++)
+			{
+				Messaging message;
+				XMLNode MessagingNode = node.getChildNode("Messaging", cptMessagingNode);
+				XMLNode nameNode = MessagingNode.getChildNode("Name", 0);
+				message.name = _iconv.convert(nameNode.getText());
+				XMLNode dispatchingNode = MessagingNode.getChildNode("Dispatching", 0);
+				if ((string)(dispatchingNode.getText()) == "Immediat")
+				{
+					message.dispatching = Immediat;
+				}
+				else if ((string)(dispatchingNode.getText()) == "Differe")
+				{
+					message.dispatching = Differe;
+				}
+				else if ((string)(dispatchingNode.getText()) == "Repete")
+				{
+					message.dispatching = Repete;
+				}
+				else
+				{
+					util::Log::GetInstance().warn("IneoTerminusConnection : Message avec Dispatching inconnu : ");
+				}
+				XMLNode startDateNode = MessagingNode.getChildNode("StartDate", 0);
+				string startDateStr = startDateNode.getText();
+				XMLNode stopDateNode = MessagingNode.getChildNode("StopDate", 0);
+				string stopDateStr = stopDateNode.getText();
+				XMLNode startTimeNode = MessagingNode.getChildNode("StartTime", 0);
+				string startTimeStr = startTimeNode.getText();
+				XMLNode stopTimeNode = MessagingNode.getChildNode("StopTime", 0);
+				string stopTimeStr = stopTimeNode.getText();
+				message.startDate =  XmlToolkit::GetIneoDateTime(
+					startDateStr + " " + startTimeStr
+				);
+				message.stopDate =  XmlToolkit::GetIneoDateTime(
+					stopDateStr + " " + stopTimeStr
+				);
+				XMLNode repeatPeriodNode = MessagingNode.getChildNode("RepeatPeriod", 0);
+				message.repeatPeriod = lexical_cast<int>(repeatPeriodNode.getText());
+				if (messagerieName == "Passenger")
+				{
+					XMLNode inhibitionNode = MessagingNode.getChildNode("Inhibition", 0);
+					message.inhibition = ((string)(inhibitionNode.getText()) == "oui");
+					XMLNode colorNode = MessagingNode.getChildNode("Color", 0);
+					message.color = colorNode.getText();
+				}
+				else
+				{
+					message.inhibition = false;
+					message.color = "";
+				}
+				XMLNode textNode = MessagingNode.getChildNode("Text", 0);
+				int numLineNode = textNode.nChildNode("Line");
+				for (int cptLineNode = 0;cptLineNode<numLineNode;cptLineNode++)
+				{
+					XMLNode LineNode = textNode.getChildNode("Line", cptLineNode);
+					if (cptLineNode > 0)
+					{
+						message.content += "<br />";
+					}
+					message.content += _iconv.convert(LineNode.getText());
+				}
+				XMLNode RecipientsNode = MessagingNode.getChildNode("Recipients", 0);
+				message.recipients = _readRecipients(RecipientsNode);
+
+				messages.push_back(message);
+			}
+
+			// Find the scenario ScenarioStopAction
+			boost::shared_ptr<ParametersMap> messagesAndCalendarsPM(new ParametersMap);
+			BOOST_FOREACH(const Messaging& message, messages)
+			{
+				boost::shared_ptr<ParametersMap> periodPM(new ParametersMap);
+				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()) +" "+ boost::posix_time::to_simple_string(message.startDate.time_of_day()));
+				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()) +" "+ boost::posix_time::to_simple_string(message.stopDate.time_of_day()));
+				periodPM->insert("date", "");
+				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
+				messagePM->insert("title", message.name);
+				messagePM->insert("content", message.content);
+				messagePM->insert("color", message.color);
+				if (message.dispatching == Immediat)
+				{
+					messagePM->insert("dispatching", "Immediat");
+				}
+				else if (message.dispatching == Differe)
+				{
+					messagePM->insert("dispatching", "Differe");
+				}
+				else if (message.dispatching == Repete)
+				{
+					messagePM->insert("dispatching", "Repete");
+				}
+				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod));
+				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
+				messagePM->insert("section", "");
+				messagePM->insert("alternative", "");
+				_addRecipientsPM(*messagePM, message.recipients);
+				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+				calendarPM->insert("period", periodPM);
+				calendarPM->insert("message", messagePM);
+				messagesAndCalendarsPM->insert("calendar", calendarPM);
+			}
+
+			stringstream stream;
+			messagesAndCalendarsPM->outputJSON(stream, "");
+			boost::property_tree::ptree messagesAndCalendars;
+			boost::property_tree::json_parser::read_json(stream, messagesAndCalendars);
+			ScenarioStopAction scenarioStopAction;
+			SentScenario* sscenario = scenarioStopAction.findScenarioByMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
+			if (sscenario)
+			{
+				scenarioStopAction.setScenario(sscenario);
+				Request fakeRequest;
+				scenarioStopAction.run(fakeRequest);
+			}
+			else
+			{
+				util::Log::GetInstance().warn("IneoTerminusConnection : requete Delete non prise en compte car evenement non trouvé dans Terminus");
+			}
+
+			stringstream response(_getXMLHeader());
+			string responseName = messagerieName + "DeleteMessageResponse";
+			response << char(10) << "<" << responseName << ">" << char(10) <<
+				"  <ID>" << idStr << "</ID>" << char(10) <<
+				"  <RequestID>" << idStr << "</RequestID>" << char(10) <<
+				"  <ResponseTimeStamp>" << _writeIneoDate(requestTimeStamp) << " " << _writeIneoTime(requestTimeStamp) << "</ResponseTimeStamp>" << char(10) <<
+				"  <ResponseRef>Terminus</ResponseRef>" << char(10);
+			BOOST_FOREACH(const Messaging& message, messages)
+			{
+				response << "  <Messaging>" << char(10) <<
+					"    <Name>" << message.name << "</Name>" << char(10) <<
+					"    <Dispatching>";
+				if (message.dispatching == Immediat)
+				{
+					response << "Immediat";
+				}
+				else if (message.dispatching == Differe)
+				{
+					response << "Differe";
+				}
+				else if (message.dispatching == Repete)
+				{
+					response << "Repete";
+				}
+				response << "</Dispatching>" << char(10) <<
+					"    <StartDate>" << _writeIneoDate(message.startDate) << "</StartDate>" << char(10) <<
+					"    <StopDate>" << _writeIneoDate(message.stopDate) << "</StopDate>" << char(10) <<
+					"    <StartTime>" << _writeIneoTime(message.startDate) << "</StartTime>" << char(10) <<
+					"    <StopTime>" << _writeIneoTime(message.stopDate) << "</StopTime>" << char(10) <<
+					"    <RepeatPeriod>" << lexical_cast<string>(message.repeatPeriod) << "</RepeatPeriod>" << char(10);
+				if (messagerieName == "Passenger")
+				{
+					response <<
+						"    <Inhibition>" << (message.inhibition ? "oui" : "non") << "</Inhibition>" << char(10) <<
+						"    <Color>" << message.color << "</Color>" << char(10);
+				}
+				response <<
+					"    <Text>" << char(10);
+				string longMessage(message.content);
+				stringstream lineSeparator;
+				lineSeparator << "</Line>" << char(10) << "      <Line>";
+				replace_all(longMessage, "<br />", lineSeparator.str());
+				response << "      <Line>" << longMessage << "</Line>" << char(10) <<
+					"    </Text>" << char(10) <<
+					"    <Recipients>" << char(10) << _writeIneoRecipients(message.recipients) << char(10) << "    </Recipients>" << char(10) <<
+					"  </Messaging>" << char(10);
+			}
+			response << "</" << responseName << ">";
 
 			return response.str();
 		}
