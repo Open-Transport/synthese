@@ -214,14 +214,51 @@ namespace synthese
 					Scenario::Messages alarms = sscenario->getMessages();
 					BOOST_FOREACH(const Alarm* alarm, alarms)
 					{
+						bool allPeriodsFound(true);
+						BOOST_FOREACH(MessageApplicationPeriod* period, alarm->getCalendar()->getApplicationPeriods())
+						{
+							bool periodFound(false);
+							BOOST_FOREACH(const ptree::value_type& calendarNode, messagesAndCalendars->get_child("calendar"))
+							{
+								BOOST_FOREACH(const ptree::value_type& periodNode, calendarNode.second.get_child("period"))
+								{
+									string startDateStr(periodNode.second.get("start_date", string()));
+									ptime startDate = startDateStr.empty() ? ptime(not_a_date_time) : time_from_string(startDateStr);
+									string endDateStr(periodNode.second.get("end_date", string()));
+									ptime endDate = endDateStr.empty() ? ptime(not_a_date_time) : time_from_string(endDateStr);
+
+									if (period->getStart() == startDate &&
+										period->getEnd() == endDate)
+									{
+										periodFound = true;
+										break;
+									}
+								}
+								if (periodFound)
+								{
+									break; // to avoid loop on other calendar
+								}
+							}
+							if (!periodFound)
+							{
+								allPeriodsFound = false;
+								break;
+							}
+						}
+						if (!allPeriodsFound)
+						{
+							allAlarmsFound = false;
+							break;
+						}
+
 						bool alarmFound(false);
 						BOOST_FOREACH(const ptree::value_type& calendarNode, messagesAndCalendars->get_child("calendar"))
 						{
-							// TO-DO ? Compare start date_time and end date_time
 							BOOST_FOREACH(const ptree::value_type& messageNode, calendarNode.second.get_child("message"))
 							{
-								if (alarm->getShortMessage() == messageNode.second.get("title", string())&&
-									alarm->getLongMessage() == messageNode.second.get("content", string()))
+								if (alarm->getShortMessage() == messageNode.second.get("title", string()) &&
+									alarm->getLongMessage() == messageNode.second.get("content", string()) &&
+									alarm->getRepeatInterval() == messageNode.second.get("repeat_interval", 0))
 								{
 									bool identicalRecipients(true);
 									// Content of message is equal, verify recipients
