@@ -278,34 +278,135 @@ namespace synthese
 					return;
 				}
 				string tagName(childNode.getName());
-				string message("Message pour Ineo");
+				string message(_getXMLHeader());
+				message += char(10);
+				message += bufStr;
 
 				if (tagName == "CheckStatusRequest")
 				{
-					message = _checkStatusRequest(childNode);
+					if (_checkStatusRequest(childNode))
+					{
+						replace_all(message, "CheckStatusRequest", "CheckStatusResponse");
+					}
+					else
+					{
+						message = "";
+					}
 				}
 				else if (tagName == "PassengerCreateMessageRequest")
 				{
-					message = _createMessageRequest(childNode);
+					if (_createMessageRequest(childNode))
+					{
+						replace_all(message, "PassengerCreateMessageRequest", "PassengerCreateMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
 				}
 				else if (tagName == "PassengerDeleteMessageRequest")
 				{
-					message = _deleteMessageRequest(childNode);
+					if (_deleteMessageRequest(childNode))
+					{
+						replace_all(message, "PassengerDeleteMessageRequest", "PassengerDeleteMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
 				}
 				else if (tagName == "DriverCreateMessageRequest")
 				{
-					message = _createMessageRequest(childNode);
+					if (_createMessageRequest(childNode))
+					{
+						replace_all(message, "DriverCreateMessageRequest", "DriverCreateMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
 				}
 				else if (tagName == "DriverDeleteMessageRequest")
 				{
-					message = _deleteMessageRequest(childNode);
+					if (_deleteMessageRequest(childNode))
+					{
+						replace_all(message, "DriverDeleteMessageRequest", "DriverDeleteMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "PpdsCreateMessageRequest")
+				{
+					if (_createMessageRequest(childNode))
+					{
+						replace_all(message, "PpdsCreateMessageRequest", "PpdsCreateMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "PpdsDeleteMessageRequest")
+				{
+					if (_deleteMessageRequest(childNode))
+					{
+						replace_all(message, "PpdsDeleteMessageRequest", "PpdsDeleteMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "GirouetteCreateMessageRequest")
+				{
+					if (_createMessageRequest(childNode))
+					{
+						replace_all(message, "GirouetteCreateMessageRequest", "GirouetteCreateMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "GirouetteDeleteMessageRequest")
+				{
+					if (_deleteMessageRequest(childNode))
+					{
+						replace_all(message, "GirouetteDeleteMessageRequest", "GirouetteDeleteMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "SonoPassengerCreateMessageRequest")
+				{
+					if (_createMessageRequest(childNode))
+					{
+						replace_all(message, "SonoPassengerCreateMessageRequest", "SonoPassengerCreateMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "SonoPassengerDeleteMessageRequest")
+				{
+					if (_deleteMessageRequest(childNode))
+					{
+						replace_all(message, "SonoPassengerDeleteMessageRequest", "SonoPassengerDeleteMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
 				}
 				else
 				{
 					util::Log::GetInstance().warn("Ineo Terminus : Parser non codé pour " + tagName);
 				}
-				util::IConv iconv("UTF-8","ISO-8859-1");
-				message = iconv.convert(message);
 				message += char(0);
 				boost::asio::async_write(
 					_socket,
@@ -414,7 +515,7 @@ namespace synthese
 			return "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>";
 		}
 
-		string IneoTerminusConnection::tcp_connection::_checkStatusRequest(XMLNode node)
+		bool IneoTerminusConnection::tcp_connection::_checkStatusRequest(XMLNode node)
 		{
 			string tagName(node.getName());
 			if (tagName != "CheckStatusRequest")
@@ -441,20 +542,10 @@ namespace synthese
 				requestorRefStr
 			);
 
-			// TO-DO : insert line feeds
-			stringstream response(_getXMLHeader());
-			response << char(10) <<
-				"<CheckStatusResponse>" << char(10) <<
-				"  <ID>" << idStr << "</ID>" << char(10) <<
-				"  <RequestID>" << idStr << "</RequestID>" << char(10) <<
-				"  <ResponseTimeStamp>" << _writeIneoDate(requestTimeStamp) << " " << _writeIneoTime(requestTimeStamp) << "</ResponseTimeStamp>" << char(10) <<
-				"  <ResponseRef>Terminus</ResponseRef>" << char(10) <<
-				"</CheckStatusResponse>";
-
-			return response.str();
+			return true;
 		}
 
-		string IneoTerminusConnection::tcp_connection::_createMessageRequest(XMLNode node)
+		bool IneoTerminusConnection::tcp_connection::_createMessageRequest(XMLNode node)
 		{
 			string tagName(node.getName());
 			string messagerieName;
@@ -465,6 +556,18 @@ namespace synthese
 			else if (tagName != "DriverCreateMessageRequest")
 			{
 				messagerieName = "Driver";
+			}
+			else if (tagName != "PpdsCreateMessageRequest")
+			{
+				messagerieName = "Ppds";
+			}
+			else if (tagName != "GirouetteCreateMessageRequest")
+			{
+				messagerieName = "Girouette";
+			}
+			else if (tagName != "SonoPassengerCreateMessageRequest")
+			{
+				messagerieName = "SonoPassenger";
 			}
 
 			XMLNode IDNode = node.getChildNode("ID", 0);
@@ -481,69 +584,8 @@ namespace synthese
 			vector<Messaging> messages;
 			for (int cptMessagingNode = 0;cptMessagingNode<numMessagingNode;cptMessagingNode++)
 			{
-				Messaging message;
 				XMLNode MessagingNode = node.getChildNode("Messaging", cptMessagingNode);
-				XMLNode nameNode = MessagingNode.getChildNode("Name", 0);
-				message.name = _iconv.convert(nameNode.getText());
-				XMLNode dispatchingNode = MessagingNode.getChildNode("Dispatching", 0);
-				if ((string)(dispatchingNode.getText()) == "Immediat")
-				{
-					message.dispatching = Immediat;
-				}
-				else if ((string)(dispatchingNode.getText()) == "Differe")
-				{
-					message.dispatching = Differe;
-				}
-				else if ((string)(dispatchingNode.getText()) == "Repete")
-				{
-					message.dispatching = Repete;
-				}
-				else
-				{
-					util::Log::GetInstance().warn("IneoTerminusConnection : Message avec Dispatching inconnu : ");
-				}
-				XMLNode startDateNode = MessagingNode.getChildNode("StartDate", 0);
-				string startDateStr = startDateNode.getText();
-				XMLNode stopDateNode = MessagingNode.getChildNode("StopDate", 0);
-				string stopDateStr = stopDateNode.getText();
-				XMLNode startTimeNode = MessagingNode.getChildNode("StartTime", 0);
-				string startTimeStr = startTimeNode.getText();
-				XMLNode stopTimeNode = MessagingNode.getChildNode("StopTime", 0);
-				string stopTimeStr = stopTimeNode.getText();
-				message.startDate =  XmlToolkit::GetIneoDateTime(
-					startDateStr + " " + startTimeStr
-				);
-				message.stopDate =  XmlToolkit::GetIneoDateTime(
-					stopDateStr + " " + stopTimeStr
-				);
-				XMLNode repeatPeriodNode = MessagingNode.getChildNode("RepeatPeriod", 0);
-				message.repeatPeriod = lexical_cast<int>(repeatPeriodNode.getText());
-				if (messagerieName == "Passenger")
-				{
-					XMLNode inhibitionNode = MessagingNode.getChildNode("Inhibition", 0);
-					message.inhibition = ((string)(inhibitionNode.getText()) == "oui");
-					XMLNode colorNode = MessagingNode.getChildNode("Color", 0);
-					message.color = colorNode.getText();
-				}
-				else
-				{
-					message.inhibition = false;
-					message.color = "";
-				}
-				XMLNode textNode = MessagingNode.getChildNode("Text", 0);
-				int numLineNode = textNode.nChildNode("Line");
-				for (int cptLineNode = 0;cptLineNode<numLineNode;cptLineNode++)
-				{
-					XMLNode LineNode = textNode.getChildNode("Line", cptLineNode);
-					if (cptLineNode > 0)
-					{
-						message.content += "<br />";
-					}
-					message.content += _iconv.convert(LineNode.getText());
-				}
-				XMLNode RecipientsNode = MessagingNode.getChildNode("Recipients", 0);
-				message.recipients = _readRecipients(RecipientsNode);
-
+				Messaging message = _readMessagingNode(MessagingNode, messagerieName);
 				messages.push_back(message);
 			}
 
@@ -600,7 +642,7 @@ namespace synthese
 			sscenario->setIsEnabled(true);
 			ScenarioTableSync::Save(sscenario.get());
 
-			util::Log::GetInstance().debug("IneoTerminusConnection::_passengerCreateMessageRequest : id " +
+			util::Log::GetInstance().debug("IneoTerminusConnection::_createMessageRequest : id " +
 				idStr +
 				" ; timestamp " +
 				RequestTimeStampNode.getText() +
@@ -611,59 +653,10 @@ namespace synthese
 				" message(s)"
 			);
 
-			stringstream response(_getXMLHeader());
-			string responseName = messagerieName + "CreateMessageResponse";
-			response << char(10) << "<" << responseName << ">" << char(10) <<
-				"  <ID>" << idStr << "</ID>" << char(10) <<
-				"  <RequestID>" << idStr << "</RequestID>" << char(10) <<
-				"  <ResponseTimeStamp>" << _writeIneoDate(requestTimeStamp) << " " << _writeIneoTime(requestTimeStamp) << "</ResponseTimeStamp>" << char(10) <<
-				"  <ResponseRef>Terminus</ResponseRef>" << char(10);
-			BOOST_FOREACH(const Messaging& message, messages)
-			{
-				response << "  <Messaging>" << char(10) <<
-					"    <Name>" << message.name << "</Name>" << char(10) <<
-					"    <Dispatching>";
-				if (message.dispatching == Immediat)
-				{
-					response << "Immediat";
-				}
-				else if (message.dispatching == Differe)
-				{
-					response << "Differe";
-				}
-				else if (message.dispatching == Repete)
-				{
-					response << "Repete";
-				}
-				response << "</Dispatching>" << char(10) <<
-					"    <StartDate>" << _writeIneoDate(message.startDate) << "</StartDate>" << char(10) <<
-					"    <StopDate>" << _writeIneoDate(message.stopDate) << "</StopDate>" << char(10) <<
-					"    <StartTime>" << _writeIneoTime(message.startDate) << "</StartTime>" << char(10) <<
-					"    <StopTime>" << _writeIneoTime(message.stopDate) << "</StopTime>" << char(10) <<
-					"    <RepeatPeriod>" << lexical_cast<string>(message.repeatPeriod) << "</RepeatPeriod>" << char(10);
-				if (messagerieName == "Passenger")
-				{
-					response <<
-						"    <Inhibition>" << (message.inhibition ? "oui" : "non") << "</Inhibition>" << char(10) <<
-						"    <Color>" << message.color << "</Color>" << char(10);
-				}
-				response <<
-					"    <Text>" << char(10);
-				string longMessage(message.content);
-				stringstream lineSeparator;
-				lineSeparator << "</Line>" << char(10) << "      <Line>";
-				replace_all(longMessage, "<br />", lineSeparator.str());
-				response << "      <Line>" << longMessage << "</Line>" << char(10) <<
-					"    </Text>" << char(10) <<
-					"    <Recipients>" << char(10) << _writeIneoRecipients(message.recipients) << char(10) << "    </Recipients>" << char(10) <<
-					"  </Messaging>" << char(10);
-			}
-			response << "</" << responseName << ">";
-
-			return response.str();
+			return true;
 		}
 
-		string IneoTerminusConnection::tcp_connection::_deleteMessageRequest(XMLNode node)
+		bool IneoTerminusConnection::tcp_connection::_deleteMessageRequest(XMLNode node)
 		{
 			string tagName(node.getName());
 			string messagerieName;
@@ -674,6 +667,18 @@ namespace synthese
 			else if (tagName != "DriverDeleteMessageRequest")
 			{
 				messagerieName = "Driver";
+			}
+			else if (tagName != "PpdsDeleteMessageRequest")
+			{
+				messagerieName = "Ppds";
+			}
+			else if (tagName != "GirouetteDeleteMessageRequest")
+			{
+				messagerieName = "Girouette";
+			}
+			else if (tagName != "SonoPassengerDeleteMessageRequest")
+			{
+				messagerieName = "SonoPassenger";
 			}
 
 			XMLNode IDNode = node.getChildNode("ID", 0);
@@ -690,69 +695,8 @@ namespace synthese
 			vector<Messaging> messages;
 			for (int cptMessagingNode = 0;cptMessagingNode<numMessagingNode;cptMessagingNode++)
 			{
-				Messaging message;
 				XMLNode MessagingNode = node.getChildNode("Messaging", cptMessagingNode);
-				XMLNode nameNode = MessagingNode.getChildNode("Name", 0);
-				message.name = _iconv.convert(nameNode.getText());
-				XMLNode dispatchingNode = MessagingNode.getChildNode("Dispatching", 0);
-				if ((string)(dispatchingNode.getText()) == "Immediat")
-				{
-					message.dispatching = Immediat;
-				}
-				else if ((string)(dispatchingNode.getText()) == "Differe")
-				{
-					message.dispatching = Differe;
-				}
-				else if ((string)(dispatchingNode.getText()) == "Repete")
-				{
-					message.dispatching = Repete;
-				}
-				else
-				{
-					util::Log::GetInstance().warn("IneoTerminusConnection : Message avec Dispatching inconnu : ");
-				}
-				XMLNode startDateNode = MessagingNode.getChildNode("StartDate", 0);
-				string startDateStr = startDateNode.getText();
-				XMLNode stopDateNode = MessagingNode.getChildNode("StopDate", 0);
-				string stopDateStr = stopDateNode.getText();
-				XMLNode startTimeNode = MessagingNode.getChildNode("StartTime", 0);
-				string startTimeStr = startTimeNode.getText();
-				XMLNode stopTimeNode = MessagingNode.getChildNode("StopTime", 0);
-				string stopTimeStr = stopTimeNode.getText();
-				message.startDate =  XmlToolkit::GetIneoDateTime(
-					startDateStr + " " + startTimeStr
-				);
-				message.stopDate =  XmlToolkit::GetIneoDateTime(
-					stopDateStr + " " + stopTimeStr
-				);
-				XMLNode repeatPeriodNode = MessagingNode.getChildNode("RepeatPeriod", 0);
-				message.repeatPeriod = lexical_cast<int>(repeatPeriodNode.getText());
-				if (messagerieName == "Passenger")
-				{
-					XMLNode inhibitionNode = MessagingNode.getChildNode("Inhibition", 0);
-					message.inhibition = ((string)(inhibitionNode.getText()) == "oui");
-					XMLNode colorNode = MessagingNode.getChildNode("Color", 0);
-					message.color = colorNode.getText();
-				}
-				else
-				{
-					message.inhibition = false;
-					message.color = "";
-				}
-				XMLNode textNode = MessagingNode.getChildNode("Text", 0);
-				int numLineNode = textNode.nChildNode("Line");
-				for (int cptLineNode = 0;cptLineNode<numLineNode;cptLineNode++)
-				{
-					XMLNode LineNode = textNode.getChildNode("Line", cptLineNode);
-					if (cptLineNode > 0)
-					{
-						message.content += "<br />";
-					}
-					message.content += _iconv.convert(LineNode.getText());
-				}
-				XMLNode RecipientsNode = MessagingNode.getChildNode("Recipients", 0);
-				message.recipients = _readRecipients(RecipientsNode);
-
+				Messaging message = _readMessagingNode(MessagingNode, messagerieName);
 				messages.push_back(message);
 			}
 
@@ -808,56 +752,128 @@ namespace synthese
 				util::Log::GetInstance().warn("IneoTerminusConnection : requete Delete non prise en compte car evenement non trouvé dans Terminus");
 			}
 
-			stringstream response(_getXMLHeader());
-			string responseName = messagerieName + "DeleteMessageResponse";
-			response << char(10) << "<" << responseName << ">" << char(10) <<
-				"  <ID>" << idStr << "</ID>" << char(10) <<
-				"  <RequestID>" << idStr << "</RequestID>" << char(10) <<
-				"  <ResponseTimeStamp>" << _writeIneoDate(requestTimeStamp) << " " << _writeIneoTime(requestTimeStamp) << "</ResponseTimeStamp>" << char(10) <<
-				"  <ResponseRef>Terminus</ResponseRef>" << char(10);
-			BOOST_FOREACH(const Messaging& message, messages)
-			{
-				response << "  <Messaging>" << char(10) <<
-					"    <Name>" << message.name << "</Name>" << char(10) <<
-					"    <Dispatching>";
-				if (message.dispatching == Immediat)
-				{
-					response << "Immediat";
-				}
-				else if (message.dispatching == Differe)
-				{
-					response << "Differe";
-				}
-				else if (message.dispatching == Repete)
-				{
-					response << "Repete";
-				}
-				response << "</Dispatching>" << char(10) <<
-					"    <StartDate>" << _writeIneoDate(message.startDate) << "</StartDate>" << char(10) <<
-					"    <StopDate>" << _writeIneoDate(message.stopDate) << "</StopDate>" << char(10) <<
-					"    <StartTime>" << _writeIneoTime(message.startDate) << "</StartTime>" << char(10) <<
-					"    <StopTime>" << _writeIneoTime(message.stopDate) << "</StopTime>" << char(10) <<
-					"    <RepeatPeriod>" << lexical_cast<string>(message.repeatPeriod) << "</RepeatPeriod>" << char(10);
-				if (messagerieName == "Passenger")
-				{
-					response <<
-						"    <Inhibition>" << (message.inhibition ? "oui" : "non") << "</Inhibition>" << char(10) <<
-						"    <Color>" << message.color << "</Color>" << char(10);
-				}
-				response <<
-					"    <Text>" << char(10);
-				string longMessage(message.content);
-				stringstream lineSeparator;
-				lineSeparator << "</Line>" << char(10) << "      <Line>";
-				replace_all(longMessage, "<br />", lineSeparator.str());
-				response << "      <Line>" << longMessage << "</Line>" << char(10) <<
-					"    </Text>" << char(10) <<
-					"    <Recipients>" << char(10) << _writeIneoRecipients(message.recipients) << char(10) << "    </Recipients>" << char(10) <<
-					"  </Messaging>" << char(10);
-			}
-			response << "</" << responseName << ">";
+			return true;
+		}
 
-			return response.str();
+
+		IneoTerminusConnection::tcp_connection::Messaging IneoTerminusConnection::tcp_connection::_readMessagingNode(XMLNode node, string messagerieName)
+		{
+			Messaging message;
+			if (node.nChildNode("Name") > 0)
+			{
+				XMLNode nameNode = node.getChildNode("Name", 0);
+				message.name = _iconv.convert(nameNode.getText());
+			}
+			if (messagerieName == "Passenger" ||
+				messagerieName == "Driver" ||
+				messagerieName == "SonoPassenger")
+			{
+				XMLNode dispatchingNode = node.getChildNode("Dispatching", 0);
+				if ((string)(dispatchingNode.getText()) == "Immediat")
+				{
+					message.dispatching = Immediat;
+				}
+				else if ((string)(dispatchingNode.getText()) == "Differe")
+				{
+					message.dispatching = Differe;
+				}
+				else if ((string)(dispatchingNode.getText()) == "Repete")
+				{
+					message.dispatching = Repete;
+				}
+				else
+				{
+					util::Log::GetInstance().warn("IneoTerminusConnection : Message avec Dispatching inconnu : ");
+				}
+			}
+			string startDateStr("01/01/1970");
+			string stopDateStr("31/12/2037");
+			if (node.nChildNode("StartDate") > 0)
+			{
+				XMLNode startDateNode = node.getChildNode("StartDate", 0);
+				startDateStr = startDateNode.getText();
+			}
+			if (node.nChildNode("StopDate") > 0)
+			{
+				XMLNode stopDateNode = node.getChildNode("StopDate", 0);
+				stopDateStr = stopDateNode.getText();
+			}
+			string startTimeStr("00:00:00");
+			string stopTimeStr("23:59:00");
+			if (node.nChildNode("StartTime") > 0)
+			{
+				XMLNode startTimeNode = node.getChildNode("StartTime", 0);
+				startTimeStr = startTimeNode.getText();
+			}
+			if (node.nChildNode("StopTime") > 0)
+			{
+				XMLNode stopTimeNode = node.getChildNode("StopTime", 0);
+				stopTimeStr = stopTimeNode.getText();
+			}
+			message.startDate =  XmlToolkit::GetIneoDateTime(
+				startDateStr + " " + startTimeStr
+			);
+			message.stopDate =  XmlToolkit::GetIneoDateTime(
+				stopDateStr + " " + stopTimeStr
+			);
+			if (node.nChildNode("RepeatPeriod") > 0)
+			{
+				XMLNode repeatPeriodNode = node.getChildNode("RepeatPeriod", 0);
+				message.repeatPeriod = lexical_cast<int>(repeatPeriodNode.getText());
+			}
+			if (messagerieName == "Driver" && message.dispatching == Immediat)
+			{
+				XMLNode confirmNode = node.getChildNode("Confirm", 0);
+				message.confirm = ((string)(confirmNode.getText()) == "oui");
+			}
+			if (messagerieName == "Passenger" ||
+				messagerieName == "SonoPassenger")
+			{
+				XMLNode inhibitionNode = node.getChildNode("Inhibition", 0);
+				message.inhibition = ((string)(inhibitionNode.getText()) == "oui");
+			}
+			if (messagerieName == "Passenger")
+			{
+				XMLNode colorNode = node.getChildNode("Color", 0);
+				message.color = colorNode.getText();
+			}
+			if (messagerieName == "SonoPassenger")
+			{
+				XMLNode activateHeadJingle = node.getChildNode("ActivateHeadJingle", 0);
+				message.activateHeadJingle = ((string)(activateHeadJingle.getText()) == "oui");
+				XMLNode activateBackJingle = node.getChildNode("ActivateBackJingle", 0);
+				message.activateBackJingle = ((string)(activateBackJingle.getText()) == "oui");
+			}
+			if (node.nChildNode("StartStopPoint") > 0)
+			{
+				XMLNode startStopPointNode = node.getChildNode("StartStopPoint", 0);
+				message.startStopPoint = startStopPointNode.getText();
+			}
+			if (node.nChildNode("EndStopPoint") > 0)
+			{
+				XMLNode endStopPointNode = node.getChildNode("EndStopPoint", 0);
+				message.endStopPoint = endStopPointNode.getText();
+			}
+			if (messagerieName == "Girouette")
+			{
+				XMLNode codeNode = node.getChildNode("Code", 0);
+				message.codeGirouette = lexical_cast<int>(codeNode.getText());
+			}
+			XMLNode textNode = node.getChildNode("Text", 0);
+			int numLineNode = textNode.nChildNode("Line");
+			for (int cptLineNode = 0;cptLineNode<numLineNode;cptLineNode++)
+			{
+				XMLNode LineNode = textNode.getChildNode("Line", cptLineNode);
+				if (cptLineNode > 0)
+				{
+					message.content += "<br />";
+				}
+				message.content += _iconv.convert(LineNode.getText());
+			}
+			XMLNode RecipientsNode = node.getChildNode("Recipients", 0);
+			message.recipients = _readRecipients(RecipientsNode);
+
+			return message;
 		}
 
 		vector<IneoTerminusConnection::Recipient> IneoTerminusConnection::tcp_connection::_readRecipients(XMLNode node)
@@ -917,6 +933,48 @@ namespace synthese
 						}
 					}
 				}
+				else if (recipientType == "Cars")
+				{
+					int nCarNode = recipientNode.nChildNode();
+					for (int cptCarNode = 0;cptCarNode<nCarNode;cptCarNode++)
+					{
+						XMLNode carNode = recipientNode.getChildNode(cptCarNode);
+						string recipientCarType(carNode.getName());
+						if (recipientCarType == "Car")
+						{
+							string carNumber = carNode.getText();
+							IneoTerminusConnection::Recipient new_recipient;
+							new_recipient.type = "Car";
+							new_recipient.name = carNumber;
+							recipients.push_back(new_recipient);
+						}
+						else
+						{
+							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientCarType + " est fils d'un noeud Cars");
+						}
+					}
+				}
+				else if (recipientType == "CarServices")
+				{
+					int nCarServiceNode = recipientNode.nChildNode();
+					for (int cptCarServiceNode = 0;cptCarServiceNode<nCarServiceNode;cptCarServiceNode++)
+					{
+						XMLNode carServiceNode = recipientNode.getChildNode(cptCarServiceNode);
+						string recipientCarServiceType(carServiceNode.getName());
+						if (recipientCarServiceType == "CarService")
+						{
+							string carServiceNumber = carServiceNode.getText();
+							IneoTerminusConnection::Recipient new_recipient;
+							new_recipient.type = "CarService";
+							new_recipient.name = carServiceNumber;
+							recipients.push_back(new_recipient);
+						}
+						else
+						{
+							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientCarServiceType + " est fils d'un noeud CarServices");
+						}
+					}
+				}
 				else
 				{
 					util::Log::GetInstance().warn("_readRecipients : Recipient non codé : " + recipientType);
@@ -924,96 +982,6 @@ namespace synthese
 			}
 
 			return recipients;
-		}
-
-		string IneoTerminusConnection::tcp_connection::_writeIneoRecipients(vector<IneoTerminusConnection::Recipient> recipients)
-		{
-			stringstream strRecipients;
-			// All Network
-			BOOST_FOREACH(const IneoTerminusConnection::Recipient& recipient, recipients)
-			{
-				if (recipient.type == "AllNetwork")
-				{
-					strRecipients << "      <AllNetwork />";
-				}
-			}
-
-			// Lines
-			bool first(true);
-			BOOST_FOREACH(const IneoTerminusConnection::Recipient& recipient, recipients)
-			{
-				if (recipient.type == "Line" && first)
-				{
-					strRecipients << "      <Lines>" << char(10) <<
-						"        <Line>" << recipient.name << "</Line>" << char(10);
-					first = false;
-				}
-				else if (recipient.type == "Line")
-				{
-					strRecipients << "        <Line>" << recipient.name << "</Line>" << char(10);
-				}
-			}
-			if (!first)
-			{
-				strRecipients << "      </Lines>";
-			}
-
-			// Vehicles
-			first = false;
-			BOOST_FOREACH(const IneoTerminusConnection::Recipient& recipient, recipients)
-			{
-				if (recipient.type == "Vehicle" && first)
-				{
-					strRecipients << "      <Vehicles>" << char(10) <<
-						"        <Vehicle>" << recipient.name << "</Vehicle>" << char(10);
-					first = false;
-				}
-				else if (recipient.type == "Vehicle")
-				{
-					strRecipients << "        <Vehicle>" << recipient.name << "</Vehicle>" << char(10);
-				}
-			}
-			if (!first)
-			{
-				strRecipients << "      </Vehicles>";
-			}
-
-			// Write warn for non coded recipients
-			BOOST_FOREACH(const IneoTerminusConnection::Recipient& recipient, recipients)
-			{
-				if (recipient.type != "AllNetwork" &&
-					recipient.type != "Line" &&
-					recipient.type != "Vehicle")
-				{
-					util::Log::GetInstance().warn("_writeIneoRecipients : Recipient non codé : " + recipient.type);
-				}
-			}
-
-			return strRecipients.str();
-		}
-
-		string IneoTerminusConnection::tcp_connection::_writeIneoDate(ptime date)
-		{
-			stringstream str;
-			str << setw( 2 ) << setfill ( '0' ) <<
-				date.date().day() << "/" <<
-				setw( 2 ) << setfill ( '0' ) <<
-				static_cast<long>(date.date().month()) << "/" <<
-				setw( 2 ) << setfill ( '0' ) <<
-				date.date().year();
-			return str.str();
-		}
-
-		string IneoTerminusConnection::tcp_connection::_writeIneoTime(ptime date)
-		{
-			stringstream str;
-			str << setw( 2 ) << setfill ( '0' ) <<
-				date.time_of_day().hours() << ":" <<
-				setw( 2 ) << setfill ( '0' ) <<
-				date.time_of_day().minutes () << ":" <<
-				setw( 2 ) << setfill ( '0' ) <<
-				date.time_of_day().seconds();
-			return str.str();
 		}
 
 		void IneoTerminusConnection::tcp_connection::_addRecipientsPM(ParametersMap& pm, vector<IneoTerminusConnection::Recipient> recipients)
@@ -1050,6 +1018,16 @@ namespace synthese
 				{
 					// A priori on ne fait rien pour les recipient Vehicle dans Synthese
 					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient vehicle");
+				}
+				else if (recipient.type == "Car")
+				{
+					// A priori on ne fait rien pour les recipient Car dans Synthese
+					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient car");
+				}
+				else if (recipient.type == "CarService")
+				{
+					// A priori on ne fait rien pour les recipient CarService dans Synthese
+					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient carService");
 				}
 				else
 				{
