@@ -111,27 +111,6 @@ namespace synthese
 				util::IConv _iconv;
 				boost::shared_ptr<boost::asio::streambuf> _buf;
 
-				// Response generators
-				std::string _checkStatusRequest(
-					XMLNode node
-				);
-				std::string _createMessageRequest(
-					XMLNode node
-				);
-				std::string _deleteMessageRequest(
-					XMLNode node
-				);
-
-				// generic parsers
-				std::string _getXMLHeader();
-				std::vector<IneoTerminusConnection::Recipient> _readRecipients(XMLNode node);
-
-				//generic writers
-				std::string _writeIneoRecipients(std::vector<IneoTerminusConnection::Recipient>);
-				std::string _writeIneoDate(boost::posix_time::ptime date);
-				std::string _writeIneoTime(boost::posix_time::ptime date);
-				void _addRecipientsPM(util::ParametersMap& pm, std::vector<IneoTerminusConnection::Recipient>);
-
 				//generic enums
 				typedef enum
 				{
@@ -150,9 +129,34 @@ namespace synthese
 					int repeatPeriod;
 					bool inhibition;
 					std::string color;
+					int codeGirouette;
+					bool activateHeadJingle;
+					bool activateBackJingle;
+					bool confirm;
+					std::string startStopPoint;
+					std::string endStopPoint;
 					std::string content;
 					std::vector<IneoTerminusConnection::Recipient> recipients;
 				};
+
+				// Response generators
+				bool _checkStatusRequest(
+					XMLNode node
+				);
+				bool _createMessageRequest(
+					XMLNode node
+				);
+				bool _deleteMessageRequest(
+					XMLNode node
+				);
+
+				// generic parsers
+				std::string _getXMLHeader();
+				std::vector<IneoTerminusConnection::Recipient> _readRecipients(XMLNode node);
+				Messaging _readMessagingNode(XMLNode node, std::string messagerieName);
+
+				//generic writers
+				void _addRecipientsPM(util::ParametersMap& pm, std::vector<IneoTerminusConnection::Recipient>);
 			};
 
 			class tcp_server
