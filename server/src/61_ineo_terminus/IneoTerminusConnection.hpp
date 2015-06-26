@@ -135,6 +135,8 @@ namespace synthese
 					bool confirm;
 					std::string startStopPoint;
 					std::string endStopPoint;
+					bool diodFlashing;
+					bool alternance;
 					std::string content;
 					std::vector<IneoTerminusConnection::Recipient> recipients;
 				};

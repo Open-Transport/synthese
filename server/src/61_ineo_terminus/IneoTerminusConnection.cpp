@@ -403,6 +403,116 @@ namespace synthese
 						message = "";
 					}
 				}
+				else if (tagName == "SonoDriverCreateMessageRequest")
+				{
+					if (_createMessageRequest(childNode))
+					{
+						replace_all(message, "SonoDriverCreateMessageRequest", "SonoDriverCreateMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "SonoDriverDeleteMessageRequest")
+				{
+					if (_deleteMessageRequest(childNode))
+					{
+						replace_all(message, "SonoDriverDeleteMessageRequest", "SonoDriverDeleteMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "SonoStopPointCreateMessageRequest")
+				{
+					if (_createMessageRequest(childNode))
+					{
+						replace_all(message, "SonoStopPointCreateMessageRequest", "SonoStopPointCreateMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "SonoStopPointDeleteMessageRequest")
+				{
+					if (_deleteMessageRequest(childNode))
+					{
+						replace_all(message, "SonoStopPointDeleteMessageRequest", "SonoStopPointDeleteMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "BivGeneralCreateMessageRequest")
+				{
+					if (_createMessageRequest(childNode))
+					{
+						replace_all(message, "BivGeneralCreateMessageRequest", "BivGeneralCreateMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "BivGeneralDeleteMessageRequest")
+				{
+					if (_deleteMessageRequest(childNode))
+					{
+						replace_all(message, "BivGeneralDeleteMessageRequest", "BivGeneralDeleteMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "BivLineManCreateMessageRequest")
+				{
+					if (_createMessageRequest(childNode))
+					{
+						replace_all(message, "BivLineManCreateMessageRequest", "BivLineManCreateMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "BivLineManDeleteMessageRequest")
+				{
+					if (_deleteMessageRequest(childNode))
+					{
+						replace_all(message, "BivLineManDeleteMessageRequest", "BivLineManDeleteMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "BivLineAutoCreateMessageRequest")
+				{
+					if (_createMessageRequest(childNode))
+					{
+						replace_all(message, "BivLineAutoCreateMessageRequest", "BivLineAutoCreateMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
+				else if (tagName == "BivLineAutoDeleteMessageRequest")
+				{
+					if (_deleteMessageRequest(childNode))
+					{
+						replace_all(message, "BivLineAutoDeleteMessageRequest", "BivLineAutoDeleteMessageResponse");
+					}
+					else
+					{
+						message = "";
+					}
+				}
 				else
 				{
 					util::Log::GetInstance().warn("Ineo Terminus : Parser non codé pour " + tagName);
@@ -549,25 +659,45 @@ namespace synthese
 		{
 			string tagName(node.getName());
 			string messagerieName;
-			if (tagName != "PassengerCreateMessageRequest")
+			if (tagName == "PassengerCreateMessageRequest")
 			{
 				messagerieName = "Passenger";
 			}
-			else if (tagName != "DriverCreateMessageRequest")
+			else if (tagName == "DriverCreateMessageRequest")
 			{
 				messagerieName = "Driver";
 			}
-			else if (tagName != "PpdsCreateMessageRequest")
+			else if (tagName == "PpdsCreateMessageRequest")
 			{
 				messagerieName = "Ppds";
 			}
-			else if (tagName != "GirouetteCreateMessageRequest")
+			else if (tagName == "GirouetteCreateMessageRequest")
 			{
 				messagerieName = "Girouette";
 			}
-			else if (tagName != "SonoPassengerCreateMessageRequest")
+			else if (tagName == "SonoPassengerCreateMessageRequest")
 			{
 				messagerieName = "SonoPassenger";
+			}
+			else if (tagName == "SonoDriverCreateMessageRequest")
+			{
+				messagerieName = "SonoDriver";
+			}
+			else if (tagName == "SonoStopPointCreateMessageRequest")
+			{
+				messagerieName = "SonoStopPoint";
+			}
+			else if (tagName == "BivGeneralCreateMessageRequest")
+			{
+				messagerieName = "BivGeneral";
+			}
+			else if (tagName == "BivLineManCreateMessageRequest")
+			{
+				messagerieName = "BivLineMan";
+			}
+			else if (tagName == "BivLineAutoCreateMessageRequest")
+			{
+				messagerieName = "BivLineAuto";
 			}
 
 			XMLNode IDNode = node.getChildNode("ID", 0);
@@ -660,25 +790,45 @@ namespace synthese
 		{
 			string tagName(node.getName());
 			string messagerieName;
-			if (tagName != "PassengerDeleteMessageRequest")
+			if (tagName == "PassengerDeleteMessageRequest")
 			{
 				messagerieName = "Passenger";
 			}
-			else if (tagName != "DriverDeleteMessageRequest")
+			else if (tagName == "DriverDeleteMessageRequest")
 			{
 				messagerieName = "Driver";
 			}
-			else if (tagName != "PpdsDeleteMessageRequest")
+			else if (tagName == "PpdsDeleteMessageRequest")
 			{
 				messagerieName = "Ppds";
 			}
-			else if (tagName != "GirouetteDeleteMessageRequest")
+			else if (tagName == "GirouetteDeleteMessageRequest")
 			{
 				messagerieName = "Girouette";
 			}
-			else if (tagName != "SonoPassengerDeleteMessageRequest")
+			else if (tagName == "SonoPassengerDeleteMessageRequest")
 			{
 				messagerieName = "SonoPassenger";
+			}
+			else if (tagName == "SonoDriverDeleteMessageRequest")
+			{
+				messagerieName = "SonoDriver";
+			}
+			else if (tagName == "SonoStopPointDeleteMessageRequest")
+			{
+				messagerieName = "SonoStopPoint";
+			}
+			else if (tagName == "BivGeneralDeleteMessageRequest")
+			{
+				messagerieName = "BivGeneral";
+			}
+			else if (tagName == "BivLineManDeleteMessageRequest")
+			{
+				messagerieName = "BivLineMan";
+			}
+			else if (tagName == "BivLineAutoDeleteMessageRequest")
+			{
+				messagerieName = "BivLineAuto";
 			}
 
 			XMLNode IDNode = node.getChildNode("ID", 0);
@@ -766,7 +916,9 @@ namespace synthese
 			}
 			if (messagerieName == "Passenger" ||
 				messagerieName == "Driver" ||
-				messagerieName == "SonoPassenger")
+				messagerieName == "SonoPassenger" ||
+				messagerieName == "SonoDriver" ||
+				messagerieName == "SonoStopPoint")
 			{
 				XMLNode dispatchingNode = node.getChildNode("Dispatching", 0);
 				if ((string)(dispatchingNode.getText()) == "Immediat")
@@ -858,6 +1010,16 @@ namespace synthese
 			{
 				XMLNode codeNode = node.getChildNode("Code", 0);
 				message.codeGirouette = lexical_cast<int>(codeNode.getText());
+			}
+			if (messagerieName == "BivGeneral")
+			{
+				XMLNode diodFlashingNode = node.getChildNode("DiodFlashing", 0);
+				message.diodFlashing = ((string)(diodFlashingNode.getText()) == "oui");
+			}
+			if (messagerieName == "BivLineMan")
+			{
+				XMLNode alternanceNode = node.getChildNode("Alternance", 0);
+				message.alternance = ((string)(alternanceNode.getText()) == "oui");
 			}
 			XMLNode textNode = node.getChildNode("Text", 0);
 			int numLineNode = textNode.nChildNode("Line");
@@ -975,6 +1137,69 @@ namespace synthese
 						}
 					}
 				}
+				else if (recipientType == "LinesWays")
+				{
+					int nLineWayNode = recipientNode.nChildNode();
+					for (int cptLineWayNode = 0;cptLineWayNode<nLineWayNode;cptLineWayNode++)
+					{
+						XMLNode lineWayNode = recipientNode.getChildNode(cptLineWayNode);
+						string recipientLineWayType(lineWayNode.getName());
+						if (recipientLineWayType == "LineWay")
+						{
+							string lineWayNumber = lineWayNode.getText();
+							IneoTerminusConnection::Recipient new_recipient;
+							new_recipient.type = "LineWay";
+							new_recipient.name = lineWayNumber;
+							recipients.push_back(new_recipient);
+						}
+						else
+						{
+							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientLineWayType + " est fils d'un noeud LinesWays");
+						}
+					}
+				}
+				else if (recipientType == "Bivs")
+				{
+					int nBivNode = recipientNode.nChildNode();
+					for (int cptBivNode = 0;cptBivNode<nBivNode;cptBivNode++)
+					{
+						XMLNode bivNode = recipientNode.getChildNode(cptBivNode);
+						string recipientBivType(bivNode.getName());
+						if (recipientBivType == "Biv")
+						{
+							string bivNumber = bivNode.getText();
+							IneoTerminusConnection::Recipient new_recipient;
+							new_recipient.type = "Biv";
+							new_recipient.name = bivNumber;
+							recipients.push_back(new_recipient);
+						}
+						else
+						{
+							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientBivType + " est fils d'un noeud Bivs");
+						}
+					}
+				}
+				else if (recipientType == "Groups")
+				{
+					int nGroupNode = recipientNode.nChildNode();
+					for (int cptGroupNode = 0;cptGroupNode<nGroupNode;cptGroupNode++)
+					{
+						XMLNode groupNode = recipientNode.getChildNode(cptGroupNode);
+						string recipientGroupType(groupNode.getName());
+						if (recipientGroupType == "Group")
+						{
+							string groupNumber = groupNode.getText();
+							IneoTerminusConnection::Recipient new_recipient;
+							new_recipient.type = "Group";
+							new_recipient.name = groupNumber;
+							recipients.push_back(new_recipient);
+						}
+						else
+						{
+							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientGroupType + " est fils d'un noeud Groups");
+						}
+					}
+				}
 				else
 				{
 					util::Log::GetInstance().warn("_readRecipients : Recipient non codé : " + recipientType);
@@ -1028,6 +1253,21 @@ namespace synthese
 				{
 					// A priori on ne fait rien pour les recipient CarService dans Synthese
 					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient carService");
+				}
+				else if (recipient.type == "LineWay")
+				{
+					// A priori on ne fait rien pour les recipient LineWay dans Synthese
+					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient LineWay");
+				}
+				else if (recipient.type == "Biv")
+				{
+					// A priori on ne fait rien pour les recipient Biv dans Synthese
+					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient Biv");
+				}
+				else if (recipient.type == "Group")
+				{
+					// A priori on ne fait rien pour les recipient Group dans Synthese
+					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient Group");
 				}
 				else
 				{
