@@ -346,14 +346,20 @@ namespace synthese
 					(	gzipCompression &&
 						req.ipaddr != "127.0.0.1" // Never compress for localhost use
 				)	){
-					stringstream os;
-					filtering_stream<output> fs;
-					fs.push(gzip_compressor());
-					fs.push(os);
-					boost::iostreams::copy(ros, fs);
-					fs.pop();
-					rep.content.append(os.str());
-					rep.headers.insert(make_pair("Content-Encoding", "gzip"));
+					std::string rosContent = ros.str();
+
+					// Do not compress an empty response because it breaks web browsers
+					if(0 < rosContent.size())
+					{
+						stringstream os;
+						filtering_stream<output> fs;
+						fs.push(gzip_compressor());
+						fs.push(os);
+						boost::iostreams::copy(ros, fs);
+						fs.pop();
+						rep.content.append(os.str());
+						rep.headers.insert(make_pair("Content-Encoding", "gzip"));
+					}
 				}
 				else
 				{
