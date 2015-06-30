@@ -59,7 +59,7 @@ required).
 
 ### Security
 
-## [3.9.1] - 2015-06-08
+## [3.9.2] - 2015-06-23
 ### Added
 
 ### Changed
@@ -71,6 +71,21 @@ required).
 ### Removed
 
 ### Fixed
+
+### Security
+
+## [3.9.3] - 2015-06-30
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+- #57622 : Prevent gzip compression of empty responses
 
 ### Security
 
