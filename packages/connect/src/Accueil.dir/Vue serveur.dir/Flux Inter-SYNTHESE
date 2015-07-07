@@ -72,10 +72,17 @@
 		  <div class="controls"><input type="text" id="prop_name" name="actionParam_field_name" value="<@name@>" /></div>
 		 </div>
 		 <div class="control-group">
-		  <label class="control-label">Tranmission complète systématique</label>
+		  <label class="control-label">Transmission complète systématique</label>
 		  <div class="controls">
 		   <label class="radio inline"><input type="radio" name="actionParam_field_force_dump" value="1" <@force_dump?"checked=\"true\"":""@>" /> OUI</label>
 		   <label class="radio inline"><input type="radio" name="actionParam_field_force_dump" value="0" <@force_dump?"":"checked=\"true\""@>" /> NON</label>
+		  </div>
+		 </div>
+		 <div class="control-group">
+		  <label class="control-label">Désactivation du filtrage en émission ("where clause")</label>
+		  <div class="controls">
+		   <label class="radio inline"><input type="radio" name="actionParam_field_disable_where_clause" value="1" <@disable_where_clause?"checked=\"true\"":""@>" /> OUI</label>
+		   <label class="radio inline"><input type="radio" name="actionParam_field_disable_where_clause" value="0" <@disable_where_clause?"":"checked=\"true\""@>" /> NON</label>
 		  </div>
 		 </div>
 		 <div class="control-group">
