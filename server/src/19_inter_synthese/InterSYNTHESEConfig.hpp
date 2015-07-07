@@ -45,14 +45,16 @@ namespace synthese
 		FIELD_SIZE_T(MaxQueriesNumber)
 		FIELD_BOOL(ForceDump)
 		FIELD_BOOL(Multimaster)
-		
+		FIELD_BOOL(DisableWhereClause)
+
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Name),
 			FIELD(LinkBreakMinutes),
 			FIELD(MaxQueriesNumber),
 			FIELD(ForceDump),
-			FIELD(Multimaster)
+			FIELD(Multimaster),
+			FIELD(DisableWhereClause)
 		> InterSYNTHESEConfigRecord;
 
 

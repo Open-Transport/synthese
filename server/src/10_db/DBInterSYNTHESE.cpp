@@ -340,7 +340,18 @@ namespace synthese
 						env,
 						FIELDS_ONLY_LOAD_LEVEL
 				)	); */
-				DBResultSPtr rows(directTableSync->searchRecords(directTableSync->whereClauseDefault()));
+
+				// Where clause are used to filter out some records.
+				// (if set only Revervation of the day are pushed)
+				// The option DisableWhereClause disable this functionnality
+				// to get all the data.
+				string whereClause;
+				if(	!slave.get<InterSYNTHESEConfig>() ||
+					!slave.get<InterSYNTHESEConfig>()->get<DisableWhereClause>()
+				){
+					whereClause = directTableSync->whereClauseDefault();
+				}
+				DBResultSPtr rows(directTableSync->searchRecords(whereClause));
 
 				DBTransaction transaction(false);
 
