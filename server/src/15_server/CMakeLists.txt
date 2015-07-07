@@ -130,6 +130,4 @@ target_link_libraries(15_server
   ${PTHREAD}
 )
 
-add_dependencies(15_server)
-
 install(TARGETS 15_server DESTINATION lib)
