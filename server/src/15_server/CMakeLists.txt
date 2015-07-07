@@ -130,7 +130,6 @@ target_link_libraries(15_server
   ${PTHREAD}
 )
 
-# Explicitly say that the executable depends on custom svn target
-add_dependencies(15_server revisiontag)
+add_dependencies(15_server)
 
 install(TARGETS 15_server DESTINATION lib)
