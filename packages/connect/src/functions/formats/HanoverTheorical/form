@@ -1,0 +1,19 @@
+<#forms/text_input&
+  label=Connecteur de base de données&
+  name=conn_string&
+#>
+
+<#forms/text_input&
+  label=Nom de base de données&
+  name=db&
+#>
+
+<#forms/text_input&
+  label=Identifiant du réseau VMCV&
+  name=ni&
+#>
+
+<#forms/text_input&
+  label=Identifiant de la ville par défaut (pour import des zones d'arrêt sans référence à une ville existante)&
+  name=default_city&
+#>
