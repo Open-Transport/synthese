@@ -48,10 +48,10 @@
 <div class="control-group">
  <label class="control-label">Source de données des arrêts (si différente)</label>
  <div class="controls">
-  <select name="stops_datasource_id" is_parameter="true">
+  <select name="stops_data_source_id" is_parameter="true">
    <option value="">(non défini)</option>
    <?data_sources&template=<{data_source&template=
-   	<option value="<@id@>" <@(id==stops_datasource_id)?"selected=\"true\"":""@>><@name@></option>
+   	<option value="<@id@>" <@(id==stops_data_source_id)?"selected=\"true\"":""@>><@name@></option>
    }>?>
   </select>
  </div>
