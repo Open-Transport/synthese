@@ -248,9 +248,14 @@ namespace synthese
 					// Rows before
 					if(rowsBeforeStr.empty())
 					{
-						timetableCopy->set<TransferTimetableBefore>(
-							const_cast<Timetable&>(*_timetable->getTransferTimetableBefore(1))
-						);
+						const Timetable* transferTimetableBefore = _timetable->getTransferTimetableBefore(1);
+
+						if(NULL != transferTimetableBefore)
+						{
+							timetableCopy->set<TransferTimetableBefore>(
+								const_cast<Timetable&>(*transferTimetableBefore)
+							);
+						}
 					}
 					else
 					{
@@ -293,9 +298,14 @@ namespace synthese
 					// Rows after
 					if(rowsAfterStr.empty())
 					{
-						timetableCopy->set<TransferTimetableAfter>(
-							const_cast<Timetable&>(*_timetable->getTransferTimetableAfter(1))
-						);
+						const Timetable* transferTimetableAfter = _timetable->getTransferTimetableAfter(1);
+
+						if(NULL != transferTimetableAfter)
+						{
+							timetableCopy->set<TransferTimetableAfter>(
+								const_cast<Timetable&>(*transferTimetableAfter)
+							);
+						}
 					}
 					else
 					{
@@ -471,7 +481,7 @@ namespace synthese
 			// Building the parameters map from the result
 			_outputResult(
 				pm,
-				*_timetable,
+				_timetable,
 				_timetableRank
 			);
 
@@ -501,15 +511,15 @@ namespace synthese
 
 		void TimetableBuildService::_outputResult(
 			util::ParametersMap& pm,
-			const timetables::Timetable& object,
+			boost::shared_ptr<const Timetable> object,
 			std::size_t rank
 		) const {
 
-			object.toParametersMap(pm, true);
+			object->toParametersMap(pm, true);
 			pm.insert(ATTR_TIMETABLE_RANK, rank);
 
 			// Content
-			if(object.getContentType() == Timetable::CONTAINER)
+			if(object->getContentType() == Timetable::CONTAINER)
 			{
 				size_t ttRank(0);
 				BOOST_FOREACH(const boost::shared_ptr<Timetable>& tt, _containerContent)
@@ -520,7 +530,7 @@ namespace synthese
 					// Recursive call
 					_outputResult(
 						*subPM,
-						*tt,
+						tt,
 						ttRank++
 					);
 
@@ -529,12 +539,12 @@ namespace synthese
 				}
 			}
 			else if(
-				object.getContentType() == Timetable::TABLE_SERVICES_IN_ROWS ||
-				object.getContentType() == Timetable::TABLE_SERVICES_IN_COLS
+				object->getContentType() == Timetable::TABLE_SERVICES_IN_ROWS ||
+				object->getContentType() == Timetable::TABLE_SERVICES_IN_COLS
 			){
 				// Generator construction
 				auto_ptr<TimetableGenerator> generator(
-					object.getGenerator(
+					object->getGenerator(
 						Env::GetOfficialEnv(),
 						(	_calendarTemplate.get() && _calendarTemplate->isLimited() ?
 							optional<Calendar>(
@@ -557,11 +567,11 @@ namespace synthese
 				// Timetable build
 				TimetableResult result(generator->build(_withWarnings, _warnings));
 
-				if(object.getContentType() == Timetable::TABLE_SERVICES_IN_COLS)
+				if(object->getContentType() == Timetable::TABLE_SERVICES_IN_COLS)
 				{
 					// 5.1 : Transfers rows before schedules
 					stringstream transfersBeforeContent;
-					for(size_t depth(object.getBeforeTransferTimetablesNumber()); depth > 0; --depth)
+					for(size_t depth(object->getBeforeTransferTimetablesNumber()); depth > 0; --depth)
 					{
 						const TimetableResult::RowServicesVector services(
 							result.getBeforeTransferTimetable(depth).getRowServices()
@@ -575,7 +585,7 @@ namespace synthese
 							}
 
 							// Jump over empty rows if necessary
-							if(object.get<IgnoreEmptyRows>() && !result.getBeforeTransferTimetable(depth).hasSchedules(row.getRank()))
+							if(object->get<IgnoreEmptyRows>() && !result.getBeforeTransferTimetable(depth).hasSchedules(row.getRank()))
 							{
 								continue;
 							}
@@ -610,7 +620,7 @@ namespace synthese
 						}
 
 						// Jump over empty rows if necessary
-						if(object.get<IgnoreEmptyRows>() && !result.hasSchedules(row.getRank()))
+						if(object->get<IgnoreEmptyRows>() && !result.hasSchedules(row.getRank()))
 						{
 							continue;
 						}
@@ -633,7 +643,7 @@ namespace synthese
 					}
 
 					// 5.3 : Transfers rows after schedules
-					for(size_t depth(1); depth <= object.getAfterTransferTimetablesNumber(); ++depth)
+					for(size_t depth(1); depth <= object->getAfterTransferTimetablesNumber(); ++depth)
 					{
 						const TimetableResult::RowServicesVector services(
 							result.getAfterTransferTimetable(depth).getRowServices()
@@ -646,7 +656,7 @@ namespace synthese
 							}
 
 							// Jump over empty rows if necessary
-							if(object.get<IgnoreEmptyRows>() && !result.getAfterTransferTimetable(depth).hasSchedules(row.getRank()))
+							if(object->get<IgnoreEmptyRows>() && !result.getAfterTransferTimetable(depth).hasSchedules(row.getRank()))
 							{
 								continue;
 							}
@@ -679,7 +689,7 @@ namespace synthese
 					boost::shared_ptr<ParametersMap> colPM(new ParametersMap);
 					col.toParametersMap(
 						*colPM,
-						object.getContentType() == Timetable::TABLE_SERVICES_IN_ROWS,
+						object->getContentType() == Timetable::TABLE_SERVICES_IN_ROWS,
 						result.getColumns(),
 						rank++
 					);

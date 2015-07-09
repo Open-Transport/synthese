@@ -24,6 +24,20 @@ Test
 ### Security
 
 
+## [3.9.4] - 2015-??-??
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+- #58117 : Crashes when generating timetables using 'timetable_build' service
+
+### Security
 
 
 

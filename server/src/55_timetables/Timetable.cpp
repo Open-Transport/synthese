@@ -51,7 +51,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(AuthorizedLines, "authorized_lines", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(AuthorizedPhysicalStops, "authorized_physical_stops", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(TransferTimetableBefore, "transfer_timetable_before", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(TransferTimetableAfter, "transfer_timetable_after", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(TransferTimetableAfter, "transfer_timetable_after", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(IgnoreEmptyRows, "ignore_empty_rows", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(Compression, "compression", SQL_BOOLEAN)
 

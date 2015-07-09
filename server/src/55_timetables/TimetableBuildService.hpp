@@ -203,7 +203,7 @@ namespace synthese
 
 			void _outputResult(
 				util::ParametersMap& pm,
-				const timetables::Timetable& object,
+				boost::shared_ptr<const Timetable> object,
 				std::size_t rank
 			) const;
 
