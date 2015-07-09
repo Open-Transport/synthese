@@ -709,7 +709,7 @@ namespace synthese
 
 			// 2) Compute the vertex access map of C as the union of the C -> Pi or Pi -> C road journeys
 			VertexAccessMap& relayParksVam = (_startWithCar ? departureVam : arrivalVam);
-			int nbParkings = 0;
+			unsigned int nbParkings = 0;
 
 			BOOST_FOREACH(const SortableStopAreaSet::value_type& relayPark, relayParks)
 			{

@@ -306,9 +306,9 @@ namespace synthese
 			_period(NULL),
 			_logger(new AlgorithmLogger()),
 			_broadcastPoint(NULL),
-			_page(NULL),
 			_startWithCar(false),
-			_endWithCar(false)
+			_endWithCar(false),
+			_page(NULL)
 		{}
 
 
@@ -1196,15 +1196,6 @@ namespace synthese
 
 			// Set of commercial lines used by the journeys
 			set<const CommercialLine*> lines;
-
-			// Parkings are cast as NamedPlace to compare them with the
-			// arrival/departure points of the journeys
-			const NamedPlace* departureParking(
-				dynamic_cast<const NamedPlace*>(_departure_parking.placeResult.value.get())
-			);
-			const NamedPlace* arrivalParking(
-				dynamic_cast<const NamedPlace*>(_arrival_parking.placeResult.value.get())
-			);
 
 			// Loop on each journey
 			int i=1;
