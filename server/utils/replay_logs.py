@@ -235,7 +235,7 @@ if __name__ == '__main__':
          default=False, help='Stop replay when a HTTP error is detected')
 
     (options, args) = parser.parse_args()
-    if len(args) != 1:
+    if len(args) == 0:
         parser.print_help()
         sys.exit(1)
 
