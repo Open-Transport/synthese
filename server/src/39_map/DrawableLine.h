@@ -91,7 +91,7 @@ namespace synthese
 				  const synthese::util::RGBColor& color,
 				  bool withPhysicalStops = true);
 
-			~DrawableLine();
+			virtual ~DrawableLine();
 
 			//! @name Getters/Setters
 			//@{

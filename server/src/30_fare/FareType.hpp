@@ -71,6 +71,7 @@ namespace synthese
 		public:
 
 			FareType(FareTypeNumber typeNumber);
+			virtual ~FareType() {}
 
 
 

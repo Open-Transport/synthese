@@ -101,10 +101,10 @@ namespace synthese
 			_endReached(journey2._endReached),
 			_distanceToEnd(journey2._distanceToEnd),
 			_score(journey2._score),
-			_similarity(journey1._similarity == false ? false : logic::indeterminate)
+			_similarity(tribool(indeterminate))
 		{
 			assert(journey1._phase == journey2._phase);
-
+			_similarity = (journey1._similarity == false ? tribool(false) : tribool(indeterminate));
 			if(journey1._phase == DEPARTURE_TO_ARRIVAL)
 			{
 				append(journey2);

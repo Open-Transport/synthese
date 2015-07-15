@@ -31,7 +31,7 @@ public:
     * \exception Exception if the attributes don't contain a valid "id" key
     */
    Element(AttributeMap &attributes) throw(Exception);
-   ~Element();
+   virtual ~Element();
 
    /**
     * \return the id of the element in the osm database

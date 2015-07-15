@@ -60,7 +60,7 @@ namespace synthese
 				std::string::const_iterator& it,
 				std::string::const_iterator end
 			);
-
+			virtual ~VariableUpdateNode() {}
 
 
 			//////////////////////////////////////////////////////////////////////////

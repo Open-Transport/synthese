@@ -73,6 +73,7 @@ namespace synthese
 				boost::optional<std::ostream&> outputStream,
 				util::ParametersMap& pm
 			);
+			virtual ~Importer() {}
 
 		protected:
 			util::Env&				_env;

@@ -45,6 +45,7 @@ namespace synthese
 
 			public:
 				Field(const std::string& title);
+				virtual ~Field() {}
 
 				//! @name Getters
 				//@{
@@ -81,6 +82,7 @@ namespace synthese
 					bool unique,
 					const Choices& choices
 				);
+				virtual ~SelectField() {}
 
 				virtual void getField(std::ostream& stream) const;
 
@@ -103,7 +105,7 @@ namespace synthese
 				TextInputField(
 					const std::string& title
 				);
-
+				virtual ~TextInputField() {}
 				virtual void getField(std::ostream& stream) const;
 
 				virtual void getInit(

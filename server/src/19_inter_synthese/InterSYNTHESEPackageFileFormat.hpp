@@ -47,6 +47,8 @@ namespace synthese
 		{
 		public:
 
+			virtual ~InterSYNTHESEPackageFileFormat() {}
+
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
 				public impex::ConnectionImporter<InterSYNTHESEPackageFileFormat>
@@ -86,6 +88,7 @@ namespace synthese
 					boost::optional<std::ostream&> outputStream,
 					util::ParametersMap& pm
 				);
+				virtual ~Importer_() {}
 
 				const std::string& getSmartURL() const { return _smartURL; }
 				const std::string& getUser() const { return _user; }

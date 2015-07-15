@@ -196,7 +196,7 @@ namespace synthese
 			//@}
 
 			UseRule();
-			~UseRule();
+			virtual ~UseRule();
 		};
 	}
 }

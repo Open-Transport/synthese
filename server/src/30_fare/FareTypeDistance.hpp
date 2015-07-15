@@ -46,7 +46,7 @@ namespace synthese
 
 
 
-			~FareTypeDistance();
+			virtual ~FareTypeDistance();
 
 
 

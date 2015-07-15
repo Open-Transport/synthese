@@ -43,6 +43,8 @@ namespace synthese
 				: F()
 			{}
 
+			virtual ~FactorableTemplate() {}
+
 			static const std::string FACTORY_KEY;
 
 			virtual const std::string& getFactoryKey() const;

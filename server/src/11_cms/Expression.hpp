@@ -40,6 +40,7 @@ namespace synthese
 			) const;
 
 		public:
+			virtual ~Expression() {}
 			virtual void display(
 				std::ostream& stream,
 				const server::Request& request,

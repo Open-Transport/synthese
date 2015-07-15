@@ -94,7 +94,7 @@ namespace synthese
 			int terminusRank(__DP->second.size() - 1);
 			size_t rank(0);
 			for(int i((numberOfIntermediatesStops != 0) ? firstIntermediatesStops : terminusRank);
-				i != (__AfficherTerminus ? __DP->second.size() : terminusRank);
+				i != (__AfficherTerminus ? (int)__DP->second.size() : terminusRank);
 				++i
 			){
 				// Max number of destinations

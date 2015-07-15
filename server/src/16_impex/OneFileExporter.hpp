@@ -46,6 +46,7 @@ namespace synthese
 				const Export& export_
 			):	Exporter(export_)
 			{}
+			virtual ~OneFileExporter() {}
 		};
 
 		template<class FF>

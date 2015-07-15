@@ -50,6 +50,8 @@ namespace synthese
 		{
 		public:
 
+			virtual ~InterSYNTHESEFileFormat() {}
+
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
 				public impex::ConnectionImporter<InterSYNTHESEFileFormat>

@@ -44,6 +44,7 @@ namespace synthese
 				const Export& export_
 			):	Exporter(export_)
 			{}
+			virtual ~NoExportPolicy() {}
 
 			virtual void build(std::ostream&) const {}
 

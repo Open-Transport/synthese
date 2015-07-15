@@ -48,6 +48,7 @@ namespace synthese
 				const Export& export_
 			):	_export(export_)
 			{}
+			virtual ~Exporter() {}
 
 			virtual void killPermanentThread() const {}
 			virtual void runPermanentThread() const {}

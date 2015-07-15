@@ -111,6 +111,8 @@ namespace synthese
 				const Webpage& page,
 				util::ParametersMap& variables
 			) const;
+
+			virtual ~WebpageContentNode() {}
 		};
 }	}
 

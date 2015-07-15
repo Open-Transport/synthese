@@ -31,7 +31,9 @@
 
 #include <boost/assert.hpp>
 #include <boost/static_assert.hpp>
+#pragma GCC diagnostic ignored "-Wunused-variable"
 #include <boost/thread/mutex.hpp>
+#pragma GCC diagnostic pop
 #include <boost/thread/condition_variable.hpp>
 #if BOOST_VERSION > 103900
 #include <boost/thread/detail/thread_interruption.hpp>

@@ -82,9 +82,9 @@ namespace synthese
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
 			_reservationRulesDelayType(reservationRulesDelayType),
+			_keepContinuousJourneys(keepContinuousJourneys),
 			_logger(logger),
-			_journeyTemplates(graphToUse),
-			_keepContinuousJourneys(keepContinuousJourneys)
+			_journeyTemplates(graphToUse)
 		{}
 
 
@@ -132,9 +132,9 @@ namespace synthese
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
 			_reservationRulesDelayType(reservationRulesDelayType),
+			_keepContinuousJourneys(keepContinuousJourneys),
 			_logger(logger),
-			_journeyTemplates(graphToUse),
-			_keepContinuousJourneys(keepContinuousJourneys)
+			_journeyTemplates(graphToUse)
 		{}
 
 

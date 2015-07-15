@@ -76,7 +76,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Destructor.
-			~Journey();
+			virtual ~Journey();
 
 
 			//! @name Getters
