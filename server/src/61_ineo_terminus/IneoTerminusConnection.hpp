@@ -142,14 +142,28 @@ namespace synthese
 				};
 
 				// Response generators
+
 				bool _checkStatusRequest(
-					XMLNode node
+					XMLNode& node,
+					std::string& message
 				);
+
 				bool _createMessageRequest(
-					XMLNode node
+					XMLNode& node,
+					std::string& message
 				);
+
 				bool _deleteMessageRequest(
-					XMLNode node
+					XMLNode& node,
+					std::string& message
+				);
+
+				std::string _generateResponse(XMLNode& requestNode);
+
+				void _copyXMLNode(
+					XMLNode& node,
+					const int tabDepth,
+					std::stringstream& outputStream
 				);
 
 				// generic parsers

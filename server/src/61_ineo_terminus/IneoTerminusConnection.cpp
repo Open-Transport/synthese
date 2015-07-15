@@ -277,250 +277,74 @@ namespace synthese
 					);
 					return;
 				}
+
 				string tagName(childNode.getName());
-				string message(_getXMLHeader());
-				message += char(10);
-				message += bufStr;
+				string response = "";
+
+				std::set<std::string> creationRequestTags;
+				std::set<std::string> deletionRequestTags;
+
+				creationRequestTags.insert("PassengerCreateMessageRequest");
+				creationRequestTags.insert("DriverCreateMessageRequest");
+				creationRequestTags.insert("PpdsCreateMessageRequest");
+				creationRequestTags.insert("GirouetteCreateMessageRequest");
+				creationRequestTags.insert("SonoPassengerCreateMessageRequest");
+				creationRequestTags.insert("SonoDriverCreateMessageRequest");
+				creationRequestTags.insert("SonoStopPointCreateMessageRequest");
+				creationRequestTags.insert("BivGeneralCreateMessageRequest");
+				creationRequestTags.insert("BivLineManCreateMessageRequest");
+				creationRequestTags.insert("BivLineAutoCreateMessageRequest");
+
+				deletionRequestTags.insert("PassengerDeleteMessageRequest");
+				deletionRequestTags.insert("DriverDeleteMessageRequest");
+				deletionRequestTags.insert("PpdsDeleteMessageRequest");
+				deletionRequestTags.insert("GirouetteDeleteMessageRequest");
+				deletionRequestTags.insert("SonoPassengerDeleteMessageRequest");
+				deletionRequestTags.insert("SonoDriverDeleteMessageRequest");
+				deletionRequestTags.insert("SonoStopPointDeleteMessageRequest");
+				deletionRequestTags.insert("BivGeneralDeleteMessageRequest");
+				deletionRequestTags.insert("BivLineManDeleteMessageRequest");
+				deletionRequestTags.insert("BivLineAutoDeleteMessageRequest");
 
 				if (tagName == "CheckStatusRequest")
 				{
-					if (_checkStatusRequest(childNode))
+					bool requestSuccessful = _checkStatusRequest(childNode, response);
+
+					if(!requestSuccessful)
 					{
-						replace_all(message, "CheckStatusRequest", "CheckStatusResponse");
-					}
-					else
-					{
-						message = "";
+						// TODO : log
 					}
 				}
-				else if (tagName == "PassengerCreateMessageRequest")
+
+				else if (creationRequestTags.end() != creationRequestTags.find(tagName))
 				{
-					if (_createMessageRequest(childNode))
+					bool requestSuccessful = _createMessageRequest(childNode, response);
+
+					if(!requestSuccessful)
 					{
-						replace_all(message, "PassengerCreateMessageRequest", "PassengerCreateMessageResponse");
-					}
-					else
-					{
-						message = "";
+						// TODO : log
 					}
 				}
-				else if (tagName == "PassengerDeleteMessageRequest")
+
+				else if (deletionRequestTags.end() != deletionRequestTags.find(tagName))
 				{
-					if (_deleteMessageRequest(childNode))
+					bool requestSuccessful = _deleteMessageRequest(childNode, response);
+
+					if(!requestSuccessful)
 					{
-						replace_all(message, "PassengerDeleteMessageRequest", "PassengerDeleteMessageResponse");
-					}
-					else
-					{
-						message = "";
+						// TODO : log
 					}
 				}
-				else if (tagName == "DriverCreateMessageRequest")
-				{
-					if (_createMessageRequest(childNode))
-					{
-						replace_all(message, "DriverCreateMessageRequest", "DriverCreateMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "DriverDeleteMessageRequest")
-				{
-					if (_deleteMessageRequest(childNode))
-					{
-						replace_all(message, "DriverDeleteMessageRequest", "DriverDeleteMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "PpdsCreateMessageRequest")
-				{
-					if (_createMessageRequest(childNode))
-					{
-						replace_all(message, "PpdsCreateMessageRequest", "PpdsCreateMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "PpdsDeleteMessageRequest")
-				{
-					if (_deleteMessageRequest(childNode))
-					{
-						replace_all(message, "PpdsDeleteMessageRequest", "PpdsDeleteMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "GirouetteCreateMessageRequest")
-				{
-					if (_createMessageRequest(childNode))
-					{
-						replace_all(message, "GirouetteCreateMessageRequest", "GirouetteCreateMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "GirouetteDeleteMessageRequest")
-				{
-					if (_deleteMessageRequest(childNode))
-					{
-						replace_all(message, "GirouetteDeleteMessageRequest", "GirouetteDeleteMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "SonoPassengerCreateMessageRequest")
-				{
-					if (_createMessageRequest(childNode))
-					{
-						replace_all(message, "SonoPassengerCreateMessageRequest", "SonoPassengerCreateMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "SonoPassengerDeleteMessageRequest")
-				{
-					if (_deleteMessageRequest(childNode))
-					{
-						replace_all(message, "SonoPassengerDeleteMessageRequest", "SonoPassengerDeleteMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "SonoDriverCreateMessageRequest")
-				{
-					if (_createMessageRequest(childNode))
-					{
-						replace_all(message, "SonoDriverCreateMessageRequest", "SonoDriverCreateMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "SonoDriverDeleteMessageRequest")
-				{
-					if (_deleteMessageRequest(childNode))
-					{
-						replace_all(message, "SonoDriverDeleteMessageRequest", "SonoDriverDeleteMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "SonoStopPointCreateMessageRequest")
-				{
-					if (_createMessageRequest(childNode))
-					{
-						replace_all(message, "SonoStopPointCreateMessageRequest", "SonoStopPointCreateMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "SonoStopPointDeleteMessageRequest")
-				{
-					if (_deleteMessageRequest(childNode))
-					{
-						replace_all(message, "SonoStopPointDeleteMessageRequest", "SonoStopPointDeleteMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "BivGeneralCreateMessageRequest")
-				{
-					if (_createMessageRequest(childNode))
-					{
-						replace_all(message, "BivGeneralCreateMessageRequest", "BivGeneralCreateMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "BivGeneralDeleteMessageRequest")
-				{
-					if (_deleteMessageRequest(childNode))
-					{
-						replace_all(message, "BivGeneralDeleteMessageRequest", "BivGeneralDeleteMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "BivLineManCreateMessageRequest")
-				{
-					if (_createMessageRequest(childNode))
-					{
-						replace_all(message, "BivLineManCreateMessageRequest", "BivLineManCreateMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "BivLineManDeleteMessageRequest")
-				{
-					if (_deleteMessageRequest(childNode))
-					{
-						replace_all(message, "BivLineManDeleteMessageRequest", "BivLineManDeleteMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "BivLineAutoCreateMessageRequest")
-				{
-					if (_createMessageRequest(childNode))
-					{
-						replace_all(message, "BivLineAutoCreateMessageRequest", "BivLineAutoCreateMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
-				else if (tagName == "BivLineAutoDeleteMessageRequest")
-				{
-					if (_deleteMessageRequest(childNode))
-					{
-						replace_all(message, "BivLineAutoDeleteMessageRequest", "BivLineAutoDeleteMessageResponse");
-					}
-					else
-					{
-						message = "";
-					}
-				}
+
 				else
 				{
 					util::Log::GetInstance().warn("Ineo Terminus : Parser non codé pour " + tagName);
 				}
-				message += char(0);
+
+				response += char(0);
 				boost::asio::async_write(
 					_socket,
-					boost::asio::buffer(message),
+					boost::asio::buffer(response),
 					boost::bind(
 						&tcp_connection::handle_write,
 						this,
@@ -625,13 +449,13 @@ namespace synthese
 			return "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>";
 		}
 
-		bool IneoTerminusConnection::tcp_connection::_checkStatusRequest(XMLNode node)
+		bool IneoTerminusConnection::tcp_connection::_checkStatusRequest(XMLNode& node, std::string& response)
 		{
 			string tagName(node.getName());
 			if (tagName != "CheckStatusRequest")
 			{
 				// tagName is not CheckStatusRequest, this method should not have been called
-				return "";
+				return false;
 			}
 
 			XMLNode IDNode = node.getChildNode("ID", 0);
@@ -652,10 +476,13 @@ namespace synthese
 				requestorRefStr
 			);
 
+			// Generate the XML response to this request
+			response = _generateResponse(node);
+
 			return true;
 		}
 
-		bool IneoTerminusConnection::tcp_connection::_createMessageRequest(XMLNode node)
+		bool IneoTerminusConnection::tcp_connection::_createMessageRequest(XMLNode& node, std::string& response)
 		{
 			string tagName(node.getName());
 			string messagerieName;
@@ -783,10 +610,13 @@ namespace synthese
 				" message(s)"
 			);
 
+			// Generate the XML response to this request
+			response = _generateResponse(node);
+
 			return true;
 		}
 
-		bool IneoTerminusConnection::tcp_connection::_deleteMessageRequest(XMLNode node)
+		bool IneoTerminusConnection::tcp_connection::_deleteMessageRequest(XMLNode& node, std::string& response)
 		{
 			string tagName(node.getName());
 			string messagerieName;
@@ -902,9 +732,74 @@ namespace synthese
 				util::Log::GetInstance().warn("IneoTerminusConnection : requete Delete non prise en compte car evenement non trouvé dans Terminus");
 			}
 
+			// Generate the XML response to this request
+			response = _generateResponse(node);
+
 			return true;
 		}
 
+		std::string IneoTerminusConnection::tcp_connection::_generateResponse(XMLNode& requestNode)
+		{
+			std::stringstream responseStream;
+
+			string requestTag = requestNode.getName();
+			string requestId = requestNode.getChildNode("ID", 0).getText();
+			string requestTimestamp = requestNode.getChildNode("RequestTimeStamp", 0).getText();
+
+			// Build the response tag
+			std::string responseTag = requestTag;
+			replace_all(responseTag, "Request", "Response");
+
+			// Build the response header
+			responseStream << _getXMLHeader() << char(10);
+			responseStream << "<" << responseTag << ">" << char(10);
+			responseStream << "\t<ID>" << boost::lexical_cast<std::string>(GetNextRequestID()) << "</ID>" << char(10);
+			responseStream << "\t<RequestID>" << requestId << "</RequestID>" << char(10);
+			// Note : according to interface description 'ResponseTimeStamp' = 'RequestTimeStamp'
+			responseStream << "\t<ResponseTimeStamp>" << requestTimestamp << "</ResponseTimeStamp>" << char(10);
+			responseStream << "\t<ResponseRef>Terminus</ResponseRef>" << char(10);
+
+			// Copy the content of 'Messaging' nodes
+			int messagingCount = requestNode.nChildNode("Messaging");
+			for (int cptMessaging = 0; cptMessaging < messagingCount; cptMessaging++)
+			{
+				XMLNode messagingNode = requestNode.getChildNode("Messaging", cptMessaging);
+				int tabDepth = 2;
+				_copyXMLNode(messagingNode, tabDepth, responseStream);
+			}
+
+			responseStream << "</" << responseTag << ">" << char(10);
+
+			return responseStream.str();
+		}
+
+		void IneoTerminusConnection::tcp_connection::_copyXMLNode(XMLNode& node, const int tabDepth, std::stringstream& outputStream)
+		{
+			int childCount = node.nChildNode();
+			std::string tabs(tabDepth, '\t');
+
+			for (int cptChild = 0; cptChild < childCount; cptChild++)
+			{
+				XMLNode childNode = node.getChildNode(cptChild);
+				std::string childName = childNode.getName();
+
+				outputStream << tabs << "<" << childName << ">";
+
+				if(0 < childNode.nChildNode())
+				{
+					// This child has children, call _copyXMLNode recursively
+					outputStream << char(10);
+					_copyXMLNode(childNode, tabDepth + 1, outputStream);
+					outputStream << tabs << "</" << childName << ">" << char(10);
+				}
+
+				else
+				{
+					// This child is a simple text node, copy its value
+					outputStream << childNode.getText() << "</" << childName << ">" << char(10);
+				}
+			}
+		}
 
 		IneoTerminusConnection::tcp_connection::Messaging IneoTerminusConnection::tcp_connection::_readMessagingNode(XMLNode node, string messagerieName)
 		{
