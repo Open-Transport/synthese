@@ -1,0 +1,9 @@
+<?if&
+ cond=<@recipient&&message@>&
+ then=	<?action&
+	  a=mailing_list_send&
+	  actionParam_mailing_list_id=<@recipient@>&
+	  actionParam_message_id=<@message@>&
+	  nr=1&
+	?>&
+?>
