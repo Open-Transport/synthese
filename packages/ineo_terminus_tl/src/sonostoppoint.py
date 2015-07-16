@@ -10,49 +10,14 @@ try:
 except ImportError:
   print("la lib lxml n'est pas disponible")
 
-
-def convert_to_ineo_color( hexcolor ):
-  import colorsys
-
-  # Convert hexa integer into decimal integer
-  color  = int(hexcolor, 16)  
-  # Extract RGB values
-  blue   = (color % 256)
-  green  = (color / 256) % 256
-  red    = (color / (256*256))
-  # Normalize them
-  bluef  = float(blue)  / 256.0
-  greenf = float(green) / 256.0
-  redf   = float(red)   / 256.0
-
-  # Convert to HSV
-  hsv = colorsys.rgb_to_hsv(redf, greenf, bluef)
-  hue = hsv[0] * 360
-
-  # Default value is 'Vert'
-  # TODO : change
-  colorStr = 'Vert'
   
-  # Hue E ]10..45]  => 'Orange'
-  if hue > 10.0 and hue <= 45.0:
-    colorStr = 'Orange'
-  # Hue E [60..170] => 'Vert'
-  if hue >= 60.0 and hue <= 170.0:
-    colorStr = 'Vert'
-  # Hue E [0..10] or [290..360] => 'Rouge'
-  if hue <= 10.0 or hue >= 290.0:
-    colorStr = 'Rouge'
-
-  return colorStr
-
-
 # TODO : pass variable as parameter
 networkId="6192453782601729"
 #dataSourceId="16607027920896001"
 dataSourceId="16607027920896002"
 
 # Request headers
-root = etree.Element("Passenger" + type + "MessageRequest")
+root = etree.Element("SonoStopPoint" + type + "MessageRequest")
 childID = etree.SubElement(root, "ID")
 childID.text = ID
 childRequestTimeStamp = etree.SubElement(root, "RequestTimeStamp")
@@ -68,12 +33,6 @@ childName = etree.SubElement(childMessaging, "Name")
 messageID = int(message[0]["message_id"]) % 10000
 childName.text = "{:04d} {:.27s}".format(messageID, message[0]["title"])
 
-# Tts (text)
-if int(needs_play_tts) != 0:
-  if int(message[0]["play_tts"]) != 0:
-    childTts = etree.SubElement(childMessaging, "Tts")
-    childTts.text = message[0]["content"]
-
 # Dispatching
 childDispatching = etree.SubElement(childMessaging, "Dispatching")
 childDispatching.text = "Repete"
@@ -88,50 +47,10 @@ childStartTime.text = "00:00:00"
 childStopTime = etree.SubElement(childMessaging, "StopTime")
 childStopTime.text = "23:59:00"
 
-# NumberShow
-
 # RepeatPeriod
 if int(needs_repeat_interval) != 0:
   childRepeatPeriod = etree.SubElement(childMessaging, "RepeatPeriod")
   childRepeatPeriod.text = str(int(message[0]["repeat_interval"]) / 60)
-
-# Inhibition
-childInhibition = etree.SubElement(childMessaging, "Inhibition")
-childInhibition.text = "non"
-
-# Color
-childColor = etree.SubElement(childMessaging, "Color")
-# TODO : change
-ineoColor = "Vert"
-# Search for 'color' attributes in the message
-match = re.search("(?<=color: #)[0-9a-fA-F]{6}", message[0]["content"])
-if match:
-  # Convert the RGB of the first 'color' attribute into the Ineo enumerate
-  ineoColor = convert_to_ineo_color(match.group(0))
-childColor.text = ineoColor
-
-# Tts (boolean)
-if int(needs_play_tts) != 0:
-  childTts = etree.SubElement(childMessaging, "Tts")
-  childTts.text = "oui" if int(message[0]["play_tts"]) != 0 else "non"
-
-# Jingle
-
-# {Start,End}StopPoint
-if needs_start_stop_point:
-  startStopPointId = int(message[0]["start_stop_point"])
-  if startStopPointId > 0:
-    childStartStopPoint = etree.SubElement(childMessaging, "StartStopPoint")
-    childStartStopPoint.text = message[0]["start_stop_point"]
-if needs_end_stop_point:
-  endStopPointId = int(message[0]["end_stop_point"])
-  if endStopPointId > 0:
-    childEndStopPoint = etree.SubElement(childMessaging, "EndStopPoint")
-    childEndStopPoint.text = message[0]["end_stop_point"]
-
-# Chaining
-
-# Priority
 
 # Text
 # Split text around <br /> and \n
@@ -145,6 +64,10 @@ for line in re.split('<br />|\n',message[0]["content"]):
 childRecipients = etree.SubElement(childMessaging, "Recipients")
 recipients = message[0]["recipients"][0]
 hasAllNetwork = False
+
+print recipients
+
+# Process CommercialLine and TransportNetwork recipients
 if 'line' in recipients:
   # Scan the 'line' recipients to check if the whole transport network is selected
   for line in recipients["line"]:
@@ -156,14 +79,34 @@ if 'line' in recipients:
   else:
     childLines = etree.SubElement(childRecipients, "Lines")
     for line in recipients["line"]:
+      print "line " + str(line)
       parameters = { "roid": line["id"] }
       linePM = synthese.service("LinesListFunction2", parameters)
+      print "linePM " + str(linePM)
       lineCodesStr = linePM["line"][0]["creator_id"]
       lineCodes = map(lambda x: x.split('|'), lineCodesStr.split(','))
       for lineCode in lineCodes:
         if lineCode[0] == dataSourceId:
           childLine = etree.SubElement(childLines, "Line")
           childLine.text = lineCode[1]
+
+# Process StopArea recipients
+if 'stoparea' in recipients:
+  childStopPoints = etree.SubElement(childRecipients, "StopPoints")
+  for stoparea in recipients["stoparea"]:
+    # SYNTHESE has stop area recipients, but Ineo expects stop points so we request all the stop points of each stop area
+    parameters = { "roid": stoparea["id"], "output_stops": 1, "of": "text" }
+    print "stoparea " + str(stoparea)
+    stopAreasPM = synthese.service("StopAreasListFunction", parameters)
+    print "stopareaPM " + str(stopAreasPM)
+    # Loop over stop points
+    for stop in stopAreasPM["stopArea"][0]["stop"]:
+      # Split the operator codes and find the Ineo code
+      stopCodes = map(lambda x: x.split('|'), stop["operator_code"].split(','))
+      for stopCode in stopCodes:
+        if stopCode[0] == dataSourceId:
+          childStopPoint = etree.SubElement(childStopPoints, "StopPoint")
+          childStopPoint.text = stopCode[1]
 
 # Print resulting XML to output stream
 print(etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="iso-8859-1"))
