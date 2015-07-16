@@ -1,0 +1,73 @@
+<h4>Paramètres spécifiques</h4>
+
+<div class="control-group">
+  <label class="control-label" id="label_cms_interpreter_id">ID de la page CMS interpréteur</label>
+  <div class="controls">
+    <input type="text" name="cms_interpreter_id" is_parameter="true" value="<@cms_interpreter_id?<@cms_interpreter_id@>:0@>" />
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_needs_repeat_interval">Durée entre chaque répétition du message</label>
+  <div class="controls">
+    <input type="text" name="needs_repeat_interval" is_parameter="true" value="<@needs_repeat_interval?<@needs_repeat_interval@>:0@>" />
+    <span class="add-on">s</span>
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_needs_with_ack">Accusé de réception requis</label>
+  <div class="controls">
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_with_ack" <@needs_with_ack?"checked=\"true\"":""@> value="1" /> Oui</label>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_with_ack" <@needs_with_ack?"":"checked=\"true\""@> value="0" /> Non</label>
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_needs_multiple_stops">Message à chaque passage</label>
+  <div class="controls">
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_multiple_stops" <@needs_multiple_stops?"checked=\"true\"":""@> value="1" /> Oui</label>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_multiple_stops" <@needs_multiple_stops?"":"checked=\"true\""@> value="0" /> Non</label>
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_needs_play_tts">Lecture TTS pendant l'affichage</label>
+  <div class="controls">
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_play_tts" <@needs_play_tts?"checked=\"true\"":""@> value="1" /> Oui</label>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_play_tts" <@needs_play_tts?"":"checked=\"true\""@> value="0" /> Non</label>
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_needs_light">Allumage LED clignotantes</label>
+  <div class="controls">
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_light" <@needs_light?"checked=\"true\"":""@> value="1" /> Oui</label>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_light" <@needs_light?"":"checked=\"true\""@> value="0" /> Non</label>
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_needs_direction_sign_code">Girouette pré-encodée</label>
+  <div class="controls">
+    <select name="needs_direction_sign_code" is_parameter="true">
+      <option value="0">Aucune</option>
+      <option value="1">Le service de liste des destinations n'existe pas encore</option>
+    </select>
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_needs_start_stop_point">Affichage sur tronçon : arrêt de début</label>
+  <div class="controls">
+    <input type="text" name="needs_start_stop_point" is_parameter="true" value="<@needs_start_stop_point?<@needs_start_stop_point@>:0@>" />
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" id="label_needs_end_stop_point">Affichage sur tronçon : arrêt de fin</label>
+  <div class="controls">
+    <input type="text" name="needs_end_stop_point" is_parameter="true" value="<@needs_end_stop_point?<@needs_end_stop_point@>:0@>" />
+    <span class="add-on">s</span>
+  </div>
+</div>
