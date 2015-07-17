@@ -88,7 +88,7 @@ void testQuery(const TestBackend& testBackend)
 		query.execute();
 
 		CHECK_COUNTERS(1, 1, 0);
-		BOOST_REQUIRE_EQUAL(registry.size(), 1);
+		BOOST_REQUIRE_EQUAL(registry.size(), 1ULL);
 		util::Registry<TestObject>::value_type regValue(*registry.begin());
 		boost::shared_ptr<TestObject> objFromReg = regValue.second;
 
@@ -127,7 +127,7 @@ void testQuery(const TestBackend& testBackend)
 		transaction.run();
 
 		CHECK_COUNTERS(1, 1, 0);
-		BOOST_REQUIRE_EQUAL(registry.size(), 1);
+		BOOST_REQUIRE_EQUAL(registry.size(), 1ULL);
 		util::Registry<TestObject>::value_type regValue(*registry.begin());
 		boost::shared_ptr<TestObject> objFromReg = regValue.second;
 
@@ -171,7 +171,7 @@ void testQuery(const TestBackend& testBackend)
 		transaction.run();
 
 		CHECK_COUNTERS(1, 2, 0);
-		BOOST_REQUIRE_EQUAL(registry.size(), 1);
+		BOOST_REQUIRE_EQUAL(registry.size(), 1ULL);
 
 		util::Registry<TestObject>::value_type regValue(*registry.begin());
 		boost::shared_ptr<TestObject> objFromReg = regValue.second;
@@ -180,7 +180,7 @@ void testQuery(const TestBackend& testBackend)
 		// Object from registry is newly allocated.
 		BOOST_CHECK_NE(&obj, objFromReg.get());
 		BOOST_CHECK_EQUAL(objFromReg->getKey(), obj.getKey());
-		BOOST_CHECK_EQUAL(objFromReg->getNetworkId(), 16);
+		BOOST_CHECK_EQUAL(objFromReg->getNetworkId(), 16ULL);
 		BOOST_CHECK_EQUAL(objFromReg->getName(), "sample name");
 		BOOST_CHECK_EQUAL(objFromReg->getShortName(), "some short name");
 	}

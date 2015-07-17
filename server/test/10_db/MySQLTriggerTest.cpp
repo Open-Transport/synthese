@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(MySQLTrigger)
 
 	CHECK_COUNTERS(1, 0, 1);
 	// Check that the object is now in the registry.
-	BOOST_REQUIRE_EQUAL(registry.size(), 1);
+	BOOST_REQUIRE_EQUAL(registry.size(), 1ULL);
 	util::Registry<TestObject>::value_type regValue(*registry.begin());
 	boost::shared_ptr<TestObject> objFromReg = regValue.second;
 
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(MySQLTrigger)
 
 	// Check that the object was updated through the trigger.
 	CHECK_COUNTERS(1, 1, 0);
-	BOOST_REQUIRE_EQUAL(registry.size(), 1);
+	BOOST_REQUIRE_EQUAL(registry.size(), 1ULL);
 	objFromReg = registry.begin()->second;
 	BOOST_CHECK_EQUAL(objFromReg->getKey(), obj.getKey());
 	BOOST_CHECK_EQUAL(objFromReg->getNetworkId(), obj.getNetworkId());

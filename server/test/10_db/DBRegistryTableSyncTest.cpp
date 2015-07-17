@@ -86,7 +86,7 @@ void testRegistryTableSync(const TestBackend& testBackend)
 	TestTableSync::Save(&obj);
 
 	CHECK_COUNTERS(1, 1, 1);
-	BOOST_REQUIRE_EQUAL(registry.size(), 1);
+	BOOST_REQUIRE_EQUAL(registry.size(), 1ULL);
 
 	// querying
 
@@ -123,7 +123,7 @@ void testRegistryTableSync(const TestBackend& testBackend)
 	TestTableSync::Save(&obj2);
 
 	CHECK_COUNTERS(1, 0, 1);
-	BOOST_REQUIRE_EQUAL(registry.size(), 1);
+	BOOST_REQUIRE_EQUAL(registry.size(), 1ULL);
 
 	db::DBModule::GetDB()->deleteStmt(obj2.getKey(), optional<db::DBTransaction&>());
 
@@ -148,13 +148,13 @@ void testRegistryTableSync(const TestBackend& testBackend)
 
 		CHECK_COUNTERS(0, 0, 1);
 		// Object is not yet in the registry
-		BOOST_REQUIRE_EQUAL(registry.size(), 0);
+		BOOST_REQUIRE_EQUAL(registry.size(), 0ULL);
 
 		TestTableSync::Save(&obj2, transaction);
 
 		CHECK_COUNTERS(0, 0, 1);
 		// Object is not yet in the registry
-		BOOST_REQUIRE_EQUAL(registry.size(), 0);
+		BOOST_REQUIRE_EQUAL(registry.size(), 0ULL);
 
 		db::DBModule::GetDB()->deleteStmt(obj2.getKey(), transaction);
 
@@ -163,7 +163,7 @@ void testRegistryTableSync(const TestBackend& testBackend)
 		transaction.run();
 
 		CHECK_COUNTERS(1, 0, 0);
-		BOOST_REQUIRE_EQUAL(registry.size(), 1);
+		BOOST_REQUIRE_EQUAL(registry.size(), 1ULL);
 	}
 }
 
