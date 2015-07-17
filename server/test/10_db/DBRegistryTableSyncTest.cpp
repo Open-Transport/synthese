@@ -91,10 +91,10 @@ void testRegistryTableSync(const TestBackend& testBackend)
 	// querying
 
 	TestTableSync::SearchResult results = TestTableSync::Search(util::Env::GetOfficialEnv(), 999);
-	BOOST_CHECK_EQUAL(results.size(), 0);
+	BOOST_CHECK_EQUAL(results.size(), 0ULL);
 
 	results = TestTableSync::Search(util::Env::GetOfficialEnv(), 22, std::string("sample name"));
-	BOOST_CHECK_EQUAL(results.size(), 1);
+	BOOST_CHECK_EQUAL(results.size(), 1ULL);
 	boost::shared_ptr<TestObject> objFromResult = results[0];
 	BOOST_CHECK_EQUAL(objFromResult->getNetworkId(), obj.getNetworkId());
 	BOOST_CHECK_EQUAL(objFromResult->getName(), obj.getName());

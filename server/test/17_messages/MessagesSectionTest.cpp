@@ -30,9 +30,7 @@
 
 #include <iostream>
 
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <boost/test/auto_unit_test.hpp>
-#pragma GCC diagnostic pop
 
 using namespace boost::posix_time;
 using namespace boost::gregorian;

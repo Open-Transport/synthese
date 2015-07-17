@@ -28,9 +28,7 @@
 #include "PTModule.h"
 #include "JourneysResult.h"
 
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <boost/test/auto_unit_test.hpp>
-#pragma GCC diagnostic pop
 
 using namespace synthese::algorithm;
 using namespace synthese::graph;
@@ -91,7 +89,7 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 			boost::optional<boost::posix_time::time_duration>()
 		);
 
-		BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 4);
+		BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 4ULL);
 	}
 
 	{ // 05 -> 95

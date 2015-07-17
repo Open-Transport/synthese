@@ -7,9 +7,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <boost/test/auto_unit_test.hpp>
-#pragma GCC diagnostic pop
 
 using namespace synthese::util;
 

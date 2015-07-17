@@ -27,9 +27,7 @@
 #include "TreeRankOrderingPolicy.hpp"
 #include "TreeUniqueRootPolicy.hpp"
 
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <boost/test/auto_unit_test.hpp>
-#pragma GCC diagnostic pop
 
 using namespace synthese::tree;
 using namespace boost;

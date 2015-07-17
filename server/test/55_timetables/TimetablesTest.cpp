@@ -22,9 +22,7 @@
 
 #include "TimetablesTestData.inc.hpp"
 
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <boost/test/auto_unit_test.hpp>
-#pragma GCC diagnostic pop
 
 #include "CalendarTemplate.h"
 #include "CalendarTemplateElement.h"
@@ -335,7 +333,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 			warnings
 			)	);
 
-		BOOST_CHECK_EQUAL(result.getColumns().size(), 1);
+		BOOST_CHECK_EQUAL(result.getColumns().size(), 1ULL);
 		if(result.getColumns().size() > 0)
 		{
 			const TimetableColumn& column(*result.getColumns().begin());

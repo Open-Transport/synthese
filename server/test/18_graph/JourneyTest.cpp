@@ -24,9 +24,7 @@
 #include "Journey.h"
 #include "ServicePointer.h"
 
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <boost/test/auto_unit_test.hpp>
-#pragma GCC diagnostic pop
 
 using namespace synthese::graph;
 using namespace boost::posix_time;

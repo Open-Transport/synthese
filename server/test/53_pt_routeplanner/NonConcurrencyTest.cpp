@@ -43,9 +43,7 @@
 
 #include <iostream>
 
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <boost/test/auto_unit_test.hpp>
-#pragma GCC diagnostic pop
 
 #define NB_STOP 2
 
@@ -229,9 +227,9 @@ void checkJourneyEquals(size_t i, PTRoutePlannerResult::Journeys& journeys,
 
 	BOOST_CHECK_EQUAL(to_iso_extended_string(journey.getFirstDepartureTime()), to_iso_extended_string(expectedTime));
 	// There is a single leg
-	BOOST_CHECK_EQUAL(jl.size(), 1);
+	BOOST_CHECK_EQUAL(jl.size(), 1ULL);
 	BOOST_CHECK_EQUAL(to_simple_string(leg.getServiceRange()), to_simple_string(expectedDuration));
-	BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getKey(), 0);
+	BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getKey(), 0ULL);
 	
 	/// @FIXME In continuous case the ArrivalEdge is correct but not its key
 	//cout << "leg.getArrivalEdge()->getKey() = " << leg.getArrivalEdge()->getKey() << endl;

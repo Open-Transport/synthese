@@ -24,9 +24,7 @@
 
 #include <iostream>
 
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <boost/test/auto_unit_test.hpp>
-#pragma GCC diagnostic pop
 
 using namespace synthese::lexical_matcher;
 using namespace std;

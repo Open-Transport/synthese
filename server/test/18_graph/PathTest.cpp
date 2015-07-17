@@ -22,9 +22,7 @@
 
 #include "FakeGraphImplementation.hpp"
 
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <boost/test/auto_unit_test.hpp>
-#pragma GCC diagnostic pop
 
 using namespace synthese::util;
 using namespace synthese::graph;

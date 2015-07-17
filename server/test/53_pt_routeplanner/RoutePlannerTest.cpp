@@ -32,9 +32,7 @@
 #include "FreeDRTArea.hpp"
 #include "StopPoint.hpp"
 
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <boost/test/auto_unit_test.hpp>
-#pragma GCC diagnostic pop
 
 using namespace synthese::pt_journey_planner;
 using namespace synthese::algorithm;
@@ -183,7 +181,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 
 		Journey j(r.run());
 
-		BOOST_CHECK_EQUAL(j.size(), 1);
+		BOOST_CHECK_EQUAL(j.size(), 1ULL);
 		if(j.size() >= 1)
 		{
 			BOOST_CHECK_EQUAL(

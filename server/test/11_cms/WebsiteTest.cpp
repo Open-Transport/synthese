@@ -28,9 +28,7 @@
 #include "WebPageDisplayFunction.h"
 #include "Website.hpp"
 
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <boost/test/auto_unit_test.hpp>
-#pragma GCC diagnostic pop
 
 using namespace boost;
 using namespace std;
