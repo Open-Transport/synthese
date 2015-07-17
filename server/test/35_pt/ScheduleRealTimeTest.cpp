@@ -42,7 +42,9 @@
 
 #include <iostream>
 
+#pragma GCC diagmostic ignored "-Werror=sign-compare"
 #include <boost/test/auto_unit_test.hpp>
+#pragma GCC diagnostic pop
 
 #define TEST_SERVICE_DATASOURCE 16607027920896001
 #define TEST_STOP_AREA_ID 1970329131942220

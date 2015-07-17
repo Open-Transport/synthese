@@ -32,7 +32,9 @@
 #include "FreeDRTArea.hpp"
 #include "StopPoint.hpp"
 
+#pragma GCC diagmostic ignored "-Werror=sign-compare"
 #include <boost/test/auto_unit_test.hpp>
+#pragma GCC diagnostic pop
 
 using namespace synthese::pt_journey_planner;
 using namespace synthese::algorithm;

@@ -22,7 +22,9 @@
 
 #include "TimetablesTestData.inc.hpp"
 
+#pragma GCC diagmostic ignored "-Werror=sign-compare"
 #include <boost/test/auto_unit_test.hpp>
+#pragma GCC diagnostic pop
 
 #include "CalendarTemplate.h"
 #include "CalendarTemplateElement.h"

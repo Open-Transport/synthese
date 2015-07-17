@@ -35,7 +35,9 @@
 #include "101_sqlite/SQLiteDB.h"
 #include "UtilTypes.h"
 
+#pragma GCC diagmostic ignored "-Werror=sign-compare"
 #include <boost/test/auto_unit_test.hpp>
+#pragma GCC diagnostic pop
 
 using namespace synthese::admin;
 using namespace synthese::data_exchange;

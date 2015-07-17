@@ -24,7 +24,9 @@
 #include "CalendarTemplate.h"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
+#pragma GCC diagmostic ignored "-Werror=sign-compare"
 #include <boost/test/auto_unit_test.hpp>
+#pragma GCC diagnostic pop
 #include <boost/foreach.hpp>
 
 using namespace synthese::calendar;
