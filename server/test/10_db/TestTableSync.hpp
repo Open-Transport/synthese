@@ -47,9 +47,9 @@ public:
 		Registrable(key)
 	{};
 
-	const RegistryKeyType getNetworkId() const { return _networkId; }
-	virtual std::string getName() const { return _name; }
-	const std::string& getShortName() const { return _shortName; }
+	RegistryKeyType getNetworkId() { return _networkId; }
+	virtual std::string getName() { return _name; } const
+	std::string& getShortName() { return _shortName; }
 
 	void setNetworkId(const RegistryKeyType networkId) { _networkId = networkId; }
 	void setName(const std::string& name) { _name = name; }

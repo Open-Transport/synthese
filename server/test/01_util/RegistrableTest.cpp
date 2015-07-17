@@ -27,7 +27,9 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
+#pragma GCC diagmostic ignored "-Werror=sign-compare"
 #include <boost/test/auto_unit_test.hpp>
+#pragma GCC diagnostic pop
 
 using namespace synthese::util;
 

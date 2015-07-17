@@ -23,7 +23,9 @@
 #include "UtilTypes.h"
 
 #include <iostream>
+#pragma GCC diagmostic ignored "-Werror=sign-compare"
 #include <boost/test/auto_unit_test.hpp>
+#pragma GCC diagnostic pop
 
 using namespace synthese::util;
 
