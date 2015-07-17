@@ -23,9 +23,7 @@
 #include "UtilTypes.h"
 
 #include <iostream>
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <boost/test/auto_unit_test.hpp>
-#pragma GCC diagnostic pop
 
 using namespace synthese::util;
 
@@ -39,7 +37,7 @@ BOOST_AUTO_TEST_CASE (testEncodingDecoding)
 
     RegistryKeyType id = encodeUId (tableId, gridNodeId, objectId);
 
-	BOOST_REQUIRE_EQUAL (id, 1125929971870484LL);
+	BOOST_REQUIRE_EQUAL (id, 1125929971870484ULL);
     BOOST_REQUIRE_EQUAL (tableId, decodeTableId (id));
     BOOST_REQUIRE_EQUAL (gridNodeId, decodeGridNodeId (id));
     BOOST_REQUIRE_EQUAL (objectId, decodeObjectId (id));

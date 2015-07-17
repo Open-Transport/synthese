@@ -57,7 +57,7 @@ void testRegistryTableSync(const TestBackend& testBackend)
 
 	util::Env& env(util::Env::GetOfficialEnv());
 	util::Registry<TestObject>& registry(env.getEditableRegistry<TestObject>());
-	BOOST_CHECK_EQUAL(registry.size(), 0);
+	BOOST_CHECK_EQUAL(registry.size(), 0ULL);
 
 	TestObject obj;
 	obj.setNetworkId(22);

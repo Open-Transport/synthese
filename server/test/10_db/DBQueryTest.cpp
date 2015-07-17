@@ -49,7 +49,7 @@ void testQuery(const TestBackend& testBackend)
 
 	util::Env& env(util::Env::GetOfficialEnv());
 	util::Registry<TestObject>& registry(env.getEditableRegistry<TestObject>());
-	BOOST_CHECK_EQUAL(registry.size(), 0);
+	BOOST_CHECK_EQUAL(registry.size(), 0ULL);
 
 	TestObject obj;
 	obj.setNetworkId(10);
@@ -96,7 +96,7 @@ void testQuery(const TestBackend& testBackend)
 		// Object from registry is newly allocated.
 		BOOST_CHECK_NE(&obj, objFromReg.get());
 		BOOST_CHECK_EQUAL(objFromReg->getKey(), obj.getKey());
-		BOOST_CHECK_EQUAL(objFromReg->getNetworkId(), 12);
+		BOOST_CHECK_EQUAL(objFromReg->getNetworkId(), 12ULL);
 		BOOST_CHECK_EQUAL(objFromReg->getName(), "sample name");
 		BOOST_CHECK_EQUAL(objFromReg->getShortName(), "some short name");
 	}
