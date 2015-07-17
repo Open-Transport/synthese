@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_OtherClassRoot)
 
 	node1.setParent(NULL);
 	node1.registerInParentOrRoot();
-	BOOST_REQUIRE_EQUAL(root.getChildren().size(), 1);
+	BOOST_REQUIRE_EQUAL(root.getChildren().size(), 1ULL);
 	BOOST_CHECK_EQUAL(root.getChildren().begin()->first, node1.getRank());
 	BOOST_CHECK_EQUAL(root.getChildren().begin()->second, &node1);
 	BOOST_CHECK(node1.getChildren().empty());

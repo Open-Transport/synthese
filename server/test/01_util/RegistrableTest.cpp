@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE (testRegistryOperations)
 {
       {
 	  RegistrableForTest reg (1);
-	  BOOST_REQUIRE_EQUAL (1, reg.getKey ());
+	  BOOST_REQUIRE_EQUAL (reg.getKey (), 1ULL);
       }
 
       bool exceptionThrown (false);

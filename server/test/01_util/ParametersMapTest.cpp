@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE (testParametersMap)
 
 	{	// URI constructor
 		ParametersMap pm("a=1&b=toto");
-		BOOST_CHECK_EQUAL(pm.getMap().size(), 2);
+		BOOST_CHECK_EQUAL(pm.getMap().size(), 2ULL);
 		BOOST_CHECK_EQUAL(pm.get<int>("a"), 1);
 		BOOST_CHECK_EQUAL(pm.get<string>("b"), "toto");
 	}
