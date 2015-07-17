@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(MySQLTrigger)
 
 	util::Env& env(util::Env::GetOfficialEnv());
 	util::Registry<TestObject>& registry(env.getEditableRegistry<TestObject>());
-	BOOST_CHECK_EQUAL(registry.size(), 0);
+	BOOST_CHECK_EQUAL(registry.size(), 0ULL);
 
 	TestObject obj;
 	obj.setNetworkId(22);

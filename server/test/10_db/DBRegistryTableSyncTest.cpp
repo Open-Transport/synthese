@@ -70,7 +70,7 @@ void testRegistryTableSync(const TestBackend& testBackend)
 
 	CHECK_COUNTERS(1, 0, 1);
 	// Check that the object is now in the registry.
-	BOOST_REQUIRE_EQUAL(registry.size(), 1);
+	BOOST_REQUIRE_EQUAL(registry.size(), 1ULL);
 	util::Registry<TestObject>::value_type regValue(*registry.begin());
 	boost::shared_ptr<TestObject> objFromReg = regValue.second;
 
