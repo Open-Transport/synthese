@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE (testParametersMap)
 			"-----------------------------2921238217421\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n2097152\r\n-----------------------------2921238217421\r\nContent-Disposition: form-data; name=\"b\"; filename=\"notes.txt\"\r\nContent-Type: text/plain\r\n\r\nTablette : GTP1000\r\n\r\n-----------------------------2921238217421--",
 			"---------------------------2921238217421"
 		);
-		BOOST_CHECK_EQUAL(pm.getMap().size(), 1);
+		BOOST_CHECK_EQUAL(pm.getMap().size(), 1ULL);
 		BOOST_CHECK_EQUAL(pm.get<string>("a", false), "2097152");
 		ParametersMap::File f(pm.getFile("b"));
 		try

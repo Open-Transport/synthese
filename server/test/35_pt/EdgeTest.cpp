@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 		Edge* lNULL(NULL);
 
 		ls1D.link(env, true);
-		BOOST_CHECK_EQUAL(ls1D.getGeneratedLineStops().size(), 1);
+		BOOST_CHECK_EQUAL(ls1D.getGeneratedLineStops().size(), 1ULL);
 		const Edge& l1D(**ls1D.getGeneratedLineStops().begin());
 		BOOST_CHECK_EQUAL(l1D.isDepartureAllowed(), true);
 		BOOST_CHECK_EQUAL(l1D.isArrivalAllowed(), false);

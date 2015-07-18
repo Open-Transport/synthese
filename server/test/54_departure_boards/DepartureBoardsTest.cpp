@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 		);
 		const ArrivalDepartureList& result(g.generate());
 
-		BOOST_CHECK_EQUAL(result.size(), 5);
+		BOOST_CHECK_EQUAL(result.size(), 5ULL);
 
 		ArrivalDepartureList::const_iterator dep(result.begin());
 

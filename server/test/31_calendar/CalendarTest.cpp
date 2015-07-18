@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(CalendarTest)
 	}
 
 	Calendar::DatesVector v(c.getActiveDates());
-	BOOST_CHECK_EQUAL(v.size(), d2.day_of_year() + 365 + 366 - d1.day_of_year());
+	BOOST_CHECK_EQUAL(v.size(), (size_t)d2.day_of_year() + 365 + 366 - d1.day_of_year());
 	BOOST_CHECK_EQUAL(v.size(), c.size());
 	date dtest(d1);
 	BOOST_FOREACH(const Calendar::DatesVector::value_type& d, v)

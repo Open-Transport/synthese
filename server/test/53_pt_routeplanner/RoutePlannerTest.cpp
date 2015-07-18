@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 
 		Journey j(r.run());
 
-		BOOST_REQUIRE_EQUAL(j.size(), 2);
+		BOOST_REQUIRE_EQUAL(j.size(), 2ULL);
 		BOOST_CHECK_EQUAL(
 			boost::posix_time::to_simple_string(j.getJourneyLeg(0).getDepartureDateTime()),
 			boost::posix_time::to_simple_string(ptime(tomorrow.date(), time_duration(9,0,0)))

@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 
 	ScheduledService s(1234, "1234AB", &l);
 
-	BOOST_CHECK_EQUAL(s.getKey(), 1234);
+	BOOST_CHECK_EQUAL(s.getKey(), 1234ULL);
 	BOOST_CHECK_EQUAL(s.getServiceNumber(), "1234AB");
 	BOOST_CHECK_EQUAL(s.getPath(), &l);
 	BOOST_CHECK_EQUAL(s.isContinuous(), false);
@@ -1308,7 +1308,7 @@ BOOST_AUTO_TEST_CASE (testServcesIndices)
 	l4A.set<ScheduleInput>(true);
 	l4A.link(env, true);
 
-	BOOST_CHECK_EQUAL(l.getEdges().size(), 6);
+	BOOST_CHECK_EQUAL(l.getEdges().size(), 6ULL);
 
 	Edge* lNULL(NULL);
 

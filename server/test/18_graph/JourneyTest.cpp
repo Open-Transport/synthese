@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE (TransferNumber)
 	{	// Empty journey
 		{
 			Journey j1;
-			BOOST_CHECK_EQUAL(j1.getTransportConnectionsCount(), 0);
+			BOOST_CHECK_EQUAL(j1.getTransportConnectionsCount(), 0ULL);
 			BOOST_CHECK_EQUAL(j1.getDistance(), 0);
 			BOOST_CHECK_EQUAL(j1.getEffectiveDuration().total_seconds(), 0);
 		}

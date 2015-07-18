@@ -248,31 +248,31 @@ BOOST_AUTO_TEST_CASE(comparison)
 
 	FrenchSentence::ComparisonScore sA_cE(sanAntonio.compare(cerneuxEtajes));
 	BOOST_CHECK_CLOSE(sA_cE.phoneticScore, 0.287, 1);
-	BOOST_CHECK_EQUAL(sA_cE.levenshtein, 29);
+	BOOST_CHECK_EQUAL(sA_cE.levenshtein, 29ULL);
 
 	FrenchSentence::ComparisonScore sA_vM(sanAntonio.compare(valMorobbia));
 	BOOST_CHECK_EQUAL(sA_vM.phoneticScore, 1);
-	BOOST_CHECK_EQUAL(sA_vM.levenshtein, 20);
+	BOOST_CHECK_EQUAL(sA_vM.levenshtein, 20ULL);
 
 	FrenchSentence::ComparisonScore sA_cEM(sanAntonio.compare(cerneuxEtagesWithMistake));
 	BOOST_CHECK_CLOSE(sA_cEM.phoneticScore, 0.287, 1);
-	BOOST_CHECK_EQUAL(sA_cEM.levenshtein, 29);
+	BOOST_CHECK_EQUAL(sA_cEM.levenshtein, 29ULL);
 
 	FrenchSentence::ComparisonScore cEM_sA(cerneuxEtagesWithMistake.compare(sanAntonio));
 	BOOST_CHECK_CLOSE(cEM_sA.phoneticScore, 0.083, 1);
-	BOOST_CHECK_EQUAL(cEM_sA.levenshtein, 29);
+	BOOST_CHECK_EQUAL(cEM_sA.levenshtein, 29ULL);
 
 	FrenchSentence::ComparisonScore cE_cEM(cerneuxEtajes.compare(cerneuxEtagesWithMistake));
 	BOOST_CHECK_CLOSE(cE_cEM.phoneticScore, 0.952, 1);
-	BOOST_CHECK_EQUAL(cE_cEM.levenshtein, 1);
+	BOOST_CHECK_EQUAL(cE_cEM.levenshtein, 1ULL);
 
 	FrenchSentence::ComparisonScore cEM_cE(cerneuxEtagesWithMistake.compare(cerneuxEtajes));
 	BOOST_CHECK_CLOSE(cEM_cE.phoneticScore, 0.952, 1);
-	BOOST_CHECK_EQUAL(cEM_cE.levenshtein, 1);
+	BOOST_CHECK_EQUAL(cEM_cE.levenshtein, 1ULL);
 
 	FrenchSentence::ComparisonScore cEM_cEOK(cerneuxEtagesWithMistake.compare(cerneuxEtagesOK));
 	BOOST_CHECK_CLOSE(cEM_cEOK.phoneticScore, 0.952, 1);
-	BOOST_CHECK_EQUAL(cEM_cEOK.levenshtein, 11);
+	BOOST_CHECK_EQUAL(cEM_cEOK.levenshtein, 11ULL);
 
 	LexicalMatcher<int> lexmatcher;
 	lexmatcher.add(sanAntonio.getSource(), 0);

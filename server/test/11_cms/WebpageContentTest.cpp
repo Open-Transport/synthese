@@ -325,7 +325,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
 		string eval(wpc.eval(request, additionalParametersMap, page, variables));
 		BOOST_CHECK_EQUAL(eval, "test");
-		BOOST_CHECK_EQUAL(variables.getMap().size(), 1);
+		BOOST_CHECK_EQUAL(variables.getMap().size(), 1ULL);
 		BOOST_CHECK_EQUAL(variables.get<int>("variable"), 2);
 	}
 

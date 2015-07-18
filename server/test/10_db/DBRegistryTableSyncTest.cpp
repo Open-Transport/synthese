@@ -106,7 +106,7 @@ void testRegistryTableSync(const TestBackend& testBackend)
 
 	CHECK_COUNTERS(0, 0, 0);
 	// Nothing should be removed from registry.
-	BOOST_CHECK_EQUAL(registry.size(), 1);
+	BOOST_CHECK_EQUAL(registry.size(), 1ULL);
 
 	TestTableSync::RemoveByName("sample name");
 

@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE (Edges)
 		BOOST_REQUIRE_EQUAL(r.getForwardPath().getRoad(), &r);
 		BOOST_REQUIRE_EQUAL(r.getReversePath().getRoad(), &r);
 
-		BOOST_REQUIRE_EQUAL(r.get<RoadPlace>()->getPaths().size(), 2);
+		BOOST_REQUIRE_EQUAL(r.get<RoadPlace>()->getPaths().size(), 2ULL);
 		BOOST_CHECK(p.getPaths().find(&r.getForwardPath()) != p.getPaths().end());
 		BOOST_CHECK(p.getPaths().find(&r.getReversePath()) != p.getPaths().end());
 

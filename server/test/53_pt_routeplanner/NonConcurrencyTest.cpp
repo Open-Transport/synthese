@@ -305,7 +305,7 @@ BOOST_AUTO_TEST_CASE (scheduledVSscheduled)
 	);
 	PTRoutePlannerResult result(r.run());
 	resultDump(result);
-	BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 10);
+	BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 10ULL);
 	size_t i = 0;
 	checkJourneyEquals(i++, result.getJourneys(), "CL1", start_time + time_duration(0, 0, 0), time_duration(0, 0, 0));
 	checkJourneyEquals(i++, result.getJourneys(), "CL1", start_time + time_duration(1, 0, 0), time_duration(0, 0, 0));

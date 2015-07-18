@@ -66,11 +66,11 @@ BOOST_AUTO_TEST_CASE(SimpleObjectTest)
 	TestObject obj;
 
 	BOOST_CHECK_EQUAL(obj.getClassName(), "TestObject");
-	BOOST_CHECK_EQUAL(obj.getClassNumber(), 980);
+	BOOST_CHECK_EQUAL(obj.getClassNumber(), 980ULL);
 	BOOST_CHECK_EQUAL(obj.getTableName(), "t980_test_object");
 	
 	BOOST_CHECK_EQUAL(obj.get<Key>(), 0);
-	BOOST_CHECK_EQUAL(obj.getKey(), 0);
+	BOOST_CHECK_EQUAL(obj.getKey(), 0ULL);
 	BOOST_CHECK_EQUAL(obj.get<DoubleField>(), 2.2);
 
 	obj.set<Key>(4);
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(SimpleObjectTest)
 		ParametersMap pm;
 		obj.toParametersMap(pm);
 
-		BOOST_CHECK_EQUAL(pm.getMap().size(), 2);
+		BOOST_CHECK_EQUAL(pm.getMap().size(), 2ULL);
 		BOOST_CHECK_EQUAL(pm.get<RegistryKeyType>("id"), 8);
 		BOOST_CHECK_EQUAL(pm.get<double>("double_field"), 9.2);
 	}

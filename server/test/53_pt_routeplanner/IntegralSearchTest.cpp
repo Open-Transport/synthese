@@ -133,6 +133,6 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 			boost::optional<boost::posix_time::time_duration>()
 		);
 
-		BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 4);
+		BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 4ULL);
 	}
 }
