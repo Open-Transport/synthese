@@ -834,7 +834,7 @@ namespace synthese
 						_database +".CHAINAGE.nom,"+
 						_database +".CHAINAGE.sens,"+
 						_database +".CHAINAGE.ligne "+
-						(_readDestSMS ? ","+ _database +".DEST.destsms " : "")+
+						(_readDestSMS ? "," + _database +".DEST.destsms " : "")+
 					" FROM "+
 						(_readDestSMS ? _database +".DEST, " : "")+
 						_database +".ARRETCHN "+
@@ -980,7 +980,7 @@ namespace synthese
 						_database +".ARRETCHN.chainage "+
 						// The if in the next line is here because it looks like there is no way in Synthese to do the difference
 						// between a empty string and a NULL value (resulting from the LEFT JOIN)
-						( _neutralized ? ",IF("+ _database +".VEHICULE.Symb IS NULL, 'NULL', "+ _database +".VEHICULE.Symb) As Symb " : "")+
+						( _neutralized ? ", IF("+ _database +".VEHICULE.Symb IS NULL, 'NULL', "+ _database +".VEHICULE.Symb) As Symb " : "")+
 					"FROM "+
 						_database +".HORAIRE "+
 						"INNER JOIN "+ _database +".ARRETCHN ON "+
