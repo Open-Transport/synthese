@@ -137,7 +137,20 @@ namespace synthese
 					std::string endStopPoint;
 					bool diodFlashing;
 					bool alternance;
+					bool multipleStop;
+					bool terminusOrStop;
+					std::string way;
+					std::string stopPoint;
+					int numberShow;
+					bool ttsBroadcasting;
+					bool jingle;
+					std::string chaining;
+					bool priority;
+					bool varying;
+					int duration;
 					std::string content;
+					std::string contentTts;
+					std::string contentScrolling;
 					std::vector<IneoTerminusConnection::Recipient> recipients;
 				};
 

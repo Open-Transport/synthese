@@ -863,26 +863,61 @@ namespace synthese
 			message.stopDate =	XmlToolkit::GetIneoDateTime(
 				stopDateStr + " " + stopTimeStr
 			);
+			if (node.nChildNode("MultipleStop") > 0)
+			{
+				XMLNode multipleStopNode = node.getChildNode("MultipleStop", 0);
+				message.multipleStop = ((string)(multipleStopNode.getText()) == "oui");
+			}
+			if (messagerieName == "Driver" &&
+				node.nChildNode("EndStopPoint") > 0)
+			{
+				XMLNode endStopPointNode = node.getChildNode("EndStopPoint", 0);
+				message.terminusOrStop = ((string)(endStopPointNode.getText()) == "oui");
+			}
+			if (node.nChildNode("Way") > 0)
+			{
+				XMLNode wayNode = node.getChildNode("way", 0);
+				message.way = wayNode.getText();
+			}
+			if (node.nChildNode("StopPoint") > 0)
+			{
+				XMLNode stopPointNode = node.getChildNode("StopPoint", 0);
+				message.stopPoint = stopPointNode.getText();
+			}
+			if (node.nChildNode("NumberShow") > 0)
+			{
+				XMLNode numberShowNode = node.getChildNode("NumberShow", 0);
+				message.numberShow = lexical_cast<int>(numberShowNode.getText());
+			}
 			if (node.nChildNode("RepeatPeriod") > 0)
 			{
 				XMLNode repeatPeriodNode = node.getChildNode("RepeatPeriod", 0);
 				message.repeatPeriod = lexical_cast<int>(repeatPeriodNode.getText());
 			}
-			if (messagerieName == "Driver" && message.dispatching == Immediat)
+			if (node.nChildNode("Confirm") > 0)
 			{
 				XMLNode confirmNode = node.getChildNode("Confirm", 0);
 				message.confirm = ((string)(confirmNode.getText()) == "oui");
 			}
-			if (messagerieName == "Passenger" ||
-				messagerieName == "SonoPassenger")
+			if (node.nChildNode("Inhibition") > 0)
 			{
 				XMLNode inhibitionNode = node.getChildNode("Inhibition", 0);
 				message.inhibition = ((string)(inhibitionNode.getText()) == "oui");
 			}
-			if (messagerieName == "Passenger")
+			if (node.nChildNode("Color") > 0)
 			{
 				XMLNode colorNode = node.getChildNode("Color", 0);
 				message.color = colorNode.getText();
+			}
+			if (node.nChildNode("TtsBroadcasting") > 0)
+			{
+				XMLNode ttsBroadcastingNode = node.getChildNode("TtsBroadcasting", 0);
+				message.ttsBroadcasting = ((string)(ttsBroadcastingNode.getText()) == "oui");
+			}
+			if (node.nChildNode("Jingle") > 0)
+			{
+				XMLNode jingleNode = node.getChildNode("Jingle", 0);
+				message.jingle = ((string)(jingleNode.getText()) == "oui");
 			}
 			if (messagerieName == "SonoPassenger")
 			{
@@ -896,36 +931,116 @@ namespace synthese
 				XMLNode startStopPointNode = node.getChildNode("StartStopPoint", 0);
 				message.startStopPoint = startStopPointNode.getText();
 			}
-			if (node.nChildNode("EndStopPoint") > 0)
+			if (messagerieName != "Driver" &&
+				node.nChildNode("EndStopPoint") > 0)
 			{
 				XMLNode endStopPointNode = node.getChildNode("EndStopPoint", 0);
 				message.endStopPoint = endStopPointNode.getText();
+			}
+			if (node.nChildNode("Chaining") > 0)
+			{
+				XMLNode chainingNode = node.getChildNode("Chaining", 0);
+				message.chaining = chainingNode.getText();
+			}
+			if (node.nChildNode("Priority") > 0)
+			{
+				XMLNode priorityNode = node.getChildNode("Priority", 0);
+				message.priority = ((string)(priorityNode.getText()) == "oui");
 			}
 			if (messagerieName == "Girouette")
 			{
 				XMLNode codeNode = node.getChildNode("Code", 0);
 				message.codeGirouette = lexical_cast<int>(codeNode.getText());
 			}
-			if (messagerieName == "BivGeneral")
+			if (node.nChildNode("Varying") > 0)
+			{
+				XMLNode varyingNode = node.getChildNode("Varying", 0);
+				message.varying = ((string)(varyingNode.getText()) == "oui");
+			}
+			if (node.nChildNode("Duration") > 0)
+			{
+				XMLNode durationNode = node.getChildNode("Duration", 0);
+				message.duration = lexical_cast<int>(durationNode.getText());
+			}
+			if (node.nChildNode("DiodFlashing") > 0)
 			{
 				XMLNode diodFlashingNode = node.getChildNode("DiodFlashing", 0);
 				message.diodFlashing = ((string)(diodFlashingNode.getText()) == "oui");
 			}
-			if (messagerieName == "BivLineMan")
+			if (node.nChildNode("Alternance") > 0)
 			{
 				XMLNode alternanceNode = node.getChildNode("Alternance", 0);
 				message.alternance = ((string)(alternanceNode.getText()) == "oui");
 			}
-			XMLNode textNode = node.getChildNode("Text", 0);
-			int numLineNode = textNode.nChildNode("Line");
-			for (int cptLineNode = 0;cptLineNode<numLineNode;cptLineNode++)
+			int numTextNode = node.nChildNode("Text");
+			for (int cptTextNode = 0;cptTextNode<numTextNode;cptTextNode++)
 			{
-				XMLNode LineNode = textNode.getChildNode("Line", cptLineNode);
-				if (cptLineNode > 0)
+				if (cptTextNode > 0)
 				{
-					message.content += "<br />";
+					message.content += "<br /><br />";
 				}
-				message.content += _iconv.convert(LineNode.getText());
+				XMLNode textNode = node.getChildNode("Text", cptTextNode);
+				int numLineNode = textNode.nChildNode("Line");
+				for (int cptLineNode = 0;cptLineNode<numLineNode;cptLineNode++)
+				{
+					XMLNode LineNode = textNode.getChildNode("Line", cptLineNode);
+					if (cptLineNode > 0)
+					{
+						message.content += "<br />";
+					}
+					message.content += _iconv.convert(LineNode.getText());
+				}
+				if (textNode.nChildNode("TypeBIV") > 0)
+				{
+					// We are in a BIVGENERALMESSAGINGTEXTTYPE
+					XMLNode fixedTextNode = textNode.getChildNode("FixedText", 0);
+					numLineNode = fixedTextNode.nChildNode("Line");
+					for (int cptLineNode = 0;cptLineNode<numLineNode;cptLineNode++)
+					{
+						XMLNode LineNode = fixedTextNode.getChildNode("Line", cptLineNode);
+						if (cptLineNode > 0)
+						{
+							message.content += "<br />";
+						}
+						message.content += _iconv.convert(LineNode.getText());
+					}
+					XMLNode scrollingTextNode = textNode.getChildNode("ScrollingText", 0);
+					numLineNode = scrollingTextNode.nChildNode("Line");
+					for (int cptLineNode = 0;cptLineNode<numLineNode;cptLineNode++)
+					{
+						XMLNode LineNode = scrollingTextNode.getChildNode("Line", cptLineNode);
+						if (cptLineNode > 0)
+						{
+							message.contentScrolling += "<br />";
+						}
+						message.contentScrolling += _iconv.convert(LineNode.getText());
+					}
+					XMLNode ttsTextNode = textNode.getChildNode("TtsText", 0);
+					numLineNode = ttsTextNode.nChildNode("Line");
+					for (int cptLineNode = 0;cptLineNode<numLineNode;cptLineNode++)
+					{
+						XMLNode LineNode = ttsTextNode.getChildNode("Tts", cptLineNode);
+						if (cptLineNode > 0)
+						{
+							message.contentTts += "<br />";
+						}
+						message.contentTts += _iconv.convert(LineNode.getText());
+					}
+				}
+			}
+			if (node.nChildNode("Tts") > 0)
+			{
+				XMLNode ttsNode = node.getChildNode("Tts", 0);
+				int numLineNode = ttsNode.nChildNode("Line");
+				for (int cptLineNode = 0;cptLineNode<numLineNode;cptLineNode++)
+				{
+					XMLNode LineNode = ttsNode.getChildNode("Line", cptLineNode);
+					if (cptLineNode > 0)
+					{
+						message.contentTts += "<br />";
+					}
+					message.contentTts += _iconv.convert(LineNode.getText());
+				}
 			}
 			XMLNode RecipientsNode = node.getChildNode("Recipients", 0);
 			message.recipients = _readRecipients(RecipientsNode);
