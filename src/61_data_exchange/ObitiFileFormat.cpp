@@ -535,29 +535,47 @@ namespace synthese
 									return false;
 								}
 
-								if(timeStr.size() > 4)
+								// An empty timeStr indicates that this stop point is skipped by the current service
+								if(false == timeStr.empty())
 								{
-									time_duration td(
-										lexical_cast<int>(timeStr.substr(0,2)),
-										lexical_cast<int>(timeStr.substr(3,2)),
-										0
-									);
-									if(td < lastTd)
-									{
-										td += hours(24);
-									}
-									departureSchedules.push_back(td - seconds(td.seconds()));
-									arrivalSchedules.push_back(td.seconds() ? td + seconds(60 - td.seconds()) : td);
-									lastTd = td;
+									// timeStr is not empty, check its format and parse it
+									size_t colonPosition = timeStr.find(':');
 
-									JourneyPattern::StopWithDepartureArrivalAuthorization stop(
-										stopPoints,
-										optional<double>(),
-										true,
-										true,
-										true
-									);
-									stops.push_back(stop);
+									if((4 <= timeStr.size()) && (string::npos != colonPosition))
+									{
+										string hoursStr   = timeStr.substr(0, colonPosition);
+										string minutesStr = timeStr.substr(colonPosition + 1, 2);
+
+										time_duration td(
+											lexical_cast<int>(hoursStr),
+											lexical_cast<int>(minutesStr),
+											0
+										);
+
+										if(td < lastTd)
+										{
+											td += hours(24);
+										}
+										departureSchedules.push_back(td - seconds(td.seconds()));
+										arrivalSchedules.push_back(td.seconds() ? td + seconds(60 - td.seconds()) : td);
+										lastTd = td;
+
+										JourneyPattern::StopWithDepartureArrivalAuthorization stop(
+											stopPoints,
+											optional<double>(),
+											true,
+											true,
+											true
+										);
+										stops.push_back(stop);
+									}
+
+									else
+									{
+										_logWarning(
+											"Invalid time " + timeStr + "in service number " + lexical_cast<string>(numService)
+										);
+									}
 								}
 							}
 
