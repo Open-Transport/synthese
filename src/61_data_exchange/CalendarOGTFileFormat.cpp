@@ -136,6 +136,19 @@ namespace synthese
 					}
 				}
 
+				// Existing calendar. Invoke PTDataCleanerFileFormat::beforeParsing for cleanup
+				calendar::CalendarTemplate* calPointer = _getCalendarTemplate(_calendarTemplates, calendarName);
+				if (calPointer)
+				{
+					pm.insert(PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID, calPointer->getKey());
+					_ogtImporter._setFromParametersMap(pm);
+					_logDebug(
+						"Cleaning PT data related to calendar "
+						+ calendarName + " ID=" + boost::lexical_cast<std::string>(calPointer->getKey())
+					);
+					_ogtImporter.beforeParsing();
+				}
+
 				_logDebug(
 					"Processing calendar " + calendarName
 				);
@@ -209,7 +222,6 @@ namespace synthese
 		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
 			OneFileTypeImporter<CalendarOGTFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
 			CalendarFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
-			PTDataCleanerFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_ogtImporter(env, import, minLogLevel, logPath, outputStream, pm),
 			_calendarTemplates(*import.get<DataSource>(), env)
 		{}
@@ -225,7 +237,14 @@ namespace synthese
 
 		void CalendarOGTFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
-			PTDataCleanerFileFormat::_setFromParametersMap(map);
 			_ogtImporter._setFromParametersMap(map);
 		}
+
+
+
+		bool CalendarOGTFileFormat::Importer_::afterParsing()
+		{
+			return _ogtImporter.afterParsing();
+		}
+
 }	}

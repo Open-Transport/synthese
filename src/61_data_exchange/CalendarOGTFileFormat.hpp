@@ -49,7 +49,6 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
 				public impex::OneFileTypeImporter<CalendarOGTFileFormat>,
-				public PTDataCleanerFileFormat,
 				public CalendarFileFormat
 			{
 			private:
@@ -76,6 +75,8 @@ namespace synthese
 					boost::optional<std::ostream&> outputStream,
 					util::ParametersMap& pm
 				);
+
+				virtual bool afterParsing();
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from attributes to generic parameter maps.
