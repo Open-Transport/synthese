@@ -10,6 +10,7 @@
  <#tab_title&id=sections&title=Sections#>
  <#tab_title&id=log&title=Journal#>
  <#tab_title&id=system&title=Système#>
+ <#tab_title&id=ineo&title=Connexion Ineo / Terminus#>
 </ul>
 
 <div id="tab_content" class="tab-content">
@@ -554,7 +555,7 @@
     </form>
    </div>
   </div>
- <div class="control-group">
+  <div class="control-group">
    <label class="control-label">Adresse serveur SMTP</label>
    <div class="controls">
     <?form&
@@ -654,13 +655,16 @@
     </form>
    </div>
   </div>
-  
+ </div>
+
+</div><#tab_div&id=ineo#>
+ <div class="form-horizontal">
   <div class="control-group">
    <label class="control-label" for="ineoTerminusPort">Port pour les sockets Ineo Terminus</label>
    <div class="controls">
     <?form&
       target=<@p@>&
-      tab=system&
+      tab=ineo&
       a=global_variable_update&
       actionParam_variable=ineo_terminus_port&
       actionParam_persistent=1&
@@ -677,7 +681,7 @@
    <div class="controls">
     <?form&
       target=<@p@>&
-      tab=system&
+      tab=ineo&
       a=global_variable_update&
       actionParam_variable=ineo_terminus_network&
       actionParam_persistent=1&
@@ -702,13 +706,13 @@
     </form>
    </div>
   </div>
-
+  
   <div class="control-group">
    <label class="control-label" for="ineo_terminus_datasource">Datasource concernée par la connexion Ineo Terminus</label>
    <div class="controls">
     <?form&
       target=<@p@>&
-      tab=system&
+      tab=ineo&
       a=global_variable_update&
       actionParam_variable=ineo_terminus_datasource&
       actionParam_persistent=1&
@@ -733,13 +737,13 @@
     </form>
    </div>
   </div>
-
+  
   <div class="control-group">
    <label class="control-label" for="ineoTerminusTickInterval">Intervalle minimale pour l'envoi des messages à travers le socket Ineo Terminus (s)</label>
    <div class="controls">
     <?form&
       target=<@p@>&
-      tab=system&
+      tab=ineo&
       a=global_variable_update&
       actionParam_variable=ineo_terminus_tick_interval&
       actionParam_persistent=1&
@@ -750,10 +754,7 @@
     </form>
    </div>
   </div>
-  	
  </div>
-
-</div>
 
 </div>
 
