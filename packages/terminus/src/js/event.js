@@ -205,11 +205,13 @@ function generate_alternative_click()
 {
   if($(this).attr('generate_alternative') == 'all')
   {
-    var fields = $('#message textarea[field=message_alternative]');
+    var textAreas = $('#message textarea[field=message_alternative]');
+
     var confir = false;
-    for(var i=0; i<fields.length; ++i)
+    for(var i=0; i<textAreas.length; ++i)
     {
-      if(fields.get(i).value)
+      var field = tinyMCE.get(textAreas.eq(i).attr('id'));
+      if(field.getContent({format: 'text'}))
       {
         confir = true;
         break;
@@ -223,16 +225,20 @@ function generate_alternative_click()
       }
     }
     var txt = tinyMCE.get('tinymce').getContent({format: 'text'});
-    for(var i=0; i<fields.length; ++i)
+    for(var i=0; i<textAreas.length; ++i)
     {
-      var field = fields.eq(i);
-      field.val(txt.substring(0, field.attr('limit')));
+      var field = tinyMCE.get(textAreas.eq(i).attr('id'));
+      var limitedTxt = txt.substring(0, textAreas.eq(i).attr('limit')).replace(/\n/ig,"<br>");
+      field.setContent(limitedTxt);
     }
+    $('#alternatives textarea.mceEditor').each(update_chars_alternative);
   }
   else
   {
-    var field = $(this).closest('tr').find('textarea');
-    if(field.val())
+    var textArea = $(this).parents('[type_id]').first().find('textarea');
+    var limit = textArea.attr('limit');
+    var field = tinyMCE.get(textArea.attr('id'));
+    if(field.getContent({format: 'text'}))
     {
       if(!confirm("Un contenu alternatif est déjà défini. Etes-vous sûr de vouloir l'écraser ?"))
       {
@@ -240,15 +246,22 @@ function generate_alternative_click()
       }
     }
     var txt = tinyMCE.get('tinymce').getContent({format: 'text'});
-    field.val(txt.substring(0, field.attr('limit')));
+    txt = txt.substring(0, limit).replace(/\n/ig,"<br>");
+    field.setContent(txt);
+    $('#alternatives textarea.mceEditor').each(update_chars_alternative);
   }
   return false;
 }
 
-function update_chars_alternative()
+function update_chars_alternative(alternativeEditor)
 {
-  var size = $(this).val().length;
-  $(this).next().html(size + ' caractère' + (size > 1 ? 's' : ''));
+  if (typeof(alternativeEditor)==='undefined') {
+    alternativeEditor = tinyMCE.activeEditor;  
+  } else {
+    alternativeEditor = tinyMCE.get($(this).attr('id'));
+  }
+  var size = alternativeEditor.getContent({format: 'text'}).length;
+  $('#' + alternativeEditor.id).nextAll('[field=counter]').html(size + ' caractère' + (size > 1 ? 's' : ''));
 }
 
 function update_chars()
@@ -263,9 +276,14 @@ function tinymce_event(e)
   if(e.type == "keydown" || e.type == "keyup")
   {
     activateForm();
-    update_chars();
+    if (tinyMCE.activeEditor.id == 'tinymce') {
+      update_chars();
+    } else {
+      update_chars_alternative();
+    }
   }
 }
+
 
 next_calendar_rank = 0;
 calendar_by_rank = [];
@@ -484,7 +502,7 @@ function open_message(message)
 
   if(message.alternative.length)
   {
-    $('#table_alternatives tbody tr').each(function(){
+    $('#table_alternatives > div.row-fluid').each(function(){
       $(this).addClass('hide');
       for(var i=0; i<message.alternative.length; ++i)
       {
@@ -492,7 +510,8 @@ function open_message(message)
         if(at.type_id == $(this).attr('type_id'))
         {
           $(this).removeClass('hide');
-          $(this).find('textarea').val(at.content);
+          var text = at.content.replace(/\\\"/g,"\"").replace(/\n/ig,"<br>")
+          tinyMCE.get('tinymce_ma' + i).setContent(text);
           break;
         }
       }
@@ -517,6 +536,7 @@ function open_message(message)
   $('#mi_m_'+ message.rank +' i').addClass('icon-white');
   
   update_chars();
+  $('#alternatives textarea.mceEditor').each(update_chars_alternative);
   
   for(var i=0; i < messagesWhichHaveBeenClosed.length; ++i)
   {
@@ -546,7 +566,7 @@ function close_message()
       current_message.digitized_version = $('#message [field=digitized_version]').val();
     }
 
-    $('#table_alternatives tbody tr').each(function(){
+    $('#table_alternatives > div.row-fluid').each(function(){
       if(!$(this).hasClass('hide'))
       {
         for(var i=0; i<current_message.alternative.length; ++i)
@@ -554,7 +574,7 @@ function close_message()
           var at = current_message.alternative[i];
           if(at.type_id == $(this).attr('type_id'))
           {
-            at.content = $(this).find('textarea').val();
+            at.content = tinyMCE.get('tinymce_ma' + i).getContent({format: 'text'}).replace(/\"/g,"\\\"");
             break;
           }
         }
@@ -1170,7 +1190,6 @@ $(function(){
   $('div[action=add_calendar]').click(new_calendar_click);
   $('div[action=add_calendar]').tooltip({placement: 'right'});
   $('#change_calendar').click(change_calendar_click);
-  $('textarea[field=message_alternative]').keyup(update_chars_alternative);
   $('.modal').bind('shown', focus_on_input);
 
 

@@ -319,8 +319,33 @@ template=
 
       <div id="alternatives">
         <h4><span class="badge badge-inverse" style="vertical-align:middle">3</span> Variantes de contenus</h4>
-        <div class="well">
-          <a class="btn btn-primary btn-mini" href="#" generate_alternative="all">Générer tout</a>
+        <div class="well" id="table_alternatives">
+          <a class="btn btn-primary btn-mini" href="#" generate_alternative="all">Générer tout</a><br/>
+
+            <?message_types&
+             template=<{type&template=
+              
+              <div class="row-fluid" type_id="<@id@>" max_length="<@max_length@>">
+                <div class="span2">
+                  <@name@><br /><a href="#" class="btn btn-warning btn-mini" generate_alternative="specific">Générer</a>
+                </div>
+                <div class="span10">
+                  <textarea id="tinymce_ma<@item_rank@>"
+                            class="mceEditor"
+                            onkeyup="activateForm()"
+                            onpaste="activateForm()"
+                            oncut="activateForm()"
+                            field="message_alternative"
+                            limit="<@max_length@>">
+                  </textarea>
+                  <span field="counter"></span>
+                </div>
+              </div>
+              <br/>
+            }>?>
+
+
+          <!--
           <table class="table table-condensed" id="table_alternatives">
             <thead><tr><th>règle</th><th>message</th><th></th><th></th></tr></thead>
             <tbody>
@@ -334,6 +359,8 @@ template=
             }>?>
             </tbody>
           </table>
+
+        -->
         </div>
       </div>
 
@@ -610,6 +637,7 @@ template=
       theme: "advanced",
       plugins: "fullscreen",
       convert_urls: false,
+      //remove_linebreaks : false,
       force_p_newlines : false,
       forced_root_block : false,
       force_br_newlines : false,
@@ -650,7 +678,14 @@ template=
     displayDuration :<?if&cond=<@display_duration@>&then="<@display_duration@>"&else=""?>,
     digitized_version :"<@digitized_version@>",
     alternative:[
-        <{message_alternative&template=<@alternative_id[message_type_id]=<@id@>@><@alternative_content[message_type_id]=<@content@>@>}>
+        <{message_alternative&template=
+          <@content_a=<#str_replace&t=<@content@>&f=<?char&code=13?><?char&code=10?>&r=\\r\\n#>@>
+          <@content_b=<#str_replace&t=<@content_a@>&f=<?char&code=13?>&r=\\r#>@>
+          <@content_c=<#str_replace&t=<@content_b@>&f=<?char&code=10?>&r=\\n#>@>
+
+          <@alternative_id[message_type_id]=<@id@>@>
+          <@alternative_content[message_type_id]=<@content_c@>@>
+        }>
         <?message_types&
           message_id=<@roid@>&
           template=<{type&template=
