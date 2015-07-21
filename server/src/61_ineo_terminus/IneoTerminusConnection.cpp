@@ -23,6 +23,9 @@
 #include "IneoTerminusConnection.hpp"
 
 #include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
+#include "DataSourceTableSync.h"
+#include "ImportableTableSync.hpp"
 #include "Log.h"
 #include "Request.h"
 #include "ScenarioSaveAction.h"
@@ -51,6 +54,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace impex;
 	using namespace messages;
 	using namespace pt;
 	using namespace util;
@@ -84,7 +88,8 @@ namespace synthese
 			IneoTerminusConnection::tcp_server tcpServer(
 				ioService,
 				_theConnection->getIneoPort(),
-				_theConnection->getIneoNetworkID()
+				_theConnection->getIneoNetworkID(),
+				_theConnection->getIneoDatasource()
 			);
 			ioService.run();
 		}
@@ -411,9 +416,11 @@ namespace synthese
 		IneoTerminusConnection::tcp_server::tcp_server(
 			boost::asio::io_service& ioService,
 			string port,
-			RegistryKeyType network_id
+			RegistryKeyType network_id,
+			RegistryKeyType datasource_id
 		):	_io_service(ioService),
 			_network_id(network_id),
+			_datasource_id(datasource_id),
 			_acceptor(ioService, tcp::endpoint(tcp::v4(), lexical_cast<int>(port)))
 		{
 			start_accept();
@@ -421,7 +428,7 @@ namespace synthese
 
 		void IneoTerminusConnection::tcp_server::start_accept()
 		{
-			IneoTerminusConnection::tcp_connection* new_connection = new IneoTerminusConnection::tcp_connection(_io_service, _network_id);
+			IneoTerminusConnection::tcp_connection* new_connection = new IneoTerminusConnection::tcp_connection(_io_service, _network_id, _datasource_id);
 
 			_acceptor.async_accept(
 				new_connection->socket(),
@@ -1241,13 +1248,18 @@ namespace synthese
 				else if (recipient.type == "Line")
 				{
 					bool found(false);
-					BOOST_FOREACH(const CommercialLine::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<CommercialLine>())
+					boost::shared_ptr<const impex::DataSource> dataSource = DataSourceTableSync::Get(
+						_datasource_id,
+						Env::GetOfficialEnv()
+					);
+					ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*dataSource, Env::GetOfficialEnv());
+					set<CommercialLine*> loadedLines(lines.get(recipient.name));
+					BOOST_FOREACH(CommercialLine* loadedLine, loadedLines)
 					{
-						if(it.second->getShortName() == recipient.name &&
-							it.second->getNetwork()->getKey())
+						if(loadedLine->getNetwork()->getKey() == _network_id)
 						{
 							boost::shared_ptr<ParametersMap> lineRecipientPM(new ParametersMap);
-							lineRecipientPM->insert("recipient_id", it.second->getKey());
+							lineRecipientPM->insert("recipient_id", loadedLine->getKey());
 							pm.insert("line_recipient", lineRecipientPM);
 							found = true;
 						}

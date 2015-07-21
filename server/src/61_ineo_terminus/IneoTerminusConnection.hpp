@@ -85,9 +85,11 @@ namespace synthese
 			public:
 				tcp_connection(
 					boost::asio::io_service& io_service,
-					util::RegistryKeyType network_id
+					util::RegistryKeyType network_id,
+					util::RegistryKeyType datasource_id
 				) :	_socket(io_service),
 					_network_id(network_id),
+					_datasource_id(datasource_id),
 					_iconv("ISO-8859-1","UTF-8") {}
 
 				boost::asio::ip::tcp::socket& socket();
@@ -110,6 +112,7 @@ namespace synthese
 
 				boost::asio::ip::tcp::socket _socket;
 				util::RegistryKeyType _network_id;
+				util::RegistryKeyType _datasource_id;
 				util::IConv _iconv;
 				boost::shared_ptr<boost::asio::streambuf> _buf;
 
@@ -196,7 +199,8 @@ namespace synthese
 				tcp_server(
 					boost::asio::io_service& io_service,
 					std::string port,
-					util::RegistryKeyType network_id
+					util::RegistryKeyType network_id,
+					util::RegistryKeyType datasource_id
 				);
 
 			private:
@@ -209,6 +213,7 @@ namespace synthese
 
 				boost::asio::io_service& _io_service;
 				util::RegistryKeyType _network_id;
+				util::RegistryKeyType _datasource_id;
 				boost::asio::ip::tcp::acceptor _acceptor;
 			};
 
