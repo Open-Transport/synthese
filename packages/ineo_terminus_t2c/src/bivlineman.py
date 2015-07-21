@@ -11,10 +11,8 @@ except ImportError:
   print("la lib lxml n'est pas disponible")
 
   
-# TODO : pass variable as parameter
-networkId="6192453782601729"
-#dataSourceId="16607027920896001"
-dataSourceId="16607027920896002"
+networkId=network_id
+dataSourceId=datasource_id
 
 # Request headers
 root = etree.Element("BivLineMan" + type + "MessageRequest")

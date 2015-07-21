@@ -93,6 +93,11 @@ function changeIneoTerminusNetwork() {
   $('#' + field.attr('field')).val(field.val());
 }
 
+function changeIneoTerminusDatasource() {
+  var field = $(this);
+  $('#' + field.attr('field')).val(field.val());
+}
+
 function np_select_template_click()
 {
   $('.np_template_element').removeClass('active');
@@ -162,4 +167,5 @@ $(function(){
   $('[field=inputMediaId]').on("change", changeMediaId);
   
   $('[field=inputIneoTerminusNetwork]').on("change", changeIneoTerminusNetwork);
+  $('[field=inputIneoTerminusDatasource]').on("change", changeIneoTerminusDatasource);
 });

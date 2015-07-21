@@ -25,6 +25,7 @@
 #include <FactorableTemplate.h>
 #include <IneoNotificationChannel.hpp>
 #include <IneoTerminusConnection.hpp>
+#include "IneoTerminusModule.hpp"
 #include <ParametersMap.h>
 #include "Webpage.h"
 
@@ -103,6 +104,8 @@ namespace synthese
 			}
 			fields.insert("messagerie", provider->getName());
 			fields.insert("ID", lexical_cast<string>(IneoTerminusConnection::GetNextRequestID()));
+			fields.insert("network_id", IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK));
+			fields.insert("datasource_id", IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE));
 
 			if (provider->get<Parameters>().getDefault<RegistryKeyType>(PARAMETER_CMS_INTERPRETER, 0))
 			{

@@ -46,10 +46,8 @@ def convert_to_ineo_color( hexcolor ):
   return colorStr
 
 
-# TODO : pass variable as parameter
-networkId="6192453782601729"
-#dataSourceId="16607027920896001"
-dataSourceId="16607027920896002"
+networkId=network_id
+dataSourceId=datasource_id
 
 # Request headers
 root = etree.Element("Passenger" + type + "MessageRequest")

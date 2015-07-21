@@ -769,7 +769,38 @@ then=
     </form>
    </div>
   </div>
-  
+
+  <div class="control-group">
+   <label class="control-label" for="ineo_terminus_datasource">Datasource concernée par la connexion Ineo Terminus</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=system&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_datasource&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+    <@datasourceFound=0@>
+     <?data_sources&
+       template=
+         <select name="ineo_terminus_datasource" field="inputIneoTerminusDatasource">
+           <option value="none">Aucun</option>
+           <{data_source&template=
+             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_datasource")==id@>&then= selected="selected"?>><@name@></option>
+             <?if&cond=<@~global("ineo_terminus_datasource")==id@>&then=<@datasourceFound=1@>?>
+           }>
+         </select>
+    ?>
+    <?if&cond=<@datasourceFound@>&then=
+    <input type="hidden" id="inputIneoTerminusDatasource" name="actionParam_value" value="<@~global("ineo_terminus_datasource")@>"/>
+    &else=<input type="hidden" id="inputIneoTerminusDatasource" name="actionParam_value" value="none"/>
+    ?>
+     <button type="submit" id="submitIneoTerminusDatasource" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+
   <div class="control-group">
    <label class="control-label" for="ineoTerminusTickInterval">Intervalle minimale pour l'envoi des messages à travers le socket Ineo Terminus (s)</label>
    <div class="controls">
