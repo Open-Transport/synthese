@@ -24,6 +24,7 @@
 #include <Alarm.h>
 #include <AlarmObjectLink.h>
 #include <CMSScript.hpp>
+#include <CityTableSync.h>
 #include <CommercialLine.h>
 #include <Env.h>
 #include <MessageAlternative.hpp>
@@ -36,6 +37,7 @@
 #include <ParametersMap.h>
 #include <ParametersMapField.hpp>
 #include <StopArea.hpp>
+#include <StopAreaTableSync.hpp>
 
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -252,15 +254,32 @@ namespace synthese
 
 			BOOST_FOREACH(const AlarmObjectLink* link, alarm->getLinkedObjects("stoparea"))
 			{
-				boost::shared_ptr<const pt::StopArea> stop = Env::GetOfficialEnv().get<pt::StopArea>(link->getObjectId());
-				if(stop.get())
+				RegistryTableType tableId(decodeTableId(link->getObjectId()));
+				if (tableId == pt::StopAreaTableSync::TABLE.ID)
 				{
-					if(!firstStopInStream)
+					boost::shared_ptr<const pt::StopArea> stop = Env::GetOfficialEnv().get<pt::StopArea>(link->getObjectId());
+					if(stop.get())
 					{
-						stopsStream << VARIABLE_ID_SEPARATOR;
-						firstStopInStream = false;
+						if(!firstStopInStream)
+						{
+							stopsStream << VARIABLE_ID_SEPARATOR;
+							firstStopInStream = false;
+						}
+						stopsStream << stop->getName();
 					}
-					stopsStream << stop->getName();
+				}
+				else if (tableId == geography::CityTableSync::TABLE.ID)
+				{
+					boost::shared_ptr<const geography::City> city = Env::GetOfficialEnv().get<geography::City>(link->getObjectId());
+					if(city.get())
+					{
+						if(!firstStopInStream)
+						{
+							stopsStream << VARIABLE_ID_SEPARATOR;
+							firstStopInStream = false;
+						}
+						stopsStream << city->getName();
+					}
 				}
 			}
 			scriptParameters.insert(VARIABLE_STOP_IDS, stopsStream.str());
