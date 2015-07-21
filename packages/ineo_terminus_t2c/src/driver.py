@@ -12,9 +12,8 @@ except ImportError:
 
 
 # TODO : pass variable as parameter
-networkId="6192453782601729"
-#dataSourceId="16607027920896001"
-dataSourceId="16607027920896002"
+networkId=network_id
+dataSourceId=datasource_id
 
 # Request headers
 root = etree.Element("Driver" + type + "MessageRequest")

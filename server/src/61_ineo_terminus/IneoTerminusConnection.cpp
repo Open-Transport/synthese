@@ -60,6 +60,7 @@ namespace synthese
 	{
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PORT = "ineo_terminus_port";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK = "ineo_terminus_network";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE = "ineo_terminus_datasource";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL = "ineo_terminus_tick_interval";
 
 		boost::shared_ptr<IneoTerminusConnection> IneoTerminusConnection::_theConnection(new IneoTerminusConnection);
@@ -70,6 +71,7 @@ namespace synthese
 		)
 		{
 			_ineoNetworkID = 0;
+			_ineoDatasource = 0;
 			_ineoTickInterval = 0;
 			_ineoPort = "";
 		}
@@ -153,6 +155,12 @@ namespace synthese
 				changed = (_theConnection->_ineoNetworkID != lexical_cast<RegistryKeyType>(value));
 				_theConnection->_ineoNetworkID = lexical_cast<RegistryKeyType>(value);
 			}
+			if(name == MODULE_PARAM_INEO_TERMINUS_DATASOURCE &&
+				!value.empty())
+			{
+				changed = (_theConnection->_ineoDatasource != lexical_cast<RegistryKeyType>(value));
+				_theConnection->_ineoDatasource = lexical_cast<RegistryKeyType>(value);
+			}
 			if (name == MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL &&
 				!value.empty())
 			{
@@ -164,6 +172,7 @@ namespace synthese
 			){
 				if(	_theConnection->_ineoPort.empty() ||
 					_theConnection->_ineoNetworkID == 0 ||
+					_theConnection->_ineoDatasource == 0 ||
 					_theConnection->_ineoTickInterval == 0
 				){
 					_theConnection->_status = connect;
