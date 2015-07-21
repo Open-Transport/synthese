@@ -69,7 +69,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	template<>
 	const string FactorableTemplate<FileFormat, data_exchange::IneoBDSIFileFormat>::FACTORY_KEY = "ineo_bdsi";
 
@@ -85,7 +85,7 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_NEUTRALIZED = "neutralized";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_NON_COMMERCIAL = "non_commercial";
-		
+
 
 
 		ParametersMap IneoBDSIFileFormat::Importer_::getParametersMap() const
@@ -93,9 +93,9 @@ namespace synthese
 			ParametersMap map;
 			return map;
 		}
-		
-		
-		
+
+
+
 		void IneoBDSIFileFormat::Importer_::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Planned datasource
@@ -216,8 +216,17 @@ namespace synthese
 				Chainage::ArretChns arretChns;
 				// Loop on horaires to create arretChns
 				std::size_t horaireCount(0);
+				bool firstStopFound(false);
 				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, chainage.arretChns)
 				{
+					if (!firstStopFound && it.ref != horaires.at(0).arretchn)
+					{
+						continue;
+					}
+					else if (it.ref == horaires.at(0).arretchn)
+					{
+						firstStopFound = true;
+					}
 					ArretChn& arretChn(
 						*arretChns.insert(
 							arretChns.end(),
@@ -233,9 +242,9 @@ namespace synthese
 						break;
 					}
 				}
-				
+
 				newChainage = _createAndReturnChainage(chainages,arretChns,*(chainage.ligne),chainage.nom,chainage.direction,chainage.sens,chainage.ref + "-" + lexical_cast<string>(horaires.size()));
-				
+
 				// Jump over dead runs
 				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, arretChns)
 				{
@@ -244,7 +253,7 @@ namespace synthese
 						return;
 					}
 				}
-				
+
 				// OK let's store the service
 				Course& course(
 					courses.insert(
@@ -258,7 +267,7 @@ namespace synthese
 				course.chainage = newChainage;
 				course.syntheseService = NULL;
 				course.handicapped = handicapped;
-				
+
 				// Trace
 				_logLoadDetail(
 					"SERVICE",courseRef,courseRef,0,string(),string(), string(),"OK"
@@ -274,7 +283,7 @@ namespace synthese
 						return;
 					}
 				}
-		
+
 				// OK let's store the service
 				Course& course(
 					courses.insert(
@@ -335,7 +344,7 @@ namespace synthese
 			);
 
 		}
-		
+
 		IneoBDSIFileFormat::Importer_::Chainage* IneoBDSIFileFormat::Importer_::_createAndReturnChainage(
 			Chainages& chainages,
 			const Chainage::ArretChns& arretchns,
@@ -345,7 +354,7 @@ namespace synthese
 			bool sens,
 			const std::string& ref
 		) const	{
-		
+
 			// Check if arretchns is long enough
 			if(arretchns.size() < 2)
 			{
@@ -354,7 +363,7 @@ namespace synthese
 				);
 				return NULL;
 			}
-			
+
 			Chainage& chainage(
 				chainages.insert(
 					make_pair(
@@ -371,13 +380,13 @@ namespace synthese
 			_logLoadDetail(
 				"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"OK"
 			);
-			
+
 			return &chainage;
-		
+
 		}
-		
-		
-		
+
+
+
 		bool IneoBDSIFileFormat::Importer_::_read(
 		) const {
 
@@ -411,7 +420,7 @@ namespace synthese
 			Programmations programmations;
 			DB& db(*DBModule::GetDB());
 			string todayStr("'"+ to_iso_extended_string(today) +"'");
-			
+
 			// Arrets
 			{
 				string query(
@@ -539,7 +548,7 @@ namespace synthese
 					" ORDER BY "+
 						_database +".ARRETCHN.chainage, "+
 						_database +".ARRETCHN.pos"
-				);			
+				);
 				DBResultSPtr chainageResult(db.execQuery(chainageQuery));
 				string lastRef;
 				const Ligne* ligne(NULL);
@@ -615,7 +624,7 @@ namespace synthese
 						);
 						continue;
 					}
-					
+
 					ArretChn& arretChn(
 						*arretChns.insert(
 							arretChns.end(),
@@ -655,6 +664,7 @@ namespace synthese
 						_database +".HORAIRE.etat_harr,"+
 						_database +".HORAIRE.etat_hdep,"+
 						_database +".HORAIRE.course,"+
+						_database +".HORAIRE.arretchn,"+
 						_database +".ARRETCHN.chainage, "+
 						// The if in the next line is here because it looks like there is no way in Synthese to do the difference
 						// between a empty string and a NULL value (resulting from the LEFT JOIN)
@@ -763,6 +773,7 @@ namespace synthese
 					horaire.hra = duration_from_string(horaireResult->getText("hra"));
 					horaire.htd = duration_from_string(horaireResult->getText("htd"));
 					horaire.hta = duration_from_string(horaireResult->getText("hta"));
+					horaire.arretchn = horaireResult->getText("arretchn");
 
 					// Patch for schedules after midnight
 					if(horaire.hrd < dayBreakTime)
@@ -822,7 +833,7 @@ namespace synthese
 						chainages
 					);
 				}
-			}			
+			}
 
 			// Programmations
 			{
@@ -869,7 +880,7 @@ namespace synthese
 						programmation.endTime += days(1);
 					}
 
-					do 
+					do
 					{
 						int prog_ref(destResult->getInt("ref_prog"));
 						if(prog_ref != ref)
@@ -971,7 +982,7 @@ namespace synthese
 							_logWarning(
 								"Corrupted message : scenario should contain one message : " + lexical_cast<string>(scenario->getKey())
 							);
-							
+
 							SentScenario::Messages::const_iterator it(messages.begin());
 							for(++it; it != messages.end(); ++it)
 							{
@@ -1074,8 +1085,8 @@ namespace synthese
 				ServicesSet servicesToMove;
 				CoursesVector servicesToLink;
 				CoursesVector servicesToUpdate; // Update of the schedules must be done on these services
-			
-				
+
+
 
 				// Existing services coming from theoretical data
 				DataSource::LinkedObjects existingJourneyPatterns(
@@ -1176,7 +1187,7 @@ namespace synthese
 					{
 						continue;
 					}
-						
+
 					// Checks if the service and the course are matching
 					if(course != *service)
 					{
@@ -1259,19 +1270,19 @@ namespace synthese
 					{
 						continue;
 					}
-					
+
 					// Maybe an inactive service has been found and can be activated
 					if (inactiveService)
 					{
 						inactiveService->setActive(today);
 						course.syntheseService = inactiveService;
-						
+
 						// The service must be updated
 						servicesToUpdate.push_back(&course);
-						
+
 						// The service must not be removed
 						servicesToRemove.erase(inactiveService);
-						
+
 						// The service must be linked
 						servicesToLink.push_back(&course);
 						continue;
@@ -1426,7 +1437,7 @@ namespace synthese
 
 			return true;
 		}
-		
+
 
 
 		IneoBDSIFileFormat::Importer_::Importer_(
@@ -1732,7 +1743,7 @@ namespace synthese
 			{
 				return UpdateDeltas();
 			}
-			
+
 			// if course is ended, don't update it because it may have been cleaned by RTDataCleaner
 			// and we do not want update the course for tomorrow
 			boost::posix_time::ptime now(boost::posix_time::second_clock::local_time());
@@ -1932,7 +1943,7 @@ namespace synthese
 			}
 
 			return syntheseJourneyPatterns;
-			
+
 		}
 }	}
 
