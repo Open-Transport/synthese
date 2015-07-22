@@ -158,15 +158,13 @@ namespace synthese
 
 
 
-		bool CommercialLine::operator<(
-			const CommercialLine& cl
-		) const {
+		bool CommercialLine::operator<(const CommercialLine& cl) const {
 			if(getNetwork() == cl.getNetwork())
 			{
 				if(getWeightForSorting() == cl.getWeightForSorting())
 				{
-					// Handle empty short names
-					if(getShortName().empty() && cl.getShortName().empty())
+					if ((getShortName().empty() && cl.getShortName().empty()) ||
+						(getShortName() == cl.getShortName()))
 					{
 						return getKey() < cl.getKey();
 					}
