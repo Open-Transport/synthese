@@ -78,6 +78,11 @@ function changeIneoTerminusDatasource() {
   $('#' + field.attr('field')).val(field.val());
 }
 
+function changeIneoTerminusFakeBroadcast() {
+  var field = $(this);
+  $('#' + field.attr('field')).val(field.val());
+}
+
 function np_select_template_click()
 {
   $('.np_template_element').removeClass('active');
@@ -147,4 +152,14 @@ $(function(){
   
   $('[field=inputIneoTerminusNetwork]').on("change", changeIneoTerminusNetwork);
   $('[field=inputIneoTerminusDatasource]').on("change", changeIneoTerminusDatasource);
+  $('[field=inputIneoTerminusPassengerFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
+  $('[field=inputIneoTerminusDriverFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
+  $('[field=inputIneoTerminusPpdsFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
+  $('[field=inputIneoTerminusGirouetteFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
+  $('[field=inputIneoTerminusSonoPassengerFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
+  $('[field=inputIneoTerminusSonoDriverFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
+  $('[field=inputIneoTerminusSonoStopPointFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
+  $('[field=inputIneoTerminusBivGeneralFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
+  $('[field=inputIneoTerminusBivLineAutoFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
+  $('[field=inputIneoTerminusBivLineManFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
 });

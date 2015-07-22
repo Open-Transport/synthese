@@ -55,6 +55,16 @@ namespace synthese
 			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK, "", &IneoTerminusConnection::ParameterCallback);
 			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE, "", &IneoTerminusConnection::ParameterCallback);
 			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL, "", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_GIROUETTE_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOPASSENGER_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONODRIVER_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOSTOPPOINT_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
 		}
 
 		template<> void ModuleClassTemplate<IneoTerminusModule>::Init()
@@ -77,6 +87,16 @@ namespace synthese
 			UnregisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK);
 			UnregisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE);
 			UnregisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL);
+			UnregisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST);
+			UnregisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST);
+			UnregisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST);
+			UnregisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_GIROUETTE_FAKE_BROADCAST);
+			UnregisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOPASSENGER_FAKE_BROADCAST);
+			UnregisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONODRIVER_FAKE_BROADCAST);
+			UnregisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOSTOPPOINT_FAKE_BROADCAST);
+			UnregisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST);
+			UnregisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST);
+			UnregisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST);
 		}
 
 
