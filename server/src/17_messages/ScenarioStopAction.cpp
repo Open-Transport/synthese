@@ -208,6 +208,10 @@ namespace synthese
 					BOOST_FOREACH(const Alarm* alarm, alarms)
 					{
 						bool allPeriodsFound(true);
+						if (!alarm->getCalendar())
+						{
+							continue;
+						}
 						BOOST_FOREACH(MessageApplicationPeriod* period, alarm->getCalendar()->getApplicationPeriods())
 						{
 							bool periodFound(false);
