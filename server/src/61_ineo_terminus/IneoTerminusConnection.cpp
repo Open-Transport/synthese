@@ -626,19 +626,29 @@ namespace synthese
 			messagesAndCalendarsPM->outputJSON(stream, "");
 			boost::property_tree::ptree messagesAndCalendars;
 			boost::property_tree::json_parser::read_json(stream, messagesAndCalendars);
-			ScenarioSaveAction scenarioSaveAction;
-			scenarioSaveAction.setMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
-			boost::shared_ptr<Scenario>	scenario;
-			boost::shared_ptr<SentScenario> sscenario;
-			sscenario.reset(new SentScenario);
-			scenario = static_pointer_cast<Scenario, SentScenario>(sscenario);
-			scenarioSaveAction.setSScenario(sscenario);
-			scenarioSaveAction.setScenario(scenario);
-			Request fakeRequest;
-			scenarioSaveAction.run(fakeRequest);
-			// Enable the scenario
-			sscenario->setIsEnabled(true);
-			SentScenarioTableSync::Save(sscenario.get());
+			// Verify the existant of an identical event
+			ScenarioStopAction scenarioStopAction;
+			SentScenario* identicalScenario = scenarioStopAction.findScenarioByMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
+			if (!identicalScenario)
+			{
+				ScenarioSaveAction scenarioSaveAction;
+				scenarioSaveAction.setMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
+				boost::shared_ptr<Scenario>	scenario;
+				boost::shared_ptr<SentScenario> sscenario;
+				sscenario.reset(new SentScenario);
+				scenario = static_pointer_cast<Scenario, SentScenario>(sscenario);
+				scenarioSaveAction.setSScenario(sscenario);
+				scenarioSaveAction.setScenario(scenario);
+				Request fakeRequest;
+				scenarioSaveAction.run(fakeRequest);
+				// Enable the scenario
+				sscenario->setIsEnabled(true);
+				SentScenarioTableSync::Save(sscenario.get());
+			}
+			else
+			{
+				util::Log::GetInstance().debug("IneoTerminusConnection::_createMessageRequest : Un événement du SAE est déjà existant " + idStr);
+			}
 
 			util::Log::GetInstance().debug("IneoTerminusConnection::_createMessageRequest : id " +
 				idStr +
