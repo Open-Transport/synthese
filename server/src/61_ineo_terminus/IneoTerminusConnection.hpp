@@ -49,6 +49,16 @@ namespace synthese
 			static const std::string MODULE_PARAM_INEO_TERMINUS_NETWORK;
 			static const std::string MODULE_PARAM_INEO_TERMINUS_DATASOURCE;
 			static const std::string MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL;
+			static const std::string MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST;
+			static const std::string MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST;
+			static const std::string MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST;
+			static const std::string MODULE_PARAM_INEO_TERMINUS_GIROUETTE_FAKE_BROADCAST;
+			static const std::string MODULE_PARAM_INEO_TERMINUS_SONOPASSENGER_FAKE_BROADCAST;
+			static const std::string MODULE_PARAM_INEO_TERMINUS_SONODRIVER_FAKE_BROADCAST;
+			static const std::string MODULE_PARAM_INEO_TERMINUS_SONOSTOPPOINT_FAKE_BROADCAST;
+			static const std::string MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST;
+			static const std::string MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST;
+			static const std::string MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST;
 
 			enum Status
 			{
@@ -65,6 +75,15 @@ namespace synthese
 			util::RegistryKeyType _ineoNetworkID;
 			util::RegistryKeyType _ineoDatasource;
 			int _ineoTickInterval;
+			util::RegistryKeyType _ineoPassengerFakeBroadcast;
+			util::RegistryKeyType _ineoDriverFakeBroadcast;
+			util::RegistryKeyType _ineoPpdsFakeBroadcast;
+			util::RegistryKeyType _ineoGirouetteFakeBroadcast;
+			util::RegistryKeyType _ineoSonoPassengerFakeBroadcast;
+			util::RegistryKeyType _ineoSonoDriverFakeBroadcast;
+			util::RegistryKeyType _ineoBivGeneralFakeBroadcast;
+			util::RegistryKeyType _ineoBivLineManFakeBroadcast;
+			util::RegistryKeyType _ineoBivLineAutoFakeBroadcast;
 
 			mutable Status _status;
 

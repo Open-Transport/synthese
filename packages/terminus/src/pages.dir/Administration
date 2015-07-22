@@ -822,6 +822,336 @@ then=
    </div>
   </div>
  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="ineo_terminus_passenger_fake_broadcast">Diffuseur associé aux messages Passenger reçus du SAE</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=ineo&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_passenger_fake_broadcast&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+    <@broadcastFound=0@>
+     <?custom_broadcast_points&
+       recursive=1&
+       template=
+         <select name="ineo_terminus_passenger_fake_broadcast" field="inputIneoTerminusPassengerFakeBroadcast">
+           <option value="none">Aucun</option>
+           <{broadcast_point&recursive=1&template=
+             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_passenger_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+             <?if&cond=<@~global("ineo_terminus_passenger_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+             <@recursive_content@>
+           }>
+         </select>
+    ?>
+    <?if&cond=<@broadcastFound@>&then=
+    <input type="hidden" id="inputIneoTerminusPassengerFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_passenger_fake_broadcast")@>"/>
+    &else=<input type="hidden" id="inputIneoTerminusPassengerFakeBroadcast" name="actionParam_value" value="none"/>
+    ?>
+     <button type="submit" id="submitIneoTerminusPassengerFakeBroadcast" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="ineo_terminus_driver_fake_broadcast">Diffuseur associé aux messages Driver reçus du SAE</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=ineo&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_driver_fake_broadcast&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+    <@broadcastFound=0@>
+     <?custom_broadcast_points&
+       recursive=1&
+       template=
+         <select name="ineo_terminus_driver_fake_broadcast" field="inputIneoTerminusDriverFakeBroadcast">
+           <option value="none">Aucun</option>
+           <{broadcast_point&recursive=1&template=
+             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_driver_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+             <?if&cond=<@~global("ineo_terminus_driver_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+             <@recursive_content@>
+           }>
+         </select>
+    ?>
+    <?if&cond=<@broadcastFound@>&then=
+    <input type="hidden" id="inputIneoTerminusDriverFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_driver_fake_broadcast")@>"/>
+    &else=<input type="hidden" id="inputIneoTerminusDriverFakeBroadcast" name="actionParam_value" value="none"/>
+    ?>
+     <button type="submit" id="submitIneoTerminusDriverFakeBroadcast" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="ineo_terminus_ppds_fake_broadcast">Diffuseur associé aux messages Ppds reçus du SAE</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=ineo&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_ppds_fake_broadcast&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+    <@broadcastFound=0@>
+     <?custom_broadcast_points&
+       recursive=1&
+       template=
+         <select name="ineo_terminus_ppds_fake_broadcast" field="inputIneoTerminusPpdsFakeBroadcast">
+           <option value="none">Aucun</option>
+           <{broadcast_point&recursive=1&template=
+             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_ppds_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+             <?if&cond=<@~global("ineo_terminus_ppds_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+             <@recursive_content@>
+           }>
+         </select>
+    ?>
+    <?if&cond=<@broadcastFound@>&then=
+    <input type="hidden" id="inputIneoTerminusPpdsFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_ppds_fake_broadcast")@>"/>
+    &else=<input type="hidden" id="inputIneoTerminusPpdsFakeBroadcast" name="actionParam_value" value="none"/>
+    ?>
+     <button type="submit" id="submitIneoTerminusPpdsFakeBroadcast" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="ineo_terminus_girouette_fake_broadcast">Diffuseur associé aux messages Girouette reçus du SAE</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=ineo&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_girouette_fake_broadcast&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+    <@broadcastFound=0@>
+     <?custom_broadcast_points&
+       recursive=1&
+       template=
+         <select name="ineo_terminus_girouette_fake_broadcast" field="inputIneoTerminusGirouetteFakeBroadcast">
+           <option value="none">Aucun</option>
+           <{broadcast_point&recursive=1&template=
+             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_girouette_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+             <?if&cond=<@~global("ineo_terminus_girouette_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+             <@recursive_content@>
+           }>
+         </select>
+    ?>
+    <?if&cond=<@broadcastFound@>&then=
+    <input type="hidden" id="inputIneoTerminusGirouetteFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_girouette_fake_broadcast")@>"/>
+    &else=<input type="hidden" id="inputIneoTerminusGirouetteFakeBroadcast" name="actionParam_value" value="none"/>
+    ?>
+     <button type="submit" id="submitIneoTerminusGirouetteFakeBroadcast" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="ineo_terminus_sonopassenger_fake_broadcast">Diffuseur associé aux messages SonoPassenger reçus du SAE</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=ineo&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_sonopassenger_fake_broadcast&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+    <@broadcastFound=0@>
+     <?custom_broadcast_points&
+       recursive=1&
+       template=
+         <select name="ineo_terminus_sonopassenger_fake_broadcast" field="inputIneoTerminusSonoPassengerFakeBroadcast">
+           <option value="none">Aucun</option>
+           <{broadcast_point&recursive=1&template=
+             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_sonopassenger_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+             <?if&cond=<@~global("ineo_terminus_sonopassenger_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+             <@recursive_content@>
+           }>
+         </select>
+    ?>
+    <?if&cond=<@broadcastFound@>&then=
+    <input type="hidden" id="inputIneoTerminusSonoPassengerFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_sonopassenger_fake_broadcast")@>"/>
+    &else=<input type="hidden" id="inputIneoTerminusSonoPassengerFakeBroadcast" name="actionParam_value" value="none"/>
+    ?>
+     <button type="submit" id="submitIneoTerminusSonoPassengerFakeBroadcast" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="ineo_terminus_sonodriver_fake_broadcast">Diffuseur associé aux messages SonoDriver reçus du SAE</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=ineo&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_sonodriver_fake_broadcast&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+    <@broadcastFound=0@>
+     <?custom_broadcast_points&
+       recursive=1&
+       template=
+         <select name="ineo_terminus_sonodriver_fake_broadcast" field="inputIneoTerminusSonoDriverFakeBroadcast">
+           <option value="none">Aucun</option>
+           <{broadcast_point&recursive=1&template=
+             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_sonodriver_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+             <?if&cond=<@~global("ineo_terminus_sonodriver_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+             <@recursive_content@>
+           }>
+         </select>
+    ?>
+    <?if&cond=<@broadcastFound@>&then=
+    <input type="hidden" id="inputIneoTerminusSonoDriverFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_sonodriver_fake_broadcast")@>"/>
+    &else=<input type="hidden" id="inputIneoTerminusSonoDriverFakeBroadcast" name="actionParam_value" value="none"/>
+    ?>
+     <button type="submit" id="submitIneoTerminusSonoDriverFakeBroadcast" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="ineo_terminus_sonostoppoint_fake_broadcast">Diffuseur associé aux messages SonoStopPoint reçus du SAE</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=ineo&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_sonostoppoint_fake_broadcast&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+    <@broadcastFound=0@>
+     <?custom_broadcast_points&
+       recursive=1&
+       template=
+         <select name="ineo_terminus_sonostoppoint_fake_broadcast" field="inputIneoTerminusSonoStopPointFakeBroadcast">
+           <option value="none">Aucun</option>
+           <{broadcast_point&recursive=1&template=
+             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_sonostoppoint_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+             <?if&cond=<@~global("ineo_terminus_sonostoppoint_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+             <@recursive_content@>
+           }>
+         </select>
+    ?>
+    <?if&cond=<@broadcastFound@>&then=
+    <input type="hidden" id="inputIneoTerminusSonoStopPointFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_sonostoppoint_fake_broadcast")@>"/>
+    &else=<input type="hidden" id="inputIneoTerminusSonoStopPointFakeBroadcast" name="actionParam_value" value="none"/>
+    ?>
+     <button type="submit" id="submitIneoTerminusSonoStopPointFakeBroadcast" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="ineo_terminus_bivgeneral_fake_broadcast">Diffuseur associé aux messages BivGeneral reçus du SAE</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=ineo&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_bivgeneral_fake_broadcast&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+    <@broadcastFound=0@>
+     <?custom_broadcast_points&
+       recursive=1&
+       template=
+         <select name="ineo_terminus_bivgeneral_fake_broadcast" field="inputIneoTerminusBivGeneralFakeBroadcast">
+           <option value="none">Aucun</option>
+           <{broadcast_point&recursive=1&template=
+             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_bivgeneral_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+             <?if&cond=<@~global("ineo_terminus_bivgeneral_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+             <@recursive_content@>
+           }>
+         </select>
+    ?>
+    <?if&cond=<@broadcastFound@>&then=
+    <input type="hidden" id="inputIneoTerminusBivGeneralFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_bivgeneral_fake_broadcast")@>"/>
+    &else=<input type="hidden" id="inputIneoTerminusBivGeneralFakeBroadcast" name="actionParam_value" value="none"/>
+    ?>
+     <button type="submit" id="submitIneoTerminusBivGeneralFakeBroadcast" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="ineo_terminus_bivlineauto_fake_broadcast">Diffuseur associé aux messages BivLineAuto reçus du SAE</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=ineo&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_bivlineauto_fake_broadcast&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+    <@broadcastFound=0@>
+     <?custom_broadcast_points&
+       recursive=1&
+       template=
+         <select name="ineo_terminus_bivlineauto_fake_broadcast" field="inputIneoTerminusBivLineAutoFakeBroadcast">
+           <option value="none">Aucun</option>
+           <{broadcast_point&recursive=1&template=
+             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_bivlineauto_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+             <?if&cond=<@~global("ineo_terminus_bivlineauto_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+             <@recursive_content@>
+           }>
+         </select>
+    ?>
+    <?if&cond=<@broadcastFound@>&then=
+    <input type="hidden" id="inputIneoTerminusBivLineAutoFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_bivlineauto_fake_broadcast")@>"/>
+    &else=<input type="hidden" id="inputIneoTerminusBivLineAutoFakeBroadcast" name="actionParam_value" value="none"/>
+    ?>
+     <button type="submit" id="submitIneoTerminusBivLineAutoFakeBroadcast" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+  
+  <div class="control-group">
+   <label class="control-label" for="ineo_terminus_bivlineman_fake_broadcast">Diffuseur associé aux messages BivLineMan reçus du SAE</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=ineo&
+      a=global_variable_update&
+      actionParam_variable=ineo_terminus_bivlineman_fake_broadcast&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+    <@broadcastFound=0@>
+     <?custom_broadcast_points&
+       recursive=1&
+       template=
+         <select name="ineo_terminus_bivlineman_fake_broadcast" field="inputIneoTerminusBivLineManFakeBroadcast">
+           <option value="none">Aucun</option>
+           <{broadcast_point&recursive=1&template=
+             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_bivlineman_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+             <?if&cond=<@~global("ineo_terminus_bivlineman_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+             <@recursive_content@>
+           }>
+         </select>
+    ?>
+    <?if&cond=<@broadcastFound@>&then=
+    <input type="hidden" id="inputIneoTerminusBivLineManFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_bivlineman_fake_broadcast")@>"/>
+    &else=<input type="hidden" id="inputIneoTerminusBivLineManFakeBroadcast" name="actionParam_value" value="none"/>
+    ?>
+     <button type="submit" id="submitIneoTerminusBivLineManFakeBroadcast" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
 
 </div>
 

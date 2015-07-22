@@ -26,6 +26,7 @@
 #include "CommercialLineTableSync.h"
 #include "DataSourceTableSync.h"
 #include "ImportableTableSync.hpp"
+#include "IneoTerminusModule.hpp"
 #include "Log.h"
 #include "Request.h"
 #include "ScenarioSaveAction.h"
@@ -66,6 +67,16 @@ namespace synthese
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK = "ineo_terminus_network";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE = "ineo_terminus_datasource";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL = "ineo_terminus_tick_interval";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST = "ineo_terminus_passenger_fake_broadcast";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST = "ineo_terminus_driver_fake_broadcast";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST = "ineo_terminus_ppds_fake_broadcast";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_GIROUETTE_FAKE_BROADCAST = "ineo_terminus_girouette_fake_broadcast";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOPASSENGER_FAKE_BROADCAST = "ineo_terminus_sonopassenger_fake_broadcast";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONODRIVER_FAKE_BROADCAST = "ineo_terminus_sonodriver_fake_broadcast";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOSTOPPOINT_FAKE_BROADCAST = "ineo_terminus_sonostoppoint_fake_broadcast";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST = "ineo_terminus_bivgeneral_fake_broadcast";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST = "ineo_terminus_bivlineauto_fake_broadcast";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST = "ineo_terminus_bivlineman_fake_broadcast";
 
 		boost::shared_ptr<IneoTerminusConnection> IneoTerminusConnection::_theConnection(new IneoTerminusConnection);
 		int IneoTerminusConnection::_idRequest(0);
@@ -502,45 +513,56 @@ namespace synthese
 		{
 			string tagName(node.getName());
 			string messagerieName;
+			RegistryKeyType fakeBroadCastPoint(0);
 			if (tagName == "PassengerCreateMessageRequest")
 			{
 				messagerieName = "Passenger";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST));
 			}
 			else if (tagName == "DriverCreateMessageRequest")
 			{
 				messagerieName = "Driver";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST));
 			}
 			else if (tagName == "PpdsCreateMessageRequest")
 			{
 				messagerieName = "Ppds";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST));
 			}
 			else if (tagName == "GirouetteCreateMessageRequest")
 			{
 				messagerieName = "Girouette";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_GIROUETTE_FAKE_BROADCAST));
 			}
 			else if (tagName == "SonoPassengerCreateMessageRequest")
 			{
 				messagerieName = "SonoPassenger";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOPASSENGER_FAKE_BROADCAST));
 			}
 			else if (tagName == "SonoDriverCreateMessageRequest")
 			{
 				messagerieName = "SonoDriver";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONODRIVER_FAKE_BROADCAST));
 			}
 			else if (tagName == "SonoStopPointCreateMessageRequest")
 			{
 				messagerieName = "SonoStopPoint";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOSTOPPOINT_FAKE_BROADCAST));
 			}
 			else if (tagName == "BivGeneralCreateMessageRequest")
 			{
 				messagerieName = "BivGeneral";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST));
 			}
 			else if (tagName == "BivLineManCreateMessageRequest")
 			{
 				messagerieName = "BivLineMan";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST));
 			}
 			else if (tagName == "BivLineAutoCreateMessageRequest")
 			{
 				messagerieName = "BivLineAuto";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST));
 			}
 
 			XMLNode IDNode = node.getChildNode("ID", 0);
@@ -591,6 +613,9 @@ namespace synthese
 				messagePM->insert("section", "");
 				messagePM->insert("alternative", "");
 				_addRecipientsPM(*messagePM, message.recipients);
+				boost::shared_ptr<ParametersMap> displayRecipientPM(new ParametersMap);
+				displayRecipientPM->insert("recipient_id", fakeBroadCastPoint);
+				messagePM->insert("displayscreen_recipient", displayRecipientPM);
 				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 				calendarPM->insert("period", periodPM);
 				calendarPM->insert("message", messagePM);
@@ -636,45 +661,56 @@ namespace synthese
 		{
 			string tagName(node.getName());
 			string messagerieName;
+			RegistryKeyType fakeBroadCastPoint(0);
 			if (tagName == "PassengerDeleteMessageRequest")
 			{
 				messagerieName = "Passenger";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST));
 			}
 			else if (tagName == "DriverDeleteMessageRequest")
 			{
 				messagerieName = "Driver";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST));
 			}
 			else if (tagName == "PpdsDeleteMessageRequest")
 			{
 				messagerieName = "Ppds";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST));
 			}
 			else if (tagName == "GirouetteDeleteMessageRequest")
 			{
 				messagerieName = "Girouette";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_GIROUETTE_FAKE_BROADCAST));
 			}
 			else if (tagName == "SonoPassengerDeleteMessageRequest")
 			{
 				messagerieName = "SonoPassenger";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOPASSENGER_FAKE_BROADCAST));
 			}
 			else if (tagName == "SonoDriverDeleteMessageRequest")
 			{
 				messagerieName = "SonoDriver";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONODRIVER_FAKE_BROADCAST));
 			}
 			else if (tagName == "SonoStopPointDeleteMessageRequest")
 			{
 				messagerieName = "SonoStopPoint";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOSTOPPOINT_FAKE_BROADCAST));
 			}
 			else if (tagName == "BivGeneralDeleteMessageRequest")
 			{
 				messagerieName = "BivGeneral";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST));
 			}
 			else if (tagName == "BivLineManDeleteMessageRequest")
 			{
 				messagerieName = "BivLineMan";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST));
 			}
 			else if (tagName == "BivLineAutoDeleteMessageRequest")
 			{
 				messagerieName = "BivLineAuto";
+				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST));
 			}
 
 			XMLNode IDNode = node.getChildNode("ID", 0);
@@ -725,6 +761,9 @@ namespace synthese
 				messagePM->insert("section", "");
 				messagePM->insert("alternative", "");
 				_addRecipientsPM(*messagePM, message.recipients);
+				boost::shared_ptr<ParametersMap> displayRecipientPM(new ParametersMap);
+				displayRecipientPM->insert("recipient_id", fakeBroadCastPoint);
+				messagePM->insert("displayscreen_recipient", displayRecipientPM);
 				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 				calendarPM->insert("period", periodPM);
 				calendarPM->insert("message", messagePM);
@@ -1305,7 +1344,6 @@ namespace synthese
 					util::Log::GetInstance().warn("_addRecipientsPM : Recipient non codé : " + recipient.type);
 				}
 			}
-			pm.insert("displayscreen_recipient", "");
 			pm.insert("stoparea_recipient", "");
 		}
 }	}
