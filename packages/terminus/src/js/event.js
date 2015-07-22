@@ -133,7 +133,7 @@ function update_object_preview(recipient, message)
   }
   else
   {
-    s = (recipient == 'displayscreen' ? "Aucun" : "Tous");
+    s = "Aucun";
   }
   $('#preview_recipients_'+ recipient).html(s);
 
