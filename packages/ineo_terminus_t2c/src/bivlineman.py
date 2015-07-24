@@ -10,9 +10,6 @@ try:
 except ImportError:
   print("la lib lxml n'est pas disponible")
 
-  
-networkId=network_id
-dataSourceId=datasource_id
 
 # Request headers
 root = etree.Element("BivLineMan" + type + "MessageRequest")
@@ -61,13 +58,13 @@ recipients = message[0]["recipients"][0]
 if 'line' in recipients:
   childLines = etree.SubElement(childRecipients, "Lines")
   for line in recipients["line"]:
-    if line["id"] != networkId:
+    if line["id"] != network_id:
       parameters = { "roid": line["id"] }
       linePM = synthese.service("LinesListFunction2", parameters)
       lineCodesStr = linePM["line"][0]["creator_id"]
       lineCodes = map(lambda x: x.split('|'), lineCodesStr.split(','))
       for lineCode in lineCodes:
-        if lineCode[0] == dataSourceId:
+        if lineCode[0] == datasource_id:
           childLine = etree.SubElement(childLines, "Line")
           childLine.text = lineCode[1]
 
