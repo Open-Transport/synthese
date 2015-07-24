@@ -45,12 +45,65 @@ childDuration.text = message[0]["display_duration"]
 
 # Text
 # Split text around <br /> and \n
-# TODO : change to match BivGeneralMessagingTextType structure (details pending)
-childText = etree.SubElement(childMessaging, "Text")
-for line in re.split('<br />|\n',message[0]["content"]):
-  h = HTMLParser.HTMLParser()
-  childLine = etree.SubElement(childText, "Line")
-  childLine.text = h.unescape(line)
+contentLines = re.split('<br />|\n',message[0]["content"])
+h = HTMLParser.HTMLParser()
+
+# TypeBIV = BUS4L
+childText1 = etree.SubElement(childMessaging, "Text")
+childTypeBIV1 = etree.SubElement(childText1, "TypeBIV")
+childTypeBIV1.text = "BUS4L"
+childFixedText1 = etree.SubElement(childText1, "FixedText")
+for contentLine in contentLines:
+  childLine1 = etree.SubElement(childFixedText1, "Line")
+  childLine1.text = h.unescape(contentLine)
+
+# TypeBIV = BUS8L
+childText2 = etree.SubElement(childMessaging, "Text")
+childTypeBIV2 = etree.SubElement(childText2, "TypeBIV")
+childTypeBIV2.text = "BUS8L"
+childFixedText2 = etree.SubElement(childText2, "FixedText")
+for contentLine in contentLines:
+  childLine2 = etree.SubElement(childFixedText2, "Line")
+  childLine2.text = h.unescape(contentLine)
+
+# TypeBIV = ER
+childText3 = etree.SubElement(childMessaging, "Text")
+childTypeBIV3 = etree.SubElement(childText3, "TypeBIV")
+childTypeBIV3.text = "ER"
+childFixedText3 = etree.SubElement(childText3, "FixedText")
+for contentLine in contentLines:
+  childLine3 = etree.SubElement(childFixedText3, "Line")
+  childLine3.text = h.unescape(contentLine)
+
+# TypeBIV = TFT
+childText4 = etree.SubElement(childMessaging, "Text")
+childTypeBIV4 = etree.SubElement(childText4, "TypeBIV")
+childTypeBIV4.text = "TFT"
+childFixedText4 = etree.SubElement(childText4, "FixedText")
+for contentLine in contentLines:
+  childLine4 = etree.SubElement(childFixedText4, "Line")
+  childLine4.text = h.unescape(contentLine)
+
+# TypeBIV = TTS
+childText5 = etree.SubElement(childMessaging, "Text")
+childTypeBIV5 = etree.SubElement(childText5, "TypeBIV")
+childTypeBIV5.text = "TTS"
+childFixedText5 = etree.SubElement(childText5, "TtsText")
+childLine5 = etree.SubElement(childFixedText5, "Line")
+childLine5.text = h.unescape(contentLines[0])
+
+# TypeBIV = TW3L
+childText6 = etree.SubElement(childMessaging, "Text")
+childTypeBIV6 = etree.SubElement(childText6, "TypeBIV")
+childTypeBIV6.text = "TW3L"
+childFixedText6 = etree.SubElement(childText6, "FixedText")
+for contentLine in contentLines:
+  childLine6 = etree.SubElement(childFixedText6, "Line")
+  childLine6.text = h.unescape(contentLine)
+childScrollingText6 = etree.SubElement(childText6, "ScrollingText")
+childScrollingLine6 = etree.SubElement(childScrollingText6, "Line")
+childScrollingLine6.text = h.unescape(contentLines[0])
+
 
 # Recipients
 childRecipients = etree.SubElement(childMessaging, "Recipients")
@@ -59,7 +112,7 @@ hasAllNetwork = False
 if 'line' in recipients:
   # Scan the 'line' recipients to check if the whole transport network is selected
   for line in recipients["line"]:
-    hasAllNetwork = hasAllNetwork or (line["id"] == networkId)
+    hasAllNetwork = hasAllNetwork or (line["id"] == network_id)
   # If it is, use 'AllNetwork' tag
   if hasAllNetwork:
     childAllNetwork = etree.SubElement(childRecipients, "AllNetwork")
@@ -72,7 +125,7 @@ if 'line' in recipients:
       lineCodesStr = linePM["line"][0]["creator_id"]
       lineCodes = map(lambda x: x.split('|'), lineCodesStr.split(','))
       for lineCode in lineCodes:
-        if lineCode[0] == dataSourceId:
+        if lineCode[0] == datasource_id:
           childLine = etree.SubElement(childLines, "Line")
           childLine.text = lineCode[1]
 

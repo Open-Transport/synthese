@@ -40,8 +40,8 @@ childStopTime.text = "23:59:00"
 # Text
 # Split text around <br /> and \n
 childText = etree.SubElement(childMessaging, "Text")
+h = HTMLParser.HTMLParser()
 for line in re.split('<br />|\n',message[0]["content"]):
-  h = HTMLParser.HTMLParser()
   childLine = etree.SubElement(childText, "Line")
   childLine.text = h.unescape(line)
 

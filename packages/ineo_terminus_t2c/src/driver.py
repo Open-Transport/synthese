@@ -11,10 +11,6 @@ except ImportError:
   print("la lib lxml n'est pas disponible")
 
 
-# TODO : pass variable as parameter
-networkId=network_id
-dataSourceId=datasource_id
-
 # Request headers
 root = etree.Element("Driver" + type + "MessageRequest")
 childID = etree.SubElement(root, "ID")
@@ -61,7 +57,7 @@ if 'stoparea' in recipients:
     # Split the operator codes and find the Ineo code
     stopCodes = map(lambda x: x.split('|'), stop["operator_code"].split(','))
     for stopCode in stopCodes:
-      if stopCode[0] == dataSourceId:
+      if stopCode[0] == datasource_id:
         childStopPoint.text = stopCode[1]
 
 # RepeatPeriod
@@ -83,7 +79,7 @@ hasAllNetwork = False
 if 'line' in recipients:
   # Scan the 'line' recipients to check if the whole transport network is selected
   for line in recipients["line"]:
-    hasAllNetwork = hasAllNetwork or (line["id"] == networkId)
+    hasAllNetwork = hasAllNetwork or (line["id"] == network_id)
   # If it is, use 'AllNetwork' tag
   if hasAllNetwork:
     childAllNetwork = etree.SubElement(childRecipients, "AllNetwork")
@@ -96,7 +92,7 @@ if 'line' in recipients:
       lineCodesStr = linePM["line"][0]["creator_id"]
       lineCodes = map(lambda x: x.split('|'), lineCodesStr.split(','))
       for lineCode in lineCodes:
-        if lineCode[0] == dataSourceId:
+        if lineCode[0] == datasource_id:
           childLine = etree.SubElement(childLines, "Line")
           childLine.text = lineCode[1]
 
