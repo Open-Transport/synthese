@@ -26,6 +26,7 @@
 #include <CMSScript.hpp>
 #include <CityTableSync.h>
 #include <CommercialLine.h>
+#include <CommercialLineTableSync.h>
 #include <Env.h>
 #include <MessageAlternative.hpp>
 #include <MessageType.hpp>
@@ -38,6 +39,7 @@
 #include <ParametersMapField.hpp>
 #include <StopArea.hpp>
 #include <StopAreaTableSync.hpp>
+#include <TransportNetworkTableSync.h>
 
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -236,15 +238,32 @@ namespace synthese
 			bool firstLineInStream = true;
 			BOOST_FOREACH(const AlarmObjectLink* link, alarm->getLinkedObjects("line"))
 			{
-				boost::shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
-				if(line.get())
+				RegistryTableType tableId(decodeTableId(link->getObjectId()));
+				if (tableId == pt::CommercialLineTableSync::TABLE.ID)
 				{
-					if(!firstLineInStream)
+					boost::shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
+					if(line.get())
 					{
-						linesStream << VARIABLE_ID_SEPARATOR;
-						firstLineInStream = false;
+						if(!firstLineInStream)
+						{
+							linesStream << VARIABLE_ID_SEPARATOR;
+							firstLineInStream = false;
+						}
+						linesStream << line->getName();
 					}
-					linesStream << line->getName();
+				}
+				else if (tableId == pt::TransportNetworkTableSync::TABLE.ID)
+				{
+					boost::shared_ptr<const pt::TransportNetwork> network = Env::GetOfficialEnv().get<pt::TransportNetwork>(link->getObjectId());
+					if(network.get())
+					{
+						if(!firstLineInStream)
+						{
+							linesStream << VARIABLE_ID_SEPARATOR;
+							firstLineInStream = false;
+						}
+						linesStream << network->getName();
+					}
 				}
 			}
 			scriptParameters.insert(VARIABLE_LINE_IDS, linesStream.str());
