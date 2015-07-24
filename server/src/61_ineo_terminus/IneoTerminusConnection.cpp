@@ -257,6 +257,16 @@ namespace synthese
 							boost::asio::placeholders::error
 						)
 					);
+					boost::asio::async_read_until(
+						_socket,
+						*_buf,
+						char(0),
+						boost::bind(
+							&tcp_connection::handle_read,
+							this,
+							boost::asio::placeholders::error,
+							boost::asio::placeholders::bytes_transferred
+					)	);
 					return;
 				}
 				bufStr = bufStr.substr(43, bufStr.size() - 43); // Remove XML header (<?xml ... ?>)
@@ -280,6 +290,16 @@ namespace synthese
 							boost::asio::placeholders::error
 						)
 					);
+					boost::asio::async_read_until(
+						_socket,
+						*_buf,
+						char(0),
+						boost::bind(
+							&tcp_connection::handle_read,
+							this,
+							boost::asio::placeholders::error,
+							boost::asio::placeholders::bytes_transferred
+					)	);
 					return;
 				}
 				XMLNode childNode(node.getChildNode(0));
@@ -300,6 +320,16 @@ namespace synthese
 							boost::asio::placeholders::error
 						)
 					);
+					boost::asio::async_read_until(
+						_socket,
+						*_buf,
+						char(0),
+						boost::bind(
+							&tcp_connection::handle_read,
+							this,
+							boost::asio::placeholders::error,
+							boost::asio::placeholders::bytes_transferred
+					)	);
 					return;
 				}
 
@@ -376,20 +406,7 @@ namespace synthese
 						boost::asio::placeholders::error
 					)
 				);
-			}
-			else
-			{
-				IneoTerminusConnection::GetTheConnection()->removeConnection(this);
-			}
-		}
 
-		void IneoTerminusConnection::tcp_connection::handle_write
-		(
-			const boost::system::error_code& error
-		)
-		{
-			if (!error)
-			{
 				boost::asio::async_read_until(
 					_socket,
 					*_buf,
@@ -399,11 +416,23 @@ namespace synthese
 						this,
 						boost::asio::placeholders::error,
 						boost::asio::placeholders::bytes_transferred
-					)
-				);
+				)	);
 			}
 			else
 			{
+				util::Log::GetInstance().debug("handle_read sort en erreur " + error.message());
+				IneoTerminusConnection::GetTheConnection()->removeConnection(this);
+			}
+		}
+
+		void IneoTerminusConnection::tcp_connection::handle_write
+		(
+			const boost::system::error_code& error
+		)
+		{
+			if (error)
+			{
+				util::Log::GetInstance().debug("handle_write sort en erreur " + error.message());
 				IneoTerminusConnection::GetTheConnection()->removeConnection(this);
 			}
 		}
