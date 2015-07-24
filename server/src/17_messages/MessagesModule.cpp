@@ -110,6 +110,8 @@ namespace synthese
 		boost::mutex MessagesModule::_activatedMessagesMutex;
 		long MessagesModule::_lastMinute(60);
 		long MessagesModule::_lastMinuteScenario(60);
+		bool MessagesModule::_messagesActivationRanOnce = false;
+		bool MessagesModule::_scenariosActivationRanOnce = false;
 
 		MessagesModule::Labels MessagesModule::GetScenarioTemplatesLabels(
 			string withAllLabel,
@@ -258,6 +260,8 @@ namespace synthese
 					// Update the last seconds cache
 					_lastMinute = now.time_of_day().minutes();
 
+					_messagesActivationRanOnce = true;
+
 					// Change the thread status
 					ServerModule::SetCurrentThreadWaiting();
 				}
@@ -289,6 +293,8 @@ namespace synthese
 					// Update the last seconds cache
 					_lastMinuteScenario = now.time_of_day().minutes();
 
+					_scenariosActivationRanOnce = true;
+
 					// Change the thread status
 					ServerModule::SetCurrentThreadWaiting();
 				}
@@ -306,12 +312,15 @@ namespace synthese
 		{
 			while (true)
 			{
-				// Change the thread status
-				ServerModule::SetCurrentThreadRunningAction();
+				if((true == _messagesActivationRanOnce) && (true == _scenariosActivationRanOnce))
+				{
+					// Change the thread status
+					ServerModule::SetCurrentThreadRunningAction();
 
-				// Handle notification events.
-				// Loop over events until nothing to process.
-				while (HandleNotificationEvents() > 0);
+					// Handle notification events.
+					// Loop over events until nothing to process.
+					while (HandleNotificationEvents() > 0);
+				}
 
 				// Change the thread status
 				ServerModule::SetCurrentThreadWaiting();
