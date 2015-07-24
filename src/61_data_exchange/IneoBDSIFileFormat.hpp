@@ -30,7 +30,18 @@
 #include "FileFormatTemplate.h"
 #include "NoExportPolicy.hpp"
 
+#include "VehicleTableSync.hpp"
+#include "VehiclePositionTableSync.hpp"
+
 #include "SchedulesBasedService.h"
+
+namespace geos
+{
+	namespace geom
+	{
+		class Point;
+	}
+}
 
 namespace synthese
 {
@@ -67,6 +78,12 @@ namespace synthese
 		class RuleUser;
 	}
 
+	namespace vehicle
+	{
+		class Vehicle;
+		class VehiclePosition;
+	}
+
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -101,7 +118,10 @@ namespace synthese
 				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
 				static const std::string PARAMETER_NEUTRALIZED;
 				static const std::string PARAMETER_NON_COMMERCIAL;
-		
+				static const std::string PARAMETER_CLEAN_UNUSED_VEHICLES;
+
+				static const std::map<std::string, vehicle::VehiclePosition::Status> vehiclePositionStatusBdsi2Synthese;
+
 			private:
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 				boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;
@@ -113,11 +133,34 @@ namespace synthese
 				util::RegistryKeyType _handicappedPTAllowedUseRuleId;
 				bool _neutralized;
 				bool _nonCommercial;
+				bool _cleanUnusedVehicles;
 
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;
 				mutable std::set<util::RegistryKeyType> _messagesToRemove;
 				mutable std::set<pt::ScheduledService*> _servicesToSave;
+
+				mutable std::set<util::RegistryKeyType> _vehiclesToRemove;
+				mutable std::set<boost::shared_ptr<vehicle::VehiclePosition> > _vehiclePositionsToRemove;
+				mutable std::set<boost::shared_ptr<vehicle::VehiclePosition> > _vehiclePositions;
+
+				mutable impex::ImportableTableSync::ObjectBySource<vehicle::VehicleTableSync> _vehicles;
+
+				struct VehiculePosition
+				{
+					std::string code;
+					std::string name;
+					std::string number;
+					bool available;
+					std::string type;
+					boost::shared_ptr<geos::geom::Point> point;
+
+					vehicle::VehiclePosition::Status status;
+					vehicle::VehiclePosition::Meters position;
+					std::size_t stopRank;
+					boost::shared_ptr<pt::ScheduledService> service;
+				};
+				typedef std::map<std::string, VehiculePosition> VehiculePositions;
 
 				struct Arret
 				{
@@ -302,6 +345,56 @@ namespace synthese
 				) const;
 				const boost::posix_time::time_duration& getHysteresis() const { return _hysteresis; }
 
+				std::set<vehicle::Vehicle*> _getVehicles(
+					const impex::ImportableTableSync::ObjectBySource<vehicle::VehicleTableSync>& vehicles,
+					const std::string& id,
+					boost::optional<const std::string&> name,
+					bool errorIfNotFound
+					) const;
+
+				std::set<vehicle::Vehicle*> _createOrUpdateVehicle(
+					impex::ImportableTableSync::ObjectBySource<vehicle::VehicleTableSync>& vehicles,
+					const std::string& code,
+					boost::optional<const std::string&> name,
+					boost::optional<const std::string&> number,
+					bool available,
+					const impex::DataSource& source
+					) const;
+
+				vehicle::Vehicle* _createVehicle(
+					impex::ImportableTableSync::ObjectBySource<vehicle::VehicleTableSync>& vehicles,
+					const std::string& code,
+					boost::optional<const std::string&> name,
+					const impex::DataSource& source
+					) const;
+
+				std::set<boost::shared_ptr<vehicle::VehiclePosition> > _getVehiclePositions(
+					boost::optional<util::RegistryKeyType> vehicleId,
+					bool errorIfNotFound
+					) const;
+
+				std::set<boost::shared_ptr<vehicle::VehiclePosition> > _createOrUpdateVehiclePosition(
+					const std::string& code,
+					vehicle::Vehicle* vehicle,
+					boost::optional<vehicle::VehiclePosition::Status> status,
+					boost::optional<vehicle::VehiclePosition::Meters> meterOffset,
+					boost::optional<std::size_t> rankInPath,
+					boost::optional<boost::shared_ptr<pt::ScheduledService> > service,
+					boost::optional<boost::shared_ptr<geos::geom::Point> > point
+					) const;
+
+				boost::shared_ptr<vehicle::VehiclePosition> _createVehiclePosition(
+					const std::string& code,
+					vehicle::Vehicle* vehicle,
+					boost::optional<vehicle::VehiclePosition::Status> status,
+					boost::optional<vehicle::VehiclePosition::Meters> meterOffset,
+					boost::optional<std::size_t> rankInPath,
+					boost::optional<boost::shared_ptr<pt::ScheduledService> > service,
+					boost::optional<boost::shared_ptr<geos::geom::Point> > point
+					) const;
+
+				vehicle::VehiclePosition::Status toVehiclePositionStatus(
+					const std::string& etat) const;
 
 			protected:
 				//////////////////////////////////////////////////////////////////////////
