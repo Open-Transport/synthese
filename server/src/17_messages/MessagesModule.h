@@ -91,6 +91,8 @@ namespace synthese
 			static boost::mutex _activatedMessagesMutex;
 			static long _lastMinute;
 			static long _lastMinuteScenario;
+			static bool _messagesActivationRanOnce;
+			static bool _scenariosActivationRanOnce;
 
 			static bool _selectMessagesToActivate(const Alarm& object);
 			static bool _selectAlarm(const Alarm& object);
