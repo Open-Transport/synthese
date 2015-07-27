@@ -415,6 +415,7 @@ function activate_filter(isOnAllSections)
        if(isOnAllSections == 0) {
          if(theevent[i].archiving_right_section == 1) {
            s += '<a href="#" onclick="if (window.confirm(\'Etes-vous sûr de vouloir clore et archiver cet événement ?\')) window.location=\'/terminus/events?a=scenariostop&amp;actionParams=' + theevent[i].roid 
+                 + '&amp;actionParam_archive=1'
                  + '&amp;section=' + theevent[i].current_section + '\';return false;" class="btn btn-danger btn-mini btn-with-margins"><i class="icon-eject icon-white"></i></a>';
          }
          else {

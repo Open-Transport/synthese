@@ -57,6 +57,7 @@ namespace synthese
 			static const std::string DATA_ACTIVE;
 			static const std::string DATA_SCENARIO_ID;
 			static const std::string DATA_IS_TEMPLATE;
+			static const std::string DATA_ARCHIVED;
 			static const std::string DATA_CODE;
 			static const std::string DATA_VALUE;
 
