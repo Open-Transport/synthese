@@ -86,18 +86,34 @@ if 'stoparea' in recipients:
   childStopPoints = etree.SubElement(childRecipients, "StopPoints")
   for stoparea in recipients["stoparea"]:
     # SYNTHESE has stop area AND/OR stop points recipients, but Ineo expects stop points so we request all the stop points of each stop area
-    # TODO : support stop points as 'stoparea' recipients
-    parameters = { "roid": stoparea["id"], "output_stops": 1, "of": "text" }
-    stopAreasPM = synthese.service("StopAreasListFunction", parameters)
-    if 'stopArea' in stopAreasPM:
-      # Loop over stop points
-      for stop in stopAreasPM["stopArea"][0]["stop"]:
+    recipientId = int(stoparea["id"])
+    recipientTableId = (recipientId / (2**48))
+
+    if recipientTableId == 12:
+      # This 'stoparea' recipient is a stop point : find its Ineo code
+      parameters = { "roid": recipientId }
+      stopPointPM = synthese.service("object", parameters)
+      if 'operator_code' in stopPointPM:
         # Split the operator codes and find the Ineo code
-        stopCodes = map(lambda x: x.split('|'), stop["operator_code"].split(','))
+        stopCodes = map(lambda x: x.split('|'), stopPointPM["operator_code"].split(','))
         for stopCode in stopCodes:
           if stopCode[0] == datasource_id:
             childStopPoint = etree.SubElement(childStopPoints, "StopPoint")
             childStopPoint.text = stopCode[1]
+
+    if recipientTableId == 7:
+      # This 'stoparea' recipient is a stop area : apply message to all its stop points
+      parameters = { "roid": recipientId, "output_stops": 1, "of": "text" }
+      stopAreasPM = synthese.service("StopAreasListFunction", parameters)
+      if 'stopArea' in stopAreasPM:
+        # Loop over stop points
+        for stop in stopAreasPM["stopArea"][0]["stop"]:
+          # Split the operator codes and find the Ineo code
+          stopCodes = map(lambda x: x.split('|'), stop["operator_code"].split(','))
+          for stopCode in stopCodes:
+            if stopCode[0] == datasource_id:
+              childStopPoint = etree.SubElement(childStopPoints, "StopPoint")
+              childStopPoint.text = stopCode[1]
 
 # Print resulting XML to output stream
 print(etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="iso-8859-1"))
