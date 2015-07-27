@@ -50,17 +50,32 @@ recipients = message[0]["recipients"][0]
 if 'stoparea' in recipients:
   childStopPoint = etree.SubElement(childMessaging, "StopPoint")
   # SYNTHESE has stop area AND/OR stop point recipients, but Ineo expects stop points so we request all the stop points of each stop area
-  # TODO : support stop points as 'stoparea' recipients
-  parameters = { "roid": recipients["stoparea"][0]["id"], "output_stops": 1, "of" : "text" }
-  stopAreasPM = synthese.service("StopAreasListFunction", parameters)
-  if 'stopArea' in stopAreasPM:
-    # Loop over stop points
-    for stop in stopAreasPM["stopArea"][0]["stop"]:
+  recipientId = int(recipients["stoparea"][0]["id"])
+  recipientTableId = (recipientId / (2**48))
+
+  if recipientTableId == 12:
+    # This 'stoparea' recipient is a stop point : find its Ineo code
+    parameters = { "roid": recipientId }
+    stopPointPM = synthese.service("object", parameters)
+    if 'operator_code' in stopPointPM:
       # Split the operator codes and find the Ineo code
-      stopCodes = map(lambda x: x.split('|'), stop["operator_code"].split(','))
+      stopCodes = map(lambda x: x.split('|'), stopPointPM["operator_code"].split(','))
       for stopCode in stopCodes:
         if stopCode[0] == datasource_id:
           childStopPoint.text = stopCode[1]
+
+  if recipientTableId == 7:
+    # This 'stoparea' recipient is a stop area : retrieve the Ineo code of one of its stop points
+    parameters = { "roid": recipientId, "output_stops": 1, "of" : "text" }
+    stopAreasPM = synthese.service("StopAreasListFunction", parameters)
+    if 'stopArea' in stopAreasPM:
+      # Loop over stop points
+      for stop in stopAreasPM["stopArea"][0]["stop"]:
+        # Split the operator codes and find the Ineo code
+        stopCodes = map(lambda x: x.split('|'), stop["operator_code"].split(','))
+        for stopCode in stopCodes:
+          if stopCode[0] == datasource_id:
+            childStopPoint.text = stopCode[1]
 
 # RepeatPeriod
 
