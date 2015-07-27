@@ -32,6 +32,7 @@
 #include "AlarmTemplate.h"
 #include "SentAlarm.h"
 #include "ScenarioTemplate.h"
+#include "SentScenarioDao.hpp"
 
 
 #include <vector>
@@ -65,7 +66,8 @@ namespace synthese
 				Scenario,
 				db::FullSynchronizationPolicy,
 				db::InheritanceLoadSavePolicy
-			>
+			>,
+			public SentScenarioDao
 		{
 		public:
 			static const std::string COL_IS_TEMPLATE;
@@ -167,6 +169,11 @@ namespace synthese
 				bool raisingOrder = false,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+
+			virtual std::vector<boost::shared_ptr<SentScenario> > list() const;
+			virtual void save(boost::shared_ptr<SentScenario>& sentScenario) const;
+
 		};
 }	}
 

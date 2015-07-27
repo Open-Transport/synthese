@@ -990,13 +990,6 @@ namespace synthese
 						string endHourStr(periodNode.second.get("end_hour", string()));
 						period->set<EndHour>(endHourStr.empty() ? time_duration(not_a_date_time) : duration_from_string(endHourStr));
 
-						// Dates
-						period->clear();
-						BOOST_FOREACH(const ptree::value_type& dateNode, periodNode.second.get_child("date"))
-						{
-							period->setActive(from_string(dateNode.second.data()));
-						}
-
 						// Save
 						MessageApplicationPeriodTableSync::Save(period.get(), transaction);
 					}

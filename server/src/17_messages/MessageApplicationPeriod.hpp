@@ -1,4 +1,3 @@
-
 /** MessageApplicationPeriod class header.
 	@file MessageApplicationPeriod.hpp
 
@@ -23,10 +22,8 @@
 #ifndef SYNTHESE_messages_MessageApplicationPeriod_hpp__
 #define SYNTHESE_messages_MessageApplicationPeriod_hpp__
 
-#include "Calendar.h"
 #include "Object.hpp"
 
-#include "CalendarField.hpp"
 #include "MessageType.hpp"
 #include "NumericField.hpp"
 #include "SchemaMacros.hpp"
@@ -48,8 +45,7 @@ namespace synthese
 		FIELD(StartHour),
 		FIELD(EndHour),
 		FIELD(StartTime),
-		FIELD(EndTime),
-		FIELD(Dates)
+		FIELD(EndTime)
 	> MessageApplicationPeriodRecord;
 
 	namespace messages
@@ -58,8 +54,7 @@ namespace synthese
 			@ingroup m17
 		*/
 		class MessageApplicationPeriod:
-			public Object<MessageApplicationPeriod, MessageApplicationPeriodRecord>,
-			public calendar::Calendar
+			public Object<MessageApplicationPeriod, MessageApplicationPeriodRecord>
 		{
 		public:
 			static const std::string TAG_DATE;
@@ -79,12 +74,18 @@ namespace synthese
 
 			/// @name Services
 			//@{
-				bool getValue(const boost::posix_time::ptime& time) const;
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if the specified time is in the defined period.
+				/// @param time the time to check
+				/// @return true if the time is in the defined period
+				bool isInside(const boost::posix_time::ptime& time) const;
 
-				virtual void addAdditionalParameters(
-					util::ParametersMap& map,
-					std::string prefix = std::string()
-				) const;
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if the specified time is in the defined period.
+				/// @param time the time to check
+				/// @return true if the time is in the defined period
+				bool isAfter(const boost::posix_time::ptime& time) const;
+
 			//@}
 		};
 }	}

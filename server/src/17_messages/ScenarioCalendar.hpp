@@ -75,6 +75,22 @@ namespace synthese
 			const ApplicationPeriods& getApplicationPeriods() const { return _applicationPeriods; }
 			void setApplicationPeriods(const ApplicationPeriods& value) const { _applicationPeriods = value; }
 
+			/// @name Services
+			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if the specified time is in the defined calendar.
+				/// @param time the time to check
+				/// @return true if the time is in any of calendar application periods
+				bool isInside(const boost::posix_time::ptime& time) const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if the specified time is after the defined calendar.
+				/// @param time the time to check
+				/// @return true if the time is after all calendar application periods
+				bool isAfter(const boost::posix_time::ptime& time) const;
+			//@}
+
+
 			virtual void addAdditionalParameters(
 				util::ParametersMap& map,
 				std::string prefix = std::string()

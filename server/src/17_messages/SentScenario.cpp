@@ -159,6 +159,48 @@ namespace synthese
 		}
 
 
+		bool SentScenario::belongsToAnAutomaticSection() const
+		{
+			BOOST_FOREACH(const Scenario::Sections::value_type& section, getSections())
+			{
+				if (section->get<AutoActivation>())
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+
+		bool SentScenario::shouldBeEnabled(const boost::posix_time::ptime& time) const
+		{
+			BOOST_FOREACH(const ScenarioCalendar* calendar, getCalendars())
+			{
+				if (calendar->isInside(time))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+
+		bool SentScenario::shouldBeArchived(const boost::posix_time::ptime& time) const
+		{
+			if (getCalendars().empty())
+			{
+				return false;
+			}
+			BOOST_FOREACH(const ScenarioCalendar* calendar, getCalendars())
+			{
+				if (!calendar->isAfter(time))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
 
 		void SentScenario::setTemplate(
 			const ScenarioTemplate* value

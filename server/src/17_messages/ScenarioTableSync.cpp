@@ -798,5 +798,30 @@ namespace synthese
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
+
+
+		std::vector<boost::shared_ptr<SentScenario> >
+		ScenarioTableSync::list() const
+		{
+			ScenarioTableSync::SearchResult scenarios(SearchSentScenarios(
+				Env::GetOfficialEnv(),
+				boost::optional<std::string>()));
+			std::vector<boost::shared_ptr<SentScenario> > sentScenarios;
+			BOOST_FOREACH(const boost::shared_ptr<Scenario>& scenario, scenarios)
+			{
+				sentScenarios.push_back(dynamic_pointer_cast<SentScenario, Scenario>(scenario));
+			}
+
+			return sentScenarios;
+		}
+
+
+		void
+		ScenarioTableSync::save(boost::shared_ptr<SentScenario>& sentScenario) const
+		{
+			ScenarioTableSync::Save(sentScenario.get());
+		}
+
+
 	}
 }

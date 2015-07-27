@@ -5,6 +5,8 @@ alphanum.hpp
 AlphanumericFilter.h
 Base64.cpp
 Base64.hpp
+Clock.hpp
+Clock.cpp
 ConcurrentQueue.hpp
 ConstantReturner.h
 Conversion.cpp
@@ -19,6 +21,8 @@ FactorableTemplate.h
 Factory.h
 FactoryBase.h
 FactoryException.h
+FakeClock.hpp
+FakeClock.cpp
 IConv.cpp
 IConv.hpp
 Log.cpp

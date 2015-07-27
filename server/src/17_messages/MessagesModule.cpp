@@ -35,6 +35,7 @@
 #include "ScenarioFolderTableSync.h"
 #include "TextTemplateTableSync.h"
 #include "TextTemplate.h"
+#include "ScenarioAutopilot.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -262,6 +263,9 @@ namespace synthese
 		/// This thread updates every minute the list of enabled scenarii.
 		void MessagesModule::ScenariiActivationThread()
 		{
+			boost::shared_ptr<SentScenarioDao> sentScenarioDao(new ScenarioTableSync());
+			boost::shared_ptr<ScenarioAutopilot> scenarioAutopilot(new ScenarioAutopilot(*sentScenarioDao));
+
 			while(true)
 			{
 				// Check if a new minute has begun
@@ -271,8 +275,7 @@ namespace synthese
 					// Change the thread status
 					ServerModule::SetCurrentThreadRunningAction();
 
-					// Update the enabled scenarii
-					UpdateEnabledScenarii();
+					scenarioAutopilot->runOnce();
 
 					// Update the last seconds cache
 					_lastMinuteScenario = now.time_of_day().minutes();
@@ -372,78 +375,6 @@ namespace synthese
 			}
 		}
 		
-		//////////////////////////////////////////////////////////////////////////
-		/// Updates the enabled scenarii
-		void MessagesModule::UpdateEnabledScenarii()
-		{
-			// Loop on all sent scenarii
-			ScenarioTableSync::SearchResult scenarios;
-
-			scenarios = ScenarioTableSync::SearchSentScenarios(
-				Env::GetOfficialEnv(),
-				boost::optional<std::string>()
-			);
-			BOOST_FOREACH(const boost::shared_ptr<Scenario>& scenario, scenarios)
-			{
-				if(!dynamic_cast<const SentScenario*>(scenario.get()))
-				{
-					continue;
-				}
-				SentScenario* sscenario = static_cast<SentScenario*>(scenario.get());
-				if (_enableScenarioIfAutoActivation(sscenario))
-				{
-					ScenarioTableSync::Save(sscenario);
-				}
-			}
-		}
-		
-		bool MessagesModule::_enableScenarioIfAutoActivation( SentScenario* sscenario )
-		{
-			if (sscenario->getArchived()) return false;
-
-			// Is the scenario associated to an auto_activation section ?
-			bool autoChange(false);
-			BOOST_FOREACH(const Scenario::Sections::value_type& section, sscenario->getSections())
-			{
-				if (section->get<AutoActivation>())
-				{
-					autoChange = true;
-					break;
-				}
-			}
-
-			if (autoChange)
-			{
-				ptime now(second_clock::local_time());
-				bool shouldBeEnabled(false);
-				BOOST_FOREACH(const ScenarioCalendar* calendar, sscenario->getCalendars())
-				{
-					BOOST_FOREACH( const ScenarioCalendar::ApplicationPeriods::value_type& period, calendar->getApplicationPeriods() )
-					{
-						if(period->getValue(now))
-						{
-							shouldBeEnabled = true;
-							break;
-						}
-					}
-				}
-
-				if (shouldBeEnabled && !sscenario->getIsEnabled())
-				{
-					sscenario->setIsEnabled(true);
-					return true;
-				}
-				if (!shouldBeEnabled && sscenario->getIsEnabled())
-				{
-					sscenario->setIsEnabled(false);
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Lists the message to display on a broadcast point according to the

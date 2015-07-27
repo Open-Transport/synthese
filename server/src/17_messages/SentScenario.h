@@ -147,15 +147,34 @@ namespace synthese
 			//@}
 
 
-			/** Applicability test.
-				@param start Start of applicability period
-				@param end End of applicability period
-				@return true if the message is not empty and is valid for the whole period given as argument.
-			*/
-			bool isApplicable ( const boost::posix_time::ptime& start, const boost::posix_time::ptime& end ) const;
+			/// @name Services
+			//@{
+				/** Applicability test.
+					@param start Start of applicability period
+					@param end End of applicability period
+					@return true if the message is not empty and is valid for the whole period given as argument.
+				*/
+				bool isApplicable ( const boost::posix_time::ptime& start, const boost::posix_time::ptime& end ) const;
 
-			bool isApplicable(const boost::posix_time::ptime& date) const;
+				bool isApplicable(const boost::posix_time::ptime& date) const;
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if this scenario belong to an automatic section.
+				/// @return true if this belongs to at least one automatic section
+				bool belongsToAnAutomaticSection() const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if this scenario should be enabled.
+				/// @param time Time at which we should check if scenario should be enabled
+				/// @return true if time inside this scenario calendar
+				bool shouldBeEnabled(const boost::posix_time::ptime& time) const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if this scenario should be archived.
+				/// @param time Time at which we should check if scenario should be archived
+				/// @return true if time is after all application periods of all calendars
+				bool shouldBeArchived(const boost::posix_time::ptime& time) const;
+			//@}
 
 
 			//////////////////////////////////////////////////////////////////////////

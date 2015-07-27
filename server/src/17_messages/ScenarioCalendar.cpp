@@ -106,5 +106,36 @@ namespace synthese
 				MessageApplicationPeriodTableSync::Remove(NULL, period->getKey(), *transaction, false);
 			}
 		}
+
+		bool ScenarioCalendar::isInside( const boost::posix_time::ptime& time ) const
+		{
+			BOOST_FOREACH(MessageApplicationPeriod* period, _applicationPeriods)
+			{
+				if (period->isInside(time))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+
+		bool ScenarioCalendar::isAfter( const boost::posix_time::ptime& time ) const
+		{
+			if (_applicationPeriods.empty())
+			{
+				return false;
+			}
+			BOOST_FOREACH(MessageApplicationPeriod* period, _applicationPeriods)
+			{
+				if (!period->isAfter(time))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+
 }	}
 

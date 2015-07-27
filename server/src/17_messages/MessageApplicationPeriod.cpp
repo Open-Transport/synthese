@@ -1,4 +1,3 @@
-
 /** MessageApplicationPeriod class implementation.
 	@file MessageApplicationPeriod.cpp
 
@@ -22,9 +21,6 @@
 
 #include "MessageApplicationPeriod.hpp"
 
-#include "SentAlarm.h"
-#include "SentScenario.h"
-
 using namespace boost;
 using namespace std;
 using namespace boost::gregorian;
@@ -41,7 +37,6 @@ namespace synthese
 		const string MessageApplicationPeriod::TAG_DATE = "date";
 
 
-
 		MessageApplicationPeriod::MessageApplicationPeriod(
 			util::RegistryKeyType id /*= 0 */
 		):	Registrable(id),
@@ -52,8 +47,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(StartHour),
 					FIELD_DEFAULT_CONSTRUCTOR(EndHour),
 					FIELD_DEFAULT_CONSTRUCTOR(StartTime),
-					FIELD_DEFAULT_CONSTRUCTOR(EndTime),
-					FIELD_DEFAULT_CONSTRUCTOR(Dates)
+					FIELD_DEFAULT_CONSTRUCTOR(EndTime)
 			)	)
 		{}
 
@@ -90,17 +84,8 @@ namespace synthese
 
 
 
-		//////////////////////////////////////////////////////////////////////////
-		/// Checks if the specified time is in the defined period.
-		/// @param time the time to check
-		/// @return true if the time is in the defined period
-		bool MessageApplicationPeriod::getValue( const boost::posix_time::ptime& time ) const
+		bool MessageApplicationPeriod::isInside( const boost::posix_time::ptime& time ) const
 		{
-			// If dates are defined, the current time must belong to the dates list
-			if(	!Calendar::empty() && !isActive(time.date()))
-			{
-				return false;
-			}
 			// If start time is defined, the current time must be after it
 			if(	!get<StartTime>().is_not_a_date_time() && time < get<StartTime>())
 			{
@@ -126,18 +111,19 @@ namespace synthese
 			return true;
 		}
 
-
-
-		void MessageApplicationPeriod::addAdditionalParameters(
-			util::ParametersMap& map,
-			std::string prefix /*= std::string() */
-		) const	{
-
-			BOOST_FOREACH(const date& d, getActiveDates())
+		bool MessageApplicationPeriod::isAfter( const boost::posix_time::ptime& time ) const
+		{
+			if(time > get<EndTime>())
 			{
-				boost::shared_ptr<ParametersMap> datePM(new ParametersMap);
-				datePM->insert(TAG_DATE, to_iso_extended_string(d));
-				map.insert(TAG_DATE, datePM);
+				return true;
 			}
+			if (!get<EndHour>().is_not_a_date_time())
+			{
+				date endTimeDate(get<EndTime>().date());
+				boost::posix_time::ptime lastEndHour(endTimeDate, get<EndHour>());
+				if (time > lastEndHour) return true;
+			}
+			return false;
 		}
+
 }	}
