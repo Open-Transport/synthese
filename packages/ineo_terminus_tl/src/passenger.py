@@ -30,7 +30,6 @@ def convert_to_ineo_color( hexcolor ):
   hue = hsv[0] * 360
 
   # Default value is 'Vert'
-  # TODO : change
   colorStr = 'Vert'
   
   # Hue E ]10..45]  => 'Orange'
@@ -45,9 +44,6 @@ def convert_to_ineo_color( hexcolor ):
 
   return colorStr
 
-
-networkId=network_id
-dataSourceId=datasource_id
 
 # Request headers
 root = etree.Element("Passenger" + type + "MessageRequest")
@@ -99,7 +95,6 @@ childInhibition.text = "non"
 
 # Color
 childColor = etree.SubElement(childMessaging, "Color")
-# TODO : change
 ineoColor = "Vert"
 # Search for 'color' attributes in the message
 match = re.search("(?<=color: #)[0-9a-fA-F]{6}", message[0]["content"])
@@ -108,9 +103,9 @@ if match:
   ineoColor = convert_to_ineo_color(match.group(0))
 childColor.text = ineoColor
 
-# Tts (boolean)
+# TtsBroadcasting
 if int(needs_play_tts) != 0:
-  childTts = etree.SubElement(childMessaging, "Tts")
+  childTts = etree.SubElement(childMessaging, "TtsBroadcasting")
   childTts.text = "oui" if int(message[0]["play_tts"]) != 0 else "non"
 
 # Jingle
@@ -146,7 +141,7 @@ hasAllNetwork = False
 if 'line' in recipients:
   # Scan the 'line' recipients to check if the whole transport network is selected
   for line in recipients["line"]:
-    hasAllNetwork = hasAllNetwork or (line["id"] == networkId)
+    hasAllNetwork = hasAllNetwork or (line["id"] == network_id)
   # If it is, use 'AllNetwork' tag
   if hasAllNetwork:
     childAllNetwork = etree.SubElement(childRecipients, "AllNetwork")
@@ -159,7 +154,7 @@ if 'line' in recipients:
       lineCodesStr = linePM["line"][0]["creator_id"]
       lineCodes = map(lambda x: x.split('|'), lineCodesStr.split(','))
       for lineCode in lineCodes:
-        if lineCode[0] == dataSourceId:
+        if lineCode[0] == datasource_id:
           childLine = etree.SubElement(childLines, "Line")
           childLine.text = lineCode[1]
 

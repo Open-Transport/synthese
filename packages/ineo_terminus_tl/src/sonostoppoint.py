@@ -10,9 +10,6 @@ try:
 except ImportError:
   print("la lib lxml n'est pas disponible")
 
-  
-networkId=network_id
-dataSourceId=datasource_id
 
 # Request headers
 root = etree.Element("SonoStopPoint" + type + "MessageRequest")
@@ -63,13 +60,11 @@ childRecipients = etree.SubElement(childMessaging, "Recipients")
 recipients = message[0]["recipients"][0]
 hasAllNetwork = False
 
-print recipients
-
 # Process CommercialLine and TransportNetwork recipients
 if 'line' in recipients:
   # Scan the 'line' recipients to check if the whole transport network is selected
   for line in recipients["line"]:
-    hasAllNetwork = hasAllNetwork or (line["id"] == networkId)
+    hasAllNetwork = hasAllNetwork or (line["id"] == network_id)
   # If it is, use 'AllNetwork' tag
   if hasAllNetwork:
     childAllNetwork = etree.SubElement(childRecipients, "AllNetwork")
@@ -77,14 +72,12 @@ if 'line' in recipients:
   else:
     childLines = etree.SubElement(childRecipients, "Lines")
     for line in recipients["line"]:
-      print "line " + str(line)
       parameters = { "roid": line["id"] }
       linePM = synthese.service("LinesListFunction2", parameters)
-      print "linePM " + str(linePM)
       lineCodesStr = linePM["line"][0]["creator_id"]
       lineCodes = map(lambda x: x.split('|'), lineCodesStr.split(','))
       for lineCode in lineCodes:
-        if lineCode[0] == dataSourceId:
+        if lineCode[0] == datasource_id:
           childLine = etree.SubElement(childLines, "Line")
           childLine.text = lineCode[1]
 
@@ -92,19 +85,19 @@ if 'line' in recipients:
 if 'stoparea' in recipients:
   childStopPoints = etree.SubElement(childRecipients, "StopPoints")
   for stoparea in recipients["stoparea"]:
-    # SYNTHESE has stop area recipients, but Ineo expects stop points so we request all the stop points of each stop area
+    # SYNTHESE has stop area AND/OR stop points recipients, but Ineo expects stop points so we request all the stop points of each stop area
+    # TODO : support stop points as 'stoparea' recipients
     parameters = { "roid": stoparea["id"], "output_stops": 1, "of": "text" }
-    print "stoparea " + str(stoparea)
     stopAreasPM = synthese.service("StopAreasListFunction", parameters)
-    print "stopareaPM " + str(stopAreasPM)
-    # Loop over stop points
-    for stop in stopAreasPM["stopArea"][0]["stop"]:
-      # Split the operator codes and find the Ineo code
-      stopCodes = map(lambda x: x.split('|'), stop["operator_code"].split(','))
-      for stopCode in stopCodes:
-        if stopCode[0] == dataSourceId:
-          childStopPoint = etree.SubElement(childStopPoints, "StopPoint")
-          childStopPoint.text = stopCode[1]
+    if 'stopArea' in stopAreasPM:
+      # Loop over stop points
+      for stop in stopAreasPM["stopArea"][0]["stop"]:
+        # Split the operator codes and find the Ineo code
+        stopCodes = map(lambda x: x.split('|'), stop["operator_code"].split(','))
+        for stopCode in stopCodes:
+          if stopCode[0] == datasource_id:
+            childStopPoint = etree.SubElement(childStopPoints, "StopPoint")
+            childStopPoint.text = stopCode[1]
 
 # Print resulting XML to output stream
 print(etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="iso-8859-1"))
