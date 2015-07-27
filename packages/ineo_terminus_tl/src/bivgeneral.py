@@ -11,9 +11,6 @@ except ImportError:
   print("la lib lxml n'est pas disponible")
 
 
-networkId=network_id
-dataSourceId=datasource_id
-
 # Request headers
 root = etree.Element("BivGeneral" + type + "MessageRequest")
 childID = etree.SubElement(root, "ID")
@@ -65,7 +62,7 @@ hasAllNetwork = False
 if 'line' in recipients:
   # Scan the 'line' recipients to check if the whole transport network is selected
   for line in recipients["line"]:
-    hasAllNetwork = hasAllNetwork or (line["id"] == networkId)
+    hasAllNetwork = hasAllNetwork or (line["id"] == network_id)
   # If it is, use 'AllNetwork' tag
   if hasAllNetwork:
     childAllNetwork = etree.SubElement(childRecipients, "AllNetwork")
@@ -78,7 +75,7 @@ if 'line' in recipients:
       lineCodesStr = linePM["line"][0]["creator_id"]
       lineCodes = map(lambda x: x.split('|'), lineCodesStr.split(','))
       for lineCode in lineCodes:
-        if lineCode[0] == dataSourceId:
+        if lineCode[0] == datasource_id:
           childLine = etree.SubElement(childLines, "Line")
           childLine.text = lineCode[1]
 

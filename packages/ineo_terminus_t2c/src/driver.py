@@ -49,16 +49,18 @@ childEndStopPoint.text = "non"
 recipients = message[0]["recipients"][0]
 if 'stoparea' in recipients:
   childStopPoint = etree.SubElement(childMessaging, "StopPoint")
-  # SYNTHESE has stop area recipients, but Ineo expects stop points so we request all the stop points of each stop area
+  # SYNTHESE has stop area AND/OR stop point recipients, but Ineo expects stop points so we request all the stop points of each stop area
+  # TODO : support stop points as 'stoparea' recipients
   parameters = { "roid": recipients["stoparea"][0]["id"], "output_stops": 1, "of" : "text" }
   stopAreasPM = synthese.service("StopAreasListFunction", parameters)
-  # Loop over stop points
-  for stop in stopAreasPM["stopArea"][0]["stop"]:
-    # Split the operator codes and find the Ineo code
-    stopCodes = map(lambda x: x.split('|'), stop["operator_code"].split(','))
-    for stopCode in stopCodes:
-      if stopCode[0] == datasource_id:
-        childStopPoint.text = stopCode[1]
+  if 'stopArea' in stopAreasPM:
+    # Loop over stop points
+    for stop in stopAreasPM["stopArea"][0]["stop"]:
+      # Split the operator codes and find the Ineo code
+      stopCodes = map(lambda x: x.split('|'), stop["operator_code"].split(','))
+      for stopCode in stopCodes:
+        if stopCode[0] == datasource_id:
+          childStopPoint.text = stopCode[1]
 
 # RepeatPeriod
 
