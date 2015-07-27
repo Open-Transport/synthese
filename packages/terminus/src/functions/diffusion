@@ -4,7 +4,7 @@
   roid=<@scenario_id@>&
 template=
 <@scenario_folder_id=<@folder_id@>@>
-<@in_archive=<@end_date&&(end_date<=<?date&strftime_format=%Y-%m-%d %H:%M:%S?>)@>@>
+<@in_archive=<@archived@>@>
 <@section_name=<@section?<?object&roid=<@section@>&template=<@name@>?>:title@>@>
 <@writeRightOnCurrentSection=<@<@is_template@>||<#has_section_right&level=WRITE&sectionid=<@section@>#>@>@>
 
@@ -219,7 +219,7 @@ template=
             <{section&template=
 		<@archivingAuthorized=<@<@archivingAuthorized@>&&<#has_section_right&level=DELETE_RIGHT&sectionid=<@id@>#>@>@>
             }>
-            <?if&cond=<@archivingAuthorized@>&then=<?link&target=<@p@>&a=scenariostop&actionParams=<@scenario_id@>&roid=<@scenario_id@>&class=btn btn-danger btn-mini&text=<i class="icon-eject icon-white"></i>&confirm=Etes-vous sûr de vouloir clore et archiver l'événement ??>&
+            <?if&cond=<@archivingAuthorized@>&then=<?link&target=<@p@>&a=scenariostop&actionParams=<@scenario_id@>&actionParam_archive=1&roid=<@scenario_id@>&class=btn btn-danger btn-mini&text=<i class="icon-eject icon-white"></i>&confirm=Etes-vous sûr de vouloir clore et archiver l'événement ??>&
             else=Archivage non autorisé?>
           </td>
           </tr>&

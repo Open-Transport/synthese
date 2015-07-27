@@ -60,6 +60,7 @@ namespace synthese
 		const string ScenarioStopAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "s";
 		const string ScenarioStopAction::PARAMETER_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_datasource_id";
 		const string ScenarioStopAction::PARAMETER_REMOVE = Action_PARAMETER_PREFIX + "_remove";
+		const string ScenarioStopAction::PARAMETER_ARCHIVE = Action_PARAMETER_PREFIX + "_archive";
 
 
 
@@ -115,6 +116,8 @@ namespace synthese
 
 			// True removal ?
 			_remove = map.getDefault<bool>(PARAMETER_REMOVE, false);
+
+			_archive = map.getDefault<bool>(PARAMETER_ARCHIVE, false);
 		}
 
 
@@ -132,6 +135,11 @@ namespace synthese
 				// Action
 				_scenario->setPeriodEnd(_stopDateTime);
 				_scenario->setIsEnabled(false);
+
+				if (_archive)
+				{
+					_scenario->setArchived(true);
+				}
 
 				ScenarioTableSync::Save(_scenario);
 

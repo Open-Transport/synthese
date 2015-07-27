@@ -50,6 +50,7 @@ namespace synthese
 		const std::string SentScenario::DATA_ACTIVE = "active";
 		const std::string SentScenario::DATA_SCENARIO_ID = "scenario_id";
 		const std::string SentScenario::DATA_IS_TEMPLATE = "is_template";
+		const std::string SentScenario::DATA_ARCHIVED = "archived";
 		const std::string SentScenario::DATA_CODE = "code";
 		const std::string SentScenario::DATA_VALUE = "value";
 
@@ -187,6 +188,9 @@ namespace synthese
 
 			// is template
 			pm.insert(DATA_IS_TEMPLATE, false);
+
+			// is template
+			pm.insert(DATA_ARCHIVED, getArchived());
 
 			if(	getTemplate()
 			){

@@ -47,12 +47,14 @@ namespace synthese
 			static const std::string PARAMETER_SCENARIO_ID;
 			static const std::string PARAMETER_DATASOURCE_ID;
 			static const std::string PARAMETER_REMOVE;
+			static const std::string PARAMETER_ARCHIVE;
 
 		private:
 			SentScenario*	_scenario;
 			const impex::DataSource* _dataSource;
 			const boost::posix_time::ptime	_stopDateTime;
 			bool _remove;
+			bool _archive;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

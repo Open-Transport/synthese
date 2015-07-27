@@ -159,6 +159,7 @@ calendar: [<{calendar&template=
 		          a=scenariostop&
 	     	          section=<@section@>&
 	      	          actionParams=<@roid@>&
+                    actionParam_archive=1&
 	    	          class=btn btn-danger btn-mini btn-with-margins&
 	     	          text=<i class="icon-eject icon-white"></i>&
 	     	          confirm=Etes-vous sûr de vouloir clore et archiver l'événement ?&

@@ -725,18 +725,13 @@ namespace synthese
 				if(*inArchive)
 				{
 					query << " AND " <<
-						ScenarioTableSync::COL_PERIODEND << " IS NOT NULL AND " <<
-						ScenarioTableSync::COL_PERIODEND << "!='' AND " <<
-						ScenarioTableSync::COL_PERIODEND << "<='" << to_iso_extended_string(date.date()) << " " << to_simple_string(date.time_of_day()) << "'"
+						ScenarioTableSync::COL_ARCHIVED << " = 1 "
 					;
 				}
 				else
 				{
-					query << " AND (" <<
-						ScenarioTableSync::COL_PERIODEND << " IS NULL OR " <<
-						ScenarioTableSync::COL_PERIODEND << "='' OR " <<
-						ScenarioTableSync::COL_PERIODEND << ">'" << to_iso_extended_string(date.date()) << " " << to_simple_string(date.time_of_day()) << "'" <<
-						")"
+					query << " AND " <<
+						ScenarioTableSync::COL_ARCHIVED << " = 0 "
 					;
 				}
 			}

@@ -399,6 +399,8 @@ namespace synthese
 		
 		bool MessagesModule::_enableScenarioIfAutoActivation( SentScenario* sscenario )
 		{
+			if (sscenario->getArchived()) return false;
+
 			// Is the scenario associated to an auto_activation section ?
 			bool autoChange(false);
 			BOOST_FOREACH(const Scenario::Sections::value_type& section, sscenario->getSections())
