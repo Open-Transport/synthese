@@ -31,6 +31,7 @@
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 #include <set>
 #include <string>
 
@@ -238,7 +239,11 @@ namespace synthese
 
 			std::set<IneoTerminusConnection::tcp_connection*> _livingConnections;
 			std::set<std::string> _messagesToSend;
-			
+
+			boost::mutex _connectionsMutex;
+			boost::mutex _messagesMutex;
+			boost::mutex _requestIdsMutex;
+
 		public:
 			IneoTerminusConnection();
 
@@ -273,9 +278,10 @@ namespace synthese
 			);
 
 			static void MessageSender();
+			void sendMessage();
 
 			static boost::shared_ptr<IneoTerminusConnection> GetTheConnection(){ return _theConnection; }
-			static int GetNextRequestID(){ _idRequest++; return _idRequest; }
+			int getNextRequestID();
 		};
 }	}
 

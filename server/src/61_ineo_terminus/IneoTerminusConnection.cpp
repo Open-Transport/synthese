@@ -105,20 +105,27 @@ namespace synthese
 			ioService.run();
 		}
 
+
 		void IneoTerminusConnection::addConnection(IneoTerminusConnection::tcp_connection* new_connection)
 		{
+			boost::mutex::scoped_lock lock(_connectionsMutex);
 			_livingConnections.insert(new_connection);
 		}
 
+
 		void IneoTerminusConnection::removeConnection(IneoTerminusConnection::tcp_connection* connection_to_remove)
 		{
+			boost::mutex::scoped_lock lock(_connectionsMutex);
 			_livingConnections.erase(connection_to_remove);
 		}
 
+
 		void IneoTerminusConnection::addMessage(string new_message)
 		{
+			boost::mutex::scoped_lock lock(_messagesMutex);
 			_messagesToSend.insert(new_message);
 		}
+
 
 		void IneoTerminusConnection::MessageSender()
 		{
@@ -126,18 +133,26 @@ namespace synthese
 			// Main loop
 			while (true)
 			{
-				// If we have an active connection, we send the first message by this way
-				if (!_theConnection->_livingConnections.empty())
-				{
-					if (!_theConnection->_messagesToSend.empty())
-					{
-						(*(_theConnection->_livingConnections.begin()))->sendMessage(*(_theConnection->_messagesToSend.begin()));
-						_theConnection->_messagesToSend.erase(_theConnection->_messagesToSend.begin());
-					}
-				}
-
+				GetTheConnection()->sendMessage();
 				// Sleep
 				boost::this_thread::sleep(boost::posix_time::seconds(_theConnection->getIneoTickInterval()));
+			}
+		}
+
+
+		void IneoTerminusConnection::sendMessage()
+		{
+			boost::mutex::scoped_lock connectionsLock(_connectionsMutex);
+			// If we have an active connection, we send the first message by this way
+			if (!_livingConnections.empty())
+			{
+				boost::mutex::scoped_lock messagesLock(_messagesMutex);
+				if (!_messagesToSend.empty())
+				{
+					std::set<std::string>::iterator firstMessageIter = _messagesToSend.begin();
+					(*(_livingConnections.begin()))->sendMessage(*firstMessageIter);
+					_messagesToSend.erase(firstMessageIter);
+				}
 			}
 		}
 
@@ -153,7 +168,6 @@ namespace synthese
 			}
 			return allNode;
 		}
-
 
 
 		void IneoTerminusConnection::ParameterCallback( const std::string& name, const std::string& value )
@@ -200,10 +214,20 @@ namespace synthese
 			}
 		}
 
+
+		int IneoTerminusConnection::getNextRequestID()
+		{
+			boost::mutex::scoped_lock lock (_requestIdsMutex);
+			_idRequest++;
+			return _idRequest;
+		}
+
+
 		tcp::socket& IneoTerminusConnection::tcp_connection::socket()
 		{
 			return _socket;
 		}
+
 
 		void IneoTerminusConnection::tcp_connection::start()
 		{
@@ -220,6 +244,7 @@ namespace synthese
 					boost::asio::placeholders::bytes_transferred
 			)	);
 		}
+
 
 		void IneoTerminusConnection::tcp_connection::handle_read(
 			const boost::system::error_code& error,
@@ -847,7 +872,7 @@ namespace synthese
 			// Build the response header
 			responseStream << _getXMLHeader() << char(10);
 			responseStream << "<" << responseTag << ">" << char(10);
-			responseStream << "\t<ID>" << boost::lexical_cast<std::string>(GetNextRequestID()) << "</ID>" << char(10);
+			responseStream << "\t<ID>" << boost::lexical_cast<std::string>(IneoTerminusConnection::GetTheConnection()->getNextRequestID()) << "</ID>" << char(10);
 			responseStream << "\t<RequestID>" << requestId << "</RequestID>" << char(10);
 			// Note : according to interface description 'ResponseTimeStamp' = 'RequestTimeStamp'
 			responseStream << "\t<ResponseTimeStamp>" << requestTimestamp << "</ResponseTimeStamp>" << char(10);
