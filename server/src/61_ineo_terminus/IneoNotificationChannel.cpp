@@ -103,7 +103,7 @@ namespace synthese
 				fields.insert("type", string("Delete"));
 			}
 			fields.insert("messagerie", provider->getName());
-			fields.insert("ID", lexical_cast<string>(IneoTerminusConnection::GetNextRequestID()));
+			fields.insert("ID", lexical_cast<string>(IneoTerminusConnection::GetTheConnection()->getNextRequestID()));
 			fields.insert("network_id", IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK));
 			fields.insert("datasource_id", IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE));
 
