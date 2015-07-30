@@ -32,7 +32,9 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <set>
+#include <deque>
 #include <string>
 
 namespace synthese
@@ -60,6 +62,7 @@ namespace synthese
 			static const std::string MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST;
 			static const std::string MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST;
 			static const std::string MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST;
+			static const std::string INEO_TERMINUS_XML_HEADER;
 
 			enum Status
 			{
@@ -205,7 +208,6 @@ namespace synthese
 				);
 
 				// generic parsers
-				std::string _getXMLHeader();
 				std::vector<IneoTerminusConnection::Recipient> _readRecipients(XMLNode node);
 				Messaging _readMessagingNode(XMLNode node, std::string messagerieName);
 
@@ -238,11 +240,15 @@ namespace synthese
 			};
 
 			std::set<IneoTerminusConnection::tcp_connection*> _livingConnections;
-			std::set<std::string> _messagesToSend;
+			std::deque<std::string> _messagesToSend;
 
 			boost::mutex _connectionsMutex;
-			boost::mutex _messagesMutex;
+			boost::recursive_mutex _messagesMutex;
 			boost::mutex _requestIdsMutex;
+
+			void _sendMessage();
+			void _synchronizeMessages();
+			const std::string _buildGetStatesRequest(const std::string& ineoMessageType);
 
 		public:
 			IneoTerminusConnection();
@@ -278,8 +284,6 @@ namespace synthese
 			);
 
 			static void MessageSender();
-			void sendMessage();
-
 			static boost::shared_ptr<IneoTerminusConnection> GetTheConnection(){ return _theConnection; }
 			int getNextRequestID();
 		};

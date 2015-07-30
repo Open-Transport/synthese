@@ -35,6 +35,9 @@
 #include "ServerModule.h"
 #include "TransportNetwork.h"
 #include "XmlToolkit.h"
+#include "NotificationProvider.hpp"
+#include "IneoNotificationChannel.hpp"
+#include "MessagesModule.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/bind/bind.hpp>
@@ -77,6 +80,7 @@ namespace synthese
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST = "ineo_terminus_bivgeneral_fake_broadcast";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST = "ineo_terminus_bivlineauto_fake_broadcast";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST = "ineo_terminus_bivlineman_fake_broadcast";
+		const string IneoTerminusConnection::INEO_TERMINUS_XML_HEADER = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>";
 
 		boost::shared_ptr<IneoTerminusConnection> IneoTerminusConnection::_theConnection(new IneoTerminusConnection);
 		int IneoTerminusConnection::_idRequest(0);
@@ -108,8 +112,16 @@ namespace synthese
 
 		void IneoTerminusConnection::addConnection(IneoTerminusConnection::tcp_connection* new_connection)
 		{
-			boost::mutex::scoped_lock lock(_connectionsMutex);
+			boost::mutex::scoped_lock connectionLock(_connectionsMutex);
 			_livingConnections.insert(new_connection);
+
+			util::Log::GetInstance().info("New connection from Ineo SAE (count=" + boost::lexical_cast<std::string>(_livingConnections.size()) + ")");
+
+			if(1 == _livingConnections.size())
+			{
+				// Upon first connection or reconnection from Ineo SAE, we need to synchronize the messages between the 2 systems
+				_synchronizeMessages();
+			}
 		}
 
 
@@ -117,13 +129,14 @@ namespace synthese
 		{
 			boost::mutex::scoped_lock lock(_connectionsMutex);
 			_livingConnections.erase(connection_to_remove);
+			util::Log::GetInstance().info("Connection to Ineo SAE closed (count=" + boost::lexical_cast<std::string>(_livingConnections.size()) + ")");
 		}
 
 
 		void IneoTerminusConnection::addMessage(string new_message)
 		{
-			boost::mutex::scoped_lock lock(_messagesMutex);
-			_messagesToSend.insert(new_message);
+			boost::recursive_mutex::scoped_lock lock(_messagesMutex);
+			_messagesToSend.push_back(new_message);
 		}
 
 
@@ -133,27 +146,103 @@ namespace synthese
 			// Main loop
 			while (true)
 			{
-				GetTheConnection()->sendMessage();
+				GetTheConnection()->_sendMessage();
 				// Sleep
 				boost::this_thread::sleep(boost::posix_time::seconds(_theConnection->getIneoTickInterval()));
 			}
 		}
 
 
-		void IneoTerminusConnection::sendMessage()
+		void IneoTerminusConnection::_sendMessage()
 		{
 			boost::mutex::scoped_lock connectionsLock(_connectionsMutex);
-			// If we have an active connection, we send the first message by this way
+			// If we have an active connection, we send the first message from the queue
 			if (!_livingConnections.empty())
 			{
-				boost::mutex::scoped_lock messagesLock(_messagesMutex);
+				boost::recursive_mutex::scoped_lock messagesLock(_messagesMutex);
 				if (!_messagesToSend.empty())
 				{
-					std::set<std::string>::iterator firstMessageIter = _messagesToSend.begin();
-					(*(_livingConnections.begin()))->sendMessage(*firstMessageIter);
-					_messagesToSend.erase(firstMessageIter);
+					std::string firstMessage = _messagesToSend.front();
+					(*(_livingConnections.begin()))->sendMessage(firstMessage);
+					_messagesToSend.pop_front();
 				}
 			}
+		}
+
+
+		void IneoTerminusConnection::_synchronizeMessages()
+		{
+			util::Log::GetInstance().info("Synchronizing messages with Ineo SAE");
+
+			// Lock the message queue and empty it
+			boost::recursive_mutex::scoped_lock messagesLock(_messagesMutex);
+			_messagesToSend.clear();
+
+			// For each Ineo Notification provider :
+			// * build a XXXGetStatesRequest to request active messages from Ineo SAE
+			// * build a XXXCreateMessageRequest for each currently active message associated to this provider
+			// TODO : delete existing Ineo SAE messages
+			BOOST_FOREACH(const NotificationProvider::Registry::value_type& providerEntry, Env::GetOfficialEnv().getRegistry<NotificationProvider>())
+			{
+				boost::shared_ptr<NotificationProvider> provider = providerEntry.second;
+
+				if(IneoNotificationChannel::FACTORY_KEY == provider->get<NotificationChannelKey>())
+				{
+					const ParametersMap& parameters = provider->get<Parameters>();
+					MessagesModule::ActivatedMessages providerMessages = MessagesModule::GetActivatedMessages(*provider, ParametersMap());
+
+					if(true == parameters.isDefined(IneoNotificationChannel::PARAMETER_INEO_MESSAGE_TYPE))
+					{
+						// Build XXXGetStatesRequest and queue it
+						std::string ineoMessageType = parameters.getValue(IneoNotificationChannel::PARAMETER_INEO_MESSAGE_TYPE);
+						std::string stateRequest = _buildGetStatesRequest(ineoMessageType);
+						addMessage(stateRequest);
+
+						util::Log::GetInstance().info("Ineo SAE NotificationProvider " + ineoMessageType + " has " +
+													  boost::lexical_cast<std::string>(providerMessages.size()) + " active messages");
+					}
+
+					BOOST_FOREACH(const boost::shared_ptr<Alarm> providerMessage, providerMessages)
+					{
+						// NotificationProvider does not process Alarm, it requires a NotificationEvent
+						// Since we don't want to add another NotificationEvent into the database, we create a fake one that is only used to generate the message
+						const boost::shared_ptr<NotificationEvent> fakeEvent(new NotificationEvent(0, *providerMessage, *provider, BEGIN));
+						provider->notify(fakeEvent);
+					}
+				}
+			}
+
+			util::Log::GetInstance().debug("Synchronization with Ineo SAE ended : " + boost::lexical_cast<std::string>(_messagesToSend.size()) +
+										   " messages queued for sending");
+		}
+
+
+		const std::string IneoTerminusConnection::_buildGetStatesRequest(const std::string& ineoMessageType)
+		{
+			std::stringstream requestStream;
+
+			// Build the request tag
+			std::string requestTag = ineoMessageType + "GetStatesRequest";
+
+			// Set the format of datetime objects to the format expected by Ineo
+			boost::posix_time::ptime now = second_clock::local_time();
+			std::stringstream timestampStream;
+			timestampStream << setfill('0') << setw(2) << now.date().day() << "/"
+							<< setfill('0') << setw(2) << int(now.date().month()) << "/"
+							<< setfill('0') << setw(4) << now.date().year() << " "
+							<< setfill('0') << setw(2) << now.time_of_day().hours() << ":"
+							<< setfill('0') << setw(2) << now.time_of_day().minutes() << ":"
+							<< setfill('0') << setw(2) << now.time_of_day().seconds();
+
+			// Build the request header
+			requestStream << INEO_TERMINUS_XML_HEADER << char(10);
+			requestStream << "<" << requestTag << ">" << char(10);
+			requestStream << "\t<ID>" << boost::lexical_cast<std::string>(getNextRequestID()) << "</ID>" << char(10);
+			requestStream << "\t<RequestTimeStamp>" << timestampStream.str() << "</RequestTimeStamp>" << char(10);
+			requestStream << "\t<RequestorRef>Terminus</RequestorRef>" << char(10);
+			requestStream << "</" << requestTag << ">" << char(10);
+
+			return requestStream.str();
 		}
 
 
@@ -218,7 +307,8 @@ namespace synthese
 		int IneoTerminusConnection::getNextRequestID()
 		{
 			boost::mutex::scoped_lock lock (_requestIdsMutex);
-			_idRequest++;
+			// Request identifiers are comprised between 1 and 65535
+			_idRequest = (_idRequest % 65534) + 1;
 			return _idRequest;
 		}
 
@@ -450,6 +540,7 @@ namespace synthese
 			}
 		}
 
+
 		void IneoTerminusConnection::tcp_connection::handle_write
 		(
 			const boost::system::error_code& error
@@ -461,6 +552,7 @@ namespace synthese
 				IneoTerminusConnection::GetTheConnection()->removeConnection(this);
 			}
 		}
+
 
 		void IneoTerminusConnection::tcp_connection::sendMessage(
 			string message
@@ -478,6 +570,7 @@ namespace synthese
 			)	);
 		}
 
+
 		IneoTerminusConnection::tcp_server::tcp_server(
 			boost::asio::io_service& ioService,
 			string port,
@@ -490,6 +583,7 @@ namespace synthese
 		{
 			start_accept();
 		}
+
 
 		void IneoTerminusConnection::tcp_server::start_accept()
 		{
@@ -505,6 +599,7 @@ namespace synthese
 				)
 			);
 		}
+
 
 		void IneoTerminusConnection::tcp_server::handle_accept(
 			tcp_connection* new_connection,
@@ -524,11 +619,6 @@ namespace synthese
 			start_accept();
 		}
 
-		// Response generators
-		string IneoTerminusConnection::tcp_connection::_getXMLHeader()
-		{
-			return "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>";
-		}
 
 		bool IneoTerminusConnection::tcp_connection::_checkStatusRequest(XMLNode& node, std::string& response)
 		{
@@ -870,7 +960,7 @@ namespace synthese
 			replace_all(responseTag, "Request", "Response");
 
 			// Build the response header
-			responseStream << _getXMLHeader() << char(10);
+			responseStream << INEO_TERMINUS_XML_HEADER << char(10);
 			responseStream << "<" << responseTag << ">" << char(10);
 			responseStream << "\t<ID>" << boost::lexical_cast<std::string>(IneoTerminusConnection::GetTheConnection()->getNextRequestID()) << "</ID>" << char(10);
 			responseStream << "\t<RequestID>" << requestId << "</RequestID>" << char(10);
