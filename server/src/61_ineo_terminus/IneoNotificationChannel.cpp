@@ -51,6 +51,7 @@ namespace synthese
 	namespace ineo_terminus
 	{
 		const std::string IneoNotificationChannel::PARAMETER_CMS_INTERPRETER = "cms_interpreter_id";
+		const std::string IneoNotificationChannel::PARAMETER_INEO_MESSAGE_TYPE = "ineo_message_type";
 		const std::string IneoNotificationChannel::PARAMETER_NEEDS_REPEAT_INTERVAL = "needs_repeat_interval";
 		const std::string IneoNotificationChannel::PARAMETER_NEEDS_WITH_ACK = "needs_with_ack";
 		const std::string IneoNotificationChannel::PARAMETER_NEEDS_MULTIPLE_STOPS = "needs_multiple_stops";
@@ -65,6 +66,7 @@ namespace synthese
 		{
 			vector<string> result;
 			result.push_back(PARAMETER_CMS_INTERPRETER);
+			result.push_back(PARAMETER_INEO_MESSAGE_TYPE);
 			result.push_back(PARAMETER_NEEDS_REPEAT_INTERVAL);
 			result.push_back(PARAMETER_NEEDS_WITH_ACK);
 			result.push_back(PARAMETER_NEEDS_MULTIPLE_STOPS);
@@ -75,7 +77,6 @@ namespace synthese
 			result.push_back(PARAMETER_NEEDS_END_STOP_POINT);
 			return result;
 		}
-
 
 
 		bool IneoNotificationChannel::notifyEvent(const boost::shared_ptr<NotificationEvent> event)

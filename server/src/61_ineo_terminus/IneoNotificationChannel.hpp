@@ -41,6 +41,7 @@ namespace synthese
 
 		public:
 			static const std::string PARAMETER_CMS_INTERPRETER;
+			static const std::string PARAMETER_INEO_MESSAGE_TYPE;
 			/// Parameters needs_
 			static const std::string PARAMETER_NEEDS_REPEAT_INTERVAL;
 			static const std::string PARAMETER_NEEDS_WITH_ACK;
