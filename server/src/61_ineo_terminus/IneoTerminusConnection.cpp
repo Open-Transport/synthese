@@ -85,6 +85,11 @@ namespace synthese
 		boost::shared_ptr<IneoTerminusConnection> IneoTerminusConnection::_theConnection(new IneoTerminusConnection);
 		int IneoTerminusConnection::_idRequest(0);
 		
+		std::map<std::string, util::RegistryKeyType> IneoTerminusConnection::_fakeBroadcastPoints;
+		std::set<std::string> IneoTerminusConnection::_creationRequestTags;
+		std::set<std::string> IneoTerminusConnection::_deletionRequestTags;
+		std::set<std::string> IneoTerminusConnection::_creationOrDeletionResponseTags;
+		std::set<std::string> IneoTerminusConnection::_getStatesResponseTags;
 
 		IneoTerminusConnection::IneoTerminusConnection(
 		)
@@ -107,6 +112,38 @@ namespace synthese
 				_theConnection->getIneoDatasource()
 			);
 			ioService.run();
+		}
+
+
+		void IneoTerminusConnection::Initialize()
+		{
+			std::list<std::string> ineoMessageTypes;
+			ineoMessageTypes.push_back("Passenger");
+			ineoMessageTypes.push_back("Driver");
+			ineoMessageTypes.push_back("Ppds");
+			ineoMessageTypes.push_back("Girouette");
+			ineoMessageTypes.push_back("SonoPassenger");
+			ineoMessageTypes.push_back("SonoDriver");
+			ineoMessageTypes.push_back("SonoStopPoint");
+			ineoMessageTypes.push_back("BivGeneral");
+			ineoMessageTypes.push_back("BivLineMan");
+			ineoMessageTypes.push_back("BivLineAuto");
+
+			BOOST_FOREACH(const std::string& ineoMessageType, ineoMessageTypes)
+			{
+				std::string creationRequestTag   = ineoMessageType + "CreateMessageRequest";
+				std::string deletionRequestTag   = ineoMessageType + "DeleteMessageRequest";
+				std::string creationResponseTag  = ineoMessageType + "CreateMessageResponse";
+				std::string deletionResponseTag  = ineoMessageType + "DeleteMessageResponse";
+				std::string getStatesResponseTag = ineoMessageType + "GetStatesResponse";
+
+				// Those sets are used to decode the messages received from Ineo SAE
+				_creationRequestTags.insert(creationRequestTag);
+				_deletionRequestTags.insert(deletionRequestTag);
+				_creationOrDeletionResponseTags.insert(creationResponseTag);
+				_creationOrDeletionResponseTags.insert(deletionResponseTag);
+				_getStatesResponseTags.insert(getStatesResponseTag);
+			}
 		}
 
 
@@ -301,6 +338,76 @@ namespace synthese
 					_theConnection->_status = offline;
 				}
 			}
+
+			if(name == MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST)
+			{
+				std::string ineoMessageType = "Passenger";
+				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
+				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+			}
+
+			if(name == MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST)
+			{
+				std::string ineoMessageType = "Driver";
+				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
+				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+			}
+
+			if(name == MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST)
+			{
+				std::string ineoMessageType = "Ppds";
+				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
+				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+			}
+
+			if(name == MODULE_PARAM_INEO_TERMINUS_GIROUETTE_FAKE_BROADCAST)
+			{
+				std::string ineoMessageType = "Girouette";
+				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
+				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+			}
+
+			if(name == MODULE_PARAM_INEO_TERMINUS_SONOPASSENGER_FAKE_BROADCAST)
+			{
+				std::string ineoMessageType = "SonoPassenger";
+				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
+				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+			}
+
+			if(name == MODULE_PARAM_INEO_TERMINUS_SONODRIVER_FAKE_BROADCAST)
+			{
+				std::string ineoMessageType = "SonoDriver";
+				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
+				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+			}
+
+			if(name == MODULE_PARAM_INEO_TERMINUS_SONOSTOPPOINT_FAKE_BROADCAST)
+			{
+				std::string ineoMessageType = "SonoStopPoint";
+				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
+				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+			}
+
+			if(name == MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST)
+			{
+				std::string ineoMessageType = "BivGeneral";
+				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
+				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+			}
+
+			if(name == MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST)
+			{
+				std::string ineoMessageType = "BivLineMan";
+				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
+				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+			}
+
+			if(name == MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST)
+			{
+				std::string ineoMessageType = "BivLineAuto";
+				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
+				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+			}
 		}
 
 
@@ -343,6 +450,7 @@ namespace synthese
 		{
 			if (!error)
 			{
+				// Read data until '\0' is reached
 				string bufStr;
 				istream is(_buf.get());
 				getline(is, bufStr, char(0));
@@ -352,13 +460,12 @@ namespace synthese
 					return;
 				}
 
-				string singleLine(bufStr);
 				// Log for debug
-				util::Log::GetInstance().debug("Ineo Terminus : on a recu ca : " + singleLine);
+				util::Log::GetInstance().debug("Ineo Terminus received : " + bufStr);
+				// TODO : accept both " and '
 				if (bufStr.substr(0,43) != "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>")
 				{
-					util::Log::GetInstance().warn("Ineo Terminus : message XML sans entete");
-					// TO-DO : insert char(10) (line feed) in error responses
+					util::Log::GetInstance().warn("Ineo Terminus received a XML message with wrong header");
 					string message("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><ResponseRef>Terminus</ResponseRef><ErrorType>ProtocolError</ErrorType><ErrorMessage>Syntaxe incorrecte</ErrorMessage><ErrorID>1</ErrorID>");
 					util::IConv iconv("UTF-8","ISO-8859-1");
 					message = iconv.convert(message);
@@ -391,7 +498,6 @@ namespace synthese
 				if(node.isEmpty())
 				{
 					util::Log::GetInstance().warn("Ineo Terminus : Message XML vide");
-					// TO-DO : insert char(10) (line feed) in error responses
 					string message("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><ResponseRef>Terminus</ResponseRef><ErrorType>ProtocolError</ErrorType><ErrorMessage>Syntaxe incorrecte</ErrorMessage><ErrorID>1</ErrorID>");
 					util::IConv iconv("UTF-8","ISO-8859-1");
 					message = iconv.convert(message);
@@ -421,7 +527,6 @@ namespace synthese
 				if(childNode.isEmpty())
 				{
 					util::Log::GetInstance().warn("Ineo Terminus : Message XML vide sans node 0");
-					// TO-DO : insert char(10) (line feed) in error responses
 					string message("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><ResponseRef>Terminus</ResponseRef><ErrorType>ProtocolError</ErrorType><ErrorMessage>Syntaxe incorrecte</ErrorMessage><ErrorID>1</ErrorID>");
 					util::IConv iconv("UTF-8","ISO-8859-1");
 					message = iconv.convert(message);
@@ -451,31 +556,6 @@ namespace synthese
 				string tagName(childNode.getName());
 				string response = "";
 
-				std::set<std::string> creationRequestTags;
-				std::set<std::string> deletionRequestTags;
-
-				creationRequestTags.insert("PassengerCreateMessageRequest");
-				creationRequestTags.insert("DriverCreateMessageRequest");
-				creationRequestTags.insert("PpdsCreateMessageRequest");
-				creationRequestTags.insert("GirouetteCreateMessageRequest");
-				creationRequestTags.insert("SonoPassengerCreateMessageRequest");
-				creationRequestTags.insert("SonoDriverCreateMessageRequest");
-				creationRequestTags.insert("SonoStopPointCreateMessageRequest");
-				creationRequestTags.insert("BivGeneralCreateMessageRequest");
-				creationRequestTags.insert("BivLineManCreateMessageRequest");
-				creationRequestTags.insert("BivLineAutoCreateMessageRequest");
-
-				deletionRequestTags.insert("PassengerDeleteMessageRequest");
-				deletionRequestTags.insert("DriverDeleteMessageRequest");
-				deletionRequestTags.insert("PpdsDeleteMessageRequest");
-				deletionRequestTags.insert("GirouetteDeleteMessageRequest");
-				deletionRequestTags.insert("SonoPassengerDeleteMessageRequest");
-				deletionRequestTags.insert("SonoDriverDeleteMessageRequest");
-				deletionRequestTags.insert("SonoStopPointDeleteMessageRequest");
-				deletionRequestTags.insert("BivGeneralDeleteMessageRequest");
-				deletionRequestTags.insert("BivLineManDeleteMessageRequest");
-				deletionRequestTags.insert("BivLineAutoDeleteMessageRequest");
-
 				if (tagName == "CheckStatusRequest")
 				{
 					bool requestSuccessful = _checkStatusRequest(childNode, response);
@@ -486,7 +566,7 @@ namespace synthese
 					}
 				}
 
-				else if (creationRequestTags.end() != creationRequestTags.find(tagName))
+				else if (_creationRequestTags.end() != _creationRequestTags.find(tagName))
 				{
 					bool requestSuccessful = _createMessageRequest(childNode, response);
 
@@ -496,7 +576,7 @@ namespace synthese
 					}
 				}
 
-				else if (deletionRequestTags.end() != deletionRequestTags.find(tagName))
+				else if (_deletionRequestTags.end() != _deletionRequestTags.find(tagName))
 				{
 					bool requestSuccessful = _deleteMessageRequest(childNode, response);
 
@@ -506,21 +586,41 @@ namespace synthese
 					}
 				}
 
-				else
+				else if (_creationOrDeletionResponseTags.end() != _creationOrDeletionResponseTags.find(tagName))
 				{
-					util::Log::GetInstance().warn("Ineo Terminus : Parser non codé pour " + tagName);
+					// TODO : error handling
+					// If message has 'ErrorType', 'ErrorMessage' and 'ErrorID' nodes then our request was rejected
 				}
 
-				response += char(0);
-				boost::asio::async_write(
-					_socket,
-					boost::asio::buffer(response),
-					boost::bind(
-						&tcp_connection::handle_write,
-						this,
-						boost::asio::placeholders::error
-					)
-				);
+				else if (_getStatesResponseTags.end() != _getStatesResponseTags.find(tagName))
+				{
+					bool requestSuccessful = _getStatesResponse(childNode, response);
+
+					if(!requestSuccessful)
+					{
+						// TODO : log
+					}
+				}
+
+				else
+				{
+					util::Log::GetInstance().warn("Ineo Terminus unsupported message : " + tagName);
+				}
+
+				if(false == response.empty())
+				{
+					// This message requires a response, add the message delimiter and send the buffer
+					response += char(0);
+					boost::asio::async_write(
+						_socket,
+						boost::asio::buffer(response),
+						boost::bind(
+							&tcp_connection::handle_write,
+							this,
+							boost::asio::placeholders::error
+						)
+					);
+				}
 
 				boost::asio::async_read_until(
 					_socket,
@@ -535,7 +635,7 @@ namespace synthese
 			}
 			else
 			{
-				util::Log::GetInstance().debug("handle_read sort en erreur " + error.message());
+				util::Log::GetInstance().debug("Ineo Terminus read error : " + error.message());
 				IneoTerminusConnection::GetTheConnection()->removeConnection(this);
 			}
 		}
@@ -548,7 +648,7 @@ namespace synthese
 		{
 			if (error)
 			{
-				util::Log::GetInstance().debug("handle_write sort en erreur " + error.message());
+				util::Log::GetInstance().debug("Ineo Terminus write error : " + error.message());
 				IneoTerminusConnection::GetTheConnection()->removeConnection(this);
 			}
 		}
@@ -620,6 +720,40 @@ namespace synthese
 		}
 
 
+		IneoTerminusConnection::tcp_connection::Messaging::Messaging()
+		{
+			name = "";
+			dispatching = Repete;
+			startDate = boost::posix_time::not_a_date_time;
+			stopDate = boost::posix_time::not_a_date_time;
+			repeatPeriod = 0;
+			inhibition = false;
+			color = "";
+			codeGirouette = 0;
+			activateHeadJingle = false;
+			activateBackJingle = false;
+			confirm = false;
+			startStopPoint = "";
+			endStopPoint = "";
+			diodFlashing = false;
+			alternance = false;
+			multipleStop = false;
+			terminusOrStop = false;
+			way = "";
+			stopPoint = "";
+			numberShow = 0;
+			ttsBroadcasting = false;
+			jingle = false;
+			chaining = "";
+			priority = false;
+			varying = false;
+			duration = 0;
+			content = "";
+			contentTts = "";
+			contentScrolling = "";
+		}
+
+
 		bool IneoTerminusConnection::tcp_connection::_checkStatusRequest(XMLNode& node, std::string& response)
 		{
 			string tagName(node.getName());
@@ -643,7 +777,7 @@ namespace synthese
 				idStr +
 				" ; timestamp " +
 				RequestTimeStampNode.getText() +
-				" ; de " +
+				" ; from " +
 				requestorRefStr
 			);
 
@@ -653,61 +787,13 @@ namespace synthese
 			return true;
 		}
 
+
 		bool IneoTerminusConnection::tcp_connection::_createMessageRequest(XMLNode& node, std::string& response)
 		{
 			string tagName(node.getName());
-			string messagerieName;
-			RegistryKeyType fakeBroadCastPoint(0);
-			if (tagName == "PassengerCreateMessageRequest")
-			{
-				messagerieName = "Passenger";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST));
-			}
-			else if (tagName == "DriverCreateMessageRequest")
-			{
-				messagerieName = "Driver";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST));
-			}
-			else if (tagName == "PpdsCreateMessageRequest")
-			{
-				messagerieName = "Ppds";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST));
-			}
-			else if (tagName == "GirouetteCreateMessageRequest")
-			{
-				messagerieName = "Girouette";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_GIROUETTE_FAKE_BROADCAST));
-			}
-			else if (tagName == "SonoPassengerCreateMessageRequest")
-			{
-				messagerieName = "SonoPassenger";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOPASSENGER_FAKE_BROADCAST));
-			}
-			else if (tagName == "SonoDriverCreateMessageRequest")
-			{
-				messagerieName = "SonoDriver";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONODRIVER_FAKE_BROADCAST));
-			}
-			else if (tagName == "SonoStopPointCreateMessageRequest")
-			{
-				messagerieName = "SonoStopPoint";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOSTOPPOINT_FAKE_BROADCAST));
-			}
-			else if (tagName == "BivGeneralCreateMessageRequest")
-			{
-				messagerieName = "BivGeneral";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST));
-			}
-			else if (tagName == "BivLineManCreateMessageRequest")
-			{
-				messagerieName = "BivLineMan";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST));
-			}
-			else if (tagName == "BivLineAutoCreateMessageRequest")
-			{
-				messagerieName = "BivLineAuto";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST));
-			}
+			// Extract Ineo message type from tag name
+			std::string ineoMessageType = tagName.substr(0, tagName.find("CreateMessageRequest"));
+			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
 
 			XMLNode IDNode = node.getChildNode("ID", 0);
 			string idStr = IDNode.getText();
@@ -724,83 +810,20 @@ namespace synthese
 			for (int cptMessagingNode = 0;cptMessagingNode<numMessagingNode;cptMessagingNode++)
 			{
 				XMLNode MessagingNode = node.getChildNode("Messaging", cptMessagingNode);
-				Messaging message = _readMessagingNode(MessagingNode, messagerieName);
+				Messaging message = _readMessagingNode(MessagingNode, ineoMessageType);
 				messages.push_back(message);
 			}
 
 			// Creation of a scenario and a message using ScenarioSaveAction
-			boost::shared_ptr<ParametersMap> messagesAndCalendarsPM(new ParametersMap);
-			BOOST_FOREACH(const Messaging& message, messages)
-			{
-				boost::shared_ptr<ParametersMap> periodPM(new ParametersMap);
-				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()) +" "+ boost::posix_time::to_simple_string(message.startDate.time_of_day()));
-				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()) +" "+ boost::posix_time::to_simple_string(message.stopDate.time_of_day()));
-				periodPM->insert("date", "");
-				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
-				messagePM->insert("title", message.name);
-				messagePM->insert("content", message.content);
-				messagePM->insert("color", message.color);
-				if (message.dispatching == Immediat)
-				{
-					messagePM->insert("dispatching", "Immediat");
-				}
-				else if (message.dispatching == Differe)
-				{
-					messagePM->insert("dispatching", "Differe");
-				}
-				else if (message.dispatching == Repete)
-				{
-					messagePM->insert("dispatching", "Repete");
-				}
-				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod));
-				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
-				messagePM->insert("section", "");
-				messagePM->insert("alternative", "");
-				_addRecipientsPM(*messagePM, message.recipients);
-				boost::shared_ptr<ParametersMap> displayRecipientPM(new ParametersMap);
-				displayRecipientPM->insert("recipient_id", fakeBroadCastPoint);
-				messagePM->insert("displayscreen_recipient", displayRecipientPM);
-				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
-				calendarPM->insert("period", periodPM);
-				calendarPM->insert("message", messagePM);
-				messagesAndCalendarsPM->insert("calendar", calendarPM);
-			}
-
-			stringstream stream;
-			messagesAndCalendarsPM->outputJSON(stream, "");
-			boost::property_tree::ptree messagesAndCalendars;
-			boost::property_tree::json_parser::read_json(stream, messagesAndCalendars);
-			// Verify the existant of an identical event
-			ScenarioStopAction scenarioStopAction;
-			SentScenario* identicalScenario = scenarioStopAction.findScenarioByMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
-			if (!identicalScenario)
-			{
-				ScenarioSaveAction scenarioSaveAction;
-				scenarioSaveAction.setMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
-				boost::shared_ptr<Scenario>	scenario;
-				boost::shared_ptr<SentScenario> sscenario;
-				sscenario.reset(new SentScenario);
-				scenario = static_pointer_cast<Scenario, SentScenario>(sscenario);
-				scenarioSaveAction.setSScenario(sscenario);
-				scenarioSaveAction.setScenario(scenario);
-				Request fakeRequest;
-				scenarioSaveAction.run(fakeRequest);
-				// Enable the scenario
-				sscenario->setIsEnabled(true);
-				SentScenarioTableSync::Save(sscenario.get());
-			}
-			else
-			{
-				util::Log::GetInstance().debug("IneoTerminusConnection::_createMessageRequest : Un événement du SAE est déjà existant " + idStr);
-			}
+			_createMessages(messages, fakeBroadCastPoint);
 
 			util::Log::GetInstance().debug("IneoTerminusConnection::_createMessageRequest : id " +
 				idStr +
 				" ; timestamp " +
 				RequestTimeStampNode.getText() +
-				" ; de " +
+				" ; from " +
 				requestorRefStr +
-				" avec " +
+				" with " +
 				lexical_cast<string>(messages.size()) +
 				" message(s)"
 			);
@@ -811,61 +834,13 @@ namespace synthese
 			return true;
 		}
 
+
 		bool IneoTerminusConnection::tcp_connection::_deleteMessageRequest(XMLNode& node, std::string& response)
 		{
 			string tagName(node.getName());
-			string messagerieName;
-			RegistryKeyType fakeBroadCastPoint(0);
-			if (tagName == "PassengerDeleteMessageRequest")
-			{
-				messagerieName = "Passenger";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST));
-			}
-			else if (tagName == "DriverDeleteMessageRequest")
-			{
-				messagerieName = "Driver";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST));
-			}
-			else if (tagName == "PpdsDeleteMessageRequest")
-			{
-				messagerieName = "Ppds";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST));
-			}
-			else if (tagName == "GirouetteDeleteMessageRequest")
-			{
-				messagerieName = "Girouette";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_GIROUETTE_FAKE_BROADCAST));
-			}
-			else if (tagName == "SonoPassengerDeleteMessageRequest")
-			{
-				messagerieName = "SonoPassenger";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOPASSENGER_FAKE_BROADCAST));
-			}
-			else if (tagName == "SonoDriverDeleteMessageRequest")
-			{
-				messagerieName = "SonoDriver";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONODRIVER_FAKE_BROADCAST));
-			}
-			else if (tagName == "SonoStopPointDeleteMessageRequest")
-			{
-				messagerieName = "SonoStopPoint";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOSTOPPOINT_FAKE_BROADCAST));
-			}
-			else if (tagName == "BivGeneralDeleteMessageRequest")
-			{
-				messagerieName = "BivGeneral";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST));
-			}
-			else if (tagName == "BivLineManDeleteMessageRequest")
-			{
-				messagerieName = "BivLineMan";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST));
-			}
-			else if (tagName == "BivLineAutoDeleteMessageRequest")
-			{
-				messagerieName = "BivLineAuto";
-				fakeBroadCastPoint = lexical_cast<RegistryKeyType>(IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST));
-			}
+			// Extract Ineo message type from tag name
+			std::string ineoMessageType = tagName.substr(0, tagName.find("DeleteMessageRequest"));
+			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
 
 			XMLNode IDNode = node.getChildNode("ID", 0);
 			string idStr = IDNode.getText();
@@ -882,7 +857,7 @@ namespace synthese
 			for (int cptMessagingNode = 0;cptMessagingNode<numMessagingNode;cptMessagingNode++)
 			{
 				XMLNode MessagingNode = node.getChildNode("Messaging", cptMessagingNode);
-				Messaging message = _readMessagingNode(MessagingNode, messagerieName);
+				Messaging message = _readMessagingNode(MessagingNode, ineoMessageType);
 				messages.push_back(message);
 			}
 
@@ -947,6 +922,63 @@ namespace synthese
 			return true;
 		}
 
+
+		bool IneoTerminusConnection::tcp_connection::_getStatesResponse(XMLNode& node, std::string& response)
+		{
+			std::string tagName(node.getName());
+			// Extract Ineo message type from tag name
+			std::string ineoMessageType = tagName.substr(0, tagName.find("GetStatesResponse"));
+			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
+
+			XMLNode idNode = node.getChildNode("ID", 0);
+			string idStr = idNode.getText();
+
+			XMLNode requestIdNode = node.getChildNode("RequestID", 0);
+			string requestIdStr = requestIdNode.getText();
+
+			XMLNode responseTimeStampNode = node.getChildNode("ResponseTimeStamp", 0);
+			ptime responseTimeStamp(
+				XmlToolkit::GetIneoDateTime(
+					responseTimeStampNode.getText()
+			)	);
+
+			XMLNode responseRefNode = node.getChildNode("ResponseRef", 0);
+			string responseRefStr = responseRefNode.getText();
+
+			XMLNode messagingStatesNode = node.getChildNode("MessagingStates", 0);
+			int numMessagingStateNode = messagingStatesNode.nChildNode("MessagingState");
+			int numActiveMessages = 0;
+
+			for (int cptMessagingStateNode = 0; cptMessagingStateNode < numMessagingStateNode; cptMessagingStateNode++)
+			{
+				XMLNode messagingStateNode = messagingStatesNode.getChildNode("MessagingState", cptMessagingStateNode);
+				XMLNode messagingNode = messagingStateNode.getChildNode("Messaging");
+				XMLNode isActiveNode = messagingStateNode.getChildNode("IsActive");
+				std::string isActiveText(isActiveNode.getText());
+
+				// Process this message only if it is active
+				if("oui" == isActiveText)
+				{
+					Messaging message = _readMessagingNode(messagingNode, ineoMessageType);
+					vector<Messaging> messages;
+					messages.push_back(message);
+
+					// Creation of a scenario and a message in SYNTHESE
+					_createMessages(messages, fakeBroadCastPoint);
+
+					numActiveMessages++;
+				}
+			}
+
+			util::Log::GetInstance().debug(
+				"Ineo Terminus processing message " + tagName + " : id " + idStr + " ; request id " + requestIdStr + " ; timestamp " +
+				boost::posix_time::to_simple_string(responseTimeStamp) + " ; from " + responseRefStr + " with " + lexical_cast<string>(numActiveMessages) + " active message(s)"
+			);
+
+			return true;
+		}
+
+
 		std::string IneoTerminusConnection::tcp_connection::_generateResponse(XMLNode& requestNode)
 		{
 			std::stringstream responseStream;
@@ -982,6 +1014,7 @@ namespace synthese
 			return responseStream.str();
 		}
 
+
 		void IneoTerminusConnection::tcp_connection::_copyXMLNode(XMLNode& node, const int tabDepth, std::stringstream& outputStream)
 		{
 			int childCount = node.nChildNode();
@@ -1009,6 +1042,7 @@ namespace synthese
 				}
 			}
 		}
+
 
 		IneoTerminusConnection::tcp_connection::Messaging IneoTerminusConnection::tcp_connection::_readMessagingNode(XMLNode node, string messagerieName)
 		{
@@ -1256,6 +1290,87 @@ namespace synthese
 
 			return message;
 		}
+
+
+		void IneoTerminusConnection::tcp_connection::_createMessages(std::vector<Messaging> messages, RegistryKeyType fakeBroadCastPoint)
+		{
+			boost::shared_ptr<ParametersMap> messagesAndCalendarsPM(new ParametersMap);
+
+			// Fill the parameters map from the vector of messages
+			BOOST_FOREACH(const Messaging& message, messages)
+			{
+				boost::shared_ptr<ParametersMap> periodPM(new ParametersMap);
+				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()) +" "+ boost::posix_time::to_simple_string(message.startDate.time_of_day()));
+				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()) +" "+ boost::posix_time::to_simple_string(message.stopDate.time_of_day()));
+				periodPM->insert("date", "");
+				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
+				messagePM->insert("title", message.name);
+				messagePM->insert("content", message.content);
+				messagePM->insert("color", message.color);
+				if (message.dispatching == Immediat)
+				{
+					messagePM->insert("dispatching", "Immediat");
+				}
+				else if (message.dispatching == Differe)
+				{
+					messagePM->insert("dispatching", "Differe");
+				}
+				else if (message.dispatching == Repete)
+				{
+					messagePM->insert("dispatching", "Repete");
+				}
+				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod));
+				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
+				messagePM->insert("section", "");
+				messagePM->insert("alternative", "");
+				_addRecipientsPM(*messagePM, message.recipients);
+				boost::shared_ptr<ParametersMap> displayRecipientPM(new ParametersMap);
+				if(0 != fakeBroadCastPoint)
+				{
+					displayRecipientPM->insert("recipient_id", fakeBroadCastPoint);
+				}
+				messagePM->insert("displayscreen_recipient", displayRecipientPM);
+				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+				calendarPM->insert("period", periodPM);
+				calendarPM->insert("message", messagePM);
+				messagesAndCalendarsPM->insert("calendar", calendarPM);
+			}
+
+			// Convert the parameters map into a Boost property tree
+			stringstream stream;
+			messagesAndCalendarsPM->outputJSON(stream, "");
+			boost::property_tree::ptree messagesAndCalendars;
+			boost::property_tree::json_parser::read_json(stream, messagesAndCalendars);
+
+			// Verify the existence of an identical event
+			ScenarioStopAction scenarioStopAction;
+			SentScenario* identicalScenario = scenarioStopAction.findScenarioByMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
+
+			if (!identicalScenario)
+			{
+				// This event does not exist, create it
+				ScenarioSaveAction scenarioSaveAction;
+				scenarioSaveAction.setMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
+				boost::shared_ptr<Scenario>	scenario;
+				boost::shared_ptr<SentScenario> sscenario;
+				sscenario.reset(new SentScenario);
+				scenario = static_pointer_cast<Scenario, SentScenario>(sscenario);
+				scenarioSaveAction.setSScenario(sscenario);
+				scenarioSaveAction.setScenario(scenario);
+				Request fakeRequest;
+				scenarioSaveAction.run(fakeRequest);
+				// Enable the scenario
+				sscenario->setIsEnabled(true);
+				SentScenarioTableSync::Save(sscenario.get());
+			}
+
+			else
+			{
+				// This event already exists, log a message
+				util::Log::GetInstance().debug("Ineo Terminus cannot create message because it already exists");
+			}
+		}
+
 
 		vector<IneoTerminusConnection::Recipient> IneoTerminusConnection::tcp_connection::_readRecipients(XMLNode node)
 		{

@@ -74,20 +74,16 @@ namespace synthese
 		private:
 			static boost::shared_ptr<IneoTerminusConnection> _theConnection;
 			static int _idRequest;
+			static std::map<std::string, util::RegistryKeyType> _fakeBroadcastPoints;
+			static std::set<std::string> _creationRequestTags;
+			static std::set<std::string> _deletionRequestTags;
+			static std::set<std::string> _creationOrDeletionResponseTags;
+			static std::set<std::string> _getStatesResponseTags;
 
 			std::string _ineoPort;
 			util::RegistryKeyType _ineoNetworkID;
 			util::RegistryKeyType _ineoDatasource;
 			int _ineoTickInterval;
-			util::RegistryKeyType _ineoPassengerFakeBroadcast;
-			util::RegistryKeyType _ineoDriverFakeBroadcast;
-			util::RegistryKeyType _ineoPpdsFakeBroadcast;
-			util::RegistryKeyType _ineoGirouetteFakeBroadcast;
-			util::RegistryKeyType _ineoSonoPassengerFakeBroadcast;
-			util::RegistryKeyType _ineoSonoDriverFakeBroadcast;
-			util::RegistryKeyType _ineoBivGeneralFakeBroadcast;
-			util::RegistryKeyType _ineoBivLineManFakeBroadcast;
-			util::RegistryKeyType _ineoBivLineAutoFakeBroadcast;
 
 			mutable Status _status;
 
@@ -180,23 +176,30 @@ namespace synthese
 					std::string contentTts;
 					std::string contentScrolling;
 					std::vector<IneoTerminusConnection::Recipient> recipients;
+
+					Messaging();
 				};
 
 				// Response generators
 
 				bool _checkStatusRequest(
 					XMLNode& node,
-					std::string& message
+					std::string& response
 				);
 
 				bool _createMessageRequest(
 					XMLNode& node,
-					std::string& message
+					std::string& response
 				);
 
 				bool _deleteMessageRequest(
 					XMLNode& node,
-					std::string& message
+					std::string& response
+				);
+
+				bool _getStatesResponse(
+					XMLNode& node,
+					std::string& response
 				);
 
 				std::string _generateResponse(XMLNode& requestNode);
@@ -210,6 +213,7 @@ namespace synthese
 				// generic parsers
 				std::vector<IneoTerminusConnection::Recipient> _readRecipients(XMLNode node);
 				Messaging _readMessagingNode(XMLNode node, std::string messagerieName);
+				void _createMessages(std::vector<Messaging> messages, util::RegistryKeyType fakeBroadCastPoint);
 
 				//generic writers
 				void _addRecipientsPM(util::ParametersMap& pm, std::vector<IneoTerminusConnection::Recipient>);
@@ -246,12 +250,12 @@ namespace synthese
 			boost::recursive_mutex _messagesMutex;
 			boost::mutex _requestIdsMutex;
 
+			IneoTerminusConnection();
 			void _sendMessage();
 			void _synchronizeMessages();
 			const std::string _buildGetStatesRequest(const std::string& ineoMessageType);
 
 		public:
-			IneoTerminusConnection();
 
 			/// @name Setters
 			//@{
@@ -284,6 +288,7 @@ namespace synthese
 			);
 
 			static void MessageSender();
+			static void Initialize();
 			static boost::shared_ptr<IneoTerminusConnection> GetTheConnection(){ return _theConnection; }
 			int getNextRequestID();
 		};
