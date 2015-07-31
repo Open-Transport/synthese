@@ -51,25 +51,26 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<IneoTerminusModule>::PreInit()
 		{
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PORT, "", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK, "", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE, "", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL, "", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_GIROUETTE_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOPASSENGER_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONODRIVER_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOSTOPPOINT_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST, "", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PORT, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_GIROUETTE_FAKE_BROADCAST, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOPASSENGER_FAKE_BROADCAST, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONODRIVER_FAKE_BROADCAST, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_SONOSTOPPOINT_FAKE_BROADCAST, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST, "0", &IneoTerminusConnection::ParameterCallback);
 		}
 
 		template<> void ModuleClassTemplate<IneoTerminusModule>::Init()
 		{
 			// In the init section in order to read this parameter after the data load (DBModule::Init)
+			IneoTerminusConnection::Initialize();
 		}
 
 		template<> void ModuleClassTemplate<IneoTerminusModule>::Start()
