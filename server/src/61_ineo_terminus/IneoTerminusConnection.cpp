@@ -39,11 +39,7 @@
 #include "IneoNotificationChannel.hpp"
 #include "MessagesModule.h"
 
-#include <boost/algorithm/string.hpp>
-#include <boost/bind/bind.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/iostreams/stream.hpp>
-#include <boost/lambda/lambda.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
 using namespace boost;
@@ -51,10 +47,10 @@ using namespace boost::algorithm;
 using namespace boost::asio;
 using namespace boost::asio::ip;
 using namespace boost::gregorian;
-using namespace boost::lambda;
 using namespace boost::posix_time;
 using namespace boost::system;
 using namespace std;
+
 
 namespace synthese
 {
@@ -211,6 +207,21 @@ namespace synthese
 		{
 			util::Log::GetInstance().info("Synchronizing messages with Ineo SAE");
 
+			// Delete existing Ineo SAE messages
+			if(0 != _ineoDatasource)
+			{
+				db::DBTransaction transaction;
+				boost::shared_ptr<DataSource> ineoDataSource = Env::GetOfficialEnv().getEditable<DataSource>(_ineoDatasource);
+				DataSource::LinkedObjects ineoSaeScenarios(ineoDataSource->getLinkedObjects<SentScenario>());
+
+				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& ineoSaeScenario, ineoSaeScenarios)
+				{
+					SentScenarioTableSync::Remove(NULL, ineoSaeScenario.second->getKey(), transaction, false);
+				}
+
+				transaction.run();
+			}
+
 			// Lock the message queue and empty it
 			boost::recursive_mutex::scoped_lock messagesLock(_messagesMutex);
 			_messagesToSend.clear();
@@ -218,7 +229,6 @@ namespace synthese
 			// For each Ineo Notification provider :
 			// * build a XXXGetStatesRequest to request active messages from Ineo SAE
 			// * build a XXXCreateMessageRequest for each currently active message associated to this provider
-			// TODO : delete existing Ineo SAE messages
 			BOOST_FOREACH(const NotificationProvider::Registry::value_type& providerEntry, Env::GetOfficialEnv().getRegistry<NotificationProvider>())
 			{
 				boost::shared_ptr<NotificationProvider> provider = providerEntry.second;
@@ -1359,8 +1369,23 @@ namespace synthese
 				scenarioSaveAction.setScenario(scenario);
 				Request fakeRequest;
 				scenarioSaveAction.run(fakeRequest);
+
 				// Enable the scenario
 				sscenario->setIsEnabled(true);
+
+				// If the Ineo Terminus data source is configured, set it as the source of the scenario
+				std::string ineoDataSourceStr = IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE);
+				if(false == ineoDataSourceStr.empty())
+				{
+					RegistryKeyType ineoDataSourceId = boost::lexical_cast<RegistryKeyType>(ineoDataSourceStr);
+					boost::shared_ptr<const DataSource> ineoDataSource = Env::GetOfficialEnv().getRegistry<DataSource>().get(ineoDataSourceId);
+
+					if(NULL != ineoDataSource.get())
+					{
+						sscenario->addCodeBySource(*ineoDataSource, "");
+					}
+				}
+
 				SentScenarioTableSync::Save(sscenario.get());
 			}
 
