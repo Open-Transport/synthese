@@ -139,7 +139,7 @@ namespace synthese
 					const ScenarioCalendar::ApplicationPeriods::value_type& period,
 					_calendar->getApplicationPeriods()
 				){
-					if(period->getValue(when))
+					if(period->isInside(when))
 					{
 						return true;
 					}

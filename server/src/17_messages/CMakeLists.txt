@@ -98,6 +98,8 @@ NewMessageAction.cpp
 NewMessageAction.h
 Scenario.cpp
 Scenario.h
+ScenarioAutopilot.hpp
+ScenarioAutopilot.cpp
 ScenarioCalendar.cpp
 ScenarioCalendar.hpp
 ScenarioCalendarTableSync.cpp
@@ -126,6 +128,7 @@ ScenarioTemplate.cpp
 ScenarioTemplate.h
 SentAlarm.cpp
 SentAlarm.h
+SentScenarioDao.hpp
 SentScenario.cpp
 SentScenario.h
 SimpleMessageCreationAction.cpp
