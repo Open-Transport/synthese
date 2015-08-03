@@ -85,6 +85,7 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_NEUTRALIZED = "neutralized";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_NON_COMMERCIAL = "non_commercial";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_DEST_DEMITOUR = "dest_demitour";
 
 
 
@@ -175,6 +176,9 @@ namespace synthese
 
 			// Eliminate non-commercial services
 			_nonCommercial = map.getDefault<bool>(PARAMETER_NON_COMMERCIAL, false);
+
+			// Change the destination in case of a demi-tour
+			_destDemitour = map.getDefault<bool>(PARAMETER_DEST_DEMITOUR, false);
 		}
 
 
@@ -243,7 +247,28 @@ namespace synthese
 					}
 				}
 
-				newChainage = _createAndReturnChainage(chainages,arretChns,*(chainage.ligne),chainage.nom,chainage.direction,chainage.sens,chainage.ref + "-" + lexical_cast<string>(horaires.size()));
+				std::string dest = chainage.direction;
+
+				// If the last stop has changed, modify the destination
+				if ( _destDemitour && arretChns.back().ref != chainage.arretChns.back().ref )
+				{
+					Arret *destArret = arretChns.back().arret;
+					if (destArret)
+					{
+						pt::StopPoint *destStopPoint = destArret->syntheseStop;
+						if (destStopPoint)
+						{
+							const pt::StopArea *destStopArea = destStopPoint->getConnectionPlace();
+							if (destStopArea)
+							{
+								dest = destStopArea->getName();
+								_logDebug("Demi-tour : Using " + dest + " as destination instead of " + chainage.direction + " for the new journeyPattern " + chainage.nom + "(" + chainage.ref + ") in line " + chainage.ligne->ref);
+							}
+						}
+					}
+				}
+
+				newChainage = _createAndReturnChainage(chainages,arretChns,*(chainage.ligne),chainage.nom,dest,chainage.sens,chainage.ref + "-" + lexical_cast<string>(horaires.size()));
 
 				// Jump over dead runs
 				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, arretChns)

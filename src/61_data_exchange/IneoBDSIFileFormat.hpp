@@ -101,6 +101,7 @@ namespace synthese
 				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
 				static const std::string PARAMETER_NEUTRALIZED;
 				static const std::string PARAMETER_NON_COMMERCIAL;
+				static const std::string PARAMETER_DEST_DEMITOUR;
 		
 			private:
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
@@ -113,6 +114,7 @@ namespace synthese
 				util::RegistryKeyType _handicappedPTAllowedUseRuleId;
 				bool _neutralized;
 				bool _nonCommercial;
+				bool _destDemitour;
 
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;
