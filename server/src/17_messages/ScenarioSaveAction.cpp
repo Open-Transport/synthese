@@ -778,7 +778,14 @@ namespace synthese
 						_sscenario->getIsEnabled() ? "activé" : "désactivé",
 						*_enabled ? "activé" : "désactivé"
 					);
-					_sscenario->setIsEnabled(*_enabled);
+					if (_sscenario->getIsEnabled() != *_enabled)
+					{
+						_sscenario->setIsEnabled(*_enabled);
+						if (_sscenario->belongsToAnAutomaticSection())
+						{
+							_sscenario->setManualOverride(true);
+						}
+					}
 				}
 
 				// Archived

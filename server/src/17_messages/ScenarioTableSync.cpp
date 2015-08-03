@@ -80,6 +80,7 @@ namespace synthese
 		const string ScenarioTableSync::COL_EVENT_START = "event_start";
 		const string ScenarioTableSync::COL_EVENT_END = "event_end";
 		const string ScenarioTableSync::COL_ARCHIVED = "archived";
+		const string ScenarioTableSync::COL_MANUAL_OVERRIDE = "manual_override";
 
 		const string ScenarioTableSync::VARIABLES_SEPARATOR = "|";
 		const string ScenarioTableSync::VARIABLES_OPERATOR = "&";
@@ -108,6 +109,7 @@ namespace synthese
 			Field(ScenarioTableSync::COL_EVENT_START, SQL_DATETIME),
 			Field(ScenarioTableSync::COL_EVENT_END, SQL_DATETIME),
 			Field(ScenarioTableSync::COL_ARCHIVED, SQL_BOOLEAN),
+			Field(ScenarioTableSync::COL_MANUAL_OVERRIDE, SQL_BOOLEAN),
 			Field()
 		};
 
@@ -212,6 +214,8 @@ namespace synthese
 
 				// Archived
 				sentScenario.setArchived(rows->getBool(ScenarioTableSync::COL_ARCHIVED));
+
+				sentScenario.setManualOverride(rows->getBool(ScenarioTableSync::COL_MANUAL_OVERRIDE));
 
 				// Variables
 				const string txtVariables(rows->getText(ScenarioTableSync::COL_VARIABLES));
@@ -384,6 +388,8 @@ namespace synthese
 
 			// Archived field
 			query.addField(!isTemplate && sentScenario->getArchived());
+
+			query.addField(!isTemplate && sentScenario->getManualOverride());
 
 			// Run the query
 			query.execute(transaction);

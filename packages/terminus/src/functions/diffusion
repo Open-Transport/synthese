@@ -3,6 +3,10 @@
 <?scenario&
   roid=<@scenario_id@>&
 template=
+
+<@belongs_to_an_auto_section=0@>
+<{section&template=<@belongs_to_an_auto_section=<@belongs_to_an_auto_section||auto_activation@>@>}>
+
 <@scenario_folder_id=<@folder_id@>@>
 <@in_archive=<@archived@>@>
 <@section_name=<@section?<?object&roid=<@section@>&template=<@name@>?>:title@>@>
@@ -190,11 +194,17 @@ template=
           <?if&
            cond=<@is_template@>&
           then=<h4>Modèle de bibliothèque</h4>&
-          else=<h4>Statut : <?if&
-	     		cond=<@in_archive@>&
-                        then=<span class="label label-info">Archivé</span>&
-                        else=<span class="label <@active?"label-success":""@>"><@active?"Actif":"Inactif"@></span>&
-          ?>
+          else=<h4>Statut : <?if
+	     		                    &cond=<@in_archive@>
+                              &then=<span class="label label-info">Archivé</span>
+                              &else=<?if
+                                     &cond=<@belongs_to_an_auto_section&&<@!manual_override@>@>
+                                     &then=
+                                      <span class="label label-info">Auto</span>
+                                     &else=
+                                      <span class="label <@active?"label-success":""@>"><@active?"Actif":"Inactif"@></span>
+                                    ?>
+                            ?>
           ?></h4>
         </td>
           <?if&cond=<@is_template@>&else=

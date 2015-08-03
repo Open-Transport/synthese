@@ -53,6 +53,7 @@ namespace synthese
 		const std::string SentScenario::DATA_ARCHIVED = "archived";
 		const std::string SentScenario::DATA_CODE = "code";
 		const std::string SentScenario::DATA_VALUE = "value";
+		const std::string SentScenario::DATA_MANUAL_OVERRIDE = "manual_override";
 
 		const std::string SentScenario::TAG_VARIABLE = "variable";
 		const std::string SentScenario::TAG_MESSAGE = "message";
@@ -67,6 +68,7 @@ namespace synthese
 		):	Registrable(key),
 			Scenario(),
 			_isEnabled(false),
+			_manualOverride(false),
 			_periodStart(second_clock::local_time()),
 			_periodEnd(not_a_date_time),
 			_template(NULL),
@@ -80,6 +82,7 @@ namespace synthese
 		):	Registrable(0),
 			Scenario(source.getName()),
 			_isEnabled(false),
+			_manualOverride(false),
 			_periodStart(second_clock::local_time()),
 			_periodEnd(not_a_date_time),
 			_template(&source),
@@ -93,6 +96,7 @@ namespace synthese
 		):	Registrable(0),
 			Scenario(source._template ? source._template->getName() : source.getName()),
 			_isEnabled(false),
+			_manualOverride(false),
 			_periodStart(second_clock::local_time()),
 			_periodEnd(not_a_date_time),
 			_template(source._template),
@@ -359,5 +363,9 @@ namespace synthese
 
 			// active
 			pm.insert(DATA_ACTIVE, getIsEnabled());
+
+			// active
+			pm.insert(DATA_MANUAL_OVERRIDE, getManualOverride());
+
 		}
 }	}

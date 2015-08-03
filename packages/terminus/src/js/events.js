@@ -380,9 +380,14 @@ function activate_filter(isOnAllSections)
        s += '</td>';
        // Activation ou desactivation Evenement
        s += '<td>';
+       
        if(theevent[i].write_right_section == 1) {
          if (theevent[i].active == 1) {
-           s += '<div class="label label-success">Actif</div>';
+           if ((theevent[i].belongs_to_an_auto_section == 1) && (theevent[i].manual_override == 0)) {
+             s += '<div class="label label-info">Auto</div>';
+           } else {
+             s += '<div class="label label-success">Actif</div>';
+           }
            if(isOnAllSections == 1) {
              s += '<a href="#" onclick="if (window.confirm(\'Etes-vous sûr de vouloir suspendre la diffusion de cet événement ?\')) window.location=\'/terminus/all_sections?a=scenario%5fsave&amp;actionParamena=0&amp;actionParamsid=' + 
                 theevent[i].roid + '&amp;section=\';return false;" class="btn btn-warning btn-mini btn-inactive"><i class="icon-pause icon-white"></i></a>';
@@ -392,7 +397,11 @@ function activate_filter(isOnAllSections)
            }
          }
          else {
-           s += '<div class="label">Inactif</div>';
+           if ((theevent[i].belongs_to_an_auto_section == 1) && (theevent[i].manual_override == 0)) {
+             s += '<div class="label label-info">Auto</div>';
+           } else {
+             s += '<div class="label">Inactif</div>';
+           }
            if(isOnAllSections == 1) {
              s += '<a href="#" onclick="if (window.confirm(\'Etes-vous sûr de vouloir activer la diffusion de cet événement ?\')) window.location=\'/terminus/all_sections?a=scenario%5fsave&amp;actionParamena=0&amp;actionParamsid=' + 
                 theevent[i].roid + '&amp;section=\';return false;" class="btn btn-warning btn-mini btn-inactive"><i class="icon-play icon-white"></i></a>';
@@ -404,9 +413,17 @@ function activate_filter(isOnAllSections)
        }
        else {
          if (theevent[i].active == 1){
-           s += '<span class="label label-success">Actif</span>';
+           if ((theevent[i].belongs_to_an_auto_section == 1) && (theevent[i].manual_override == 0)) {
+             s += '<span class="label label-info">Auto</span>';
+           } else {
+             s += '<span class="label label-success">Actif</span>';
+           }
          } else {
-           s += '<span class="label">Inactif</span>';
+           if ((theevent[i].belongs_to_an_auto_section == 1) && (theevent[i].manual_override == 0)) {
+             s += '<span class="label label-info">Auto</span>';
+           } else {
+             s += '<span class="label">Inactif</span>';
+           }
          }
        }
        s += '</td>';

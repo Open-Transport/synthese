@@ -60,6 +60,7 @@ namespace synthese
 			static const std::string DATA_ARCHIVED;
 			static const std::string DATA_CODE;
 			static const std::string DATA_VALUE;
+			static const std::string DATA_MANUAL_OVERRIDE;
 
 			static const std::string TAG_VARIABLE;
 			static const std::string TAG_MESSAGE;
@@ -75,6 +76,7 @@ namespace synthese
 
 		private:
 			bool _isEnabled;
+			bool _manualOverride;
 			boost::posix_time::ptime _eventStart; //!< Alarm applicability period start
 			boost::posix_time::ptime _eventEnd;   //!< Alarm applicability period end
 			boost::posix_time::ptime _periodStart; //!< Alarm applicability period start
@@ -117,6 +119,7 @@ namespace synthese
 				const boost::posix_time::ptime&	getPeriodStart() const { return _periodStart; }
 				const boost::posix_time::ptime&	getPeriodEnd() const { return _periodEnd; }
 				bool getIsEnabled()	const { return _isEnabled; }
+				bool getManualOverride()	const { return _manualOverride; }
 				bool getArchived() const { return _archived; }
 				const ScenarioTemplate*	getTemplate() const { return _template; }
 				const VariablesMap&	getVariables() const { return _variables; }
@@ -141,6 +144,7 @@ namespace synthese
 
 				void setEventEnd ( const boost::posix_time::ptime& value){ _eventEnd = value; }
 				void setIsEnabled(bool value){ _isEnabled = value; }
+				void setManualOverride(bool value){ _manualOverride = value; }
 				void setTemplate(const ScenarioTemplate* value);
 				void setVariables(const VariablesMap& value);
 				void setArchived(bool value){ _archived = value; }

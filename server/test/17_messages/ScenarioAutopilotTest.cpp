@@ -100,6 +100,7 @@ struct single_scenario_on_single_application_period_fixture
 		sentScenario.reset(new SentScenario);
 		sentScenario->setIsEnabled(false);
 		sentScenario->setArchived(false);
+		sentScenario->setManualOverride(false);
 		sentScenario->setCalendars(scenarioCalendars);
 		sentScenario->setSections(scenarioSections);
 
@@ -175,7 +176,7 @@ struct single_scenario_from_2015_Jul_10_to_2015_Jul_20 : public single_scenario_
 
 
 
-BOOST_FIXTURE_TEST_CASE (scenario_belonging_to_an_automatic_section_should_be_enabled_when_entering_application_period,
+BOOST_FIXTURE_TEST_CASE (scenario_should_be_enabled_when_entering_application_period,
 						 single_scenario_from_2015_Jul_10_to_2015_Jul_20)
 {
 	clock_is_inside_application_period();
@@ -196,7 +197,19 @@ BOOST_FIXTURE_TEST_CASE (scenario_not_belonging_to_an_automatic_section_should_n
 }
 
 
-BOOST_FIXTURE_TEST_CASE (archived_scenario_belonging_to_an_automatic_section_should_not_be_enabled_when_entering_application_period,
+BOOST_FIXTURE_TEST_CASE (scenario_with_manual_override_should_not_be_enabled_when_entering_application_period,
+						 single_scenario_from_2015_Jul_10_to_2015_Jul_20)
+{
+	sentScenario->setManualOverride(true);
+
+	clock_is_inside_application_period();
+	autopilot->runOnce();
+	check_scenario_is_still_disabled();
+}
+
+
+
+BOOST_FIXTURE_TEST_CASE (archived_scenario_should_not_be_enabled_when_entering_application_period,
 						 single_scenario_from_2015_Jul_10_to_2015_Jul_20)
 {
 	sentScenario->setArchived(true);
@@ -207,7 +220,7 @@ BOOST_FIXTURE_TEST_CASE (archived_scenario_belonging_to_an_automatic_section_sho
 }
 
 
-BOOST_FIXTURE_TEST_CASE (scenario_belonging_to_an_automatic_section_should_be_disabled_and_archived_when_leaving_application_period,
+BOOST_FIXTURE_TEST_CASE (scenario_should_be_disabled_and_archived_when_leaving_application_period,
 						 single_scenario_from_2015_Jul_10_to_2015_Jul_20)
 {
 	sentScenario->setIsEnabled(true);
@@ -230,5 +243,16 @@ BOOST_FIXTURE_TEST_CASE (scenario_not_belonging_to_an_automatic_section_should_n
 }
 
 
+
+BOOST_FIXTURE_TEST_CASE (scenario_with_manual_override_should_not_be_disabled_when_leaving_application_period,
+						 single_scenario_from_2015_Jul_10_to_2015_Jul_20)
+{
+	sentScenario->setManualOverride(true);
+	sentScenario->setIsEnabled(true);
+
+	clock_is_after_application_period();
+	autopilot->runOnce();
+	check_scenario_is_still_enabled();
+}
 
 
