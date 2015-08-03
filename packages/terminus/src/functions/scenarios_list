@@ -18,8 +18,10 @@
     </tr>
   </thead>
   
- <div class="hide" id="event_category" value="<@cat@>"></div>
+   <div class="hide" id="event_category" value="<@cat@>"></div>
  <tbody>
+ 
+
  <@hasWriteRights=<@0||<#has_section_right&level=WRITE&sectionid=<@section@>#>@>@>
  <?scenarii&
  	t=0&
@@ -27,6 +29,10 @@
  	currently_displayed=<@cat=="active"@>&
  	section_in=<@section@>&
  	template=<{scenario&template=
+
+<@belongs_to_an_auto_section=0@>
+<{section&template=<@belongs_to_an_auto_section=<@belongs_to_an_auto_section||auto_activation@>@>}>
+    
 <script>
 theevent["<@roid@>"] = {
 id: '<@id@>',
@@ -34,6 +40,8 @@ scenario_id: '<@scenario_id@>',
 roid: '<@roid@>',
 name: '<@name@>',
 active: <@active@>,
+belongs_to_an_auto_section: <@belongs_to_an_auto_section@>,
+manual_override: <@manual_override@>,
 filtered: 0,
 current_section: '<@section@>',
 <@canArchive=1@>
@@ -129,23 +137,44 @@ calendar: [<{calendar&template=
             </div>
 	  </td>
 	  <td>
-	   <?if&
-	     cond=<@active@>&
-	     then=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&
-	            then=<div class="label label-success">Actif</div>
-	            <?link&target=<@p@>&section=<@section@>&
-	                  a=scenario_save&actionParamsid=<@roid@>&actionParamena=0&
-	                  class=btn btn-warning btn-mini btn-inactive&
-	                  text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>&
-	          ?>&
-	     else=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>& 
-	            then=<div class="label">Inactif</div>
-	                 <?link&target=<@p@>&section=<@section@>&
-	                     a=scenario_save&actionParamsid=<@roid@>&actionParamena=1&
-	                     class=btn btn-warning btn-mini btn-inactive&
-	                     text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>&
-	          ?>&
-	   ?>
+
+   <?if&
+       cond=<@belongs_to_an_auto_section&&<@!manual_override@>@>
+       &then=
+         <div class="label label-info">Auto</div>
+      &else=
+         <?if
+           &cond=<@active@>
+           &then=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>
+                  &then=
+                  <div class="label label-success">Actif</div>
+                ?>
+           &else=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#> 
+                  &then=
+                  <div class="label">Inactif</div>
+                ?>
+         ?>
+    ?>
+
+    <?if&
+       cond=<@active@>&
+       then=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&
+              then=
+      	            <?link&target=<@p@>&section=<@section@>&
+      	                  a=scenario_save&actionParamsid=<@roid@>&actionParamena=0&
+      	                  class=btn btn-warning btn-mini btn-inactive&
+      	                  text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>&
+            ?>&
+       else=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>& 
+              then=
+                   <?link&target=<@p@>&section=<@section@>&
+                       a=scenario_save&actionParamsid=<@roid@>&actionParamena=1&
+                       class=btn btn-warning btn-mini btn-inactive&
+                       text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>&
+            ?>&
+    ?>
+
+
 	  </td>
 	  <td>
 	  <@archivingAuthorized=1@>

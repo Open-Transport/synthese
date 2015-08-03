@@ -34,6 +34,7 @@ ScenarioAutopilot::runOnce() const
 	BOOST_FOREACH(boost::shared_ptr<SentScenario> sentScenario, sentScenarios)
 	{
 		if ((!sentScenario->belongsToAnAutomaticSection() ||
+			(sentScenario->getManualOverride()) ||
 			(sentScenario->getArchived()))) continue;
 
 		bool shouldBeEnabled(sentScenario->shouldBeEnabled(now));
