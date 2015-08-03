@@ -50,13 +50,11 @@
 #include "MessagesSection.hpp"
 
 #include <boost/filesystem.hpp>
-#include <boost/assign/list_of.hpp>
 
 using namespace boost;
 using namespace boost::gregorian;
 using namespace boost::posix_time;
 using namespace boost::filesystem;
-using namespace geos::geom;
 using namespace std;
 
 namespace synthese
@@ -71,7 +69,6 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	using namespace vehicle;
 
 	template<>
 	const string FactorableTemplate<FileFormat, data_exchange::IneoBDSIFileFormat>::FACTORY_KEY = "ineo_bdsi";
@@ -88,18 +85,8 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_NEUTRALIZED = "neutralized";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_NON_COMMERCIAL = "non_commercial";
-		const string IneoBDSIFileFormat::Importer_::PARAMETER_CLEAN_UNUSED_VEHICLES = "clean_unused_vehicles";
-		
-		const std::map<std::string, VehiclePosition::Status> IneoBDSIFileFormat::Importer_::vehiclePositionStatusBdsi2Synthese = boost::assign::map_list_of
-			("DEG", vehicle::VehiclePosition::UNKNOWN_STATUS)
-			("GUI", vehicle::VehiclePosition::SERVICE)
-			("HLP", vehicle::VehiclePosition::DEAD_RUN_DEPOT)
-			("HS", vehicle::VehiclePosition::OUT_OF_SERVICE)
-			("INC", vehicle::VehiclePosition::UNKNOWN_STATUS)
-			("LIGN", vehicle::VehiclePosition::SERVICE)
-			("RADI", vehicle::VehiclePosition::UNKNOWN_STATUS)
-			("TARR", vehicle::VehiclePosition::NOT_IN_SERVICE)
-			("TDEP", vehicle::VehiclePosition::TERMINUS_START);
+
+
 
 		ParametersMap IneoBDSIFileFormat::Importer_::getParametersMap() const
 		{
@@ -188,9 +175,6 @@ namespace synthese
 
 			// Eliminate non-commercial services
 			_nonCommercial = map.getDefault<bool>(PARAMETER_NON_COMMERCIAL, false);
-			
-			// Delete not referenced (not used) vehicles
-			_cleanUnusedVehicles = map.getDefault<bool>(PARAMETER_CLEAN_UNUSED_VEHICLES, false);
 		}
 
 
@@ -434,93 +418,8 @@ namespace synthese
 			Arrets arrets;
 			Chainages chainages;
 			Programmations programmations;
-			VehiculePositions vehiculePositions;
 			DB& db(*DBModule::GetDB());
 			string todayStr("'"+ to_iso_extended_string(today) +"'");
-
-			// Vehicles and Vehicle Positions
-			{
-				string query(
-					"SELECT ref, no, neutralise, type, etat, pos, course, arretchn, x, y FROM " + _database + ".VEHICULE GROUP BY ref ORDER BY ref"
-					);
-				DBResultSPtr result(db.execQuery(query));
-				while (result->next())
-				{
-					// Fields load
-					string ref(result->get<string>("ref"));
-					string name(result->get<string>("no"));
-					string number(result->get<string>("no"));
-					bool available = (result->get<string>("neutralise") == "O");
-					string type(result->get<string>("type"));
-					VehiclePosition::Status status(toVehiclePositionStatus(result->get<string>("etat")));
-					VehiclePosition::Meters position(static_cast<VehiclePosition::Meters>(result->get<double>("pos")));
-					std::size_t stopRank(result->get<size_t>("arretchn"));
-					string x(result->get<string>("x"));
-					string y(result->get<string>("y"));
-					string code(number + type);
-
-					// Point
-					boost::shared_ptr<geos::geom::Point> point;
-					if (!x.empty() && !y.empty())
-					{
-						try
-						{
-							point = _plannedDataSource->getActualCoordinateSystem().createPoint(
-								lexical_cast<double>(x),
-								lexical_cast<double>(y)
-								);
-							if (point->isEmpty())
-							{
-								point.reset();
-							}
-						}
-						catch (boost::bad_lexical_cast&)
-						{
-						}
-					}
-
-					// SYNTHESE vehicle
-					Vehicle* vehicle(
-						_plannedDataSource->getObjectByCode<Vehicle>(code)
-						);
-					if (vehicle)
-					{
-						_logLoadDetail(
-							"VEHICLE", code, name, vehicle->getKey(), vehicle->getName(), string(), string(), "OK"
-							);
-					}
-					else
-					{
-						_logWarningDetail(
-							"VEHICLE", code, name, 0, string(), string(), string(), "NOT FOUND"
-							);
-					}
-
-					// Registration
-					// If the code is empty, then it is not registered
-					if (!code.empty())
-					{
-						VehiculePosition& vehiculePosition(
-							vehiculePositions.insert(
-							make_pair(
-							code,
-							VehiculePosition()
-							)).first->second
-							);
-
-						// Copy of values
-						vehiculePosition.code = code;
-						vehiculePosition.name = name;
-						vehiculePosition.number = number;
-						vehiculePosition.available = available;
-						vehiculePosition.type = type;
-						vehiculePosition.status = status;
-						vehiculePosition.position = position;
-						vehiculePosition.stopRank = stopRank;
-						vehiculePosition.point = point;
-					}
-				}
-			}
 
 			// Arrets
 			{
@@ -1018,90 +917,6 @@ namespace synthese
 			DataSource* dataSourceOnSharedEnv(
 				Env::GetOfficialEnv().getEditable<DataSource>(_import.get<DataSource>()->getKey()).get()
 			);
-
-			// Vehicles
-			{
-				if (_cleanUnusedVehicles)
-				{
-					BOOST_FOREACH(const ImportableTableSync::ObjectBySource<VehicleTableSync>::Map::value_type& itVehicle, _vehicles.getMap())
-					{
-						BOOST_FOREACH(Vehicle* vehicle, itVehicle.second)
-						{
-							BOOST_FOREACH(const std::string& code, vehicle->getCodesBySource(*_plannedDataSource))
-							{
-								VehiculePositions::const_iterator it(vehiculePositions.find(code));
-								if (it == vehiculePositions.end())
-								{
-									vehicle->removeSourceLink(*_plannedDataSource, code);
-									_vehiclesToRemove.insert(vehicle->getKey());
-								}
-
-								BOOST_FOREACH(const Registry<VehiclePosition>::value_type& itVehiclePosition, _env.getRegistry<VehiclePosition>())
-								{
-									const VehiclePosition& vehiclePosition(*itVehiclePosition.second);
-									
-									if (vehiclePosition.getVehicle()->getKey() == vehicle->getKey())
-									{
-										_vehiclePositionsToRemove.insert(itVehiclePosition.second);
-									}
-								}
-							}
-						}
-					}
-
-					// Vehicle positions to delete are removed from the environment to avoid useless saving
-					BOOST_FOREACH(const boost::shared_ptr<VehiclePosition>& vehiclePosition, _vehiclePositionsToRemove)
-					{
-						_env.getEditableRegistry<VehiclePosition>().remove(vehiclePosition->getKey());
-					}
-					
-					// Vehicles to delete are removed from the environment to avoid useless saving
-					BOOST_FOREACH(const RegistryKeyType id, _vehiclesToRemove)
-					{
-						_env.getEditableRegistry<Vehicle>().remove(id);
-					}
-				}
-
-				// Imported vehicles and vechile positions from BDSI will be added to SYNTHESE
-				BOOST_FOREACH(const VehiculePositions::value_type& itVehiculePosition, vehiculePositions)
-				{
-					const VehiculePosition& vehiculePosition(itVehiculePosition.second);
-
-					// Creation of the vehicle
-					std::set<Vehicle*> vehicle;
-					vehicle = _createOrUpdateVehicle(
-						_vehicles,
-						vehiculePosition.code,
-						vehiculePosition.name,
-						vehiculePosition.number,
-						vehiculePosition.available,
-						*_plannedDataSource
-						);
-
-					// Creation of the vehicle position
-					// only if the creation of the vehicle was successful
-					if (!vehicle.empty())
-					{
-						set<boost::shared_ptr<VehiclePosition> > setVehiclePositions =
-							_createOrUpdateVehiclePosition(
-							vehiculePosition.code,
-							*vehicle.begin(),
-							vehiculePosition.status,
-							vehiculePosition.position,  // meterOffset
-							vehiculePosition.stopRank,  // rankInPath
-							optional<boost::shared_ptr<ScheduledService> >(),
-							//vehiculePosition.service,
-							vehiculePosition.point
-							);
-
-						BOOST_FOREACH(const boost::shared_ptr<VehiclePosition>& vehiclePosition, setVehiclePositions)
-						{
-							_vehiclePositions.insert(vehiclePosition);
-						}
-						
-					}
-				}
-			}
 
 			{ // Scenarios and messages
 				// Scenarios
@@ -1634,8 +1449,7 @@ namespace synthese
 			util::ParametersMap& pm
 		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
 			DatabaseReadImporter<IneoBDSIFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
-			_hysteresis(seconds(0)),
-			_vehicles(*_plannedDataSource, _env)
+			_hysteresis(seconds(0))
 		{}
 
 
@@ -1751,30 +1565,6 @@ namespace synthese
 		DBTransaction IneoBDSIFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
-
-			// Removed vehicle positions
-			BOOST_FOREACH(const boost::shared_ptr<VehiclePosition>& vehiclePosition, _vehiclePositionsToRemove)
-			{
-				VehiclePositionTableSync::Remove(NULL, vehiclePosition->getKey(), transaction, false);
-			}
-
-			// Removed vehicles
-			BOOST_FOREACH(RegistryKeyType id, _vehiclesToRemove)
-			{
-				DBTableSyncTemplate<VehicleTableSync>::Remove(NULL, id, transaction, false);
-			}
-
-			// Created vehicles
-			BOOST_FOREACH(const Registry<Vehicle>::value_type vehicle, _env.getRegistry<Vehicle>())
-			{
-				VehicleTableSync::Save(vehicle.second.get(), transaction);
-			}
-
-			// Created vehicle positions
-			BOOST_FOREACH(const boost::shared_ptr<VehiclePosition>& vehiclePosition, _vehiclePositions)
-			{
-				VehiclePositionTableSync::Save(vehiclePosition.get(), transaction);
-			}
 
 			// Created journey patterns
 			BOOST_FOREACH(const JourneyPattern::Registry::value_type& journeyPattern, _env.getRegistry<JourneyPattern>())
@@ -2154,314 +1944,6 @@ namespace synthese
 
 			return syntheseJourneyPatterns;
 
-		}
-
-		Vehicle* IneoBDSIFileFormat::Importer_::_createVehicle(
-			impex::ImportableTableSync::ObjectBySource<VehicleTableSync>& vehicles,
-			const std::string& code,
-			boost::optional<const std::string&> name,
-			const impex::DataSource& source
-			) const {
-			// Object creation
-			Vehicle* vehicle = new Vehicle(
-				VehicleTableSync::getId()
-			);
-			Importable::DataSourceLinks links;
-			links.insert(make_pair(&source, code));
-			vehicle->setDataSourceLinksWithoutRegistration(links);
-			_env.getEditableRegistry<Vehicle>().add(boost::shared_ptr<Vehicle>(vehicle));
-			vehicles.add(*vehicle);
-			
-			// Properties
-			if (name)
-			{
-				vehicle->setName(*name);
-			}
-
-			// Log
-			stringstream logStream;
-			logStream << "Creation of the vehicle with key " << code;
-			if (name)
-			{
-				logStream << " (" << *name << ")";
-			}
-			_logCreation(logStream.str());
-
-			// Return
-			return vehicle;
-		}
-
-
-		VehiclePosition::Status IneoBDSIFileFormat::Importer_::toVehiclePositionStatus(
-			const std::string& etat) const
-		{
-			VehiclePosition::Status status;
-			
-			std::map<std::string, VehiclePosition::Status>::const_iterator it = vehiclePositionStatusBdsi2Synthese.find(etat);
-			if (it != vehiclePositionStatusBdsi2Synthese.end())
-			{
-				status = it->second;
-			}
-			else
-			{
-				_logWarning(
-					"Unable to recognize the status " + etat + " of the vehicle position."
-					);
-				status = VehiclePosition::UNKNOWN_STATUS;
-			}
-
-			return status;
-		}
-
-
-		boost::shared_ptr<VehiclePosition> IneoBDSIFileFormat::Importer_::_createVehiclePosition(
-			const std::string& code,
-			Vehicle* vehicle,
-			boost::optional<VehiclePosition::Status> status,
-			boost::optional<VehiclePosition::Meters> meterOffset,
-			boost::optional<std::size_t> rankInPath,
-			boost::optional<boost::shared_ptr<ScheduledService> > service,
-			boost::optional<boost::shared_ptr<Point> > point
-			) const {
-			// Object creation
-			boost::shared_ptr<VehiclePosition> vehiclePosition(new VehiclePosition(
-				VehiclePositionTableSync::getId()
-				));
-
-			// Properties
-			if (vehicle != NULL)
-			{
-				vehiclePosition->setVehicle(vehicle);
-			}
-			if (status)
-			{
-				vehiclePosition->setStatus(*status);
-			}
-			if (meterOffset)
-			{
-				vehiclePosition->setMeterOffset(*meterOffset);
-			}
-			if (rankInPath)
-			{
-				vehiclePosition->setRankInPath(*rankInPath);
-			}
-			if (point)
-			{
-				vehiclePosition->setGeometry(*point);
-			}
-			if (service)
-			{
-				vehiclePosition->setService(service->get());
-			}
-
-			_env.getEditableRegistry<VehiclePosition>().add(boost::shared_ptr<VehiclePosition>(vehiclePosition));
-
-			// Log
-			stringstream logStream;
-			logStream << "Creation of the vehicle position with key " << code;
-			_logCreation(logStream.str());
-
-			// Return
-			return vehiclePosition;
-		}
-
-		std::set<boost::shared_ptr<VehiclePosition> >  IneoBDSIFileFormat::Importer_::_createOrUpdateVehiclePosition(
-			const std::string& code,
-			Vehicle* vehicle,
-			boost::optional<VehiclePosition::Status> status,
-			boost::optional<VehiclePosition::Meters> meterOffset,
-			boost::optional<std::size_t> rankInPath,
-			boost::optional<boost::shared_ptr<ScheduledService> > service,
-			boost::optional<boost::shared_ptr<Point> > point
-			) const {
-
-			// Load if possible
-			std::set<boost::shared_ptr<VehiclePosition> > result(_getVehiclePositions(vehicle->getKey(), false));
-
-			// Create if necessary
-			if (result.empty())
-			{
-				result.insert(
-					_createVehiclePosition(
-					code,
-					vehicle,
-					status,
-					meterOffset,
-					rankInPath,
-					service,
-					point
-					));
-			}
-
-			// Update
-			BOOST_FOREACH(const boost::shared_ptr<VehiclePosition>& vehiclePosition, result)
-			{
-				if (vehicle != NULL)
-				{
-					vehiclePosition->setVehicle(vehicle);
-				}
-				if (status)
-				{
-					vehiclePosition->setStatus(*status);
-				}
-				if (meterOffset)
-				{
-					vehiclePosition->setMeterOffset(*meterOffset);
-				}
-				if (rankInPath)
-				{
-					vehiclePosition->setRankInPath(*rankInPath);
-				}
-				if (point)
-				{
-					vehiclePosition->setGeometry(*point);
-				}
-				if (service)
-				{
-					vehiclePosition->setService(service->get());
-				}
-			}
-
-			return result;
-		}
-
-		std::set<Vehicle*> IneoBDSIFileFormat::Importer_::_createOrUpdateVehicle(
-			impex::ImportableTableSync::ObjectBySource<VehicleTableSync>& vehicles,
-			const std::string& code,
-			boost::optional<const std::string&> name,
-			boost::optional<const std::string&> number,
-			bool available,
-			const impex::DataSource& source
-			) const {
-
-			// Load if possible
-			set<Vehicle*> result(_getVehicles(vehicles, code, name, false));
-
-			// Create if necessary
-			if (result.empty())
-			{
-				// Abort if undefined name
-				if (!name)
-				{
-					_logWarning(
-						"The vehicle " + code + " cannot be created because of undefined name."
-						);
-					return result;
-				}
-
-				result.insert(
-					_createVehicle(
-					vehicles,
-					code,
-					name,
-					source
-					));
-			}
-
-			// Update
-			BOOST_FOREACH(Vehicle* vehicle, result)
-			{
-				if (name)
-				{
-					vehicle->setName(*name);
-				}
-				if (number)
-				{
-					vehicle->setNumber(*number);
-				}
-				vehicle->setAvailable(available);
-			}
-
-			return result;
-		}
-
-		std::set<Vehicle*> IneoBDSIFileFormat::Importer_::_getVehicles(
-			const impex::ImportableTableSync::ObjectBySource<VehicleTableSync>& vehicles,
-			const std::string& id,
-			boost::optional<const std::string&> name,
-			bool errorIfNotFound
-			) const {
-			if (vehicles.contains(id))
-			{
-				set<Vehicle*> loadedVehicles(vehicles.get(id));
-				
-				if (loadedVehicles.size() > 1)
-				{
-					_logWarning(
-						"More than one vehicle with key " + id
-						);
-				}
-
-				stringstream logStream;
-				logStream << "Link between vehicles " << id;
-				if (name)
-				{
-					logStream << " (" << *name << ")";
-				}
-				logStream << " and ";
-				BOOST_FOREACH(Vehicle* vh, loadedVehicles)
-				{
-					logStream << vh->getKey() << " (" << vh->getName() << ") ";
-				}
-				_logLoad(logStream.str());
-
-				return loadedVehicles;
-			}
-			if (errorIfNotFound)
-			{
-				stringstream logStream;
-				logStream << "Vehicle not found " << id;
-				if (name)
-				{
-					logStream << " (" << *name << ")";
-				}
-				_logError(logStream.str());
-			}
-			return set<Vehicle*>();
-		}
-
-		std::set<boost::shared_ptr<VehiclePosition> > IneoBDSIFileFormat::Importer_::_getVehiclePositions(
-			boost::optional<RegistryKeyType> vehicleId,
-			bool errorIfNotFound
-			) const {
-			VehiclePositionTableSync::SearchResult existingVehiclePositions(
-				VehiclePositionTableSync::Search(
-				_env,
-				vehicleId
-				));
-
-			if (!existingVehiclePositions.empty())
-			{
-				std::set<boost::shared_ptr<VehiclePosition> > vehiclePositions(existingVehiclePositions.begin(), existingVehiclePositions.end());
-
-				if (vehiclePositions.size() > 1)
-				{
-					_logWarning(
-						"Found more than one vehicle position for vehicleId " + boost::lexical_cast<std::string>(vehicleId)
-						);
-				}
-
-				stringstream logStream;
-				logStream << "Link between vehicleId " << boost::lexical_cast<std::string>(vehicleId);
-				logStream << " and ";
-				logStream << " vehicle positions ";
-
-				BOOST_FOREACH(const boost::shared_ptr<VehiclePosition>& vehiclePosition, vehiclePositions)
-				{
-					logStream << vehiclePosition->getKey() << " (" << vehiclePosition->getVehicle()->getName() << ") ";
-				}
-				_logLoad(logStream.str());
-
-				return vehiclePositions;
-			}
-			if (errorIfNotFound)
-			{
-				stringstream logStream;
-				logStream << "Vehicle position not found for vehicleId " << boost::lexical_cast<std::string>(vehicleId);
-				_logError(logStream.str());
-			}
-
-			return std::set<boost::shared_ptr<VehiclePosition> >();
 		}
 }	}
 
