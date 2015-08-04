@@ -406,7 +406,7 @@ template=
 <div id="calendar" class="hide">
   <div class="row-fluid">
     <div class="span8">
-      <div class="well"><a href="#" class="btn btn-warning btn-mini" id="new_period">Nouvelle plage horaire</a></div>
+      <div class="well"><a href="#" class="btn btn-warning btn-mini" id="new_period">Nouvelle phase de publication</a></div>
       <div id="periods"></div>
     </div>
     <div class="span4">

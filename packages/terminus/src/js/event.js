@@ -1004,7 +1004,7 @@ function add_period(period)
   }
   var s =
    '<div class="well form-horizontal" rank="' + period.rank +'" period_id="'+ period.id +'">' +
-    '<h4>Plage horaire '+ (period.rank+1) +'<div class="pull-right"><a href="#" class="btn btn-danger btn-mini" id="remove_period_'+ period.rank +'">Supprimer</a></div></h4>' +
+    '<h4>Publication phase '+ (period.rank+1) +'<div class="pull-right"><a href="#" class="btn btn-danger btn-mini" id="remove_period_'+ period.rank +'">Supprimer</a></div></h4>' +
     '<div class="control-group">' +
      '<label class="control-label">Début</label>' +
      '<div class="controls">' +
