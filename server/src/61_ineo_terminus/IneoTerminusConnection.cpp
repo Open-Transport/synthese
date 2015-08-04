@@ -619,6 +619,7 @@ namespace synthese
 
 				if(false == response.empty())
 				{
+					util::Log::GetInstance().debug("Ineo Terminus response : " + response);
 					// This message requires a response, add the message delimiter and send the buffer
 					response += char(0);
 					boost::asio::async_write(
@@ -900,9 +901,14 @@ namespace synthese
 				messagePM->insert("section", "");
 				messagePM->insert("alternative", "");
 				_addRecipientsPM(*messagePM, message.recipients);
-				boost::shared_ptr<ParametersMap> displayRecipientPM(new ParametersMap);
-				displayRecipientPM->insert("recipient_id", fakeBroadCastPoint);
-				messagePM->insert("displayscreen_recipient", displayRecipientPM);
+
+				if(0 != fakeBroadCastPoint)
+				{
+					boost::shared_ptr<ParametersMap> displayRecipientPM(new ParametersMap);
+					displayRecipientPM->insert("recipient_id", fakeBroadCastPoint);
+					messagePM->insert("displayscreen_recipient", displayRecipientPM);
+				}
+
 				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 				calendarPM->insert("period", periodPM);
 				calendarPM->insert("message", messagePM);
@@ -924,6 +930,7 @@ namespace synthese
 			else
 			{
 				util::Log::GetInstance().warn("IneoTerminusConnection : requete Delete non prise en compte car evenement non trouvé dans Terminus");
+				// TODO : générer msg erreur pour Ineo
 			}
 
 			// Generate the XML response to this request
@@ -1335,11 +1342,13 @@ namespace synthese
 				messagePM->insert("alternative", "");
 				_addRecipientsPM(*messagePM, message.recipients);
 				boost::shared_ptr<ParametersMap> displayRecipientPM(new ParametersMap);
+
 				if(0 != fakeBroadCastPoint)
 				{
 					displayRecipientPM->insert("recipient_id", fakeBroadCastPoint);
+					messagePM->insert("displayscreen_recipient", displayRecipientPM);
 				}
-				messagePM->insert("displayscreen_recipient", displayRecipientPM);
+
 				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 				calendarPM->insert("period", periodPM);
 				calendarPM->insert("message", messagePM);
@@ -1375,15 +1384,12 @@ namespace synthese
 
 				// If the Ineo Terminus data source is configured, set it as the source of the scenario
 				std::string ineoDataSourceStr = IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE);
-				if(false == ineoDataSourceStr.empty())
-				{
-					RegistryKeyType ineoDataSourceId = boost::lexical_cast<RegistryKeyType>(ineoDataSourceStr);
-					boost::shared_ptr<const DataSource> ineoDataSource = Env::GetOfficialEnv().getRegistry<DataSource>().get(ineoDataSourceId);
+				RegistryKeyType ineoDataSourceId = (false == ineoDataSourceStr.empty()) ? boost::lexical_cast<RegistryKeyType>(ineoDataSourceStr) : 0;
 
-					if(NULL != ineoDataSource.get())
-					{
-						sscenario->addCodeBySource(*ineoDataSource, "");
-					}
+				if(0 != ineoDataSourceId)
+				{
+					boost::shared_ptr<const DataSource> ineoDataSource = Env::GetOfficialEnv().getRegistry<DataSource>().get(ineoDataSourceId);
+					sscenario->addCodeBySource(*ineoDataSource, "");
 				}
 
 				SentScenarioTableSync::Save(sscenario.get());
@@ -1565,6 +1571,8 @@ namespace synthese
 				}
 			}
 
+			// TODO : process 'StopPoints'
+
 			return recipients;
 		}
 
@@ -1638,7 +1646,8 @@ namespace synthese
 					util::Log::GetInstance().warn("_addRecipientsPM : Recipient non codé : " + recipient.type);
 				}
 			}
-			pm.insert("stoparea_recipient", "");
+
+			// TODO : process 'StopPoints'
 		}
 }	}
 

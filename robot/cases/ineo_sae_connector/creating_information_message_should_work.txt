@@ -11,5 +11,9 @@ Creating Passenger Message Should Work
     ${request}=  Create Message From Ineo SAEIV  PassengerCreateMessageRequest
     Connector Should Handle Request  ${request}
 
+Creating BivLineMan Message Should Work
+    Ineo SAEIV Establishes Connection  127.0.0.1  4563
+    ${request}=  Create Message From Ineo SAEIV  BivLineManCreateMessageRequest
+    Connector Should Handle Request  ${request}
 
     
