@@ -18,8 +18,8 @@ https://extranet.rcsmobility.com/projects/synthese/wiki/Home
 Developer documentation :  
 https://extranet.rcsmobility.com/projects/synthese/wiki/Developer_documentation
 
-Public releases and snapshot builds :  
-http://ci.rcsmobility.com/~build/
+Public releases and snapshot builds :
+http://download.rcsmobility.com/
 
 ### Configuration management
 * A modification should be done in a feature branch
