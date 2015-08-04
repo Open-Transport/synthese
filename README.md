@@ -1,5 +1,7 @@
 # SYNTHESE
 
+<img src="synthese-logo.png" alt="SYNTHESE logo" title="SYNTHESE" align="right" />
+
 SYNTHESE is a public transportation server.
 
 It provides network modeling, passenger information, DRT reservation,
