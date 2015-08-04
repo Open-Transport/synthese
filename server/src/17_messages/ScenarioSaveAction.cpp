@@ -1121,43 +1121,50 @@ namespace synthese
 							// Recipients
 							Alarm::LinkedObjects::mapped_type existingLinks(message->getLinkedObjects(linkType->getFactoryKey()));
 
+							// Recipient nodes may be missing, so we need to test their presence before requesting their children
+							std::string factoryKey = linkType->getFactoryKey();
+							boost::optional<const ptree&> recipientNode = messageNode.second.get_child_optional(linkType->getFactoryKey() + "_recipient");
+
 							// Loop on recipients
-							BOOST_FOREACH(const ptree::value_type& linkNode, messageNode.second.get_child(linkType->getFactoryKey() + "_recipient"))
+							if(recipientNode)
 							{
-								RegistryKeyType linkId(linkNode.second.get("id", RegistryKeyType(0)));
-								boost::shared_ptr<AlarmObjectLink> link;
-
-								if(	linkId &&
-									_env->getRegistry<AlarmObjectLink>().contains(linkId)
-								){
-									link = _env->getEditable<AlarmObjectLink>(linkId);
-
-									// Check if the link is linked to the event
-									Alarm::LinkedObjects::mapped_type::iterator it(existingLinks.find(link.get()));
-									if(it == existingLinks.end())
-									{
-										link.reset();
-									}
-									else
-									{
-										existingLinks.erase(it);
-									}
-								}
-
-								// Link was not found, create it
-								if(!link.get())
+								BOOST_FOREACH(const ptree::value_type& linkNode, recipientNode.get())
 								{
-									link.reset(new AlarmObjectLink);
-									link->setAlarm(message.get());
-									link->setRecipient(linkType->getFactoryKey());
+									RegistryKeyType linkId(linkNode.second.get("id", RegistryKeyType(0)));
+									boost::shared_ptr<AlarmObjectLink> link;
+
+									if(	linkId &&
+										_env->getRegistry<AlarmObjectLink>().contains(linkId)
+									){
+										link = _env->getEditable<AlarmObjectLink>(linkId);
+
+										// Check if the link is linked to the event
+										Alarm::LinkedObjects::mapped_type::iterator it(existingLinks.find(link.get()));
+										if(it == existingLinks.end())
+										{
+											link.reset();
+										}
+										else
+										{
+											existingLinks.erase(it);
+										}
+									}
+
+									// Link was not found, create it
+									if(!link.get())
+									{
+										link.reset(new AlarmObjectLink);
+										link->setAlarm(message.get());
+										link->setRecipient(linkType->getFactoryKey());
+									}
+
+									// Properties
+									link->setObjectId(linkNode.second.get("recipient_id", RegistryKeyType(0)));
+									link->setParameter(linkNode.second.get("parameter", string()));
+
+									// Save
+									AlarmObjectLinkTableSync::Save(link.get(), transaction);
 								}
-
-								// Properties
-								link->setObjectId(linkNode.second.get("recipient_id", RegistryKeyType(0)));
-								link->setParameter(linkNode.second.get("parameter", string()));
-
-								// Save
-								AlarmObjectLinkTableSync::Save(link.get(), transaction);
 							}
 
 							// Removals

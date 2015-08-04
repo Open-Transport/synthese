@@ -194,11 +194,11 @@ namespace synthese
 			{
 				// Loop on events
 				SentScenarioTableSync::SearchResult scenarios;
-
 				scenarios = SentScenarioTableSync::Search(
 					Env::GetOfficialEnv(),
 					boost::optional<std::string>()
 				);
+
 				BOOST_FOREACH(const boost::shared_ptr<Scenario>& scenario, scenarios)
 				{
 					if(!dynamic_cast<const SentScenario*>(scenario.get()))
@@ -272,11 +272,22 @@ namespace synthese
 									{
 										// Existing links of this factory in the existent message
 										Alarm::LinkedObjects::mapped_type existingLinks(alarm->getLinkedObjects(linkType->getFactoryKey()));
+										boost::optional<const ptree&> recipientNode = messageNode.second.get_child_optional(linkType->getFactoryKey() + "_recipient");
+										size_t nbRecipientLinks = (recipientNode ? recipientNode.get().count("recipient_id") : 0);
+
+										// If the number of links differs between the existing alarm and the request then they do not match
+										if(nbRecipientLinks != existingLinks.size())
+										{
+											identicalRecipients = false;
+											break;
+										}
+
 										BOOST_FOREACH(const AlarmObjectLink* link, existingLinks)
 										{
 											bool linkFound(false);
+
 											// Loop on recipients
-											BOOST_FOREACH(const ptree::value_type& linkNode, messageNode.second.get_child(linkType->getFactoryKey() + "_recipient"))
+											BOOST_FOREACH(const ptree::value_type& linkNode, recipientNode.get())
 											{
 												if (link->getObjectId() == linkNode.second.get("recipient_id", RegistryKeyType(0)) &&
 													link->getParameter() == linkNode.second.get("parameter", string()))
@@ -285,6 +296,7 @@ namespace synthese
 													break;
 												}
 											}
+
 											if (!linkFound)
 											{
 												// Recipients are different
@@ -293,22 +305,12 @@ namespace synthese
 											}
 										}
 
-										// It may be more recipients in the ptree, compare on number
-										size_t nbRecipientLinks(0);
-										BOOST_FOREACH(const ptree::value_type& linkNode, messageNode.second.get_child(linkType->getFactoryKey() + "_recipient"))
-										{
-											nbRecipientLinks++;
-										}
-										if (nbRecipientLinks != existingLinks.size())
-										{
-											identicalRecipients = false;
-										}
-
 										if (!identicalRecipients)
 										{
 											break; // to avoid loop on other recipient factories
 										}
 									} // Loop on recipient factories
+
 									if (identicalRecipients)
 									{
 										alarmFound = true;
