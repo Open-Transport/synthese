@@ -56,6 +56,7 @@ namespace synthese
 		const string Alarm::DATA_DONE = "done";
 		const string Alarm::DATA_DISPLAY_DURATION("display_duration");
 		const string Alarm::DATA_DIGITIZED_VERSION("digitized_version");
+		const string Alarm::DATA_TAGS("tags");
 
 		const string Alarm::TAG_MESSAGE_ALTERNATIVE = "message_alternative";
 		const string Alarm::TAG_RECIPIENTS = "recipients";
@@ -93,7 +94,8 @@ namespace synthese
 			_section(source._section),
 			_calendar(source._calendar),
 			_displayDuration(source._displayDuration),
-			_digitizedVersion(source._digitizedVersion)
+			_digitizedVersion(source._digitizedVersion),
+			_tags(source._tags)
 		{}
 
 
@@ -112,7 +114,8 @@ namespace synthese
 			_section(source._section),
 			_calendar(calendar),
 			_displayDuration(source._displayDuration),
-			_digitizedVersion(source._digitizedVersion)
+			_digitizedVersion(source._digitizedVersion),
+			_tags(source._tags)
 		{}
 
 
@@ -136,6 +139,10 @@ namespace synthese
 			pm.insert(prefix + DATA_PRIORITY, static_cast<int>(getLevel()));
 			pm.insert(prefix + DATA_DISPLAY_DURATION, getDisplayDuration());
 			pm.insert(prefix + DATA_DIGITIZED_VERSION, getDigitizedVersion());
+
+			string tagsString = boost::algorithm::join(_tags, ", ");
+			pm.insert(prefix + DATA_TAGS, tagsString);
+
 			if(withScenario && getScenario())
 			{
 				pm.insert(prefix + DATA_SCENARIO_ID, getScenario()->getKey());

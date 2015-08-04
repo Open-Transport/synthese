@@ -67,6 +67,7 @@ namespace synthese
 			static const std::string DATA_DONE;
 			static const std::string DATA_DISPLAY_DURATION;
 			static const std::string DATA_DIGITIZED_VERSION;
+			static const std::string DATA_TAGS;
 
 			static const std::string TAG_MESSAGE_ALTERNATIVE;
 			static const std::string TAG_RECIPIENTS;
@@ -97,6 +98,7 @@ namespace synthese
 			const ScenarioCalendar* _calendar;
 			std::size_t			_displayDuration;
 			std::string			_digitizedVersion;
+			std::set<std::string> _tags;
 
 			// Links
 			//@{
@@ -137,6 +139,7 @@ namespace synthese
 				const ScenarioCalendar* getCalendar() const { return _calendar; }
 				std::size_t				getDisplayDuration() const { return _displayDuration;}
 				const std::string&		getDigitizedVersion()	const { return _digitizedVersion; }
+				const std::set<std::string>& getTags() const { return _tags; }
 			//@}
 
 			//! @name Setters
@@ -154,6 +157,7 @@ namespace synthese
 				void setCalendar(const ScenarioCalendar* value){ _calendar = value; }
 				void setDisplayDuration(std::size_t value){ _displayDuration = value; }
 				void setDigitizedVersion( const std::string& value){ _digitizedVersion = value; }
+				void setTags(const std::set<std::string> tags) { _tags = tags; }
 			//@}
 
 			//! @name Services

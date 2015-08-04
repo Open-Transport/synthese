@@ -112,6 +112,8 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_TO_CREATE = Action_PARAMETER_PREFIX + "me";
 		const string ScenarioSaveAction::PARAMETER_ENCODING = Action_PARAMETER_PREFIX + "_encoding";
 		const string ScenarioSaveAction::PARAMETER_LEVEL = Action_PARAMETER_PREFIX + "le";
+		const string ScenarioSaveAction::PARAMETER_TAGS = Action_PARAMETER_PREFIX + "tags";
+
 		const string ScenarioSaveAction::PARAMETER_DISPLAY_DURATION = Action_PARAMETER_PREFIX + "ddur";
 		const string ScenarioSaveAction::PARAMETER_DIGITIZED_VERSION = Action_PARAMETER_PREFIX + "dv";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_ID = Action_PARAMETER_PREFIX + "re";
@@ -598,6 +600,7 @@ namespace synthese
 						_messageToCreateTitle = iconv.convert(map.get<string>(PARAMETER_CREATED_MESSAGE_TITLE));
 					}
 					_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(ALARM_LEVEL_WARNING)));
+					_tags = map.get<string>(PARAMETER_TAGS);
 					_display_duration = static_cast<size_t>(map.getDefault<int>(PARAMETER_DISPLAY_DURATION));
 					_digitizedVersion = map.getDefault<string>(PARAMETER_DIGITIZED_VERSION);
 					if (map.isDefined(PARAMETER_MESSAGE_SECTION))
@@ -1051,6 +1054,10 @@ namespace synthese
 						message->setLongMessage(messageNode.second.get("content", string()));
 						message->setDisplayDuration(messageNode.second.get("displayDuration", 0));
 						message->setDigitizedVersion(messageNode.second.get("digitized_version", string()));
+						std::string tagsString = messageNode.second.get("tags", string());
+						std::set<string> tags;
+						boost::algorithm::split(tags, tagsString, is_any_of(", "), token_compress_on );
+						message->setTags(tags);
 						BOOST_FOREACH(const ptree::value_type& sectionNode, messageNode.second.get_child("section"))
 						{
 							RegistryKeyType sectionId(sectionNode.second.get("id", RegistryKeyType(0)));
@@ -1230,6 +1237,9 @@ namespace synthese
 				message->setShortMessage(_messageToCreateTitle ? *_messageToCreateTitle : "Unique message");
 				message->setLongMessage(*_messageToCreate);
 				message->setLevel(*_level);
+				std::set<string> tags;
+				boost::algorithm::split(tags, _tags, is_any_of(", "), token_compress_on );
+				message->setTags(tags);
 				if (_display_duration) message->setDisplayDuration(*_display_duration);
 				message->setDigitizedVersion(_digitizedVersion);
 				message->setSection(_messageSection.get());

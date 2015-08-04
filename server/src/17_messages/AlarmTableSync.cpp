@@ -80,6 +80,7 @@ namespace synthese
 		const string AlarmTableSync::COL_DATASOURCE_LINKS = "datasource_links";
 		const string AlarmTableSync::COL_DISPLAY_DURATION = "display_duration";
 		const string AlarmTableSync::COL_DIGITIZED_VERSION = "digitized_version";
+		const string AlarmTableSync::COL_TAGS = "tags";
 	}
 
 	namespace db
@@ -104,6 +105,7 @@ namespace synthese
 			Field(AlarmTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			Field(AlarmTableSync::COL_DISPLAY_DURATION, SQL_INTEGER),
 			Field(AlarmTableSync::COL_DIGITIZED_VERSION, SQL_TEXT),
+			Field(AlarmTableSync::COL_TAGS, SQL_TEXT),
 			Field()
 		};
 
@@ -145,6 +147,12 @@ namespace synthese
 			alarm->setDone(rows->getBool(AlarmTableSync::COL_DONE));
 			alarm->setDisplayDuration(rows->getInt (AlarmTableSync::COL_DISPLAY_DURATION));
 			alarm->setDigitizedVersion(rows->getText(AlarmTableSync::COL_DIGITIZED_VERSION));
+
+			std::string tagsString(rows->getText(AlarmTableSync::COL_TAGS));
+			std::set<string> tags;
+			boost::algorithm::split(tags, tagsString, is_any_of(", "), token_compress_on );
+			alarm->setTags(tags);
+
 			// Section
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -304,6 +312,10 @@ namespace synthese
 			)	);
 			query.addField(object->getDisplayDuration());
 			query.addField(object->getDigitizedVersion());
+
+			string tagsString = boost::algorithm::join(object->getTags(), ", ");
+			query.addField(tagsString);
+
 			query.execute(transaction);
 		}
 

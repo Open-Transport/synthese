@@ -481,6 +481,7 @@ function open_message(message)
   // When opening a message, format its content, i.e. \" becomes "
   tinyMCE.get('tinymce').setContent(message.content.replace(/\\\"/g,"\""));
   $('#message select[field=level]').val(message.level);
+  $('#message input[field=tags]').val(message.tags);
   $('#message [field=displayDuration]').val(message.displayDuration);
   if (message.digitized_version != "")
   {
@@ -556,6 +557,7 @@ function close_message()
     // when closing a message, format its content to make it SYNTHESE registrabled, i.e. " becomes \"
     current_message.content = tinyMCE.get('tinymce').getContent().replace(/\"/g,"\\\"");
     current_message.level = $('#message select[field=level]').val();
+    current_message.tags = $('#message input[field=tags]').val();
     current_message.displayDuration = $('#message [field=displayDuration]').val();
     if ($('#message [field=digitized_version]').val() == $('#message input[field=def_digital_msg_url]').val())
     {
@@ -601,6 +603,7 @@ function copy_message_click()
    title:"Copie de "+ message.title,
    content: message.content,
    level: message.level,
+   tags: message.tags,
    displayDuration: message.displayDuration,
    digitized_version: message.digitized_version,
    alternative:[],
@@ -675,6 +678,7 @@ function create_message_click()
    title:"",
    content:"",
    level:10,
+   tags:"",
    displayDuration:"",
    digitized_version: $('#message input[field=def_digital_msg_url]').val() != undefined ? $('#message input[field=def_digital_msg_url]').val() : "",
    alternative:[],
