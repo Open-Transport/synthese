@@ -349,20 +349,6 @@ namespace synthese
 
 			BOOST_FOREACH(const boost::shared_ptr<NotificationEvent>& event, pendingEvents)
 			{
-				// OVE : Temporary sanity check (see tc-227 for details)
-				bool eventHasProvider = (boost::none != event->get<NotificationProvider>());
-				bool eventHasAlarm    = (boost::none != event->get<Alarm>());
-
-				// if provider or alarm is missing, DO NOT PROCESS THE DAMN EVENT PLEASE !!!!!
-				if(!eventHasProvider || !eventHasAlarm)
-				{
-					event->markSuccessful();
-					NotificationEventTableSync::Save(event.get());
-					continue;
-				}
-
-				// OVE : tc-227 end
-
 				NotificationProvider& eventProvider = *(event->get<NotificationProvider>());
 				bool to_process = false;
 
