@@ -201,6 +201,8 @@ namespace synthese
 					std::string firstMessage = _messagesToSend.front();
 					(*(_livingConnections.begin()))->sendMessage(firstMessage);
 					_messagesToSend.pop_front();
+
+					util::Log::GetInstance().debug("Ineo Terminus : sending message " + firstMessage);
 				}
 			}
 		}
