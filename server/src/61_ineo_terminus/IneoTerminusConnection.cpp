@@ -43,6 +43,7 @@
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 using namespace boost;
 using namespace boost::algorithm;
@@ -487,8 +488,12 @@ namespace synthese
 
 				// Log for debug
 				util::Log::GetInstance().debug("Ineo Terminus received : " + bufStr);
-				// TODO : accept both " and '
-				if (bufStr.substr(0,43) != "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>")
+
+				size_t messageHeaderPosition = bufStr.find("?>");
+				string messageHeader = (string::npos != messageHeaderPosition) ? bufStr.substr(0, messageHeaderPosition + 2) : "";
+				boost::replace_all(messageHeader, "'", "\"");
+
+				if (INEO_TERMINUS_XML_HEADER != messageHeader)
 				{
 					util::Log::GetInstance().warn("Ineo Terminus received a XML message with wrong header");
 					string message("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><ResponseRef>Terminus</ResponseRef><ErrorType>ProtocolError</ErrorType><ErrorMessage>Syntaxe incorrecte</ErrorMessage><ErrorID>1</ErrorID>");
