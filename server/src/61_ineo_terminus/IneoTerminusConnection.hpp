@@ -111,6 +111,8 @@ namespace synthese
 					_datasource_id(datasource_id),
 					_iconv("ISO-8859-1","UTF-8") {}
 
+				~tcp_connection();
+
 				boost::asio::ip::tcp::socket& socket();
 
 				void start();

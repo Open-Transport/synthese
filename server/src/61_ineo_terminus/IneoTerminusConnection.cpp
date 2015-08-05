@@ -164,6 +164,7 @@ namespace synthese
 		{
 			boost::mutex::scoped_lock lock(_connectionsMutex);
 			_livingConnections.erase(connection_to_remove);
+			delete connection_to_remove;
 			util::Log::GetInstance().info("Connection to Ineo SAE closed (count=" + boost::lexical_cast<std::string>(_livingConnections.size()) + ")");
 		}
 
@@ -429,6 +430,16 @@ namespace synthese
 			// Request identifiers are comprised between 1 and 65535
 			_idRequest = (_idRequest % 65534) + 1;
 			return _idRequest;
+		}
+
+
+		IneoTerminusConnection::tcp_connection::~tcp_connection()
+		{
+			boost::system::error_code errorCode;
+
+			// Upon destruction of this tcp_connection, close its socket properly
+			_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, errorCode);
+			_socket.close(errorCode);
 		}
 
 
