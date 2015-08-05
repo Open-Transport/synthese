@@ -24,6 +24,8 @@
 
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
+#include "StopPoint.hpp"
+#include "StopPointTableSync.hpp"
 #include "DataSourceTableSync.h"
 #include "ImportableTableSync.hpp"
 #include "IneoTerminusModule.hpp"
@@ -1405,6 +1407,8 @@ namespace synthese
 
 		vector<IneoTerminusConnection::Recipient> IneoTerminusConnection::tcp_connection::_readRecipients(XMLNode node)
 		{
+			// TODO : refactor
+
 			vector<IneoTerminusConnection::Recipient> recipients;
 			int nChildNode = node.nChildNode();
 			for (int cptChildNode = 0;cptChildNode<nChildNode;cptChildNode++)
@@ -1436,6 +1440,27 @@ namespace synthese
 						else
 						{
 							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientLineType + " est fils d'un noeud Lines");
+						}
+					}
+				}
+				else if (recipientType == "StopPoints")
+				{
+					int nStopNode = recipientNode.nChildNode();
+					for (int cptStopNode = 0;cptStopNode<nStopNode;cptStopNode++)
+					{
+						XMLNode stopNode = recipientNode.getChildNode(cptStopNode);
+						string recipientLineType(stopNode.getName());
+						if (recipientLineType == "StopPoint")
+						{
+							string stopId = stopNode.getText();
+							IneoTerminusConnection::Recipient new_recipient;
+							new_recipient.type = "StopPoint";
+							new_recipient.name = stopId;
+							recipients.push_back(new_recipient);
+						}
+						else
+						{
+							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientLineType + " est fils d'un noeud StopPoints");
 						}
 					}
 				}
@@ -1571,8 +1596,6 @@ namespace synthese
 				}
 			}
 
-			// TODO : process 'StopPoints'
-
 			return recipients;
 		}
 
@@ -1586,6 +1609,7 @@ namespace synthese
 					lineRecipientPM->insert("recipient_id", _network_id);
 					pm.insert("line_recipient", lineRecipientPM);
 				}
+
 				else if (recipient.type == "Line")
 				{
 					bool found(false);
@@ -1607,47 +1631,50 @@ namespace synthese
 					}
 					if (!found)
 					{
-						util::Log::GetInstance().warn("Ineo Terminus : Ligne non trouvée " + recipient.name);
-						pm.insert("line_recipient", "");
+						util::Log::GetInstance().warn("Ineo Terminus : line not found " + recipient.name);
 					}
 				}
-				else if (recipient.type == "Vehicle")
+
+				else if (recipient.type == "StopPoint")
 				{
-					// A priori on ne fait rien pour les recipient Vehicle dans Synthese
-					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient vehicle");
+					boost::shared_ptr<const impex::DataSource> dataSource = DataSourceTableSync::Get(
+						_datasource_id,
+						Env::GetOfficialEnv()
+					);
+					ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(*dataSource, Env::GetOfficialEnv());
+					set<StopPoint*> loadedStopPoints(stopPoints.get(recipient.name));
+
+					BOOST_FOREACH(StopPoint* loadedStopPoint, loadedStopPoints)
+					{
+						boost::shared_ptr<ParametersMap> stopRecipientPM(new ParametersMap);
+						stopRecipientPM->insert("recipient_id", loadedStopPoint->getKey());
+						pm.insert("stoparea_recipient", stopRecipientPM);
+					}
+
+					if(true == loadedStopPoints.empty())
+					{
+						util::Log::GetInstance().warn("Ineo Terminus : stop not found " + recipient.name);
+					}
 				}
-				else if (recipient.type == "Car")
+
+				// The following recipient types are not processed by SYNTHESE
+				else if (
+						  (recipient.type == "Vehicle") ||
+						  (recipient.type == "Car") ||
+						  (recipient.type == "CarService") ||
+						  (recipient.type == "LineWay") ||
+						  (recipient.type == "Biv") ||
+						  (recipient.type == "Group")
+						)
 				{
-					// A priori on ne fait rien pour les recipient Car dans Synthese
-					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient car");
+					util::Log::GetInstance().debug("Ineo Terminus : skipped recipient type " + recipient.type);
 				}
-				else if (recipient.type == "CarService")
-				{
-					// A priori on ne fait rien pour les recipient CarService dans Synthese
-					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient carService");
-				}
-				else if (recipient.type == "LineWay")
-				{
-					// A priori on ne fait rien pour les recipient LineWay dans Synthese
-					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient LineWay");
-				}
-				else if (recipient.type == "Biv")
-				{
-					// A priori on ne fait rien pour les recipient Biv dans Synthese
-					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient Biv");
-				}
-				else if (recipient.type == "Group")
-				{
-					// A priori on ne fait rien pour les recipient Group dans Synthese
-					util::Log::GetInstance().debug("_addRecipientsPM : Message concerne recipient Group");
-				}
+
 				else
 				{
-					util::Log::GetInstance().warn("_addRecipientsPM : Recipient non codé : " + recipient.type);
+					util::Log::GetInstance().warn("Ineo Terminus : unknown recipient type " + recipient.type);
 				}
 			}
-
-			// TODO : process 'StopPoints'
 		}
 }	}
 
