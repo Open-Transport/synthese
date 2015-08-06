@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--- commentaire libre -->
+<BivGeneralCreateMessageRequest>
+	<ID>${ID}</ID>
+	<RequestTimeStamp>${TIMESTAMP}<RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+		<Name>0018 MessageCommercial1</Name>
+		<StartDate>20/01/2015</StartDate>
+		<StopDate>21/01/2015</StopDate>
+		<Varying>oui</Varying>
+		<Text>
+			<TypeBIV>BUS4L</TypeBIV>
+			<FixedText>
+				<Line>Message commercial aux </Line>
+				<Line>bornes 10 et 11”</Line>
+				<Line/>
+				<Line>avec une ligne vide</Line>
+			</FixedText>
+		</Text>
+		<Text>
+			<TypeBIV>BUS8L</TypeBIV>
+			<FixedText>
+				<Line>Message commercial aux </Line>
+				<Line>bornes 10 et 11</Line>
+				<Line/>
+				<Line/>
+				<Line/>
+				<Line/>
+				<Line/>
+				<Line>avec cinq lignes vides</Line>
+			</FixedText>
+		</Text>
+		<Text>
+			<TypeBIV>ER</TypeBIV>
+			<FixedText>
+				<Line>Message commercial aux </Line>
+				<Line>bornes 10 et 11</Line>
+				<Line/>
+				<Line/>
+				<Line/>
+				<Line/>
+				<Line>avec cinq ligne vide</Line>
+			</FixedText>
+		</Text>
+		<Text>
+			<TypeBIV>TFT</TypeBIV>
+			<FixedText>
+				<Line>Message commercial aux </Line>
+				<Line>bornes 10 et 11</Line>
+				<Line/>
+				<Line/>
+				<Line/>
+				<Line>avec trois lignes vides</Line>
+			</FixedText>
+		</Text>
+		<Text>
+			<TypeBIV>TTS</TypeBIV>
+			<TtsText>
+				<Line="Message commercial aux bornes 10 et 11"/>
+			</TtsText>
+		</Text>
+		<Text>
+			<TypeBIV>TW3L</TypeBIV>
+			<FixedText>
+				<Line>Message commercial aux </Line>
+				<Line>bornes 10 et 11</Line>
+				<Line>sans ligne vide</Line>
+			</FixedText>
+			<ScrollingText>
+				<Line="Message commercial aux bornes 10 et 11"/>
+			</ScrollingText>
+		</Text>
+		<Recipients>
+			<Bivs>
+				<Biv>10</Biv>
+				<Biv>11</Biv>
+			</Bivs>
+		</Recipients>
+	</Messaging>
+</BivGeneralCreateMessageRequest>

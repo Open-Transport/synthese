@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<PpdsDeleteMessageRequest>
+	<ID>${ID}</ID>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+		<Name>0009 MessagePPDS2</Name>
+		<StartDate>20/01/2015</StartDate>
+		<StopDate>21/01/2015</StopDate>
+		<StartTime>10:00:00</StartTime>
+		<StopTime>19:00:00</StopTime>
+		<Text>
+			<Line>Message à l’attention des conducteurs opérant sur des SV</Line>
+		</Text>
+		<Recipients>
+			<CarServices>
+				<CarService>1802</CarService>
+				<CarService>1804</CarService>
+			</CarServices>
+		</Recipients>
+	</Messaging>
+</PpdsDeleteMessageRequest>

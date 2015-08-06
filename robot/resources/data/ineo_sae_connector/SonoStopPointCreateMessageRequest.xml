@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<SonoStopPointCreateMessageRequest>
+	<ID>${ID}</ID>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+		<Name>0016 MessageSonoArret1</Name>
+		<Dispatching>Repete</Dispatching>
+		<StartDate>20/01/2015</StartDate>
+		<StopDate>21/01/2015</StopDate>
+		<StartTime>12:00:00</StartTime>
+		<StopTime>14:00:00</StopTime>
+		<RepeatPeriod>5</RepeatPeriod>
+		<Text Line="Message sonore à des arrêts"/>
+		<Recipients>
+			<StopPoints>
+				<StopPoint>ACIA00</StopPoint>
+				<StopPoint>AERO02</StopPoint>
+			</StopPoints>
+		</Recipients>
+	</Messaging>
+</SonoStopPointCreateMessageRequest>

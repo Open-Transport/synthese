@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<BivGeneralCreateMessageRequest>
+	<ID>${ID}</ID>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+		<Name>0018 MessageCommercial1</Name>
+		<StartDate>20/01/2015</StartDate>
+		<StopDate>21/01/2015</StopDate>
+		<StartTime>16:00:00</StartTime>
+		<StopTime>20:00:00</StopTime>
+		<DiodFlashing>oui</DiodFlashing>
+		<Text>
+			<Line>Message commercial aux </Line>
+			<Line>bornes 10 et 11</Line>
+			<Line/>
+			<Line>avec une ligne vide”</Line>
+		</Text>
+		<Recipients>
+			<Bivs>
+				<Biv>10</Biv>
+				<Biv>11</Biv>
+			</Bivs>
+		</Recipients>
+	</Messaging>
+</BivGeneralCreateMessageRequest>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!-- commentaire libre -->
-<BivLineManCreateMessageRequest>
+<BivLineManDeleteMessageRequest>
 	<ID>${ID}</ID>
 	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
 	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
 	<Messaging>
-		<Name>0020 MessageLigneManuel1</Name>
+		<Name>0021 MessageLigneManuel2</Name>
 		<StartDate>20/01/2015</StartDate>
 		<StopDate>21/01/2015</StopDate>
 		<StartTime>12:00:00</StartTime>
@@ -13,9 +13,15 @@
 		<Alternance>oui</Alternance>
 		<Text>
 			<Line>Message affiché sur </Line>
-			<Line>les bornes de la </Line>
-			<Line>ligne 12</Line>
+			<Line>les bornes 5 et 12 </Line>
+			<Line>de la ligne 18</Line>
 		</Text>
-		<Recipients Line="12"/>
+		<Recipients>
+			<Line>10</Line>
+			<Bivs>
+				<Biv>5</Biv>
+				<Biv>12</Biv>
+			</Bivs>
+		</Recipients>
 	</Messaging>
-</BivLineManCreateMessageRequest>
+</BivLineManDeleteMessageRequest>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<PpdsCreateMessageRequest>
+	<ID>${ID}</ID>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+		<Name>0008 MessagePPDS1</Name>
+		<StartDate>20/01/2015</StartDate>
+		<StopDate>21/01/2015</StopDate>
+		<StartTime>11:00:00</StartTime>
+		<StopTime>19:00:00</StopTime>
+		<Text>
+			<Line>Message à l’attention des conducteurs opérant sur la voiture</Line>
+		</Text>
+		<Recipients>
+			<Cars Car="18-02"/>
+		</Recipients>
+	</Messaging>
+</PpdsCreateMessageRequest>
