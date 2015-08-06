@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<SonoPassengerDeleteMessageRequest>
+	<ID>${ID}</ID>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+		<Name>0013 MessageSonoPassager2</Name>
+		<Dispatching>Repete</Dispatching>
+		<StartDate>20/01/2015</StartDate>
+		<StopDate>21/01/2015</StopDate>
+		<StartTime>15:00:00</StartTime>
+		<StopTime>23:00:00</StopTime>
+		<RepeatPeriod>5</RepeatPeriod>
+		<Inhibition>non</Inhibition>
+		<ActivateHeadJingle>oui</ActivateHeadJingle>
+		<ActivateBackJingle>oui</ActivateBackJingle>
+		<StartStopPoint>ACIA00</StartStopPoint>
+		<EndStopPoint>AERO02</EndStopPoint>
+		<Text Line="Message sonore à l’attention des passagers de la ligne 10"/>
+		<Recipients>
+			<Lines Line="10"/>
+		</Recipients>
+	</Messaging>
+</SonoPassengerDeleteMessageRequest>

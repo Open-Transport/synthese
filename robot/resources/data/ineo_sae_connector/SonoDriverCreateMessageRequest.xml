@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<SonoDriverCreateMessageRequest>
+	<ID>${ID}</ID>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+		<Name>0014 MessageSonoConducteur1</Name>
+		<Dispatching>Repete</Dispatching>
+		<StartDate>20/01/2015</StartDate>
+		<StopDate>21/01/2015</StopDate>
+		<StartTime>25:00:00</StartTime>
+		<StopTime>26:00:00</StopTime>
+		<RepeatPeriod>5</RepeatPeriod>
+		<Text Line="Message sonore aux conducteurs des lignes 15 et 16"/>
+		<Recipients>
+			<Lines>
+				<Line>15</Line>
+				<Line>16</Line>
+			</Lines>
+		</Recipients>
+	</Messaging>
+</SonoDriverCreateMessageRequest>

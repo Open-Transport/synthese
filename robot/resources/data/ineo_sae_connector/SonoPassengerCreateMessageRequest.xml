@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<SonoPassengerCreateMessageRequest>
+	<ID>${ID}</ID>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+		<Name>0012 MessageSonoPassager1</Name>
+		<Dispatching>Immediat</Dispatching>
+		<Inhibition>oui</Inhibition>
+		<ActivateHeadJingle>oui</ActivateHeadJingle>
+		<ActivateBackJingle>oui</ActivateBackJingle>
+		<Text Line="Message sonore général à l’attention de tous les passagers"/>
+		<Recipients>
+			<AllNetwork />
+		</Recipients>
+	</Messaging>
+</SonoPassengerCreateMessageRequest>

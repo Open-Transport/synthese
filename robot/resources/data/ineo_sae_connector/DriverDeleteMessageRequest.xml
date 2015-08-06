@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<DriverDeleteMessageRequest>
+	<ID>${ID}</ID>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+		<Name>0005 MessageConducteur2</Name>
+		<Dispatching>Differe</Dispatching>
+		<StartDate>20/01/2015</StartDate>
+		<StopDate>21/01/2015</StopDate>
+		<StartTime>11:00:00</StartTime>
+		<StopTime>19:00:00</StopTime>
+		<RepeatPeriod>0</RepeatPeriod>
+		<Text>
+			<Line>Message à l’attention </Line>
+			<Line>des conducteurs</Line>
+		</Text>
+		<Recipients>
+			<Lines>
+				<Line>10</Line>
+				<Line>15</Line>
+			<Lines/>
+		</Recipients>
+	</Messaging>
+</DriverDeleteMessageRequest >

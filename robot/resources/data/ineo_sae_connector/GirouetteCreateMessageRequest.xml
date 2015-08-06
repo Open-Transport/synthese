@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<GirouetteCreateMessageRequest>
+	<ID>${ID}</ID>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+	<Name>0010 MessageGirouette1</Name>
+	<StartDate>20/01/2015</StartDate>
+	<StopDate>21/01/2015</StopDate>
+	<Code>1</Code>
+	<Text>
+		<Line>Message à destination des</Line>
+		<Line> girouettes des bus de </Line>
+		<Line> la ligne 12</Line>
+	</Text>
+	<Recipients>
+		<Lines Line="12"/>
+	</Recipients>
+	</Messaging>
+</GirouetteCreateMessageRequest>

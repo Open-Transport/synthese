@@ -1043,7 +1043,10 @@ namespace synthese
 			{
 				XMLNode messagingNode = requestNode.getChildNode("Messaging", cptMessaging);
 				int tabDepth = 2;
+
+				responseStream << "\t<Messaging>" << char(10);
 				_copyXMLNode(messagingNode, tabDepth, responseStream);
+				responseStream << "\t</Messaging>" << char(10);
 			}
 
 			responseStream << "</" << responseTag << ">" << char(10);

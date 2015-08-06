@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<BivLineManCreateMessageRequest>
+  <ID>${ID}</ID>
+  <RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+  <RequestorRef>${REQUESTOR_REF}</RequestorRef>
+  <Messaging>
+    <Name>TestEnCours</Name>
+    <StartDate>31/07/2015</StartDate>
+    <StopDate>31/07/2015</StopDate>
+    <Text>
+      <Line>Essais en cours</Line>
+    </Text>
+    <Tts>
+      <Line>Essais en cours, les rame</Line>
+      <Line>s ne prennent pas de voya</Line>
+      <Line>geurs</Line>
+      <Line/>
+      <Line/>
+      <Line/>
+    </Tts>
+    <Recipients Line="7"/>
+  </Messaging>
+</BivLineManCreateMessageRequest>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<BivGeneralDeleteMessageRequest>
+	<ID>${ID}<ID>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+		<Name>0019 MessageCommercial2</Name>
+		<StartDate>20/01/2015</StartDate>
+		<StopDate>21/01/2015</StopDate>
+		<StartTime>10:00:00</StartTime>
+		<StopTime>22:00:00</StopTime>
+		<DiodFlashing>non</DiodFlashing>
+		<Text>
+			<Line>Message commercial aux </Line>
+			<Line>bornes de la ligne 36</Line>
+		</Text>
+		<Recipients>
+			<Lines Line="36"/>
+		</Recipients>
+	</Messaging>
+</BivGeneralDeleteMessageRequest>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<BivLineAutoDeleteMessageRequest>
+	<ID>${ID}</ID>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+		<Name>MsgLigneAuto0002</Name>
+		<Text>
+			<Line>Ligne déviée entre </Line>
+			<Line>ARRET1 et </Line>
+			<Line>ARRET2</Line>
+		</Text>
+		<Recipients>
+			<Bivs Biv="20"/>
+		</Recipients>
+	</Messaging>
+</BivLineAutoDeleteMessageRequest>

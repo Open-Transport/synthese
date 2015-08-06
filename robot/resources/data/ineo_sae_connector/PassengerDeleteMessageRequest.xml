@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<PassengerDeleteMessageRequest>
+	<ID>${ID}</ID>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+		<Name>0007 MessagePassager2</Name>
+		<Dispatching>Differe</Dispatching>
+		<StartDate>20/01/2015</StartDate>
+		<StopDate>21/01/2015</StopDate>
+		<StartTime>10:00:00</StartTime>
+		<StopTime>25:00:00</StopTime>
+		<RepeatPeriod>0</RepeatPeriod>
+		<Inhibition>oui</Inhibition>
+		<Color>Rouge</Color>
+		<StartStopPoint>ACIA00</StartStopPoint>
+		<EndStopPoint>AERO02</EndStopPoint>
+		<Text>
+			<Line>Message à l’attention </Line>
+			<Line>de tous les passagers </Line>
+			<Line>des lignes 4 et 15</Line>
+		</Text>
+		<Recipients>
+			<Lines>
+				<Line>4</Line>
+				<Line>15</Line>
+			</Lines>
+		</Recipients>
+	</Messaging>
+</PassengerDeleteMessageRequest>
