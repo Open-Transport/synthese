@@ -56,17 +56,17 @@ for line in re.split('<br />|\n',message[0]["content"]):
 childRecipients = etree.SubElement(childMessaging, "Recipients")
 recipients = message[0]["recipients"][0]
 if 'line' in recipients:
-  childLines = etree.SubElement(childRecipients, "Lines")
-  for line in recipients["line"]:
-    if line["id"] != network_id:
-      parameters = { "roid": line["id"] }
-      linePM = synthese.service("LinesListFunction2", parameters)
-      lineCodesStr = linePM["line"][0]["creator_id"]
-      lineCodes = map(lambda x: x.split('|'), lineCodesStr.split(','))
-      for lineCode in lineCodes:
-        if lineCode[0] == datasource_id:
-          childLine = etree.SubElement(childLines, "Line")
-          childLine.text = lineCode[1]
+  lineId = int(recipients["line"][0]["id"])
+  lineTableId = (lineId / (2**48))
+  if lineTableId == 42:
+    parameters = { "roid": lineId }
+    linePM = synthese.service("LinesListFunction2", parameters)
+    lineCodesStr = linePM["line"][0]["creator_id"]
+    lineCodes = map(lambda x: x.split('|'), lineCodesStr.split(','))
+    for lineCode in lineCodes:
+      if lineCode[0] == datasource_id:
+        childLine = etree.SubElement(childRecipients, "Line")
+        childLine.text = lineCode[1]
 
 # Print resulting XML to output stream
 print(etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="iso-8859-1"))
