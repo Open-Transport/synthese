@@ -11,7 +11,7 @@
 		<StopDate>21/01/2015</StopDate>
 		<StartTime>11:00:00</StartTime>
 		<StopTime>19:00:00</StopTime>
-		<RepeatPeriod>5<RepeatPeriod>
+		<RepeatPeriod>5</RepeatPeriod>
 		<Text>
 			<Line>Message à l’attention </Line>
 			<Line>des conducteurs</Line>
