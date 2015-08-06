@@ -2,7 +2,7 @@
 <!--- commentaire libre -->
 <BivGeneralCreateMessageRequest>
 	<ID>${ID}</ID>
-	<RequestTimeStamp>${TIMESTAMP}<RequestTimeStamp>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
 	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
 	<Messaging>
 		<Name>0018 MessageCommercial1</Name>
@@ -57,7 +57,7 @@
 		<Text>
 			<TypeBIV>TTS</TypeBIV>
 			<TtsText>
-				<Line="Message commercial aux bornes 10 et 11"/>
+				<Line>Message commercial aux bornes 10 et 11</Line>
 			</TtsText>
 		</Text>
 		<Text>
@@ -68,7 +68,7 @@
 				<Line>sans ligne vide</Line>
 			</FixedText>
 			<ScrollingText>
-				<Line="Message commercial aux bornes 10 et 11"/>
+				<Line>Message commercial aux bornes 10 et 11</Line>
 			</ScrollingText>
 		</Text>
 		<Recipients>
