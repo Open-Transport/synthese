@@ -4,65 +4,29 @@ Resource          ../../resources/s3-fakeclient/ineo_sae_connector.txt
 Test Setup        Start Synthese On Node 0  
 Test Teardown     Stop Synthese On Node 0
 
+*** Keywords ***
+
+Creating Ineo Message Should Work
+    [Arguments]  ${ineo_message_template}
+    Ineo SAEIV Establishes Connection  127.0.0.1  4563
+    ${request}=  Create Message From Ineo SAEIV  request_template=${ineo_message_template}
+    Connector Should Handle Request  ${request}
+
+
 *** Test Cases ***
 
-Creating Passenger Message Should Work
-    Ineo SAEIV Establishes Connection  127.0.0.1  4563
-    ${request}=  Create Message From Ineo SAEIV  PassengerCreateMessageRequest
-    Connector Should Handle Request  ${request}
-
-Creating Driver Message Should Work
-    Ineo SAEIV Establishes Connection  127.0.0.1  4563
-    ${request}=  Create Message From Ineo SAEIV  DriverCreateMessageRequest
-    Connector Should Handle Request  ${request}
-
-Creating Ppds Message Should Work
-    Ineo SAEIV Establishes Connection  127.0.0.1  4563
-    ${request}=  Create Message From Ineo SAEIV  PpdsCreateMessageRequest
-    Connector Should Handle Request  ${request}
-
-Creating Girouette Message Should Work
-    Ineo SAEIV Establishes Connection  127.0.0.1  4563
-    ${request}=  Create Message From Ineo SAEIV  GirouetteCreateMessageRequest
-    Connector Should Handle Request  ${request}
-
-Creating SonoPassenger Message Should Work
-    Ineo SAEIV Establishes Connection  127.0.0.1  4563
-    ${request}=  Create Message From Ineo SAEIV  SonoPassengerCreateMessageRequest
-    Connector Should Handle Request  ${request}
-
-Creating SonoDriver Message Should Work
-    Ineo SAEIV Establishes Connection  127.0.0.1  4563
-    ${request}=  Create Message From Ineo SAEIV  SonoDriverCreateMessageRequest
-    Connector Should Handle Request  ${request}
-
-Creating SonoStopPoint Message Should Work
-    Ineo SAEIV Establishes Connection  127.0.0.1  4563
-    ${request}=  Create Message From Ineo SAEIV  SonoStopPointCreateMessageRequest
-    Connector Should Handle Request  ${request}
-
-Creating BivGeneral Message Should Work
-    Ineo SAEIV Establishes Connection  127.0.0.1  4563
-    ${request}=  Create Message From Ineo SAEIV  BivGeneralCreateMessageRequest
-    Connector Should Handle Request  ${request}
-
-Creating BivLineMan Message Should Work
-    Ineo SAEIV Establishes Connection  127.0.0.1  4563
-    ${request}=  Create Message From Ineo SAEIV  BivLineManCreateMessageRequest
-    Connector Should Handle Request  ${request}
-
-Creating BivLineAuto Message Should Work
-    Ineo SAEIV Establishes Connection  127.0.0.1  4563
-    ${request}=  Create Message From Ineo SAEIV  BivLineAutoCreateMessageRequest
-    Connector Should Handle Request  ${request}
-
-Creating BivGeneralT2C Message Should Work
-    Ineo SAEIV Establishes Connection  127.0.0.1  4563
-    ${request}=  Create Message From Ineo SAEIV  BivGeneralCreateMessageRequest_T2C
-    Connector Should Handle Request  ${request}
-
-Creating BivLineManT2C Message Should Work
-    Ineo SAEIV Establishes Connection  127.0.0.1  4563
-    ${request}=  Create Message From Ineo SAEIV  BivLineManCreateMessageRequest_T2C
-    Connector Should Handle Request  ${request}
+Creating Ineo Message Should Work For Any Message Type
+    [Template]    Creating Ineo Message Should Work
+    PassengerCreateMessageRequest
+    DriverCreateMessageRequest
+    PpdsCreateMessageRequest
+    GirouetteCreateMessageRequest
+    SonoPassengerCreateMessageRequest
+    SonoDriverCreateMessageRequest
+    SonoStopPointCreateMessageRequest
+    BivGeneralCreateMessageRequest
+    BivLineManCreateMessageRequest
+    BivLineAutoCreateMessageRequest
+    BivGeneralCreateMessageRequest_T2C
+    BivLineManCreateMessageRequest_T2C
 
