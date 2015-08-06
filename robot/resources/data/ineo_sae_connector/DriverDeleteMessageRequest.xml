@@ -20,7 +20,7 @@
 			<Lines>
 				<Line>10</Line>
 				<Line>15</Line>
-			<Lines/>
+			</Lines>
 		</Recipients>
 	</Messaging>
 </DriverDeleteMessageRequest >

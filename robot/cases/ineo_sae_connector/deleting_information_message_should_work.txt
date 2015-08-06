@@ -1,0 +1,30 @@
+*** Settings ***
+Resource          ../../resources/s3-server/common.txt    
+Resource          ../../resources/s3-fakeclient/ineo_sae_connector.txt    
+Test Setup        Start Synthese On Node 0  
+Test Teardown     Stop Synthese On Node 0
+
+*** Keywords ***
+
+Deleting Ineo Message Should Work
+    [Arguments]  ${ineo_message_template}
+    Ineo SAEIV Establishes Connection  127.0.0.1  4563
+    ${request}=  Delete Message From Ineo SAEIV  request_template=${ineo_message_template}
+    Connector Should Handle Request  ${request}
+
+
+*** Test Cases ***
+
+Deleting Ineo Message Should Work For Any Message Type
+    [Template]    Deleting Ineo Message Should Work
+    PassengerDeleteMessageRequest
+    DriverDeleteMessageRequest
+    PpdsDeleteMessageRequest
+    GirouetteDeleteMessageRequest
+    SonoPassengerDeleteMessageRequest
+    SonoDriverDeleteMessageRequest
+    SonoStopPointDeleteMessageRequest
+    BivGeneralDeleteMessageRequest
+    BivLineManDeleteMessageRequest
+    BivLineAutoDeleteMessageRequest
+

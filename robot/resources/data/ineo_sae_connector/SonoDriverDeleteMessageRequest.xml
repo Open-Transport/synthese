@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- commentaire libre -->
+<SonoDriverDeleteMessageRequest>
+	<ID>${ID}</ID>
+	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
+	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
+	<Messaging>
+		<Name>0015 MessageSonoConducteur2</Name>
+		<Dispatching>Repete</Dispatching>
+		<StartDate>20/01/2015</StartDate>
+		<StopDate>21/01/2015</StopDate>
+		<StartTime>11:00:00</StartTime>
+		<StopTime>26:00:00</StopTime>
+		<RepeatPeriod>15</RepeatPeriod>
+		<Text Line="Message sonore aux conducteurs des SV 1 à 3 ligne 9"/>
+		<Recipients>
+			<CarServices>
+				<CarService>901</CarService>
+				<CarService>902</CarService>
+				<CarService>903</CarService>
+			</CarServices >
+		</Recipients>
+	</Messaging>
+</SonoDriverDeleteMessageRequest>

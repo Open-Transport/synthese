@@ -21,13 +21,20 @@ Create Message From Ineo SAEIV
     ${REQUESTOR_REF}=  Set Variable  SAE
     ${request}=  Replace Variables  ${request}
     [Return]  ${request}
-    
+
+Delete Message From Ineo SAEIV
+    [Arguments]  ${request_template}
+    ${request}=  Get File	path=${CURDIR}/../data/ineo_sae_connector/${request_template}.xml  encoding=ISO-8859-1
+    ${date}=  Get Current Date
+    ${TIMESTAMP}=  Convert Date	 ${date}  result_format=%d/%m/%Y %H:%M:%S
+    ${REQUESTOR_REF}=  Set Variable  SAE
+    ${request}=  Replace Variables  ${request}
+    [Return]  ${request}
 
 Ineo SAEIV Sends 
     [Arguments]  ${request_message}
     ${response}=  Send Sync  ${saeiv_connection}  ${request}
     [Return]  ${response}
-    
 
 Response Should Match Request  
     [Arguments]  ${response}  ${request}
@@ -44,9 +51,4 @@ Connector Should Handle Request
     [Arguments]  ${request}
     ${response}=  Ineo SAEIV Sends  ${request}
     Response Should Match Request  ${response}  ${request}
-    
-
-
-
-
 

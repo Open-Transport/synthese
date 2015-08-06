@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!-- commentaire libre -->
 <BivGeneralDeleteMessageRequest>
-	<ID>${ID}<ID>
+	<ID>${ID}</ID>
 	<RequestTimeStamp>${TIMESTAMP}</RequestTimeStamp>
 	<RequestorRef>${REQUESTOR_REF}</RequestorRef>
 	<Messaging>
