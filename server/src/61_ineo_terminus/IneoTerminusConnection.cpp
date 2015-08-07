@@ -524,10 +524,16 @@ namespace synthese
 				bufStr = bufStr.substr(43, bufStr.size() - 43); // Remove XML header (<?xml ... ?>)
 
 				// Parsing
-				XMLNode node(ParseInput(bufStr));
-				if(node.isEmpty())
+				XMLNode node;
+
+				try
 				{
-					util::Log::GetInstance().warn("Ineo Terminus : Message XML vide");
+					node = ParseInput(bufStr);
+				}
+
+				catch(synthese::Exception&)
+				{
+					util::Log::GetInstance().warn("Ineo Terminus : received message is ill-formed");
 					string message("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><ResponseRef>Terminus</ResponseRef><ErrorType>ProtocolError</ErrorType><ErrorMessage>Syntaxe incorrecte</ErrorMessage><ErrorID>1</ErrorID>");
 					util::IConv iconv("UTF-8","ISO-8859-1");
 					message = iconv.convert(message);
@@ -553,6 +559,7 @@ namespace synthese
 					)	);
 					return;
 				}
+
 				XMLNode childNode(node.getChildNode(0));
 				if(childNode.isEmpty())
 				{
@@ -787,11 +794,20 @@ namespace synthese
 
 		bool IneoTerminusConnection::tcp_connection::_checkStatusRequest(XMLNode& node, std::string& response)
 		{
-			string tagName(node.getName());
-			if (tagName != "CheckStatusRequest")
+			bool status = true;
+
+			// Check for mandatory nodes
+			int numIDNode = node.nChildNode("ID");
+			int numRequestTimeStampNode = node.nChildNode("RequestTimeStamp");
+			int numRequestorRefNode = node.nChildNode("RequestorRef");
+
+			status = ((1 == numIDNode) && (1 == numRequestTimeStampNode) && (1 == numRequestorRefNode));
+			if(false == status)
 			{
-				// tagName is not CheckStatusRequest, this method should not have been called
-				return false;
+				// Message is ill-formed, reply to Ineo with an error
+				util::Log::GetInstance().warn("Ineo Terminus : message misses mandatory nodes");
+				response = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><ResponseRef>Terminus</ResponseRef><ErrorType>ProtocolError</ErrorType><ErrorMessage>Syntaxe incorrecte</ErrorMessage><ErrorID>1</ErrorID>";
+				return status;
 			}
 
 			XMLNode IDNode = node.getChildNode("ID", 0);
@@ -804,25 +820,43 @@ namespace synthese
 			XMLNode RequestorRefNode = node.getChildNode("RequestorRef", 0);
 			string requestorRefStr = RequestorRefNode.getText();
 
-			util::Log::GetInstance().debug("IneoTerminusConnection::_checkStatusRequest : id " +
+			util::Log::GetInstance().debug("Ineo Terminus : check status request id " +
 				idStr +
 				" ; timestamp " +
-				RequestTimeStampNode.getText() +
+				boost::posix_time::to_simple_string(requestTimeStamp) +
 				" ; from " +
 				requestorRefStr
 			);
 
 			// Generate the XML response to this request
-			response = _generateResponse(node);
+			response = _generateResponse(node, AucuneErreur);
 
-			return true;
+			return status;
 		}
 
 
 		bool IneoTerminusConnection::tcp_connection::_createMessageRequest(XMLNode& node, std::string& response)
 		{
-			string tagName(node.getName());
+			bool status = true;
+			IneoApplicationError errorCode = AucuneErreur;
+
+			// Check for mandatory nodes
+			int numIDNode = node.nChildNode("ID");
+			int numRequestTimeStampNode = node.nChildNode("RequestTimeStamp");
+			int numRequestorRefNode = node.nChildNode("RequestorRef");
+			int numMessagingNode = node.nChildNode("Messaging");
+
+			status = ((1 == numIDNode) && (1 == numRequestTimeStampNode) && (1 == numRequestorRefNode) && (0 < numMessagingNode));
+			if(false == status)
+			{
+				// Message is ill-formed, reply to Ineo with an error
+				util::Log::GetInstance().warn("Ineo Terminus : message misses mandatory nodes");
+				response = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><ResponseRef>Terminus</ResponseRef><ErrorType>ProtocolError</ErrorType><ErrorMessage>Syntaxe incorrecte</ErrorMessage><ErrorID>1</ErrorID>";
+				return status;
+			}
+
 			// Extract Ineo message type from tag name
+			std::string tagName(node.getName());
 			std::string ineoMessageType = tagName.substr(0, tagName.find("CreateMessageRequest"));
 			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
 
@@ -836,7 +870,6 @@ namespace synthese
 			XMLNode RequestorRefNode = node.getChildNode("RequestorRef", 0);
 			string requestorRefStr = RequestorRefNode.getText();
 
-			int numMessagingNode = node.nChildNode("Messaging");
 			vector<Messaging> messages;
 			for (int cptMessagingNode = 0;cptMessagingNode<numMessagingNode;cptMessagingNode++)
 			{
@@ -845,13 +878,10 @@ namespace synthese
 				messages.push_back(message);
 			}
 
-			// Creation of a scenario and a message using ScenarioSaveAction
-			_createMessages(messages, fakeBroadCastPoint);
-
-			util::Log::GetInstance().debug("IneoTerminusConnection::_createMessageRequest : id " +
+			util::Log::GetInstance().debug("Ineo Terminus : create message request : id " +
 				idStr +
 				" ; timestamp " +
-				RequestTimeStampNode.getText() +
+				boost::posix_time::to_simple_string(requestTimeStamp) +
 				" ; from " +
 				requestorRefStr +
 				" with " +
@@ -859,17 +889,38 @@ namespace synthese
 				" message(s)"
 			);
 
-			// Generate the XML response to this request
-			response = _generateResponse(node);
+			// Creation of a scenario and a message using ScenarioSaveAction
+			status = _createMessages(messages, fakeBroadCastPoint, errorCode);
 
-			return true;
+			// Generate the XML response to this request
+			response = _generateResponse(node, errorCode);
+
+			return status;
 		}
 
 
 		bool IneoTerminusConnection::tcp_connection::_deleteMessageRequest(XMLNode& node, std::string& response)
 		{
-			string tagName(node.getName());
+			bool status = true;
+			IneoApplicationError errorCode = AucuneErreur;
+
+			// Check for mandatory nodes
+			int numIDNode = node.nChildNode("ID");
+			int numRequestTimeStampNode = node.nChildNode("RequestTimeStamp");
+			int numRequestorRefNode = node.nChildNode("RequestorRef");
+			int numMessagingNode = node.nChildNode("Messaging");
+
+			status = ((1 == numIDNode) && (1 == numRequestTimeStampNode) && (1 == numRequestorRefNode) && (0 < numMessagingNode));
+			if(false == status)
+			{
+				// Message is ill-formed, reply to Ineo with an error
+				util::Log::GetInstance().warn("Ineo Terminus : message misses mandatory nodes");
+				response = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><ResponseRef>Terminus</ResponseRef><ErrorType>ProtocolError</ErrorType><ErrorMessage>Syntaxe incorrecte</ErrorMessage><ErrorID>1</ErrorID>";
+				return status;
+			}
+
 			// Extract Ineo message type from tag name
+			std::string tagName(node.getName());
 			std::string ineoMessageType = tagName.substr(0, tagName.find("DeleteMessageRequest"));
 			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
 
@@ -883,7 +934,6 @@ namespace synthese
 			XMLNode RequestorRefNode = node.getChildNode("RequestorRef", 0);
 			string requestorRefStr = RequestorRefNode.getText();
 
-			int numMessagingNode = node.nChildNode("Messaging");
 			vector<Messaging> messages;
 			for (int cptMessagingNode = 0;cptMessagingNode<numMessagingNode;cptMessagingNode++)
 			{
@@ -892,7 +942,18 @@ namespace synthese
 				messages.push_back(message);
 			}
 
-			// Find the scenario ScenarioStopAction
+			util::Log::GetInstance().debug("Ineo Terminus : delete message request id " +
+				idStr +
+				" ; timestamp " +
+				boost::posix_time::to_simple_string(requestTimeStamp) +
+				" ; from " +
+				requestorRefStr +
+				" with " +
+				lexical_cast<string>(messages.size()) +
+				" message(s)"
+			);
+
+			// Build a parameters map from the data of the request
 			boost::shared_ptr<ParametersMap> messagesAndCalendarsPM(new ParametersMap);
 			BOOST_FOREACH(const Messaging& message, messages)
 			{
@@ -900,6 +961,7 @@ namespace synthese
 				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()) +" "+ boost::posix_time::to_simple_string(message.startDate.time_of_day()));
 				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()) +" "+ boost::posix_time::to_simple_string(message.stopDate.time_of_day()));
 				periodPM->insert("date", "");
+
 				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
 				messagePM->insert("title", message.name);
 				messagePM->insert("content", message.content);
@@ -920,10 +982,20 @@ namespace synthese
 				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
 				messagePM->insert("section", "");
 				messagePM->insert("alternative", "");
-				_addRecipientsPM(*messagePM, message.recipients);
+
+				IneoApplicationError recipientsErrorCode = AucuneErreur;
+				bool recipientsFound = _addRecipientsPM(*messagePM, message.recipients, recipientsErrorCode);
+
+				if(false == recipientsFound)
+				{
+					// At least one recipient could not be found, reply to Ineo with an error
+					errorCode = recipientsErrorCode;
+					status = false;
+				}
 
 				if(0 != fakeBroadCastPoint)
 				{
+					// If a fake broadcast point was configured for this message type, add it as a recipient
 					boost::shared_ptr<ParametersMap> displayRecipientPM(new ParametersMap);
 					displayRecipientPM->insert("recipient_id", fakeBroadCastPoint);
 					messagePM->insert("displayscreen_recipient", displayRecipientPM);
@@ -935,35 +1007,75 @@ namespace synthese
 				messagesAndCalendarsPM->insert("calendar", calendarPM);
 			}
 
-			stringstream stream;
-			messagesAndCalendarsPM->outputJSON(stream, "");
-			boost::property_tree::ptree messagesAndCalendars;
-			boost::property_tree::json_parser::read_json(stream, messagesAndCalendars);
-			ScenarioStopAction scenarioStopAction;
-			SentScenario* sscenario = scenarioStopAction.findScenarioByMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
-			if (sscenario)
+			if(true == status)
 			{
-				scenarioStopAction.setScenario(sscenario);
-				Request fakeRequest;
-				scenarioStopAction.run(fakeRequest);
-			}
-			else
-			{
-				util::Log::GetInstance().warn("IneoTerminusConnection : requete Delete non prise en compte car evenement non trouvé dans Terminus");
-				// TODO : générer msg erreur pour Ineo
+				// ScenarioStopAction requires a boost::property_tree so we need to tranform the parameters map into JSON and then parse it with Boost
+				stringstream stream;
+				messagesAndCalendarsPM->outputJSON(stream, "");
+				boost::property_tree::ptree messagesAndCalendars;
+				boost::property_tree::json_parser::read_json(stream, messagesAndCalendars);
+				ScenarioStopAction scenarioStopAction;
+				SentScenario* sscenario = NULL;
+
+				try
+				{
+					sscenario = scenarioStopAction.findScenarioByMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
+
+					if (sscenario)
+					{
+						// SYNTHESE has a matching scenario, try to stop it
+						scenarioStopAction.setScenario(sscenario);
+						Request fakeRequest;
+						scenarioStopAction.run(fakeRequest);
+					}
+					else
+					{
+						// SYNTHESE has no matching scenario, generate an error
+						util::Log::GetInstance().warn("Ineo Terminus : no scenario matching this delete request");
+						status = false;
+						errorCode = ProgrammationInconnue;
+					}
+				}
+
+				catch(const std::exception& e)
+				{
+					// Catching std::exception is considered bad practice, but it is needed here because the implementation
+					// of ScenarioStopAction is not robust : in particular it does not check the structure of the ptree
+					// prior to accessing it, so it may trigger exceptions if it is ill-formed
+					// TODO : rewrite ScenarioStopAction
+					util::Log::GetInstance().warn("Ineo Terminus : an error occurred while processing this delete request");
+					status = false;
+					errorCode = AutreErreur;
+				}
 			}
 
 			// Generate the XML response to this request
-			response = _generateResponse(node);
+			response = _generateResponse(node, errorCode);
 
-			return true;
+			return status;
 		}
 
 
 		bool IneoTerminusConnection::tcp_connection::_getStatesResponse(XMLNode& node, std::string& response)
 		{
-			std::string tagName(node.getName());
+			bool status = true;
+
+			// Check for mandatory nodes
+			int numIDNode = node.nChildNode("ID");
+			int numRequestTimeStampNode = node.nChildNode("RequestTimeStamp");
+			int numRequestorRefNode = node.nChildNode("RequestorRef");
+			int numMessagingStatesNode = node.nChildNode("MessagingStates");
+
+			status = ((1 == numIDNode) && (1 == numRequestTimeStampNode) && (1 == numRequestorRefNode) && (1 == numMessagingStatesNode));
+			if(false == status)
+			{
+				// Message is ill-formed, reply to Ineo with an error
+				util::Log::GetInstance().warn("Ineo Terminus : message misses mandatory nodes");
+				return status;
+			}
+
 			// Extract Ineo message type from tag name
+			std::string tagName(node.getName());
 			std::string ineoMessageType = tagName.substr(0, tagName.find("GetStatesResponse"));
 			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
 
@@ -1001,7 +1113,9 @@ namespace synthese
 					messages.push_back(message);
 
 					// Creation of a scenario and a message in SYNTHESE
-					_createMessages(messages, fakeBroadCastPoint);
+					// Note : Ineo does not expect SYNTHESE to reply to a XXXGetStatesResponse, so we do not create an error response
+					IneoApplicationError unused = AucuneErreur;
+					_createMessages(messages, fakeBroadCastPoint, unused);
 
 					numActiveMessages++;
 				}
@@ -1012,11 +1126,11 @@ namespace synthese
 				boost::posix_time::to_simple_string(responseTimeStamp) + " ; from " + responseRefStr + " with " + lexical_cast<string>(numActiveMessages) + " active message(s)"
 			);
 
-			return true;
+			return status;
 		}
 
 
-		std::string IneoTerminusConnection::tcp_connection::_generateResponse(XMLNode& requestNode)
+		std::string IneoTerminusConnection::tcp_connection::_generateResponse(XMLNode& requestNode, const IneoApplicationError& errorCode)
 		{
 			std::stringstream responseStream;
 
@@ -1036,6 +1150,35 @@ namespace synthese
 			// Note : according to interface description 'ResponseTimeStamp' = 'RequestTimeStamp'
 			responseStream << "\t<ResponseTimeStamp>" << requestTimestamp << "</ResponseTimeStamp>" << char(10);
 			responseStream << "\t<ResponseRef>Terminus</ResponseRef>" << char(10);
+
+			// If an error occurred while processing the request, notify Ineo
+			if(AucuneErreur != errorCode)
+			{
+				std::string errorMessage = "Erreur non documentée";
+
+				switch(errorCode)
+				{
+					case LigneInconnue:
+						errorMessage = "Ligne inconnue";
+						break;
+
+					case ArretInconnu:
+						errorMessage = "Arrêt inconnu";
+						break;
+
+					case ProgrammationInconnue:
+						errorMessage = "Programmation inconnue";
+						break;
+
+					default:
+						// no default case because errorMessage is already initialized a default value
+						break;
+				}
+
+				responseStream << "\t<ErrorType>ApplicationError</ErrorType>" << char(10);
+				responseStream << "\t<ErrorMessage>" << errorMessage << "</ErrorMessage>" << char(10);
+				responseStream << "\t<ErrorID>" << errorCode << "</ErrorID>" << char(10);
+			}
 
 			// Copy the content of 'Messaging' nodes
 			int messagingCount = requestNode.nChildNode("Messaging");
@@ -1332,8 +1475,9 @@ namespace synthese
 		}
 
 
-		void IneoTerminusConnection::tcp_connection::_createMessages(std::vector<Messaging> messages, RegistryKeyType fakeBroadCastPoint)
+		bool IneoTerminusConnection::tcp_connection::_createMessages(std::vector<Messaging> messages, RegistryKeyType fakeBroadCastPoint, IneoApplicationError& errorCode)
 		{
+			bool status = true;
 			boost::shared_ptr<ParametersMap> messagesAndCalendarsPM(new ParametersMap);
 
 			// Fill the parameters map from the vector of messages
@@ -1343,6 +1487,7 @@ namespace synthese
 				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()) +" "+ boost::posix_time::to_simple_string(message.startDate.time_of_day()));
 				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()) +" "+ boost::posix_time::to_simple_string(message.stopDate.time_of_day()));
 				periodPM->insert("date", "");
+
 				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
 				messagePM->insert("title", message.name);
 				messagePM->insert("content", message.content);
@@ -1363,11 +1508,21 @@ namespace synthese
 				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
 				messagePM->insert("section", "");
 				messagePM->insert("alternative", "");
-				_addRecipientsPM(*messagePM, message.recipients);
-				boost::shared_ptr<ParametersMap> displayRecipientPM(new ParametersMap);
+
+				IneoApplicationError recipientsErrorCode = AucuneErreur;
+				bool recipientsFound = _addRecipientsPM(*messagePM, message.recipients, recipientsErrorCode);
+
+				if(false == recipientsFound)
+				{
+					// At least one recipient could not be found, reply to Ineo with an error
+					errorCode = recipientsErrorCode;
+					status = false;
+				}
 
 				if(0 != fakeBroadCastPoint)
 				{
+					// If a fake broadcast point was configured for this message type, add it as a recipient
+					boost::shared_ptr<ParametersMap> displayRecipientPM(new ParametersMap);
 					displayRecipientPM->insert("recipient_id", fakeBroadCastPoint);
 					messagePM->insert("displayscreen_recipient", displayRecipientPM);
 				}
@@ -1378,51 +1533,77 @@ namespace synthese
 				messagesAndCalendarsPM->insert("calendar", calendarPM);
 			}
 
-			// Convert the parameters map into a Boost property tree
-			stringstream stream;
-			messagesAndCalendarsPM->outputJSON(stream, "");
-			boost::property_tree::ptree messagesAndCalendars;
-			boost::property_tree::json_parser::read_json(stream, messagesAndCalendars);
-
-			// Verify the existence of an identical event
-			ScenarioStopAction scenarioStopAction;
-			SentScenario* identicalScenario = scenarioStopAction.findScenarioByMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
-
-			if (!identicalScenario)
+			if(true == status)
 			{
-				// This event does not exist, create it
-				ScenarioSaveAction scenarioSaveAction;
-				scenarioSaveAction.setMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
-				boost::shared_ptr<Scenario>	scenario;
-				boost::shared_ptr<SentScenario> sscenario;
-				sscenario.reset(new SentScenario);
-				scenario = static_pointer_cast<Scenario, SentScenario>(sscenario);
-				scenarioSaveAction.setSScenario(sscenario);
-				scenarioSaveAction.setScenario(scenario);
-				Request fakeRequest;
-				scenarioSaveAction.run(fakeRequest);
+				// Convert the parameters map into a Boost property tree
+				stringstream stream;
+				messagesAndCalendarsPM->outputJSON(stream, "");
+				boost::property_tree::ptree messagesAndCalendars;
+				boost::property_tree::json_parser::read_json(stream, messagesAndCalendars);
 
-				// Enable the scenario
-				sscenario->setIsEnabled(true);
+				// Check for the existence of an identical event
+				ScenarioStopAction scenarioStopAction;
 
-				// If the Ineo Terminus data source is configured, set it as the source of the scenario
-				std::string ineoDataSourceStr = IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE);
-				RegistryKeyType ineoDataSourceId = (false == ineoDataSourceStr.empty()) ? boost::lexical_cast<RegistryKeyType>(ineoDataSourceStr) : 0;
-
-				if(0 != ineoDataSourceId)
+				try
 				{
-					boost::shared_ptr<const DataSource> ineoDataSource = Env::GetOfficialEnv().getRegistry<DataSource>().get(ineoDataSourceId);
-					sscenario->addCodeBySource(*ineoDataSource, "");
+					SentScenario* identicalScenario = scenarioStopAction.findScenarioByMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
+
+					if (!identicalScenario)
+					{
+						// This event does not exist, create it
+						ScenarioSaveAction scenarioSaveAction;
+						scenarioSaveAction.setMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars));
+						boost::shared_ptr<Scenario>	scenario;
+						boost::shared_ptr<SentScenario> sscenario;
+						sscenario.reset(new SentScenario);
+						scenario = static_pointer_cast<Scenario, SentScenario>(sscenario);
+						scenarioSaveAction.setSScenario(sscenario);
+						scenarioSaveAction.setScenario(scenario);
+						Request fakeRequest;
+						scenarioSaveAction.run(fakeRequest);
+
+						// Enable the scenario
+						sscenario->setIsEnabled(true);
+
+						// If the Ineo Terminus data source is configured, set it as the source of the scenario
+						std::string ineoDataSourceStr = IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE);
+						RegistryKeyType ineoDataSourceId = (false == ineoDataSourceStr.empty()) ? boost::lexical_cast<RegistryKeyType>(ineoDataSourceStr) : 0;
+
+						if(0 != ineoDataSourceId) try
+						{
+							boost::shared_ptr<const DataSource> ineoDataSource = Env::GetOfficialEnv().getRegistry<DataSource>().get(ineoDataSourceId);
+							sscenario->addCodeBySource(*ineoDataSource, "");
+						}
+
+						catch(synthese::util::ObjectNotFoundException<impex::DataSource>&)
+						{
+							util::Log::GetInstance().warn("Ineo Terminus : data source " + boost::lexical_cast<string>(_datasource_id) + " does not exist");
+						}
+
+						SentScenarioTableSync::Save(sscenario.get());
+					}
+
+					else
+					{
+						// This event already exists, log a message
+						util::Log::GetInstance().debug("Ineo Terminus : cannot create message because it already exists");
+						// TODO : generate a specific Ineo error ???
+					}
 				}
 
-				SentScenarioTableSync::Save(sscenario.get());
+				catch(const std::exception& e)
+				{
+					// Catching std::exception is considered bad practice, but it is needed here because the implementation
+					// of ScenarioStopAction/ScenarioSaveAction are not robust : in particular they do not check the structure
+					// of the ptree prior to accessing it, so they may trigger exceptions if it is ill-formed
+					// TODO : rewrite ScenarioStopAction and ScenarioSaveAction
+					util::Log::GetInstance().warn("Ineo Terminus : an error occurred while trying to create a message");
+					status = false;
+					errorCode = AutreErreur;
+				}
 			}
 
-			else
-			{
-				// This event already exists, log a message
-				util::Log::GetInstance().debug("Ineo Terminus cannot create message because it already exists");
-			}
+			return status;
 		}
 
 
@@ -1485,24 +1666,24 @@ namespace synthese
 						}
 					}
 				}
-				else if (recipientType == "Vehicles")
+				else if (recipientType == "Vehicules")
 				{
 					int nVehicleNode = recipientNode.nChildNode();
 					for (int cptVehicleNode = 0;cptVehicleNode<nVehicleNode;cptVehicleNode++)
 					{
 						XMLNode vehicleNode = recipientNode.getChildNode(cptVehicleNode);
 						string recipientVehicleType(vehicleNode.getName());
-						if (recipientVehicleType == "Vehicle")
+						if (recipientVehicleType == "Vehicule")
 						{
 							string vehicleNumber = vehicleNode.getText();
 							IneoTerminusConnection::Recipient new_recipient;
-							new_recipient.type = "Vehicle";
+							new_recipient.type = "Vehicule";
 							new_recipient.name = vehicleNumber;
 							recipients.push_back(new_recipient);
 						}
 						else
 						{
-							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientVehicleType + " est fils d'un noeud Vehicles");
+							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientVehicleType + " est fils d'un noeud Vehicules");
 						}
 					}
 				}
@@ -1621,10 +1802,13 @@ namespace synthese
 		}
 
 
-		void IneoTerminusConnection::tcp_connection::_addRecipientsPM(ParametersMap& pm, vector<IneoTerminusConnection::Recipient> recipients)
+		bool IneoTerminusConnection::tcp_connection::_addRecipientsPM(ParametersMap& pm, vector<IneoTerminusConnection::Recipient> recipients, IneoApplicationError& errorCode)
 		{
 			boost::shared_ptr<const impex::DataSource> dataSource;
+			bool status = true;
+			errorCode = AucuneErreur;
 
+			// Get the DataSource object that will be used to query lines and stop points by their Ineo code
 			try
 			{
 				dataSource = DataSourceTableSync::Get(_datasource_id, Env::GetOfficialEnv());
@@ -1635,6 +1819,7 @@ namespace synthese
 				util::Log::GetInstance().warn("Ineo Terminus : data source " + boost::lexical_cast<string>(_datasource_id) + " does not exist");
 			}
 
+			// Iterate through recipients
 			BOOST_FOREACH(const IneoTerminusConnection::Recipient& recipient, recipients)
 			{
 				if (recipient.type == "AllNetwork")
@@ -1646,7 +1831,13 @@ namespace synthese
 
 				else if (recipient.type == "Line")
 				{
-					if(NULL != dataSource.get())
+					if(NULL == dataSource.get())
+					{
+						status = false;
+						errorCode = LigneInconnue;
+					}
+
+					else
 					{
 						ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*dataSource, Env::GetOfficialEnv());
 						set<CommercialLine*> loadedLines(lines.get(recipient.name));
@@ -1662,16 +1853,25 @@ namespace synthese
 								found = true;
 							}
 						}
+
 						if (!found)
 						{
 							util::Log::GetInstance().warn("Ineo Terminus : line not found " + recipient.name);
+							status = false;
+							errorCode = LigneInconnue;
 						}
 					}
 				}
 
 				else if (recipient.type == "StopPoint")
 				{
-					if(NULL != dataSource.get())
+					if(NULL == dataSource.get())
+					{
+						status = false;
+						errorCode = ArretInconnu;
+					}
+
+					else
 					{
 						ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(*dataSource, Env::GetOfficialEnv());
 						set<StopPoint*> loadedStopPoints(stopPoints.get(recipient.name));
@@ -1686,13 +1886,15 @@ namespace synthese
 						if(true == loadedStopPoints.empty())
 						{
 							util::Log::GetInstance().warn("Ineo Terminus : stop not found " + recipient.name);
+							status = false;
+							errorCode = ArretInconnu;
 						}
 					}
 				}
 
 				// The following recipient types are not processed by SYNTHESE
 				else if (
-						  (recipient.type == "Vehicle") ||
+						  (recipient.type == "Vehicule") ||
 						  (recipient.type == "Car") ||
 						  (recipient.type == "CarService") ||
 						  (recipient.type == "LineWay") ||
@@ -1708,6 +1910,8 @@ namespace synthese
 					util::Log::GetInstance().warn("Ineo Terminus : unhandled recipient type " + recipient.type);
 				}
 			}
+
+			return status;
 		}
 }	}
 
