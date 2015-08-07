@@ -1609,192 +1609,73 @@ namespace synthese
 
 		vector<IneoTerminusConnection::Recipient> IneoTerminusConnection::tcp_connection::_readRecipients(XMLNode node)
 		{
-			// TODO : refactor
+			// This map stores the pair 'list_node', 'element_node' for recipient lists
+			std::map<std::string, std::string> recipientTypes;
+			recipientTypes.insert(make_pair("Lines", "Line"));
+			recipientTypes.insert(make_pair("StopPoints", "StopPoint"));
+			recipientTypes.insert(make_pair("Vehicules", "Vehicule"));
+			recipientTypes.insert(make_pair("Cars", "Car"));
+			recipientTypes.insert(make_pair("CarServices", "CarService"));
+			recipientTypes.insert(make_pair("LinesWays", "LineWay"));
+			recipientTypes.insert(make_pair("Bivs", "Biv"));
+			recipientTypes.insert(make_pair("Groups", "Group"));
 
 			vector<IneoTerminusConnection::Recipient> recipients;
 			int nChildNode = node.nChildNode();
 			for (int cptChildNode = 0;cptChildNode<nChildNode;cptChildNode++)
 			{
 				XMLNode recipientNode = node.getChildNode(cptChildNode);
-				string recipientType(recipientNode.getName());
-				if (recipientType == "AllNetwork")
+				std::string recipientType(recipientNode.getName());
+
+				// Special case #1 : 'AllNetwork'
+				if ("AllNetwork" == recipientType)
 				{
 					IneoTerminusConnection::Recipient new_recipient;
 					new_recipient.type = "AllNetwork";
 					new_recipient.name = "AllNetwork";
 					recipients.push_back(new_recipient);
 				}
-				else if (recipientType == "Lines")
+
+				// Special case #2 : 'Line' node without 'Lines' (found in BivLineManMessagingStructure)
+				else if ("Line" == recipientType)
 				{
-					int nLineNode = recipientNode.nChildNode();
-					for (int cptLineNode = 0;cptLineNode<nLineNode;cptLineNode++)
+					std::string lineCode = recipientNode.getText();
+					IneoTerminusConnection::Recipient new_recipient;
+					new_recipient.type = "Line";
+					new_recipient.name = lineCode;
+					recipients.push_back(new_recipient);
+				}
+
+				// Generic case : recipients are listed by class
+				else if (recipientTypes.end() != recipientTypes.find(recipientType))
+				{
+					const std::string expectedType = recipientTypes.at(recipientType);
+					int nChildNodes = recipientNode.nChildNode();
+
+					for (int cptChildNode = 0; cptChildNode < nChildNodes; cptChildNode++)
 					{
-						XMLNode lineNode = recipientNode.getChildNode(cptLineNode);
-						string recipientLineType(lineNode.getName());
-						if (recipientLineType == "Line")
+						XMLNode childNode = recipientNode.getChildNode(cptChildNode);
+						string childNodeType(childNode.getName());
+
+						if (expectedType == childNodeType)
 						{
-							string lineShortName = lineNode.getText();
+							std::string recipientCode = childNode.getText();
 							IneoTerminusConnection::Recipient new_recipient;
-							new_recipient.type = "Line";
-							new_recipient.name = lineShortName;
+							new_recipient.type = expectedType;
+							new_recipient.name = recipientCode;
 							recipients.push_back(new_recipient);
 						}
+
 						else
 						{
-							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientLineType + " est fils d'un noeud Lines");
+							util::Log::GetInstance().warn("Ineo Terminus : unexpected recipient " + childNodeType + " as child of " + recipientType);
 						}
 					}
 				}
-				else if (recipientType == "StopPoints")
-				{
-					int nStopNode = recipientNode.nChildNode();
-					for (int cptStopNode = 0;cptStopNode<nStopNode;cptStopNode++)
-					{
-						XMLNode stopNode = recipientNode.getChildNode(cptStopNode);
-						string recipientLineType(stopNode.getName());
-						if (recipientLineType == "StopPoint")
-						{
-							string stopId = stopNode.getText();
-							IneoTerminusConnection::Recipient new_recipient;
-							new_recipient.type = "StopPoint";
-							new_recipient.name = stopId;
-							recipients.push_back(new_recipient);
-						}
-						else
-						{
-							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientLineType + " est fils d'un noeud StopPoints");
-						}
-					}
-				}
-				else if (recipientType == "Vehicules")
-				{
-					int nVehicleNode = recipientNode.nChildNode();
-					for (int cptVehicleNode = 0;cptVehicleNode<nVehicleNode;cptVehicleNode++)
-					{
-						XMLNode vehicleNode = recipientNode.getChildNode(cptVehicleNode);
-						string recipientVehicleType(vehicleNode.getName());
-						if (recipientVehicleType == "Vehicule")
-						{
-							string vehicleNumber = vehicleNode.getText();
-							IneoTerminusConnection::Recipient new_recipient;
-							new_recipient.type = "Vehicule";
-							new_recipient.name = vehicleNumber;
-							recipients.push_back(new_recipient);
-						}
-						else
-						{
-							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientVehicleType + " est fils d'un noeud Vehicules");
-						}
-					}
-				}
-				else if (recipientType == "Cars")
-				{
-					int nCarNode = recipientNode.nChildNode();
-					for (int cptCarNode = 0;cptCarNode<nCarNode;cptCarNode++)
-					{
-						XMLNode carNode = recipientNode.getChildNode(cptCarNode);
-						string recipientCarType(carNode.getName());
-						if (recipientCarType == "Car")
-						{
-							string carNumber = carNode.getText();
-							IneoTerminusConnection::Recipient new_recipient;
-							new_recipient.type = "Car";
-							new_recipient.name = carNumber;
-							recipients.push_back(new_recipient);
-						}
-						else
-						{
-							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientCarType + " est fils d'un noeud Cars");
-						}
-					}
-				}
-				else if (recipientType == "CarServices")
-				{
-					int nCarServiceNode = recipientNode.nChildNode();
-					for (int cptCarServiceNode = 0;cptCarServiceNode<nCarServiceNode;cptCarServiceNode++)
-					{
-						XMLNode carServiceNode = recipientNode.getChildNode(cptCarServiceNode);
-						string recipientCarServiceType(carServiceNode.getName());
-						if (recipientCarServiceType == "CarService")
-						{
-							string carServiceNumber = carServiceNode.getText();
-							IneoTerminusConnection::Recipient new_recipient;
-							new_recipient.type = "CarService";
-							new_recipient.name = carServiceNumber;
-							recipients.push_back(new_recipient);
-						}
-						else
-						{
-							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientCarServiceType + " est fils d'un noeud CarServices");
-						}
-					}
-				}
-				else if (recipientType == "LinesWays")
-				{
-					int nLineWayNode = recipientNode.nChildNode();
-					for (int cptLineWayNode = 0;cptLineWayNode<nLineWayNode;cptLineWayNode++)
-					{
-						XMLNode lineWayNode = recipientNode.getChildNode(cptLineWayNode);
-						string recipientLineWayType(lineWayNode.getName());
-						if (recipientLineWayType == "LineWay")
-						{
-							string lineWayNumber = lineWayNode.getText();
-							IneoTerminusConnection::Recipient new_recipient;
-							new_recipient.type = "LineWay";
-							new_recipient.name = lineWayNumber;
-							recipients.push_back(new_recipient);
-						}
-						else
-						{
-							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientLineWayType + " est fils d'un noeud LinesWays");
-						}
-					}
-				}
-				else if (recipientType == "Bivs")
-				{
-					int nBivNode = recipientNode.nChildNode();
-					for (int cptBivNode = 0;cptBivNode<nBivNode;cptBivNode++)
-					{
-						XMLNode bivNode = recipientNode.getChildNode(cptBivNode);
-						string recipientBivType(bivNode.getName());
-						if (recipientBivType == "Biv")
-						{
-							string bivNumber = bivNode.getText();
-							IneoTerminusConnection::Recipient new_recipient;
-							new_recipient.type = "Biv";
-							new_recipient.name = bivNumber;
-							recipients.push_back(new_recipient);
-						}
-						else
-						{
-							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientBivType + " est fils d'un noeud Bivs");
-						}
-					}
-				}
-				else if (recipientType == "Groups")
-				{
-					int nGroupNode = recipientNode.nChildNode();
-					for (int cptGroupNode = 0;cptGroupNode<nGroupNode;cptGroupNode++)
-					{
-						XMLNode groupNode = recipientNode.getChildNode(cptGroupNode);
-						string recipientGroupType(groupNode.getName());
-						if (recipientGroupType == "Group")
-						{
-							string groupNumber = groupNode.getText();
-							IneoTerminusConnection::Recipient new_recipient;
-							new_recipient.type = "Group";
-							new_recipient.name = groupNumber;
-							recipients.push_back(new_recipient);
-						}
-						else
-						{
-							util::Log::GetInstance().warn("IneoTerminusConnection : Un noeud " + recipientGroupType + " est fils d'un noeud Groups");
-						}
-					}
-				}
+
 				else
 				{
-					util::Log::GetInstance().warn("_readRecipients : Recipient non codé : " + recipientType);
+					util::Log::GetInstance().warn("Ineo Terminus : unsupported recipient " + recipientType);
 				}
 			}
 

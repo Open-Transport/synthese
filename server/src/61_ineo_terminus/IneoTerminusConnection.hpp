@@ -71,6 +71,34 @@ namespace synthese
 				connect		// The client must be connected
 			};
 
+			typedef enum
+			{
+				AucuneErreur = 0,
+				BorneInconnue = 10,
+				LigneInconnue = 11,
+				ConducteurInconnu = 12,
+				ServiceVoitureInconnu = 13,
+				VoitureInconnue = 14,
+				VehiculeInconnu = 15,
+				ArretInconnu = 16,
+				GroupeInconnu = 17,
+				ChainageInconnu = 18,
+				EcranInconnu = 19,
+				ProgrammationInconnue = 20,
+				ProgrammationPerimee = 21,
+				ProgrammationImpossiblePriorite = 22,
+				ProgrammationImpossibleCollision = 23,
+				MessageInconnu = 24,
+				MessageVide = 25,
+				EtatBorneInconnu = 26,
+				VehiculePasEnService = 27,
+				ValeurBaliseHorsLimites = 28,
+				ValeurBaliseCaractereInterdit = 29,
+				TropDeMessagesPourBorne = 30,
+				AutreErreur = 99
+			} IneoApplicationError;
+
+
 		private:
 			static boost::shared_ptr<IneoTerminusConnection> _theConnection;
 			static int _idRequest;
@@ -204,7 +232,7 @@ namespace synthese
 					std::string& response
 				);
 
-				std::string _generateResponse(XMLNode& requestNode);
+				std::string _generateResponse(XMLNode& requestNode, const IneoApplicationError& errorCode);
 
 				void _copyXMLNode(
 					XMLNode& node,
@@ -215,10 +243,10 @@ namespace synthese
 				// generic parsers
 				std::vector<IneoTerminusConnection::Recipient> _readRecipients(XMLNode node);
 				Messaging _readMessagingNode(XMLNode node, std::string messagerieName);
-				void _createMessages(std::vector<Messaging> messages, util::RegistryKeyType fakeBroadCastPoint);
+				bool _createMessages(std::vector<Messaging> messages, util::RegistryKeyType fakeBroadCastPoint, IneoApplicationError& errorCode);
 
 				//generic writers
-				void _addRecipientsPM(util::ParametersMap& pm, std::vector<IneoTerminusConnection::Recipient>);
+				bool _addRecipientsPM(util::ParametersMap& pm, std::vector<IneoTerminusConnection::Recipient>, IneoApplicationError& errorCode);
 			};
 
 			class tcp_server
