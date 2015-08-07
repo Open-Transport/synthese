@@ -1620,8 +1620,21 @@ namespace synthese
 			return recipients;
 		}
 
+
 		void IneoTerminusConnection::tcp_connection::_addRecipientsPM(ParametersMap& pm, vector<IneoTerminusConnection::Recipient> recipients)
 		{
+			boost::shared_ptr<const impex::DataSource> dataSource;
+
+			try
+			{
+				dataSource = DataSourceTableSync::Get(_datasource_id, Env::GetOfficialEnv());
+			}
+
+			catch(synthese::util::ObjectNotFoundException<impex::DataSource>&)
+			{
+				util::Log::GetInstance().warn("Ineo Terminus : data source " + boost::lexical_cast<string>(_datasource_id) + " does not exist");
+			}
+
 			BOOST_FOREACH(const IneoTerminusConnection::Recipient& recipient, recipients)
 			{
 				if (recipient.type == "AllNetwork")
@@ -1633,48 +1646,47 @@ namespace synthese
 
 				else if (recipient.type == "Line")
 				{
-					bool found(false);
-					boost::shared_ptr<const impex::DataSource> dataSource = DataSourceTableSync::Get(
-						_datasource_id,
-						Env::GetOfficialEnv()
-					);
-					ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*dataSource, Env::GetOfficialEnv());
-					set<CommercialLine*> loadedLines(lines.get(recipient.name));
-					BOOST_FOREACH(CommercialLine* loadedLine, loadedLines)
+					if(NULL != dataSource.get())
 					{
-						if(loadedLine->getNetwork()->getKey() == _network_id)
+						ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*dataSource, Env::GetOfficialEnv());
+						set<CommercialLine*> loadedLines(lines.get(recipient.name));
+						bool found(false);
+
+						BOOST_FOREACH(CommercialLine* loadedLine, loadedLines)
 						{
-							boost::shared_ptr<ParametersMap> lineRecipientPM(new ParametersMap);
-							lineRecipientPM->insert("recipient_id", loadedLine->getKey());
-							pm.insert("line_recipient", lineRecipientPM);
-							found = true;
+							if(loadedLine->getNetwork()->getKey() == _network_id)
+							{
+								boost::shared_ptr<ParametersMap> lineRecipientPM(new ParametersMap);
+								lineRecipientPM->insert("recipient_id", loadedLine->getKey());
+								pm.insert("line_recipient", lineRecipientPM);
+								found = true;
+							}
 						}
-					}
-					if (!found)
-					{
-						util::Log::GetInstance().warn("Ineo Terminus : line not found " + recipient.name);
+						if (!found)
+						{
+							util::Log::GetInstance().warn("Ineo Terminus : line not found " + recipient.name);
+						}
 					}
 				}
 
 				else if (recipient.type == "StopPoint")
 				{
-					boost::shared_ptr<const impex::DataSource> dataSource = DataSourceTableSync::Get(
-						_datasource_id,
-						Env::GetOfficialEnv()
-					);
-					ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(*dataSource, Env::GetOfficialEnv());
-					set<StopPoint*> loadedStopPoints(stopPoints.get(recipient.name));
-
-					BOOST_FOREACH(StopPoint* loadedStopPoint, loadedStopPoints)
+					if(NULL != dataSource.get())
 					{
-						boost::shared_ptr<ParametersMap> stopRecipientPM(new ParametersMap);
-						stopRecipientPM->insert("recipient_id", loadedStopPoint->getKey());
-						pm.insert("stoparea_recipient", stopRecipientPM);
-					}
+						ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(*dataSource, Env::GetOfficialEnv());
+						set<StopPoint*> loadedStopPoints(stopPoints.get(recipient.name));
 
-					if(true == loadedStopPoints.empty())
-					{
-						util::Log::GetInstance().warn("Ineo Terminus : stop not found " + recipient.name);
+						BOOST_FOREACH(StopPoint* loadedStopPoint, loadedStopPoints)
+						{
+							boost::shared_ptr<ParametersMap> stopRecipientPM(new ParametersMap);
+							stopRecipientPM->insert("recipient_id", loadedStopPoint->getKey());
+							pm.insert("stoparea_recipient", stopRecipientPM);
+						}
+
+						if(true == loadedStopPoints.empty())
+						{
+							util::Log::GetInstance().warn("Ineo Terminus : stop not found " + recipient.name);
+						}
 					}
 				}
 
@@ -1693,7 +1705,7 @@ namespace synthese
 
 				else
 				{
-					util::Log::GetInstance().warn("Ineo Terminus : unknown recipient type " + recipient.type);
+					util::Log::GetInstance().warn("Ineo Terminus : unhandled recipient type " + recipient.type);
 				}
 			}
 		}
