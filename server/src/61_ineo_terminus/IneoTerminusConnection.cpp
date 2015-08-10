@@ -1062,11 +1062,12 @@ namespace synthese
 
 			// Check for mandatory nodes
 			int numIDNode = node.nChildNode("ID");
-			int numRequestTimeStampNode = node.nChildNode("RequestTimeStamp");
-			int numRequestorRefNode = node.nChildNode("RequestorRef");
+			int numRequestIDNode = node.nChildNode("RequestID");
+			int numResponseTimeStampNode = node.nChildNode("ResponseTimeStamp");
+			int numResponseRefNode = node.nChildNode("ResponseRef");
 			int numMessagingStatesNode = node.nChildNode("MessagingStates");
 
-			status = ((1 == numIDNode) && (1 == numRequestTimeStampNode) && (1 == numRequestorRefNode) && (1 == numMessagingStatesNode));
+			status = ((1 == numIDNode) && (1 == numRequestIDNode) && (1 == numResponseTimeStampNode) && (1 == numResponseRefNode) && (1 == numMessagingStatesNode));
 			if(false == status)
 			{
 				// Message is ill-formed, reply to Ineo with an error
