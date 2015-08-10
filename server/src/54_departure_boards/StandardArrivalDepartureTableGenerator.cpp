@@ -205,7 +205,7 @@ namespace synthese
 
 								std::string dest =
 									journeyPattern->getDirection().empty() && journeyPattern->getDirectionObj() ?
-									journeyPattern->getDirectionObj()->getDisplayedText() :
+									journeyPattern->getDirectionObj()->get<DisplayedText>() :
 									journeyPattern->getDirection();
 
 								// Fetch the time from SCOM

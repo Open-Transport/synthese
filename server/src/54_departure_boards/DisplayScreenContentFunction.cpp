@@ -2508,7 +2508,7 @@ namespace synthese
 
 						std::string dest =
 							journeyPattern->getDirection().empty() && journeyPattern->getDirectionObj() ?
-							journeyPattern->getDirectionObj()->getDisplayedText() :
+							journeyPattern->getDirectionObj()->get<DisplayedText>() :
 							journeyPattern->getDirection();
 
 						ptime adaptedTime = it->first.getDepartureDateTime();
