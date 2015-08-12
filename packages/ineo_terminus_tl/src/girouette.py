@@ -37,7 +37,7 @@ childStopDate.text = "31/12/2037"
 # Code
 if int(needs_direction_sign_code) != 0:
   childCode = etree.SubElement(childMessaging, "Code")
-  childCode = message[0]["direction_sign_code"]
+  childCode.text = message[0]["direction_sign_code"]
 
 # Text
 # Split text around <br /> and \n

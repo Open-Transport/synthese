@@ -372,12 +372,6 @@ template=
             </tbody>
           </table>
           <div class="row-fluid">
-          <label>Girouette pré-encodée
-            <select class="input-medium" field="direction_sign_code" onkeyup="activateForm()" onchange="activateForm()">
-              <option value="0">Aucune</option>
-              <option value="1">Le service de liste des destinations n'existe pas encore</option>
-            </select>
-          </label>
       </div>
         </div>
       </div>
@@ -398,7 +392,7 @@ template=
 
     <h4><span class="badge badge-inverse" style="vertical-align:middle" id="calendar_panel_id">3</span> Paramètres</h4>
     <div class="well">
-      <label>Niveau<br />
+      <label>Niveau
         <select class="input-medium" field="level" onkeyup="activateForm()" onchange="activateForm()">
           <option value="10">Complémentaire</option>
           <option value="30">Alterné</option>
@@ -409,7 +403,7 @@ template=
         <input class="input-mini" value="" type="number" maxlength="3" field="displayDuration" min="1" max="100" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()"> secondes<span class="inline-help"> (nombre entre 1 et 100)</span>
       </label>
       <label>Durée entre chaque répétition du message
-        <input class="input-mini" value="" type="number" maxlength="3" field="repeat_interval" min="0" max="999" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()"> secondes<span class="inline-help"> (nombre entre 0 et 999)</span>
+        <input class="input-mini" value="" type="number" maxlength="3" field="repeat_interval" min="0" max="3600" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()"> secondes<span class="inline-help"> (nombre entre 0 et 3600)</span>
       </label>
       <label>Accusé de réception requis
         <select class="input-medium" field="with_ack" onkeyup="activateForm()" onchange="activateForm()">
@@ -433,6 +427,17 @@ template=
         <select class="input-medium" field="light" onkeyup="activateForm()" onchange="activateForm()">
           <option value="0">Non</option>
           <option value="1">Oui</option>
+        </select>
+      </label>
+      <label>Girouette pré-encodée
+        <select class="input-medium" field="direction_sign_code" onkeyup="activateForm()" onchange="activateForm()">
+          <?objectlist&table_id=74&template=
+            <{object&template=
+              <@direction_sign_code_delimiter_position=<?StrStr&text=<@data_source_links@>&match=|?>@>
+              <@direction_sign_code_value=<?substr&t=<@data_source_links@>&f=<@direction_sign_code_delimiter_position@>?>@>
+              <option value="<@direction_sign_code_value@>"><@direction_sign_code_value@> (<@displayed_text@>)</option>
+            }>
+          ?>
         </select>
       </label>
     </div>
@@ -756,6 +761,7 @@ template=<{
     multiple_stops :<?if&cond=<@multiple_stops@>&then="<@multiple_stops@>"&else="0"?>,
     play_tts :<?if&cond=<@play_tts@>&then="<@play_tts@>"&else="0"?>,
     light :<?if&cond=<@light@>&then="<@light@>"&else="0"?>,
+    direction_sign_code :<?if&cond=<@direction_sign_code@>&then="<@direction_sign_code@>"&else="0"?>,
     digitized_version :"<@digitized_version@>",
     alternative:[
         <{message_alternative&template=

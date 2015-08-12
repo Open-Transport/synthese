@@ -532,6 +532,7 @@ function open_message(message)
   $('#message [field=multiple_stops]').val(message.multiple_stops);
   $('#message [field=play_tts]').val(message.play_tts);
   $('#message [field=light]').val(message.light);
+  $('#message [field=direction_sign_code]').val(message.direction_sign_code);
   if (message.digitized_version != "")
   {
     $('#message input[field=digitized_version]').val(message.digitized_version);
@@ -615,6 +616,7 @@ function close_message()
     current_message.multiple_stops = $('#message [field=multiple_stops]').val();
     current_message.play_tts = $('#message [field=play_tts]').val();
     current_message.light = $('#message [field=light]').val();
+    current_message.direction_sign_code = $('#message [field=direction_sign_code]').val();
     if ($('#message [field=digitized_version]').val() == $('#message input[field=def_digital_msg_url]').val())
     {
       current_message.digitized_version = "";
@@ -666,6 +668,7 @@ function copy_message_click()
    multiple_stops: message.multiple_stops,
    play_tts: message.play_tts,
    light: message.light,
+   direction_sign_code: message.direction_sign_code,
    digitized_version: message.digitized_version,
    alternative:[],
    section: message.section,
@@ -746,6 +749,7 @@ function create_message_click()
    multiple_stops:"",
    play_tts:"",
    light:"",
+   direction_sign_code:"",
    digitized_version: $('#message input[field=def_digital_msg_url]').val() != undefined ? $('#message input[field=def_digital_msg_url]').val() : "",
    alternative:[],
    section:[],
@@ -968,6 +972,15 @@ function change_message_light()
   if (typeof $(this).val() != 'undefined') {
     var disp_dur = $(this).val();
     $('#message input[field=light]').val(disp_dur);
+    activateForm();
+  }
+}
+
+function change_message_direction_sign_code()
+{
+  if (typeof $(this).val() != 'undefined') {
+    var disp_dur = $(this).val();
+    $('#message input[field=direction_sign_code]').val(disp_dur);
     activateForm();
   }
 }
@@ -1314,6 +1327,9 @@ $(function(){
   $('#message input[field=light]').bind('keyup', change_message_light);
   $('#message input[field=light]').bind('cut', change_message_light);
   $('#message input[field=light]').bind('paste', change_message_light);
+  $('#message input[field=direction_sign_code]').bind('keyup', change_message_direction_sign_code);
+  $('#message input[field=direction_sign_code]').bind('cut', change_message_direction_sign_code);
+  $('#message input[field=direction_sign_code]').bind('paste', change_message_direction_sign_code);
   $('#message input[field=digitized_version]').bind('keyup', change_message_digitized_version);
   $('#message input[field=digitized_version]').bind('cut', change_message_digitized_version);
   $('#message input[field=digitized_version]').bind('paste', change_message_digitized_version);
