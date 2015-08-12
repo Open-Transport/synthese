@@ -73,6 +73,7 @@ function copyContent(contentRank)
     multiple_stops: document.getElementById('multiple_stops_'+ contentRank).value,
     play_tts: document.getElementById('play_tts_'+ contentRank).value,
     light: document.getElementById('light_'+ contentRank).value,
+    direction_sign_code: document.getElementById('direction_sign_code_'+ contentRank).value,
     alternatives: {},
     recipients: {}
   });
