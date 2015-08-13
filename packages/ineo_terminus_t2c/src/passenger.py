@@ -55,9 +55,10 @@ childNumberShow.text = "20"
 # RepeatPeriod
 if int(needs_repeat_interval) != 0:
   repeatPeriod = int(message[0]["repeat_interval"]) / 60
-  if repeatPeriod > 0:
-    childRepeatPeriod = etree.SubElement(childMessaging, "RepeatPeriod")
-    childRepeatPeriod.text = str(repeatPeriod)
+  if repeatPeriod == 0:
+    repeatPeriod = 1
+  childRepeatPeriod = etree.SubElement(childMessaging, "RepeatPeriod")
+  childRepeatPeriod.text = str(repeatPeriod)
 
 # Inhibition
 
