@@ -47,7 +47,27 @@ for line in re.split('<br />|\n',message[0]["content"]):
 
 # Recipients
 childRecipients = etree.SubElement(childMessaging, "Recipients")
-childAllNetwork = etree.SubElement(childRecipients, "AllNetwork")
+recipients = message[0]["recipients"][0]
+hasAllNetwork = False
+if 'line' in recipients:
+  # Scan the 'line' recipients to check if the whole transport network is selected
+  for line in recipients["line"]:
+    hasAllNetwork = hasAllNetwork or (line["id"] == network_id)
+  # If it is, use 'AllNetwork' tag
+  if hasAllNetwork:
+    childAllNetwork = etree.SubElement(childRecipients, "AllNetwork")
+  # Else add the Ineo code of each commercial line in the recipients
+  else:
+    childLines = etree.SubElement(childRecipients, "Lines")
+    for line in recipients["line"]:
+      parameters = { "roid": line["id"] }
+      linePM = synthese.service("LinesListFunction2", parameters)
+      lineCodesStr = linePM["line"][0]["creator_id"]
+      lineCodes = map(lambda x: x.split('|'), lineCodesStr.split(','))
+      for lineCode in lineCodes:
+        if lineCode[0] == datasource_id:
+          childLine = etree.SubElement(childLines, "Line")
+          childLine.text = lineCode[1]
 
 # Print resulting XML to output stream
 print(etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="iso-8859-1"))
