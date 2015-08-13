@@ -41,9 +41,13 @@ if int(needs_multiple_stops) != 0:
 
 # EndStopPoint
 childEndStopPoint = etree.SubElement(childMessaging, "EndStopPoint")
-childEndStopPoint.text = "non"
+# Set value to "oui" to apply message to the terminus of the line, and change it to "non" if StopPoint is set
+childEndStopPoint.text = "oui"
 
 # Way
+# Set value to "ALLER/RETOUR" by default, and remove element if there is no StopPoint
+childWay = etree.SubElement(childMessaging, "Way")
+childWay.text = "ALLER/RETOUR"
 
 # StopPoint
 recipients = message[0]["recipients"][0]
@@ -62,7 +66,10 @@ if 'stoparea' in recipients:
       stopCodes = map(lambda x: x.split('|'), stopPointPM["operator_code"].split(','))
       for stopCode in stopCodes:
         if stopCode[0] == datasource_id:
-          childStopPoint.text = stopCode[1]
+          # A stop point was found, change value of EndStopPoint to "non" to apply message to this stop point
+          childEndStopPoint.text = "non"
+          # OVE : Ineo stop point ids start with "MNLP_**_", but this prefix must not be sent to Ineo (TODO : make it configurable ?)
+          childStopPoint.text = stopCode[1][8:]
 
   if recipientTableId == 7:
     # This 'stoparea' recipient is a stop area : retrieve the Ineo code of one of its stop points
@@ -75,7 +82,14 @@ if 'stoparea' in recipients:
         stopCodes = map(lambda x: x.split('|'), stop["operator_code"].split(','))
         for stopCode in stopCodes:
           if stopCode[0] == datasource_id:
-            childStopPoint.text = stopCode[1]
+            # A stop point was found, change value of EndStopPoint to "non" to apply message to this stop point
+            childEndStopPoint.text = "non"
+            # OVE : Ineo stop point ids start with "MNLP_**_", but this prefix must not be sent to Ineo (TODO : make it configurable ?)
+            childStopPoint.text = stopCode[1][8:]
+
+# No StopPoint found, do not generate Way
+if childEndStopPoint.text == "oui":
+  childMessaging.remove(childWay)
 
 # RepeatPeriod
 

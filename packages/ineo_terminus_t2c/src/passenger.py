@@ -54,8 +54,10 @@ childNumberShow.text = "20"
 
 # RepeatPeriod
 if int(needs_repeat_interval) != 0:
-  childRepeatPeriod = etree.SubElement(childMessaging, "RepeatPeriod")
-  childRepeatPeriod.text = str(int(message[0]["repeat_interval"]) / 60)
+  repeatPeriod = int(message[0]["repeat_interval"]) / 60
+  if repeatPeriod > 0:
+    childRepeatPeriod = etree.SubElement(childMessaging, "RepeatPeriod")
+    childRepeatPeriod.text = str(repeatPeriod)
 
 # Inhibition
 
@@ -86,7 +88,8 @@ if needs_end_stop_point:
 
 # Priority
 childPriority = etree.SubElement(childMessaging, "Priority")
-childPriority.text = message[0]["priority"]
+priority = int(message[0]["priority"])
+childPriority.text = "oui" if priority >= 50 else "non"
 
 # Text
 # Split text around <br /> and \n
