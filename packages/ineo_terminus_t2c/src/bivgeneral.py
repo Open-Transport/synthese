@@ -2,13 +2,94 @@
 
 import datetime
 import re
-import HTMLParser
+from HTMLParser import HTMLParser
 import synthese
 
 try:
   from lxml import etree
 except ImportError:
   print("la lib lxml n'est pas disponible")
+
+
+# Custom subclass of HTMLParser that extracts the lines of text from a HTML document
+class HTMLTextExtractor(HTMLParser):
+  def __init__(self):
+    from HTMLParser import HTMLParser
+    HTMLParser.__init__(self)
+    self.lines = []
+    self.current_line = ''
+    self.after_entity = False
+
+  def handle_starttag(self, tag, attrs):
+    # If tag is a <br/>, append current line and start new line
+    if tag == 'br':
+      self.lines.append(self.current_line)
+      self.current_line = ''
+      self.after_entity = False
+
+  def handle_data(self, data):
+    # Concatenate data to current line
+    self.current_line += data if len(self.current_line) == 0 else (('' if self.after_entity else ' ') + data)
+    self.after_entity = False
+
+  def handle_entityref(self, data):
+    # Decode entity and concatenate it to current line
+    from htmlentitydefs import name2codepoint
+    character = unichr(name2codepoint[data])
+    self.current_line = self.current_line + character
+    self.after_entity = True
+
+  def feed(self, data):
+    from HTMLParser import HTMLParser
+    HTMLParser.feed(self, data)
+    if len(self.current_line) > 0:
+      self.lines.append(self.current_line)
+      self.current_line = ''
+
+  def get_lines(self):
+    return self.lines
+
+  def wrap_lines(self, max_lines_count, max_line_size):
+    split_lines = []
+    merged_lines = []
+
+    # Break lines to match max line size
+    for line in self.lines:
+      if len(line) == 0:
+        split_lines.append(line)
+      else:
+        start_index = 0
+        end_index = max_line_size
+        while start_index < len(line):
+          split_line = line[start_index:end_index]
+          split_lines.append(split_line)
+          start_index += max_line_size
+          end_index += max_line_size
+
+    # If there are too many lines, first remove empty lines
+    if len(split_lines) > max_lines_count:
+      split_lines[:] = [line for line in split_lines if len(line.strip()) > 0]
+
+    # If there are still too many lines, try to concatenate them up to max_line_size
+    if len(split_lines) <= max_lines_count:
+      merged_lines = split_lines
+    else:
+      merged_line = ''
+      for split_line in split_lines:
+        nb_chars = max_line_size - len(merged_line)
+        if len(merged_line) > 0:
+          nb_chars = nb_chars - 1
+          merged_line = merged_line + ' ' + split_line[0:nb_chars]
+        else:
+          merged_line = split_line[0:nb_chars]
+        if len(merged_line) == max_line_size:
+          merged_lines.append(merged_line)
+          merged_line = split_line[nb_chars:]
+      if len(merged_line) > 0:
+        merged_lines.append(merged_line)
+
+    return merged_lines
+
 
 # Request headers
 root = etree.Element("BivGeneral" + type + "MessageRequest")
@@ -43,66 +124,103 @@ childDuration.text = message[0]["display_duration"]
 
 # DiodFlashing
 
+
 # Text
-# Split text around <br /> and \n
-contentLines = re.split('<br />|\n',message[0]["content"])
-h = HTMLParser.HTMLParser()
+# Extract HTML text lines 
+htmlParser = HTMLTextExtractor()
+htmlParser.feed(message[0]["content"])
 
 # TypeBIV = BUS4L
 childText1 = etree.SubElement(childMessaging, "Text")
 childTypeBIV1 = etree.SubElement(childText1, "TypeBIV")
 childTypeBIV1.text = "BUS4L"
 childFixedText1 = etree.SubElement(childText1, "FixedText")
+# BUS4L accepts 4 lines * [0..24] characters (must pad with blank lines)
+contentLines = htmlParser.wrap_lines(4, 24)
+blankLinesNb = 4 - len(contentLines)
 for contentLine in contentLines:
   childLine1 = etree.SubElement(childFixedText1, "Line")
-  childLine1.text = h.unescape(contentLine)
+  childLine1.text = contentLine
+# Blank lines for padding
+for i in range(0, blankLinesNb):
+  childLine1 = etree.SubElement(childFixedText1, "Line")
 
 # TypeBIV = BUS8L
 childText2 = etree.SubElement(childMessaging, "Text")
 childTypeBIV2 = etree.SubElement(childText2, "TypeBIV")
 childTypeBIV2.text = "BUS8L"
 childFixedText2 = etree.SubElement(childText2, "FixedText")
+# BUS8L accepts 8 lines * [0..24] characters (must pad with blank lines)
+contentLines = htmlParser.wrap_lines(8, 24)
+blankLinesNb = 8 - len(contentLines)
 for contentLine in contentLines:
   childLine2 = etree.SubElement(childFixedText2, "Line")
-  childLine2.text = h.unescape(contentLine)
+  childLine2.text = contentLine
+# Blank lines for padding
+for i in range(0, blankLinesNb):
+  childLine2 = etree.SubElement(childFixedText2, "Line")
 
 # TypeBIV = ER
 childText3 = etree.SubElement(childMessaging, "Text")
 childTypeBIV3 = etree.SubElement(childText3, "TypeBIV")
 childTypeBIV3.text = "ER"
 childFixedText3 = etree.SubElement(childText3, "FixedText")
+# ER accepts 8 lines * [0..30] characters (must pad with blank lines)
+contentLines = htmlParser.wrap_lines(8, 30)
+blankLinesNb = 8 - len(contentLines)
 for contentLine in contentLines:
   childLine3 = etree.SubElement(childFixedText3, "Line")
-  childLine3.text = h.unescape(contentLine)
+  childLine3.text = contentLine
+# Blank lines for padding
+for i in range(0, blankLinesNb):
+  childLine3 = etree.SubElement(childFixedText3, "Line")
 
 # TypeBIV = TFT
 childText4 = etree.SubElement(childMessaging, "Text")
 childTypeBIV4 = etree.SubElement(childText4, "TypeBIV")
 childTypeBIV4.text = "TFT"
 childFixedText4 = etree.SubElement(childText4, "FixedText")
+# TFT accepts 6 lines * [0..40] characters (must pad with blank lines)
+contentLines = htmlParser.wrap_lines(6, 40)
+blankLinesNb = 6 - len(contentLines)
 for contentLine in contentLines:
   childLine4 = etree.SubElement(childFixedText4, "Line")
-  childLine4.text = h.unescape(contentLine)
+  childLine4.text = contentLine
+# Blank lines for padding
+for i in range(0, blankLinesNb):
+  childLine4 = etree.SubElement(childFixedText4, "Line")
 
 # TypeBIV = TTS
 childText5 = etree.SubElement(childMessaging, "Text")
 childTypeBIV5 = etree.SubElement(childText5, "TypeBIV")
 childTypeBIV5.text = "TTS"
 childFixedText5 = etree.SubElement(childText5, "TtsText")
-childLine5 = etree.SubElement(childFixedText5, "Line")
-childLine5.text = h.unescape(contentLines[0])
+# TTS accepts 1 lines * [1..100] characters
+contentLines = htmlParser.wrap_lines(1, 100)
+for contentLine in contentLines:
+  childLine5 = etree.SubElement(childFixedText5, "Line")
+  childLine5.text = contentLine
 
 # TypeBIV = TW3L
 childText6 = etree.SubElement(childMessaging, "Text")
 childTypeBIV6 = etree.SubElement(childText6, "TypeBIV")
 childTypeBIV6.text = "TW3L"
 childFixedText6 = etree.SubElement(childText6, "FixedText")
+# TW3L accepts 3 lines * [0..30] characters (must pad with blank lines)
+contentLines = htmlParser.wrap_lines(3, 30)
+blankLinesNb = 3 - len(contentLines)
 for contentLine in contentLines:
   childLine6 = etree.SubElement(childFixedText6, "Line")
-  childLine6.text = h.unescape(contentLine)
+  childLine6.text = contentLine
+# Blank lines for padding
+for i in range(0, blankLinesNb):
+  childLine6 = etree.SubElement(childFixedText6, "Line")
+# Scrolling text accepts 1 line * [1..100] characters
 childScrollingText6 = etree.SubElement(childText6, "ScrollingText")
-childScrollingLine6 = etree.SubElement(childScrollingText6, "Line")
-childScrollingLine6.text = h.unescape(contentLines[0])
+contentLines = htmlParser.wrap_lines(1, 100)
+for contentLine in contentLines:
+  childScrollingLine6 = etree.SubElement(childScrollingText6, "Line")
+  childScrollingLine6.text = contentLine
 
 
 # Recipients
