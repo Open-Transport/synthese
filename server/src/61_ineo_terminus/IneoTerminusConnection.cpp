@@ -148,8 +148,8 @@ namespace synthese
 
 		void IneoTerminusConnection::addConnection(IneoTerminusConnection::tcp_connection* new_connection)
 		{
-			boost::mutex::scoped_lock connectionLock(_connectionsMutex);
-			_livingConnections.insert(new_connection);
+			boost::mutex::scoped_lock connectionsLock(_connectionsMutex);
+			_livingConnections.push_back(new_connection);
 
 			util::Log::GetInstance().info("New connection from Ineo SAE (count=" + boost::lexical_cast<std::string>(_livingConnections.size()) + ")");
 
@@ -163,10 +163,50 @@ namespace synthese
 
 		void IneoTerminusConnection::removeConnection(IneoTerminusConnection::tcp_connection* connection_to_remove)
 		{
-			boost::mutex::scoped_lock lock(_connectionsMutex);
-			_livingConnections.erase(connection_to_remove);
+			boost::mutex::scoped_lock connectionsLock(_connectionsMutex);
+			std::deque<IneoTerminusConnection::tcp_connection*>::iterator itConnections = _livingConnections.begin();
+
+			for(; itConnections != _livingConnections.end(); itConnections++)
+			{
+				// Search for connection_to_remove and stop iterating when it is found
+				if(*itConnections == connection_to_remove) break;
+			}
+
+			if(itConnections != _livingConnections.end())
+			{
+				// Remove connection_to_remove from list
+				_livingConnections.erase(itConnections);
+			}
+			//_livingConnections.erase(connection_to_remove);
+
 			delete connection_to_remove;
 			util::Log::GetInstance().info("Connection to Ineo SAE closed (count=" + boost::lexical_cast<std::string>(_livingConnections.size()) + ")");
+		}
+
+
+		void IneoTerminusConnection::setActiveConnection(tcp_connection* active_connection)
+		{
+			// Push active_connection as the first connection of _livingConnections, so that it will be used to send new messages to Ineo SAE
+			boost::mutex::scoped_lock connectionsLock(_connectionsMutex);
+
+			if(_livingConnections.front() != active_connection)
+			{
+				std::deque<IneoTerminusConnection::tcp_connection*>::iterator itConnections = _livingConnections.begin();
+
+				for(; itConnections != _livingConnections.end(); itConnections++)
+				{
+					// Search for connection_to_remove and stop iterating when it is found
+					if(*itConnections == active_connection) break;
+				}
+
+				if(itConnections != _livingConnections.end())
+				{
+					// Remove connection_to_remove from list
+					_livingConnections.erase(itConnections);
+				}
+
+				_livingConnections.push_front(active_connection);
+			}
 		}
 
 
@@ -200,7 +240,7 @@ namespace synthese
 				if (!_messagesToSend.empty())
 				{
 					std::string firstMessage = _messagesToSend.front();
-					(*(_livingConnections.begin()))->sendMessage(firstMessage);
+					(_livingConnections.front())->sendMessage(firstMessage);
 					_messagesToSend.pop_front();
 
 					util::Log::GetInstance().debug("Ineo Terminus : sending message " + firstMessage);
@@ -476,6 +516,9 @@ namespace synthese
 		{
 			if (!error)
 			{
+				// The last connection which receives data is set as the currently "active" connection, and will be used to send messages to Ineo SAE
+				GetTheConnection()->setActiveConnection(this);
+
 				// Read data until '\0' is reached
 				string bufStr;
 				istream is(_buf.get());
