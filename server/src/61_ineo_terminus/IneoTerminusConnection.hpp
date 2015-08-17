@@ -273,7 +273,7 @@ namespace synthese
 				boost::asio::ip::tcp::acceptor _acceptor;
 			};
 
-			std::set<IneoTerminusConnection::tcp_connection*> _livingConnections;
+			std::deque<IneoTerminusConnection::tcp_connection*> _livingConnections;
 			std::deque<std::string> _messagesToSend;
 
 			boost::mutex _connectionsMutex;
@@ -307,6 +307,7 @@ namespace synthese
 			
 			void addConnection(tcp_connection* new_connection);
 			void removeConnection(tcp_connection* connection_to_remove);
+			void setActiveConnection(tcp_connection* active_connection);
 
 			void addMessage(std::string new_message);
 
