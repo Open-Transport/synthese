@@ -20,10 +20,10 @@
                                    
                 <?if&cond=<?StrStr&text=<@mime_type@>&match=image?>&then=
                   <@my_url=http://<@host_and_port@><@site_url@><@smart_url@>@>
-                  <img data-src="<@title@>/260*180" alt="260*180" src="<@my_url@>" >
+                  <img data-src="<@title@>/260*180" alt="260*180" src="<@my_url@>" data-toggle="tooltip" data-placement="top" title="<@title@>"/>
                   &else=
                     <@type=<?substr&t=<@mime_type@>&f=<?StrStr&text=<@mime_type@>&match=/?>&n=<?strlen&t=<@mime_type@>?>?>@>
-                    <span class="terminus-file <@type@>-file"></span>
+                    <span class="terminus-file <@type@>-file" data-toggle="tooltip" data-placement="top" title="<@title@>"></span>
                 ?>
               </a>
               <p class="thumbnail-text text-center" data-toggle="tooltip" data-placement="top" title="<@title@>"><@title@></p>
