@@ -68,13 +68,13 @@
             <li class="span2" style="position: relative;">
               <span href="#" class="thumbnail">
                 <?if&cond=<?StrStr&text=<@mime_type@>&match=image?>&then=
-                  <img data-src="<@title@>/260*180" alt="260*180" src="<@href@>" data-toggle="tooltip" data-placement="top" title="<@title@>">
+                  <img data-src="<@title@>/260*180" alt="260*180" src="<@href@>" data-toggle="tooltip" data-placement="top" title="<@title@>"/>
                   &else=
                     <@type=<?substr&t=<@mime_type@>&f=<?StrStr&text=<@mime_type@>&match=/?>&n=<?strlen&t=<@mime_type@>?>?>@>
                     <span class="terminus-file <@type@>-file" data-toggle="tooltip" data-placement="top" title="<@title@>"></span>
                 ?>
               </span>
-              <p class="thumbnail-text text-center"><@title@></p>
+              <p class="thumbnail-text text-center" data-toggle="tooltip" data-placement="top" title="<@title@>"><@title@></p>
               <span class="remove-file" data-action="removeFile" id="<@id@>"><i class="icon-remove"></i></span>
             </li>
           ?>
