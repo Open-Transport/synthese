@@ -104,8 +104,8 @@ namespace synthese
 			util::ParametersMap& pm
 		):	_env(env),
 			_import(import),
-			_minLogLevel(minLogLevel),
 			_maxLoggedLevel(IMPORT_LOG_TRAC),
+			_minLogLevel(minLogLevel),
 			_outputStream(outputStream),
 			_pm(pm),
 			_logPath(logPath)

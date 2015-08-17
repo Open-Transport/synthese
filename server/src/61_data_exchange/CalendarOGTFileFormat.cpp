@@ -35,6 +35,7 @@
 #include <boost/date_time/gregorian/greg_date.hpp>
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace boost;
@@ -107,7 +108,14 @@ namespace synthese
 
 			BOOST_FOREACH(CalendarDatesMap::value_type& aCalendarPair, calendarDates)
 			{
-				const string& calendarName(aCalendarPair.first);
+				// Calendar name : if the .xml extension exists, remove it
+				string calendarName(aCalendarPair.first);
+
+				if (boost::filesystem::extension(calendarName) == ".xml")
+				{
+					calendarName.erase(calendarName.length() - 4);
+				}
+
 				const DayList& daysList(aCalendarPair.second);
 
 				DatesVector datesList;
@@ -126,6 +134,19 @@ namespace synthese
 						// Next date by the way
 						continue;
 					}
+				}
+
+				// Existing calendar. Invoke PTDataCleanerFileFormat::beforeParsing for cleanup
+				calendar::CalendarTemplate* calPointer = _getCalendarTemplate(_calendarTemplates, calendarName);
+				if (calPointer)
+				{
+					pm.insert(PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID, calPointer->getKey());
+					_ogtImporter._setFromParametersMap(pm);
+					_logDebug(
+						"Cleaning PT data related to calendar "
+						+ calendarName + " ID=" + boost::lexical_cast<std::string>(calPointer->getKey())
+					);
+					_ogtImporter.beforeParsing();
 				}
 
 				_logDebug(
@@ -209,7 +230,7 @@ namespace synthese
 
 		util::ParametersMap CalendarOGTFileFormat::Importer_::_getParametersMap() const
 		{
-			return _ogtImporter._getParametersMap();
+			return _ogtImporter._getParametersMap(); // Already contains the PTDataCleanerFileFormat parameters map
 		}
 
 
@@ -218,4 +239,12 @@ namespace synthese
 		{
 			_ogtImporter._setFromParametersMap(map);
 		}
+
+
+
+		bool CalendarOGTFileFormat::Importer_::afterParsing()
+		{
+			return _ogtImporter.afterParsing();
+		}
+
 }	}

@@ -76,19 +76,17 @@ namespace synthese
 					util::ParametersMap& pm
 				);
 
+				virtual bool afterParsing();
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from attributes to generic parameter maps.
 				/// @return Generated parameters map
 				virtual util::ParametersMap _getParametersMap() const;
 
-
-
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from generic parameters map to attributes.
 				/// @param map Parameters map to interpret
 				virtual void _setFromParametersMap(const util::ParametersMap& map);
-
-
 
 				virtual db::DBTransaction _save() const;
 			};
