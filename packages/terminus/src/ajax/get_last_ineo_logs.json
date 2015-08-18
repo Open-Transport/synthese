@@ -1,4 +1,4 @@
-<@logs:=<?db_log&log_key=ineoterminuserrormessages&number=3?>@>
+<@logs:=<?db_log&log_key=ineoterminuserrormessages&type=99&number=3?>@>
 <@first=1@>
 {
 "logs":[
