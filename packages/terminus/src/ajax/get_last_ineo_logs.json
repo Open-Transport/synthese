@@ -1,0 +1,16 @@
+<@logs:=<?db_log&log_key=ineoterminuserrormessages&number=3?>@>
+<@first=1@>
+{
+"logs":[
+<{logs.entry&template=
+	<?if&cond=<@first@>&then=<@first=0@>&else=,?>
+ {
+  "date": "<@date@>",
+  "tag": "<@col0@>",
+  "type": "<@col1@>",
+  "message": "<@col2@>",
+  "id": "<@col3@>",
+  "requestid": "<@col4@>"
+ }
+}>
+]}

@@ -1,0 +1,48 @@
+<div class="container-fluid" id="logs_container">
+  <a class="btn btn-primary btn-mini" id="deploy_last_logs" href="#">Dernières erreurs Ineo</a>
+  <!--<h4>Derniers logs Ineo</h4>-->
+  <table class="table-striped table-condensed table" id="tblIneoLogs">
+    <thead>
+      <tr>
+        <th data-field="date">date</th>
+        <th data-field="tag">Entête XML</th>
+        <th data-field="type">Type d'erreur</th>
+        <th data-field="message">Message d'erreur</th>
+        <th data-field="id">Id de l'erreur Ineo</th>
+        <th data-field="requestid">Id de la requête référencée</th>
+      </tr>
+    </thead>
+  </table>
+</div>
+<script>
+$('#tblIneoLogs').bootstrapTable({});
+
+function updateIneoTerminusLogs(myData) {
+ $('#tblIneoLogs').bootstrapTable("load", myData);
+}
+
+function loadAndRefresh() {
+ $.ajax({ type: "GET",
+  async: "true",
+  url: "/terminus/ajax/get_last_ineo_logs.json"
+ })
+ .done(function(data) {
+  if (data.logs.length > 0) {
+   updateIneoTerminusLogs(data.logs);
+   $('#logs_container').removeClass('hidden');
+  } else {
+   $('#logs_container').addClass('hidden');
+  }
+ })
+ .fail(function(data) {
+  console.log('erreur');
+ });
+}
+
+loadAndRefresh();
+var timeout = setInterval(loadAndRefresh,5000);
+
+$('#deploy_last_logs').click(function() {
+  $('#tblIneoLogs').toggleClass('hidden');
+});
+</script>
