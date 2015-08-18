@@ -10,6 +10,8 @@ set(ineo_terminus_SRCS
   IneoTerminusModuleRegister.cpp
   IneoTerminusConnection.cpp
   IneoTerminusConnection.hpp
+  IneoTerminusLog.cpp
+  IneoTerminusLog.hpp
 )
 
 set_source_files_properties(IneoTerminusModule.gen.cpp IneoTerminusModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
