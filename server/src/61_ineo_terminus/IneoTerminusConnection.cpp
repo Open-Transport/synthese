@@ -39,6 +39,7 @@
 #include "XmlToolkit.h"
 #include "NotificationProvider.hpp"
 #include "IneoNotificationChannel.hpp"
+#include "IneoTerminusLog.hpp"
 #include "MessagesModule.h"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -668,8 +669,12 @@ namespace synthese
 
 				else if (_creationOrDeletionResponseTags.end() != _creationOrDeletionResponseTags.find(tagName))
 				{
-					// TODO : error handling
 					// If message has 'ErrorType', 'ErrorMessage' and 'ErrorID' nodes then our request was rejected
+					if (childNode.nChildNode("ErrorType") == 1)
+					{
+						util::Log::GetInstance().warn("Ineo Terminus error received in response : " + tagName);
+						IneoTerminusLog::AddIneoTerminusErrorMessageEntry(childNode);
+					}
 				}
 
 				else if (_getStatesResponseTags.end() != _getStatesResponseTags.find(tagName))
@@ -685,6 +690,7 @@ namespace synthese
 				else
 				{
 					util::Log::GetInstance().warn("Ineo Terminus unsupported message : " + tagName);
+					IneoTerminusLog::AddIneoTerminusErrorMessageEntry(childNode);
 				}
 
 				if(false == response.empty())
