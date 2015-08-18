@@ -442,7 +442,7 @@ namespace synthese
 
 			while(PyDict_Next(dictionary, &index, &key, &value))
 			{
-				if(NULL == value)
+				if((NULL == value) || (NULL == key))
 				{
 					continue;
 				}
@@ -454,14 +454,19 @@ namespace synthese
 
 					for(int i = 0; i < nbSubmaps; i++)
 					{
-						PyObject* keyStrPython = PyObject_Str(key);
-						std::string keyString = PyString_AsString(keyStrPython);
-						PyObject* submap = PyTuple_GetItem(value, i);
+						PyObject* keyStrPython = (PyUnicode_Check(key) ? PyUnicode_AsUTF8String(key) : PyObject_Str(key));
 
-						// Build the new submap from the content of the current tuple index
-						boost::shared_ptr<ParametersMap> subParametersMap(new ParametersMap());
-						_BuildParametersMapFromDictionary(subParametersMap, submap);
-						map->insert(keyString, subParametersMap);
+						if(NULL != keyStrPython)
+						{
+							std::string keyString = PyString_AsString(keyStrPython);
+							PyObject* submap = PyTuple_GetItem(value, i);
+
+							// Build the new submap from the content of the current tuple index
+							boost::shared_ptr<ParametersMap> subParametersMap(new ParametersMap());
+							_BuildParametersMapFromDictionary(subParametersMap, submap);
+							map->insert(keyString, subParametersMap);
+						}
+
 						Py_XDECREF(keyStrPython);
 					}
 				}
@@ -469,22 +474,32 @@ namespace synthese
 				else if(1 == PyObject_IsInstance(value, dictType))
 				{
 					// Value is a dictionary : create one submap named 'key'
-					PyObject* keyStrPython = PyObject_Str(key);
-					std::string keyString = PyString_AsString(keyStrPython);
-					boost::shared_ptr<ParametersMap> subParametersMap(new ParametersMap());
-					_BuildParametersMapFromDictionary(subParametersMap, value);
-					map->insert(keyString, subParametersMap);
+					PyObject* keyStrPython = (PyUnicode_Check(key) ? PyUnicode_AsUTF8String(key) : PyObject_Str(key));
+
+					if(NULL != keyStrPython)
+					{
+						std::string keyString = PyString_AsString(keyStrPython);
+						boost::shared_ptr<ParametersMap> subParametersMap(new ParametersMap());
+						_BuildParametersMapFromDictionary(subParametersMap, value);
+						map->insert(keyString, subParametersMap);
+					}
+
 					Py_XDECREF(keyStrPython);
 				}
 
 				else					
 				{
 					// Insert the string representation of value into the map
-					PyObject* keyStrPython = PyObject_Str(key);
-					PyObject* valueStrPython = PyObject_Str(value);
-					std::string keyString   = PyString_AsString(keyStrPython);
-					std::string valueString = PyString_AsString(valueStrPython);
-					map->insert(keyString, valueString);
+					PyObject* keyStrPython = (PyUnicode_Check(key) ? PyUnicode_AsUTF8String(key) : PyObject_Str(key));
+					PyObject* valueStrPython = (PyUnicode_Check(value) ? PyUnicode_AsUTF8String(value) : PyObject_Str(value));
+
+					if((NULL != keyStrPython) && (NULL != valueStrPython))
+					{
+						std::string keyString   = PyString_AsString(keyStrPython);
+						std::string valueString = PyString_AsString(valueStrPython);
+						map->insert(keyString, valueString);
+					}
+
 					Py_XDECREF(keyStrPython);
 					Py_XDECREF(valueStrPython);
 				}
