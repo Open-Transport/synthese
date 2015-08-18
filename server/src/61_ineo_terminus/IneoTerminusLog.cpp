@@ -64,6 +64,7 @@ namespace synthese
 			v.push_back("ErrorType");
 			v.push_back("ErrorMessage");
 			v.push_back("ErrorID");
+			v.push_back("RequestID");
 			return v;
 		}
 
@@ -105,6 +106,14 @@ namespace synthese
 			if (node.nChildNode("ErrorID") == 1)
 			{
 				content.push_back(node.getChildNode("ErrorID", 0).getText());
+			}
+			else
+			{
+				content.push_back("");
+			}
+			if (node.nChildNode("RequestID") == 1)
+			{
+				content.push_back(node.getChildNode("RequestID", 0).getText());
 			}
 			else
 			{
