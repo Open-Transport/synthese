@@ -56,6 +56,15 @@ namespace synthese
 				XMLNode node
 			);
 
+			/**
+				Add an entry for a IneoTerminus log message (for messages sent).
+			*/
+			static void AddIneoTerminusInfoMessageEntry(
+				std::string requestName,
+				std::string requestID,
+				std::string shortMessage
+			);
+
 		private:
 
 		};

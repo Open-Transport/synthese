@@ -11,6 +11,7 @@
  <#tab_title&id=log&title=Journal#>
  <#tab_title&id=system&title=Système#>
  <#tab_title&id=ineo&title=Connexion Ineo / Terminus#>
+ <#tab_title&id=ineolog&title=Logs Ineo / Terminus#>
 </ul>
 
 <div id="tab_content" class="tab-content">
@@ -1085,6 +1086,47 @@
     </form>
    </div>
   </div>
+
+</div><#tab_div&id=ineolog#>
+
+  <div class="pagination">
+    <ul>
+<?if&cond=<@r>=150@>&then=<li><?link&target=<@p@>&r=0&text=1&tab=ineolog?></li>?>
+<?if&cond=<@r>=200@>&then=<li class="disabled"><a href="#">...</a></li>?>
+<?if&cond=<@r>=100@>&then=<li><?link&target=<@p@>&r=<@r-100@>&text=<@(r/50)-1@>&tab=ineolog?></li>?>
+<?if&cond=<@r>=50@>&then=<li><?link&target=<@p@>&r=<@r-50@>&text=<@(r/50)@>&tab=ineolog?></li>?>
+      <li class="active"><a href="#"><@1+(r/50)@></a></li>
+      <li><?link&target=<@p@>&r=<@r+50@>&text=<@(r/50)+2@>&tab=ineolog?></li>
+      <li><?link&target=<@p@>&r=<@r+100@>&text=<@(r/50)+3@>&tab=ineolog?></li>
+    </ul>
+  </div>
+  <table class="table-striped table-condensed table">
+    <thead>
+      <tr>
+        <th>date</th>
+        <th>Entête XML</th>
+        <th>Type de message</th>
+        <th>Message</th>
+        <th>ID de l'erreur Ineo</th>
+        <th>ID de la requête</th>
+      </tr>
+    </thead>
+    <tbody>
+<?db_log&
+log_key=ineoterminuserrormessages&
+first=<@r@>&
+template=<{entry&template=
+      <tr>
+        <td><@date@></td>
+        <td><@col0@></td>
+        <td><@col1@></td>
+        <td><@col2@></td>
+        <td><@col3@></td>
+        <td><@col4@></td>
+      </tr>
+}>?>
+    </tbody>
+  </table>
 
 </div>
 
