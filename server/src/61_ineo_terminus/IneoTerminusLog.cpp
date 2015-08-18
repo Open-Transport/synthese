@@ -123,5 +123,21 @@ namespace synthese
 			_addEntry(FACTORY_KEY, level, content, NULL);
 		}
 
+		void IneoTerminusLog::AddIneoTerminusInfoMessageEntry(
+			string requestName,
+			string requestID,
+			string shortMessage
+		) {
+			DBLogEntry::Level level = DBLogEntry::DB_LOG_INFO;
+			DBLog::ColumnsVector content;
+			content.push_back(requestName);
+			content.push_back("Envoi d'un message au SAE Ineo depuis Terminus");
+			content.push_back(shortMessage);
+			content.push_back("");
+			content.push_back(requestID);
+
+			_addEntry(FACTORY_KEY, level, content, NULL);
+		}
+
 	} /* namespace ineo_terminus */
 } /* namespace synthese */

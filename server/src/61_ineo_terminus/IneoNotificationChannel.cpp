@@ -26,6 +26,7 @@
 #include <IneoNotificationChannel.hpp>
 #include <IneoTerminusConnection.hpp>
 #include "IneoTerminusModule.hpp"
+#include "IneoTerminusLog.hpp"
 #include <ParametersMap.h>
 #include "Webpage.h"
 
@@ -95,16 +96,20 @@ namespace synthese
 			shared_ptr<ParametersMap> messagePM(new ParametersMap);
 			alarm->toParametersMap(*messagePM, true, "", true);
 			fields.insert("message", messagePM);
+			string requestName = provider->getName();
 			if (event->get<EventType>() == BEGIN)
 			{
 				fields.insert("type", string("Create"));
+				requestName += "Create";
 			}
 			else if (event->get<EventType>() == END)
 			{
 				fields.insert("type", string("Delete"));
+				requestName += "Delete";
 			}
 			fields.insert("messagerie", provider->getName());
-			fields.insert("ID", lexical_cast<string>(IneoTerminusConnection::GetTheConnection()->getNextRequestID()));
+			string requestID = lexical_cast<string>(IneoTerminusConnection::GetTheConnection()->getNextRequestID());
+			fields.insert("ID", requestID);
 			fields.insert("network_id", IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK));
 			fields.insert("datasource_id", IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE));
 
@@ -115,6 +120,8 @@ namespace synthese
 				interpreter->display(message, fields);
 
 				IneoTerminusConnection::GetTheConnection()->addMessage(message.str());
+				// Log the message in db_log
+				IneoTerminusLog::AddIneoTerminusInfoMessageEntry(requestName, requestID, alarm->getShortMessage());
 
 				return true;
 			}
