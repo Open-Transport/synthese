@@ -13,10 +13,12 @@
   <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="/lib/bootstrap_table/css/table.css" rel="stylesheet" media="screen">
   <script src="/lib/jquery/jquery-1.7.1.min.js"></script>
     <script src="/lib/jquery_validate/js/jquery-validate.min.js"></script>
   <script src="/lib/jquery-ui/jquery-ui-1.8.22.custom.min.js"></script>
   <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+  <script src="/lib/bootstrap_table/js/bootstrap-table.min.js"></script>
   <link href="/lib/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
   <link href="/terminus/css/terminus.css" rel="stylesheet">
    
@@ -55,6 +57,7 @@
       
   </div>
 
+  <#last_logs#>
   <#navbar#>
 
  </body>

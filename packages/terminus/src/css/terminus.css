@@ -7,6 +7,13 @@ body {
  padding-bottom: 60px;
 }
 
+#logs_container {
+ bottom: 60px;
+ position: fixed;
+ right: 0;
+ background-color: white;
+}
+
 .message_overview p {
  display:inline;
 }
