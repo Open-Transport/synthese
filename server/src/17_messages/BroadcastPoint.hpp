@@ -92,8 +92,6 @@ namespace synthese
 				const Alarm& message
 			) const {}
 
-
-
 			//////////////////////////////////////////////////////////////////////////
 			/// Function to run when the message display ends.
 			/// Default implementation does nothing.
@@ -101,6 +99,23 @@ namespace synthese
 			virtual void onDisplayEnd(
 				const Alarm& message
 			) const {}
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Function to run before an applicable message is updated.
+			/// Default implementation does nothing.
+			/// @param message the Alarm to hide
+			virtual void beforeMessageUpdate(
+				const Alarm& message
+			) const {}
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Function to run after an applicable message is updated.
+			/// Default implementation does nothing.
+			/// @param message the Alarm to hide
+			virtual void afterMessageUpdate(
+				const Alarm& message
+			) const {}
+
 		};
 }	}
 

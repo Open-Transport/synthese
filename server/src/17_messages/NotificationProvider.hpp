@@ -61,6 +61,7 @@ namespace synthese
 
 		FIELD_BOOL(SubscribeAllBegin)
 		FIELD_BOOL(SubscribeAllEnd)
+		FIELD_BOOL(SubscribeUpdates)
 		FIELD_BOOL(SetEventsHold)
 		FIELD_INT(RetryAttemptDelay)
 		FIELD_INT(MaximumRetryAttempts)
@@ -83,6 +84,9 @@ namespace synthese
 
 			// Flag to force processing of all sent alarms for end events
 			FIELD(SubscribeAllEnd),
+
+			// Flag indicating whether this NotificationProvider is interested in message updates
+			FIELD(SubscribeUpdates),
 
 			// Flag to force events to be set to HOLD state for manual confirmation
 			FIELD(SetEventsHold),
@@ -167,6 +171,11 @@ namespace synthese
 				virtual void onDisplayStart(const Alarm& message) const;
 
 				virtual void onDisplayEnd(const Alarm& message) const;
+
+				virtual void beforeMessageUpdate(const Alarm& message) const;
+
+				virtual void afterMessageUpdate(const Alarm& message) const;
+
 			//@}
 
 			/**
