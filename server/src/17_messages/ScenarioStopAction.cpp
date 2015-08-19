@@ -23,6 +23,7 @@
 #include "ScenarioStopAction.h"
 
 #include "AlarmObjectLink.h"
+#include "AlarmObjectLinkTableSync.h"
 #include "AlarmRecipient.h"
 #include "DataSource.h"
 #include "DBTransaction.hpp"
@@ -188,7 +189,8 @@ namespace synthese
 
 
 		SentScenario* ScenarioStopAction::findScenarioByMessagesAndCalendars(
-			boost::optional<boost::property_tree::ptree> messagesAndCalendars
+			boost::optional<boost::property_tree::ptree> messagesAndCalendars,
+			bool compareRecipients
 		) {
 			if (messagesAndCalendars)
 			{
@@ -266,50 +268,53 @@ namespace synthese
 									alarm->getRepeatInterval() == messageNode.second.get("repeat_interval", 0))
 								{
 									bool identicalRecipients(true);
-									// Content of message is equal, verify recipients
-									// Loop on all recipient factories
-									BOOST_FOREACH(boost::shared_ptr<AlarmRecipient> linkType, Factory<AlarmRecipient>::GetNewCollection())
+									// Content of message is equal, verify recipients if needed
+									if (compareRecipients)
 									{
-										// Existing links of this factory in the existent message
-										Alarm::LinkedObjects::mapped_type existingLinks(alarm->getLinkedObjects(linkType->getFactoryKey()));
-										boost::optional<const ptree&> recipientNode = messageNode.second.get_child_optional(linkType->getFactoryKey() + "_recipient");
-										size_t nbRecipientLinks = (recipientNode ? recipientNode.get().count("recipient_id") : 0);
-
-										// If the number of links differs between the existing alarm and the request then they do not match
-										if(nbRecipientLinks != existingLinks.size())
+										// Loop on all recipient factories
+										BOOST_FOREACH(boost::shared_ptr<AlarmRecipient> linkType, Factory<AlarmRecipient>::GetNewCollection())
 										{
-											identicalRecipients = false;
-											break;
-										}
+											// Existing links of this factory in the existent message
+											Alarm::LinkedObjects::mapped_type existingLinks(alarm->getLinkedObjects(linkType->getFactoryKey()));
+											boost::optional<const ptree&> recipientNode = messageNode.second.get_child_optional(linkType->getFactoryKey() + "_recipient");
+											size_t nbRecipientLinks = (recipientNode ? recipientNode.get().count("recipient_id") : 0);
 
-										BOOST_FOREACH(const AlarmObjectLink* link, existingLinks)
-										{
-											bool linkFound(false);
-
-											// Loop on recipients
-											BOOST_FOREACH(const ptree::value_type& linkNode, recipientNode.get())
+											// If the number of links differs between the existing alarm and the request then they do not match
+											if(nbRecipientLinks != existingLinks.size())
 											{
-												if (link->getObjectId() == linkNode.second.get("recipient_id", RegistryKeyType(0)) &&
-													link->getParameter() == linkNode.second.get("parameter", string()))
+												identicalRecipients = false;
+												break;
+											}
+
+											BOOST_FOREACH(const AlarmObjectLink* link, existingLinks)
+											{
+												bool linkFound(false);
+
+												// Loop on recipients
+												BOOST_FOREACH(const ptree::value_type& linkNode, recipientNode.get())
 												{
-													linkFound = true;
+													if (link->getObjectId() == linkNode.second.get("recipient_id", RegistryKeyType(0)) &&
+														link->getParameter() == linkNode.second.get("parameter", string()))
+													{
+														linkFound = true;
+														break;
+													}
+												}
+
+												if (!linkFound)
+												{
+													// Recipients are different
+													identicalRecipients = false;
 													break;
 												}
 											}
 
-											if (!linkFound)
+											if (!identicalRecipients)
 											{
-												// Recipients are different
-												identicalRecipients = false;
-												break;
+												break; // to avoid loop on other recipient factories
 											}
-										}
-
-										if (!identicalRecipients)
-										{
-											break; // to avoid loop on other recipient factories
-										}
-									} // Loop on recipient factories
+										} // Loop on recipient factories
+									}
 
 									if (identicalRecipients)
 									{
@@ -358,6 +363,95 @@ namespace synthese
 			else
 			{
 				return NULL;
+			}
+		}
+
+		void ScenarioStopAction::deleteAlarmObjectLinks(
+			boost::optional<boost::property_tree::ptree> messagesAndCalendars,
+			Request& request
+		) {
+			if (messagesAndCalendars)
+			{
+				// Loop on messages
+				Scenario::Messages alarms = _scenario->getMessages();
+				BOOST_FOREACH(const Alarm* alarm, alarms)
+				{
+					bool allPeriodsFound(true);
+					if (!alarm->getCalendar())
+					{
+						continue;
+					}
+					BOOST_FOREACH(MessageApplicationPeriod* period, alarm->getCalendar()->getApplicationPeriods())
+					{
+						bool periodFound(false);
+						BOOST_FOREACH(const ptree::value_type& calendarNode, messagesAndCalendars->get_child("calendar"))
+						{
+							BOOST_FOREACH(const ptree::value_type& periodNode, calendarNode.second.get_child("period"))
+							{
+								string startDateStr(periodNode.second.get("start_date", string()));
+								ptime startDate = startDateStr.empty() ? ptime(not_a_date_time) : time_from_string(startDateStr);
+								string endDateStr(periodNode.second.get("end_date", string()));
+								ptime endDate = endDateStr.empty() ? ptime(not_a_date_time) : time_from_string(endDateStr);
+
+								if (period->getStart() == startDate &&
+									period->getEnd() == endDate)
+								{
+									periodFound = true;
+									break;
+								}
+							}
+							if (periodFound)
+							{
+								break; // to avoid loop on other calendar
+							}
+						}
+						if (!periodFound)
+						{
+							allPeriodsFound = false;
+							break;
+						}
+					}
+					if (!allPeriodsFound)
+					{
+						break;
+					}
+
+					BOOST_FOREACH(const ptree::value_type& calendarNode, messagesAndCalendars->get_child("calendar"))
+					{
+						BOOST_FOREACH(const ptree::value_type& messageNode, calendarNode.second.get_child("message"))
+						{
+							if (alarm->getShortMessage() == messageNode.second.get("title", string()) &&
+								alarm->getLongMessage() == messageNode.second.get("content", string()) &&
+								alarm->getRepeatInterval() == messageNode.second.get("repeat_interval", 0))
+							{
+								// This is the message to work on
+								// Loop on all recipient factories
+								BOOST_FOREACH(boost::shared_ptr<AlarmRecipient> linkType, Factory<AlarmRecipient>::GetNewCollection())
+								{
+									// Existing links of this factory in the existent message
+									Alarm::LinkedObjects::mapped_type existingLinks(alarm->getLinkedObjects(linkType->getFactoryKey()));
+									boost::optional<const ptree&> recipientNode = messageNode.second.get_child_optional(linkType->getFactoryKey() + "_recipient");
+
+									BOOST_FOREACH(const AlarmObjectLink* link, existingLinks)
+									{
+										// Loop on recipients of the ptree
+										BOOST_FOREACH(const ptree::value_type& linkNode, recipientNode.get())
+										{
+											if (link->getObjectId() == linkNode.second.get("recipient_id", RegistryKeyType(0)) &&
+												link->getParameter() == linkNode.second.get("parameter", string()))
+											{
+												// Delete this link
+												DBTransaction transaction;
+												AlarmObjectLinkTableSync::Remove(request.getSession().get(), link->getKey(), transaction, false);
+												transaction.run();
+											}
+										}
+									}
+								} // Loop on recipient factories
+							} // Comparison on content of message
+						} // Loop on messages of ptree calendar
+					} // Loop on calendars of ptree
+				} // Loop on messages of the scenario
 			}
 		}
 }	}
