@@ -25,6 +25,7 @@
 #include "EMail.h"
 #include "Log.h"
 
+#include <sys/resource.h> // for getrusage
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -271,6 +272,11 @@ namespace synthese
 			const HTTPRequest& req,
 			HTTPReply& rep
 		){
+
+			ptime now(microsec_clock::local_time());
+			struct rusage usageStart;
+			getrusage(RUSAGE_THREAD, &usageStart);
+
 			try
 			{
 				Log::GetInstance ().debug ("Received request : " +
@@ -284,7 +290,6 @@ namespace synthese
 				SetCurrentThreadAnalysing(req.uri + (req.postData.empty() ? string() : " + "+ req.postData.substr(0, 100)));
 				DynamicRequest request(req);
 
-				ptime now(microsec_clock::local_time());
 				auto_ptr<ofstream> of;
 				if(_httpTracePath)
 				{
@@ -424,6 +429,16 @@ namespace synthese
 				Log::GetInstance().debug("An unhandled exception has occured.");
 				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error);
 			}
+
+			struct rusage usageEnd;
+			getrusage(RUSAGE_THREAD, &usageEnd);
+			time_duration cpuUsage( (seconds(usageEnd.ru_utime.tv_sec) + microsec(usageEnd.ru_utime.tv_usec)) -
+									(seconds(usageStart.ru_utime.tv_sec) + microsec(usageStart.ru_utime.tv_usec)) );
+
+			time_duration td = microsec_clock::local_time() - now;
+			Log::GetInstance ().debug ("request duration (ms): " + lexical_cast<string>(td.total_milliseconds()) +
+									   + " cpu: " + lexical_cast<string>(cpuUsage.total_milliseconds()) +
+									   + " status: " + lexical_cast<string>(rep.status));
 
 			SetCurrentThreadWaiting();
 		}
