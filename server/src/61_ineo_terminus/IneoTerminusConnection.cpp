@@ -1079,10 +1079,22 @@ namespace synthese
 					}
 					else
 					{
-						// SYNTHESE has no matching scenario, generate an error
-						util::Log::GetInstance().warn("Ineo Terminus : no scenario matching this delete request");
-						status = false;
-						errorCode = ProgrammationInconnue;
+						// Search a matching scenario with different recipients
+						sscenario = scenarioStopAction.findScenarioByMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars), false);
+						if (sscenario)
+						{
+							// The delete requests only concerns recipients
+							scenarioStopAction.setScenario(sscenario);
+							Request fakeRequest;
+							scenarioStopAction.deleteAlarmObjectLinks(boost::optional<boost::property_tree::ptree>(messagesAndCalendars),fakeRequest);
+						}
+						else
+						{
+							// SYNTHESE has no matching scenario, generate an error
+							util::Log::GetInstance().warn("Ineo Terminus : no scenario matching this delete request");
+							status = false;
+							errorCode = ProgrammationInconnue;
+						}
 					}
 				}
 

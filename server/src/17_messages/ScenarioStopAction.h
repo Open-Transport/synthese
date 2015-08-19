@@ -77,10 +77,16 @@ namespace synthese
 			virtual bool isAuthorized(const server::Session* session) const;
 
 			SentScenario* findScenarioByMessagesAndCalendars(
-				boost::optional<boost::property_tree::ptree> messagesAndCalendars
+				boost::optional<boost::property_tree::ptree> messagesAndCalendars,
+				bool compareRecipients = true
 			);
 
 			void setScenario(SentScenario* value){ _scenario = value; }
+
+			void deleteAlarmObjectLinks(
+				boost::optional<boost::property_tree::ptree> messagesAndCalendars,
+				server::Request& request
+			);
 		};
 	}
 }
