@@ -336,7 +336,7 @@ namespace synthese
 				return seconds(10);
 			}
 
-			return seconds(1);
+			return seconds(10);
 		}
 
 
