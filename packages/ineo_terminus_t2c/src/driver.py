@@ -148,8 +148,8 @@ if 'stoparea' in recipients:
         if stopCode[0] == datasource_id:
           # A stop point was found, change value of EndStopPoint to "non" to apply message to this stop point
           childEndStopPoint.text = "non"
-          # OVE : Ineo stop point ids start with "MNLP_**_", but this prefix must not be sent to Ineo (TODO : make it configurable ?)
-          childStopPoint.text = stopCode[1][8:]
+          # Ineo stop point ids may start with "MNLP_**_", but this prefix must not be sent to Ineo
+          childStopPoint.text = (stopCode[1] if stopCode[1].startswith(ineo_stop_point_prefix) == False else stopCode[1][len(ineo_stop_point_prefix):])
 
   if recipientTableId == 7:
     # This 'stoparea' recipient is a stop area : retrieve the Ineo code of one of its stop points
@@ -164,8 +164,8 @@ if 'stoparea' in recipients:
           if stopCode[0] == datasource_id:
             # A stop point was found, change value of EndStopPoint to "non" to apply message to this stop point
             childEndStopPoint.text = "non"
-            # OVE : Ineo stop point ids start with "MNLP_**_", but this prefix must not be sent to Ineo (TODO : make it configurable ?)
-            childStopPoint.text = stopCode[1][8:]
+            # Ineo stop point ids may start with "MNLP_**_", but this prefix must not be sent to Ineo
+            childStopPoint.text = (stopCode[1] if stopCode[1].startswith(ineo_stop_point_prefix) == False else stopCode[1][len(ineo_stop_point_prefix):])
 
 # No StopPoint found, do not generate Way
 if childEndStopPoint.text == "oui":
