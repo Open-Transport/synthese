@@ -57,6 +57,7 @@ namespace synthese
 			if(_action.get())
 			{
 				_action->_setFromParametersMap(_allParametersMap);
+				name = _action->getFactoryKey();
 			}
 		}
 
@@ -96,6 +97,7 @@ namespace synthese
 				}
 				_function->setTemplateParameters(templateParametersMap);
 				_function->_setFromParametersMap(_allParametersMap);
+				name = _function->getFactoryKey();
 			}
 		}
 

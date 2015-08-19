@@ -41,6 +41,7 @@ namespace synthese
 			public virtual Request
 		{
 		public:
+			std::string name;
 			template<class T>
 			class BadTypeException:
 				public synthese::Exception

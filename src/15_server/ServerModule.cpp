@@ -276,6 +276,7 @@ namespace synthese
 			ptime now(microsec_clock::local_time());
 			struct rusage usageStart;
 			getrusage(RUSAGE_THREAD, &usageStart);
+			string requestName("");
 
 			try
 			{
@@ -337,7 +338,9 @@ namespace synthese
 					boost::shared_lock<boost::shared_mutex> lock(ServerModule::InterSYNTHESEAgainstRequestsMutex);
 					request.run(ros);
 				}
-				
+				// Now the request name has been evaluated
+				requestName = request.name;
+
 				// Output
 				if(	_forceGZip ||
 					(	gzipCompression &&
@@ -437,9 +440,10 @@ namespace synthese
 
 			time_duration td = microsec_clock::local_time() - now;
 			Log::GetInstance ().debug (req.ipaddr +
-									   " # request duration (ms): " + lexical_cast<string>(td.total_milliseconds()) +
-									   + " cpu: " + lexical_cast<string>(cpuUsage.total_milliseconds()) +
-									   + " status: " + lexical_cast<string>(rep.status));
+									   " # request duration (ms): " + lexical_cast<string>(td.total_milliseconds())
+									   + " cpu: " + lexical_cast<string>(cpuUsage.total_milliseconds())
+									   + " status: " + lexical_cast<string>(rep.status)
+									   + " request: " + requestName);
 
 			SetCurrentThreadWaiting();
 		}
