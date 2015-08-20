@@ -32,6 +32,7 @@
 #include "MessageApplicationPeriod.hpp"
 #include "MessageApplicationPeriodTableSync.hpp"
 #include "MessagesRight.h"
+#include "MessagesSection.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "Request.h"
