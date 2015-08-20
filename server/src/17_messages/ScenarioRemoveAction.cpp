@@ -37,7 +37,7 @@
 #include "Request.h"
 #include "Scenario.h"
 #include "ScenarioCalendarTableSync.hpp"
-#include "SentScenarioTableSync.h"
+#include "ScenarioTableSync.h"
 #include "SentScenario.h"
 #include "Session.h"
 #include "User.h"
@@ -78,7 +78,7 @@ namespace synthese
 			// Scenario
 			try
 			{
-				_scenario = SentScenarioTableSync::GetCastEditable<SentScenario>(
+				_scenario = ScenarioTableSync::GetCastEditable<SentScenario>(
 					map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID),
 					*_env
 				).get();
@@ -128,7 +128,7 @@ namespace synthese
 				AlarmTableSync::Remove(request.getSession().get(), message->getKey(), transaction, false);
 			}
 
-			SentScenarioTableSync::Remove(NULL, _scenario->getKey(), transaction, false);
+			ScenarioTableSync::Remove(NULL, _scenario->getKey(), transaction, false);
 			transaction.run();
 		}
 
@@ -148,7 +148,7 @@ namespace synthese
 			{
 				if (!_scenario->getSections().empty())
 				{
-					BOOST_FOREACH(const MessagesSection* section, _scenario->get<Sections>())
+					BOOST_FOREACH(const MessagesSection* section, _scenario->getSections())
 					{
 						result = result && session->getUser()->getProfile()->isAuthorized<MessagesRight>(
 							DELETE_RIGHT,
