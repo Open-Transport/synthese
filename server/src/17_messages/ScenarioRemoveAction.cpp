@@ -148,7 +148,7 @@ namespace synthese
 			{
 				if (!_scenario->getSections().empty())
 				{
-					BOOST_FOREACH(const MessagesSection* section, _scenario->getSections())
+					BOOST_FOREACH(const Scenario::Sections::value_type& section, _scenario->getSections())
 					{
 						result = result && session->getUser()->getProfile()->isAuthorized<MessagesRight>(
 							DELETE_RIGHT,
