@@ -124,6 +124,8 @@ ScenarioSaveAction.cpp
 ScenarioSaveAction.h
 ScenariosListFunction.cpp
 ScenariosListFunction.hpp
+ScenarioRemoveAction.cpp
+ScenarioRemoveAction.h
 ScenarioStopAction.cpp
 ScenarioStopAction.h
 ScenarioTableSync.cpp

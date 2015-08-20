@@ -48,12 +48,12 @@
 #include "NewMessageAction.h"
 #include "UpdateTextTemplateAction.h"
 #include "ScenarioStopAction.h"
+#include "ScenarioRemoveAction.h"
 #include "AddScenarioAction.h"
 #include "TextTemplateAddAction.h"
 #include "UpdateAlarmMessagesAction.h"
 #include "AlarmRemoveLinkAction.h"
 #include "AlarmAddLinkAction.h"
-#include "ScenarioStopAction.h"
 #include "ScenarioFolderAdd.h"
 #include "ScenarioFolderUpdateAction.h"
 
@@ -126,6 +126,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::ScenarioSaveAction::integrate();
 	synthese::messages::SimpleMessageCreationAction::integrate();
 	synthese::messages::ScenarioStopAction::integrate();
+	synthese::messages::ScenarioRemoveAction::integrate();
 	synthese::messages::UpdateAlarmMessagesFromTemplateAction::integrate();
 	synthese::messages::NewMessageAction::integrate();
 	synthese::messages::UpdateTextTemplateAction::integrate();
