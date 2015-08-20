@@ -119,7 +119,7 @@
 
 <#tab_div&id=archives#>
  <table class="table table-striped">
- <thead><tr><th>fin</th><th>nom</th><th></th><th></th><th></th></tr></thead>
+ <thead><tr><th>fin</th><th>nom</th><th></th><th></th><th></th><th></th></tr></thead>
  <tbody>
  <?scenarii&
   t=0&
@@ -146,7 +146,7 @@
 	    class=btn btn-warning btn-mini&
 	    text=Copier dans la bibliothèque&
 	  ?>
-	 </td><?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&then=<td>
+	 </td><td><?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&then=
 	  <?link&
 	    target=/events/event&
 	    co=1&
@@ -157,8 +157,19 @@
 	    actionParammt=<@roid@>&
 	    class=btn btn-warning btn-mini&
 	    text=Copier dans les événements actifs&
-	  ?>
-	 </td>&?>
+	  ?>?>
+	 </td><td><?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&then=
+	  <?link&
+	    target=/events&
+	    co=1&
+	    a=scenarioremove&
+	    section=<@section@>&
+	    actionParams=<@roid@>&
+	    class=btn btn-danger btn-mini&
+	    text=Supprimer définitivement cet événement&
+	    confirm=Etes-vous sûr de vouloir supprimer définitivement l'événement ?&
+	  ?>?>
+	 </td>
 	</tr>
  }>?>
  </tbody>
