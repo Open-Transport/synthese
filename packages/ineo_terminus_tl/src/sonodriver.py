@@ -35,7 +35,7 @@ class HTMLTextExtractor(HTMLParser):
   def handle_entityref(self, data):
     # Decode entity and concatenate it to current line
     from htmlentitydefs import name2codepoint
-    character = unichr(name2codepoint[data])
+    character = ' ' if data == 'nbsp' else unichr(name2codepoint[data])
     self.current_line = self.current_line + character
     self.after_entity = True
 
