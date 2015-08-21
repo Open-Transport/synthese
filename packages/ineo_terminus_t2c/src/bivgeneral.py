@@ -227,7 +227,7 @@ for contentLine in contentLines:
 childRecipients = etree.SubElement(childMessaging, "Recipients")
 recipients = message[0]["recipients"][0]
 hasAllNetwork = False
-if 'line' in recipients:
+if "line" in recipients:
   # Scan the 'line' recipients to check if the whole transport network is selected
   for line in recipients["line"]:
     hasAllNetwork = hasAllNetwork or (line["id"] == network_id)
@@ -236,16 +236,22 @@ if 'line' in recipients:
     childAllNetwork = etree.SubElement(childRecipients, "AllNetwork")
   # Else add the Ineo code of each commercial line in the recipients
   else:
-    childLines = etree.SubElement(childRecipients, "Lines")
+    childLinesWays = etree.SubElement(childRecipients, "LinesWays")
     for line in recipients["line"]:
+      linkParameters = line["link_parameter"] if "link_parameter" in line else ""
       parameters = { "roid": line["id"] }
       linePM = synthese.service("LinesListFunction2", parameters)
       lineCodesStr = linePM["line"][0]["creator_id"]
       lineCodes = map(lambda x: x.split('|'), lineCodesStr.split(','))
       for lineCode in lineCodes:
         if lineCode[0] == datasource_id:
-          childLine = etree.SubElement(childLines, "Line")
+          childLineWay = etree.SubElement(childLinesWays, "LineWay")
+          childLine = etree.SubElement(childLineWay, "Line")
           childLine.text = lineCode[1]
+          childInWard = etree.SubElement(childLineWay, "InWard")
+          childInWard.text = "non" if linkParameters == "1" else "oui"
+          childOutWard = etree.SubElement(childLineWay, "OutWard")
+          childOutWard.text = "non" if linkParameters == "0" else "oui"
 
 # Print resulting XML to output stream
 print(etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="iso-8859-1"))
