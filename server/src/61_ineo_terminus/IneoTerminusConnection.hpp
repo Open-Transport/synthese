@@ -121,6 +121,7 @@ namespace synthese
 			{
 				std::string type;
 				std::string name;
+				std::string parameter;
 			};
 			
 			static XMLNode ParseInput(
