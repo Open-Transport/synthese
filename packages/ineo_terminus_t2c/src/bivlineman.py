@@ -112,15 +112,24 @@ childName.text = "{:04d} {:.27s}".format(messageID, message[0]["title"])
 if int(needs_play_tts) != 0:
   if int(message[0]["play_tts"]) != 0:
     childTts = etree.SubElement(childMessaging, "Tts")
-    childTts.text = message[0]["content"]
+    # Extract HTML text lines 
+    htmlParser = HTMLTextExtractor()
+    htmlParser.feed(message[0]["content"])
+    # 'Tts' node accepts [1..6] lines * [0..25] characters
+    lines = htmlParser.wrap_lines(6, 25)
+    for line in lines:
+      childLine = etree.SubElement(childTts, "Line")
+      childLine.text = line
 
-# {Start,Stop}Date
+# {Start,Stop}{Date,Time}
 childStartDate = etree.SubElement(childMessaging, "StartDate")
 childStartDate.text = "01/01/1970"
 childStopDate = etree.SubElement(childMessaging, "StopDate")
 childStopDate.text = "31/12/2037"
-
-# {Start,Stop}Time
+childStartTime = etree.SubElement(childMessaging, "StartTime")
+childStartTime.text = "00:00:00"
+childStopTime = etree.SubElement(childMessaging, "StopTime")
+childStopTime.text = "23:59:00"
 
 # Alternance
 
