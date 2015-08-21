@@ -1530,9 +1530,23 @@ namespace synthese
 					}
 					message.contentTts += _iconv.convert(LineNode.getText());
 				}
+
+				if("BivLineMan" == messagerieName)
+				{
+					message.ttsBroadcasting = true;
+				}
 			}
 			XMLNode RecipientsNode = node.getChildNode("Recipients", 0);
 			message.recipients = _readRecipients(RecipientsNode);
+
+			if(false == message.stopPoint.empty())
+			{
+				// Driver.StopPoint is processed as a StopPoint recipient
+				IneoTerminusConnection::Recipient new_recipient;
+				new_recipient.type = "StopPoint";
+				new_recipient.name = message.stopPoint;
+				message.recipients.push_back(new_recipient);
+			}
 
 			return message;
 		}
@@ -1567,10 +1581,17 @@ namespace synthese
 				{
 					messagePM->insert("dispatching", "Repete");
 				}
-				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod));
+				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod * 60));
 				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
 				messagePM->insert("section", "");
 				messagePM->insert("alternative", "");
+				messagePM->insert("with_ack", message.confirm);
+				messagePM->insert("multiple_stops", message.multipleStop);
+				messagePM->insert("play_tts", message.ttsBroadcasting);
+				messagePM->insert("light", message.diodFlashing);
+				messagePM->insert("direction_sign_code", message.codeGirouette);
+				messagePM->insert("start_stop_point", message.startStopPoint);
+				messagePM->insert("end_stop_point", message.endStopPoint);
 
 				IneoApplicationError recipientsErrorCode = AucuneErreur;
 				bool recipientsFound = _addRecipientsPM(*messagePM, message.recipients, recipientsErrorCode);
@@ -1619,6 +1640,8 @@ namespace synthese
 						boost::shared_ptr<Scenario>	scenario;
 						boost::shared_ptr<SentScenario> sscenario;
 						sscenario.reset(new SentScenario);
+						sscenario->set<Name>(messages[0].name);
+
 						scenario = static_pointer_cast<Scenario, SentScenario>(sscenario);
 						scenarioSaveAction.setSScenario(sscenario);
 						scenarioSaveAction.setScenario(scenario);
@@ -1679,7 +1702,6 @@ namespace synthese
 			recipientTypes.insert(make_pair("Vehicules", "Vehicule"));
 			recipientTypes.insert(make_pair("Cars", "Car"));
 			recipientTypes.insert(make_pair("CarServices", "CarService"));
-			recipientTypes.insert(make_pair("LinesWays", "LineWay"));
 			recipientTypes.insert(make_pair("Bivs", "Biv"));
 			recipientTypes.insert(make_pair("Groups", "Group"));
 
@@ -1709,6 +1731,50 @@ namespace synthese
 					recipients.push_back(new_recipient);
 				}
 
+				// Special case #3 : 'LinesWays'
+				else if ("LinesWays" == recipientType)
+				{
+					int nChildNodes = recipientNode.nChildNode();
+
+					for (int cptChildNode = 0; cptChildNode < nChildNodes; cptChildNode++)
+					{
+						XMLNode childNode = recipientNode.getChildNode(cptChildNode);
+						std::string childNodeType(childNode.getName());
+
+						if ("LineWay" == childNodeType)
+						{
+							XMLNode lineNode = childNode.getChildNode("Line", 0);
+							XMLNode inWardNode = childNode.getChildNode("InWard", 0);
+							XMLNode outWardNode = childNode.getChildNode("OutWard", 0);
+							std::string lineCode = lineNode.getText();
+							std::string inWard(inWardNode.getText());
+							std::string outWard(outWardNode.getText());
+							IneoTerminusConnection::Recipient new_recipient;
+
+							new_recipient.type = "Line";
+							new_recipient.name = lineCode;
+							new_recipient.parameter = "";
+
+							if("oui" == inWard && "non" == outWard)
+							{
+								new_recipient.parameter = "0";
+							}
+
+							if("non" == inWard && "oui" == outWard)
+							{
+								new_recipient.parameter = "1";
+							}
+
+							recipients.push_back(new_recipient);
+						}
+
+						else
+						{
+							util::Log::GetInstance().warn("Ineo Terminus : unexpected recipient " + childNodeType + " as child of LinesWays");
+						}
+					}
+				}
+
 				// Generic case : recipients are listed by class
 				else if (recipientTypes.end() != recipientTypes.find(recipientType))
 				{
@@ -1718,7 +1784,7 @@ namespace synthese
 					for (int cptChildNode = 0; cptChildNode < nChildNodes; cptChildNode++)
 					{
 						XMLNode childNode = recipientNode.getChildNode(cptChildNode);
-						string childNodeType(childNode.getName());
+						std::string childNodeType(childNode.getName());
 
 						if (expectedType == childNodeType)
 						{
@@ -1793,6 +1859,7 @@ namespace synthese
 							{
 								boost::shared_ptr<ParametersMap> lineRecipientPM(new ParametersMap);
 								lineRecipientPM->insert("recipient_id", loadedLine->getKey());
+								lineRecipientPM->insert("parameter", recipient.parameter);
 								pm.insert("line_recipient", lineRecipientPM);
 								found = true;
 							}
