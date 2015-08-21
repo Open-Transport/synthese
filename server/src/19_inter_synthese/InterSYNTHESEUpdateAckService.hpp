@@ -60,7 +60,6 @@ namespace synthese
 				boost::optional<util::RegistryKeyType> _slaveId;
 				boost::optional<util::RegistryKeyType> _rangeBegin;
 				boost::optional<util::RegistryKeyType> _rangeEnd;
-				boost::shared_ptr<boost::recursive_mutex::scoped_lock> _queueMutex;
 			//@}
 			
 			
