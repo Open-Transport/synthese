@@ -167,9 +167,14 @@ if 'stoparea' in recipients:
             # Ineo stop point ids may start with "MNLP_**_", but this prefix must not be sent to Ineo
             childStopPoint.text = (stopCode[1] if stopCode[1].startswith(ineo_stop_point_prefix) == False else stopCode[1][len(ineo_stop_point_prefix):])
 
-# No StopPoint found, do not generate Way
+# Modify Way depending on StopPoint value
 if childEndStopPoint.text == "oui":
   childMessaging.remove(childWay)
+else:
+  if childStopPoint.text.endswith("A"):
+    childWay.text = "ALLER"
+  if childStopPoint.text.endswith("R"):
+    childWay.text = "RETOUR"
 
 # RepeatPeriod
 
