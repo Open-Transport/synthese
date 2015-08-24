@@ -220,8 +220,8 @@ template=
           <td>
             <?if&
 	      cond=<@active@>&
-              then=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&then=<div class="btn btn-success btn-mini btn-inactive"><i class="icon-play icon-white"></i></div> <?link&target=<@p@>&a=scenario_save&actionParamsid=<@scenario_id@>&roid=<@scenario_id@>&actionParamena=0&class=btn btn-warning btn-mini btn-active&text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>?>&
-              else=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&then=<?link&target=<@p@>&a=scenario_save&actionParamsid=<@scenario_id@>&roid=<@scenario_id@>&actionParamena=1&class=btn btn-success btn-mini btn-active&text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??> <div class="btn btn-warning btn-mini btn-inactive"><i class="icon-pause icon-white"></i></div>?>&
+              then=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&then=<?link&target=<@p@>&a=scenario_save&actionParamsid=<@scenario_id@>&roid=<@scenario_id@>&actionParamena=0&class=btn btn-warning btn-mini btn-inactive&text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>?>&
+              else=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&then=<?link&target=<@p@>&a=scenario_save&actionParamsid=<@scenario_id@>&roid=<@scenario_id@>&actionParamena=1&class=btn btn-success btn-mini btn-inactive&text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>?>&
             ?>
             <?if&cond=<@active@>&then=<?link&target=<@p@>&roid=<@roid@>&text=Envoyer SMS/E-mails&class=btn btn-primary btn-mini?>?>
           </td><td>
