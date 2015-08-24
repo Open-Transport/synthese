@@ -1700,6 +1700,7 @@ namespace synthese
 								break;
 							}
 						}
+
 						if(!mustBeExported) {
 							Log::GetInstance().debug(
 									"Scheduled service has the no export label : " +
@@ -1709,6 +1710,21 @@ namespace synthese
 							continue;
 						}
 
+						// Check if the service is accessible at all
+						const PTUseRule* PedestrianUseRule = dynamic_cast<const PTUseRule*>(
+							&(sdService)->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+						);
+
+						if ( PedestrianUseRule && PedestrianUseRule->getAccessCapacity().get_value_or(9999) == 0 ) {
+							Log::GetInstance().debug(
+									"Scheduled service is not accessible for pedestrian: " +
+									boost::lexical_cast<std::string>(itsdsrv.first) +
+									" (line " + sdJourney->getCommercialLine()->getName() + ")"
+							);
+							continue;
+						}
+
+						// Check if it has a rolling stock
 						if(rs != NULL)
 						{
 							_filesProvider(sdService,
