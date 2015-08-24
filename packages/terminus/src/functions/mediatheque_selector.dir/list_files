@@ -1,10 +1,13 @@
 <?if&cond=<@folder_id@>&then=<@root_file=<@folder_id@>@>&else=<@root_file=<@~global("website_media_id")@>@>?>
     <?menu&root=<@root_file@>&raw_data=1&min_depth=0&max_depth=9999&template=
       <@file_found=0@>
+<?if&cond=<@view_mode@>&then=
+      <div class="btn-group btn-group-vertical row-fluid" data-toogle="buttons-radio">
+&else=
       <ul class="thumbnails">
+?>
       <{page&recursive=1&template=
         <?if&cond=<@mime_type=="/"@>&else=
-          <!-- search mode? -->
           <?if&cond=<@file_search@>&then=
             <?if&cond=<?StrStr&text=<@title@>&match=<@file_search@>?>&then=
               <@display=1@>&else=<@display=0@>
@@ -12,26 +15,46 @@
           ?>
           <?if&cond=<@display@>&then=
             <@file_found=1@>
+            <@host_and_port=<?if&cond=<@~global("server_name")@>&then=<@~global("server_name")@>&else=<@host_name@>?>@>
+            <@smart_url=<?object&roid=<@id@>&template=<@smart_url_path@>?>@>
+            <@site_url=<?object&roid=<@~global("website_media_id")@>&template=<@cient_url@>?>@>
+
+<?if&cond=<@view_mode@>&then=
+            <span class="btn btn-left btn-with-margins thumbnail-list<?if&cond=<@admin_mediatheque@>&then="&else= thumbnail-selectable" data-file-action="selectFile" data-id="<@id@>"?>>
+              <?if&cond=<?StrStr&text=<@mime_type@>&match=image?>&then=
+                <@my_url=http://<@host_and_port@><@site_url@><@smart_url@>@>
+                <img src="<@my_url@>" alt="<@title@>" data-toggle="tooltip" data-placement="top" title="<@title@>"/>
+              &else=
+                <@type=<?substr&t=<@mime_type@>&f=<?StrStr&text=<@mime_type@>&match=/?>&n=<?strlen&t=<@mime_type@>?>?>@>
+                <span class="terminus-file mini-file <@type@>-file" data-toggle="tooltip" data-placement="top" title="<@title@>"></span>
+              ?>
+              <span data-toggle="tooltip" data-placement="top" title="<@title@>"><@title@></span>
+              <?if&cond=<@admin_mediatheque@>&then=<span class="remove-file-list" data-form-action="removeFile" id="<@id@>" data-id="<@folder_id@>" data-toggle="tooltip" data-placement="top" title="Remove <@title@>"><i class="icon-remove"></i></span>?>
+            </span>
+&else=
             <li class="span2" style="position: relative;">
-              <a href="#" class="thumbnail" data-action="selectFile" data-id="<@id@>">
-                <@host_and_port=<?if&cond=<@~global("server_name")@>&then=<@~global("server_name")@>&else=<@host_name@>?>@>
-                <@smart_url=<?object&roid=<@id@>&template=<@smart_url_path@>?>@>
-                <@site_url=<?object&roid=<@~global("website_media_id")@>&template=<@cient_url@>?>@>
-                                   
-                <?if&cond=<?StrStr&text=<@mime_type@>&match=image?>&then=
-                  <@my_url=http://<@host_and_port@><@site_url@><@smart_url@>@>
-                  <img data-src="<@title@>/260*180" alt="260*180" src="<@my_url@>" data-toggle="tooltip" data-placement="top" title="<@title@>"/>
-                  &else=
-                    <@type=<?substr&t=<@mime_type@>&f=<?StrStr&text=<@mime_type@>&match=/?>&n=<?strlen&t=<@mime_type@>?>?>@>
-                    <span class="terminus-file <@type@>-file" data-toggle="tooltip" data-placement="top" title="<@title@>"></span>
-                ?>
-              </a>
+              <?if&cond=<@admin_mediatheque@>&then=<span&else=<a?>
+                href="#" class="thumbnail<?if&cond=<@admin_mediatheque@>&then="&else= thumbnail-selectable" data-file-action="selectFile" data-id="<@id@>"?>>
+              <?if&cond=<?StrStr&text=<@mime_type@>&match=image?>&then=
+                <@my_url=http://<@host_and_port@><@site_url@><@smart_url@>@>
+                <img src="<@my_url@>" alt="<@title@>" data-toggle="tooltip" data-placement="top" title="<@title@>"/>
+              &else=
+                <@type=<?substr&t=<@mime_type@>&f=<?StrStr&text=<@mime_type@>&match=/?>&n=<?strlen&t=<@mime_type@>?>?>@>
+                <span class="terminus-file <@type@>-file" data-toggle="tooltip" data-placement="top" title="<@title@>"></span>
+              ?>
+              <?if&cond=<@admin_mediatheque@>&then=</span>&else=</a>?>
               <p class="thumbnail-text text-center" data-toggle="tooltip" data-placement="top" title="<@title@>"><@title@></p>
+              <?if&cond=<@admin_mediatheque@>&then=<span class="remove-file" data-form-action="removeFile" id="<@id@>" data-id="<@folder_id@>" data-toggle="tooltip" data-placement="top" title="Remove <@title@>"><i class="icon-remove"></i></span>?>
             </li>
+?>
           ?>
         ?>
         <?if&cond=<@file_search@>&then=<@recursive_content@>?>
       }>
+<?if&cond=<@view_mode@>&then=
+      </div>
+&else=
       </ul>
+?>
     ?>
     <?if&cond=<@file_found==0@>&then=<div class="alert alert-info">Aucun élément n'est présent dans ce répertoire.</div>?>

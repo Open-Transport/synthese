@@ -4,88 +4,12 @@
 <?if&cond=<@websiteFound@>&else=<#404#>
 &then=
 <@folder_id=<@roid?roid:0@>@>
-<ul class="breadcrumb">
- <@roid?  
-   ("<li>" + <?link&target=<@p@>&folder_id=<@folder_id@>?> + " <span class=\"divider\">/</span></li>"):
-   "<li class=\"active\">"<@title@>"</li>"
-  @>
-  <?menu&root=<@~global("website_media_id")@>&raw_data=1&min_depth=0&max_depth=9999&
-    template=<{page&recursive=1&template=
-      <@recursive_content?("<li>"+<?link&target=<@p@>&roid=<@id@>&text=<@title@>?>+" <span class=\"divider\">/</span></li>"):""@>
-      <@(id==folder_id)?("<li class=\"active\">"+<@title@>+"</li>"):""@>
-      <@recursive_content@>
-    }>
-  ?>
+<ul class="breadcrumb" id="admin_mediatheque">
+  <li class=\"active\"><@title@></li>
 </ul>
+  <@admin_mediatheque=1@>
+  <#mediatheque_selector#>
 
-<div class="row-fluid">
-  <div class="span3">
-    <ul class="nav nav-list well">
-      <?menu&root=<@~global("website_media_id")@>&raw_data=1&min_depth=0&max_depth=9999&template=
-        <li<@folder_id?"":" class=\"active\""@>>
-          <?if&cond=<@folder_id@>
-            &then=<?link&target=<@p@>&text=<@title@>?>
-            &else=<a href="#"><@title@><span class="pull-right" id="new_dir_link" data-action="addFolder" data-parent="si"><i class="icon-plus icon-white"></i></span></a>
-          ?>
-        </li>
-     	<{page&recursive=1&template=
-    	  <?if&cond=<@mime_type=="/"@>&then=
-    	    <li class="tree_<@depth+1@><?if&cond=<@id==<@folder_id@>@>&then= active?>" file_id="<@id@>" file_type="<@mime_type@>" file_path="<@smart_url_path@>">
-    	      <@text=<@title@>@>
-    	      <?if&cond=<@id==<@folder_id@>@>
-    	           &then=<@text=<@text@><span class="pull-right" id="new_dir_link" data-action="addFolder" data-parent="pi"><i class="icon-plus icon-white"></i></span><span class="pull-right" id="rename_dir_link" data-action="renameFolder"><i class="icon-edit icon-white"></i></span>@>
-    	                <?if&cond=<@recursive_content@>&else=<@text=<@text@><span class="pull-right" id="remove_dir_link" data-action="removeFolder"><i class="icon-remove icon-white"></i></span>@>?>
-    	      ?>
-    	      <?link&target=<@p@>&roid=<@id@>&text=<@text@>?>
-    	    </li>
-    	  &else=<li class="tree_<@depth+1@>" style="display:none;"><@id@></li>?>
-	  <@recursive_content@>
-	}>
-      ?>
-    </ul>
-  </div>
-  <div class="span9">
-    <?form&name=search&page_id=<@p@>&class=form-search well?>
-      <input type="text" name="file_search" value="<@file_search@>" placeholder="Nom du fichier">
-      <button type="submit" class="btn btn-primary">Rechercher</button>
-    </form>
-    <?if&cond=<@folder_id@>&then=<@root_file=<@folder_id@>@>&else=<@root_file=<@~global("website_media_id")@>@>?>
-    <?menu&root=<@root_file@>&raw_data=1&min_depth=0&max_depth=9999&template=
-      <@file_found=0@>
-      <ul class="thumbnails">
-      <{page&recursive=1&template=
-        <?if&cond=<@mime_type=="/"@>&else=
-        
-          <!-- search mode? -->
-          <?if&cond=<@file_search@>&then=
-            <?if&cond=<?StrStr&text=<@title@>&match=<@file_search@>?>&then=
-              <@display=1@>&else=<@display=0@>
-            ?>&else=<@display=1@>
-          ?>
-          
-          <?if&cond=<@display@>&then=
-            <@file_found=1@>
-            <li class="span2" style="position: relative;">
-              <span href="#" class="thumbnail">
-                <?if&cond=<?StrStr&text=<@mime_type@>&match=image?>&then=
-                  <img data-src="<@title@>/260*180" alt="260*180" src="<@href@>" data-toggle="tooltip" data-placement="top" title="<@title@>"/>
-                  &else=
-                    <@type=<?substr&t=<@mime_type@>&f=<?StrStr&text=<@mime_type@>&match=/?>&n=<?strlen&t=<@mime_type@>?>?>@>
-                    <span class="terminus-file <@type@>-file" data-toggle="tooltip" data-placement="top" title="<@title@>"></span>
-                ?>
-              </span>
-              <p class="thumbnail-text text-center" data-toggle="tooltip" data-placement="top" title="<@title@>"><@title@></p>
-              <span class="remove-file" data-action="removeFile" id="<@id@>"><i class="icon-remove"></i></span>
-            </li>
-          ?>
-        ?>
-        <?if&cond=<@file_search@>&then=<@recursive_content@>?>
-      }>
-      </ul>
-    ?>
-    <?if&cond=<@file_found==0@>&then=<div class="alert alert-info">Aucun élément n'est présent dans ce répertoire.</div>?>
-    <?if&cond=<@folder_id@>&then=<hr><a data-action="uploadFile" class="btn btn-primary pull-right">Uploader</a>?>
-  </div>
   <div id="addFolderModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="addFolderModalLabel" aria-hidden="true">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -99,6 +23,7 @@
       actionParamsi=<@~global("website_media_id")@>&
       actionParampi=<@folder_id@>&
       actionParammt=/&
+      view_mode=<@view_mode@>&
       roid=<@folder_id@>
     ?>
     <div class="modal-body">
@@ -125,6 +50,7 @@
       a=RemoveObjectAction&
       target=<@p@>&
       class=form-horizontal&
+      view_mode=<@view_mode@>&
       actionParam_object_id=<@folder_id@>
     ?>
     <div class="modal-body">
@@ -150,6 +76,7 @@
       actionParammt=/&
       actionParamdu=1&
       actionParam_do_not_evaluate=1&
+      view_mode=<@view_mode@>&
       roid=<@folder_id@>
     ?>
     <div class="modal-body">
@@ -176,6 +103,7 @@
 	a=RemoveObjectAction&
 	target=<@p@>&
 	actionParam_object_id=&
+	view_mode=<@view_mode@>&
 	roid=<@folder_id@>
       ?>
       <div class="modal-body">
@@ -197,7 +125,8 @@
 	a=WebpageContentUploadAction&
 	target=<@p@>&
 	actionParam_up_id=<@folder_id@>&
-    actionParam_smart_url_from_tree=1&
+	actionParam_smart_url_from_tree=1&
+	view_mode=<@view_mode@>&
 	roid=<@folder_id@>
       ?>
       <div class="modal-body">
