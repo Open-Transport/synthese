@@ -161,6 +161,8 @@ namespace synthese
 				);
 				if(networks.empty())
 				{
+					string errorString = "Error in line filter " + s + " : network " + pattern + " not found";
+					_logError(errorString);
 					continue;
 				}
 				lineFilter.network = *networks.begin();
@@ -390,6 +392,8 @@ namespace synthese
 					Bahnhofs::iterator itBahnhof(_bahnhofs.find(operatorCode));
 					if(itBahnhof == _bahnhofs.end())
 					{
+						string warnString = "Bahnhof " + operatorCode + " referenced in BAHNHOF file but not declared in KOORD file";
+						_logWarning(warnString);
 						continue;
 					}
 					
@@ -504,6 +508,8 @@ namespace synthese
 					Bahnhofs::iterator itBahnhof(_bahnhofs.find(stopCode));
 					if(itBahnhof == _bahnhofs.end())
 					{
+						string warnString = "Bahnhof " + stopCode + " referenced in UMSTEIBG file but not declared in KOORD file";
+						_logWarning(warnString);
 						continue;
 					}
 
@@ -541,6 +547,8 @@ namespace synthese
 					}
 					catch(bad_lexical_cast&)
 					{
+						string warnString = "Cannot parse this line in UMSTEIGZ file : " + _line;
+						_logWarning(warnString);
 					}
 				}
 			}
@@ -565,6 +573,8 @@ namespace synthese
 						}
 						catch(bad_lexical_cast&)
 						{
+							string warnString = "Cannot parse this line in METABHF file : " + _line;
+							_logWarning(warnString);
 						}
 					}
 					else // Stop area mapping
@@ -695,6 +705,8 @@ namespace synthese
 							}
 							if(!hasDeparture || !hasArrival)
 							{
+								string warnString = "Zug " + itZug->number + "/" + itZug->lineNumber + " has no departure nor arrival";
+								_logWarning(warnString);
 								_zugs.pop_back();
 								itZug = _zugs.end();
 							}
@@ -1151,6 +1163,10 @@ namespace synthese
 					citiesByName.insert(make_pair(city->getName(), city.get()));
 				}
 
+				stringstream logStream;
+				logStream << "Parsed " << _bahnhofs.size() << " bahnhofs";
+				_logInfo(logStream.str());
+
 				// Stop areas
 				BOOST_FOREACH(const Bahnhofs::value_type& itBahnhof, _bahnhofs)
 				{
@@ -1160,6 +1176,8 @@ namespace synthese
 					// Avoid unused stops
 					if(!bahnhof.used)
 					{
+						string infoString = "Bahnhof " + bahnhof.operatorCode + " is unused, do not import";
+						_logInfo(infoString);
 						continue;
 					}
 
@@ -1424,6 +1442,11 @@ namespace synthese
 			// Services
 			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(dataSource, _env);
 			ImportableTableSync::ObjectBySource<RollingStockTableSync> transportModes(dataSource, _env);
+
+			stringstream logStream;
+			logStream << "Parsed " << _zugs.size() << " zugs";
+			_logInfo(logStream.str());
+
 			BOOST_FOREACH(const Zug& zug, _zugs)
 			{
 				// Line
@@ -1440,6 +1463,9 @@ namespace synthese
 				);
 				if(!line)
 				{
+					logStream.str("");
+					logStream << "Failed to create or update line for zug #" << zug.lineNumber;
+					_logError(logStream.str());
 					continue;
 				}
 
@@ -1671,6 +1697,8 @@ namespace synthese
 			// No filter = import nothing
 			if(_linesFilter.empty())
 			{
+				string errorString = "Line filter is empty";
+				_logError(errorString);
 				return NULL;
 			}
 
@@ -1698,6 +1726,9 @@ namespace synthese
 					return &item.second;
 				}
 			}
+
+			string infoString = "Zug " + lineNumber + " does not match line filters";
+			_logInfo(infoString);
 
 			return NULL;
 		}

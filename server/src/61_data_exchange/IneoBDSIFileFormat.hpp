@@ -104,6 +104,9 @@ namespace synthese
 				static const std::string PARAMETER_HANDICAPPED_FORBIDDEN_USE_RULE;
 				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
 				static const std::string PARAMETER_NEUTRALIZED;
+				static const std::string PARAMETER_AUTO_CREATE_STOPS;
+				static const std::string PARAMETER_DEFAULT_CITY_ID;
+				static const std::string PARAMETER_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_NON_COMMERCIAL;
 				static const std::string PARAMETER_READ_DEST_SMS;
 				static const std::string PARAMETER_OVERLOAD_LINES;
@@ -128,6 +131,9 @@ namespace synthese
 				util::RegistryKeyType _handicappedForbiddenPTUseRuleId;
 				util::RegistryKeyType _handicappedPTAllowedUseRuleId;
 				bool _neutralized;
+				bool _autoCreateStops;
+				boost::shared_ptr<const geography::City> _defaultCity;
+				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
 				bool _nonCommercial;
 				bool _readDestSMS;
 				std::string _strOverloadLines;
@@ -212,6 +218,7 @@ namespace synthese
 					boost::posix_time::time_duration hta;
 					boost::posix_time::time_duration hrd;
 					boost::posix_time::time_duration hra;
+					std::string arretchn;
 				};
 
 
@@ -321,6 +328,10 @@ namespace synthese
 				) const;
 				const boost::posix_time::time_duration& getHysteresis() const { return _hysteresis; }
 
+				db::DBTransaction saveNow(
+					bool saveStops = false
+				) const;
+
 
 			protected:
 				//////////////////////////////////////////////////////////////////////////
@@ -347,7 +358,6 @@ namespace synthese
 				);
 
 
-				db::DBTransaction saveNow() const;
 				virtual db::DBTransaction _save() const;
 
 

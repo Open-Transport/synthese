@@ -2651,6 +2651,7 @@ namespace synthese
 				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.get<DisplayTypePtr>()->get<MaxStopsNumber>());
 			}
 			pm.insert(DATA_DISPLAY_TEAM, screen.get<DisplayTeam>());
+			pm.insert(DATA_IS_REAL_TIME, row.first.getRTData());
 			if(row.first.getService())
 			{
 				static_cast<const StopPoint*>(row.first.getDepartureEdge()->getFromVertex())->getConnectionPlace()->toParametersMap(pm, true);

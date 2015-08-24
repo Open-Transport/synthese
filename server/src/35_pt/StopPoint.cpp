@@ -80,7 +80,8 @@ namespace synthese
 			boost::shared_ptr<Point> geometry,
 			bool withIndexation
 		):	Registrable(id),
-			Vertex(place, geometry, withIndexation)
+			Vertex(place, geometry, withIndexation),
+			_name(name)
 		{
 		}
 

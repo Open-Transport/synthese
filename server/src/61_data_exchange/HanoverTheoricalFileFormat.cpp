@@ -690,7 +690,7 @@ namespace synthese
 					MetricOffset nextOffset(0);
 					BOOST_FOREACH(const Link& link, run.second.route->links)
 					{
-						bool isDeparture = (rank+1 < run.second.route->links.size() + 1);
+						bool isDeparture = (rank < run.second.route->links.size());
 						bool isArrival = rank > 0;
 						sps.insert(link.stops.front().syntheseStop);
 						JourneyPattern::StopWithDepartureArrivalAuthorization stop(
@@ -706,10 +706,10 @@ namespace synthese
 						sps.clear();
 
 						// Only for last link, get the second stop point of the link too
-						if(rank +1 == run.second.route->links.size())
+						if(rank + 1 == run.second.route->links.size())
 						{
-							isDeparture = (rank+1 < run.second.route->links.size() + 1);
-							isArrival = rank > 0;
+							isDeparture = false;//last stop is never departure
+							isArrival = true;//last stop is always arrival
 							sps.insert(link.stops.back().syntheseStop);
 							JourneyPattern::StopWithDepartureArrivalAuthorization stop(
 								sps,

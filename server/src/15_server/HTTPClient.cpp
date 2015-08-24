@@ -77,7 +77,7 @@
 // Connect Timeout in seconds after which we cancel the HTTP request
 #define CLIENT_CONNECT_TIMEOUT_S 15
 // Read Timeout in seconds after which we cancel the HTTP request
-#define CLIENT_READ_TIMEOUT_S 15
+#define CLIENT_READ_TIMEOUT_S 300
 
 using boost::asio::deadline_timer;
 using boost::asio::ip::tcp;

@@ -176,11 +176,15 @@ namespace synthese
 							{
 								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
 								const StopArea* destination = journeyPattern->getDestination()->getConnectionPlace();
-								if (destination->getKey() == it.second->getConnectionPlace()->getKey())
-								{
+								// Filter if last stop area is equal to current stop area AND
+								// journey pattern is NOT a circular line (ie current stop is departure and jp has more than 2 stops)
+								if (destination->getKey() == it.second->getConnectionPlace()->getKey() &&
+									!(servicePointer.getDepartureEdge()->getRankInPath() == 0 && journeyPattern->getEdges().size() > 2)
+								) {
 									continue;
 								}
-								
+
+								// Filter on first physical stop if the 2 first stops are in the same stop area (jp starts with about-turn)
 								if (journeyPattern->getEdges().size() >= 2 &&
 									(journeyPattern->getEdge(0))->getFromVertex() && (journeyPattern->getEdge(0))->getFromVertex()->getHub() &&
 									it.second->getKey() == (journeyPattern->getEdge(0))->getFromVertex()->getKey() &&
@@ -189,7 +193,8 @@ namespace synthese
 								{
 									continue;
 								}
-								
+
+								// filter on first physical stop if 2 consecutive stops are in the same stop area (jp makes about-turn)
 								if (servicePointer.getDepartureEdge()->getRankInPath() < journeyPattern->getEdges().size() - 2 &&
 									servicePointer.getDepartureEdge()->getFromVertex()->getHub() && journeyPattern->getEdge(servicePointer.getDepartureEdge()->getRankInPath() + 1)->getFromVertex()->getHub() &&
 									servicePointer.getDepartureEdge()->getFromVertex()->getHub() == journeyPattern->getEdge(servicePointer.getDepartureEdge()->getRankInPath() + 1)->getFromVertex()->getHub())
