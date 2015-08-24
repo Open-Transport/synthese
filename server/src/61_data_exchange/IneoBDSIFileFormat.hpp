@@ -328,7 +328,7 @@ namespace synthese
 				) const;
 				const boost::posix_time::time_duration& getHysteresis() const { return _hysteresis; }
 
-				db::DBTransaction saveNow(
+				db::DBTransaction _saveNow(
 					bool saveStops = false
 				) const;
 
