@@ -23,8 +23,8 @@
   <@folder_data_id=<?if&cond=<@folder_id@>&then=data-id="<@folder_id@>"?>@>
   <div class="span9">
     <div class="form-search well well-small">
-      <input type="text" name="file_search" value="<@file_search@>" placeholder="Nom du fichier">
-      <button id="search-button" class="btn btn-primary holder-folder-id" <@folder_data_id@> data-file-action="reloadFilesList">Rechercher</button>
+      <input type="text" name="file_search" value="<@file_search@>" class="holder-folder-id" <@folder_data_id@> placeholder="Nom du fichier">
+      <button id="search-button" type="button" class="btn btn-primary holder-folder-id" <@folder_data_id@> data-file-action="reloadFilesList">Rechercher</button>
       <div id="view-mode" data-active-mode="<@view_mode?1:0@>" class="btn-group btn-group-xs pull-right" data-toggle="buttons-radio">
         <button type="button" class="btn btn-primary holder-folder-id view-mode-button<@view_mode?"":" active"@>" data-mode="0" <@folder_data_id@> data-file-action="reloadFilesList">
           <i class="icon-th-large icon-white"></i>
@@ -47,8 +47,9 @@
     </div>
   </div>
   <script>
-    function changeListFiles() {
+    function changeListFiles(event, item) {
       var elem = $(this);
+      if (typeof item != 'undefined') { elem = item; };
       if (elem.attr('data-id')) {
         // Copy folder id to live action buttons
         $('.holder-folder-id').attr('data-id', elem.attr('data-id'));
@@ -126,6 +127,10 @@
         $('#view-mode').attr('data-active-mode', $(this).attr('data-mode'));
       });
       $('[data-file-action="reloadFilesList"]').click(changeListFiles);
+      $('[name="file_search"]').keypress(function(event) {
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if (keycode == '13') { changeListFiles(event, $(this)); };
+      });
 <?if&cond=<@admin_mediatheque@>&then=
       $('#search-button').trigger('click');
 &else=
