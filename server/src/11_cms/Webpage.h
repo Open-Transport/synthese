@@ -166,6 +166,8 @@ namespace synthese
 
 			Webpage(util::RegistryKeyType id = 0);
 
+			~Webpage();
+
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////

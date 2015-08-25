@@ -94,6 +94,15 @@ namespace synthese
 		{
 		}
 
+		Webpage::~Webpage()
+		{
+			// Unlink children before delete
+			BOOST_FOREACH(const ChildrenType::value_type& page, getChildren())
+			{
+				page.second->unlink();
+			}
+		}
+
 
 
 		bool Webpage::mustBeDisplayed( boost::posix_time::ptime now /*= boost::posix_time::second_clock::local_time()*/ ) const
