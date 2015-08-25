@@ -1,0 +1,1832 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!--III.2 Formatage des requêtes et réponses-->
+	<xs:complexType name="Request">
+		<xs:sequence>
+			<xs:element name="ID" type="RequestIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Identifiant unique de la requête</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RequestTimeStamp" type="DateTime">
+				<xs:annotation>
+					<xs:documentation>Horodatage de la demande</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RequestorRef" type="RequestorRefType">
+				<xs:annotation>
+					<xs:documentation>Elément permettant d’identifier le demandeur de manière unique</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Response">
+		<xs:sequence>
+			<xs:element name="ID" type="ResponseIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Identifiant unique de la réponse</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RequestID" type="RequestIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Identifiant unique de la requête</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ResponseTimeStamp" type="DateTime">
+				<xs:annotation>
+					<xs:documentation>Horodatage de la demande</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ReponseRef" type="ResponseRefType">
+				<xs:annotation>
+					<xs:documentation>Elément permettant d’identifier le fournisseur de la réponse de manière unique</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="ErrorTypeEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ProtocolError"/>
+			<xs:enumeration value="ApplicationError"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ErrorIDEnum">
+		<xs:restriction base="xs:integer">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Syntaxe incorrecte</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Dépassement de quota</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>SAETR indisponible</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10">
+				<xs:annotation>
+					<xs:documentation>Borne inconnue</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="11">
+				<xs:annotation>
+					<xs:documentation>Ligne inconnue</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="12">
+				<xs:annotation>
+					<xs:documentation>Conducteur inconnu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="13">
+				<xs:annotation>
+					<xs:documentation>Service voiture inconnu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="14">
+				<xs:annotation>
+					<xs:documentation>Voiture inconnue</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="15">
+				<xs:annotation>
+					<xs:documentation>Véhicule inconnu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="16">
+				<xs:annotation>
+					<xs:documentation>Arrêt inconnu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="17">
+				<xs:annotation>
+					<xs:documentation>Groupe inconnu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="18">
+				<xs:annotation>
+					<xs:documentation>Chainage inconnu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="19">
+				<xs:annotation>
+					<xs:documentation>Ecran inconnu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="20">
+				<xs:annotation>
+					<xs:documentation>Programmation inconnue</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="21">
+				<xs:annotation>
+					<xs:documentation>Programmation périmée</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="22">
+				<xs:annotation>
+					<xs:documentation>Programmation impossible (priorité)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="23">
+				<xs:annotation>
+					<xs:documentation>Programmation impossible (collision)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="24">
+				<xs:annotation>
+					<xs:documentation>Message inconnu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="25">
+				<xs:annotation>
+					<xs:documentation>Message vide</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="26">
+				<xs:annotation>
+					<xs:documentation>Etat borne inconnu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="27">
+				<xs:annotation>
+					<xs:documentation>Véhicule pas en service</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="28">
+				<xs:annotation>
+					<xs:documentation>Valeur associée à la balise (balise) hors limites</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="29">
+				<xs:annotation>
+					<xs:documentation>Caractère(s) interdit(s) dans la valeur associée à la balise (balise)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="30">
+				<xs:annotation>
+					<xs:documentation>Trop de messages commerciaux pour une borne</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="99">
+				<xs:annotation>
+					<xs:documentation>Erreur non documentée</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--IV.2 Messages-->
+	<xs:element name="CheckStatusRequest" type="Request">
+		<xs:annotation>
+			<xs:documentation source="IV.2.1">Demande de l’état de Terminus</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="CheckStatusResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.2">Réponse à la demande de l’état</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:sequence minOccurs="0">
+						<xs:element name="ErrorType" type="ErrorTypeEnum">
+							<xs:annotation>
+								<xs:documentation>Type d'erreur</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="ErrorMessage" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Message de description de l’erreur</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="ErrorID" type="ErrorIDEnum">
+							<xs:annotation>
+								<xs:documentation>Code d'erreur</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TerminalGetStatesRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.3">Demande de l’état de toutes les bornes</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="TerminalGetStatesResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.4">Etat de toutes les bornes</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:element name="States" type="TerminalStateListStructure">
+							<xs:annotation>
+								<xs:documentation>Liste des états des bornes</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TerminalVisualiseRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.7">Demande de visualisation de l'état d'une borne</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Biv" type="BivIdentifierType">
+							<xs:annotation>
+								<xs:documentation>Identifiant de la borne</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TerminalVisualiseResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.8">Visualisation de l'état d'une borne</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Visualisation" type="TerminalVisualisationStructure">
+								<xs:annotation>
+									<xs:documentation>Visualisation d’une borne</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DriverCreateMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.9">Demande de création d’une messagerie conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="DriverMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie à créer</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DriverCreateMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="DriverMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie créée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DriverDeleteMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="DriverMessagingStructure"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DriverDeleteMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="DriverMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie supprimée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DriverGetStatesRequest" type="Request">
+		<xs:annotation>
+			<xs:documentation source="IV.2.13">Demande de l’état des messageries conducteur</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="DriverGetStatesResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.14">Etat des messageries conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="MessagingStates" type="DriverMessagingStateListStructure">
+								<xs:annotation>
+									<xs:documentation>Liste des messageries conducteur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PassengerCreateMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.15">Demande de création d’une messagerie passager</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="PassengerMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie à créer</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PassengerCreateMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie passager</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="PassengerMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie créée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PassengerDeleteMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie passager</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="PassengerMessagingStructure"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PassengerDeleteMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie passager</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="PassengerMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie supprimée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PassengerGetStatesRequest" type="Request">
+		<xs:annotation>
+			<xs:documentation source="IV.2.13">Demande de l’état des messageries passager</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="PassengerGetStatesResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.14">Etat des messageries passager</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="MessagingStates" type="PassengerMessagingStateListStructure">
+								<xs:annotation>
+									<xs:documentation>Liste des messageries passager</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PpdsCreateMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.15">Demande de création d’une messagerie de prise de service</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="PpdsMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie à créer</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PpdsCreateMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie de prise de service</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="PpdsMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie créée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PpdsDeleteMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie de prise de service</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="PpdsMessagingStructure"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PpdsDeleteMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie de prise de service</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="PpdsMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie supprimée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PpdsGetStatesRequest" type="Request">
+		<xs:annotation>
+			<xs:documentation source="IV.2.13">Demande de l’état des messageries de prise de service</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="PpdsGetStatesResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.14">Etat des messageries de prise de service</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="MessagingStates" type="PpdsMessagingStateListStructure">
+								<xs:annotation>
+									<xs:documentation>Liste des messageries de prise de service</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivGeneralCreateMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.15">Demande de création d’une messagerie commerciale</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="BivGeneralMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie à créer</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivGeneralCreateMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie commerciale</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="BivGeneralMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie créée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivGeneralDeleteMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie commerciale</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="BivGeneralMessagingStructure"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivGeneralDeleteMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie commerciale</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="BivGeneralMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie supprimée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivGeneralGetStatesRequest" type="Request">
+		<xs:annotation>
+			<xs:documentation source="IV.2.13">Demande de l’état des messageries commerciale</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="BivGeneralGetStatesResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.14">Etat des messageries commerciales</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="MessagingStates" type="BivGeneralMessagingStateListStructure">
+								<xs:annotation>
+									<xs:documentation>Liste des messageries de prise de service</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivLineManCreateMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.15">Demande de création d’une messagerie ligne manuelle</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="BivLineManMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie à créer</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivLineManCreateMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie ligne manuelle</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="BivLineManMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie créée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivLineManDeleteMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie ligne manuelle</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="BivLineManMessagingStructure"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivLineManDeleteMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie ligne manuelle</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="BivLineManMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie supprimée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivLineManGetStatesRequest" type="Request">
+		<xs:annotation>
+			<xs:documentation source="IV.2.13">Demande de l’état des messageries ligne manuelle</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="BivLineManGetStatesResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.14">Etat des messageries ligne manuelle</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="MessagingStates" type="BivLineManMessagingStateListStructure">
+								<xs:annotation>
+									<xs:documentation>Liste des messageries de prise de service</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<!--IV.3 Types complexes-->
+	<xs:complexType name="TerminalStateListStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.1">Structure pour la liste d’états des bornes</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="State" type="TerminalStateStructure" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Etat d’une borne</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TerminalStateStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.2">Structure contenant l’état d’une borne</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Biv" type="BivIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Identifiant unique de la borne</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Name" type="TerminalNameType">
+				<xs:annotation>
+					<xs:documentation>Nom de la borne</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="LineCount">
+				<xs:annotation>
+					<xs:documentation>Nombre de lignes de la borne</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Type" type="TerminalType">
+				<xs:annotation>
+					<xs:documentation>Type de la borne</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="State" type="TerminalStateEnum">
+				<xs:annotation>
+					<xs:documentation>Etat de fonctionnement de la borne</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="HeartbeatResponse" type="Boolean">
+				<xs:annotation>
+					<xs:documentation>Indique si la borne répond au message de vie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TerminalVisualisationStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.3">Structure contenant la visualisation d’une borne</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Biv" type="BivIdentifierType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.3">Identifiant unique de la borne</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Name" type="TerminalNameType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.3">Nom de la borne</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="LineCount" type="xs:positiveInteger">
+				<xs:annotation>
+					<xs:documentation source="IV.3.3">Nombre de lignes écran de la borne</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="LineList" type="LineListType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.3">Liste des lignes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DriverMessagingStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.4">Structure de la messagerie conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="MessageNameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation source="IV.3.4">Nom du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Dispatching" type="DriverDispatchingTypeEnum">
+				<xs:annotation>
+					<xs:documentation source="IV.3.4">Type de diffusion</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DriverMessagingRecipientEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.3.5">Destinataires du message conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="AllNetwork" type="EmptyType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.5">Tout le réseau</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CarServices" type="CarServiceListType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.5">Liste de services voitures</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Drivers" type="DriverListType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.5">Liste de conducteurs
+
+Règle métier :
+ - ne peut être utilisé que lorsque DriverMessagingStructure.Dispatching = Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Lines" type="LineListType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.5">Liste de lignes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Vehicules" type="VehiculeListType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.5">Liste de véhicules</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="CarServiceListType">
+		<xs:annotation>
+			<xs:documentation source="IV.3.6">Liste de services voiture</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="CarService" type="CarServiceIdentifierType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation source="IV.3.6">Identifiant unique du service voiture</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LineListType">
+		<xs:annotation>
+			<xs:documentation source="IV.3.7">Liste de lignes</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Line" type="LineIdentifierType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation source="IV.3.7">Identifiant de la ligne (Nom commercial de la ligne)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DriverListType">
+		<xs:annotation>
+			<xs:documentation source="IV.3.8">Liste de conducteurs</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Driver" type="DriverIdentifierType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation source="IV.3.8">Identifiant du conducteur</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="VehiculeListType">
+		<xs:annotation>
+			<xs:documentation source="IV.3.9">Liste de véhicules</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Vehicule" type="VehiculeIdentifierType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation source="IV.3.9">Identifiant unique du véhicule</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DriverMessagingStateListStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.10">Structure pour la liste d’états des messageries conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MessagingState" type="DriverMessagingStateStructure" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation source="IV.3.10">Etat d’une messagerie conducteur</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DriverMessagingStateStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.11">Structure d’état d’une messagerie conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Messaging" type="DriverMessagingStructure">
+				<xs:annotation>
+					<xs:documentation source="IV.3.11">Description de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsActive" type="Boolean">
+				<xs:annotation>
+					<xs:documentation source="IV.3.11">Etat de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PassengerMessagingStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.12">Structure d’une messagerie passager</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="MessageNameType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.12">Nom du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Dispatching" type="PassengerDispatchingTypeEnum">
+				<xs:annotation>
+					<xs:documentation source="IV.3.12">Type de diffusion</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StartDate" type="Date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation source="IV.3.12">Date de début</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopDate" type="Date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation source="IV.3.12">Date de fin</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StartTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation source="IV.3.12">Heure de début</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation source="IV.3.12">Heure de fin</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PassengerMessagingStateListStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.14">Structure pour la liste d’états des messageries passager</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MessagingState" type="PassengerMessaginsStateStructure" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation source="IV.3.14">Etat d’une messagerie passager</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PassengerMessaginsStateStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.15">Structure d’état d’une messagerie passager</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Messaging" type="PassengerMessagingStructure">
+				<xs:annotation>
+					<xs:documentation source="IV.3.15">Description de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsActive" type="Boolean">
+				<xs:annotation>
+					<xs:documentation source="IV.3.15">Etat de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PpdsMessagingStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.16">Structure d’une messagerie de prise de service</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="MessageNameType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.16">Nom du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StartDate" type="Date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation source="IV.3.16">Date de début
+
+Règle métier T2C :
+ - doit être la journée d'expolitation courante</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopDate" type="Date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation source="IV.3.16">Date de fin
+
+Règle métier T2C :
+ - doit être la journée d'expolitation courante</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StartTime" type="Time" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation source="IV.3.16">Heure de début
+
+Règle métier T2C :
+ - doit être l'heure de début d'exploitation</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopTime" type="Time" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation source="IV.3.16">Heure de fin
+
+Règle métier T2C :
+ - doit être l'heure de fin d'exploitation</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Text" type="PpdsMessageTextType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.16">Texte du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Recipients" type="PpdsMessagingRecipientEnum">
+				<xs:annotation>
+					<xs:documentation source="IV.3.16">Type et liste des destinataires</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PpdsMessagingRecipientEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.3.17">Destinataires d’une messagerie PPDS</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="PpdsMessagingStateListStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.20">Structure pour la liste d’états des messageries de prise de service</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MessagingState" type="PpdsMessagingStateStructure">
+				<xs:annotation>
+					<xs:documentation source="IV.3.20">Etat d’une messagerie de prise de service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PpdsMessagingStateStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.21">Structure d’état d’une messagerie de prise de service</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Messaging" type="PpdsMessagingStructure">
+				<xs:annotation>
+					<xs:documentation source="IV.3.21">Description de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsActive" type="Boolean">
+				<xs:annotation>
+					<xs:documentation source="IV.3.21">Etat de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivGeneralMessagingStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.39">Structure d’une messagerie commerciale</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="MessageNameType">
+				<xs:annotation>
+					<xs:documentation>Nom du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StartDate" type="Date">
+				<xs:annotation>
+					<xs:documentation>Date de début</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopDate" type="Date">
+				<xs:annotation>
+					<xs:documentation>Date de fin</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivGeneralMessagingRecipientEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.3.35">Destinataires d’une messagerie sonore arrêt</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="BivGeneralMessagingStateListStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.47">Structure pour la liste d’états des messageries commerciales</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MessagingState" type="BivGeneralMessagingStateStructure" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Etat d’une messagerie commerciale</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivGeneralMessagingStateStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.48">Structure d’état d’une messagerie commerciale</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Messaging" type="BivGeneralMessagingStructure">
+				<xs:annotation>
+					<xs:documentation>Description de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsActive" type="Boolean">
+				<xs:annotation>
+					<xs:documentation>Etat de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivLineManMessagingStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.49">Structure du message ligne manuel</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="MessageNameType">
+				<xs:annotation>
+					<xs:documentation>Nom du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivLineManMessagingRecipientEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.3.50">Destinataires d’une messagerie ligne manuelle</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="Line" type="LineIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Ligne</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Bivs" type="BivListType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Liste de bornes de la ligne</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="BivLineManMessagingStateListStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.51">Structure pour la liste d’états des messageries ligne manuelles</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MessagingState" type="BivLineManMessagingStateStructure" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Etat d’une messagerie sonore arrêt</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivLineManMessagingStateStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.48">Structure d’état d’une messagerie commerciale</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Messaging" type="BivLineManMessagingStructure">
+				<xs:annotation>
+					<xs:documentation>Description de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsActive" type="Boolean">
+				<xs:annotation>
+					<xs:documentation>Etat de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivListType">
+		<xs:annotation>
+			<xs:documentation source="IV.3.43">Liste de bornes</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Biv" type="BivIdentifierType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Identifiant de la borne (Numéro)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!--IV.4 Types simples-->
+	<xs:simpleType name="EmptyType">
+		<xs:annotation>
+			<xs:documentation>Valeur obligatoirement vide</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Boolean">
+		<xs:annotation>
+			<xs:documentation source="IV.4.1">Boolean : « oui » ou « non »</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="3"/>
+			<xs:enumeration value="oui"/>
+			<xs:enumeration value="non"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Date">
+		<xs:annotation>
+			<xs:documentation source="IV.4.2">Date au format « JJ/MM/AAAA »
+
+Règle métier :
+ - Dans le cas de la programmation d’une messagerie, la date correspond à la journée d’exploitation</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="10"/>
+			<xs:pattern value="^(0[1-9]|[1-2][0-9]|3[0-1])/(0[1-9]|1[0-2])/20(3[0-7]|[1-2][0-9])$"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Time">
+		<xs:annotation>
+			<xs:documentation source="IV.4.3">Heure au format « HH:MM:SS »
+
+Règle métier :
+ - Dans le cas de la programmation d’une messagerie, l’heure peut varier dans une plage 00 :00 :00 à 35 :59 :59</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="8"/>
+			<xs:pattern value="^(3[0-5]|[0-2][0-9]):[0-5][0-9]:[0-5][0-9]$"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DateTime">
+		<xs:annotation>
+			<xs:documentation source="IV.4.4">Date et Heure au format «JJ/MM/AAAA HH:MM:SS»</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="^(0[1-9]|[1-2][0-9]|3[0-1])/(0[1-9]|1[0-2])/20(3[0-7]|[1-2][0-9]) (2[0-3]|[0-1][0-9]):[0-5][0-9]:[0-5][0-9]$"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="RequestIdentifierType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.5">Identifiant d’une requête</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="1"/>
+			<xs:maxInclusive value="65535"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="RequestorRefType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.6">Identifiant de l’expéditeur d’une requête</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Terminus"/>
+			<xs:enumeration value="SAE"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ResponseIdentifierType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.7">Identifiant d’une réponse
+
+Règle métier :
+ - La valeur 0 n’est utilisée que dans le cas d’une erreur de protocole ne permettant pas de déterminer l’identifiant de la requête</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="65535"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ResponseRefType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.8">Identifiant de l’expéditeur d’une réponse</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Terminus"/>
+			<xs:enumeration value="SAE"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="BivIdentifierType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.9">Identifiant unique d’une borne
+
+Règle métier :
+ - 0 = toutes les bornes
+ - 1..2048 = une borne</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="2048"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="LineIdentifierType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.10">Type pour l'identifiant unique d'une ligne</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DriverIdentifierType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.11">Type pour l'identifiant unique d'un conducteur (matricule de l’agent)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="6"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="VehiculeIdentifierType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.12">Type pour l'identifiant numéro de parc d'un véhicule</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="5"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CarServiceIdentifierType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.13">Type pour l'identifiant d'un SV</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="6"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="StopPointIdentifierType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.15">Type pour l'identifiant unique d'un arrêt</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="8"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TerminalNameType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.19">Type pour le nom d’une borne</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="16"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TerminalType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.20">Enumération des types de borne</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="TerminalStateEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.4.21">Enumération des états d’une borne</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="OutOfOrder">
+				<xs:annotation>
+					<xs:documentation source="IV.4.21">La borne est hors service</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TimetablesAndCommercialMessaging">
+				<xs:annotation>
+					<xs:documentation source="IV.4.21">La borne affiche les informations d’horaires et les messages commerciaux</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MessageNameType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.22">Type pour le nom d’un message
+
+Remarque
+ - Dans le cas d’un message défini dans Terminus, le nom commence par un numéro sur 4 chiffres suivi d’un caractère espace. Ce numéro doit être unique.
+ - Dans le cas d’un message défini dans le SAE, le nom n’est pas numéroté mais il est unique pour chaque type de message.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="6"/>
+			<xs:maxLength value="32"/>
+			<xs:pattern value="^\S(.*)\S$"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DriverDispatchingTypeEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.4.23">Enumération des types de diffusion d’une messagerie conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Immediat">
+				<xs:annotation>
+					<xs:documentation source="IV.4.23">Envoi immédiat</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Differe">
+				<xs:annotation>
+					<xs:documentation source="IV.4.23">Envoi différé</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Repete">
+				<xs:annotation>
+					<xs:documentation source="IV.4.23">Envoi différé avec répétition</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PassengerDispatchingTypeEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.4.24">Enumération des types de diffusion d’une messagerie passager</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Differe">
+				<xs:annotation>
+					<xs:documentation source="IV.4.24">Envoi programmé</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Repete">
+				<xs:annotation>
+					<xs:documentation source="IV.4.24">Envoi programmé avec répétition</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="DriverMessageTextType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.25">Texte du message conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Line" maxOccurs="3">
+				<xs:annotation>
+					<xs:documentation source="IV.4.25">Ligne du texte d’un message</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="27"/>
+						<xs:minLength value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PassengerMessageTextType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.26">Texte du message passager</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Line" maxOccurs="4">
+				<xs:annotation>
+					<xs:documentation source="IV.4.26">Ligne du texte d’un message</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="0"/>
+						<xs:maxLength value="25"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PpdsMessageTextType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.28">Texte du message prise de service</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Line" type="xs:string" nillable="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation source="IV.4.28">Texte d’un message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivGeneralMessageFixedTextType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.32">Texte fixe du message commercial</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Line" type="xs:string" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivLineMessageTextType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.35">Texte du message ligne</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+</xs:schema>
