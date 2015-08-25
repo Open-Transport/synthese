@@ -1481,4 +1481,9 @@ namespace synthese
 		) {
 			_sscenario = sscenario;
 		}
+
+		void ScenarioSaveAction::setCreation(bool creation)
+		{
+			_creation = creation;
+		}
 }	}

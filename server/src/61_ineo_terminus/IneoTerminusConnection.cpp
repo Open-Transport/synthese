@@ -1643,6 +1643,7 @@ namespace synthese
 						sscenario->set<Name>(messages[0].name);
 
 						scenario = static_pointer_cast<Scenario, SentScenario>(sscenario);
+						scenarioSaveAction.setCreation(true);
 						scenarioSaveAction.setSScenario(sscenario);
 						scenarioSaveAction.setScenario(scenario);
 						Request fakeRequest;

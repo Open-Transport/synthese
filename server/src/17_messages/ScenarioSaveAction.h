@@ -213,6 +213,9 @@ namespace synthese
 			void setSScenario(
 				boost::shared_ptr<SentScenario> sscenario
 			);
+			void setCreation(
+				bool creation
+			);
 		};
 	}
 }

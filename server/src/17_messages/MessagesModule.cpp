@@ -428,14 +428,12 @@ namespace synthese
 			return true;
 		}
 
-
-
 		//////////////////////////////////////////////////////////////////////////
 		/// Updates the activated messages cache
 		void MessagesModule::UpdateActivatedMessages()
 		{
 			// Wait for the availability of the cache
-			mutex::scoped_lock(_activatedMessagesMutex);
+			mutex::scoped_lock lock(_activatedMessagesMutex);
 
 			// Duplicate the cache to run unactivation triggers
 			ActivatedMessages unactivatedMessages(_activatedMessages);
@@ -450,25 +448,21 @@ namespace synthese
 				const Alarm::Registry::Vector::value_type& message,
 				messagesToUpdate
 			){
-				boost::shared_ptr<Alarm> sentMessage(
-					dynamic_pointer_cast<Alarm, Alarm>(message)
-				);
-
 				// Remove the message as unactivated one
-				unactivatedMessages.erase(sentMessage);
+				unactivatedMessages.erase(message);
 
 				// Check if the message was already activated
-				if(_activatedMessages.find(sentMessage) == _activatedMessages.end())
+				if(_activatedMessages.find(message) == _activatedMessages.end())
 				{
 					// Record the message as activated
-					_activatedMessages.insert(sentMessage);
+					_activatedMessages.insert(message);
 
 					// Run the display start trigger on each broadcast point
 					BOOST_FOREACH(
 						const BroadcastPoint::BroadcastPoints::value_type& bp,
 						BroadcastPoint::GetBroadcastPoints()
 					){
-						bp->onDisplayStart(*sentMessage);
+						bp->onDisplayStart(*message);
 					}
 				}
 			}
@@ -571,7 +565,7 @@ namespace synthese
 			const util::ParametersMap& parameters
 		){
 			// Wait for the availability of the cache
-			mutex::scoped_lock(_activatedMessagesMutex);
+			mutex::scoped_lock lock(_activatedMessagesMutex);
 
 			// Initialisation of the result
 			ActivatedMessages result;
@@ -633,10 +627,12 @@ namespace synthese
 			{
 				return left->getLevel() > right->getLevel();
 			}
-			const SentScenario* leftScenario =
-				dynamic_cast<const SentScenario*>(left->getScenario());
-			const SentScenario* rightScenario = 
-				dynamic_cast<const SentScenario*>(right->getScenario());
+
+			const Scenario* leftGenericScenario = left->getScenario();
+			const Scenario* rightGenericScenario = right->getScenario();
+			const SentScenario* leftScenario = dynamic_cast<const SentScenario*>(leftGenericScenario);
+			const SentScenario* rightScenario = dynamic_cast<const SentScenario*>(rightGenericScenario);
+
 			if (!leftScenario) return 0;
 			if (!rightScenario) return 0;
 			
