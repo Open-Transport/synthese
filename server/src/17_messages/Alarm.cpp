@@ -339,7 +339,6 @@ namespace synthese
 		}
 
 
-
 		//////////////////////////////////////////////////////////////////////////
 		/// Extracts the linked objects from the cache, for a recipient type only.
 		/// @param recipientKey the factory key of the recipient type
@@ -366,10 +365,12 @@ namespace synthese
 			return it->second;
 		}
 
+
 		bool
 		Alarm::belongsToTemplate() const
 		{
-			return dynamic_cast<const ScenarioTemplate*>(getScenario());
+			const ScenarioTemplate* scenarioTemplate = dynamic_cast<const ScenarioTemplate*>(getScenario());
+			return (NULL != scenarioTemplate);
 		}
 
 
@@ -385,6 +386,9 @@ namespace synthese
 				return false;
 			}
 			const SentScenario* sentScenario = dynamic_cast<const SentScenario*>(getScenario());
+
+			if (NULL == sentScenario) return false;
+
 			if (!sentScenario->getIsEnabled()) return false;
 			
 			// Then check if specific application periods are defined for the current message
@@ -427,6 +431,7 @@ namespace synthese
 				return result;
 			}
 			const SentScenario* sentScenario = dynamic_cast<const SentScenario*>(getScenario());
+			if (NULL == sentScenario) return result;
 			if (!sentScenario->getIsEnabled()) return result;
 
 			// Then check if specific application periods are defined for the current message
@@ -466,6 +471,7 @@ namespace synthese
 				return result;
 			}
 			const SentScenario* sentScenario = dynamic_cast<const SentScenario*>(getScenario());
+			if (NULL == sentScenario) return result;
 			if (!sentScenario->getIsEnabled()) return result;
 
 			// Then check if specific application periods are defined for the current message
@@ -498,7 +504,7 @@ namespace synthese
 		const Scenario*
 		Alarm::getScenario() const
 		{
-			return get<ParentScenario>().get_ptr();
+			return (get<ParentScenario>() ? get<ParentScenario>().get_ptr() : NULL);
 		}
 
 		const ScenarioCalendar*
@@ -562,6 +568,7 @@ namespace synthese
 				get<ParentScenario>()->removeMessage(*this);
 				if (!belongsToTemplate())
 				{
+					setScenario(NULL);
 					MessagesModule::UpdateActivatedMessages();
 				}
 			}
