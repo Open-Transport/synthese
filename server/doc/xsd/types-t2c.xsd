@@ -1,0 +1,775 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:redefine schemaLocation="types-common.xsd">
+		<xs:complexType name="DriverListType">
+			<xs:annotation>
+				<xs:documentation source="IV.3.8">Liste de conducteurs</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:restriction base="DriverListType">
+					<xs:sequence>
+						<xs:element name="Driver" type="DriverIdentifierType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.8">Identifiant du conducteur</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="PassengerMessagingStructure">
+			<xs:annotation>
+				<xs:documentation source="IV.3.12">Structure d’une messagerie passager</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="PassengerMessagingStructure">
+					<xs:sequence>
+						<xs:element name="NumberShow" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Nombre d’affichages
+
+Règle métier :
+ - omis lorsque Dispatching = Differe</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:integer">
+									<xs:minInclusive value="1"/>
+									<xs:maxInclusive value="20"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="RepeatPeriod" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Fréquence d’affichage</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:integer">
+									<xs:minInclusive value="1"/>
+									<xs:maxInclusive value="60"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="TtsBroadcasting" type="Boolean">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Diffusion tts</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Jingle" type="Boolean">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Ajout jingle début fin</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:choice minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Règle métier :
+ - uniquement si le destinataire du message est une unique ligne</xs:documentation>
+							</xs:annotation>
+							<xs:sequence>
+								<xs:element name="StartStopPoint" type="StopPointIdentifierType">
+									<xs:annotation>
+										<xs:documentation source="IV.3.12">Arrêt de début</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="EndStopPoint" type="StopPointIdentifierType">
+									<xs:annotation>
+										<xs:documentation source="IV.3.12">Arrêt de fin</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+							<xs:element name="Chaining" type="ChainingIdentifierType">
+								<xs:annotation>
+									<xs:documentation source="IV.3.12">Chainage</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:choice>
+						<xs:element name="Priority" type="Boolean">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Message prioritaire</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Text" type="PassengerMessageTextType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Texte du message</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Tts" type="PassengerMessageTtsType" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Texte tts du message</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Recipients" type="PassengerMessagingRecipientEnum">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Type et liste des destinataires</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="BivGeneralMessagingRecipientEnum">
+			<xs:annotation>
+				<xs:documentation source="IV.3.42">Destinataires d’une messagerie commerciale</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="BivGeneralMessagingRecipientEnum">
+					<xs:choice>
+						<xs:element name="AllNetwork" type="EmptyType">
+							<xs:annotation>
+								<xs:documentation>Tout le réseau</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="LinesWays" type="LineWayListType">
+							<xs:annotation>
+								<xs:documentation>Liste de lignes sens</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Bivs" type="BivListType">
+							<xs:annotation>
+								<xs:documentation>Liste de bornes</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Groups" type="GroupListType">
+							<xs:annotation>
+								<xs:documentation>Liste des groupes</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="BivGeneralMessagingStructure">
+			<xs:annotation>
+				<xs:documentation source="IV.3.39">Structure d’une messagerie commerciale
+
+Règle métier :
+ - Une borne peut afficher de 0 à 10 messages commerciaux</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="BivGeneralMessagingStructure">
+					<xs:sequence>
+						<xs:element name="Varying" type="Boolean">
+							<xs:annotation>
+								<xs:documentation>Type d’affichage
+
+Interprétation du champ : alterné = « oui » , permanent = « non »</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Duration" type="xs:integer" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Durée d’affichage (sec)
+
+Interprétation du champ : 0=valeur par défaut, 1..99 = durée d’affichage
+
+Règle métier :
+ - omis si l’attribut Varying = « oui »</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Text" type="BivGeneralMessagingTextType" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Textes du message
+
+Règle métier :
+ - Un attribut Text par type de borne.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Recipients" type="BivGeneralMessagingRecipientEnum">
+							<xs:annotation>
+								<xs:documentation>Type et liste des destinataires</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="BivGeneralMessageFixedTextType">
+			<xs:annotation>
+				<xs:documentation source="IV.4.32">Texte fixe du message commercial</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:restriction base="BivGeneralMessageFixedTextType">
+					<xs:sequence>
+						<xs:element name="Line" maxOccurs="8">
+							<xs:annotation>
+								<xs:documentation>Contraintes supplémentaires en fonction de la borne destinataire :
+Type de borne Nb ligne Taille
+ - BUS4L 4 0..24
+ - BUS8L 8 0..24 
+ - ER 8 0..30
+ - TFT 6 0..40
+ - TTS 1 0..200 
+ - TW3L 3 0..30</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="0"/>
+									<xs:maxLength value="200"/>
+									<xs:pattern value="^([^&amp;~#\{\[\|`\\@^°\]\}£$μù§²=_]*)$"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="PpdsMessagingRecipientEnum">
+			<xs:annotation>
+				<xs:documentation source="IV.3.17">Destinataires d’une messagerie PPDS</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="PpdsMessagingRecipientEnum">
+					<xs:choice>
+						<xs:element name="AllNetwork" type="EmptyType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.17">Tout le réseau</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Drivers" type="DriverListType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.17">Liste de conducteurs</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Lines" type="LineListType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.17">Liste de lignes</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Screens" type="ScreenListType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.17">Liste des écrans</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="PpdsMessageTextType">
+			<xs:annotation>
+				<xs:documentation source="IV.4.28">Texte du message prise de service</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:restriction base="PpdsMessageTextType">
+					<xs:sequence>
+						<xs:element name="Line" nillable="0" maxOccurs="2">
+							<xs:annotation>
+								<xs:documentation source="IV.4.28">Texte d’un message</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="0"/>
+									<xs:maxLength value="50"/>
+									<xs:pattern value="^([^&amp;~#{\[\|`\\@^°\]\}£$μù§²=_]*)$"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:simpleType name="DriverDispatchingTypeEnum">
+			<xs:annotation>
+				<xs:documentation source="IV.4.23">Enumération des types de diffusion d’une messagerie conducteur</xs:documentation>
+			</xs:annotation>
+			<xs:restriction base="DriverDispatchingTypeEnum">
+				<xs:enumeration value="Immediat">
+					<xs:annotation>
+						<xs:documentation source="IV.4.23">Envoi immédiat</xs:documentation>
+					</xs:annotation>
+				</xs:enumeration>
+				<xs:enumeration value="Differe">
+					<xs:annotation>
+						<xs:documentation source="IV.4.23">Envoi différé</xs:documentation>
+					</xs:annotation>
+				</xs:enumeration>
+			</xs:restriction>
+		</xs:simpleType>
+		<xs:complexType name="TerminalVisualisationStructure">
+			<xs:annotation>
+				<xs:documentation source="IV.3.3">Structure contenant la visualisation d’une borne</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="TerminalVisualisationStructure">
+					<xs:sequence>
+						<xs:element name="GeneralMessageName" type="MessageNameType" minOccurs="0" maxOccurs="10">
+							<xs:annotation>
+								<xs:documentation source="IV.3.3">Nom du message commercial</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="LineMessageMan" type="BivLineMessageTextType" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation source="IV.3.3">Message ligne manuel
+
+Remarque
+ - Il y a « LineCount » « LineMessageMan » (le contenu associé à l’attribut est vide lorsqu’il n’y a pas de message à afficher).</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="LineMessageTts" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation source="IV.3.3">Message ligne TTS
+
+Remarque :
+ - Il y a « LineCount » « LineMessageTts » (le contenu associé à l’attribut est vide lorsqu’il n’y a pas de message à diffuser)</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="BivLineMessageTextType">
+			<xs:annotation>
+				<xs:documentation>Texte du message ligne</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="BivLineMessageTextType">
+					<xs:sequence>
+						<xs:element name="Line">
+							<xs:annotation>
+								<xs:documentation source="IV.4.35">Texte d’un message</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="1"/>
+									<xs:maxLength value="20"/>
+									<xs:pattern value="^([^&amp;~#\{\[\|`\\@\^°\]\}£$μù§²]*)$"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="BivLineManMessagingStructure">
+			<xs:annotation>
+				<xs:documentation source="IV.3.49">Structure du message ligne manuel.</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="BivLineManMessagingStructure">
+					<xs:sequence>
+						<xs:element name="Tts" type="BivLineManMessageTtsType" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Texte tts du message</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartDate" type="Date">
+							<xs:annotation>
+								<xs:documentation>Date de début</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StopDate" type="Date">
+							<xs:annotation>
+								<xs:documentation>Date de fin</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Text" type="BivLineMessageTextType">
+							<xs:annotation>
+								<xs:documentation>Texte du message</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Recipients" type="BivLineManMessagingRecipientEnum">
+							<xs:annotation>
+								<xs:documentation>Type et liste des destinataires</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:simpleType name="TerminalType">
+			<xs:annotation>
+				<xs:documentation source="IV.4.20">Enumération des types de borne</xs:documentation>
+			</xs:annotation>
+			<xs:restriction base="TerminalType">
+				<xs:enumeration value="BUS">
+					<xs:annotation>
+						<xs:documentation source="IV.4.20">Borne bus</xs:documentation>
+					</xs:annotation>
+				</xs:enumeration>
+				<xs:enumeration value="ER">
+					<xs:annotation>
+						<xs:documentation source="IV.4.20">Borne Er</xs:documentation>
+					</xs:annotation>
+				</xs:enumeration>
+				<xs:enumeration value="TFT">
+					<xs:annotation>
+						<xs:documentation source="IV.4.20">Borne TFT</xs:documentation>
+					</xs:annotation>
+				</xs:enumeration>
+				<xs:enumeration value="TTS">
+					<xs:annotation>
+						<xs:documentation source="IV.4.20">Borne TTS</xs:documentation>
+					</xs:annotation>
+				</xs:enumeration>
+				<xs:enumeration value="TW">
+					<xs:annotation>
+						<xs:documentation source="IV.4.20">Borne tramway</xs:documentation>
+					</xs:annotation>
+				</xs:enumeration>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:redefine>
+	<xs:element name="TerminalChangeStateRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.5">Demande de modification de l'état d'une borne ou de toutes les bornes</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Biv" type="BivIdentifierType">
+							<xs:annotation>
+								<xs:documentation>Identifiant de la borne</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="State" type="TerminalStateEnum">
+							<xs:annotation>
+								<xs:documentation>Etat de la borne</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartTime" type="Time" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Heure de début
+
+Règles métier :
+ - si l’attribut StartTime est omis, l’état sera configuré dès le début d’exploitation
+ - omis si l’attribut Manual = « oui »</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StopTime" type="Time" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Heure de fin
+
+Règles métier :
+ - si l’attribut StopTime est omis, l’état sera configuré jusqu’à la fin d’exploitation
+ - omis Si l’attribut Manual = « oui »</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Manual" type="Boolean">
+							<xs:annotation>
+								<xs:documentation>Gestion manuelle de l’état de la borne</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TerminalChangeStateResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.6">Nouvel état d’une borne ou de toutes les bornes</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Biv" type="BivIdentifierType">
+								<xs:annotation>
+									<xs:documentation>Identifiant de la borne</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="State" type="TerminalStateEnum">
+								<xs:annotation>
+									<xs:documentation>Etat de la borne</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="StartTime" type="Time" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Heure de début
+
+Règles métier :
+ - si l’attribut StartTime est omis, l’état sera configuré dès le début d’exploitation
+ - omis si l’attribut Manual = « oui »</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="StopTime" type="Time" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Heure de fin
+
+Règles métier :
+ - si l’attribut StopTime est omis, l’état sera configuré jusqu’à la fin d’exploitation
+ - omis Si l’attribut Manual = « oui »</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Manual" type="Boolean">
+								<xs:annotation>
+									<xs:documentation>Gestion manuelle de l’état de la borne</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="PassengerMessagingRecipientEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.3.13">Destinataires d’une messagerie passager</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="AllNetwork" type="EmptyType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.13">Tout le réseau</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Lines" type="LineListType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.13">Liste de lignes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Vehicules" type="VehiculeListType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.13">Liste des véhicules</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="BivLineMessageTtsType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.36">Texte tts du message ligne</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Line" maxOccurs="6">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="25"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ScreenListType">
+		<xs:annotation>
+			<xs:documentation source="IV.3.19">Liste des ecrans</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Screen" type="ScreenIdentifierType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation source="IV.3.19">Identifiant unique de l’écran</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivGeneralMessagingTextType">
+		<xs:annotation>
+			<xs:documentation source="IV.3.40">Structure des textes d’une messagerie commerciale</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:annotation>
+				<xs:documentation>Règle métier selon le type de borne :
+Type de borne FixedText ScrollingText TtsText Remarque
+ - BUS4L Oui Non Non
+ - BUS8L Oui Non Non 
+ - ER Oui Non Non 
+ - TFT Oui Non Non 
+ - TTS Non Non Oui 
+ - TW3L Oui Oui Non L’un, l’autre ou les deux</xs:documentation>
+			</xs:annotation>
+			<xs:element name="TypeBIV" type="BivGeneralMessageTypeBivEnum">
+				<xs:annotation>
+					<xs:documentation>Type de BIV</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FixedText" type="BivGeneralMessageFixedTextType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Texte fixe du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ScrollingText" type="BivGeneralScrollingTextType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Text défilant du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TtsText" type="BivGeneralMessageTtsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Texte tts du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="BivGeneralMessageTypeBivEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.3.41">Types de borne pour une messagerie commerciale</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="BUS4L">
+				<xs:annotation>
+					<xs:documentation>Borne bus 4 lignes</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BUS8L">
+				<xs:annotation>
+					<xs:documentation>Borne bus 8 lignes</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ER">
+				<xs:annotation>
+					<xs:documentation>Borne écran relais</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TFT">
+				<xs:annotation>
+					<xs:documentation>Borne TFT</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TTS">
+				<xs:annotation>
+					<xs:documentation>Borne tts</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TW3L">
+				<xs:annotation>
+					<xs:documentation>Borne tramway</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="LineWayListType">
+		<xs:annotation>
+			<xs:documentation source="IV.3.45">Liste de lignes sens</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="LineWay" type="LineWayType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LineWayType">
+		<xs:annotation>
+			<xs:documentation source="IV.3.46">Structure d’une ligne sens</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Line" type="LineIdentifierType">
+				<xs:annotation>
+					<xs:documentation>Nom de la ligne</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="InWard" type="Boolean">
+				<xs:annotation>
+					<xs:documentation>Sens aller</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OutWard" type="Boolean">
+				<xs:annotation>
+					<xs:documentation>Sens retour</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GroupListType">
+		<xs:annotation>
+			<xs:documentation source="IV.3.44">Liste de groupes</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Group" type="GroupIdentifierType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--IV.4 Types simples-->
+	<xs:simpleType name="ChainingIdentifierType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.16">Type pour l'identifiant unique d'un chainage</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="32"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="GroupIdentifierType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.17">Type pour l'identifiant unique d'un groupe</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="16"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ScreenIdentifierType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.18">Type pour l'identifiant unique d'un écran</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer"/>
+	</xs:simpleType>
+	<xs:complexType name="PassengerMessageTtsType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.27">Texte tts du message passager</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Line">
+				<xs:annotation>
+					<xs:documentation source="IV.4.27">Ligne du texte d’un message</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="0"/>
+						<xs:maxLength value="300"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivGeneralScrollingTextType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.33">Texte défilant du message commercial</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Line">
+				<xs:annotation>
+					<xs:documentation>Texte d’un message</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="100"/>
+						<xs:pattern value="^([^&amp;~#\{\[\|`\\@^°\]\}£$μù§²=_]*)$"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivGeneralMessageTtsType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.34">Texte du message tts commercial</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Line">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="100"/>
+						<xs:pattern value="^([^&amp;~#\{\[\|`\\@^°\]\}£$μù§²=_]*)$"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivLineManMessageTtsType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.36">Texte tts du message ligne</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Line" maxOccurs="6">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="25"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

@@ -1,0 +1,1875 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:redefine schemaLocation="types-common.xsd">
+		<xs:complexType name="DriverMessagingStructure">
+			<xs:annotation>
+				<xs:documentation source="IV.3.4">Structure de la messagerie conducteur</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="DriverMessagingStructure">
+					<xs:sequence>
+						<xs:element name="StartDate" type="Date" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Date de début
+
+Règle métier :
+ - omis lorsque Dispatching = Immediat</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StopDate" type="Date" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Date de fin
+
+Règle métier :
+ - omis lorsque Dispatching = Immediat</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartTime" type="Time" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Heure de début
+
+Règle métier :
+ - omis lorsque Dispatching = Immediat</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StopTime" type="Time" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Heure de fin
+
+Règle métier :
+ - omis lorsque Dispatching = Immediat</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="RepeatPeriod" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Fréquence d’affichage
+
+Règles métier :
+ - 0 = pas de répétition ou 1..240 minutes
+ - omis lorsque Dispatching = Immediat
+ - forcé à 0 lorsque Dispatching = Differe</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:integer">
+									<xs:minInclusive value="0"/>
+									<xs:maxInclusive value="240"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="Confirm" type="Boolean" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Demande de confirmation
+
+Règle métier :
+ - présent que lorsque Dispatching = Immediat</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Text"/>
+						<xs:element name="Recipients"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="BivGeneralMessagingRecipientEnum">
+			<xs:annotation>
+				<xs:documentation source="IV.3.42">Destinataires d’une messagerie commerciale</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="BivGeneralMessagingRecipientEnum">
+					<xs:choice>
+						<xs:element name="AllNetwork" type="EmptyType">
+							<xs:annotation>
+								<xs:documentation>Tout le réseau</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Lines" type="LineListType">
+							<xs:annotation>
+								<xs:documentation>Liste de lignes</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Bivs" type="BivListType">
+							<xs:annotation>
+								<xs:documentation>Liste de bornes</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="PpdsMessagingRecipientEnum">
+			<xs:annotation>
+				<xs:documentation source="IV.3.17">Destinataires d’une messagerie PPDS</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="PpdsMessagingRecipientEnum">
+					<xs:choice>
+						<xs:element name="AllNetwork" type="EmptyType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.17">Tout le réseau</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="CarServices" type="CarServiceListType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.17">Liste de services voitures</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Cars" type="CarListType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.17">Liste des voitures</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Drivers" type="DriverListType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.17">Liste de conducteurs</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Lines" type="LineListType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.17">Liste de lignes</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="PpdsMessageTextType">
+			<xs:annotation>
+				<xs:documentation source="IV.4.28">Texte du message prise de service</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:restriction base="PpdsMessageTextType">
+					<xs:sequence>
+						<xs:element name="Line" nillable="0">
+							<xs:annotation>
+								<xs:documentation source="IV.4.28">Texte d’un message</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="1"/>
+									<xs:maxLength value="100"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="PassengerMessagingStructure">
+			<xs:annotation>
+				<xs:documentation source="IV.3.12">Structure d’une messagerie passager</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="PassengerMessagingStructure">
+					<xs:sequence>
+						<xs:element name="RepeatPeriod" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Fréquence d’affichage
+
+Règle métier :
+ - omis lorsque Dispatching = Differe</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:integer">
+									<xs:minInclusive value="1"/>
+									<xs:maxInclusive value="240"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="Inhibition" type="Boolean">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Inhibition</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Color" type="PassengerMessagingColorEnum">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Couleur du texte</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartStopPoint" type="StopPointIdentifierType" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Arrêt de début</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="EndStopPoint" type="StopPointIdentifierType" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Arrêt de fin</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Text" type="PassengerMessageTextType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Texte du message</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Recipients" type="PassengerMessagingRecipientEnum">
+							<xs:annotation>
+								<xs:documentation source="IV.3.12">Type et liste des destinataires</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="TerminalVisualisationStructure">
+			<xs:annotation>
+				<xs:documentation source="IV.3.3">Structure contenant la visualisation d’une borne</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="TerminalVisualisationStructure">
+					<xs:sequence>
+						<xs:element name="GeneralMessageName" type="MessageNameType" minOccurs="0" maxOccurs="3">
+							<xs:annotation>
+								<xs:documentation source="IV.3.3">Nom du message commercial</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="LineMessageMan" type="BivLineMessageTextType" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation source="IV.3.3">Message ligne manuel
+
+Remarque
+ - Il y a « LineCount » « LineMessageMan » (le contenu associé à l’attribut est vide lorsqu’il n’y a pas de message à afficher).</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="LineMessageAuto" type="BivLineMessageTextType" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation source="IV.3.3">Message ligne automatique
+
+Remarque
+ - Il y a « LineCount » « LineMessageAuto » (le contenu associé à l’attribut est vide lorsqu’il n’y a pas de message à afficher)</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="BivLineMessageTextType">
+			<xs:annotation>
+				<xs:documentation>Texte du message ligne</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="BivLineMessageTextType">
+					<xs:sequence>
+						<xs:element name="Line" maxOccurs="3">
+							<xs:annotation>
+								<xs:documentation source="IV.4.35">Texte d’un message</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="0"/>
+									<xs:maxLength value="21"/>
+									<xs:pattern value="^([^§μ]*)$"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:simpleType name="TerminalType">
+			<xs:annotation>
+				<xs:documentation source="IV.4.20">Enumération des types de borne</xs:documentation>
+			</xs:annotation>
+			<xs:restriction base="TerminalType">
+				<xs:enumeration value="LUM">
+					<xs:annotation>
+						<xs:documentation source="IV.4.20">Borne Lumiplan</xs:documentation>
+					</xs:annotation>
+				</xs:enumeration>
+				<xs:enumeration value="IP">
+					<xs:annotation>
+						<xs:documentation source="IV.4.20">Borne IP</xs:documentation>
+					</xs:annotation>
+				</xs:enumeration>
+			</xs:restriction>
+		</xs:simpleType>
+		<xs:complexType name="BivGeneralMessagingStructure">
+			<xs:annotation>
+				<xs:documentation source="IV.3.39">Structure d’une messagerie commerciale
+
+Règle métier :
+ - Une borne peut afficher de 0 à 3 messages commerciaux</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="BivGeneralMessagingStructure">
+					<xs:sequence>
+						<xs:element name="StartTime" type="Time">
+							<xs:annotation>
+								<xs:documentation>Heure de début</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StopTime" type="Time">
+							<xs:annotation>
+								<xs:documentation>Heure de fin</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="DiodFlashing" type="Boolean">
+							<xs:annotation>
+								<xs:documentation>Clignotement des diodes</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Text" type="BivGeneralMessageFixedTextType">
+							<xs:annotation>
+								<xs:documentation>Texte du message</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Recipients" type="BivGeneralMessagingRecipientEnum">
+							<xs:annotation>
+								<xs:documentation>Type et liste des destinataires</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="BivLineManMessagingStructure">
+			<xs:annotation>
+				<xs:documentation source="IV.3.49">Structure du message ligne manuel.</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="BivLineManMessagingStructure">
+					<xs:sequence>
+						<xs:element name="StartDate" type="Date">
+							<xs:annotation>
+								<xs:documentation>Date de début</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StopDate" type="Date">
+							<xs:annotation>
+								<xs:documentation>Date de fin</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartTime" type="Time">
+							<xs:annotation>
+								<xs:documentation>Heure de début</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StopTime" type="Time">
+							<xs:annotation>
+								<xs:documentation>Heure de fin</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Alternance" type="Boolean">
+							<xs:annotation>
+								<xs:documentation>Alternance avec les temps d’attente</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Text" type="BivLineMessageTextType">
+							<xs:annotation>
+								<xs:documentation>Texte du message</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Recipients" type="BivLineManMessagingRecipientEnum">
+							<xs:annotation>
+								<xs:documentation>Type et liste des destinataires</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:complexType name="BivGeneralMessageFixedTextType">
+			<xs:annotation>
+				<xs:documentation source="IV.4.32">Texte fixe du message commercial</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:restriction base="BivGeneralMessageFixedTextType">
+					<xs:sequence>
+						<xs:element name="Line" maxOccurs="6">
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="0"/>
+									<xs:maxLength value="24"/>
+									<xs:pattern value="^([^μ§]*)$"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:redefine>
+	<xs:element name="GirouetteCreateMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.15">Demande de création d’une messagerie de girouette</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="GirouetteMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie à créer</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="GirouetteCreateMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie de girouette</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="GirouetteMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie créée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="GirouetteDeleteMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie de girouette</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="GirouetteMessagingStructure"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="GirouetteDeleteMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie de girouette</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="GirouetteMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie supprimée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="GirouetteGetStatesRequest" type="Request">
+		<xs:annotation>
+			<xs:documentation source="IV.2.13">Demande de l’état des messageries de girouette</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="GirouetteGetStatesResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.14">Etat des messageries de girouette</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="MessagingStates" type="GirouetteMessagingStateListStructure">
+								<xs:annotation>
+									<xs:documentation>Liste des messageries de girouette</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoPassengerCreateMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.15">Demande de création d’une messagerie sonore passager</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="SonoPassengerMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie à créer</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoPassengerCreateMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie sonore passager</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="SonoPassengerMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie créée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoPassengerDeleteMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie sonore passager</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="SonoPassengerMessagingStructure"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoPassengerDeleteMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie sonore passager</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="SonoPassengerMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie supprimée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoPassengerGetStatesRequest" type="Request">
+		<xs:annotation>
+			<xs:documentation source="IV.2.13">Demande de l’état des messageries sonore passager</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SonoPassengerGetStatesResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.14">Etat des messageries sonore passager</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="MessagingStates" type="SonoPassengerMessagingStateListStructure">
+								<xs:annotation>
+									<xs:documentation>Liste des messageries sonores passager</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoDriverCreateMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.15">Demande de création d’une messagerie sonore conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="SonoDriverMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie à créer</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoDriverCreateMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie sonore conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="SonoDriverMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie créée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoDriverDeleteMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie sonore conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="SonoDriverMessagingStructure"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoDriverDeleteMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie sonore conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="SonoDriverMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie supprimée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoDriverGetStatesRequest" type="Request">
+		<xs:annotation>
+			<xs:documentation source="IV.2.13">Demande de l’état des messageries sonore conducteur</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SonoDriverGetStatesResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.14">Etat des messageries sonore conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="MessagingStates" type="SonoDriverMessagingStateListStructure">
+								<xs:annotation>
+									<xs:documentation>Liste des messageries sonores passager</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoStopPointCreateMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.15">Demande de création d’une messagerie sonore arrêt</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="SonoStopPointMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie à créer</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoStopPointCreateMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie sonore arrêt</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="SonoStopPointMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie créée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoStopPointDeleteMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie sonore arrêt</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="SonoStopPointMessagingStructure"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoStopPointDeleteMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie sonore arrêt</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="SonoStopPointMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie supprimée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SonoStopPointGetStatesRequest" type="Request">
+		<xs:annotation>
+			<xs:documentation source="IV.2.13">Demande de l’état des messageries sonore arrêt</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SonoStopPointGetStatesResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.14">Etat des messageries sonore arrêt</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="MessagingStates" type="SonoStopPointMessagingStateListStructure">
+								<xs:annotation>
+									<xs:documentation>Liste des messageries sonores passager</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivLineAutoCreateMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.15">Demande de création d’une messagerie ligne automatique</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="BivLineAutoMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie à créer</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivLineAutoCreateMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie ligne automatique</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="BivLineAutoMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie créée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivLineAutoDeleteMessageRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie ligne automatique</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Messaging" type="BivLineAutoMessagingStructure"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivLineAutoDeleteMessageResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie ligne automatique</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Messaging" type="BivLineAutoMessagingStructure">
+								<xs:annotation>
+									<xs:documentation>Messagerie supprimée</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BivLineAutoGetStatesRequest" type="Request">
+		<xs:annotation>
+			<xs:documentation source="IV.2.13">Demande de l’état des messageries ligne automatique</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="BivLineAutoGetStatesResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.14">Etat des messageries ligne manuelle</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="MessagingStates" type="BivLineAutoMessagingStateListStructure">
+								<xs:annotation>
+									<xs:documentation>Liste des messageries de prise de service</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="PassengerMessagingRecipientEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.3.13">Destinataires d’une messagerie passager</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="AllNetwork" type="EmptyType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.13">Tout le réseau</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CarServices" type="CarServiceListType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.13">Liste de services voitures</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Lines" type="LineListType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.13">Liste de lignes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="CarListType">
+		<xs:annotation>
+			<xs:documentation source="IV.3.18">Liste de voitures</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Car" type="CarIdentifierType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation source="IV.3.18">Identifiant unique de la voiture</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GirouetteMessagingStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.22">Structure d’une messagerie de girouette</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="MessageNameType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.22">Nom du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StartDate" type="Date">
+				<xs:annotation>
+					<xs:documentation source="IV.3.22">Date de début</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopDate" type="Date">
+				<xs:annotation>
+					<xs:documentation source="IV.3.22">Date de fin</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Code">
+				<xs:annotation>
+					<xs:documentation source="IV.3.22">Code girouette</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:minInclusive value="0"/>
+						<xs:maxInclusive value="99"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Text" type="GirouetteMessageTextType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.22">Texte du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Recipients" type="GirouetteMessagingRecipientEnum">
+				<xs:annotation>
+					<xs:documentation source="IV.3.22">Type et liste des destinataires</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GirouetteMessagingRecipientEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.3.23">Destinataires d’une messagerie de girouette</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="AllNetwork" type="EmptyType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.23">Tout le réseau</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CarServices" type="CarServiceListType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.23">Liste de services voitures</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Lines" type="LineListType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.23">Liste de lignes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="GirouetteMessagingStateListStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.24">Structure pour la liste d’états des messageries girouette</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MessagingState" type="GirouetteMessagingStateStructure" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation source="IV.3.24">Etat d’une messagerie girouette</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GirouetteMessagingStateStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.25">Structure d’état d’une messagerie de girouette</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Messaging" type="GirouetteMessagingStructure">
+				<xs:annotation>
+					<xs:documentation source="IV.3.25">Description de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsActive" type="Boolean">
+				<xs:annotation>
+					<xs:documentation source="IV.3.25">Etat de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SonoPassengerMessagingStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.26">Structure de la messagerie sonore passager</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="MessageNameType">
+				<xs:annotation>
+					<xs:documentation>Nom du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Dispatching" type="SonoDispatchingTypeEnum">
+				<xs:annotation>
+					<xs:documentation>Type de diffusion</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StartDate" type="Date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Date de début
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopDate" type="Date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Date de fin
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StartTime" type="Time" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Heure de début
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopTime" type="Time" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Heure de fin
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RepeatPeriod" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Fréquence d’affichage (minutes)
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:minInclusive value="1"/>
+						<xs:maxInclusive value="240"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Inhibition" type="Boolean">
+				<xs:annotation>
+					<xs:documentation>Inhibition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ActivateHeadJingle" type="Boolean">
+				<xs:annotation>
+					<xs:documentation>Signal de préannonce</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ActivateBackJingle" type="Boolean">
+				<xs:annotation>
+					<xs:documentation>Signal de postannonce</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StartStopPoint" type="StopPointIdentifierType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Arrêt de début
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EndStopPoint" type="StopPointIdentifierType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Arrêt de fin
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Text" type="SonoMessageTextType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.22">Texte du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Recipients" type="SonoPassengerMessagingRecipientEnum">
+				<xs:annotation>
+					<xs:documentation source="IV.3.22">Type et liste des destinataires</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SonoPassengerMessagingRecipientEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.3.27">Destinataires d’une messagerie sonore passager</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="AllNetwork" type="EmptyType">
+				<xs:annotation>
+					<xs:documentation>Tout le réseau</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CarServices" type="CarServiceListType">
+				<xs:annotation>
+					<xs:documentation>Liste de services voitures</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Lines" type="LineListType">
+				<xs:annotation>
+					<xs:documentation>Liste de lignes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="SonoPassengerMessagingStateListStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.28">Structure pour la liste d’états des messageries sonores passager</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MessagingState" type="SonoPassengerMessagingStateStructure" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Etat d’une messagerie sonore passager</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SonoPassengerMessagingStateStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.29">Structure d’état d’une messagerie sonore passager</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Messaging" type="SonoPassengerMessagingStructure">
+				<xs:annotation>
+					<xs:documentation>Description de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsActive" type="Boolean">
+				<xs:annotation>
+					<xs:documentation>Etat de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SonoDriverMessagingStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.30">Structure d’une messagerie sonore conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="MessageNameType">
+				<xs:annotation>
+					<xs:documentation>Nom du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Dispatching" type="SonoDispatchingTypeEnum">
+				<xs:annotation>
+					<xs:documentation>Type de diffusion</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StartDate" type="Date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Date de début
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopDate" type="Date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Date de fin
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StartTime" type="Time" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Heure de début
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopTime" type="Time" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Heure de fin
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RepeatPeriod" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Fréquence d’affichage (minutes)
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:minInclusive value="1"/>
+						<xs:maxInclusive value="240"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Text" type="SonoMessageTextType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.22">Texte du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Recipients" type="SonoDriverMessagingRecipientEnum">
+				<xs:annotation>
+					<xs:documentation source="IV.3.22">Type et liste des destinataires</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SonoDriverMessagingRecipientEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.3.31">Destinataires d’une messagerie sonore conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="AllNetwork" type="EmptyType">
+				<xs:annotation>
+					<xs:documentation>Tout le réseau</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CarServices" type="CarServiceListType">
+				<xs:annotation>
+					<xs:documentation>Liste de services voitures</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Lines" type="LineListType">
+				<xs:annotation>
+					<xs:documentation>Liste de lignes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="SonoDriverMessagingStateListStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.32">Structure pour la liste d’états des messageries sonores conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MessagingState" type="SonoDriverMessagingStateStructure" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Etat d’une messagerie sonore conducteur</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SonoDriverMessagingStateStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.33">Structure d’état d’une messagerie sonore conducteur</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Messaging" type="SonoDriverMessagingStructure">
+				<xs:annotation>
+					<xs:documentation>Description de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsActive" type="Boolean">
+				<xs:annotation>
+					<xs:documentation>Etat de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SonoStopPointMessagingStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.34">Structure d’une messagerie sonore arrêt</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="MessageNameType">
+				<xs:annotation>
+					<xs:documentation>Nom du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Dispatching" type="SonoDispatchingTypeEnum">
+				<xs:annotation>
+					<xs:documentation>Type de diffusion</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StartDate" type="Date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Date de début
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopDate" type="Date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Date de fin
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StartTime" type="Time" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Heure de début
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopTime" type="Time" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Heure de fin
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RepeatPeriod" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Fréquence d’affichage (minutes)
+
+Règle métier :
+ - omis lorsque Dispatching=Immediat</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:minInclusive value="1"/>
+						<xs:maxInclusive value="240"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Text" type="SonoMessageTextType">
+				<xs:annotation>
+					<xs:documentation source="IV.3.22">Texte du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Recipients" type="SonoStopPointMessagingRecipientEnum">
+				<xs:annotation>
+					<xs:documentation source="IV.3.22">Type et liste des destinataires</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SonoStopPointMessagingRecipientEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.3.35">Destinataires d’une messagerie sonore arrêt</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="AllNetwork" type="EmptyType">
+				<xs:annotation>
+					<xs:documentation>Tout le réseau</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Lines" type="LineListType">
+				<xs:annotation>
+					<xs:documentation>Liste de lignes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="StopPoints" type="StopPointListType">
+				<xs:annotation>
+					<xs:documentation>Liste d’arrêts</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="SonoStopPointMessagingStateListStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.37">Structure pour la liste d’états des messageries sonores arrêt</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MessagingState" type="SonoStopPointMessagingStateStructure" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Etat d’une messagerie sonore conducteur</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SonoStopPointMessagingStateStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.38">Structure d’état d’une messagerie arrêt</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Messaging" type="SonoStopPointMessagingStructure">
+				<xs:annotation>
+					<xs:documentation>Description de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsActive" type="Boolean">
+				<xs:annotation>
+					<xs:documentation>Etat de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivLineAutoMessagingStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.53">Structure d’une messagerie ligne automatique</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="MessageNameType">
+				<xs:annotation>
+					<xs:documentation>Nom du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Text" type="BivLineMessageTextType">
+				<xs:annotation>
+					<xs:documentation>Texte du message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Recipients" type="BivLineAutoMessagingRecipientEnum">
+				<xs:annotation>
+					<xs:documentation>Type et liste des destinataires</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivLineAutoMessagingRecipientEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.3.54">Destinataires d’une messagerie ligne automatique</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Bivs" type="BivListType">
+				<xs:annotation>
+					<xs:documentation>Liste de bornes de la ligne</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivLineAutoMessagingStateListStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.55">Structure pour la liste d’états des messageries ligne automatiques</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MessagingState" type="BivLineAutoMessagingStateStructure" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Etat d’une messagerie ligne automatique</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BivLineAutoMessagingStateStructure">
+		<xs:annotation>
+			<xs:documentation source="IV.3.56">Structure d’état d’une messagerie ligne automatique</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Messaging" type="BivLineAutoMessagingStructure">
+				<xs:annotation>
+					<xs:documentation>Description de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsActive" type="Boolean">
+				<xs:annotation>
+					<xs:documentation>Etat de la messagerie</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="StopPointListType">
+		<xs:annotation>
+			<xs:documentation source="IV.3.36">Liste d'arrêts</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="StopPoint" type="StopPointIdentifierType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Identifiant de l’arrêt</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="TerminalChangeStateRequest">
+		<xs:annotation>
+			<xs:documentation source="IV.2.5">Demande de modification de l'état d'une borne ou de toutes les bornes</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Request">
+					<xs:sequence>
+						<xs:element name="Biv" type="BivIdentifierType">
+							<xs:annotation>
+								<xs:documentation>Identifiant de la borne</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="State" type="TerminalStateEnum">
+							<xs:annotation>
+								<xs:documentation>Etat de la borne</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TerminalChangeStateResponse">
+		<xs:annotation>
+			<xs:documentation source="IV.2.6">Nouvel état d’une borne ou de toutes les bornes</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="Response">
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="ErrorType" type="ErrorTypeEnum">
+								<xs:annotation>
+									<xs:documentation>Type d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorMessage" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Message de description de l’erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="ErrorID" type="ErrorIDEnum">
+								<xs:annotation>
+									<xs:documentation>Code d'erreur</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="Biv" type="BivIdentifierType">
+								<xs:annotation>
+									<xs:documentation>Identifiant de la borne</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="State" type="TerminalStateEnum">
+								<xs:annotation>
+									<xs:documentation>Etat de la borne</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<!--IV.4 Types simples-->
+	<xs:simpleType name="CarIdentifierType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.14">Type pour l'identifiant d'une voiture</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="6"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="GirouetteMessageTextType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.29">Texte du message de girouette</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Line" nillable="0" maxOccurs="4">
+				<xs:annotation>
+					<xs:documentation source="IV.4.29">Texte d’un message</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="0"/>
+						<xs:maxLength value="25"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SonoMessageTextType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.30">Texte du message sonore</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Line" nillable="0">
+				<xs:annotation>
+					<xs:documentation>Texte d’un message</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="300"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="SonoDispatchingTypeEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.4.31">Enumération des types de diffusion d’un message sonore</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Immediat">
+				<xs:annotation>
+					<xs:documentation>Envoi immédiat</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Repete">
+				<xs:annotation>
+					<xs:documentation>Envoi programmé avec répétition</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PassengerMessagingColorEnum">
+		<xs:annotation>
+			<xs:documentation source="IV.4.37">Enumération des couleurs du texte d’un message passager</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Vert"/>
+			<xs:enumeration value="Orange"/>
+			<xs:enumeration value="Rouge"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
