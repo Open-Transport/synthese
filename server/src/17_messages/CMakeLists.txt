@@ -88,6 +88,12 @@ MessagesSectionsService.hpp
 MessagesTemplateLibraryAdmin.cpp
 MessagesTemplateLibraryAdmin.h
 MessagesTypes.h
+MessageTag.cpp
+MessageTag.hpp
+MessageTagsService.cpp
+MessageTagsService.hpp
+MessageTagTableSync.cpp
+MessageTagTableSync.hpp
 MessageType.cpp
 MessageType.hpp
 MessageTypesService.cpp

@@ -9,6 +9,7 @@
 #include "MessageAlternativeTableSync.hpp"
 #include "MessageApplicationPeriodTableSync.hpp"
 #include "MessagesSectionTableSync.hpp"
+#include "MessageTagTableSync.hpp"
 #include "MessageTypeTableSync.hpp"
 #include "ScenarioTableSync.h"
 #include "ScenarioCalendarTableSync.hpp"
@@ -33,6 +34,7 @@
 #include "GetMessagesFunction.hpp"
 #include "MailingListsService.hpp"
 #include "MessagesSectionsService.hpp"
+#include "MessageTagsService.hpp"
 #include "MessageTypesService.hpp"
 #include "ScenariosListFunction.hpp"
 #include "ScenarioDisplayFunction.hpp"
@@ -85,6 +87,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::MessageAlternativeTableSync::integrate();
 	synthese::messages::MessageApplicationPeriodTableSync::integrate();
 	synthese::messages::MessagesSectionTableSync::integrate();
+	synthese::messages::MessageTagTableSync::integrate();
 	synthese::messages::MessageTypeTableSync::integrate();
 	synthese::messages::ScenarioCalendarTableSync::integrate();
 	synthese::messages::ScenarioFolderTableSync::integrate();
@@ -107,6 +110,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::GetMessagesFunction::integrate();
 	synthese::messages::MailingListsService::integrate();
 	synthese::messages::MessagesSectionsService::integrate();
+	synthese::messages::MessageTagsService::integrate();
 	synthese::messages::MessageTypesService::integrate();
 	synthese::messages::ScenariosListFunction::integrate();
 	synthese::messages::ScenarioDisplayFunction::integrate();
@@ -140,6 +144,7 @@ void synthese::messages::moduleRegister()
 	synthese::util::Env::Integrate<synthese::messages::MailingListSubscription>();
 	synthese::util::Env::Integrate<synthese::messages::MessageAlternative>();
 	synthese::util::Env::Integrate<synthese::messages::MessageApplicationPeriod>();
+	synthese::util::Env::Integrate<synthese::messages::MessageTag>();
 	synthese::util::Env::Integrate<synthese::messages::MessageType>();
 	synthese::util::Env::Integrate<synthese::messages::ScenarioCalendar>();
 	synthese::util::Env::Integrate<synthese::messages::Alarm>();
