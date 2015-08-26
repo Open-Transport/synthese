@@ -48,6 +48,12 @@ MailingListSubscriptionTableSync.cpp
 MailingListSubscriptionTableSync.hpp
 MailingListTableSync.cpp
 MailingListTableSync.hpp
+MediaLibrary.cpp
+MediaLibrary.hpp
+MediaLibrariesService.cpp
+MediaLibrariesService.hpp
+MediaLibraryTableSync.cpp
+MediaLibraryTableSync.hpp
 MessageAdmin.cpp
 MessageAdmin.h
 MessageAlternative.cpp

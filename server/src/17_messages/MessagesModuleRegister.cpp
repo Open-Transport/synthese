@@ -6,6 +6,7 @@
 #include "CustomBroadcastPointTableSync.hpp"
 #include "MailingListTableSync.hpp"
 #include "MailingListSubscriptionTableSync.hpp"
+#include "MediaLibraryTableSync.hpp"
 #include "MessageAlternativeTableSync.hpp"
 #include "MessageApplicationPeriodTableSync.hpp"
 #include "MessagesSectionTableSync.hpp"
@@ -32,6 +33,7 @@
 #include "CustomBroadcastPointsService.hpp"
 #include "GetMessagesFunction.hpp"
 #include "MailingListsService.hpp"
+#include "MediaLibrariesService.hpp"
 #include "MessagesSectionsService.hpp"
 #include "MessageTypesService.hpp"
 #include "ScenariosListFunction.hpp"
@@ -60,6 +62,7 @@
 #include "CustomBroadcastPoint.hpp"
 #include "MailingList.hpp"
 #include "MailingListSubscription.hpp"
+#include "MediaLibrary.hpp"
 #include "MessageAlternative.hpp"
 #include "MessagesTypes.h"
 #include "MessagesSection.hpp"
@@ -82,6 +85,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::CustomBroadcastPointTableSync::integrate();
 	synthese::messages::MailingListTableSync::integrate();
 	synthese::messages::MailingListSubscriptionTableSync::integrate();
+	synthese::messages::MediaLibraryTableSync::integrate();
 	synthese::messages::MessageAlternativeTableSync::integrate();
 	synthese::messages::MessageApplicationPeriodTableSync::integrate();
 	synthese::messages::MessagesSectionTableSync::integrate();
@@ -106,6 +110,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::CustomBroadcastPointsService::integrate();
 	synthese::messages::GetMessagesFunction::integrate();
 	synthese::messages::MailingListsService::integrate();
+	synthese::messages::MediaLibrariesService::integrate();
 	synthese::messages::MessagesSectionsService::integrate();
 	synthese::messages::MessageTypesService::integrate();
 	synthese::messages::ScenariosListFunction::integrate();
@@ -147,4 +152,5 @@ void synthese::messages::moduleRegister()
 	synthese::util::Env::Integrate<synthese::messages::Scenario>();
 	synthese::util::Env::Integrate<synthese::messages::CustomBroadcastPoint>();
 	synthese::util::Env::Integrate<synthese::messages::MessagesSection>();
+	synthese::util::Env::Integrate<synthese::messages::MediaLibrary>();
 }
