@@ -605,17 +605,18 @@ template=
   <div>
     <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="106"> Autres diffuseurs</label>
     <div style="padding-left:30px;" class="hide">
-      <?custom_broadcast_points&
-	     recursive=1&
-	     template=<{broadcast_point&recursive=1&template=
-	     	<div>
-      <@recursive_content?"<i class=\"icon-chevron-right openclose\"></i> ":""@><label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> <@name@></label>
-      <@recursive_content?("<div style=\"padding-left:30px; display:none;\">"+recursive_content+"</div>"):""@>
+<?custom_broadcast_points&
+recursive=1&
+template=
+	<{broadcast_point&recursive=1&template=
+      <div>
+        <@recursive_content?"<i class=\"icon-chevron-right openclose\"></i>":""@><label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> <@name@></label>
+        <@recursive_content?"<div style=\"padding-left:30px;\" class=\"hide\">":""@><@recursive_content@><@recursive_content?"</div>":""@>
+      </div>
+	}>
+?>
+    </div>
   </div>
-  }>?>
-</div>
-</div>
-</div>
 </div>
 
 </div>
