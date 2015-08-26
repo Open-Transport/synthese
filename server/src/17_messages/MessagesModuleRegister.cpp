@@ -3,6 +3,7 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTableSync.h"
 #include "CustomBroadcastPointTableSync.hpp"
+#include "MediaLibraryTableSync.hpp"
 #include "MessageAlternativeTableSync.hpp"
 #include "MessageApplicationPeriodTableSync.hpp"
 #include "MessagesSectionTableSync.hpp"
@@ -33,6 +34,7 @@
 
 #include "CustomBroadcastPointsService.hpp"
 #include "GetMessagesFunction.hpp"
+#include "MediaLibrariesService.hpp"
 #include "MessagesSectionsService.hpp"
 #include "MessageTagsService.hpp"
 #include "MessageTypesService.hpp"
@@ -64,6 +66,7 @@
 #include "CustomBroadcastPoint.hpp"
 #include "NotificationEvent.hpp"
 #include "NotificationProvider.hpp"
+#include "MediaLibrary.hpp"
 #include "MessageAlternative.hpp"
 #include "MessagesTypes.h"
 #include "MessagesSection.hpp"
@@ -89,6 +92,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::AlarmTableSync::integrate();
 	synthese::messages::CustomBroadcastPointTableSync::integrate();
 	synthese::messages::NotificationProviderTableSync::integrate();
+	synthese::messages::MediaLibraryTableSync::integrate();
 	synthese::messages::MessageAlternativeTableSync::integrate();
 	synthese::messages::MessageApplicationPeriodTableSync::integrate();
 	synthese::messages::MessagesSectionTableSync::integrate();
@@ -119,6 +123,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::NotificationProvidersService::integrate();
 	synthese::messages::NotificationProviderTestService::integrate();
 	synthese::messages::NotificationEventsService::integrate();
+	synthese::messages::MediaLibrariesService::integrate();
 	synthese::messages::MessagesSectionsService::integrate();
 	synthese::messages::MessageTagsService::integrate();
 	synthese::messages::MessageTypesService::integrate();
@@ -168,4 +173,5 @@ void synthese::messages::moduleRegister()
 	INTEGRATE(synthese::messages::CustomBroadcastPoint);
 	INTEGRATE(synthese::messages::MessagesSection);
 
+	synthese::util::Env::Integrate<synthese::messages::MediaLibrary>();
 }

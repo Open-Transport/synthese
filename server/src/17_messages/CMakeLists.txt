@@ -38,6 +38,12 @@ GetMessagesFunction.cpp
 GetMessagesFunction.hpp
 HttpNotificationChannel.hpp
 HttpNotificationChannel.cpp
+MediaLibrary.cpp
+MediaLibrary.hpp
+MediaLibrariesService.cpp
+MediaLibrariesService.hpp
+MediaLibraryTableSync.cpp
+MediaLibraryTableSync.hpp
 MessageAdmin.cpp
 MessageAdmin.h
 MessageAlternative.cpp
