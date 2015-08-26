@@ -8,10 +8,17 @@
 </div>
 
 <div class="control-group">
+  <label class="control-label" id="label_ineo_message_type">Type de messagerie Ineo</label>
+  <div class="controls">
+    <input type="text" name="ineo_message_type" is_parameter="true" value="<@ineo_message_type?<@ineo_message_type@>:0@>" />
+  </div>
+</div>
+
+<div class="control-group">
   <label class="control-label" id="label_needs_repeat_interval">Durée entre chaque répétition du message</label>
   <div class="controls">
-    <input type="text" name="needs_repeat_interval" is_parameter="true" value="<@needs_repeat_interval?<@needs_repeat_interval@>:0@>" />
-    <span class="add-on">s</span>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_repeat_interval" <@needs_repeat_interval?"checked=\"true\"":""@> value="1" /> Oui</label>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_repeat_interval" <@needs_repeat_interval?"":"checked=\"true\""@> value="0" /> Non</label>
   </div>
 </div>
 
@@ -50,24 +57,23 @@
 <div class="control-group">
   <label class="control-label" id="label_needs_direction_sign_code">Girouette pré-encodée</label>
   <div class="controls">
-    <select name="needs_direction_sign_code" is_parameter="true">
-      <option value="0">Aucune</option>
-      <option value="1">Le service de liste des destinations n'existe pas encore</option>
-    </select>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_direction_sign_code" <@needs_direction_sign_code?"checked=\"true\"":""@> value="1" /> Oui</label>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_direction_sign_code" <@needs_direction_sign_code"":"checked=\"true\""@> value="0" /> Non</label>
   </div>
 </div>
 
 <div class="control-group">
   <label class="control-label" id="label_needs_start_stop_point">Affichage sur tronçon : arrêt de début</label>
   <div class="controls">
-    <input type="text" name="needs_start_stop_point" is_parameter="true" value="<@needs_start_stop_point?<@needs_start_stop_point@>:0@>" />
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_start_stop_point" <@needs_start_stop_point?"checked=\"true\"":""@> value="1" /> Oui</label>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_start_stop_point" <@needs_start_stop_point"":"checked=\"true\""@> value="0" /> Non</label>
   </div>
 </div>
 
 <div class="control-group">
   <label class="control-label" id="label_needs_end_stop_point">Affichage sur tronçon : arrêt de fin</label>
   <div class="controls">
-    <input type="text" name="needs_end_stop_point" is_parameter="true" value="<@needs_end_stop_point?<@needs_end_stop_point@>:0@>" />
-    <span class="add-on">s</span>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_end_stop_point" <@needs_end_stop_point?"checked=\"true\"":""@> value="1" /> Oui</label>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_end_stop_point" <@needs_end_stop_point"":"checked=\"true\""@> value="0" /> Non</label>
   </div>
 </div>
