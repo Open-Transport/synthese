@@ -92,7 +92,9 @@ class HTMLTextExtractor(HTMLParser):
 
 
 # Request headers
-root = etree.Element("BivGeneral" + type + "MessageRequest")
+namespace = "http://www.w3.org/2001/XMLSchema-instance"
+locationAttribute = "{%s}noNameSpaceSchemaLocation" % namespace
+root = etree.Element("BivGeneral" + type + "MessageRequest", attrib={locationAttribute: "http://schemas.open-transport.org/ineo-terminus/types-t2c.xsd"})
 childID = etree.SubElement(root, "ID")
 childID.text = ID
 childRequestTimeStamp = etree.SubElement(root, "RequestTimeStamp")

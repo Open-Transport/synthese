@@ -317,7 +317,8 @@ namespace synthese
 
 			// Build the request header
 			requestStream << INEO_TERMINUS_XML_HEADER << char(10);
-			requestStream << "<" << requestTag << ">" << char(10);
+			// TODO : make xsd path a configuration parameter to handle TL/T2C contexts
+			requestStream << "<" << requestTag << " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"http://schemas.open-transport.org/ineo-terminus/types-t2c.xsd\">" << char(10);
 			requestStream << "\t<ID>" << boost::lexical_cast<std::string>(getNextRequestID()) << "</ID>" << char(10);
 			requestStream << "\t<RequestTimeStamp>" << timestampStream.str() << "</RequestTimeStamp>" << char(10);
 			requestStream << "\t<RequestorRef>Terminus</RequestorRef>" << char(10);
@@ -1253,13 +1254,25 @@ namespace synthese
 			std::string responseTag = requestTag;
 			replace_all(responseTag, "Request", "Response");
 
+			// Set the format of datetime objects to the format expected by Ineo
+			boost::posix_time::ptime now = second_clock::local_time();
+			std::stringstream timestampStream;
+			timestampStream << setfill('0') << setw(2) << now.date().day() << "/"
+							<< setfill('0') << setw(2) << int(now.date().month()) << "/"
+							<< setfill('0') << setw(4) << now.date().year() << " "
+							<< setfill('0') << setw(2) << now.time_of_day().hours() << ":"
+							<< setfill('0') << setw(2) << now.time_of_day().minutes() << ":"
+							<< setfill('0') << setw(2) << now.time_of_day().seconds();
+
 			// Build the response header
 			responseStream << INEO_TERMINUS_XML_HEADER << char(10);
-			responseStream << "<" << responseTag << ">" << char(10);
+
+			// TODO : make xsd path a configuration parameter to handle TL/T2C contexts
+			responseStream << "<" << responseTag << " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"http://schemas.open-transport.org/ineo-terminus/types-t2c.xsd\">" << char(10);
 			responseStream << "\t<ID>" << boost::lexical_cast<std::string>(IneoTerminusConnection::GetTheConnection()->getNextRequestID()) << "</ID>" << char(10);
 			responseStream << "\t<RequestID>" << requestId << "</RequestID>" << char(10);
-			// Note : according to interface description 'ResponseTimeStamp' = 'RequestTimeStamp'
-			responseStream << "\t<ResponseTimeStamp>" << requestTimestamp << "</ResponseTimeStamp>" << char(10);
+			// Note : according to interface description 'ResponseTimeStamp' = 'RequestTimeStamp' but I suspect this is a typo
+			responseStream << "\t<ResponseTimeStamp>" << timestampStream.str() << "</ResponseTimeStamp>" << char(10);
 			responseStream << "\t<ResponseRef>Terminus</ResponseRef>" << char(10);
 
 			// If an error occurred while processing the request, notify Ineo
