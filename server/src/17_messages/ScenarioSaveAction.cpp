@@ -1056,7 +1056,7 @@ namespace synthese
 						message->setDigitizedVersion(messageNode.second.get("digitized_version", string()));
 						std::string tagsString = messageNode.second.get("tags", string());
 						std::set<string> tags;
-						boost::algorithm::split(tags, tagsString, is_any_of(", "), token_compress_on );
+						boost::algorithm::split(tags, tagsString, is_any_of(","), token_compress_on );
 						message->setTags(tags);
 						BOOST_FOREACH(const ptree::value_type& sectionNode, messageNode.second.get_child("section"))
 						{
@@ -1238,7 +1238,7 @@ namespace synthese
 				message->setLongMessage(*_messageToCreate);
 				message->setLevel(*_level);
 				std::set<string> tags;
-				boost::algorithm::split(tags, _tags, is_any_of(", "), token_compress_on );
+				boost::algorithm::split(tags, _tags, is_any_of(","), token_compress_on );
 				message->setTags(tags);
 				if (_display_duration) message->setDisplayDuration(*_display_duration);
 				message->setDigitizedVersion(_digitizedVersion);

@@ -140,7 +140,7 @@ namespace synthese
 			pm.insert(prefix + DATA_DISPLAY_DURATION, getDisplayDuration());
 			pm.insert(prefix + DATA_DIGITIZED_VERSION, getDigitizedVersion());
 
-			string tagsString = boost::algorithm::join(_tags, ", ");
+			string tagsString = boost::algorithm::join(_tags, ",");
 			pm.insert(prefix + DATA_TAGS, tagsString);
 
 			if(withScenario && getScenario())

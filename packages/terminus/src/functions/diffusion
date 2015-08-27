@@ -180,9 +180,9 @@ template=
     <h4>Résumé des messages</h4>
     <table class="table table-striped table-condensed"><thead>
     <tr><th>libellé</th><th>message principal</th></tr></thead><tbody>
-    <{message&template=
-    <tr><td><@title@></td><td class="message_overview"><?substr&t=<@content@>&n=50?>...</td></tr>
-    }>
+    <{calendar&template=<{message&template=
+    <tr><td><@title@></td><td class="message_overview"><?substr&t=<@content@>&n=50?>...</td><td><@tags@></td></tr>
+    }>}>
     </tbody></table>
 
   </div><div class="span5">
@@ -305,13 +305,6 @@ template=
             </select>
           </label>
         </div>
-        <div class="row-fluid">
-          <div class="span12">
-            <label>Tags<br />
-              <input type="text" field="tags" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()">
-            </label>
-          </div>
-        </div>
         </div><div class="row-fluid">
         <label>Durée d'affichage
           <input class="input-mini" value="" type="number" maxlength="3" field="displayDuration" min="1" max="100" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()">
@@ -398,6 +391,18 @@ template=
     <h4><span class="badge badge-inverse" style="vertical-align:middle" id="calendar_panel_id">4</span> Calendrier</h4>
     <div class="well">
       <div class="form-inline"><select id="change_calendar_list"></select> <a href="#" id="change_calendar" class="btn btn-warning">Modifier</a></div>
+    </div>
+    
+    <h4><span class="badge badge-inverse" style="vertical-align:middle" id="tags_panel_id">5</span> Tags</h4>
+    <div class="well">
+      <table class="table table-condensed">
+        <thead><tr><th>tags</th><th></th></tr></thead>
+        <tbody>
+          <tr><td id="preview_tags"></td><td></td></tr>
+          <tr><td><a class="btn btn-mini btn-primary" href="#" inittags="inittags">Réinitialiser</a></td><td><a class="btn btn-mini btn-primary" href="#" edittags="edittags">Ajouter</a></td></tr>
+        </tbody>
+      </table>
+      <div class="alert hide" id="old_tags_alert"><strong>ATTENTION !</strong> La liste des tags n'est peut-être plus à jour. Veuillez enregistrer l'évènement pour tenir compte des dernières modifications.</div>
     </div>
   </div>
   </div>
@@ -558,75 +563,95 @@ template=
         <div>
           <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="41"> Bornes</label>
           <div style="padding-left:30px;" class="hide">
-            <?display_types&
-      	     template=<{display_type&template=
-      	     	<div>
-            <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> Type <@name@></label>
-            <div style="padding-left:30px;" class="hide">
-              <@current_type_id=<@id@>@>
-              <?GetDepartureBoards&
-      	   	   template=<{screen&template=
-      	   	   	<?if&cond=<@type_id==current_type_id@>&then=
-              <div>
-                <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@screen_id@>"> Borne <@name@></label>
+<?display_types&
+template=<{display_type&template=
+            <div>
+              <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> Type <@name@></label>
+              <div style="padding-left:30px;" class="hide">
+	<@current_type_id=<@id@>@>
+	<?GetDepartureBoards&
+	template=<{screen&template=
+		<?if&cond=<@type_id==current_type_id@>&then=
+                <div>
+                  <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@screen_id@>"> Borne <@name@></label>
+                </div>
+		?>
+	}>?>
               </div>
-              ?>
-              }>?>
             </div>
-          </div>
-          }>?>
-        </div>
-      </div>
-      <div>
-        <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" value="107"> Listes de diffusion</label>
-        <div style="padding-left:30px;" class="hide">
-          <div>
-            <i class="icon-chevron-right openclose"></i> <label class="checkbox">Listes à envoi automatique</label>
-            <div style="padding-left:30px;" class="hide">
-              <?mailing_lists&
-	        manual_sending=0&
-	        template=<{mailing_list&template=
-	     		<div>
-              <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> Liste <@name@></label>
-            </div>
-            }>?>
+}>?>
           </div>
         </div>
         <div>
-          <i class="icon-chevron-right openclose"></i> <label class="checkbox">Listes à envoi manuel</label>
+          <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" value="107"> Listes de diffusion</label>
           <div style="padding-left:30px;" class="hide">
-            <?mailing_lists&
-	        manual_sending=1&
-	        template=<{mailing_list&template=
-	     		<div>
-            <label class="checkbox"><input type="checkbox" factory="displayscreen" manual_sending="1" noparam="1" value="<@id@>"> Liste <@name@></label>
+            <div>
+              <i class="icon-chevron-right openclose"></i> <label class="checkbox">Listes à envoi automatique</label>
+              <div style="padding-left:30px;" class="hide">
+<?mailing_lists&
+manual_sending=0&
+template=<{mailing_list&template=
+                <div>
+                  <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> Liste <@name@></label>
+                </div>
+}>?>
+              </div>
+            </div>
+            <div>
+              <i class="icon-chevron-right openclose"></i> <label class="checkbox">Listes à envoi manuel</label>
+              <div style="padding-left:30px;" class="hide">
+<?mailing_lists&
+manual_sending=1&
+template=<{mailing_list&template=
+                <div>
+                  <label class="checkbox"><input type="checkbox" factory="displayscreen" manual_sending="1" noparam="1" value="<@id@>"> Liste <@name@></label>
+                </div>
+}>?>
+              </div>
+            </div>
           </div>
-          }>?>
         </div>
-      </div>
-    </div>
-  </div>
-  <div>
-    <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="106"> Autres diffuseurs</label>
-    <div style="padding-left:30px;" class="hide">
+        <div>
+          <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="106"> Autres diffuseurs</label>
+          <div style="padding-left:30px;" class="hide">
 <?custom_broadcast_points&
 recursive=1&
-template=
-	<{broadcast_point&recursive=1&template=
-      <div>
-        <@recursive_content?"<i class=\"icon-chevron-right openclose\"></i>":""@><label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> <@name@></label>
-        <@recursive_content?"<div style=\"padding-left:30px;\" class=\"hide\">":""@><@recursive_content@><@recursive_content?"</div>":""@>
+template=<{broadcast_point&recursive=1&template=
+            <div>
+              <@recursive_content?"<i class=\"icon-chevron-right openclose\"></i> ":""@><label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> <@name@></label>
+                <@recursive_content?"<div style=\"padding-left:30px;\" class=\"hide\">":""@><@recursive_content@><@recursive_content?"</div>":""@>
+            </div>
+}>?>
+          </div>
+        </div>
       </div>
-	}>
-?>
     </div>
   </div>
 </div>
 
-</div>
-<div class="modal-footer">
-  <a href="#" class="btn btn-primary" data-dismiss="modal" >Sélectionner</a>
-</div>
+
+<div id="m_tags" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
+    <h3>Message <span id="m_tags_title"></span> : Tags</h3>
+  </div>
+  <div class="modal-body">
+    <div>
+      <div style="padding-left:30px;">
+<?message_tags&
+template=<{
+	tag&template=
+      	 <div>
+      	   <label class="checkbox"><input type="checkbox" value="<@id@>" tag="tags"><@name@></label>
+      	 </div>
+	}>
+?>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-primary" data-dismiss="modal" id="addtags">Ajouter</a>
+  </div>
 </div>
 
 

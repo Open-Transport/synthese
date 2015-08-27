@@ -102,6 +102,41 @@ function show_objects(recipient, message)
   $('#m_'+ recipient).modal();
 }
 
+function change_tag()
+{
+  var tag = $(this).attr('tag');
+  update_tags_field(current_message);
+  update_tags_preview(current_message);
+  activateForm();
+  $('#old_tags_alert').removeClass('hide');
+}
+
+function show_tags_click()
+{
+  show_tags(current_message);
+  return false;
+}
+
+function init_tags_click()
+{
+  current_message.tags = "";
+  update_tags_preview(current_message);
+  activateForm();
+  $('#old_tags_alert').removeClass('hide');
+  return false;
+}
+
+function show_tags(message)
+{
+  // Clean
+  var cbs = $('input[tag="tags"]');
+  cbs.each(function(){
+    $(this).get(0).checked = false;
+  });
+
+  $('#m_tags').modal();
+}
+
 function update_object_preview(recipient, message)
 {
   var available_recipients = $('input[factory="'+ recipient +'"]');
@@ -149,6 +184,12 @@ function update_object_preview(recipient, message)
   }
 }
 
+function update_tags_preview(message)
+{
+  var tags = message.tags;
+  $('#preview_tags').html(tags);
+}
+
 function send_mail_click()
 {
   if(!confirm("Etes-vous sûr de vouloir envoyer le message à la liste ?")) return false;
@@ -176,6 +217,25 @@ function update_objects_field(recipient, message)
   });
   
   message[recipient +'_recipient'] = recipients;
+}
+
+function update_tags_field(message)
+{
+  var tags = message.tags;
+  
+  var cbs = $('input[tag]');
+  cbs.each(function(){
+    if($(this).get(0).checked)
+    {
+      if (tags == '') {
+        tags = $(this).closest('label').text();
+      } else {
+        tags += ',' + $(this).closest('label').text();
+      }
+    }
+  });
+  
+  message.tags = tags;
 }
 
 function activateForm(myVAR)
@@ -481,7 +541,6 @@ function open_message(message)
   // When opening a message, format its content, i.e. \" becomes "
   tinyMCE.get('tinymce').setContent(message.content.replace(/\\\"/g,"\""));
   $('#message select[field=level]').val(message.level);
-  $('#message input[field=tags]').val(message.tags);
   $('#message [field=displayDuration]').val(message.displayDuration);
   if (message.digitized_version != "")
   {
@@ -519,16 +578,19 @@ function open_message(message)
     });
     $('#alternatives').removeClass('hide');
     $('#calendar_panel_id').html('4');
+    $('#tags_panel_id').html('5');
   }
   else
   {
     $('#alternatives').addClass('hide');
     $('#calendar_panel_id').html('3');
+    $('#tags_panel_id').html('4');
   }
 
   update_object_preview('line', message);
   update_object_preview('stoparea', message);
   update_object_preview('displayscreen', message);
+  update_tags_preview(message);
 
   // Select the corresponding menu item
   $('#menu > li').removeClass('active');
@@ -557,7 +619,6 @@ function close_message()
     // when closing a message, format its content to make it SYNTHESE registrabled, i.e. " becomes \"
     current_message.content = tinyMCE.get('tinymce').getContent().replace(/\"/g,"\\\"");
     current_message.level = $('#message select[field=level]').val();
-    current_message.tags = $('#message input[field=tags]').val();
     current_message.displayDuration = $('#message [field=displayDuration]').val();
     if ($('#message [field=digitized_version]').val() == $('#message input[field=def_digital_msg_url]').val())
     {
@@ -1176,8 +1237,11 @@ $(function(){
   $('.openclose').click(openclose);
   $('input[action=search]').keyup(filter);
   $('input[factory]').change(change_recipient);
+  $('#addtags').click(change_tag);
   $('#new_period').click(new_period_click);
   $('#message a[factory]').click(show_recipients_click);
+  $('#message a[inittags]').click(init_tags_click);
+  $('#message a[edittags]').click(show_tags_click);
   $('#message a[generate_alternative]').click(generate_alternative_click);
   $('#message input[field=title]').bind('keyup', change_message_title);
   $('#message input[field=title]').bind('cut', change_message_title);

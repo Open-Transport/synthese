@@ -4,6 +4,7 @@
 
 <ul id="nav_tabs" class="nav nav-tabs">
  <#tab_title&default=1&id=message_types&title=Types de messages#>
+ <#tab_title&id=message_tags&title=Mots clefs (tags de messages)#>
  <#tab_title&id=display_types&title=Types de bornes#>
  <#tab_title&id=mailing_lists&title=Listes de diffusion#>
  <#tab_title&id=broadcast_points&title=Autres diffuseurs#>
@@ -74,6 +75,72 @@
    ?>
   </div>
  </div>
+
+</div>
+<#tab_div&id=message_tags#>
+
+<@mtag_id=<@(tab=="message_tags")?roid:""@>@>
+  <div class="row-fluid">
+    <div class="span3" id="tree">
+      <ul class="nav nav-list well">
+        <li<@mtag_id?"":" class=\"active\""@>>
+          <?link&
+          target=<@p@>&
+          tab=message_tags&
+          text=Mots clefs<div class="pull-right" id="mtag_new_link"><i class="icon-plus <@mtag_id?"":"icon-white"@>"></i></div>
+          ?>
+        </li>
+<?message_tags&
+template=<{
+	tag&template=
+        <li class="tree_1 <@(id==mtag_id)?"active":""@>">
+          <?link&
+          target=<@p@>&
+          tab=message_tags&
+          roid=<@id@>&
+          text=<@name@>
+          <@(id==mtag_id)?("<div class=\"pull-right\" id=\"mtag_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>
+          ?>
+        </li>
+	}>
+?>
+      </ul>
+    </div>
+    <div class="span6">
+<?if&
+cond=<@mtag_id@>&
+else=
+      <div class="alert alert-info">Sélectionnez un type de message dans le menu ci-contre</div>&
+then=
+      <?form&
+      target=<@p@>&
+      tab=message_tags&
+      a=ObjectUpdate&
+      actionParam_object_id=<@mtag_id@>&
+      roid=<@mtag_id@>&
+      class=form-horizontal&
+      ?>
+	<?message_types&
+	roid=<@mtag_id@>&
+	template=<{
+		type&template=
+        <div class="control-group">
+          <label class="control-label">Nom</label>
+          <div class="controls">
+            <input type="text" name="actionParam_field_name" value="<@name@>" />
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <button type="submit" class="btn btn-warning">Modifier</button>
+          </div>
+        </div>
+		}>
+	?>
+      </form>
+?>
+    </div>
+  </div>
 
 </div><#tab_div&id=display_types#>
 
@@ -671,6 +738,35 @@
    <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
   </div>
  </form>
+</div>
+
+<div class="modal hide fade" id="mtag_new_modal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>Nouveau mot clef pour message</h3>
+  </div>
+  <?form&
+  name=mtag_new_form&
+  a=ObjectCreate&
+  actionParam_table_id=123&
+  target=<@p@>&
+  tab=message_tags&
+  co=1&
+  class=form-horizontal&
+  ?>
+    <div class="modal-body">
+      <div class="control-group">
+        <label class="control-label">Nom</label>
+        <div class="controls">
+          <input type="text" name="actionParam_field_name" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-warning" type="submit">Créer le mot clef pour message</button>
+      <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+    </div>
+  </form>
 </div>
 
 <div class="modal hide fade" id="ml_new_modal">

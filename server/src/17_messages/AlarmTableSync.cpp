@@ -150,7 +150,7 @@ namespace synthese
 
 			std::string tagsString(rows->getText(AlarmTableSync::COL_TAGS));
 			std::set<string> tags;
-			boost::algorithm::split(tags, tagsString, is_any_of(", "), token_compress_on );
+			boost::algorithm::split(tags, tagsString, is_any_of(","), token_compress_on );
 			alarm->setTags(tags);
 
 			// Section
@@ -313,7 +313,7 @@ namespace synthese
 			query.addField(object->getDisplayDuration());
 			query.addField(object->getDigitizedVersion());
 
-			string tagsString = boost::algorithm::join(object->getTags(), ", ");
+			string tagsString = boost::algorithm::join(object->getTags(), ",");
 			query.addField(tagsString);
 
 			query.execute(transaction);
