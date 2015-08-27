@@ -46,6 +46,8 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/algorithm/string/replace.hpp>
+#include <iostream>
+#include <iomanip>
 
 using namespace boost;
 using namespace boost::algorithm;
@@ -179,7 +181,6 @@ namespace synthese
 				// Remove connection_to_remove from list
 				_livingConnections.erase(itConnections);
 			}
-			//_livingConnections.erase(connection_to_remove);
 
 			delete connection_to_remove;
 			util::Log::GetInstance().info("Connection to Ineo SAE closed (count=" + boost::lexical_cast<std::string>(_livingConnections.size()) + ")");
@@ -262,6 +263,8 @@ namespace synthese
 				boost::shared_ptr<DataSource> ineoDataSource = Env::GetOfficialEnv().getEditable<DataSource>(_ineoDatasource);
 				DataSource::LinkedObjects ineoSaeScenarios(ineoDataSource->getLinkedObjects<SentScenario>());
 
+				util::Log::GetInstance().info("Deleting " + boost::lexical_cast<std::string>(ineoSaeScenarios.size()) + " Ineo SAE messages");
+
 				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& ineoSaeScenario, ineoSaeScenarios)
 				{
 					SentScenarioTableSync::Remove(NULL, ineoSaeScenario.second->getKey(), transaction, false);
@@ -274,9 +277,7 @@ namespace synthese
 			boost::recursive_mutex::scoped_lock messagesLock(_messagesMutex);
 			_messagesToSend.clear();
 
-			// For each Ineo Notification provider :
-			// * build a XXXGetStatesRequest to request active messages from Ineo SAE
-			// * build a XXXCreateMessageRequest for each currently active message associated to this provider
+			// For each Ineo Notification provider build a XXXGetStatesRequest to request messages from Ineo SAE
 			BOOST_FOREACH(const NotificationProvider::Registry::value_type& providerEntry, Env::GetOfficialEnv().getRegistry<NotificationProvider>())
 			{
 				boost::shared_ptr<NotificationProvider> provider = providerEntry.second;
@@ -284,7 +285,6 @@ namespace synthese
 				if(IneoNotificationChannel::FACTORY_KEY == provider->get<NotificationChannelKey>())
 				{
 					const ParametersMap& parameters = provider->get<Parameters>();
-					MessagesModule::ActivatedMessages providerMessages = MessagesModule::GetActivatedMessages(*provider, ParametersMap());
 
 					if(true == parameters.isDefined(IneoNotificationChannel::PARAMETER_INEO_MESSAGE_TYPE))
 					{
@@ -292,23 +292,9 @@ namespace synthese
 						std::string ineoMessageType = parameters.getValue(IneoNotificationChannel::PARAMETER_INEO_MESSAGE_TYPE);
 						std::string stateRequest = _buildGetStatesRequest(ineoMessageType);
 						addMessage(stateRequest);
-
-						util::Log::GetInstance().info("Ineo SAE NotificationProvider " + ineoMessageType + " has " +
-													  boost::lexical_cast<std::string>(providerMessages.size()) + " active messages");
-					}
-
-					BOOST_FOREACH(const boost::shared_ptr<Alarm> providerMessage, providerMessages)
-					{
-						// NotificationProvider does not process Alarm, it requires a NotificationEvent
-						// Since we don't want to add another NotificationEvent into the database, we create a fake one that is only used to generate the message
-						const boost::shared_ptr<NotificationEvent> fakeEvent(new NotificationEvent(0, *providerMessage, *provider, BEGIN));
-						provider->notify(fakeEvent);
 					}
 				}
 			}
-
-			util::Log::GetInstance().debug("Synchronization with Ineo SAE ended : " + boost::lexical_cast<std::string>(_messagesToSend.size()) +
-										   " messages queued for sending");
 		}
 
 
@@ -1142,6 +1128,43 @@ namespace synthese
 			std::string ineoMessageType = tagName.substr(0, tagName.find("GetStatesResponse"));
 			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
 
+			boost::shared_ptr<NotificationProvider> provider;
+			MessagesModule::ActivatedMessages activatedMessages;
+			typedef std::map< std::string, boost::shared_ptr<Alarm> > MessageMap;
+			MessageMap mapActivatedMessages;
+			MessageMap mapMessagesUnknownFromIneo;
+
+			// Find the NotificationProvider matching this response and query its activated messages
+			BOOST_FOREACH(const NotificationProvider::Registry::value_type& providerEntry, Env::GetOfficialEnv().getRegistry<NotificationProvider>())
+			{
+				if(IneoNotificationChannel::FACTORY_KEY == providerEntry.second->get<NotificationChannelKey>())
+				{
+					const ParametersMap& parameters = providerEntry.second->get<Parameters>();
+
+					if(ineoMessageType == parameters.getDefault<std::string>(IneoNotificationChannel::PARAMETER_INEO_MESSAGE_TYPE, ""))
+					{
+						provider = providerEntry.second;
+						activatedMessages = MessagesModule::GetActivatedMessages(*provider, ParametersMap());
+						break;
+					}
+				}
+			}
+
+			util::Log::GetInstance().info("Ineo Terminus : SYNTHESE has " + boost::lexical_cast<std::string>(activatedMessages.size()) + " active messages for " + ineoMessageType);
+
+			// Compute the "Ineo title" of each message and create a dictionary based on that key for fast lookup
+			BOOST_FOREACH(MessagesModule::ActivatedMessages::value_type message, activatedMessages)
+			{
+				std::string messageTitle = message->get<ShortMessage>();
+				RegistryKeyType messageId = message->getKey();
+				std::stringstream messageKeyStream;
+				messageKeyStream << std::setfill('0') << (messageId % 10000) << " " << messageTitle.substr(0, 27);
+				mapActivatedMessages.insert(std::make_pair(messageKeyStream.str(), message));
+			}
+
+			// Perform a copy the map of currently activated messages that will be used to determine which messages must be sent to Ineo
+			mapMessagesUnknownFromIneo = mapActivatedMessages;
+
 			XMLNode idNode = node.getChildNode("ID", 0);
 			string idStr = idNode.getText();
 
@@ -1159,7 +1182,8 @@ namespace synthese
 
 			XMLNode messagingStatesNode = node.getChildNode("MessagingStates", 0);
 			int numMessagingStateNode = messagingStatesNode.nChildNode("MessagingState");
-			int numActiveMessages = 0;
+			int numCreatedMessages = 0;
+			int numSentMessages = 0;
 
 			for (int cptMessagingStateNode = 0; cptMessagingStateNode < numMessagingStateNode; cptMessagingStateNode++)
 			{
@@ -1172,21 +1196,45 @@ namespace synthese
 				if("oui" == isActiveText)
 				{
 					Messaging message = _readMessagingNode(messagingNode, ineoMessageType);
-					vector<Messaging> messages;
-					messages.push_back(message);
+					MessageMap::iterator it = mapActivatedMessages.find(message.name);
 
-					// Creation of a scenario and a message in SYNTHESE
-					// Note : Ineo does not expect SYNTHESE to reply to a XXXGetStatesResponse, so we do not create an error response
-					IneoApplicationError unused = AucuneErreur;
-					_createMessages(messages, fakeBroadCastPoint, unused);
+					if(mapActivatedMessages.end() == it)
+					{
+						// This message is not a currently activated message of SYNTHESE, create it with origin = Ineo
+						vector<Messaging> messages;
+						messages.push_back(message);
 
-					numActiveMessages++;
+						// Creation of a scenario and a message in SYNTHESE
+						// Note : Ineo does not expect SYNTHESE to reply to a XXXGetStatesResponse, so we do not create an error response
+						IneoApplicationError unused = AucuneErreur;
+						_createMessages(messages, fakeBroadCastPoint, unused);
+
+						numCreatedMessages++;
+					}
+
+					else
+					{
+						// This message is a currently activated message of SYNTHESE, remove it from the list of messages unknown from Ineo
+						mapMessagesUnknownFromIneo.erase(message.name);
+						util::Log::GetInstance().debug("Ineo Terminus : message " + message.name + " from Ineo matches a SYNTHESE message, do not recreate");
+					}
 				}
+			}
+
+			// Loop through the list of currently activated messages that Ineo does not know, and send them to Ineo
+			BOOST_FOREACH(MessageMap::value_type messageEntry, mapMessagesUnknownFromIneo)
+			{
+				// NotificationProvider does not process Alarm, it requires a NotificationEvent
+				// Since we don't want to add another NotificationEvent into the database, we create a fake one that is only used to generate the message
+				const boost::shared_ptr<NotificationEvent> fakeEvent(new NotificationEvent(0, *(messageEntry.second.get()), *provider, BEGIN));
+				provider->notify(fakeEvent);
+				numSentMessages++;
 			}
 
 			util::Log::GetInstance().debug(
 				"Ineo Terminus processing message " + tagName + " : id " + idStr + " ; request id " + requestIdStr + " ; timestamp " +
-				boost::posix_time::to_simple_string(responseTimeStamp) + " ; from " + responseRefStr + " with " + lexical_cast<string>(numActiveMessages) + " active message(s)"
+				boost::posix_time::to_simple_string(responseTimeStamp) + " ; from " + responseRefStr + " with " + lexical_cast<string>(numCreatedMessages) +
+				" created message(s) and " + lexical_cast<string>(numSentMessages) + " sent message(s)"
 			);
 
 			return status;
