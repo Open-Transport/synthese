@@ -1,24 +1,5 @@
 <div class="row-fluid">
-  <div class="span3">
-    <ul id="folders-list" class="nav nav-list well">
-      <?menu&root=<@~global("website_media_id")@>&raw_data=1&min_depth=0&max_depth=9999&template=
-      <li<@folder_id?"":" class=\"active\""@>>
-      <a href="#" data-file-action="reloadFilesList">Multimédia
-        <?if&cond=<@admin_mediatheque@>&then=<span class="folder-actions"<@folder_id?" style=\"display: none\"":""@>><span class="pull-right" data-form-action="addFolder" data-parent="si"><i class="icon-plus icon-white"></i></span></span></a>?>
-      </li>
-      <{page&recursive=1&template=
-      <?if&cond=<@mime_type=="/"@>&then=
-      <li class="tree_<@depth+1@><?if&cond=<@id==<@folder_id@>@>&then= active?>" file_id="<@id@>" file_type="<@mime_type@>" file_path="<@smart_url_path@>">
-        <a href="#" data-id="<@id@>" data-file-action="reloadFilesList" data-title="<@title@>"><@title@><?if&cond=<@smart_url_path@>&then= - <@smart_url_path@>?>
-        <?if&cond=<@admin_mediatheque@>&then=<span class="folder-actions"<?if&cond=<@id==<@folder_id@>@>&else= style="display: none"?>><span class="pull-right" data-form-action="addFolder" data-parent="pi"><i class="icon-plus icon-white"></i></span><span class="pull-right" data-form-action="renameFolder"><i class="icon-edit icon-white"></i></span>
-          <?if&cond=<@recursive_content@>&else=<span class="pull-right" data-form-action="removeFolder"><i class="icon-remove icon-white"></i></span>?>
-        </span>?></a>
-      </li>
-      ?>
-      <@recursive_content@>
-      }>
-      ?>
-    </ul>
+  <div id ="folders-zone" class="span3">
   </div>
   <@folder_data_id=<?if&cond=<@folder_id@>&then=data-id="<@folder_id@>"?>@>
   <div class="span9">
@@ -47,8 +28,38 @@
     </div>
   </div>
   <script>
-    function changeListFiles() {
+  function changeMedialibraryId() {
+    var media_id = $(this).val();
+    $('#selectMediaLibrary').attr('data-id', media_id);
+    $('#selectMediaLibrary').attr('data-website-id', $(this).attr('data-website-id'));
+    loadFoldersList(media_id);
+  }
+  function loadFoldersList(active_media_id, active_folder_id) {
+      $.ajax({
+        type: 'GET',
+        url: "/terminus/list_folders",
+        data: { folder_id: active_folder_id,
+                medialibrary_id: active_media_id,
+                admin_mediatheque: $('#admin_mediatheque').length
+              }
+        })
+        .done(function (data, status) {
+          if (status == "success") {
+            $('#folders-zone').html(data);
+            changeListFiles(null, active_folder_id);
+          } else {
+            addAlert();
+          }
+        })
+        .fail(function (data, status, error) {
+          addAlert();
+        });
+    }
+    function changeListFiles(event, active_folder_id) {
       var elem = $(this);
+      if (!elem.attr('data-id') && typeof active_folder_id != 'undefined') {
+        elem = $('#folders-list').find('[data-id='+active_folder_id+']');
+      }
       if (elem.attr('data-id')) {
         // Copy folder id to live action buttons
         $('.holder-folder-id').attr('data-id', elem.attr('data-id'));
@@ -58,6 +69,7 @@
           type: 'GET',
           url: "/terminus/list_files",
           data: { folder_id: elem.attr('data-id'),
+                  medialibrary_id: $('#selectMediaLibrary').attr('data-id'),
                   admin_mediatheque: $('#admin_mediatheque').length,
                   file_search: $('[name="file_search"]').val(),
                   view_mode: $('#view-mode').attr('data-active-mode') },
@@ -87,8 +99,8 @@
         $('#files-list').html("<div class='alert alert-info'>Aucun élément n'est présent dans ce répertoire.</div>");
         $('#folders-list').children('.active').find('.folder-actions').hide();
         $('#folders-list').children('.active').removeClass('active');
-        $('#folders-list').children().first().addClass('active');
-        $('#folders-list').children().first().find('.folder-actions').show();
+        $('#folders-root').addClass('active');
+        $('#folders-root').find('.folder-actions').show();
       }
     }
 <?if&cond=<@admin_mediatheque@>&else=
@@ -125,10 +137,12 @@
       $('.view-mode-button').click(function () {
         $('#view-mode').attr('data-active-mode', $(this).attr('data-mode'));
       });
-      $('[data-file-action="reloadFilesList"]').click(changeListFiles);
+      $(document).on('change', '#selectMediaLibrary', changeMedialibraryId);
+      $(document).on('click', '[data-file-action="reloadFilesList"]', changeListFiles);
 <?if&cond=<@admin_mediatheque@>&then=
-      $('#search-button').trigger('click');
+      loadFoldersList("<@medialibrary_id@>"<?if&cond=<@folder_id@>&then=, "<@folder_id@>"?>);
 &else=
+      loadFoldersList();
       $(document).on('click', '[data-file-action="selectFile"]', selectFile);
       $(document).on('dblclick', '[data-file-action="selectFile"]', selectAndSubmitFileForm);
       $(document).on('click', '[submit="m_image"]', submitFileForm);

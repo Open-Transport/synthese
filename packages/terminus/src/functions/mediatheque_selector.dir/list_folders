@@ -1,0 +1,29 @@
+<?if&cond=<@medialibrary_id@>&else=
+  <?media_libraries&template=<{medialibrary&template=
+  <?if&cond=<@website_name@>&then=<?if&cond=<@medialibrary_id@>&else=<@medialibrary_id=<@id@>@>?>?>
+  <?if&cond=<@~global("default_medialibrary_id")==id@>&then=<@medialibrary_id=<@id@>@>?>}>?>
+?>
+<?object&roid=<@medialibrary_id@>&additional_parameters=1&template=<@current_website_id=<@website_id@>@><@current_website_name=<@website_name@>@>?>
+<ul id="folders-list" class="nav nav-list well">
+  <li><select id="selectMediaLibrary" data-id="<@medialibrary_id@>" data-website-id="<@current_website_id@>">
+    <?media_libraries&template=<{medialibrary&template=
+    <option value="<@id@>" data-website-id="<@website_id@>"<?if&cond=<@id==medialibrary_id@>&then= selected="true"?>><@website_name@></option>}>?>
+  </select></li><li class="divider"></li>
+  <?menu&root=<@current_website_id@>&raw_data=1&min_depth=0&max_depth=9999&template=
+  <li id="folders-root"<@folder_id?"":" class=\"active\""@>>
+  <a href="#" data-file-action="reloadFilesList"><@current_website_name@>
+  <?if&cond=<@admin_mediatheque@>&then=<span class="folder-actions"<@folder_id?" style=\"display: none\"":""@>><span class="pull-right" data-form-action="addFolder" data-parent="si"><i class="icon-plus icon-white"></i></span></span>?></a>
+  </li>
+  <{page&recursive=1&template=
+  <?if&cond=<@mime_type=="/"@>&then=
+  <li class="tree_<@depth+1@><?if&cond=<@id==folder_id@>&then= active?>" file_id="<@id@>" file_type="<@mime_type@>" file_path="<@smart_url_path@>">
+    <a href="#" data-id="<@id@>" data-file-action="reloadFilesList" data-title="<@title@>"><@title@><?if&cond=<@smart_url_path@>&then= - <@smart_url_path@>?>
+    <?if&cond=<@admin_mediatheque@>&then=<span class="folder-actions"<?if&cond=<@id==folder_id@>&else= style="display: none"?>><span class="pull-right" data-form-action="addFolder" data-parent="pi"><i class="icon-plus icon-white"></i></span><span class="pull-right" data-form-action="renameFolder"><i class="icon-edit icon-white"></i></span>
+      <?if&cond=<@recursive_content@>&else=<span class="pull-right" data-form-action="removeFolder"><i class="icon-remove icon-white"></i></span>?>
+    </span>?></a>
+  </li>
+  ?>
+  <@recursive_content@>
+  }>
+  ?>
+</ul>

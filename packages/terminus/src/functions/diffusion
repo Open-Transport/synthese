@@ -320,12 +320,11 @@ template=
         <label>Texte principal<div class="pull-right" id="chars_main"></div><br />
           <textarea id="tinymce" class="mceEditor" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()" field="content"></textarea>
         </label>
-        <?object&roid=<@~global("website_media_id")@>&template=
-        <?if&cond=<@exceptions@>&else=
+        <?media_libraries&template=<{medialibrary&template=<?if&cond=<@website_name@>&then=<@medialibraryFound=1@>?>}>?>
+        <?if&cond=<@medialibraryFound@>&then=
         <input type="hidden" field="m_image" onchange="activateForm()">
         <span class="file-picture"></span>
         <a href="#m_image" data-toggle="modal" field="m_image-link">Ajouter une image</a>
-        ?>
         ?>
       </div><div class="row-fluid">
           <label>URL version numérisée
