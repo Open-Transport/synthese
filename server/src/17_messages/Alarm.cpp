@@ -65,6 +65,14 @@ namespace synthese
 		const string Alarm::DATA_DIRECTION_SIGN_CODE("direction_sign_code");
 		const string Alarm::DATA_START_STOP_POINT("start_stop_point");
 		const string Alarm::DATA_END_STOP_POINT("end_stop_point");
+		const string Alarm::DATA_REPEAT_INTERVAL("repeat_interval");
+		const string Alarm::DATA_WITH_ACK("with_ack");
+		const string Alarm::DATA_MULTIPLE_STOPS("multiple_stops");
+		const string Alarm::DATA_PLAY_TTS("play_tts");
+		const string Alarm::DATA_LIGHT("light");
+		const string Alarm::DATA_DIRECTION_SIGN_CODE("direction_sign_code");
+		const string Alarm::DATA_START_STOP_POINT("start_stop_point");
+		const string Alarm::DATA_END_STOP_POINT("end_stop_point");
 
 		const string Alarm::TAG_MESSAGE_ALTERNATIVE = "message_alternative";
 		const string Alarm::TAG_RECIPIENTS = "recipients";

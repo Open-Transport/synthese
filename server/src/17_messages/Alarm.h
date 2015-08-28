@@ -76,6 +76,14 @@ namespace synthese
 			static const std::string DATA_DIRECTION_SIGN_CODE;
 			static const std::string DATA_START_STOP_POINT;
 			static const std::string DATA_END_STOP_POINT;
+			static const std::string DATA_REPEAT_INTERVAL;
+			static const std::string DATA_WITH_ACK;
+			static const std::string DATA_MULTIPLE_STOPS;
+			static const std::string DATA_PLAY_TTS;
+			static const std::string DATA_LIGHT;
+			static const std::string DATA_DIRECTION_SIGN_CODE;
+			static const std::string DATA_START_STOP_POINT;
+			static const std::string DATA_END_STOP_POINT;
 
 			static const std::string TAG_MESSAGE_ALTERNATIVE;
 			static const std::string TAG_RECIPIENTS;

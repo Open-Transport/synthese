@@ -427,10 +427,10 @@ function activate_filter(isOnAllSections)
          }
        }
        // Notification events flags
-       if(thevent[i].hold_count > 0) {
+       if(theevent[i].hold_count > 0) {
          s += '<i class="icon-flag"></i>';
        }
-       if(thevent[i].failed_count > 0) {
+       if(theevent[i].failed_count > 0) {
          s += '<i class="icon-warning-sign"></i>';
        }
        s += '</td>';
