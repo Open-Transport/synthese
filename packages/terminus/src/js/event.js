@@ -175,7 +175,7 @@ function update_tags_preview(message)
   $('#preview_tags').html(tags);
 }
 
-function send_mail_click()
+function unhold_events_click()
 function unhold_events_click()
 {
   if(!confirm("Etes-vous sûr de vouloir libérer les notifications retenues de l\'événement ?")) return false;
