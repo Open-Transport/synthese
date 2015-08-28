@@ -294,7 +294,7 @@ namespace synthese
 			if(NULL != parametersDictionary)
 			{
 				parametersMap = BuildParametersMapFromDictionary(parametersDictionary);
-				Py_DECREF(parametersDictionary);
+				//Py_DECREF(parametersDictionary);
 			}
 
 			parametersMap->insert(Request::PARAMETER_ACTION, actionName);
