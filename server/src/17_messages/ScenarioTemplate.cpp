@@ -24,13 +24,13 @@
 
 #include "ScenarioTemplate.h"
 
-#include "SentAlarm.h"
-#include "AlarmTemplate.h"
+#include "Alarm.h"
 #include "MessagesSection.hpp"
 #include "ParametersMap.h"
 #include "Registry.h"
 #include "Request.h"
 #include "ScenarioFolder.h"
+#include "ScenarioCalendar.hpp"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -43,62 +43,34 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 
+	CLASS_DEFINITION(messages::ScenarioTemplate, "t028_scenario_templates", 28)
+	FIELD_DEFINITION_OF_TYPE(messages::Folder, "folder_id", SQL_INTEGER)
+
 	namespace messages
 	{
+		
 		const std::string ScenarioTemplate::DATA_SCENARIO_ID = "scenario_id";
 		const std::string ScenarioTemplate::DATA_NAME = "name";
 		const std::string ScenarioTemplate::DATA_FOLDER_ID = "folder_id";
 		const std::string ScenarioTemplate::DATA_FOLDER_NAME = "folder_name";
 		const std::string ScenarioTemplate::DATA_IS_TEMPLATE = "is_template";
-		const std::string ScenarioTemplate::DATA_CODE = "code";
-		const std::string ScenarioTemplate::DATA_HELP_MESSAGE = "help_message";
-		const std::string ScenarioTemplate::DATA_REQUIRED = "required";
 
 		const std::string ScenarioTemplate::TAG_VARIABLE = "variable";
 		const std::string ScenarioTemplate::TAG_MESSAGE = "message";
 		const std::string ScenarioTemplate::TAG_SECTION = "section";
 		const std::string ScenarioTemplate::TAG_CALENDAR = "calendar";
 
-
-
 		ScenarioTemplate::ScenarioTemplate(
-			const ScenarioTemplate& source,
-			const std::string& name
-		):	Registrable(0),
-			Scenario(name),
-			_folder(source._folder),
-			_variables(source._variables)
+			util::RegistryKeyType key)
+			:	Scenario(key),
+				Object<ScenarioTemplate, ScenarioTemplateRecord>(
+					Schema(
+						FIELD_VALUE_CONSTRUCTOR(Key, key),
+						FIELD_DEFAULT_CONSTRUCTOR(Name),
+						FIELD_DEFAULT_CONSTRUCTOR(Folder),
+						FIELD_DEFAULT_CONSTRUCTOR(Sections)
+						))
 		{}
-
-
-
-		ScenarioTemplate::ScenarioTemplate(
-			const std::string name,
-			ScenarioFolder* folder
-		):	Registrable(0),
-			Scenario(name),
-			_folder(folder)
-		{}
-
-
-
-		ScenarioTemplate::ScenarioTemplate(
-			util::RegistryKeyType key
-		):	util::Registrable(key)
-			, Scenario()
-			, _folder(NULL)
-		{}
-
-
-
-		ScenarioTemplate::ScenarioTemplate(
-			const SentScenario& source,
-			const std::string& name
-		):	Registrable(0),
-			Scenario(name),
-			_folder(NULL)
-		{}
-
 
 
 		ScenarioTemplate::~ScenarioTemplate()
@@ -108,186 +80,16 @@ namespace synthese
 
 		ScenarioFolder* ScenarioTemplate::getFolder() const
 		{
-			return _folder;
+			return get<Folder>().get_ptr();
 		}
-
 
 
 		void ScenarioTemplate::setFolder(ScenarioFolder* value )
 		{
-			_folder = value;
+			set<Folder>(value
+						? boost::optional<ScenarioFolder&>(*value)
+						: boost::none);
 		}
-
-
-
-		const ScenarioTemplate::VariablesMap& ScenarioTemplate::getVariables(
-		) const {
-			return _variables;
-		}
-
-
-
-		void ScenarioTemplate::setVariablesMap(
-			const VariablesMap& value
-		){
-			_variables = value;
-		}
-
-
-
-		void ScenarioTemplate::GetVariablesInformations(
-			const std::string& text,
-			ScenarioTemplate::VariablesMap& result
-		){
-			for(string::const_iterator it(text.begin()); it != text.end(); ++it)
-			{
-				// jump over other characters than $
-				if (*it != '$') continue;
-
-				++it;
-
-				// $$$ = $
-				if (it != text.end() && *it== '$' && it+1 != text.end() && *(it+1) == '$')
-				{
-					++it;
-					continue;
-				}
-
-				// this is a variable definition
-				ScenarioTemplate::Variable v;
-
-				if(it == text.end())
-				{
-					break;
-				}
-
-				// compulsory variable
-				if (*it == '$')
-				{
-					++it;
-					v.compulsory = true;
-				}
-				else
-				{
-					v.compulsory = false;
-				}
-
-				// variable code
-				string::const_iterator it2(it);
-				for(; it != text.end() && *it != '|' && *it != '$'; ++it);
-				if (it == text.end())
-				{
-					break;
-				}
-				v.code = text.substr(it2-text.begin(), it-it2);
-
-				// variable information
-				if (*it == '|')
-				{
-					++it;
-					it2 = it;
-					for(; it != text.end() && *it != '$'; ++it);
-					if (it == text.end())
-					{
-						break;
-					}
-					v.helpMessage = text.substr(it2-text.begin(), it-it2);
-				}
-
-				// storage
-				ScenarioTemplate::VariablesMap::iterator vmit(result.find(v.code));
-				if(vmit == result.end())
-				{
-					result.insert(make_pair(v.code, v));
-				}
-				else
-				{
-					vmit->second.helpMessage += v.helpMessage;
-					if(v.compulsory) vmit->second.compulsory = true;
-				}
-			}
-		}
-
-
-
-		std::string ScenarioTemplate::WriteTextFromVariables(
-			const std::string& text,
-			const SentScenario::VariablesMap& variables
-		){
-			stringstream stream;
-
-			for(string::const_iterator it(text.begin()); it != text.end(); ++it)
-			{
-				// jump over other characters than $
-				if (*it != '$')
-				{
-					stream << *it;
-					continue;
-				}
-
-				++it;
-
-				// $$$ = $
-				if (it != text.end() && *it== '$' && it+1 != text.end() && *(it+1) == '$')
-				{
-					stream << "$";
-					++it;
-					continue;
-				}
-
-				// compulsory variable
-				if (*it == '$')
-				{
-					++it;
-				}
-
-				// variable code
-				string code;
-				string::const_iterator it2(it);
-				for(; it != text.end() && *it != '|' && *it != '$'; ++it);
-				if (it == text.end())
-				{
-					break;
-				}
-				code = text.substr(it2-text.begin(), it-it2);
-
-				// variable information
-				if (*it == '|')
-				{
-					++it;
-					it2 = it;
-					for(; it != text.end() && *it != '$'; ++it);
-					if (it == text.end())
-					{
-						break;
-					}
-				}
-
-				// writing
-				SentScenario::VariablesMap::const_iterator vmit(variables.find(code));
-				if(vmit != variables.end())
-				{
-					stream << vmit->second;
-				}
-			}
-			return stream.str();
-		}
-
-
-
-		bool ScenarioTemplate::CheckCompulsoryVariables(
-			const ScenarioTemplate::VariablesMap& variables,
-			const SentScenario::VariablesMap& values
-		){
-			BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
-			{
-				if(!variable.second.compulsory) continue;
-
-				if(values.find(variable.second.code) == values.end()) return false;
-			}
-			return true;
-		}
-
 
 
 		void ScenarioTemplate::toParametersMap(
@@ -306,23 +108,6 @@ namespace synthese
 			// is template
 			pm.insert(DATA_IS_TEMPLATE, true);
 
-			// variables
-			BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, getVariables())
-			{
-				boost::shared_ptr<ParametersMap> variablePM(new ParametersMap);
-				// code
-				variablePM->insert(DATA_CODE, variable.first);
-
-				// help_message
-				variablePM->insert(DATA_HELP_MESSAGE, variable.second.helpMessage);
-
-				// required
-				variablePM->insert(DATA_REQUIRED, variable.second.compulsory);
-
-				pm.insert(TAG_VARIABLE, variablePM);
-			}
-
-
 			// Calendars
 			bool oneMessageWithoutCalendar(false);
 			BOOST_FOREACH(const ScenarioCalendar* calendar, getCalendars())
@@ -331,7 +116,7 @@ namespace synthese
 				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 				calendar->toParametersMap(*calendarPM);
 				pm.insert(TAG_CALENDAR, calendarPM);
-
+				
 				// Messages loop
 				BOOST_FOREACH(const Alarm* alarm, getMessages())
 				{
@@ -341,7 +126,7 @@ namespace synthese
 						oneMessageWithoutCalendar = true;
 						continue;
 					}
-
+					
 					// Jump over messages of other calendars
 					if(alarm->getCalendar() != calendar)
 					{
@@ -356,16 +141,15 @@ namespace synthese
 			}
 
 			// Fake calendar for old style messages
-			if(	oneMessageWithoutCalendar ||
-				(getCalendars().empty() && !getMessages().empty())
-			){
+			if(		   oneMessageWithoutCalendar ||
+					   (getCalendars().empty() && !getMessages().empty())
+				){
 				// Fake calendar export
 				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 				calendarPM->insert(Key::FIELD.name, 0);
 				calendarPM->insert(Name::FIELD.name, string());
 				calendarPM->insert(ScenarioPointer::FIELD.name, getKey());
 				pm.insert(TAG_CALENDAR, calendarPM);
-
 				// Old style messages loop
 				BOOST_FOREACH(const Alarm* alarm, getMessages())
 				{
@@ -375,14 +159,13 @@ namespace synthese
 						continue;
 					}
 
-					// Message export
 					boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
 					alarm->toParametersMap(*messagePM, false, string(), true);
 					calendarPM->insert(TAG_MESSAGE, messagePM);
 				}
 			}
 
-			// Sections
+
 			BOOST_FOREACH(const MessagesSection* section, getSections())
 			{
 				boost::shared_ptr<ParametersMap> sectionPM(new ParametersMap);
@@ -400,4 +183,5 @@ namespace synthese
 				pm.insert(DATA_FOLDER_NAME, getFolder()->getName());
 			}
 		}
+
 }	}

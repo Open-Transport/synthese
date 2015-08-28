@@ -47,7 +47,7 @@ namespace synthese
 	{
 		class AlarmRecipient;
 		class MessageType;
-		class SentAlarm;
+		class Alarm;
 		class ScenarioFolder;
 		class ScenarioTemplate;
 
@@ -131,8 +131,7 @@ namespace synthese
 				boost::optional<boost::posix_time::ptime>			_endDate;
 				boost::optional<boost::posix_time::ptime>			_eventStartDate;
 				boost::optional<boost::posix_time::ptime>			_eventEndDate;
-				SentScenario::VariablesMap							_variables;
-				boost::optional<Scenario::Sections>					_sections;
+				boost::optional<std::set<MessagesSection*> >  _sections;
 			//@}
 
 			//! @name Values for A/B/G/H message update full method
@@ -160,7 +159,7 @@ namespace synthese
 				std::string											_digitizedVersion;
 				boost::shared_ptr<const MessagesSection>			_messageSection;
 				std::string											_dataSourceLinkId;
-				boost::shared_ptr<SentAlarm>						_message;
+				boost::shared_ptr<Alarm>							_message;
 			//@}
 
 

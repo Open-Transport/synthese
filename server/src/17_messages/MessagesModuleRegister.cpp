@@ -9,7 +9,8 @@
 #include "MessageTagTableSync.hpp"
 #include "MessageTypeTableSync.hpp"
 #include "NotificationEventTableSync.hpp"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
+#include "ScenarioTemplateTableSync.h"
 #include "ScenarioCalendarTableSync.hpp"
 #include "ScenarioFolderTableSync.h"
 #include "TextTemplateTableSync.h"
@@ -69,7 +70,8 @@
 #include "Alarm.h"
 #include "TextTemplate.h"
 #include "ScenarioFolder.h"
-#include "Scenario.h"
+#include "SentScenario.h"
+#include "ScenarioTemplate.h"
 #include "ScenarioCalendar.hpp"
 #include "FileNotificationChannel.hpp"
 #include "HttpNotificationChannel.hpp"
@@ -95,7 +97,8 @@ void synthese::messages::moduleRegister()
 	synthese::messages::NotificationEventTableSync::integrate();
 	synthese::messages::ScenarioCalendarTableSync::integrate();
 	synthese::messages::ScenarioFolderTableSync::integrate();
-	synthese::messages::ScenarioTableSync::integrate();
+	synthese::messages::ScenarioTemplateTableSync::integrate();
+	synthese::messages::SentScenarioTableSync::integrate();
 	synthese::messages::TextTemplateTableSync::integrate();
 
 	synthese::messages::MessagesAdmin::integrate();
@@ -149,17 +152,20 @@ void synthese::messages::moduleRegister()
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::messages::AlarmObjectLink>();
-	synthese::util::Env::Integrate<synthese::messages::NotificationEvent>();
-	synthese::util::Env::Integrate<synthese::messages::NotificationProvider>();
-	synthese::util::Env::Integrate<synthese::messages::MessageAlternative>();
-	synthese::util::Env::Integrate<synthese::messages::MessageApplicationPeriod>();
-	synthese::util::Env::Integrate<synthese::messages::MessageTag>();
-	synthese::util::Env::Integrate<synthese::messages::MessageType>();
-	synthese::util::Env::Integrate<synthese::messages::ScenarioCalendar>();
-	synthese::util::Env::Integrate<synthese::messages::Alarm>();
+	//INTEGRATE(synthese::messages::AlarmObjectLink);
+	INTEGRATE(synthese::messages::NotificationEvent);
+	INTEGRATE(synthese::messages::NotificationProvider);
+	INTEGRATE(synthese::messages::MessageAlternative);
+	INTEGRATE(synthese::messages::MessageApplicationPeriod);
+	INTEGRATE(synthese::messages::MessageTag);
+	INTEGRATE(synthese::messages::MessageType);
+	INTEGRATE(synthese::messages::ScenarioCalendar);
+	INTEGRATE(synthese::messages::Alarm);
 	synthese::util::Env::Integrate<synthese::messages::TextTemplate>();
-	synthese::util::Env::Integrate<synthese::messages::ScenarioFolder>();
-	synthese::util::Env::Integrate<synthese::messages::Scenario>();
-	synthese::util::Env::Integrate<synthese::messages::CustomBroadcastPoint>();
-	synthese::util::Env::Integrate<synthese::messages::MessagesSection>();
+	INTEGRATE(synthese::messages::ScenarioFolder);
+	INTEGRATE(synthese::messages::ScenarioTemplate);
+	INTEGRATE(synthese::messages::SentScenario);
+	INTEGRATE(synthese::messages::CustomBroadcastPoint);
+	INTEGRATE(synthese::messages::MessagesSection);
+
 }

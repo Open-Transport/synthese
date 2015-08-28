@@ -66,6 +66,9 @@ namespace synthese
 					util::Env& env
 				);
 
+				template<class S>
+				void append();
+				
 				bool contains(const std::string& code) const;
 
 				Set get(const std::string& code) const;
@@ -107,7 +110,6 @@ namespace synthese
 				}
 				add(*v);
 		}	}
-
 
 
 		template<class T>

@@ -23,50 +23,55 @@
 #ifndef SYNTHESE_messages_ScenarioFolder_h__
 #define SYNTHESE_messages_ScenarioFolder_h__
 
-#include "Registrable.h"
-#include "Registry.h"
-#include "UtilTypes.h"
+#include "Object.hpp"
+#include "StringField.hpp"
+#include "PointerField.hpp"
+
 #include <string>
 
 namespace synthese
 {
 	namespace messages
 	{
+		class ScenarioFolder;
+
+		FIELD_POINTER(Parent, ScenarioFolder)
+		
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(Parent)
+			> ScenarioFolderRecord;
+		
+		
 		/** Scenario Folder class.
 
 			@ingroup m17
 		*/
 		class ScenarioFolder:
-			public virtual util::Registrable
+			public Object<ScenarioFolder, ScenarioFolderRecord>
 		{
-		public:
-			static const std::string ATTR_NAME;
-			static const std::string ATTR_ID;
-
-			/// Chosen registry class.
-			typedef util::Registry<ScenarioFolder>	Registry;
-
-		protected:
-			ScenarioFolder* _parent;
-			std::string	_name;
 
 		public:
+			
 			ScenarioFolder(
 				util::RegistryKeyType key = 0
 			);
 
+/*
 			//! @name Getters
 			//@{
-				ScenarioFolder*		getParent()	const;
-				virtual std::string	getName()	const;
+			ScenarioFolder*		getParent()	const { return get<Parent>(); }
 			//@}
-
+			
 			//! @name Setters
 			//@{
 				void	setName(const std::string& value);
 				void	setParent(ScenarioFolder* value);
 			//@}
+			*/
 
+			
 			//! @name Queries
 			//@{
 				/** Full path getter.
@@ -77,13 +82,14 @@ namespace synthese
 				std::string getFullName() const;
 
 
-
+/*
 				virtual void toParametersMap(
 					util::ParametersMap& map,
 					bool withAdditionalParameters,
 					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
 				) const;
+*/
 			//@}
 
 		};

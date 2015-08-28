@@ -24,10 +24,15 @@
 #define SYNTHESE_MESSAGES_ALARM_H
 
 #include "PointerField.hpp"
+#include "PointerField2.hpp"
+#include "EnumObjectField.hpp"
+#include "DataSourceLinksField.hpp"
 
 #include "ImportableTemplate.hpp"
 #include "MessagesTypes.h"
-#include "Registrable.h"
+#include "MessagesSection.hpp"
+#include "ScenarioCalendar.hpp"
+#include "Scenario.h"
 
 #include <string>
 #include <boost/shared_ptr.hpp>
@@ -49,15 +54,57 @@ namespace synthese
 		class Scenario;
 		class ScenarioCalendar;
 
+		FIELD_ENUM(Level, AlarmLevel)
+		FIELD_STRING(ShortMessage)
+		FIELD_STRING(LongMessage)
+		FIELD_POINTER2(ParentScenario, Scenario)
+		FIELD_BOOL(RawEditor)
+		FIELD_BOOL(Done)
+		FIELD_POINTER(Calendar, ScenarioCalendar)
+		FIELD_SIZE_T(DisplayDuration)
+		FIELD_STRING(DigitizedVersion)
+		FIELD_INT(RepeatInterval)
+		FIELD_STRING(Tags)
+		FIELD_BOOL(WithAck)
+		FIELD_BOOL(MultipleStops)
+		FIELD_BOOL(PlayTts)
+		FIELD_BOOL(Light)
+		FIELD_INT(DirectionSignCode)
+		FIELD_INT(StartStopPoint)
+		FIELD_INT(EndStopPoint)
+
+			
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(Level),
+			FIELD(ShortMessage),
+			FIELD(LongMessage),
+			FIELD(ParentScenario),
+			FIELD(RawEditor),
+			FIELD(Done),
+			FIELD(messages::MessagesSection),
+			FIELD(Calendar),
+			FIELD(DataSourceLinksWithoutUnderscore),
+			FIELD(DisplayDuration),
+			FIELD(DigitizedVersion),
+			FIELD(RepeatInterval),
+			FIELD(Tags),
+			FIELD(WithAck),
+			FIELD(MultipleStops),
+			FIELD(PlayTts),
+			FIELD(Light),
+			FIELD(DirectionSignCode),
+			FIELD(StartStopPoint),
+			FIELD(EndStopPoint)
+			> AlarmRecord;
+			
+		
 		class Alarm:
-			public virtual util::Registrable,
-			public PointerField<Alarm, Alarm>,
+			public Object<Alarm, AlarmRecord>,
 			public impex::ImportableTemplate<Alarm>
 		{
 		public:
-			/// Chosen registry class.
-			typedef util::Registry<Alarm>	Registry;
-
 			static const std::string DATA_MESSAGE_ID;
 			static const std::string DATA_CONTENT;
 			static const std::string DATA_PRIORITY;
@@ -103,103 +150,137 @@ namespace synthese
 					const AlarmObjectLink*
 			>	> LinkedObjects;
 
-		protected:
-			AlarmLevel			_level;
-			std::string			_shortMessage;  //!< Alarm message
-			std::string			_longMessage;  //!< Alarm message
-			const Scenario* 	_scenario;
-			bool				_rawEditor;
-			bool				_done;
-			const MessagesSection* _section;
-			const ScenarioCalendar* _calendar;
-			std::size_t			_displayDuration;
-			std::string			_digitizedVersion;
-			std::set<std::string> _tags;
-			int					_repeatInterval;
-			bool				_withAck;
-			bool				_multipleStops;
-			bool				_playTts;
-			bool				_light;
-			int					_directionSignCode;
-			int					_startStopPoint;
-			int					_endStopPoint;
+			typedef std::map<
+				std::pair<
+					const BroadcastPoint*,
+					util::ParametersMap
+				>, bool
+			> BroadcastPointsCache;
 
+			mutable BroadcastPointsCache _broadcastPointsCache;
+			
+		protected:
+			
 			// Links
 			//@{
 				mutable MessageAlternatives _messageAlternatives;
 				mutable LinkedObjects _linkedObjects;
 				mutable boost::mutex _linkedObjectsMutex;
 			//@}
-
-			Alarm(
-				util::RegistryKeyType key,
-				const Scenario* scenario
-			);
-			Alarm(const Alarm& source);
-			Alarm(
-				const Alarm& source,
-				const Scenario* scenario,
-				const ScenarioCalendar* calendar
-			);
-
+			
 			bool _isOnBroadcastPoint(
 				const BroadcastPoint& point,
 				const util::ParametersMap& parameters
 			) const;
 
 		public:
+
+			Alarm(
+				util::RegistryKeyType key = 0);
+			Alarm(const Alarm& source);
+			
 			virtual ~Alarm();
 
 			//! @name Getters
 			//@{
-			const std::string&		getShortMessage()	const { return _shortMessage; }
-				const std::string&		getLongMessage()	const { return _longMessage; }
-				const AlarmLevel&		getLevel()			const { return _level; }
-				const Scenario*			getScenario()		const { return _scenario; }
-				bool					getRawEditor() const { return _rawEditor; }
-				bool					getDone() const { return _done; }
-				const MessageAlternatives& getMessageAlternatives() const { return _messageAlternatives; }
-				const MessagesSection* getSection() const { return _section; }
-				const ScenarioCalendar* getCalendar() const { return _calendar; }
-				std::size_t				getDisplayDuration() const { return _displayDuration;}
-				const std::string&		getDigitizedVersion()	const { return _digitizedVersion; }
-				const std::set<std::string>& getTags() const { return _tags; }
-				int						getRepeatInterval() const { return _repeatInterval; }
-				bool					getWithAck() const { return _withAck; }
-				bool					getMultipleStops() const { return _multipleStops; }
-				bool					getPlayTts() const { return _playTts; }
-				bool					getLight() const { return _light; }
-				int						getDirectionSignCode() const { return _directionSignCode; }
-				int						getStartStopPoint() const { return _startStopPoint; }
-				int						getEndStopPoint() const { return _endStopPoint; }
+			virtual const MessageAlternatives& getMessageAlternatives() const { return _messageAlternatives; }
+			
+			virtual const std::string&		getShortMessage()	const { return get<ShortMessage>(); }
+			virtual const std::string&		getLongMessage()	const { return get<LongMessage>(); }
+			virtual const AlarmLevel&		getLevel()			const { return get<Level>(); }
+			virtual const Scenario*			getScenario()		const;
+			virtual const ScenarioCalendar* getCalendar() const;
+
+			virtual const MessagesSection*	getSection() const;
+			virtual bool					getRawEditor() const { return get<RawEditor>(); }
+			virtual bool					getDone() const { return get<Done>(); }
+			virtual std::size_t				getDisplayDuration() const { return get<DisplayDuration>(); }
+			virtual const std::string&		getDigitizedVersion() const { return get<DigitizedVersion>(); }
+			virtual const std::string&		getTags() const [ return get<Tags>(); }
+			virtual int						getRepeatInterval() const { return get<RepeatInterval>(); }
+			virtual bool					getWithAck() const { return get<WithAck>(); }
+			virtual bool					getMultipleStops() const { return get<MultipleStops>(); }
+			virtual bool					getPlayTts() const { return get<PlayTts>(); }
+			virtual bool					getLight() const { return get<Light>(); }
+			virtual int						getDirectionSignCode() const { return get<DirectionSignCode>(); }
+			virtual int						getStartStopPoint() const { return get<StartStopPoint>(); }
+			virtual int						getEndStopPoint() const { return get<EndStopPoint>(); }
+
 			//@}
 
 			//! @name Setters
 			//@{
-				void setLevel (const AlarmLevel& level){ _level = level; }
-				void setShortMessage( const std::string& message){ _shortMessage = message; }
-				void setLongMessage( const std::string& message){ _longMessage = message; }
-				void setScenario(const Scenario* scenario){ _scenario = scenario; }
-				void setRawEditor(bool value){ _rawEditor = value; }
-				void setDone(bool value){ _done = value; }
-				void setMessageAlternatives(const MessageAlternatives& value) const { _messageAlternatives = value; }
-				void addLinkedObject(const AlarmObjectLink& link) const;
-				void removeLinkedObject(const AlarmObjectLink& link) const;
-				void setSection(const MessagesSection* value){ _section = value; }
-				void setCalendar(const ScenarioCalendar* value){ _calendar = value; }
-				void setDisplayDuration(std::size_t value){ _displayDuration = value; }
-				void setDigitizedVersion( const std::string& value){ _digitizedVersion = value; }
-				void setTags(const std::set<std::string> tags) { _tags = tags; }
-				void setRepeatInterval(int value){ _repeatInterval = value; }
-				void setWithAck(bool value){ _withAck = value; }
-				void setMultipleStops(bool value){ _multipleStops = value; }
-				void setPlayTts(bool value){ _playTts = value; }
-				void setLight(bool value){ _light = value; }
-				void setDirectionSignCode(int value){ _directionSignCode = value; }
-				void setStartStopPoint(int value){ _startStopPoint = value; }
-				void setEndStopPoint(int value){ _endStopPoint = value; }
+			virtual void setLevel (const AlarmLevel& level) { set<Level>(level); }
+			virtual void setShortMessage( const std::string& message) { set<ShortMessage>(message); }
+			virtual void setLongMessage( const std::string& message) { set<LongMessage>(message); }
+			virtual void setScenario(const Scenario* scenario);
+			virtual void setRawEditor(bool value) { set<RawEditor>(value); }
+			virtual void setDone(bool value) { set<Done>(value); }
+			
+			virtual void setSection(const MessagesSection* value);
+			virtual void setCalendar(const ScenarioCalendar* value);
+			
+			virtual void setDisplayDuration(std::size_t value) { set<DisplayDuration>(value); }
+			virtual void setDigitizedVersion( const std::string& value) { set<DigitizedVersion>(value); }
+			virtual void setTags( const std::string value) { set<Tags>(value); }
+			virtual void setRepeatInterval(int value) { set<RepeatInterval>(value); }
+			virtual void setWithAck(bool value) { set<WithAck>(value); }
+			virtual void setMultipleStops(bool value) { set<MultipleStops>(value); }
+			virtual void setPlayTts(bool value) { set<PlayTts>(value); }
+			virtual void setLight(bool value) { set<Light>(value); }
+			virtual void setDirectionSignCode(int value) { set<DirectionSignCode>(value); }
+			virtual void setStartStopPoint(int value) { set<StartStopPoint>(value); }
+			virtual void setEndStopPoint(int value) { set<EndStopPoint>(value); }
+
+			void setMessageAlternatives(const MessageAlternatives& value) const { _messageAlternatives = value; }
+				
+			void addLinkedObject(const AlarmObjectLink& link) const;
+			void removeLinkedObject(const AlarmObjectLink& link) const;
+
+			bool belongsToTemplate() const;
+
+			/**
+				Checks if the current message is active at the specified time.
+				@param when the time to check
+				@return true if the message must be displayed at the specified time
+			*/
+			bool isApplicable(
+				boost::posix_time::ptime& when
+			) const;
+
+			/**
+				Returns the start timestamp for the alarm period active at the specified time.
+				If alarm is not applicable at "when", posix_time::not_a_date_time is returned.
+
+				@param when the time to check
+				@return start date for the application period or not_a_date_time if no end date
+			*/
+			boost::posix_time::ptime getApplicationStart(
+				const boost::posix_time::ptime& when
+			) const;
+
+			/**
+				Returns the end timestamp for the alarm period active at the specified time.
+				If alarm is not applicable at "when", posix_time::not_a_date_time is returned.
+
+				@param when the time to check
+				@return end date for the application period or not_a_date_time if no end date
+			*/
+			boost::posix_time::ptime getApplicationEnd(
+				const boost::posix_time::ptime& when
+			) const;
+
+			
 			//@}
 
+
+			//! @name Modifiers
+			//@{
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
+			//@}
+
+			
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
@@ -229,9 +310,11 @@ namespace synthese
 				virtual bool isOnBroadcastPoint(
 					const BroadcastPoint& point,
 					const util::ParametersMap& parameters
-				) const;
+					) const;
+				
+				void clearBroadcastPointsCache() const;
 
-
+				  
 				LinkedObjects::mapped_type getLinkedObjects(
 					const std::string& recipientKey
 				) const;
@@ -244,6 +327,10 @@ namespace synthese
 
 			//@}
 		};
+
+		typedef std::vector<boost::shared_ptr<Alarm> > Alarms;
+		
+		
 }	}
 
 #endif

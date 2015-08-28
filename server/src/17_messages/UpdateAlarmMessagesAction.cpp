@@ -27,13 +27,13 @@
 #include "ActionException.h"
 #include "ObjectNotFoundException.h"
 #include "Profile.h"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
+#include "ScenarioTemplateTableSync.h"
 #include "Session.h"
 #include "User.h"
 #include "MessagesModule.h"
 #include "Alarm.h"
-#include "AlarmTemplate.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "AlarmTableSync.h"
 #include "MessagesLibraryRight.h"
 #include "MessagesRight.h"
@@ -152,22 +152,27 @@ namespace synthese
 
 			if(!_alarm.get())
 			{
-				_alarm.reset(new SentAlarm);
+				_alarm.reset(new Alarm);
 			}
 
 			// Scenario
 			if(map.getDefault<RegistryKeyType>(PARAMETER_SCENARIO_ID, 0))
 			{
-				try
+				util::RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID));
+				util::RegistryTableType tableId(util::decodeTableId(id));
+				if (tableId == ScenarioTemplateTableSync::TABLE.ID)
 				{
-					_scenario = ScenarioTableSync::GetEditable(
-						map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID),
+					_scenario = ScenarioTemplateTableSync::GetEditable(
+						id,
 						*_env
-					);
+						);
 				}
-				catch (ObjectNotFoundException<Scenario>&)
+				else
 				{
-					throw ActionException("Scenario not found");
+					_scenario = SentScenarioTableSync::GetEditable(
+						id,
+						*_env
+						);
 				}
 			}
 
@@ -235,10 +240,10 @@ namespace synthese
 				Importable::DataSourceLinks links;
 				links.insert(Importable::DataSourceLinks::value_type(_alarmDataSource.get(), _dataSourceLinkId));
 				_alarm->setDataSourceLinksWithoutRegistration(links);
+				
 			}
-
 			_doImportableUpdate(*_alarm, request);
-
+			
 			if(_scenario)
 			{
 				_alarm->setScenario(_scenario->get());
@@ -287,15 +292,13 @@ namespace synthese
 			}
 
 			// Log
-			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())
+			if (_alarm->belongsToTemplate())
 			{
-				boost::shared_ptr<const AlarmTemplate> alarmTemplate = dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm);
-				MessagesLibraryLog::addUpdateEntry(alarmTemplate.get(), s.str(), request.getUser().get());
+				MessagesLibraryLog::addUpdateEntry(_alarm.get(), s.str(), request.getUser().get());
 			}
 			else
 			{
-				boost::shared_ptr<const SentAlarm> scenarioSentAlarm = dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm);
-				MessagesLog::addUpdateEntry(scenarioSentAlarm.get(), s.str(), request.getUser().get());
+				MessagesLog::addUpdateEntry(_alarm.get(), s.str(), request.getUser().get());
 			}
 		}
 
@@ -303,7 +306,7 @@ namespace synthese
 
 		bool UpdateAlarmMessagesAction::isAuthorized(const Session* session
 		) const {
-			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() != NULL)
+			if (_alarm->belongsToTemplate())
 			{
 				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(WRITE);
 			}
@@ -320,7 +323,10 @@ namespace synthese
 		){
 			try
 			{
-				_alarm = AlarmTableSync::GetEditable(id, *_env);
+				_alarm = AlarmTableSync::GetEditable(
+					id,
+					*_env
+					);
 			}
 			catch (ObjectNotFoundException<Alarm>& e)
 			{

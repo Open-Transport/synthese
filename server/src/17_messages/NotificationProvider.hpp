@@ -104,14 +104,14 @@ namespace synthese
 	A NotificationProvider broadcasts message out of Synthese system. It is
 	BroadcastPoint implementation that can be associated to alarms.
 
-        The SubscribeAllBegin and SubscribeAllEnd flags allow to subscribe all
-        alarms even if user does not enlist the registered provider
-        specifically.
+		The SubscribeAllBegin and SubscribeAllEnd flags allow to subscribe all
+		alarms even if user does not enlist the registered provider
+		specifically.
 
 	Message broadcasting
 
 	Each registered provider is notified by MessagesActivationThread about
-	begin and end period for each active SentAlarm.
+	begin and end period for each active Alarm.
 
 	NotificationProvider creates a NotificationEvent which will persist for
 	relevant event (begin or end).
@@ -164,9 +164,9 @@ namespace synthese
 
 				virtual void getBroadcastPoints(BroadcastPoints& result) const;
 
-				virtual void onDisplayStart(const SentAlarm& message) const;
+				virtual void onDisplayStart(const Alarm& message) const;
 
-				virtual void onDisplayEnd(const SentAlarm& message) const;
+				virtual void onDisplayEnd(const Alarm& message) const;
 			//@}
 
 			/**

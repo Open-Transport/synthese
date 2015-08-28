@@ -27,7 +27,6 @@ void synthese::tree::moduleRegister()
 
 	synthese::tree::TreeFolderTableSync::integrate();
 
-
 	// Registries
-	synthese::util::Env::Integrate<synthese::tree::TreeFolder>();
+	INTEGRATE(synthese::tree::TreeFolder);
 }

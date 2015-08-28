@@ -183,7 +183,7 @@ namespace synthese
 			*/
 			static boost::shared_ptr<NotificationEvent> createEvent(
 				util::Env& env,
-				const SentAlarm& alarm,
+				const Alarm& alarm,
 				const NotificationProvider* provider,
 				const NotificationType type,
 				const bool saveNow = true
@@ -202,7 +202,7 @@ namespace synthese
 				@param hold_event set the event to the HOLD status
 			*/
 			static boost::shared_ptr<NotificationEvent> findOrCreateEvent(
-				const SentAlarm& alarm,
+				const Alarm& alarm,
 				const NotificationProvider* provider,
 				const NotificationType type,
 				const bool hold_event = false

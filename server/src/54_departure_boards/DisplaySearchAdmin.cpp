@@ -47,7 +47,7 @@
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
 #include "City.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUAdmin.h"
 #include "DisplayScreenCPUCreateAction.h"
@@ -221,7 +221,7 @@ namespace synthese
 				{
 					stream << "<h1>Recherche</h1>";
 
-					stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchCity, _searchStop, _searchName,  _searchLineId, _searchTypeId, _searchState, _searchMessage);
+					stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchCity, _searchStop, _searchName,	 _searchLineId, _searchTypeId, _searchState, _searchMessage);
 				}
 
 				stream << "<h1>" << (_place ? "Afficheurs" : "Résultats de la recherche") << "</h1>";
@@ -266,10 +266,10 @@ namespace synthese
 						viewRequest.setClientURL(screen->get<DisplayTypePtr>()->get<DisplayInterface>()->getDefaultClientURL());
 					}
 
-					vector<boost::shared_ptr<SentAlarm> > alarms(
+					vector<boost::shared_ptr<Alarm> > alarms(
 						DisplayScreenTableSync::GetCurrentDisplayedMessage(_getEnv(), screen->getKey(), 1)
 					);
-					boost::shared_ptr<SentAlarm> alarm(alarms.empty() ? boost::shared_ptr<SentAlarm>() : alarms.front());
+					boost::shared_ptr<Alarm> alarm(alarms.empty() ? boost::shared_ptr<Alarm>() : alarms.front());
 
 					stream << t.row(lexical_cast<string>(screen->getKey()));
 					if (!_place || !_place->get())
@@ -437,7 +437,7 @@ namespace synthese
 				{
 					stream << "<h1>Recherche</h1>";
 
-					stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchCity, _searchStop, _searchName,  _searchLineId, _searchTypeId, _searchState, _searchMessage);
+					stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchCity, _searchStop, _searchName,	 _searchLineId, _searchTypeId, _searchState, _searchMessage);
 				}
 
 				stream << "<h1>" << (_place && _place->get() ? "Unités centrales" : "Résultats de la recherche") << "</h1>";

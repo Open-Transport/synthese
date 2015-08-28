@@ -31,7 +31,7 @@
 #include <NotificationLog.hpp>
 #include <ParametersMap.h>
 #include <Registry.h>
-#include <SentAlarm.h>
+#include <Alarm.h>
 #include <SimpleObjectFieldDefinition.hpp>
 #include <UtilTypes.h>
 
@@ -305,9 +305,9 @@ namespace synthese
 
 
 		/// Function invoked when the message display ends.
-		/// @param message the SentAlarm to hide
+		/// @param message the Alarm to hide
 		void NotificationProvider::onDisplayStart(
-			const SentAlarm& message
+			const Alarm& message
 		) const {
 			// From FactorableTemplate<AlarmRecipient, BroadcastPointAlarmRecipient>::FACTORY_KEY
 			//Alarm::LinkedObjects recipients = message.getLinkedObjects("displayscreen");
@@ -322,9 +322,9 @@ namespace synthese
 
 
 		/// Function invoked when the message display ends.
-		/// @param message the SentAlarm to hide
+		/// @param message the Alarm to hide
 		void NotificationProvider::onDisplayEnd(
-			const SentAlarm& message
+			const Alarm& message
 		) const {
 			// if global subscribe or explicit recipient
 			if(get<SubscribeAllEnd>() || isRecipient(message.getLinkedObjects()))

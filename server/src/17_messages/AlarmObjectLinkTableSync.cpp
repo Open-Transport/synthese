@@ -27,7 +27,7 @@
 #include "AlarmRecipient.h"
 #include "AlarmObjectLink.h"
 #include "Profile.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "Session.h"
 #include "User.h"
 #include "Registry.h"
@@ -40,7 +40,6 @@
 #include "MessagesRight.h"
 #include "MessagesLibraryLog.h"
 #include "MessagesLog.h"
-#include "AlarmTemplate.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -120,24 +119,16 @@ namespace synthese
 			// Message
 			try
 			{
-				Alarm& alarm(
-					*AlarmTableSync::GetEditable(
-						rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID),
-						env,
-						linkLevel
-				)	);
-				object->setAlarm(&alarm);
-				alarm.addLinkedObject(*object);
-
-				// link the object in the alarm
-				SentAlarm* sentAlarm(
-					dynamic_cast<SentAlarm*>(
-						&alarm
-				)	);
-				if(sentAlarm)
-				{
-					sentAlarm->clearBroadcastPointsCache();
-				}
+				util::RegistryKeyType alarmId(rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID));
+				boost::shared_ptr<Alarm> alarm;
+				alarm = AlarmTableSync::GetEditable(
+					alarmId,
+					env,
+					linkLevel
+					);
+				object->setAlarm(alarm.get());
+				alarm->addLinkedObject(*object);
+				alarm->clearBroadcastPointsCache();
 			}
 			catch(ObjectNotFoundException<Alarm> e)
 			{
@@ -154,15 +145,7 @@ namespace synthese
 			if(object->getAlarm())
 			{
 				object->getAlarm()->removeLinkedObject(*object);
-				// link the object in the alarm (only if the linked object was found)
-				SentAlarm* sentAlarm(
-					dynamic_cast<SentAlarm*>(
-						object->getAlarm()
-				)	);
-				if(sentAlarm)
-				{
-					sentAlarm->clearBroadcastPointsCache();
-				}
+				object->getAlarm()->clearBroadcastPointsCache();
 			}
 		}
 
@@ -191,7 +174,7 @@ namespace synthese
 			{
 				Env env;
 				boost::shared_ptr<const AlarmObjectLink> aol(AlarmObjectLinkTableSync::Get(object_id, env));
-				if(dynamic_cast<AlarmTemplate*>(aol->getAlarm()))
+				if(aol->getAlarm()->belongsToTemplate())
 				{
 					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(WRITE);
 				}
@@ -230,18 +213,18 @@ namespace synthese
 		){
 			Env env;
 			boost::shared_ptr<const AlarmObjectLink> aol(AlarmObjectLinkTableSync::Get(id, env));
-			if (dynamic_cast<AlarmTemplate*>(aol->getAlarm()))
+			if (aol->getAlarm()->belongsToTemplate())
 			{
 				MessagesLibraryLog::addUpdateEntry(
-					dynamic_cast<AlarmTemplate*>(aol->getAlarm()),
+					aol->getAlarm(),
 					"Suppression de la destination "+ lexical_cast<string>(aol->getObjectId()),
 					session->getUser().get()
-				);
+					);
 			}
-			else if(dynamic_cast<SentAlarm*>(aol->getAlarm()))
+			else
 			{
 				MessagesLog::addUpdateEntry(
-					dynamic_cast<SentAlarm*>(aol->getAlarm()),
+					aol->getAlarm(),
 					"Suppression de la destination "+ lexical_cast<string>(aol->getObjectId()),
 					session->getUser().get()
 				);

@@ -1,0 +1,17 @@
+*** Settings ***
+Library           Process
+Resource          common.txt
+
+*** Variables ***
+
+*** Keywords ***
+
+List Synthese Objects
+    [Arguments]  ${table_id}
+    ${response}=    Call Synthese Service    objectlist    table_id\=${table_id}  of\=xml
+    Log Many  ${response.content}
+    Should Be Equal As Strings    ${response.status_code}    200
+    [Return]    ${response}
+
+
+

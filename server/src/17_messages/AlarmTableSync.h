@@ -1,91 +1,57 @@
-/** AlarmTableSync class header.
-	@file AlarmTableSync.h
+////////////////////////////////////////////////////////////////////////////////
+/// AlarmTableSync class header.
+///	@file AlarmTableSync.h
+///	@author Hugues Romain
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized
+///	software)
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software Foundation,
+///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+////////////////////////////////////////////////////////////////////////////////
 
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#ifndef SYNTHESE_ENVLSSQL_ALARMTABLESYNC_H
-#define SYNTHESE_ENVLSSQL_ALARMTABLESYNC_H
+#ifndef SYNTHESE_AlarmTableSync_H__
+#define SYNTHESE_AlarmTableSync_H__
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "FullSynchronizationPolicy.hpp"
-#include "InheritanceLoadSavePolicy.hpp"
-
 #include "Alarm.h"
-#include "MessagesTypes.h"
+#include "ScenarioFolder.h"
+#include "Conversion.h"
 
-#include "Exception.h"
 
+#include <vector>
 #include <string>
+#include <iostream>
 
 namespace synthese
 {
 	namespace messages
 	{
-		class SentAlarm;
-		class AlarmTemplate;
-		class SentScenario;
-		class ScenarioTemplate;
-		class Scenario;
 
-
-		/** Alarm table synchronizer.
-			@ingroup m17LS refLS
-
-			Only the sent alarms are loaded in ram.
-
-			@note As Alarm is an abstract class, do not use the get static method. Use getAlarm instead.
-		*/
+		////////////////////////////////////////////////////////////////////
+		/// Alarm table synchronizer.
+		///	@ingroup m17LS refLS
+		///
+		///
 		class AlarmTableSync:
 			public db::DBDirectTableSyncTemplate<
 				AlarmTableSync,
-				Alarm,
-				db::FullSynchronizationPolicy,
-				db::InheritanceLoadSavePolicy
+				Alarm
 			>
 		{
-		protected:
-			static const std::string _COL_CONFLICT_LEVEL;
-			static const std::string _COL_RECIPIENTS_NUMBER;
-
 		public:
-			static const std::string COL_LEVEL;
-			static const std::string COL_IS_TEMPLATE;
-			static const std::string COL_SHORT_MESSAGE;
-			static const std::string COL_LONG_MESSAGE;
-			static const std::string COL_SCENARIO_ID;
-			static const std::string COL_TEMPLATE_ID;
-			static const std::string COL_RAW_EDITOR;
-			static const std::string COL_DONE;
-			static const std::string COL_MESSAGES_SECTION_ID;
-			static const std::string COL_CALENDAR_ID;
-			static const std::string COL_DATASOURCE_LINKS;
-			static const std::string COL_DISPLAY_DURATION;
-			static const std::string COL_DIGITIZED_VERSION;
-			static const std::string COL_TAGS;
-			static const std::string COL_REPEAT_INTERVAL;
-			static const std::string COL_WITH_ACK;
-			static const std::string COL_MULTIPLE_STOPS;
-			static const std::string COL_PLAY_TTS;
-			static const std::string COL_LIGHT;
-			static const std::string COL_DIRECTION_SIGN_CODE;
-			static const std::string COL_START_STOP_POINT;
-			static const std::string COL_END_STOP_POINT;
 
 			AlarmTableSync() {}
 			~AlarmTableSync() {}
@@ -99,8 +65,55 @@ namespace synthese
 				, bool raisingOrder = false,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
-		};
-	}
-}
 
-#endif
+			template<class OutputIterator>
+				static void
+				Search(
+				util::Env& env,
+				OutputIterator result,
+				boost::optional<util::RegistryKeyType> scenarioId = boost::optional<util::RegistryKeyType>()
+				, int first = 0
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
+				, bool orderByLevel = false
+				, bool raisingOrder = false,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+			
+
+		};
+
+
+		template<class OutputIterator>
+		void
+		AlarmTableSync::Search(
+			util::Env& env,
+			OutputIterator result,
+			boost::optional<util::RegistryKeyType> scenarioId,
+			int first,
+			boost::optional<std::size_t> number,
+			bool orderByLevel,
+			bool raisingOrder,
+			util::LinkLevel linkLevel
+		){
+			std::stringstream query;
+			query
+				<< " SELECT a.*"
+				<< " FROM " << TABLE.NAME << " AS a"
+				<< " WHERE 1";
+			if(scenarioId)
+			{
+				query << " AND " << ParentScenario::FIELD.name << "=" << *scenarioId;
+			}
+			if (number)
+				query << " LIMIT " << (*number + 1);
+			if (first > 0)
+				query << " OFFSET " << first;
+
+			SearchResult searchResult =
+				LoadFromQuery(query.str(), env, linkLevel);
+			std::copy(searchResult.begin(), searchResult.end(), result);
+		}
+		
+}	}
+
+#endif // SYNTHESE_AlarmTableSync_H__

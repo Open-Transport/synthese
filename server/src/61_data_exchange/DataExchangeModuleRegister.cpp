@@ -118,7 +118,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::VixV6000FileFormat::integrate();
 
 	// Registries
-	synthese::util::Env::Integrate<synthese::data_exchange::VDVClient>();
-	synthese::util::Env::Integrate<synthese::data_exchange::VDVServer>();
-	synthese::util::Env::Integrate<synthese::data_exchange::VDVServerSubscription>();
+	INTEGRATE(synthese::data_exchange::VDVClient);
+	INTEGRATE(synthese::data_exchange::VDVServer);
+	INTEGRATE(synthese::data_exchange::VDVServerSubscription);
 }

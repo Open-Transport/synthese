@@ -73,9 +73,9 @@ void synthese::vehicle::moduleRegister()
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::vehicle::Composition>();
-	synthese::util::Env::Integrate<synthese::vehicle::Descent>();
-	synthese::util::Env::Integrate<synthese::vehicle::RollingStock>();
-	synthese::util::Env::Integrate<synthese::vehicle::Vehicle>();
-	synthese::util::Env::Integrate<synthese::vehicle::VehicleCall>();
+	INTEGRATE(synthese::vehicle::Descent);
+	INTEGRATE(synthese::vehicle::RollingStock);
+	INTEGRATE(synthese::vehicle::Vehicle);
+	INTEGRATE(synthese::vehicle::VehicleCall);
 	synthese::util::Env::Integrate<synthese::vehicle::VehiclePosition>();
 }

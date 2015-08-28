@@ -28,6 +28,7 @@
 #include "Exception.h"
 #include "FrameworkTypes.hpp"
 
+#include <map>
 #include <string>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
@@ -75,6 +76,9 @@ namespace synthese
 		public virtual util::Registrable
 	{
 	public:
+
+		static std::map<util::RegistryTableType, std::string> REGISTRY_NAMES_BY_TABLE_ID;
+		
 		ObjectBase(
 			util::RegistryKeyType id = 0
 		):	util::Registrable(id)

@@ -45,9 +45,10 @@
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
+#include "SentScenarioTableSync.h"
 #include "ScenarioTableSync.h"
 #include "ArrivalDepartureTableLog.h"
 #include "ArrivalDepartureTableRight.h"
@@ -294,7 +295,7 @@ namespace synthese
 			}	}
 			else if (orderByType)
 			{
-			    query.addOrderFieldOther<DisplayTypeTableSync>(Name::FIELD.name, raisingOrder);
+				query.addOrderFieldOther<DisplayTypeTableSync>(Name::FIELD.name, raisingOrder);
 				if(!localizationid || *localizationid != 0)
 				{
 					query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
@@ -328,7 +329,7 @@ namespace synthese
 
 
 
-		vector<boost::shared_ptr<SentAlarm> > DisplayScreenTableSync::GetCurrentDisplayedMessage(
+		vector<boost::shared_ptr<Alarm> > DisplayScreenTableSync::GetCurrentDisplayedMessage(
 			util::Env& env,
 			util::RegistryKeyType screenId,
 			optional<int> limit
@@ -338,26 +339,21 @@ namespace synthese
 			SelectQuery<AlarmObjectLinkTableSync> query;
 			query.addTableField(AlarmObjectLinkTableSync::COL_ALARM_ID);
 			query.addTableAndEqualJoin<AlarmTableSync>(TABLE_COL_ID, AlarmObjectLinkTableSync::COL_ALARM_ID);
-			query.addTableAndEqualOtherJoin<ScenarioTableSync, AlarmTableSync>(TABLE_COL_ID, AlarmTableSync::COL_SCENARIO_ID);
+			query.addTableAndEqualOtherJoin<SentScenarioTableSync, AlarmTableSync>(TABLE_COL_ID, messages::ParentScenario::FIELD.name);
 			query.addWhereField(AlarmObjectLinkTableSync::COL_OBJECT_ID, screenId);
-			query.addWhereFieldOther<ScenarioTableSync>(ScenarioTableSync::COL_ENABLED, 1);
-			query.addWhere(
-				SQLSingleOperatorExpression::Get(
-					SQLSingleOperatorExpression::OP_NOT,
-					FieldExpression::Get(
-						ScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_IS_TEMPLATE
-			)	)	);
+			query.addWhereFieldOther<SentScenarioTableSync>(ScenarioTableSync::COL_ENABLED, 1);
+
 			query.addWhere(
 				ComposedExpression::Get(
 					SQLSingleOperatorExpression::Get(
 						SQLSingleOperatorExpression::OP_IS_NULL,
 						FieldExpression::Get(
-							ScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODSTART
+							SentScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODSTART
 					)	),
 					ComposedExpression::OP_OR,
 					ComposedExpression::Get(
 						FieldExpression::Get(
-							ScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODSTART
+							SentScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODSTART
 						),
 						ComposedExpression::OP_INF,
 						ValueExpression<ptime>::Get(now)
@@ -368,33 +364,32 @@ namespace synthese
 					SQLSingleOperatorExpression::Get(
 					SQLSingleOperatorExpression::OP_IS_NULL,
 						FieldExpression::Get(
-							ScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODEND
+							SentScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODEND
 					)	),
 					ComposedExpression::OP_OR,
 					ComposedExpression::Get(
 						FieldExpression::Get(
-							ScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODEND
+							SentScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODEND
 						),
 						ComposedExpression::OP_SUP,
 						ValueExpression<ptime>::Get(now)
 					)
 			)	);
-			query.addOrderFieldOther<AlarmTableSync>(AlarmTableSync::COL_LEVEL, false);
-			query.addOrderFieldOther<ScenarioTableSync>(ScenarioTableSync::COL_PERIODSTART, false);
+			query.addOrderFieldOther<AlarmTableSync>(messages::Level::FIELD.name, false);
+			query.addOrderFieldOther<SentScenarioTableSync>(ScenarioTableSync::COL_PERIODSTART, false);
 			if (limit)
 			{
 				query.setNumber(*limit);
 			}
 			DBResultSPtr rows = query.execute();
-			vector<boost::shared_ptr<SentAlarm> > result;
+			vector<boost::shared_ptr<Alarm> > result;
 			while(rows->next())
 			{
 				result.push_back(
-					static_pointer_cast<SentAlarm,Alarm>(
-						AlarmTableSync::GetEditable(
+					AlarmTableSync::GetEditable(
 							rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID),
 							env
-				)	)	);
+				)		);
 			}
 			return result;
 		}
@@ -426,7 +421,7 @@ namespace synthese
 
 
 
-		vector<boost::shared_ptr<SentAlarm> > DisplayScreenTableSync::GetFutureDisplayedMessages(
+		vector<boost::shared_ptr<Alarm> > DisplayScreenTableSync::GetFutureDisplayedMessages(
 			Env& env,
 			RegistryKeyType screenId,
 			optional<int> number
@@ -436,10 +431,9 @@ namespace synthese
 			q	<< "SELECT " << AlarmObjectLinkTableSync::COL_ALARM_ID
 				<< " FROM " << AlarmObjectLinkTableSync::TABLE.NAME << " AS aol "
 				<< " INNER JOIN " << AlarmTableSync::TABLE.NAME << " AS a ON a." << TABLE_COL_ID << "=aol." << AlarmObjectLinkTableSync::COL_ALARM_ID
-				<< " INNER JOIN " << ScenarioTableSync::TABLE.NAME << " AS s ON s." << TABLE_COL_ID << "=a." << AlarmTableSync::COL_SCENARIO_ID
+				<< " INNER JOIN " << SentScenarioTableSync::TABLE.NAME << " AS s ON s." << TABLE_COL_ID << "=a." << messages::ParentScenario::FIELD.name
 				<< " WHERE aol." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << screenId
 				<< " AND s." << ScenarioTableSync::COL_ENABLED
-				<< " AND NOT s." << ScenarioTableSync::COL_IS_TEMPLATE
 				<< " AND s." << ScenarioTableSync::COL_PERIODSTART << ">'" << to_iso_extended_string(now.date()) << " " << to_simple_string(now.time_of_day()) << "'"
 				<< " ORDER BY s." << ScenarioTableSync::COL_PERIODSTART;
 			if (number)
@@ -447,10 +441,10 @@ namespace synthese
 				q << " LIMIT " << *number;
 			}
 			DBResultSPtr rows = DBModule::GetDB()->execQuery(q.str());
-			vector<boost::shared_ptr<SentAlarm> > result;
+			vector<boost::shared_ptr<Alarm> > result;
 			while(rows->next())
 			{
-				result.push_back(static_pointer_cast<SentAlarm,Alarm>(AlarmTableSync::GetEditable(rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID), env)));
+				result.push_back(AlarmTableSync::GetEditable(rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID), env));
 			}
 			return result;
 		}

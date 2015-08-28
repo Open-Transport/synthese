@@ -21,9 +21,9 @@
 */
 
 #include "MessagesLibraryLog.h"
-#include "AlarmTemplate.h"
+#include "Alarm.h"
 #include "ScenarioTemplate.h"
-#include "ScenarioTableSync.h"
+#include "ScenarioTemplateTableSync.h"
 #include "AlarmTableSync.h"
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
@@ -69,9 +69,9 @@ namespace synthese
 			{
 				RegistryTableType tableId = decodeTableId(id);
 				Env env;
-				if (tableId == ScenarioTableSync::TABLE.ID)
+				if (tableId == ScenarioTemplateTableSync::TABLE.ID)
 				{
-					boost::shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					boost::shared_ptr<const ScenarioTemplate> scenario(ScenarioTemplateTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return scenario->getName();
 				}
 				else if (tableId == AlarmTableSync::TABLE.ID)
@@ -109,7 +109,7 @@ namespace synthese
 		}
 
 		void MessagesLibraryLog::addUpdateEntry(
-			const AlarmTemplate* alarm
+			const Alarm* alarm
 			, const std::string& text
 			, const security::User* user
 		){
@@ -188,7 +188,7 @@ namespace synthese
 		}
 
 
-		void MessagesLibraryLog::AddDeleteEntry( const AlarmTemplate* alarm , const security::User* user )
+		void MessagesLibraryLog::AddDeleteEntry( const Alarm* alarm , const security::User* user )
 		{
 			if(!alarm->getScenario()) return;
 

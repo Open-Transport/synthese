@@ -69,7 +69,7 @@
 #include "StaticFunctionRequest.h"
 #include "RoutePlannerFunction.h"
 #include "LineMarkerInterfacePage.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "PTModule.h"
 #include "Destination.hpp"
 #include "Junction.hpp"
@@ -527,7 +527,7 @@ namespace synthese
 			try
 			{
 				if(!rsStr.empty())
-                        	{
+							{
 					vector<string> rsVect;
 					split(rsVect, rsStr, is_any_of(",; "));
 					allowedPathClasses.insert(0);
@@ -547,7 +547,7 @@ namespace synthese
 			try
 			{
 				if(!nwlStr.empty())
-                        	{
+							{
 					vector<string> nwVect;
 					split(nwVect, nwlStr, is_any_of(",; "));
 					allowedNetworks.insert(0);
@@ -3507,7 +3507,7 @@ namespace synthese
 							true,
 							leg.getArrivalEdge()->getHub() == leg.getService()->getPath()->getEdges().back()->getHub(),
 							static_cast<const StopPoint*>(leg.getArrivalEdge()->getFromVertex()),
-							it+1 != services.end()  ? dynamic_cast<const StopPoint*>((it+1)->getDepartureEdge()->getFromVertex()) : NULL,
+							it+1 != services.end()	? dynamic_cast<const StopPoint*>((it+1)->getDepartureEdge()->getFromVertex()) : NULL,
 							__Couleur,
 							leg.getArrivalDateTime(),
 							journey.getContinuousServiceRange(),

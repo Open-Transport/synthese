@@ -22,6 +22,7 @@
 
 #include "ScenarioCalendarTableSync.hpp"
 
+#include "SentScenario.h"
 #include "AlarmTableSync.h"
 #include "DBResult.hpp"
 #include "SelectQuery.hpp"

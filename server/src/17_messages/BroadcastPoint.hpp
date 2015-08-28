@@ -24,7 +24,7 @@
 
 #include "FactoryBase.h"
 
-#include "SentAlarm.h"
+#include "Alarm.h"
 
 #include <vector>
 
@@ -87,9 +87,9 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Function to run when the message display begins.
 			/// Default implementation does nothing.
-			/// @param message the SentAlarm to display
+			/// @param message the xAlarm to display
 			virtual void onDisplayStart(
-				const SentAlarm& message
+				const Alarm& message
 			) const {}
 
 
@@ -97,9 +97,9 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Function to run when the message display ends.
 			/// Default implementation does nothing.
-			/// @param message the SentAlarm to hide
+			/// @param message the Alarm to hide
 			virtual void onDisplayEnd(
-				const SentAlarm& message
+				const Alarm& message
 			) const {}
 		};
 }	}

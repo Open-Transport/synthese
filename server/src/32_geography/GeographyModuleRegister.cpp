@@ -53,7 +53,7 @@ namespace synthese
 			MapSourcesAdmin::integrate();
 
 			// Registries
-			Env::Integrate<City>();
+			INTEGRATE(City);
 			Env::Integrate<CityAlias>();
 			Env::Integrate<MapSource>();
 			Env::Integrate<PlaceAlias>();

@@ -29,11 +29,11 @@
 #include "Profile.h"
 #include "User.h"
 #include "ScenarioTemplate.h"
-#include "ScenarioTableSync.h"
+#include "ScenarioTemplateTableSync.h"
 #include "MessagesScenarioAdmin.h"
 #include "AddScenarioAction.h"
 #include "MessagesAdmin.h"
-#include "AlarmTemplate.h"
+#include "Alarm.h"
 #include "MessageAdmin.h"
 #include "MessagesLibraryRight.h"
 #include "MessagesModule.h"
@@ -127,15 +127,15 @@ namespace synthese
 			{
 				stream << "<h1>Répertoire</h1>";
 
-				if(	_getEnv().getRegistry<Scenario>().empty() &&
+				if(	_getEnv().getRegistry<ScenarioTemplate>().empty() &&
 					_getEnv().getRegistry<ScenarioFolder>().empty()
 				){
 					AdminActionFunctionRequest<RemoveObjectAction,MessagesLibraryAdmin> removeFolderRequest(_request, *this);
 					removeFolderRequest.getAction()->setObjectId(_folder->getKey());
 					removeFolderRequest.getPage()->setFolder(
-						_folder->getParent() ?
+						_folder->get<Parent>() ?
 						ScenarioFolderTableSync::Get(
-							_folder->getParent()->getKey(),
+							_folder->get<Parent>()->getKey(),
 							_getEnv()
 						):
 						boost::shared_ptr<const ScenarioFolder>()
@@ -163,7 +163,7 @@ namespace synthese
 					t.getForm().getSelectInput(
 						ScenarioFolderUpdateAction::PARAMETER_PARENT_FOLDER_ID,
 						MessagesModule::GetScenarioFoldersLabels(0,string(),_folder->getKey()),
-						optional<RegistryKeyType>(_folder->getParent() ? _folder->getParent()->getKey() : 0)
+						optional<RegistryKeyType>(_folder->get<Parent>() ? _folder->get<Parent>()->getKey() : 0)
 				)	);
 				stream << t.close();
 			}
@@ -184,8 +184,8 @@ namespace synthese
 			addScenarioRequest.setActionWillCreateObject();
 
 			// Search
-			ScenarioTableSync::SearchResult scenarios(
-				ScenarioTableSync::SearchTemplates(
+			ScenarioTemplateTableSync::SearchResult scenarios(
+				ScenarioTemplateTableSync::Search(
 					_getEnv(),
 					_folder.get() ? _folder->getKey() : 0
 					, string(), NULL
@@ -312,7 +312,7 @@ namespace synthese
 				(dynamic_cast<const MessagesScenarioAdmin*>(&currentPage) &&
 				 dynamic_cast<const ScenarioTemplate*>(static_cast<const MessagesScenarioAdmin*>(&currentPage)->getScenario().get())) ||
 				(dynamic_cast<const MessageAdmin*>(&currentPage) &&
-				 dynamic_cast<const AlarmTemplate*>(static_cast<const MessageAdmin*>(&currentPage)->getAlarm().get()))
+				 dynamic_cast<const Alarm*>(static_cast<const MessageAdmin*>(&currentPage)->getAlarm().get()))
 			){
 
 				// Folders
@@ -329,8 +329,8 @@ namespace synthese
 				}
 
 				// Scenarios
-				ScenarioTableSync::SearchResult scenarios(
-					ScenarioTableSync::SearchTemplates(
+				ScenarioTemplateTableSync::SearchResult scenarios(
+					ScenarioTemplateTableSync::Search(
 						*_env,
 						_folder.get() ? _folder->getKey() : 0
 				)	);
@@ -387,7 +387,7 @@ namespace synthese
 		bool MessagesLibraryAdmin::_hasSameContent( const AdminInterfaceElement& other ) const
 		{
 			const MessagesLibraryAdmin& mother(static_cast<const MessagesLibraryAdmin&>(other));
-            return
+			return
 				(!_folder.get() && !mother._folder.get()) ||
 				((_folder.get() && mother._folder.get()) && (mother._folder->getKey() == _folder->getKey()));
 		}

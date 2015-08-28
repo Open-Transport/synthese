@@ -146,8 +146,8 @@ void synthese::departure_boards::moduleRegister()
 	synthese::departure_boards::DisplayScreen::integrate();
 
 	// Registries
-	synthese::util::Env::Integrate<synthese::departure_boards::DisplayScreen>();
-	synthese::util::Env::Integrate<synthese::departure_boards::DisplayType>();
+	INTEGRATE(synthese::departure_boards::DisplayScreen);
+	INTEGRATE(synthese::departure_boards::DisplayType);
 	synthese::util::Env::Integrate<synthese::departure_boards::DisplayMonitoringStatus>();
 	synthese::util::Env::Integrate<synthese::departure_boards::DisplayScreenCPU>();
 	synthese::util::Env::Integrate<synthese::departure_boards::PlaceWithDisplayBoards>();

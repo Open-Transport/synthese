@@ -29,6 +29,7 @@
 #include "Env.h"
 #include "FrameworkTypes.hpp"
 #include "ObjectBase.hpp"
+#include "RegistryBase.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
@@ -76,7 +77,7 @@ namespace synthese
 			{
 				return false;
 			}
-
+			
 			typename PointerField<C, T>::Type value(boost::none);
 			try
 			{
@@ -87,7 +88,23 @@ namespace synthese
 				)	);
 				if(id > 0)
 				{
-					value = *env.getEditable<T>(id);
+					util::RegistryTableType tableId(util::decodeTableId(id));
+					std::string registryName(ObjectBase::REGISTRY_NAMES_BY_TABLE_ID[tableId]);
+					util::Env::RegistryMap::const_iterator itr(env.getMap().find(registryName));
+					if (itr == env.getMap().end())
+					{
+						// Fallback method for non migrated tables ;
+						// does not support abstract pointer types...
+						util::Log::GetInstance().trace("Cannot find registry matching table id "
+													  + boost::lexical_cast<std::string>(tableId));
+						value = *env.getEditable<T>(id);						
+					}
+					else
+					{
+						boost::shared_ptr<util::RegistryBase> registryBase = itr->second;
+						T& instance = *boost::dynamic_pointer_cast<T, util::Registrable>(registryBase->getEditableObject(id));
+						value = instance;
+					}
 				}
 			}
 			catch(boost::bad_lexical_cast&)

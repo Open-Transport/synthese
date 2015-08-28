@@ -27,25 +27,51 @@
 
 #include "Scenario.h"
 
-#include "MessageApplicationPeriod.hpp"
 #include "MessagesTypes.h"
 
-#include <map>
 #include <string>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include "PtimeField.hpp"
+#include "PointersSetField.hpp"
 
 namespace synthese
 {
 	namespace messages
 	{
-		class SentAlarm;
+		class Alarm;
 		class ScenarioTemplate;
+		class MessagesSection;
+		class ScenarioTemplate;
+
+		FIELD_BOOL(Enabled)
+		FIELD_PTIME(PeriodStart)
+		FIELD_PTIME(PeriodEnd)
+		FIELD_POINTER(Template, ScenarioTemplate)
+		FIELD_PTIME(EventStart)
+		FIELD_PTIME(EventEnd)
+		FIELD_BOOL(Archived)
+		
+		
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(Enabled),
+			FIELD(PeriodStart),
+			FIELD(PeriodEnd),
+			FIELD(Template),
+			FIELD(DataSourceLinksWithoutUnderscore),
+			FIELD(Sections),
+			FIELD(EventStart),
+			FIELD(EventEnd),
+			FIELD(Archived)
+			> SentScenarioRecord;
 
 		////////////////////////////////////////////////////////////////////
 		/// Sent scenario instance class.
 		///	@ingroup m17
 		class SentScenario:
-			public Scenario
+			public Scenario,
+			public Object<SentScenario, SentScenarioRecord>,
+			public impex::ImportableTemplate<SentScenario>
 		{
 		public:
 			static const std::string DATA_ID;
@@ -68,61 +94,35 @@ namespace synthese
 			static const std::string TAG_SECTION;
 			static const std::string TAG_CALENDAR;
 
-
-			////////////////////////////////////////////////////////////////////
-			/// Left : variable code
-			/// Right : variable value
-			typedef std::map<std::string, std::string> VariablesMap;
-
-		private:
-			bool _isEnabled;
-			bool _manualOverride;
-			boost::posix_time::ptime _eventStart; //!< Alarm applicability period start
-			boost::posix_time::ptime _eventEnd;   //!< Alarm applicability period end
-			boost::posix_time::ptime _periodStart; //!< Alarm applicability period start
-			boost::posix_time::ptime _periodEnd;   //!< Alarm applicability period end
-			const ScenarioTemplate*	_template;
-			VariablesMap _variables;
-			bool _archived;
-
-
-		public:
+			
 			/** Basic constructor
 			 *
 			 * @param key id of the sent scenario
 			 */
 			SentScenario(util::RegistryKeyType key = 0);
-
-			/** Template instantiation constructor.
-			 *
-			 * @param source the template
-			 */
-			SentScenario(
-				const ScenarioTemplate& source
-			);
-
+			~SentScenario();
 
 			/** Copy constructor.
 				@param source Scenario to copy
+				
 				The dates are not copied
 			*/
-			SentScenario(
-				const SentScenario& source
-			);
+			SentScenario(const SentScenario& source);
 
-			~SentScenario();
 
 			/// @name Getters
 			//@{
-				const boost::posix_time::ptime&	getEventStart() const { return _eventStart; }
-				const boost::posix_time::ptime&	getEventEnd() const { return _eventEnd; }
-				const boost::posix_time::ptime&	getPeriodStart() const { return _periodStart; }
-				const boost::posix_time::ptime&	getPeriodEnd() const { return _periodEnd; }
-				bool getIsEnabled()	const { return _isEnabled; }
-				bool getManualOverride()	const { return _manualOverride; }
-				bool getArchived() const { return _archived; }
-				const ScenarioTemplate*	getTemplate() const { return _template; }
-				const VariablesMap&	getVariables() const { return _variables; }
+			const boost::posix_time::ptime&	getEventStart() const { return get<EventStart>(); }
+			const boost::posix_time::ptime&	getEventEnd() const { return get<EventEnd>(); }
+			const boost::posix_time::ptime&	getPeriodStart() const { return get<PeriodStart>(); }
+			const boost::posix_time::ptime&	getPeriodEnd() const { return get<PeriodEnd>(); }			 
+			bool getIsEnabled()	const { return get<Enabled>(); }
+			bool getArchived() const { return get<Archived>(); }
+			std::string getName() const { return get<Name>(); }
+			
+			ScenarioTemplate* getTemplate() const;
+			Sections::Type& getSections() const { return get<Sections>(); }
+			
 			//@}
 
 			/// @name Setters
@@ -131,34 +131,41 @@ namespace synthese
 				/// Start broadcast date setter.
 				///	Updates the alarms too.
 				///	@param periodStart Start broadcast date
-				void setPeriodStart ( const boost::posix_time::ptime& periodStart);
+				void setPeriodStart ( const boost::posix_time::ptime& periodStart) { set<PeriodStart>(periodStart); }
 
-				void setEventStart ( const boost::posix_time::ptime& value){ _eventStart = value; }
+				void setEventStart ( const boost::posix_time::ptime& value) { set<EventStart>(value); }
 
 
 				////////////////////////////////////////////////////////////////////
 				/// End broadcast date setter.
 				///	Updates the alarms too.
 				///	@param periodEnd End broadcast date
-				void setPeriodEnd ( const boost::posix_time::ptime& periodEnd);
+				void setPeriodEnd ( const boost::posix_time::ptime& periodEnd) { set<PeriodEnd>(periodEnd); }
 
-				void setEventEnd ( const boost::posix_time::ptime& value){ _eventEnd = value; }
-				void setIsEnabled(bool value){ _isEnabled = value; }
+				void setEventEnd ( const boost::posix_time::ptime& value) { set<EventEnd>(value); }
+				
+				void setIsEnabled(bool value){ set<Enabled>(value); }
 				void setManualOverride(bool value){ _manualOverride = value; }
 				void setTemplate(const ScenarioTemplate* value);
-				void setVariables(const VariablesMap& value);
-				void setArchived(bool value){ _archived = value; }
+				void setArchived(bool value){ set<Archived>(value); }
+
+				void setSections(const Sections::Type& sections) { set<Sections>(sections); }
+				
 			//@}
 
 
-			/// @name Services
+			//! @name Modifiers
 			//@{
-				/** Applicability test.
-					@param start Start of applicability period
-					@param end End of applicability period
-					@return true if the message is not empty and is valid for the whole period given as argument.
-				*/
-				bool isApplicable ( const boost::posix_time::ptime& start, const boost::posix_time::ptime& end ) const;
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
+			//@}
+				
+			/** Applicability test.
+				@param start Start of applicability period
+				@param end End of applicability period
+				@return true if the message is not empty and is valid for the whole period given as argument.
+			*/
+			bool isApplicable(const boost::posix_time::ptime& start, const boost::posix_time::ptime& end ) const;
 
 				bool isApplicable(const boost::posix_time::ptime& date) const;
 

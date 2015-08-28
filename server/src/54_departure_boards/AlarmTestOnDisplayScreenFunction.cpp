@@ -32,7 +32,7 @@
 #include "Session.h"
 #include "User.h"
 #include "ArrivalDepartureTableRight.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "AlarmTableSync.h"
 #include "DisplayScreenContentFunction.h"
 #include "DisplayType.h"
@@ -154,7 +154,8 @@ namespace synthese
 			SentScenario scenario;
 			scenario.setIsEnabled(true);
 
-			boost::shared_ptr<SentAlarm> alarm(new SentAlarm(1, &scenario));
+			boost::shared_ptr<Alarm> alarm(new Alarm(1));
+			alarm->setScenario(&scenario);
 			alarm->setShortMessage(_alarm->getShortMessage());
 			alarm->setLongMessage(_alarm->getLongMessage());
 			alarm->setLevel(_alarm->getLevel());

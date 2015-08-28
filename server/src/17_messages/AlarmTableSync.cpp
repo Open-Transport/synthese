@@ -22,7 +22,7 @@
 #include "AlarmTableSync.h"
 
 #include "AlarmObjectLinkTableSync.h"
-#include "AlarmTemplate.h"
+#include "Alarm.h"
 #include "DataSource.h"
 #include "DataSourceLinksField.hpp"
 #include "DBResult.hpp"
@@ -37,9 +37,9 @@
 #include "Profile.h"
 #include "ReplaceQuery.h"
 #include "ScenarioCalendarTableSync.hpp"
+
 #include "ScenarioTemplate.h"
-#include "ScenarioTableSync.h"
-#include "SentAlarm.h"
+#include "ScenarioTemplateTableSync.h"
 #include "SentScenario.h"
 #include "Session.h"
 #include "User.h"
@@ -64,31 +64,6 @@ namespace synthese
 
 	namespace messages
 	{
-		const string AlarmTableSync::_COL_CONFLICT_LEVEL = "conflict_level";
-		const string AlarmTableSync::_COL_RECIPIENTS_NUMBER = "recipients";
-
-		const string AlarmTableSync::COL_IS_TEMPLATE = "is_template";
-		const string AlarmTableSync::COL_LEVEL = "level";
-		const string AlarmTableSync::COL_SHORT_MESSAGE = "short_message";
-		const string AlarmTableSync::COL_LONG_MESSAGE = "long_message";
-		const string AlarmTableSync::COL_SCENARIO_ID = "scenario_id";
-		const string AlarmTableSync::COL_TEMPLATE_ID("template_id");
-		const string AlarmTableSync::COL_RAW_EDITOR = "raw_editor";
-		const string AlarmTableSync::COL_DONE = "done";
-		const string AlarmTableSync::COL_MESSAGES_SECTION_ID = "messages_section_id";
-		const string AlarmTableSync::COL_CALENDAR_ID = "calendar_id";
-		const string AlarmTableSync::COL_DATASOURCE_LINKS = "datasource_links";
-		const string AlarmTableSync::COL_DISPLAY_DURATION = "display_duration";
-		const string AlarmTableSync::COL_DIGITIZED_VERSION = "digitized_version";
-		const string AlarmTableSync::COL_TAGS = "tags";
-		const string AlarmTableSync::COL_REPEAT_INTERVAL = "repeat_interval";
-		const string AlarmTableSync::COL_WITH_ACK = "with_ack";
-		const string AlarmTableSync::COL_MULTIPLE_STOPS = "multiple_stops";
-		const string AlarmTableSync::COL_PLAY_TTS = "play_tts";
-		const string AlarmTableSync::COL_LIGHT = "light";
-		const string AlarmTableSync::COL_DIRECTION_SIGN_CODE = "direction_sign_code";
-		const string AlarmTableSync::COL_START_STOP_POINT = "start_stop_point";
-		const string AlarmTableSync::COL_END_STOP_POINT = "end_stop_point";
 	}
 
 	namespace db
@@ -99,287 +74,16 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<AlarmTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(AlarmTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
-			Field(AlarmTableSync::COL_LEVEL, SQL_INTEGER),
-			Field(AlarmTableSync::COL_SHORT_MESSAGE, SQL_TEXT),
-			Field(AlarmTableSync::COL_LONG_MESSAGE, SQL_TEXT),
-			Field(AlarmTableSync::COL_SCENARIO_ID, SQL_INTEGER),
-			Field(AlarmTableSync::COL_TEMPLATE_ID, SQL_INTEGER),
-			Field(AlarmTableSync::COL_RAW_EDITOR, SQL_BOOLEAN),
-			Field(AlarmTableSync::COL_DONE, SQL_BOOLEAN),
-			Field(AlarmTableSync::COL_MESSAGES_SECTION_ID, SQL_INTEGER),
-			Field(AlarmTableSync::COL_CALENDAR_ID, SQL_INTEGER),
-			Field(AlarmTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			Field(AlarmTableSync::COL_DISPLAY_DURATION, SQL_INTEGER),
-			Field(AlarmTableSync::COL_DIGITIZED_VERSION, SQL_TEXT),
-			Field(AlarmTableSync::COL_TAGS, SQL_TEXT),
-			Field(AlarmTableSync::COL_REPEAT_INTERVAL, SQL_INTEGER),
-			Field(AlarmTableSync::COL_WITH_ACK, SQL_BOOLEAN),
-			Field(AlarmTableSync::COL_MULTIPLE_STOPS, SQL_BOOLEAN),
-			Field(AlarmTableSync::COL_PLAY_TTS, SQL_BOOLEAN),
-			Field(AlarmTableSync::COL_LIGHT, SQL_BOOLEAN),
-			Field(AlarmTableSync::COL_DIRECTION_SIGN_CODE, SQL_INTEGER),
-			Field(AlarmTableSync::COL_START_STOP_POINT, SQL_INTEGER),
-			Field(AlarmTableSync::COL_END_STOP_POINT, SQL_INTEGER),
-			Field()
 		};
 
+		
 		template<>
 		DBTableSync::Indexes DBTableSyncTemplate<AlarmTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(AlarmTableSync::COL_SCENARIO_ID.c_str(), ""));
+			r.push_back(DBTableSync::Index(ParentScenario::FIELD.name.c_str(), ""));
 			return r;
 		};
-
-		template<>
-		boost::shared_ptr<Alarm> InheritanceLoadSavePolicy<AlarmTableSync, Alarm>::GetNewObject(
-			const Record& row
-		){
-			if(row.getDefault<bool>(AlarmTableSync::COL_IS_TEMPLATE, false))
-			{
-				return boost::shared_ptr<Alarm>(new AlarmTemplate(row.getDefault<RegistryKeyType>(TABLE_COL_ID)));
-			}
-			else
-			{
-				return boost::shared_ptr<Alarm>(new SentAlarm(row.getDefault<RegistryKeyType>(TABLE_COL_ID)));
-			}
-		}
-
-
-
-		template<>
-		void InheritanceLoadSavePolicy<AlarmTableSync,Alarm>::Load(
-			Alarm* alarm
-			, const DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			alarm->setLevel (static_cast<AlarmLevel>(rows->getInt ( AlarmTableSync::COL_LEVEL)));
-			alarm->setShortMessage (rows->getText (AlarmTableSync::COL_SHORT_MESSAGE));
-			alarm->setLongMessage (rows->getText (AlarmTableSync::COL_LONG_MESSAGE));
-			alarm->setRawEditor(rows->getBool(AlarmTableSync::COL_RAW_EDITOR));
-			alarm->setDone(rows->getBool(AlarmTableSync::COL_DONE));
-			alarm->setDisplayDuration(rows->getInt (AlarmTableSync::COL_DISPLAY_DURATION));
-			alarm->setDigitizedVersion(rows->getText(AlarmTableSync::COL_DIGITIZED_VERSION));
-
-			std::string tagsString(rows->getText(AlarmTableSync::COL_TAGS));
-			std::set<string> tags;
-			boost::algorithm::split(tags, tagsString, is_any_of(","), token_compress_on );
-			alarm->setTags(tags);
-
-			alarm->setRepeatInterval(rows->getInt(AlarmTableSync::COL_REPEAT_INTERVAL));
-			alarm->setWithAck(rows->getBool(AlarmTableSync::COL_WITH_ACK));
-			alarm->setMultipleStops(rows->getBool(AlarmTableSync::COL_MULTIPLE_STOPS));
-			alarm->setPlayTts(rows->getBool(AlarmTableSync::COL_PLAY_TTS));
-			alarm->setLight(rows->getBool(AlarmTableSync::COL_LIGHT));
-			alarm->setDirectionSignCode(rows->getInt(AlarmTableSync::COL_DIRECTION_SIGN_CODE));
-			alarm->setStartStopPoint(rows->getInt(AlarmTableSync::COL_START_STOP_POINT));
-			alarm->setEndStopPoint(rows->getInt(AlarmTableSync::COL_END_STOP_POINT));
-			// Section
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				alarm->setSection(NULL);
-				RegistryKeyType id(rows->getDefault<RegistryKeyType>(AlarmTableSync::COL_MESSAGES_SECTION_ID));
-				if(id) try
-				{
-					alarm->setSection(MessagesSectionTableSync::Get(id, env).get());
-				}
-				catch (ObjectNotFoundException<MessagesSection>& e)
-				{
-					Log::GetInstance().warn("Invalid section", e);
-				}
-
-				if(&env == &Env::GetOfficialEnv())
-				{
-					alarm->setDataSourceLinksWithRegistration(
-						ImportableTableSync::GetDataSourceLinksFromSerializedString(
-							rows->getText(AlarmTableSync::COL_DATASOURCE_LINKS),
-							env
-					)	);
-				}
-				else
-				{
-					alarm->setDataSourceLinksWithoutRegistration(
-						ImportableTableSync::GetDataSourceLinksFromSerializedString(
-							rows->getText(AlarmTableSync::COL_DATASOURCE_LINKS),
-							env
-					)	);
-				}
-			}
-
-			if(dynamic_cast<AlarmTemplate*>(alarm))
-			{
-				AlarmTemplate& alarmTemplate(static_cast<AlarmTemplate&>(*alarm));
-				if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-				{
-					alarmTemplate.setScenario(
-						ScenarioTableSync::GetCast<ScenarioTemplate>(
-							rows->getLongLong(AlarmTableSync::COL_SCENARIO_ID),
-							env,
-							linkLevel
-						).get()
-					);
-					if(alarmTemplate.getScenario())
-					{
-						alarmTemplate.getScenario()->addMessage(alarmTemplate);
-					}
-				}
-			}
-
-			if(dynamic_cast<SentAlarm*>(alarm))
-			{
-				SentAlarm& sentAlarm(static_cast<SentAlarm&>(*alarm));
-				if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-				{
-					// Scenario
-					sentAlarm.setScenario(
-						ScenarioTableSync::GetCast<SentScenario>(
-							rows->getLongLong(AlarmTableSync::COL_SCENARIO_ID),
-							env,
-							linkLevel
-						).get()
-					);
-					if(sentAlarm.getScenario())
-					{
-						sentAlarm.getScenario()->addMessage(sentAlarm);
-					}
-
-					// Template
-					RegistryKeyType id(rows->getLongLong(AlarmTableSync::COL_TEMPLATE_ID));
-					if(id > 0)
-					{
-						sentAlarm.setTemplate(
-							AlarmTableSync::GetCast<AlarmTemplate>(
-								id,
-								env,
-								linkLevel
-							).get()
-						);
-					}
-
-					if(&env == &Env::GetOfficialEnv())
-					{
-						MessagesModule::UpdateActivatedMessages();
-					}
-				}
-				sentAlarm.clearBroadcastPointsCache();
-			}
-
-			// Calendar
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				RegistryKeyType calendarId(
-					rows->getDefault<RegistryKeyType>(
-						AlarmTableSync::COL_CALENDAR_ID,
-						RegistryKeyType(0)
-				)	);
-				alarm->setCalendar(NULL);
-				if(calendarId)
-				{
-					try
-					{
-						alarm->setCalendar(
-							ScenarioCalendarTableSync::Get(
-								calendarId,
-								env
-							).get()
-						);
-					}
-					catch(ObjectNotFoundException<ScenarioCalendar>&)
-					{
-
-					}
-				}
-			}
-		}
-
-
-
-		template<>
-		void InheritanceLoadSavePolicy<AlarmTableSync,Alarm>::Save(
-			Alarm* object,
-			optional<DBTransaction&> transaction
-		){
-			bool isTemplate(dynamic_cast<AlarmTemplate*>(object) != NULL);
-			ReplaceQuery<AlarmTableSync> query(*object);
-			query.addField(isTemplate);
-			query.addField(object->getLevel());
-			query.addField(object->getShortMessage());
-			query.addField(object->getLongMessage());
-			query.addField(
-				object->getScenario() ?
-				object->getScenario()->getKey() :
-				RegistryKeyType(0)
-			);
-			query.addField(
-				(!isTemplate && static_cast<SentAlarm*>(object)->getTemplate()) ?
-				static_cast<SentAlarm*>(object)->getTemplate()->getKey() :
-				RegistryKeyType(0)
-			);
-			query.addField(object->getRawEditor());
-			query.addField(object->getDone());
-			query.addField(
-						object->getSection() ?
-						object->getSection()->getKey() :
-						RegistryKeyType(0)
-			);
-			query.addField(
-				object->getCalendar() ?
-				object->getCalendar()->getKey() :
-				RegistryKeyType(0)
-			);
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-			query.addField(object->getDisplayDuration());
-			query.addField(object->getDigitizedVersion());
-
-			string tagsString = boost::algorithm::join(object->getTags(), ",");
-			query.addField(tagsString);
-
-			query.addField(object->getRepeatInterval());
-			query.addField(object->getWithAck());
-			query.addField(object->getMultipleStops());
-			query.addField(object->getPlayTts());
-			query.addField(object->getLight());
-			query.addField(object->getDirectionSignCode());
-			query.addField(object->getStartStopPoint());
-			query.addField(object->getEndStopPoint());
-
-			query.execute(transaction);
-		}
-
-
-
-		template<>
-		void InheritanceLoadSavePolicy<AlarmTableSync, Alarm>::Unlink(
-			Alarm* obj
-		){
-			if(obj->getScenario())
-			{
-				if(dynamic_cast<AlarmTemplate*>(obj))
-				{
-					AlarmTemplate& alarmTemplate(static_cast<AlarmTemplate&>(*obj));
-					alarmTemplate.getScenario()->removeMessage(alarmTemplate);
-				}
-				if(dynamic_cast<SentAlarm*>(obj))
-				{
-					SentAlarm& sentAlarm(static_cast<SentAlarm&>(*obj));
-					sentAlarm.getScenario()->removeMessage(sentAlarm);
-				}
-			}
-
-			if(dynamic_cast<SentAlarm*>(obj))
-			{
-				// Prevent the message to stay active
-				obj->setScenario(NULL);
-
-				MessagesModule::UpdateActivatedMessages();
-			}
-		}
 
 
 		template<> bool DBTableSyncTemplate<AlarmTableSync>::CanDelete(
@@ -390,14 +94,7 @@ namespace synthese
 			{
 				Env env;
 				boost::shared_ptr<const Alarm> alarm(AlarmTableSync::Get(object_id, env));
-				if (dynamic_cast<const SentAlarm*>(alarm.get()))
-				{
-					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(DELETE_RIGHT);
-				}
-				else
-				{
-					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
-				}
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
 			}
 			catch (ObjectNotFoundException<AlarmObjectLink>&)
 			{
@@ -443,20 +140,16 @@ namespace synthese
 		){
 			Env env;
 			boost::shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env));
-			if (dynamic_cast<const SentAlarm*>(alarm.get()))
-			{
-				MessagesLog::AddDeleteEntry(static_cast<const SentAlarm*>(alarm.get()), (session ? session->getUser().get() : NULL));
-			}
-			else
-			{
-				MessagesLibraryLog::AddDeleteEntry(static_cast<const AlarmTemplate*>(alarm.get()), (session ? session->getUser().get() : NULL));
-			}
+			MessagesLibraryLog::AddDeleteEntry(static_cast<const Alarm*>(alarm.get()), (session ? session->getUser().get() : NULL));
 		}
 	}
 
 
 	namespace messages
 	{
+
+		// TODO check search is same for sent an d template
+		
 		AlarmTableSync::SearchResult AlarmTableSync::Search(
 			util::Env& env,
 			boost::optional<util::RegistryKeyType> scenarioId /*= boost::optional<util::RegistryKeyType>() */,
@@ -466,20 +159,10 @@ namespace synthese
 			bool raisingOrder /*= false*/,
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
 		){
-			stringstream query;
-			query
-				<< " SELECT a.*"
-				<< " FROM " << TABLE.NAME << " AS a"
-				<< " WHERE 1";
-			if(scenarioId)
-			{
-				query << " AND " << COL_SCENARIO_ID << "=" << *scenarioId;
-			}
-			if (number)
-				query << " LIMIT " << (*number + 1);
-			if (first > 0)
-				query << " OFFSET " << first;
-
-			return LoadFromQuery(query.str(), env, linkLevel);
+			AlarmTableSync::SearchResult result;
+			Search(env, std::back_inserter(result), scenarioId, first, number, orderByLevel, linkLevel);
+			return result;
 		}
 }	}
+
+

@@ -27,7 +27,7 @@
 #include "Request.h"
 #include "ScenarioSaveAction.h"
 #include "ScenarioStopAction.h"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
 #include "ServerModule.h"
 #include "TransportNetwork.h"
 #include "XmlToolkit.h"
@@ -193,7 +193,7 @@ namespace synthese
 					this,
 					boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred
-			)   );
+			)	);
 		}
 
 		void IneoTerminusConnection::tcp_connection::handle_read(
@@ -770,7 +770,7 @@ namespace synthese
 			scenarioSaveAction.run(fakeRequest);
 			// Enable the scenario
 			sscenario->setIsEnabled(true);
-			ScenarioTableSync::Save(sscenario.get());
+			SentScenarioTableSync::Save(sscenario.get());
 
 			util::Log::GetInstance().debug("IneoTerminusConnection::_createMessageRequest : id " +
 				idStr +
@@ -962,10 +962,10 @@ namespace synthese
 				XMLNode stopTimeNode = node.getChildNode("StopTime", 0);
 				stopTimeStr = stopTimeNode.getText();
 			}
-			message.startDate =  XmlToolkit::GetIneoDateTime(
+			message.startDate =	 XmlToolkit::GetIneoDateTime(
 				startDateStr + " " + startTimeStr
 			);
-			message.stopDate =  XmlToolkit::GetIneoDateTime(
+			message.stopDate =	XmlToolkit::GetIneoDateTime(
 				stopDateStr + " " + stopTimeStr
 			);
 			if (node.nChildNode("RepeatPeriod") > 0)

@@ -140,7 +140,7 @@ namespace synthese
 
 		void NotificationChannel::_setApplicationDateVariables(
 			util::ParametersMap& variables,
-			const SentAlarm* alarm,
+			const Alarm* alarm,
 			const NotificationType eventType,
 			const ptime& eventTime
 		) {
@@ -270,8 +270,8 @@ namespace synthese
 				boost::lexical_cast<std::string>(alarm->getKey())
 			);
 
-			// ApplicationPeriod only available for SentAlarm, not for library template
-			if (dynamic_cast<const SentAlarm*>(alarm))
+			// ApplicationPeriod only available for Alarm, not for library template
+			if (dynamic_cast<const Alarm*>(alarm))
 			{
 				// for END notifications, event time is already out of period,
 				// message activation waits for next minute, so go back few seconds
@@ -280,7 +280,7 @@ namespace synthese
 
 				_setApplicationDateVariables(
 					scriptParameters,
-					static_cast<const SentAlarm*>(alarm),
+					static_cast<const Alarm*>(alarm),
 					eventType,
 					variablesTime
 				);

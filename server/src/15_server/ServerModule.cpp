@@ -1,23 +1,23 @@
 
 /** ServerModule class implementation.
-    @file ServerModule.cpp
+	@file ServerModule.cpp
 
-    This file belongs to the SYNTHESE project (public transportation specialized software)
-    Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 
@@ -346,14 +346,20 @@ namespace synthese
 					(	gzipCompression &&
 						req.ipaddr != "127.0.0.1" // Never compress for localhost use
 				)	){
-					stringstream os;
-					filtering_stream<output> fs;
-					fs.push(gzip_compressor());
-					fs.push(os);
-					boost::iostreams::copy(ros, fs);
-					fs.pop();
-					rep.content.append(os.str());
-					rep.headers.insert(make_pair("Content-Encoding", "gzip"));
+					std::string rosContent = ros.str();
+
+					// Do not compress an empty response because it breaks web browsers
+					if(0 < rosContent.size())
+					{
+						stringstream os;
+						filtering_stream<output> fs;
+						fs.push(gzip_compressor());
+						fs.push(os);
+						boost::iostreams::copy(ros, fs);
+						fs.pop();
+						rep.content.append(os.str());
+						rep.headers.insert(make_pair("Content-Encoding", "gzip"));
+					}
 				}
 				else
 				{
@@ -592,7 +598,7 @@ namespace synthese
 			{
 				recursive_mutex::scoped_lock lock(_threadManagementMutex);
 				ThreadInfo& info(GetThreadInfo());
-				Log::GetInstance().trace("Thread "+ info.description +"("+ lexical_cast<string>(info.theThread)  +") is now running the action "+ info.queryString);
+				Log::GetInstance().trace("Thread "+ info.description +"("+ lexical_cast<string>(info.theThread)	 +") is now running the action "+ info.queryString);
 				info.status = ThreadInfo::THREAD_RUNNING_ACTION;
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
 			}
@@ -609,7 +615,7 @@ namespace synthese
 			{
 				recursive_mutex::scoped_lock lock(_threadManagementMutex);
 				ThreadInfo& info(GetThreadInfo());
-				Log::GetInstance().trace("Thread "+ info.description +"("+ lexical_cast<string>(info.theThread)  +") is now running the service "+ info.queryString);
+				Log::GetInstance().trace("Thread "+ info.description +"("+ lexical_cast<string>(info.theThread)	 +") is now running the service "+ info.queryString);
 				info.status = ThreadInfo::THREAD_RUNNING_FUNCTION;
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
 			}
@@ -627,7 +633,7 @@ namespace synthese
 				recursive_mutex::scoped_lock lock(_threadManagementMutex);
 				ThreadInfo& info(GetThreadInfo());
 				if(info.status == ThreadInfo::THREAD_WAITING) return;
-				Log::GetInstance().trace("Thread "+ info.description +"("+ lexical_cast<string>(info.theThread)  +") is now waiting");
+				Log::GetInstance().trace("Thread "+ info.description +"("+ lexical_cast<string>(info.theThread)	 +") is now waiting");
 				info.status = ThreadInfo::THREAD_WAITING;
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
 			}

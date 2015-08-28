@@ -128,7 +128,7 @@ namespace synthese
 						env,
 						_parentFolder ?
 							(_parentFolder.get() ? (*_parentFolder)->getKey() : 0) :
-							(_folder->getParent() ? _folder->getParent()->getKey() : 0),
+						(_folder->get<Parent>() ? _folder->get<Parent>()->getKey() : 0),
 						_name,
 						0,
 						1
@@ -148,13 +148,13 @@ namespace synthese
 			// Name
 			if(_name)
 			{
-				_folder->setName(*_name);
+				_folder->set<Name>(*_name);
 			}
 
 			// Parent folder
 			if(_parentFolder)
 			{
-				_folder->setParent(_parentFolder->get());
+				_folder->set<Parent>(*(_parentFolder.get()));
 			}
 
 			ScenarioFolderTableSync::Save(_folder.get());

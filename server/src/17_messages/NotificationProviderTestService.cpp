@@ -29,6 +29,8 @@
 #include <Request.h>
 #include <RequestException.h>
 #include <Scenario.h>
+#include "ScenarioTemplateTableSync.h"
+#include "SentScenarioTableSync.h"
 #include <UtilTypes.h>
 
 #include <boost/foreach.hpp>
@@ -78,21 +80,37 @@ namespace synthese
 				_notificationProvider = Env::GetOfficialEnv().getEditable<NotificationProvider>(
 					map.get<RegistryKeyType>(PARAMETER_NOTIFICATION_PROVIDER_ID)
 				).get();
-
-				// Reference to scenario
-				_testScenario = Env::GetOfficialEnv().getEditable<Scenario>(
-					map.getDefault<RegistryKeyType>(PARAMETER_TEST_SCENARIO_ID)
-				).get();
-
 			}
 			catch(ObjectNotFoundException<NotificationProvider>&)
 			{
 				_notificationProvider = NULL;
 			}
-			catch(ObjectNotFoundException<Scenario>&)
+
+			util::RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_TEST_SCENARIO_ID));
+			util::RegistryTableType tableId(util::decodeTableId(id));
+			if (tableId == ScenarioTemplateTableSync::TABLE.ID)
 			{
-				_testScenario = NULL;
+				try
+				{
+					_testScenario = Env::GetOfficialEnv().getEditable<ScenarioTemplate>(id).get();
+				}
+				catch(ObjectNotFoundException<ScenarioTemplate>&)
+				{
+					_testScenario = NULL;
+				}
 			}
+			else
+			{
+				try
+				{
+					_testScenario = Env::GetOfficialEnv().getEditable<SentScenario>(id).get();
+				}
+				catch(ObjectNotFoundException<SentScenario>&)
+				{
+					_testScenario = NULL;
+				}
+			}
+			
 		}
 
 
@@ -115,7 +133,7 @@ namespace synthese
 
 			boost::optional<ParametersMap> fields;
 			const int type = request.getParametersMap().getDefault<int>(PARAMETER_TEST_NOTIFICATION_TYPE, 1);
-			Scenario::Messages testMessages = _testScenario->getMessages();
+			std::set<const Alarm*> testMessages = _testScenario->getMessages();
 			if (!testMessages.empty())
 			{
 				// Temporarily replace parameters from request
@@ -127,7 +145,8 @@ namespace synthese
 					_notificationProvider->get<Parameters>().merge(testParameters);
 				}
 
-				fields = _notificationProvider->generateScriptFields(*testMessages.begin(), type);
+				const Alarm* testMessage = *testMessages.begin();
+				fields = _notificationProvider->generateScriptFields(testMessage, type);
 
 				// Restore parameters
 				if (!testParameters.empty())

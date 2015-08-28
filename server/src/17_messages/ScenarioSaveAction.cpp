@@ -34,8 +34,10 @@
 #include "Session.h"
 #include "User.h"
 #include "ScenarioCalendarTableSync.hpp"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
+#include "ScenarioTemplateTableSync.h"
 #include "ScenarioTemplate.h"
+#include "SentScenario.h"
 #include "MessagesLog.h"
 #include "MessagesLibraryLog.h"
 #include "MessagesRight.h"
@@ -165,32 +167,44 @@ namespace synthese
 				// Id
 				_dataSourceLinkId = map.get<string>(PARAMETER_SCENARIO_ID);
 
-				// Update or creation ?
-				ImportableTableSync::ObjectBySource<ScenarioTableSync> scenarios(*_scenarioDataSource, *_env);
-				ImportableTableSync::ObjectBySource<ScenarioTableSync>::Set scenarioSet(scenarios.get(_dataSourceLinkId));
+				ImportableTableSync::ObjectBySource<ScenarioTemplateTableSync> scenarios(*_scenarioDataSource, *_env);
+				ImportableTableSync::ObjectBySource<ScenarioTemplateTableSync>::Set scenarioSet(scenarios.get(_dataSourceLinkId));
 				if(!scenarioSet.empty())
-				{	// Update (actions G/H)
+				{
 					_scenario = _env->getEditableSPtr(*scenarioSet.begin());
-					if(dynamic_cast<SentScenario*>(_scenario.get()))
+					_tscenario = static_pointer_cast<ScenarioTemplate, Scenario>(_scenario);
+					_sscenario.reset();
+				}
+				else
+				{
+					ImportableTableSync::ObjectBySource<SentScenarioTableSync> scenarios(*_scenarioDataSource, *_env);
+					ImportableTableSync::ObjectBySource<SentScenarioTableSync>::Set scenarioSet(scenarios.get(_dataSourceLinkId));
+					if(!scenarioSet.empty())
 					{
+						_scenario = _env->getEditableSPtr(*scenarioSet.begin());
 						_sscenario = static_pointer_cast<SentScenario, Scenario>(_scenario);
-					}
-					if(dynamic_cast<ScenarioTemplate*>(_scenario.get()))
-					{
-						_tscenario = static_pointer_cast<ScenarioTemplate, Scenario>(_scenario);
+						_tscenario.reset();
 					}
 				}
+				
 			}
 			// Update, identified by id (actions G/H)
 			else if(map.isDefined(PARAMETER_SCENARIO_ID))
 			{
 				setScenarioId(map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID));
 			}
+
+
+
+			
 			// If not update, then creation
 			if(!_scenario.get())
 			{
 				_creation = true;
 
+
+
+				
 				// Template creation
 				if(map.getDefault<bool>(PARAMETER_CREATE_TEMPLATE,false))
 				{
@@ -199,14 +213,15 @@ namespace synthese
 					{
 						try
 						{
-							_source = ScenarioTableSync::GetCast<SentScenario>(
+							_source = SentScenarioTableSync::GetCast<SentScenario>(
 								map.get<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY),
 								*_env
 							);
-							_tscenario.reset(
-								new ScenarioTemplate(*_source, _source->getName())
-							);
-							_tscenario->setSections(_source->getSections());
+							ScenarioTemplate* scenarioTemplate(new ScenarioTemplate);
+							scenarioTemplate->set<Name>(_source->get<Name>());
+							
+							_tscenario.reset(scenarioTemplate);
+							_tscenario->set<Sections>(_source->get<Sections>());
 						}
 						catch(...)
 						{
@@ -218,14 +233,15 @@ namespace synthese
 					{
 						try
 						{
-							_template = ScenarioTableSync::GetCast<ScenarioTemplate>(
+							_template = ScenarioTemplateTableSync::GetCast<ScenarioTemplate>(
 								map.get<RegistryKeyType>(PARAMETER_TEMPLATE),
 								*_env
 							);
-							_tscenario.reset(
-								new ScenarioTemplate(*_template, map.get<string>(PARAMETER_NAME))
-							);
-							_tscenario->setSections(_template->getSections());
+							ScenarioTemplate* scenarioTemplate(new ScenarioTemplate);
+							scenarioTemplate->set<Name>(map.get<string>(PARAMETER_NAME));
+							scenarioTemplate->setFolder(_template->getFolder());
+							
+							_tscenario.reset(scenarioTemplate);
 						}
 						catch(...)
 						{
@@ -249,9 +265,10 @@ namespace synthese
 								throw ActionException("Bad folder ID");
 							}
 						}
-						_tscenario.reset(
-							new ScenarioTemplate(map.get<string>(PARAMETER_NAME), folder.get())
-						);
+						ScenarioTemplate* scenarioTemplate(new ScenarioTemplate);
+						scenarioTemplate->set<Name>(map.get<string>(PARAMETER_NAME));
+						scenarioTemplate->setFolder(folder.get());
+						_tscenario.reset(scenarioTemplate);
 					}
 
 					// Name check
@@ -263,13 +280,21 @@ namespace synthese
 					_scenario = static_pointer_cast<Scenario,ScenarioTemplate>(_tscenario);
 				}
 				else
-				{	// Sent scenario creation
+				{
+
+
+
+
+
+
+					
+					// Sent scenario creation
 					// Copy an other sent scenario (action E)
 					if(map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY, 0))
 					{
 						try
 						{
-							_source = ScenarioTableSync::GetCast<SentScenario>(
+							_source = SentScenarioTableSync::GetCast<SentScenario>(
 								map.get<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY),
 								*_env,
 								UP_LINKS_LOAD_LEVEL
@@ -283,17 +308,22 @@ namespace synthese
 							throw ActionException("scenario to copy", e, *this);
 						}
 					}
+
+
 					else if(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE, 0))
 					{
 						// Copy of a template (action D)
 						try
 						{
-							_template = ScenarioTableSync::GetCast<ScenarioTemplate>(
+							_template = ScenarioTemplateTableSync::GetCast<ScenarioTemplate>(
 								map.get<RegistryKeyType>(PARAMETER_TEMPLATE),
 								*_env,
 								UP_LINKS_LOAD_LEVEL
 							);
-							_sscenario.reset(new SentScenario(*_template));
+							SentScenario* sentScenario(new SentScenario);
+							sentScenario->set<Name>(_template->get<Name>());
+							sentScenario->setTemplate(_template.get());
+							_sscenario.reset(sentScenario);
 						}
 						catch(ObjectNotFoundException<ScenarioTemplate>& e)
 						{
@@ -313,7 +343,9 @@ namespace synthese
 			if(_scenario->getKey())
 			{
 				ScenarioCalendarTableSync::SearchResult calendars(ScenarioCalendarTableSync::Search(*_env, _scenario->getKey()));
-				AlarmTableSync::SearchResult messages(AlarmTableSync::Search(*_env, _scenario->getKey()));
+				
+				Alarms messages;
+				AlarmTableSync::Search(*_env, std::back_inserter(messages), _scenario->getKey());
 
 				BOOST_FOREACH(const boost::shared_ptr<ScenarioCalendar>& calendar, calendars)
 				{
@@ -342,7 +374,7 @@ namespace synthese
 			// Sections
 			if(map.isDefined(PARAMETER_SECTIONS))
 			{
-				_sections = Scenario::Sections();
+				_sections = std::set<MessagesSection*>();
 				string sectionsStr(map.get<string>(PARAMETER_SECTIONS));
 				trim(sectionsStr);
 				if(!sectionsStr.empty())
@@ -357,7 +389,7 @@ namespace synthese
 							if(sectionId)
 							{
 								_sections->insert(
-									Env::GetOfficialEnv().get<MessagesSection>(sectionId).get()
+									Env::GetOfficialEnv().getEditable<MessagesSection>(sectionId).get()
 								);
 							}
 						}
@@ -522,46 +554,6 @@ namespace synthese
 					}
 				}
 
-				// Variables
-				if(_sscenario->getTemplate())
-				{
-					const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
-					BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
-					{
-						if(!map.isDefined(PARAMETER_VARIABLE + variable.second.code))
-						{
-							if(	variable.second.compulsory &&
-								(	(_enabled && *_enabled) ||
-									(!_enabled && _sscenario->getIsEnabled())
-								)
-							){
-								SentScenario::VariablesMap::const_iterator it(
-									_sscenario->getVariables().find(variable.second.code)
-								);
-								if(it == _sscenario->getVariables().end() || it->second.empty())
-								{
-									throw ActionException("The variable "+ variable.first +" is still undefined : the scenario cannot be active");
-								}
-							}
-							continue;
-						}
-						string value(
-							iconv.convert(map.get<string>(PARAMETER_VARIABLE + variable.second.code))
-						);
-						if(	variable.second.compulsory &&
-							(	(_enabled && *_enabled) ||
-								(!_enabled && _sscenario->getIsEnabled())
-							) &&
-							value.empty()
-						){
-							throw ActionException("Variable "+ variable.first +" must be defined to activate the scenario.");
-						}
-						_variables.insert(make_pair(
-								variable.second.code,
-								value
-						)	);
-					}
-				}
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -578,16 +570,12 @@ namespace synthese
 			else // Simplified method
 			{
 				// Load of existing messages
-				AlarmTableSync::SearchResult alarms(
-					AlarmTableSync::Search(
-						*_env,
-						_scenario->getKey(),
-						0,
-						2
-				)	);
+				Alarms alarms;
+				AlarmTableSync::Search(*_env, std::back_inserter(alarms), _scenario->getKey(), 0, 2);
+
 				if(alarms.size() == 1)
 				{
-					_message = static_pointer_cast<SentAlarm, Alarm>(*alarms.begin());
+					_message = *alarms.begin();
 				}
 
 
@@ -734,30 +722,22 @@ namespace synthese
 				_sscenario->setDataSourceLinksWithoutRegistration(links);
 			}
 
-			// Name
-			if(_name)
-			{
-				DBLogModule::appendToLogIfChange(text, "Nom", _scenario->getName(), *_name);
-				_scenario->setName(*_name);
-			}
-
-			// Sections
-			if(_sections)
-			{
-				_scenario->setSections(*_sections);
-			}
-			else if(_creation && (_source.get() || _template.get()))
-			{
-				const Scenario& tpl(
-					_template.get() ?
-					*static_pointer_cast<const Scenario, const ScenarioTemplate>(_template) :
-					*static_pointer_cast<const Scenario, const SentScenario>(_source)
-				);
-				_scenario->setSections(tpl.getSections());
-			}
 
 			if(_tscenario.get())
 			{
+				// Name
+				if(_name)
+				{
+					DBLogModule::appendToLogIfChange(text, "Nom", _scenario->getName(), *_name);
+					_tscenario->set<Name>(*_name);
+				}
+
+				// Sections
+				if(_sections)
+				{
+					_tscenario->set<Sections>(*_sections);
+				}
+				
 				// Folder
 				if(_folder)
 				{
@@ -772,6 +752,31 @@ namespace synthese
 			}
 			if(_sscenario.get())
 			{
+				// Name
+				if(_name)
+				{
+					DBLogModule::appendToLogIfChange(text, "Nom", _scenario->getName(), *_name);
+					_sscenario->set<Name>(*_name);
+				}
+
+				// Sections
+				if(_sections)
+				{
+					_sscenario->set<Sections>(*_sections);
+				}
+				else if(_creation)
+				{
+					if (_source.get())
+					{
+						_sscenario->set<Sections>(_source->get<Sections>());
+					}
+					else if (_template.get())
+					{
+						_sscenario->set<Sections>(_template->get<Sections>());
+
+					}
+
+				}
 				// Enabled
 				if(_enabled)
 				{
@@ -854,56 +859,21 @@ namespace synthese
 				// Datasource
 				_doImportableUpdate(*_sscenario, request);
 
-				// Variables
-				if(_sscenario->getTemplate())
-				{
-					const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
-					stringstream text;
-					SentScenario::VariablesMap values;
-					BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
-					{
-						SentScenario::VariablesMap::const_iterator itNew(
-							_variables.find(variable.first)
-						);
-						SentScenario::VariablesMap::const_iterator itExist(
-							_sscenario->getVariables().find(variable.first)
-						);
-						string oldValue(
-							itExist == _sscenario->getVariables().end() ?
-							string() :
-							itExist->second
-						);
-						string newValue(
-							itNew == _variables.end() ?
-							oldValue :
-							itNew->second
-						);
-						DBLogModule::appendToLogIfChange(
-							text,
-							variable.first,
-							oldValue,
-							newValue
-						);
-						values.insert(make_pair(
-								variable.first,
-								newValue
-						)	);
-					}
-					_sscenario->setVariables(values);
-					if(!values.empty())
-					{
-						ScenarioTableSync::WriteVariablesIntoMessages(*_sscenario);
-					}
-				}
-
 			}
 
 			// Save
-			ScenarioTableSync::Save(_scenario.get(), transaction);
+			if (_sscenario.get())
+			{
+				SentScenarioTableSync::Save(_sscenario.get(), transaction);
+			}
+			else
+			{
+				ScenarioTemplateTableSync::Save(_tscenario.get(), transaction);
+			}
 
 			//////////////////////////////////////////////////////////////////////////
 			// Messages
-
+			
 			// Copy from template (for creation)
 			if(_creation && (_source.get() || _template.get()))
 			{
@@ -912,14 +882,22 @@ namespace synthese
 					*static_pointer_cast<const Scenario, const ScenarioTemplate>(_template) :
 					*static_pointer_cast<const Scenario, const SentScenario>(_source)
 				);
-
-				ScenarioTableSync::CopyMessages(tpl.getKey(), *_scenario, transaction);
+				
+				if (_sscenario.get())
+				{
+					ScenarioTemplateTableSync::CopyMessages(tpl.getKey(), *_sscenario, transaction);
+				}
+				else
+				{
+					// Unimplemented ScenarioTemplateTableSync::CopyMessages(tpl.getKey(), *_tscenario, transaction);
+				}
+				
 			}
 			else if(_messagesAndCalendars)
-			{   // A/B/G/H action, full method
+			{	// A/B/G/H action, full method
 				// Objects to remove if not found
-				Scenario::ScenarioCalendars existingCalendars(_scenario->getCalendars());
-				Scenario::Messages existingMessages(_scenario->getMessages());
+				std::set<ScenarioCalendar*> existingCalendars(_scenario->getCalendars());
+				std::set<const Alarm*> existingMessages(_scenario->getMessages());
 
 				// Loop on calendars
 				BOOST_FOREACH(const ptree::value_type& calendarNode, _messagesAndCalendars->get_child("calendar"))
@@ -933,7 +911,7 @@ namespace synthese
 						calendar = _env->getEditable<ScenarioCalendar>(calendarId);
 
 						// Check if the calendar is linked to the event
-						Scenario::ScenarioCalendars::iterator it(existingCalendars.find(calendar.get()));
+						std::set<ScenarioCalendar*>::iterator it(existingCalendars.find(calendar.get()));
 						if(it == existingCalendars.end())
 						{
 							calendar.reset();
@@ -943,7 +921,7 @@ namespace synthese
 							existingCalendars.erase(it);
 						}
 					}
-
+					
 					// Calendar was not found, create it
 					if(!calendar.get())
 					{
@@ -1017,12 +995,12 @@ namespace synthese
 						boost::shared_ptr<Alarm> message;
 
 						if(	messageId &&
-							_env->getRegistry<Alarm>().contains(messageId)
+							(_env->getRegistry<Alarm>().contains(messageId))
 						){
 							message = _env->getEditable<Alarm>(messageId);
 
 							// Check if the period is linked to the event
-							Scenario::Messages::iterator it(existingMessages.find(message.get()));
+							std::set<const Alarm*>::iterator it(existingMessages.find(message.get()));
 							if(it == existingMessages.end())
 							{
 								message.reset();
@@ -1036,14 +1014,7 @@ namespace synthese
 						// Period was not found, create it
 						if(!message.get())
 						{
-							if(_sscenario.get())
-							{
-								message.reset(new SentAlarm);
-							}
-							else
-							{
-								message.reset(new AlarmTemplate);
-							}
+							message.reset(new Alarm);
 							message->setScenario(_scenario.get());
 						}
 
@@ -1081,7 +1052,7 @@ namespace synthese
 						}
 
 						// Save
-						AlarmTableSync::Save(message.get(), transaction);
+						AlarmTableSync::Save((message).get(), transaction);
 
 						// Alternatives
 						Alarm::MessageAlternatives existingAlternatives(message->getMessageAlternatives());
@@ -1206,19 +1177,19 @@ namespace synthese
 				BOOST_FOREACH(const Alarm* message, existingMessages)
 				{
 					AlarmTableSync::Remove(request.getSession().get(), message->getKey(), transaction, false);
+
 				}
 			}
 			else if(_messageToCreate && _level) // A/B/G/H action, simplified method
 			{
-				boost::shared_ptr<SentAlarm> message;
+				boost::shared_ptr<Alarm> message;
 
-				AlarmTableSync::SearchResult msgs(
-					AlarmTableSync::Search(
-						*_env, _scenario->getKey()
-				)	);
+				Alarms msgs;
+				AlarmTableSync::Search(*_env, std::back_inserter(msgs), _scenario->getKey());
+
 				if(msgs.size() == 1)
 				{
-					message = static_pointer_cast<SentAlarm,Alarm>(msgs.front());
+					message = msgs.front();
 					if(_recipients)
 					{
 						// Links
@@ -1237,9 +1208,8 @@ namespace synthese
 				}
 				else
 				{
-					message.reset(new SentAlarm);
+					message.reset(new Alarm);
 					message->setScenario(_scenario.get());
-					message->setTemplate(NULL);
 				}
 
 				message->setShortMessage(_messageToCreateTitle ? *_messageToCreateTitle : "Unique message");
@@ -1252,8 +1222,12 @@ namespace synthese
 				message->setDigitizedVersion(_digitizedVersion);
 				message->setSection(_messageSection.get());
 
-				AlarmTableSync::Save(message.get(), transaction);
-
+				// Save
+				if (message)
+				{
+					AlarmTableSync::Save(message.get(), transaction);
+				}
+				
 				if(_recipients)
 				{
 					BOOST_FOREACH(const Recipients::value_type::value_type& recipient, *_recipients)
@@ -1339,12 +1313,7 @@ namespace synthese
 				AlarmTableSync::Save(_message.get(), transaction);
 			}
 
-
 			transaction.run();
-
-			// Variables !!
-			if(_sscenario.get())
-				ScenarioTableSync::WriteVariablesIntoMessages(*_sscenario);
 
 			if(_sscenario.get())
 			{
@@ -1426,16 +1395,33 @@ namespace synthese
 
 		void ScenarioSaveAction::setScenarioId(
 			const util::RegistryKeyType id
-		) throw(ActionException) {
-			try
+			) throw(ActionException)
+		{
+			util::RegistryTableType tableId(util::decodeTableId(id));
+			if (tableId == ScenarioTemplateTableSync::TABLE.ID)
 			{
-				_scenario = ScenarioTableSync::GetEditable(id, *_env, UP_LINKS_LOAD_LEVEL);
-				_sscenario = dynamic_pointer_cast<SentScenario, Scenario>(_scenario);
-				_tscenario = dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario);
+				try
+				{
+					_tscenario = ScenarioTemplateTableSync::GetEditable(id, *_env, UP_LINKS_LOAD_LEVEL);
+					_scenario = _tscenario;
+				}
+				catch(ObjectNotFoundException<SentScenario>& e)
+				{
+					throw ActionException(PARAMETER_SCENARIO_ID, e, *this);
+				}
+				
 			}
-			catch(ObjectNotFoundException<Scenario>& e)
+			else
 			{
-				throw ActionException(PARAMETER_SCENARIO_ID, e, *this);
+				try
+				{
+					_sscenario = SentScenarioTableSync::GetEditable(id, *_env, UP_LINKS_LOAD_LEVEL);
+					_scenario = _sscenario;
+				}
+				catch(ObjectNotFoundException<SentScenario>& e)
+				{
+					throw ActionException(PARAMETER_SCENARIO_ID, e, *this);
+				}
 			}
 		}
 

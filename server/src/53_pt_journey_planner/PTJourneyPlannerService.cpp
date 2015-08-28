@@ -66,7 +66,7 @@
 #include "StopArea.hpp"
 #include "StaticFunctionRequest.h"
 #include "LineMarkerInterfacePage.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "PTModule.h"
 #include "Destination.hpp"
 #include "Junction.hpp"
@@ -2036,7 +2036,7 @@ namespace synthese
 					boost::shared_ptr<MultiLineString> multiLineString(
 						_coordinatesSystem->getGeometryFactory().createMultiLineString(
 							geometries
-					)   );
+					)	);
 					
 					_displayJunctionCell(
 						*legPM,
@@ -2254,7 +2254,7 @@ namespace synthese
 					multiLineString.reset(
 						_coordinatesSystem->getGeometryFactory().createMultiLineString(
 							geometries
-					)   );
+					)	);
 					
 					_displayJunctionCell(
 						*legPM,

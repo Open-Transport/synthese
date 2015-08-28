@@ -1,0 +1,34 @@
+*** Settings ***
+Resource          ../../resources/s3-fakeclient/topical_messaging.txt
+Resource          ../../resources/data/topical_messaging_data.txt
+Test Setup        Run Keywords  On Node 0  AND  With Test Data  ${DB}  AND  Start Synthese On Node 0
+Test Teardown     Stop Synthese On Node 0
+
+*** Keywords ***
+
+Scenario Template Folder '${folder_name}' Is Created
+    ${http_response}=  Create Synthese Object  ${SCENARIO_FOLDER_TABLE_ID}  field_name\=${folder_name}
+    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    [Return]    ${created_object_id}
+   
+Scenario Template Folder '${folder_name}' Is Created Under ${parent_folder_id:\d+}
+    ${http_response}=  Create Synthese Object  ${SCENARIO_FOLDER_TABLE_ID}  field_name\=${folder_name}  field_parent_id\=${parent_folder_id}
+    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    [Return]    ${created_object_id}
+
+Scenario Template Folder ${scenario_template_folder_id:\d+} Is Requested
+    ${content}=  View Synthese Object  ${scenario_template_folder_id}
+
+*** Test Cases ***
+
+Creating A Scenario Template Folder Should Work
+    ${scenario_template_folder_id}=  Scenario Template Folder 'Folder 1' Is Created
+    Scenario Template Folder ${scenario_template_folder_id} Is Requested
+
+Creating A Scenario Template Sub Folder Should Work
+    ${scenario_template_folder_id}=  Scenario Template Folder 'Folder 1' Is Created
+    ${scenario_template_subfolder_id}=  Scenario Template Folder 'Folder 2' Is Created Under ${scenario_template_folder_id}
+    Scenario Template Folder ${scenario_template_folder_id} Is Requested
+
+    
+

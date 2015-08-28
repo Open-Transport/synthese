@@ -18,14 +18,13 @@ void synthese::regulation::moduleRegister()
 
 	synthese::regulation::AlertTableSync::integrate();
 
-    synthese::regulation::RegulationModule::integrate();
+	synthese::regulation::RegulationModule::integrate();
 	synthese::regulation::RegulationRight::integrate();
-
-	synthese::util::Env::Integrate<synthese::regulation::Alert>();
 
 	synthese::regulation::ProcessAlertsAction::integrate();
 
-    synthese::regulation::AlertListService::integrate();
-    
+	synthese::regulation::AlertListService::integrate();
+
+	INTEGRATE(synthese::regulation::Alert);
 
 }

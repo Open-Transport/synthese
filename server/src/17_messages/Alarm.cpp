@@ -24,13 +24,17 @@
 
 #include "AlarmObjectLink.h"
 #include "AlarmRecipient.h"
-#include "BroadcastPoint.hpp"
 #include "DBConstants.h"
 #include "Factory.h"
 #include "MessageAlternative.hpp"
+#include "MessageApplicationPeriod.hpp"
 #include "MessagesSection.hpp"
+#include "MessagesModule.h"
+#include "BroadcastPoint.hpp"
 #include "Scenario.h"
-#include "AlarmTemplate.h"
+#include "SentScenario.h"
+#include "ScenarioCalendar.hpp"
+#include "ScenarioTemplate.h"
 #include "ParametersMap.h"
 
 using namespace boost;
@@ -41,10 +45,34 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace impex;
+	using namespace messages;
 
-	template<> const Field SimpleObjectFieldDefinition<messages::Alarm>::FIELD = Field("alarm_id", SQL_INTEGER);
-	template<> const std::string util::Registry<messages::Alarm>::KEY("Alarm");
+	CLASS_DEFINITION(Alarm, "t003_alarms", 3)
+	FIELD_DEFINITION_OF_OBJECT(messages::Alarm, "alarm_id", "alarm_ids")
 
+	
+	FIELD_DEFINITION_OF_TYPE(Level, "level", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(ShortMessage, "short_message", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(LongMessage, "long_message", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(ParentScenario, "scenario_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(RawEditor, "raw_editor", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(Done, "done", SQL_BOOLEAN)
+
+	FIELD_DEFINITION_OF_TYPE(Calendar, "calendar_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(DisplayDuration, "display_duration", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(DigitizedVersion, "digitized_version", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(RepeatInterval, "repeat_interval", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(WithAck, "with_ack", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(MultipleStops, "multiple_stops", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(PlayTts, "play_tts", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(Light, "light", SQL_BOOLEAN)
+	
+	FIELD_DEFINITION_OF_TYPE(DirectionSignCode, "direction_sign_code", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(StartStopPoint, "start_stop_point", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(EndStopPoint, "end_stop_point", SQL_INTEGER)
+
+
+	
 	namespace messages
 	{
 		const string Alarm::DATA_MESSAGE_ID("message_id");
@@ -84,61 +112,69 @@ namespace synthese
 
 
 		Alarm::Alarm(
-			util::RegistryKeyType key,
-			const Scenario* scenario
-		):	Registrable(key),
-			_level(ALARM_LEVEL_INFO),
-			_scenario(scenario),
-			_rawEditor(false),
-			_done(true),
-			_section(NULL),
-			_calendar(NULL),
-			_displayDuration(0)
+			util::RegistryKeyType key
+			):	Registrable(key),
+				Object<Alarm, AlarmRecord>(
+					Schema(
+						FIELD_VALUE_CONSTRUCTOR(Key, key),
+						FIELD_DEFAULT_CONSTRUCTOR(Name),
+						FIELD_VALUE_CONSTRUCTOR(Level, ALARM_LEVEL_INFO),
+						FIELD_DEFAULT_CONSTRUCTOR(ShortMessage),
+						FIELD_DEFAULT_CONSTRUCTOR(LongMessage),
+						FIELD_DEFAULT_CONSTRUCTOR(ParentScenario),
+						FIELD_VALUE_CONSTRUCTOR(RawEditor, false),
+						FIELD_VALUE_CONSTRUCTOR(Done, true),
+						FIELD_DEFAULT_CONSTRUCTOR(messages::MessagesSection),
+						FIELD_DEFAULT_CONSTRUCTOR(Calendar),
+						FIELD_DEFAULT_CONSTRUCTOR(DataSourceLinksWithoutUnderscore),
+						FIELD_DEFAULT_CONSTRUCTOR(DisplayDuration),
+						FIELD_DEFAULT_CONSTRUCTOR(DigitizedVersion),
+						FIELD_DEFAULT_CONSTRUCTOR(RepeatInterval),
+						FIELD_DEFAULT_CONSTRUCTOR(WithAck),
+						FIELD_DEFAULT_CONSTRUCTOR(MultipleStops),
+						FIELD_DEFAULT_CONSTRUCTOR(PlayTts),
+						FIELD_DEFAULT_CONSTRUCTOR(Light),
+						FIELD_DEFAULT_CONSTRUCTOR(DirectionSignCode),
+						FIELD_DEFAULT_CONSTRUCTOR(StartStopPoint),
+						FIELD_DEFAULT_CONSTRUCTOR(EndStopPoint)
+						)	)
 		{}
 
 
 
 		Alarm::Alarm(
 			const Alarm& source
-		):	Registrable(0),
-			_level(source._level),
-			_shortMessage(source._shortMessage),
-			_longMessage(source._longMessage),
-			_scenario(source._scenario),
-			_rawEditor(source._rawEditor),
-			_done(source._done),
-			_section(source._section),
-			_calendar(source._calendar),
-			_displayDuration(source._displayDuration),
-			_digitizedVersion(source._digitizedVersion),
-			_tags(source._tags)
+			):	Registrable(0),
+				Object<Alarm, AlarmRecord>(
+					Schema(
+						FIELD_VALUE_CONSTRUCTOR(Key, 0),
+						FIELD_DEFAULT_CONSTRUCTOR(Name),
+						FIELD_VALUE_CONSTRUCTOR(Level, source.getLevel()),
+						FIELD_VALUE_CONSTRUCTOR(ShortMessage, source.getShortMessage()),
+						FIELD_VALUE_CONSTRUCTOR(LongMessage, source.getLongMessage()),
+						FIELD_VALUE_CONSTRUCTOR(ParentScenario, source.get<ParentScenario>()),
+						FIELD_VALUE_CONSTRUCTOR(RawEditor, source.getRawEditor()),
+						FIELD_VALUE_CONSTRUCTOR(Done, source.getDone()),
+						FIELD_VALUE_CONSTRUCTOR(messages::MessagesSection, source.get<messages::MessagesSection>()),
+						FIELD_VALUE_CONSTRUCTOR(Calendar, source.get<Calendar>()),
+						FIELD_DEFAULT_CONSTRUCTOR(DataSourceLinksWithoutUnderscore),
+						FIELD_VALUE_CONSTRUCTOR(DisplayDuration, source.getDisplayDuration()),
+						FIELD_VALUE_CONSTRUCTOR(DigitizedVersion, source.getDigitizedVersion()),
+						FIELD_VALUE_CONSTRUCTOR(Tags, source.getTags()),
+						FIELD_VALUE_CONSTRUCTOR(RepeatInterval, source.getRepeatInterval()),
+						FIELD_VALUE_CONSTRUCTOR(WithAck, source.getWithAck()),
+						FIELD_VALUE_CONSTRUCTOR(MultipleStops, source.getMultipleStops()),
+						FIELD_VALUE_CONSTRUCTOR(PlayTts, source.getPlayTts()),
+						FIELD_VALUE_CONSTRUCTOR(Light, source.getLight()),
+						FIELD_VALUE_CONSTRUCTOR(DirectionSignCode, source.getDirectionSignCode()),
+						FIELD_VALUE_CONSTRUCTOR(StartStopPoint, source.getStartStopPoint()),
+						FIELD_VALUE_CONSTRUCTOR(EndStopPoint, source.getEndStopPoint())
+						)	)
 		{}
 
-
-
-		Alarm::Alarm(
-			const Alarm& source,
-			const Scenario* scenario,
-			const ScenarioCalendar* calendar
-		):	Registrable(0),
-			_level(source._level),
-			_shortMessage(source._shortMessage),
-			_longMessage(source._longMessage),
-			_scenario(scenario),
-			_rawEditor(source._rawEditor),
-			_done(source._done),
-			_section(source._section),
-			_calendar(calendar),
-			_displayDuration(source._displayDuration),
-			_digitizedVersion(source._digitizedVersion),
-			_tags(source._tags)
-		{}
-
-
-
+		
 		Alarm::~Alarm()
 		{}
-
 
 
 		void Alarm::toParametersMap(
@@ -166,10 +202,10 @@ namespace synthese
 			}
 
 			// Section
-			if(_section)
+			if(getSection())
 			{
 				boost::shared_ptr<ParametersMap> sectionPM(new ParametersMap);
-				_section->toParametersMap(*sectionPM, true);
+				getSection()->toParametersMap(*sectionPM, true);
 				pm.insert(TAG_SECTION, sectionPM);
 			}
 
@@ -196,7 +232,7 @@ namespace synthese
 				pm.insert(TAG_RECIPIENTS, recipientsPM);
 			}
 
-			pm.insert(ATTR_CALENDAR_ID, _calendar ? _calendar->getKey() : 0);
+			pm.insert(ATTR_CALENDAR_ID, getCalendar() ? getCalendar()->getKey() : 0);
 
 			// Ineo Terminus parameters
 			pm.insert(prefix + DATA_REPEAT_INTERVAL, getRepeatInterval());
@@ -209,7 +245,9 @@ namespace synthese
 			pm.insert(prefix + DATA_END_STOP_POINT, getEndStopPoint());
 
 			dataSourceLinksToParametersMap(pm);
+
 		}
+
 
 
 
@@ -220,14 +258,11 @@ namespace synthese
 			const BroadcastPoint& point,
 			const ParametersMap& parameters
 		) const	{
-
 			// Locks the linked objects
 			mutex::scoped_lock(_linkedObjectsMutex);
-
 			// Asks the broadcast point
 			return point.displaysMessage(_linkedObjects, parameters);
 		}
-
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -236,9 +271,22 @@ namespace synthese
 			const BroadcastPoint& point,
 			const util::ParametersMap& parameters
 		) const {
-			return _isOnBroadcastPoint(point, parameters);
+			BroadcastPointsCache::key_type pp(
+				make_pair(&point, parameters)
+			);
+			BroadcastPointsCache::const_iterator it(
+				_broadcastPointsCache.find(pp)
+			);
+			if(it == _broadcastPointsCache.end())
+			{
+				it = _broadcastPointsCache.insert(
+					make_pair(
+						pp,
+						_isOnBroadcastPoint(point, parameters)
+				)	).first;
+			}
+			return it->second;
 		}
-
 
 
 		void Alarm::addLinkedObject(
@@ -332,20 +380,208 @@ namespace synthese
 			return it->second;
 		}
 
+		bool
+		Alarm::belongsToTemplate() const
+		{
+			return dynamic_cast<const ScenarioTemplate*>(getScenario());
+		}
 
 
-		// Class documentation
-		/** @class Alarm
-			Alarm message.
-			@ingroup m17
+		void Alarm::clearBroadcastPointsCache() const
+		{
+			_broadcastPointsCache.clear();
+		}
 
-			An alarm message is intended to be broadcasted at a time period into several destinations :
-				- display screens
-				- route planner results
-				- etc.
+		bool Alarm::isApplicable( boost::posix_time::ptime& when ) const
+		{
+			if (belongsToTemplate())
+			{
+				return false;
+			}
+			const SentScenario* sentScenario = dynamic_cast<const SentScenario*>(getScenario());
+			if (!sentScenario->getIsEnabled()) return false;
+			
+			// Then check if specific application periods are defined for the current message
 
-			An alarm can be sent individually (single alarm) or in a group built from a scenario (grouped alarm)
-			The _scenario attribute points to the group if applicable.
-		*/
+			if(getCalendar())
+			{
+				// Search for an application period including the checked date
+				BOOST_FOREACH(
+					const ScenarioCalendar::ApplicationPeriods::value_type& period,
+					getCalendar()->getApplicationPeriods()
+					) {
+					if(period->getValue(when))
+					{
+						return true;
+					}
+				}
+				
+				// No period was found : the message is inactive
+				return false;
+			}
+			else
+			{
+				// Then refer to the simple start/end date of the scenario
+				return
+					(sentScenario->getPeriodStart().is_not_a_date_time() || sentScenario->getPeriodStart() <= when) &&
+					(sentScenario->getPeriodEnd().is_not_a_date_time() || sentScenario->getPeriodEnd() >= when)
+					;
+			}
+				
+		}
+		
+
+
+		boost::posix_time::ptime Alarm::getApplicationStart(
+			const boost::posix_time::ptime& when
+		) const {
+			posix_time::ptime result = posix_time::not_a_date_time;
+			if (belongsToTemplate())
+			{
+				return result;
+			}
+			const SentScenario* sentScenario = dynamic_cast<const SentScenario*>(getScenario());
+			if (!sentScenario->getIsEnabled()) return result;
+
+			// Then check if specific application periods are defined for the current message
+			if(getCalendar())
+			{
+				// Search for an application period including the checked date
+				BOOST_FOREACH(
+					const ScenarioCalendar::ApplicationPeriods::value_type& period,
+					getCalendar()->getApplicationPeriods()
+				){
+					if(period->getValue(when))
+					{
+						result = period->getStart(when);
+					}
+				}
+			}
+			else
+			{
+				// Then refer to the simple start/end date of the scenario
+				if ((sentScenario->getPeriodStart().is_not_a_date_time() || sentScenario->getPeriodStart() >= when) &&
+					(sentScenario->getPeriodEnd().is_not_a_date_time() || sentScenario->getPeriodEnd() <= when))
+				{
+					result = sentScenario->getPeriodStart();
+				}
+			}
+			return result;
+		}
+
+
+
+		boost::posix_time::ptime Alarm::getApplicationEnd(
+			const boost::posix_time::ptime& when
+		) const {
+			posix_time::ptime result = posix_time::not_a_date_time;
+			if (belongsToTemplate())
+			{
+				return result;
+			}
+			const SentScenario* sentScenario = dynamic_cast<const SentScenario*>(getScenario());
+			if (!sentScenario->getIsEnabled()) return result;
+
+			// Then check if specific application periods are defined for the current message
+			if(getCalendar())
+			{
+				// Search for an application period including the checked date
+				BOOST_FOREACH(
+					const ScenarioCalendar::ApplicationPeriods::value_type& period,
+					getCalendar()->getApplicationPeriods()
+				){
+					if(period->getValue(when))
+					{
+						result = period->getEnd(when);
+					}
+				}
+			}
+			else
+			{
+				// Then refer to the simple start/end date of the scenario
+				if ((sentScenario->getPeriodStart().is_not_a_date_time() || sentScenario->getPeriodStart() >= when) &&
+					(sentScenario->getPeriodEnd().is_not_a_date_time() || sentScenario->getPeriodEnd() <= when))
+				{
+					result = sentScenario->getPeriodEnd();
+				}
+			}
+			return result;
+		}
+
+		
+		const Scenario*
+		Alarm::getScenario() const
+		{
+			return get<ParentScenario>().get_ptr();
+		}
+
+		const ScenarioCalendar*
+		Alarm::getCalendar() const
+		{
+			return get<Calendar>().get_ptr();
+		}
+
+
+		const MessagesSection*
+		Alarm::getSection() const
+		{
+			return get<MessagesSection>().get_ptr();
+		}
+		
+
+		void
+		Alarm::setScenario(const Scenario* value)
+		{
+			set<ParentScenario>(value
+								? boost::optional<Scenario&>(*const_cast<Scenario*>(value))
+								: boost::none);
+		}
+
+		
+		void
+		Alarm::setSection(const MessagesSection* value)
+		{
+			set<MessagesSection>(value
+								 ? boost::optional<MessagesSection&>(*const_cast<MessagesSection*>(value))
+								 : boost::none);
+		}
+
+		
+		void
+		Alarm::setCalendar(const ScenarioCalendar* value)
+		{
+			set<Calendar>(value
+						  ? boost::optional<ScenarioCalendar&>(*const_cast<ScenarioCalendar*>(value))
+						  : boost::none);
+		}
+
+		
+		void Alarm::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			if (get<ParentScenario>())
+			{
+				get<ParentScenario>()->addMessage(*this);
+				if (!belongsToTemplate())
+				{
+					MessagesModule::UpdateActivatedMessages();
+				}
+			}
+		}
+
+
+		void Alarm::unlink()
+		{
+			if (get<ParentScenario>())
+			{
+				get<ParentScenario>()->removeMessage(*this);
+				if (!belongsToTemplate())
+				{
+					MessagesModule::UpdateActivatedMessages();
+				}
+			}
+		}
+
+		
+		
 }	}
 

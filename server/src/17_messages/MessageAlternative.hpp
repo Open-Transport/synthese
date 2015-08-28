@@ -23,9 +23,8 @@
 #ifndef SYNTHESE_messages_MessageAlternative_hpp__
 #define SYNTHESE_messages_MessageAlternative_hpp__
 
-#include "Object.hpp"
-
 #include "Alarm.h"
+
 #include "MessageType.hpp"
 #include "NumericField.hpp"
 #include "SchemaMacros.hpp"
@@ -35,6 +34,13 @@ namespace synthese
 {
 	FIELD_STRING(Content)
 
+	namespace messages
+	{
+		class Alarm;
+	}
+
+	
+	
 	typedef boost::fusion::map<
 		FIELD(Key),
 		FIELD(messages::Alarm),

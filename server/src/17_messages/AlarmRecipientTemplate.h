@@ -31,7 +31,6 @@
 
 #include "AlarmObjectLink.h"
 #include "AlarmRecipient.h"
-#include "SentAlarm.h"
 #include "FactorableTemplate.h"
 #include "SentScenario.h"
 
@@ -39,8 +38,8 @@
 
 namespace synthese
 {
-    namespace messages
-    {
+	namespace messages
+	{
 		/** AlarmRecipientTemplate class.
 			@ingroup m17
 		*/

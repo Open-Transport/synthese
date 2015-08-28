@@ -21,6 +21,9 @@
 
 #include "MessageApplicationPeriod.hpp"
 
+#include "Alarm.h"
+#include "SentScenario.h"
+
 using namespace boost;
 using namespace std;
 using namespace boost::gregorian;

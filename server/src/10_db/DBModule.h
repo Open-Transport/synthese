@@ -40,6 +40,7 @@
 #include <boost/shared_ptr.hpp>
 
 
+
 namespace synthese
 {
 	class ObjectBase;

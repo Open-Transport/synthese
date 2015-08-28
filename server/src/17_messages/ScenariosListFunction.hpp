@@ -74,8 +74,8 @@ namespace synthese
 				boost::optional<bool> _showCurrentlyDisplayed;
 				boost::shared_ptr<const ScenarioFolder> _parentFolder;
 				boost::shared_ptr<const cms::Webpage> _cmsTemplate;
-				boost::optional<const MessagesSection&> _sectionIn;
-				boost::optional<const MessagesSection&> _sectionOut;
+				boost::optional<MessagesSection&> _sectionIn;
+				boost::optional<MessagesSection&> _sectionOut;
 				boost::optional<std::string> _textSearch;
 				boost::optional<bool> _archivesOnly;
 			//@}

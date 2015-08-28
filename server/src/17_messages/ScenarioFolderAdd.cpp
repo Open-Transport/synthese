@@ -109,8 +109,8 @@ namespace synthese
 			Request& request
 		){
 			ScenarioFolder f;
-			f.setParent(_parent.get());
-			f.setName(_name);
+			if (_parent) f.set<Parent>(*_parent);
+			f.set<Name>(_name);
 
 			ScenarioFolderTableSync::Save(&f);
 

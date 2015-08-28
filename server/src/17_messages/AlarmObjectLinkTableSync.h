@@ -53,10 +53,10 @@ namespace synthese
 			 - less than FIELDS_ONLY_LOAD_LEVEL : not usable (assertion)
 			 - FIELDS_ONLY_LOAD_LEVEL and above : links the object to its alarm
 			 - RECURSIVE_LINKS_LOAD_LEVEL and above : links its alarm to the corresponding object according to the rules defined in the recipient class
-			   only if the alarm is a SentAlarm object
+			   only if the alarm is a Alarm object
 
 			Unlink method behavior :
-			 - removes the link between the alarm and the object if the alarm is a SentAlarm object (no exception is thrown if it does not exists)
+			 - removes the link between the alarm and the object if the alarm is a Alarm object (no exception is thrown if it does not exists)
 		*/
 		class AlarmObjectLinkTableSync:
 			public db::DBDirectTableSyncTemplate<
@@ -75,8 +75,8 @@ namespace synthese
 			/** Search of alarm object links for a specified alarm in a specified recipient type.
 				@param alarm Alarm to the object must be liked with
 				@param recipientKey Key of the recipient to search (REMOVE THIS PARAMETER WHEN THE FACTORY KEY WILL BE STATIC)
-				@param first First  object to answer
-				@param number Number of  objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@param first First	object to answer
+				@param number Number of	 objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				@return vector<*> Founded  objects.
 				@author Hugues Romain
 				@date 2006
@@ -94,8 +94,8 @@ namespace synthese
 			/** Search of alarm object links for a specified alarm in all the recipient types.
 				@param env Environment to populate
 				@param alarm Alarm to the object must be liked with
-				@param first First  object to answer
-				@param number Number of  objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@param first First	object to answer
+				@param number Number of	 objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				@return Found objects.
 				@author Hugues Romain
 				@date 2006
@@ -150,7 +150,7 @@ namespace synthese
 			util::RegistryKeyType alarmId,
 			const std::string& recipientKey,
 			int first /*= 0*/,
-			boost::optional<std::size_t> number  /*= 0*/,
+			boost::optional<std::size_t> number	 /*= 0*/,
 			util::LinkLevel linkLevel
 		){
 			std::stringstream query;
@@ -162,9 +162,9 @@ namespace synthese
 					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << alarmId
 					<< " AND " << AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << util::Conversion::ToDBString(recipientKey);
 			if (number)
-			    query << " LIMIT " << (*number + 1);
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-			    query << " OFFSET " << first;
+				query << " OFFSET " << first;
 
 			db::DBResultSPtr rows = db::DBModule::GetDB()->execQuery(query.str());
 			std::vector< boost::shared_ptr<T> > objects;

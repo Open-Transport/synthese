@@ -22,42 +22,42 @@
 
 #include "Scenario.h"
 
+#include "MessagesSection.hpp"
+#include "Alarm.h"
+#include "ScenarioCalendar.hpp"
+
+
 using namespace std;
 
 namespace synthese
 {
 	using namespace util;
+	using namespace messages;
 
-	namespace util
-	{
-		template<>
-		const string Registry<messages::Scenario>::KEY = "Scenario";
-	}
+	FIELD_DEFINITION_OF_TYPE(Sections, "messages_section_ids", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DataSourceLinksWithoutUnderscore, "datasource_links", SQL_TEXT)
 
+	
 	namespace messages
 	{
+
+
+		Scenario::Scenario(util::RegistryKeyType id)
+			: Registrable(id)
+		{
+		}
+
 		Scenario::~Scenario()
 		{}
 
 
-
-		Scenario::Scenario(
-			const std::string name /*= std::string()*/
-		)
-		{
-			_name = name;
-		}
-
-
-
-		void Scenario::addMessage( const Alarm& message ) const
+		void Scenario::addMessage(const Alarm& message) const
 		{
 			_messages.insert(&message);
 		}
-
-
-
-		void Scenario::removeMessage( const Alarm& message ) const
+		
+		
+		void Scenario::removeMessage(const Alarm& message) const
 		{
 			if (_messages.find(&message) != _messages.end())
 			{
@@ -67,11 +67,10 @@ namespace synthese
 
 
 
-		void Scenario::addSection( const MessagesSection& section ) const
+		void Scenario::addSection(const MessagesSection& section) const
 		{
-			_sections.insert(&section);
+			const_cast<Sections::Type&>(getSections()).insert(const_cast<MessagesSection*>(&section));
 		}
-
 
 
 }	}

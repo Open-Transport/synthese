@@ -37,8 +37,7 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "MessagesLog.h"
 #include "MessagesLibraryLog.h"
-#include "AlarmTemplate.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 
 using namespace std;
 using namespace boost;
@@ -86,15 +85,13 @@ namespace synthese
 
 			AlarmObjectLinkTableSync::RemoveByMessage(_alarm->getKey(), _objectId);
 
-			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() != NULL)
+			if (_alarm->belongsToTemplate())
 			{
-				boost::shared_ptr<const AlarmTemplate> talarm(dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm));
-				MessagesLibraryLog::addUpdateEntry(talarm.get(), "Suppression de la destination "+ lexical_cast<string>(_objectId), request.getUser().get());
+				MessagesLibraryLog::addUpdateEntry(_alarm.get(), "Suppression de la destination "+ lexical_cast<string>(_objectId), request.getUser().get());
 			}
-			else if(dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm).get() != NULL)
+			else
 			{
-				boost::shared_ptr<const SentAlarm> salarm(dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm));
-				MessagesLog::addUpdateEntry(salarm.get(), "Suppression de la destination "+ lexical_cast<string>(_objectId), request.getUser().get());
+				MessagesLog::addUpdateEntry(_alarm.get(), "Suppression de la destination "+ lexical_cast<string>(_objectId), request.getUser().get());
 			}
 		}
 
@@ -102,7 +99,7 @@ namespace synthese
 		{
 			try
 			{
-				_alarm = AlarmTableSync::Get(id, *_env);
+				_alarm = dynamic_pointer_cast<Alarm, util::Registrable>(db::DBModule::GetEditableObject(id, *_env));
 			}
 			catch(ObjectNotFoundException<Alarm>& e)
 			{
@@ -119,7 +116,7 @@ namespace synthese
 
 		bool AlarmRemoveLinkAction::isAuthorized(const Session* session
 		) const {
-			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() != NULL)
+			if (_alarm->belongsToTemplate())
 			{
 				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(WRITE);
 			}

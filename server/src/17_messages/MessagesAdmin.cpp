@@ -32,7 +32,7 @@
 #include "SentScenario.h"
 #include "AlarmRecipient.h"
 #include "AlarmTableSync.h"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
 #include "MessagesScenarioAdmin.h"
 #include "MessagesModule.h"
 #include "ScenarioStopAction.h"
@@ -180,8 +180,8 @@ namespace synthese
 
 			stream << "<h1>Résultats de la recherche</h1>";
 
-			ScenarioTableSync::SearchResult scenarios(
-				ScenarioTableSync::SearchSentScenarios(
+			SentScenarioTableSync::SearchResult scenarios(
+				SentScenarioTableSync::Search(
 					_getEnv(),
 					_searchName,
 					_searchArchive,
@@ -385,18 +385,16 @@ namespace synthese
 			);
 
 			if(	(sa &&
-				 dynamic_cast<const SentScenario*>(sa->getScenario().get())) ||
-				(ma &&
-				 dynamic_cast<const SentAlarm*>(ma->getAlarm().get()))
-			){
+				 dynamic_cast<const SentScenario*>(sa->getScenario().get())))
+			{
 				boost::shared_ptr<MessagesScenarioAdmin> p(
 					getNewPage<MessagesScenarioAdmin>()
-				);
+					);
 				p->setScenario(
-					ScenarioTableSync::GetCastEditable<SentScenario>(
+					SentScenarioTableSync::GetCastEditable<SentScenario>(
 						sa ? sa->getScenario()->getKey() : ma->getAlarm()->getScenario()->getKey(),
 						_getEnv()
-				)	);
+						)	);
 				links.push_back(p);
 			}
 			return links;

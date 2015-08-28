@@ -25,26 +25,16 @@
 #ifndef SYNTHESE_ScenarioTableSync_H__
 #define SYNTHESE_ScenarioTableSync_H__
 
-#include "InheritanceLoadSavePolicy.hpp"
-
 #include "Scenario.h"
-#include "AlarmTableSync.h"
-#include "AlarmTemplate.h"
-#include "SentAlarm.h"
 #include "ScenarioTemplate.h"
 #include "SentScenarioDao.hpp"
 
-
-#include <vector>
 #include <string>
-#include <iostream>
 
 namespace synthese
 {
 	namespace messages
 	{
-		class SentScenario;
-		class ScenarioTemplate;
 
 		////////////////////////////////////////////////////////////////////
 		/// Scenario table synchronizer.
@@ -60,17 +50,9 @@ namespace synthese
 		/// The format of the variables column is :
 		///		- for sent scenarios : <variable>|<value>, ...
 		///
-		class ScenarioTableSync:
-			public db::DBDirectTableSyncTemplate<
-				ScenarioTableSync,
-				Scenario,
-				db::FullSynchronizationPolicy,
-				db::InheritanceLoadSavePolicy
-			>,
-			public SentScenarioDao
+		class ScenarioTableSync
 		{
 		public:
-			static const std::string COL_IS_TEMPLATE;
 			static const std::string COL_ENABLED;
 			static const std::string COL_NAME;
 			static const std::string COL_PERIODSTART;
@@ -90,86 +72,9 @@ namespace synthese
 			static const std::string SECTIONS_SEPARATOR;
 
 			ScenarioTableSync() {}
-			~ScenarioTableSync() {}
+			virtual ~ScenarioTableSync() {}
 
 
-
-			static ScenarioTemplate::VariablesMap GetVariables(
-				util::RegistryKeyType scenarioId
-			);
-
-
-
-			static void CopyMessages(
-				util::RegistryKeyType sourceId,
-				Scenario& dest,
-				boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
-			);
-
-
-
-			/** Rewrites the messages of a sent scenario considering the values of the variables.
-				@param scenario sent scenario to rewrite
-				@author Hugues Romain
-				@date 2009
-			*/
-			static void WriteVariablesIntoMessages(
-				const SentScenario& scenario
-			);
-
-
-
-			/** Template scenario search.
-				@param env Environment to populate
-				@param name Name of the template
-				@param first First Scenario object to answer
-				@param number Number of Scenario objects to answer (0 = all)
-				The size of the vector is less or equal to number, then all users were returned despite of
-				the number limit. If the size is greater than number (actually equal to number + 1) then
-				there is others accounts to show. Test it to know if the situation needs a "click for more"
-				button.
-				@author Hugues Romain
-				@date 2006
-			*/
-			static SearchResult SearchTemplates(
-				util::Env& env,
-				boost::optional<util::RegistryKeyType> folderId,
-				const std::string name = std::string(),
-				const ScenarioTemplate* scenarioToBeDifferentWith = NULL,
-				int first = 0,
-				boost::optional<size_t> number = boost::optional<size_t>(),
-				bool orderByName = true,
-				bool raisingOrder = false,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
-			);
-
-
-
-			static SearchResult SearchSentScenarios(
-				util::Env& env,
-				boost::optional<std::string> name = boost::optional<std::string>(),
-				boost::optional<bool> inArchive = boost::optional<bool>(),
-				boost::optional<bool> isActive = boost::optional<bool>(),
-				boost::optional<util::RegistryKeyType> scenarioId = boost::optional<util::RegistryKeyType>(),
-				boost::optional<int> first = boost::optional<int>(),
-				boost::optional<size_t> number = boost::optional<size_t>(),
-				bool orderByDate = true,
-				bool orderByName = false,
-				bool raisingOrder = false,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
-			);
-
-
-
-			static SearchResult Search(
-				util::Env& env,
-				boost::optional<std::string> name = boost::optional<std::string>(),
-				boost::optional<int> first = boost::optional<int>(),
-				boost::optional<size_t> number = boost::optional<size_t>(),
-				bool orderByName = false,
-				bool raisingOrder = false,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
-			);
 
 
 			virtual std::vector<boost::shared_ptr<SentScenario> > list() const;

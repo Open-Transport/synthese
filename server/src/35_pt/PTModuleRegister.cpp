@@ -246,12 +246,12 @@ void synthese::pt::moduleRegister()
 	synthese::pt::RealTimePTDataInterSYNTHESE::integrate();
 
 	// Registries
-	synthese::util::Env::Integrate<synthese::pt::Destination>();
-	synthese::util::Env::Integrate<synthese::pt::DRTArea>();
+	INTEGRATE(synthese::pt::Destination);
+	INTEGRATE(synthese::pt::DRTArea);
 	synthese::util::Env::Integrate<synthese::pt::FreeDRTArea>();
 	synthese::util::Env::Integrate<synthese::pt::FreeDRTTimeSlot>();
 	synthese::util::Env::Integrate<synthese::pt::JourneyPattern>();
-	synthese::util::Env::Integrate<synthese::pt::LineStop>();
+	INTEGRATE(synthese::pt::LineStop);
 	synthese::util::Env::Integrate<synthese::pt::StopArea>();
 	synthese::util::Env::Integrate<synthese::pt::CommercialLine>();
 	synthese::util::Env::Integrate<synthese::pt::StopPoint>();
@@ -260,7 +260,7 @@ void synthese::pt::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt::PTUseRule>();
 	synthese::util::Env::Integrate<synthese::pt::ContinuousService>();
 	synthese::util::Env::Integrate<synthese::pt::ScheduledService>();
-	synthese::util::Env::Integrate<synthese::pt::NonConcurrencyRule>();
-	synthese::util::Env::Integrate<synthese::pt::ReservationContact>();
-	synthese::util::Env::Integrate<synthese::pt::ServiceQuota>();
+	INTEGRATE(synthese::pt::NonConcurrencyRule);
+	INTEGRATE(synthese::pt::ReservationContact);
+	INTEGRATE(synthese::pt::ServiceQuota);
 }

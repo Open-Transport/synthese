@@ -32,6 +32,7 @@ ObjectBase.hpp
 ParametersMapField.cpp
 ParametersMapField.hpp
 PointerField.hpp
+PointerField2.hpp
 PointersSetField.hpp
 PointersVectorField.hpp
 PtimeField.cpp

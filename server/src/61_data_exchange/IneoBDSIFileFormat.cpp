@@ -25,6 +25,7 @@
 #include "IneoBDSIFileFormat.hpp"
 
 #include "AlarmObjectLinkTableSync.h"
+#include "AlarmTableSync.h"
 #include "AlarmRecipientTemplate.h"
 #include "BroadcastPointAlarmRecipient.hpp"
 #include "CityTableSync.h"
@@ -44,7 +45,7 @@
 #include "PTUseRuleTableSync.h"
 #include "Request.h"
 #include "RequestException.h"
-#include "ScenarioTableSync.h"
+#include "SentScenarioTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "SentScenario.h"
 #include "ServerModule.h"
@@ -1244,7 +1245,7 @@ namespace synthese
 			{ // Scenarios and messages
 				// Scenarios
 				DataSource::LinkedObjects existingScenarios(
-					dataSourceOnSharedEnv->getLinkedObjects<Scenario>()
+					dataSourceOnSharedEnv->getLinkedObjects<SentScenario>()
 				);
 				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingScenario, existingScenarios)
 				{
@@ -1260,7 +1261,7 @@ namespace synthese
 					boost::shared_ptr<Alarm> updatedMessage;
 					SentScenario* scenario(
 						static_cast<SentScenario*>(
-							dataSourceOnSharedEnv->getObjectByCode<Scenario>(
+							dataSourceOnSharedEnv->getObjectByCode<SentScenario>(
 								lexical_cast<string>(programmation.ref)
 					)	)	);
 					Alarm* message(NULL);
@@ -1269,14 +1270,14 @@ namespace synthese
 						// Creation of the scenario
 						updatedScenario.reset(
 							new SentScenario(
-								ScenarioTableSync::getId()
+								SentScenarioTableSync::getId()
 						)	);
 						updatedScenario->addCodeBySource(
 							*_import.get<DataSource>(),
 							lexical_cast<string>(programmation.ref)
 						);
 						updatedScenario->setIsEnabled(true);
-						_env.getEditableRegistry<Scenario>().add(updatedScenario);
+						_env.getEditableRegistry<SentScenario>().add(updatedScenario);
 
 						if (_messagesSection.get())
 						{
@@ -1285,7 +1286,7 @@ namespace synthese
 
 						// Creation of the message
 						updatedMessage.reset(
-							new SentAlarm(
+							new Alarm(
 								AlarmTableSync::getId()
 						)	);
 						updatedMessage->setScenario(updatedScenario.get());
@@ -1299,14 +1300,14 @@ namespace synthese
 						_scenariosToRemove.erase(scenario->getKey());
 
 						// Message content
-						const Scenario::Messages& messages(scenario->getMessages());
+						const std::set<const Alarm*>& messages(scenario->getMessages());
 						if(messages.size() != 1)
 						{
 							_logWarning(
 								"Corrupted message : scenario should contain one message : " + lexical_cast<string>(scenario->getKey())
 							);
 							
-							SentScenario::Messages::const_iterator it(messages.begin());
+							std::set<const Alarm*>::const_iterator it(messages.begin());
 							for(++it; it != messages.end(); ++it)
 							{
 								_messagesToRemove.insert((*it)->getKey());
@@ -1317,7 +1318,7 @@ namespace synthese
 							message->getShortMessage() != programmation.messageTitle ||
 							(message->getLevel() == ALARM_LEVEL_WARNING) != programmation.priority
 						){
-							updatedMessage = AlarmTableSync::GetCastEditable<SentAlarm>(
+							updatedMessage = AlarmTableSync::GetCastEditable<Alarm>(
 								message->getKey(),
 								_env
 							);
@@ -1329,7 +1330,7 @@ namespace synthese
 							scenario->getPeriodEnd() != programmation.endTime ||
 							scenario->getIsEnabled() != programmation.active
 						){
-							updatedScenario = ScenarioTableSync::GetCastEditable<SentScenario>(
+							updatedScenario = SentScenarioTableSync::GetCastEditable<SentScenario>(
 								scenario->getKey(),
 								_env
 							);
@@ -1348,7 +1349,7 @@ namespace synthese
 					}
 					if(updatedScenario.get())
 					{
-						updatedScenario->setName(programmation.title);
+						updatedScenario->set<Name>(programmation.title);
 						updatedScenario->setPeriodStart(programmation.startTime);
 						updatedScenario->setPeriodEnd(programmation.endTime);
 						updatedScenario->setIsEnabled(programmation.active);
@@ -1970,17 +1971,17 @@ namespace synthese
 			}
 
 			// Scenarios
-			BOOST_FOREACH(const Scenario::Registry::value_type& scenario, _env.getRegistry<Scenario>())
+			BOOST_FOREACH(const SentScenario::Registry::value_type& scenario, _env.getRegistry<SentScenario>())
 			{
-				ScenarioTableSync::Save(scenario.second.get(), transaction);
+				SentScenarioTableSync::Save(scenario.second.get(), transaction);
 			}
 
 			// Messages
 			BOOST_FOREACH(const Alarm::Registry::value_type& alarm, _env.getRegistry<Alarm>())
 			{
-				AlarmTableSync::Save(alarm.second.get(), transaction);
+				AlarmTableSync::Save(dynamic_cast<Alarm*>(alarm.second.get()), transaction);
 			}
-
+			
 			// Message links
 			BOOST_FOREACH(const AlarmObjectLink::Registry::value_type& aol, _env.getRegistry<AlarmObjectLink>())
 			{
@@ -1994,7 +1995,7 @@ namespace synthese
 			}
 			BOOST_FOREACH(RegistryKeyType id, _scenariosToRemove)
 			{
-				DBTableSyncTemplate<ScenarioTableSync>::Remove(NULL, id, transaction, false);
+				DBTableSyncTemplate<SentScenarioTableSync>::Remove(NULL, id, transaction, false);
 			}
 			BOOST_FOREACH(RegistryKeyType id, _messagesToRemove)
 			{

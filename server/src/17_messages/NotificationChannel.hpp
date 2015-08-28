@@ -56,7 +56,7 @@ namespace synthese
 
 	Each registered notification provider is notified by
 	MessagesActivationThread about begin and end period for each active
-	SentAlarm.
+	Alarm.
 
 	Each provider uses an instance of corresponding NotificationChannel
 	implementation to attempt to notify an event.
@@ -188,7 +188,7 @@ namespace synthese
 			*/
 			static void _setApplicationDateVariables(
 				util::ParametersMap& variables,
-				const SentAlarm* alarm,
+				const Alarm* alarm,
 				const NotificationType eventType,
 				const boost::posix_time::ptime& eventTime
 			);

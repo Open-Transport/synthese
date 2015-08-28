@@ -27,13 +27,19 @@
 #define FIELD_DEFAULT_CONSTRUCTOR(N) boost::fusion::make_pair<N>(N::Type())
 #define FIELD_VALUE_CONSTRUCTOR(N, V) boost::fusion::make_pair<N>(V)
 #define FIELD_COPY_CONSTRUCTOR(N, V) boost::fusion::make_pair<N>(N::Type(V))
-#define FIELD_DEFINITION_OF_OBJECT(N, F, VF) 	template<> const Field SimpleObjectFieldDefinition<N>::FIELD = Field(F, SQL_INTEGER); \
+#define FIELD_DEFINITION_OF_OBJECT(N, F, VF)	template<> const Field SimpleObjectFieldDefinition<N>::FIELD = Field(F, SQL_INTEGER); \
 	template<> const Field SimpleObjectFieldDefinition<N::Vector>::FIELD = Field(VF, SQL_TEXT);
-#define FIELD_DEFINITION_OF_TYPE(N, F, T) 	template<> const Field SimpleObjectFieldDefinition<N>::FIELD = Field(F, T);
+#define FIELD_DEFINITION_OF_TYPE(N, F, T)	template<> const Field SimpleObjectFieldDefinition<N>::FIELD = Field(F, T);
 #define CLASS_DEFINITION(N, T, NUM)	namespace util \
 	{ template<> const std::string util::Registry<N>::KEY(#N); } \
 	template<> const std::string Object<N, N::Schema>::CLASS_NAME = #N; \
 	template<> const std::string Object<N, N::Schema>::TABLE_NAME = T; \
 	template<> const util::RegistryTableType Object<N, N::Schema>::CLASS_NUMBER = NUM;
+
+#define INTEGRATE(C)													\
+	synthese::util::Env::Integrate<C>();								\
+	ObjectBase::REGISTRY_NAMES_BY_TABLE_ID.insert(std::make_pair(C::CLASS_NUMBER, C::CLASS_NAME))
+	
+
 
 #endif

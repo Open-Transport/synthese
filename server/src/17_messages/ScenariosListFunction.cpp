@@ -31,7 +31,8 @@
 #include "ScenarioFolderTableSync.h"
 #include "Webpage.h"
 #include "ScenarioFolder.h"
-#include "ScenarioTableSync.h"
+#include "ScenarioTemplateTableSync.h"
+#include "SentScenarioTableSync.h"
 #include "ScenarioTemplate.h"
 
 using namespace std;
@@ -144,7 +145,7 @@ namespace synthese
 			{
 				try
 				{
-					_sectionIn = *Env::GetOfficialEnv().get<MessagesSection>(map.get<RegistryKeyType>(PARAMETER_SECTION_IN));
+					_sectionIn = *Env::GetOfficialEnv().getEditable<MessagesSection>(map.get<RegistryKeyType>(PARAMETER_SECTION_IN));
 				}
 				catch (bad_lexical_cast&)
 				{
@@ -161,7 +162,7 @@ namespace synthese
 			{
 				try
 				{
-					_sectionOut = *Env::GetOfficialEnv().get<MessagesSection>(map.get<RegistryKeyType>(PARAMETER_SECTION_OUT));
+					_sectionOut = *Env::GetOfficialEnv().getEditable<MessagesSection>(map.get<RegistryKeyType>(PARAMETER_SECTION_OUT));
 				}
 				catch (bad_lexical_cast&)
 				{
@@ -195,19 +196,21 @@ namespace synthese
 		) const {
 
 			ParametersMap pm;
-			ScenarioTableSync::SearchResult scenarios;
+			Scenarios scenarios;
 			
 			if(_showTemplates)
 			{
-				scenarios = ScenarioTableSync::SearchTemplates(
+				ScenarioTemplateTableSync::Search(
 					*_env,
+					std::back_inserter(scenarios),
 					_parentFolder.get() ? _parentFolder->getKey() : 0
 				);
 			}
 			else
 			{
-				scenarios = ScenarioTableSync::SearchSentScenarios(
+				SentScenarioTableSync::Search(
 					*_env,
+					std::back_inserter(scenarios),
 					boost::optional<std::string>(),
 					_archivesOnly,
 					_showCurrentlyDisplayed
@@ -217,7 +220,7 @@ namespace synthese
 			// Applying text search filter
 			if(_textSearch)
 			{
-				ScenarioTableSync::SearchResult newScenarios;
+				Scenarios newScenarios;
 				BOOST_FOREACH(const boost::shared_ptr<Scenario>& scenario, scenarios)
 				{
 					// Try in the scenario name
@@ -229,7 +232,7 @@ namespace synthese
 					}
 
 					// Try in each message (short and long names)
-					BOOST_FOREACH(const Scenario::Messages::value_type& message, scenario->getMessages())
+					BOOST_FOREACH(const std::set<const Alarm*>::value_type& message, scenario->getMessages())
 					{
 						if( find_first(message->getShortMessage(), *_textSearch) ||
 							find_first(message->getLongMessage(), *_textSearch)
@@ -242,10 +245,11 @@ namespace synthese
 				scenarios = newScenarios;
 			}
 
+			// TODO add an accesor virtul piure in scenario on sections!
 			BOOST_FOREACH(const boost::shared_ptr<Scenario>& scenario, scenarios)
 			{
 				// Section filter
-				const Scenario::Sections& sections(scenario->getSections());
+				std::set<MessagesSection*>& sections(scenario->getSections());
 				if(	(	_sectionIn && sections.find(&*_sectionIn) == sections.end()) ||
 					(	_sectionOut && sections.find(&*_sectionOut) != sections.end())
 				){

@@ -58,7 +58,7 @@ namespace synthese
 		bool BroadcastPoint::displaysScenario( const Scenario& scenario ) const
 		{
 			ParametersMap fakeParameters;
-			BOOST_FOREACH(const Scenario::Messages::value_type& it, scenario.getMessages())
+			BOOST_FOREACH(const Alarm* it, scenario.getMessages())
 			{
 				if(it->isOnBroadcastPoint(*this, fakeParameters))
 				{
