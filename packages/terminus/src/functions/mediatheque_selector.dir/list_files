@@ -1,4 +1,8 @@
-<?if&cond=<@folder_id@>&then=<@root_file=<@folder_id@>@>&else=<@root_file=<@~global("website_media_id")@>@>?>
+<?object&roid=<@medialibrary_id@>&template=
+  <@host_and_port=<?if&cond=<@website_hostname_port@>&then=<@website_hostname_port@>&else=<@host_name@>?>@>
+  <@site_url=<?object&roid=<@website_id@>&template=<@cient_url@>?>@>
+  <@root_file=<?if&cond=<@folder_id@>&then=<@folder_id@>&else=<@website_id@>?>@>
+?>
     <?menu&root=<@root_file@>&raw_data=1&min_depth=0&max_depth=9999&template=
       <@file_found=0@>
 <?if&cond=<@view_mode@>&then=
@@ -15,15 +19,12 @@
           ?>
           <?if&cond=<@display@>&then=
             <@file_found=1@>
-            <@host_and_port=<?if&cond=<@~global("server_name")@>&then=<@~global("server_name")@>&else=<@host_name@>?>@>
             <@smart_url=<?object&roid=<@id@>&template=<@smart_url_path@>?>@>
-            <@site_url=<?object&roid=<@~global("website_media_id")@>&template=<@cient_url@>?>@>
-
 <?if&cond=<@view_mode@>&then=
             <span class="btn btn-left btn-with-margins thumbnail-list<?if&cond=<@admin_mediatheque@>&then="&else= thumbnail-selectable" data-file-action="selectFile" data-id="<@id@>"?>>
               <?if&cond=<?StrStr&text=<@mime_type@>&match=image?>&then=
                 <@my_url=http://<@host_and_port@><@site_url@><@smart_url@>@>
-                <img src="<@my_url@>" alt="<@title@>" data-toggle="tooltip" data-placement="top" title="<@title@>"/>
+                <img src="<@my_url@>" data-toggle="tooltip" data-placement="top" title="<@title@>"/>
               &else=
                 <@type=<?substr&t=<@mime_type@>&f=<?StrStr&text=<@mime_type@>&match=/?>&n=<?strlen&t=<@mime_type@>?>?>@>
                 <span class="terminus-file mini-file <@type@>-file" data-toggle="tooltip" data-placement="top" title="<@title@>"></span>
@@ -37,7 +38,7 @@
                 href="#" class="thumbnail<?if&cond=<@admin_mediatheque@>&then="&else= thumbnail-selectable" data-file-action="selectFile" data-id="<@id@>"?>>
               <?if&cond=<?StrStr&text=<@mime_type@>&match=image?>&then=
                 <@my_url=http://<@host_and_port@><@site_url@><@smart_url@>@>
-                <img src="<@my_url@>" alt="<@title@>" data-toggle="tooltip" data-placement="top" title="<@title@>"/>
+                <img src="<@my_url@>" data-toggle="tooltip" data-placement="top" title="<@title@>"/>
               &else=
                 <@type=<?substr&t=<@mime_type@>&f=<?StrStr&text=<@mime_type@>&match=/?>&n=<?strlen&t=<@mime_type@>?>?>@>
                 <span class="terminus-file <@type@>-file" data-toggle="tooltip" data-placement="top" title="<@title@>"></span>

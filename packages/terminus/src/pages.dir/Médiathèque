@@ -1,11 +1,14 @@
-<?if&cond=<@<@~global("website_media_id")@>!='none'@>&then=
-  <?websites&template=<{website&template=<?if&cond=<@~global("website_media_id")==id@>&then=<@websiteFound=1@>?>}>?>
-?>
-<?if&cond=<@websiteFound@>&else=<#404#>
+<?if&cond=<@roid@>&then=<?object&roid=<@roid@>&template=<@folder_id=<@roid@>@><@current_website_id=<@site_id@>@>?>?>
+<?if&cond=<@medialibrary_id@>&then=<?object&roid=<@medialibrary_id@>&template=<@current_website_id=<@website_id@>@>?>?>
+<?media_libraries&template=<{medialibrary&template=
+  <?if&cond=<@website_name@>&then=<@medialibraryFound=1@>?>
+  <?if&cond=<@current_website_id@>&then=<?if&cond=<@current_website_id==website_id@>&then=<@medialibrary_id=<@id@>@>?>
+  &else=<?if&cond=<@~global("default_medialibrary_id")==id@>&then=<@medialibrary_id=<@id@>@><@current_website_id=<@website_id@>@>?>
+?>}>?>
+<?if&cond=<@medialibraryFound@>&else=<#404#>
 &then=
-<@folder_id=<@roid?roid:0@>@>
 <ul class="breadcrumb" id="admin_mediatheque">
-  <li class=\"active\"><@title@></li>
+  <li class=\"active\">Médiathèques</li>
 </ul>
   <@admin_mediatheque=1@>
   <#mediatheque_selector#>
@@ -20,10 +23,11 @@
       a=WebPageAddAction&
       target=<@p@>&
       class=form-horizontal&
-      actionParamsi=<@~global("website_media_id")@>&
+      actionParamsi=<@current_website_id@>&
       actionParampi=<@folder_id@>&
       actionParammt=/&
       view_mode=<@view_mode@>&
+      medialibrary_id=<@medialibrary_id@>&
       roid=<@folder_id@>
     ?>
     <div class="modal-body">
@@ -51,7 +55,8 @@
       target=<@p@>&
       class=form-horizontal&
       view_mode=<@view_mode@>&
-      actionParam_object_id=<@folder_id@>
+      actionParam_object_id=<@folder_id@>&
+      medialibrary_id=<@medialibrary_id@>
     ?>
     <div class="modal-body">
       <p>Etes-vous sûr de vouloir supprimer le répertoire ?</p>

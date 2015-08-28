@@ -36,9 +36,9 @@
               	       }>
             ?>
             <li><?link&target=/admin?></li>
-            <?if&cond=<@<@~global("website_media_id")@>!='none'@>&then=
-	      <?websites&template=<{website&template=<?if&cond=<@~global("website_media_id")==id@>&then=<li><?link&target=/mediatheque&text=Médiathèque?></li>?>}>?>
-	    ?>
+            <@websiteFound=0@>
+            <?media_libraries&template=<{medialibrary&template=<?if&cond=<@website_name@>&then=<@websiteFound=1@>?>}>?>
+            <?if&cond=<@websiteFound@>&then=<li><?link&target=/mediatheque&text=Médiathèques?></li>?>
 	   </ul>
 	   <ul class="nav pull-right">
             <li><a href="#"><i class="icon-wrench icon-white"></i></a></li>

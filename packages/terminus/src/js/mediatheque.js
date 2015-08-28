@@ -1,6 +1,7 @@
 function openModal() {
-  var modal = $('#'+$(this).attr('data-form-action')+'Modal');
-  var folderid = $(this).attr('data-id') ? $(this).attr('data-id') : $(this).parents('[data-id]').attr('data-id');
+  var elem = $(this);
+  var modal = $('#'+elem.attr('data-form-action')+'Modal');
+  var folderid = elem.attr('data-id') ? elem.attr('data-id') : elem.parents('[data-id]').attr('data-id');
   if (typeof folderid != 'undefined') {
     modal.find('[name="roid"]').val(folderid);
     modal.find('[name="roid"]').removeAttr('disabled');
@@ -8,23 +9,27 @@ function openModal() {
     modal.find('[name="roid"]').attr('disabled', true);
   }
   modal.find('[name="view_mode"]').val($('#view-mode').attr('data-active-mode'));
+  modal.find('[name="medialibrary_id"]').val($('#selectMediaLibrary').attr('data-id'));
 
-  eval($(this).attr('data-form-action')+"Form")($(this), folderid, modal);
+  eval(elem.attr('data-form-action')+"Form")(elem, folderid, modal);
   return false;
 }
 
 function addFolderForm(elem, folderid, modal) {
-  var parent = elem.attr('data-parent');
-  modal.find('[name="actionParampi"]').val(folderid);
+  var parent = elem.attr('data-parent'),
+      parampi = modal.find('[name="actionParampi"]'),
+      paramsi = modal.find('[name="actionParamsi"]');
+  parampi.val(folderid);
+  paramsi.val($('#selectMediaLibrary').attr('data-website-id'));
   switch(parent) {
     case 'pi':
-      modal.find('[name="actionParampi"]').removeAttr('disabled');
-      modal.find('[name="actionParamsi"]').attr('disabled', true);
+      parampi.removeAttr('disabled');
+      paramsi.attr('disabled', true);
       break;
     case 'si':
     default:
-      modal.find('[name="actionParamsi"]').removeAttr('disabled');
-      modal.find('[name="actionParampi"]').attr('disabled', true);
+      paramsi.removeAttr('disabled');
+      parampi.attr('disabled', true);
       break;
   }
   modal.modal('show');
@@ -52,7 +57,6 @@ function uploadFileForm(elem, folderid, modal) {
 }
 
 $(function(){
-  $('[data-form-action]').click(openModal);
   $(document).on('click', '[data-form-action]', openModal);
   $('[name="addFolder"]').validate();
 });
