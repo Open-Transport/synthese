@@ -181,6 +181,8 @@ namespace synthese
 					Dispatching dispatching;
 					boost::posix_time::ptime startDate;
 					boost::posix_time::ptime stopDate;
+					boost::posix_time::time_duration startHour;
+					boost::posix_time::time_duration stopHour;
 					int repeatPeriod;
 					bool inhibition;
 					std::string color;

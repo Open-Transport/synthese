@@ -25,10 +25,11 @@
 #include <FactorableTemplate.h>
 #include <IneoNotificationChannel.hpp>
 #include <IneoTerminusConnection.hpp>
-#include "IneoTerminusModule.hpp"
-#include "IneoTerminusLog.hpp"
+#include <IneoTerminusModule.hpp>
+#include <IneoTerminusLog.hpp>
 #include <ParametersMap.h>
 #include <Webpage.h>
+#include <MessageApplicationPeriod.hpp>
 #include <IneoFileFormat.hpp>
 
 #include <string>
@@ -97,6 +98,19 @@ namespace synthese
 			shared_ptr<ParametersMap> messagePM(new ParametersMap);
 			alarm->toParametersMap(*messagePM, true, "", true);
 			fields.insert("message", messagePM);
+
+			shared_ptr<ParametersMap> periodPM(new ParametersMap);
+			if(NULL != alarm->getCalendar())
+			{
+				BOOST_FOREACH(
+					const ScenarioCalendar::ApplicationPeriods::value_type& period,
+					alarm->getCalendar()->getApplicationPeriods()
+				){
+					period->toParametersMap(*periodPM, false, false, "");
+				}
+			}
+			fields.insert("period", periodPM);
+
 			string requestName = provider->getName();
 			if (event->get<EventType>() == BEGIN)
 			{
