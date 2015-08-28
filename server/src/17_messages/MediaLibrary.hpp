@@ -44,7 +44,7 @@ namespace synthese
 		/**
 			Media library type enumeration.
 			INTERNAL for classical CMS management.
-                        EXTERNAL when resources are hold out of CMS.
+			EXTERNAL when resources are hold out of CMS.
 		 */
 		typedef enum
 		{
@@ -52,10 +52,19 @@ namespace synthese
 			EXTERNAL = 1
 		} MediaLibraryType;
 
-		// Specific field declarations
-		FIELD_ENUM(LibraryType, MediaLibraryType)
+		/**
+			Media library view enumeration: thumbnails or list
+		 */
+		typedef enum
+		{
+			THUMBNAILS = 0,
+			LIST = 1
+		} MediaLibraryView;
 
+		// Specific field declarations
 		FIELD_STRING(ServerHostnamePort)
+		FIELD_ENUM(LibraryType, MediaLibraryType)
+		FIELD_ENUM(DefaultView, MediaLibraryView)
 
 		/** Entity framework persistent field declaration. */
 		typedef boost::fusion::map<
@@ -68,7 +77,10 @@ namespace synthese
 			FIELD(cms::Website),
 
 			// Type of media library: INTERNAL or EXTERNAL
-			FIELD(LibraryType)
+			FIELD(LibraryType),
+
+			// Default media library view: THUMBNAILS or LIST
+			FIELD(DefaultView)
 
 		> MediaLibraryRecord;
 

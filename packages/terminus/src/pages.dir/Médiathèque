@@ -10,6 +10,7 @@
 <ul class="breadcrumb" id="admin_mediatheque">
   <li class=\"active\">Médiathèques</li>
 </ul>
+
   <@admin_mediatheque=1@>
   <#mediatheque_selector#>
 
