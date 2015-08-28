@@ -1,0 +1,15 @@
+*** Settings ***
+Resource          ../../resources/s3-server/common.txt    
+Resource          ../../resources/s3-fakeclient/ineo_sae_connector.txt    
+Test Setup        Start Synthese On Node 0
+Test Teardown     Stop Synthese On Node 0
+
+*** Test Cases ***
+
+Connection Setup Should Work
+    Ineo SAEIV Establishes Connection  127.0.0.1  4563
+    ${request}=  Create Message From Ineo SAEIV  CheckStatusRequest
+    ${response}=  Ineo SAEIV Sends  ${request}
+    Response Should Match Request  ${response}  ${request}
+
+    
