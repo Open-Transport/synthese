@@ -75,6 +75,7 @@ namespace synthese
 		FIELD_DEFINITION_OF_TYPE(NotificationChannelKey, "channel", SQL_TEXT)
 		FIELD_DEFINITION_OF_TYPE(SubscribeAllBegin, "subscribe_all_begin", SQL_BOOLEAN)
 		FIELD_DEFINITION_OF_TYPE(SubscribeAllEnd, "subscribe_all_end", SQL_BOOLEAN)
+		FIELD_DEFINITION_OF_TYPE(SubscribeUpdates, "subscribe_updates", SQL_BOOLEAN)
 		FIELD_DEFINITION_OF_TYPE(SetEventsHold, "set_events_hold", SQL_BOOLEAN)
 
 		FIELD_DEFINITION_OF_TYPE(RetryAttemptDelay, "retry_attempt_delay", SQL_INTEGER)
@@ -119,6 +120,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(MessageTypeEnd),
 					FIELD_VALUE_CONSTRUCTOR(SubscribeAllBegin, false),
 					FIELD_VALUE_CONSTRUCTOR(SubscribeAllEnd, false),
+					FIELD_VALUE_CONSTRUCTOR(SubscribeUpdates, false),
 					FIELD_VALUE_CONSTRUCTOR(SetEventsHold, false),
 					FIELD_DEFAULT_CONSTRUCTOR(RetryAttemptDelay),
 					FIELD_DEFAULT_CONSTRUCTOR(MaximumRetryAttempts),
@@ -331,6 +333,43 @@ namespace synthese
 			{
 				const bool holdEvent = this->get<SetEventsHold>();
 				NotificationEvent::findOrCreateEvent(message, this, END, holdEvent);
+			}
+		}
+
+
+
+		/// Function invoked before the message is updated.
+		/// @param message the Alarm being updated
+		void NotificationProvider::beforeMessageUpdate(
+			const Alarm& message
+		) const {
+			// If this NotificationProvider registers to message updates and it is an explicit recipient of this message
+			if(get<SubscribeUpdates>() && isRecipient(message.getLinkedObjects()))
+			{
+				// NotificationProvider does not process Alarm, it requires a NotificationEvent
+				// Since we don't want to add another NotificationEvent into the database, we create a fake one that is only used to generate the message
+				// NotificationEvent ctor requires non const Alarm and NotificationProvider, hence the const_cast usage
+				NotificationProvider* self = const_cast<NotificationProvider*>(this);
+				const boost::shared_ptr<NotificationEvent> fakeEvent(new NotificationEvent(0, const_cast<Alarm&>(message), *self, END));
+				self->notify(fakeEvent);
+			}
+		}
+
+
+		/// Function invoked after the message is updated.
+		/// @param message the updated Alarm
+		void NotificationProvider::afterMessageUpdate(
+			const Alarm& message
+		) const {
+			// If this NotificationProvider registers to message updates and it is an explicit recipient of this message
+			if(get<SubscribeUpdates>() && isRecipient(message.getLinkedObjects()))
+			{
+				// NotificationProvider does not process Alarm, it requires a NotificationEvent
+				// Since we don't want to add another NotificationEvent into the database, we create a fake one that is only used to generate the message
+				// NotificationEvent ctor requires non const Alarm and NotificationProvider, hence the const_cast usage
+				NotificationProvider* self = const_cast<NotificationProvider*>(this);
+				const boost::shared_ptr<NotificationEvent> fakeEvent(new NotificationEvent(0, const_cast<Alarm&>(message), *self, BEGIN));
+				self->notify(fakeEvent);
 			}
 		}
 

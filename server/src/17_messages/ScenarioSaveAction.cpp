@@ -54,6 +54,7 @@
 #include "ImportableTableSync.hpp"
 #include "AlarmRecipient.h"
 #include "ImportableAdmin.hpp"
+#include "BroadcastPoint.hpp"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -194,16 +195,10 @@ namespace synthese
 				setScenarioId(map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID));
 			}
 
-
-
-			
 			// If not update, then creation
 			if(!_scenario.get())
 			{
 				_creation = true;
-
-
-
 				
 				// Template creation
 				if(map.getDefault<bool>(PARAMETER_CREATE_TEMPLATE,false))
@@ -281,13 +276,6 @@ namespace synthese
 				}
 				else
 				{
-
-
-
-
-
-
-					
 					// Sent scenario creation
 					// Copy an other sent scenario (action E)
 					if(map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY, 0))
@@ -308,7 +296,6 @@ namespace synthese
 							throw ActionException("scenario to copy", e, *this);
 						}
 					}
-
 
 					else if(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE, 0))
 					{
@@ -578,7 +565,6 @@ namespace synthese
 					_message = *alarms.begin();
 				}
 
-
 				// Messages
 				if(map.isDefined(PARAMETER_MESSAGE_TO_CREATE)
 				){
@@ -707,6 +693,8 @@ namespace synthese
 		void ScenarioSaveAction::run(Request& request)
 		{
 			DBTransaction transaction;
+			bool notifyBroadcastPoints = false;
+			ptime now(second_clock::local_time());
 
 			// Log message
 			stringstream text;
@@ -721,7 +709,6 @@ namespace synthese
 				links.insert(Importable::DataSourceLinks::value_type(_scenarioDataSource.get(), _dataSourceLinkId));
 				_sscenario->setDataSourceLinksWithoutRegistration(links);
 			}
-
 
 			if(_tscenario.get())
 			{
@@ -750,6 +737,7 @@ namespace synthese
 					_tscenario->setFolder(_folder->get());
 				}
 			}
+
 			if(_sscenario.get())
 			{
 				// Name
@@ -890,14 +878,34 @@ namespace synthese
 				else
 				{
 					// Unimplemented ScenarioTemplateTableSync::CopyMessages(tpl.getKey(), *_tscenario, transaction);
-				}
-				
+				}				
 			}
+
 			else if(_messagesAndCalendars)
 			{	// A/B/G/H action, full method
 				// Objects to remove if not found
 				std::set<ScenarioCalendar*> existingCalendars(_scenario->getCalendars());
 				std::set<const Alarm*> existingMessages(_scenario->getMessages());
+
+				// If an existing SentScenario is being updated, notify broadcast points prior any modification of an applicable message
+				if((false == _creation) && _sscenario.get())
+				{
+					notifyBroadcastPoints = true;
+
+					BOOST_FOREACH(const Alarm* existingMessage, existingMessages)
+					{
+						if(true == existingMessage->isApplicable(now))
+						{
+							// Run the before message update trigger on each broadcast point
+							BOOST_FOREACH(
+								const BroadcastPoint::BroadcastPoints::value_type& bp,
+								BroadcastPoint::GetBroadcastPoints()
+							){
+								bp->beforeMessageUpdate(*existingMessage);
+							}
+						}
+					}
+				}
 
 				// Loop on calendars
 				BOOST_FOREACH(const ptree::value_type& calendarNode, _messagesAndCalendars->get_child("calendar"))
@@ -1184,9 +1192,9 @@ namespace synthese
 				BOOST_FOREACH(const Alarm* message, existingMessages)
 				{
 					AlarmTableSync::Remove(request.getSession().get(), message->getKey(), transaction, false);
-
 				}
 			}
+
 			else if(_messageToCreate && _level) // A/B/G/H action, simplified method
 			{
 				boost::shared_ptr<Alarm> message;
@@ -1321,6 +1329,30 @@ namespace synthese
 			}
 
 			transaction.run();
+
+			// Notify broadcast points of message modifications
+			if(true == notifyBroadcastPoints)
+			{
+				BOOST_FOREACH(const Alarm* message, _sscenario->getMessages())
+				{
+					// Note : The message must be reread from the registry, because during the update the recipients are added to the registry object
+					// and not to the instance we are processing (this is highly counter-intuitive)
+					boost::shared_ptr<Alarm> registryMessagePtr = Env::GetOfficialEnv().getEditableRegistry<Alarm>().getEditable(message->getKey());
+					Alarm* registryMessage = registryMessagePtr.get();
+
+					if(true == registryMessage->isApplicable(now))
+					{
+
+						// Run the display start trigger on each broadcast point
+						BOOST_FOREACH(
+							const BroadcastPoint::BroadcastPoints::value_type& bp,
+							BroadcastPoint::GetBroadcastPoints()
+						){
+							bp->afterMessageUpdate(*registryMessage);
+						}
+					}
+				}
+			}
 
 			if(_sscenario.get())
 			{
