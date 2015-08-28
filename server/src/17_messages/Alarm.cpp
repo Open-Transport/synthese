@@ -510,14 +510,14 @@ namespace synthese
 		const ScenarioCalendar*
 		Alarm::getCalendar() const
 		{
-			return get<Calendar>().get_ptr();
+			return (get<Calendar>() ? get<Calendar>().get_ptr() : NULL);
 		}
 
 
 		const MessagesSection*
 		Alarm::getSection() const
 		{
-			return get<MessagesSection>().get_ptr();
+			return (get<MessagesSection>() ? get<MessagesSection>().get_ptr() : NULL);
 		}
 		
 

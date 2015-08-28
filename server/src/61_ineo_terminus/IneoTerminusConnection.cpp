@@ -995,8 +995,10 @@ namespace synthese
 			BOOST_FOREACH(const Messaging& message, messages)
 			{
 				boost::shared_ptr<ParametersMap> periodPM(new ParametersMap);
-				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()) +" "+ boost::posix_time::to_simple_string(message.startDate.time_of_day()));
-				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()) +" "+ boost::posix_time::to_simple_string(message.stopDate.time_of_day()));
+				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()));
+				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()));
+				periodPM->insert("start_hour", message.startHour.is_not_a_date_time() ? "" : boost::posix_time::to_simple_string(message.startHour));
+				periodPM->insert("end_hour", message.stopHour.is_not_a_date_time() ? "" : boost::posix_time::to_simple_string(message.stopHour));
 				periodPM->insert("date", "");
 
 				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
@@ -1385,6 +1387,8 @@ namespace synthese
 			}
 			string startDateStr("01/01/1970");
 			string stopDateStr("31/12/2037");
+			message.startHour = boost::posix_time::not_a_date_time;
+			message.stopHour = boost::posix_time::not_a_date_time;
 			if (node.nChildNode("StartDate") > 0)
 			{
 				XMLNode startDateNode = node.getChildNode("StartDate", 0);
@@ -1395,23 +1399,21 @@ namespace synthese
 				XMLNode stopDateNode = node.getChildNode("StopDate", 0);
 				stopDateStr = stopDateNode.getText();
 			}
-			string startTimeStr("00:00:00");
-			string stopTimeStr("23:59:00");
 			if (node.nChildNode("StartTime") > 0)
 			{
 				XMLNode startTimeNode = node.getChildNode("StartTime", 0);
-				startTimeStr = startTimeNode.getText();
+				message.startHour = boost::posix_time::duration_from_string(startTimeNode.getText());
 			}
 			if (node.nChildNode("StopTime") > 0)
 			{
 				XMLNode stopTimeNode = node.getChildNode("StopTime", 0);
-				stopTimeStr = stopTimeNode.getText();
+				message.stopHour = boost::posix_time::duration_from_string(stopTimeNode.getText());
 			}
 			message.startDate =	 XmlToolkit::GetIneoDateTime(
-				startDateStr + " " + startTimeStr
+				startDateStr + " 00:00:00"
 			);
 			message.stopDate =	XmlToolkit::GetIneoDateTime(
-				stopDateStr + " " + stopTimeStr
+				stopDateStr + " 23:59:59"
 			);
 			if (node.nChildNode("MultipleStop") > 0)
 			{
@@ -1622,8 +1624,10 @@ namespace synthese
 			BOOST_FOREACH(const Messaging& message, messages)
 			{
 				boost::shared_ptr<ParametersMap> periodPM(new ParametersMap);
-				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()) +" "+ boost::posix_time::to_simple_string(message.startDate.time_of_day()));
-				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()) +" "+ boost::posix_time::to_simple_string(message.stopDate.time_of_day()));
+				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()) + " " + boost::posix_time::to_simple_string(message.startDate.time_of_day()));
+				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()) + " " + boost::posix_time::to_simple_string(message.stopDate.time_of_day()));
+				periodPM->insert("start_hour", message.startHour.is_not_a_date_time() ? "" : boost::posix_time::to_simple_string(message.startHour));
+				periodPM->insert("end_hour", message.stopHour.is_not_a_date_time() ? "" : boost::posix_time::to_simple_string(message.stopHour));
 				periodPM->insert("date", "");
 
 				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
@@ -1745,7 +1749,7 @@ namespace synthese
 					// of ScenarioStopAction/ScenarioSaveAction are not robust : in particular they do not check the structure
 					// of the ptree prior to accessing it, so they may trigger exceptions if it is ill-formed
 					// TODO : rewrite ScenarioStopAction and ScenarioSaveAction
-					util::Log::GetInstance().warn("Ineo Terminus : an error occurred while trying to create a message");
+					util::Log::GetInstance().warn("Ineo Terminus : an error occurred while trying to create a message : " + std::string(e.what()));
 					status = false;
 					errorCode = AutreErreur;
 				}
