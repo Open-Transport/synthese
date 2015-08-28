@@ -48,7 +48,6 @@ namespace synthese
 
 	namespace messages
 	{
-		
 		const std::string ScenarioTemplate::DATA_SCENARIO_ID = "scenario_id";
 		const std::string ScenarioTemplate::DATA_NAME = "name";
 		const std::string ScenarioTemplate::DATA_FOLDER_ID = "folder_id";
@@ -61,15 +60,15 @@ namespace synthese
 		const std::string ScenarioTemplate::TAG_CALENDAR = "calendar";
 
 		ScenarioTemplate::ScenarioTemplate(
-			util::RegistryKeyType key)
-			:	Scenario(key),
-				Object<ScenarioTemplate, ScenarioTemplateRecord>(
-					Schema(
-						FIELD_VALUE_CONSTRUCTOR(Key, key),
-						FIELD_DEFAULT_CONSTRUCTOR(Name),
-						FIELD_DEFAULT_CONSTRUCTOR(Folder),
-						FIELD_DEFAULT_CONSTRUCTOR(Sections)
-						))
+			util::RegistryKeyType key
+		) : Scenario(key),
+			Object<ScenarioTemplate, ScenarioTemplateRecord>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(Folder),
+					FIELD_DEFAULT_CONSTRUCTOR(Sections)
+			)	)
 		{}
 
 
@@ -87,8 +86,8 @@ namespace synthese
 		void ScenarioTemplate::setFolder(ScenarioFolder* value )
 		{
 			set<Folder>(value
-						? boost::optional<ScenarioFolder&>(*value)
-						: boost::none);
+				? boost::optional<ScenarioFolder&>(*value)
+				: boost::none);
 		}
 
 
@@ -116,7 +115,7 @@ namespace synthese
 				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 				calendar->toParametersMap(*calendarPM);
 				pm.insert(TAG_CALENDAR, calendarPM);
-				
+
 				// Messages loop
 				BOOST_FOREACH(const Alarm* alarm, getMessages())
 				{
@@ -126,7 +125,7 @@ namespace synthese
 						oneMessageWithoutCalendar = true;
 						continue;
 					}
-					
+
 					// Jump over messages of other calendars
 					if(alarm->getCalendar() != calendar)
 					{
@@ -141,9 +140,9 @@ namespace synthese
 			}
 
 			// Fake calendar for old style messages
-			if(		   oneMessageWithoutCalendar ||
-					   (getCalendars().empty() && !getMessages().empty())
-				){
+			if( oneMessageWithoutCalendar ||
+				(getCalendars().empty() && !getMessages().empty())
+			){
 				// Fake calendar export
 				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 				calendarPM->insert(Key::FIELD.name, 0);

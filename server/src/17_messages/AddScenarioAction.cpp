@@ -116,7 +116,7 @@ namespace synthese
 				throw ActionException("Un scénario de même nom existe déjà");
 			}
 		}
-	   
+
 
 
 		void AddScenarioAction::run(Request& request)

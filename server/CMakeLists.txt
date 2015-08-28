@@ -163,7 +163,6 @@ configure_file(
   "${PROJECT_BINARY_DIR}/src/15_server/version.h"
 )
 
-
 # Python 2.7
 find_package(PythonLibs 2.7 REQUIRED)
 if(NOT PYTHONLIBS_FOUND)

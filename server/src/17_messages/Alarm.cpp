@@ -1,4 +1,4 @@
-
+﻿
 /** Alarm class implementation.
 	@file Alarm.cpp
 
@@ -57,16 +57,15 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ParentScenario, "scenario_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(RawEditor, "raw_editor", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(Done, "done", SQL_BOOLEAN)
-
 	FIELD_DEFINITION_OF_TYPE(Calendar, "calendar_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(DisplayDuration, "display_duration", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(DigitizedVersion, "digitized_version", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Tags, "tags", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(RepeatInterval, "repeat_interval", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(WithAck, "with_ack", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(MultipleStops, "multiple_stops", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(PlayTts, "play_tts", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(Light, "light", SQL_BOOLEAN)
-	
 	FIELD_DEFINITION_OF_TYPE(DirectionSignCode, "direction_sign_code", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(StartStopPoint, "start_stop_point", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(EndStopPoint, "end_stop_point", SQL_INTEGER)
@@ -93,14 +92,6 @@ namespace synthese
 		const string Alarm::DATA_DIRECTION_SIGN_CODE("direction_sign_code");
 		const string Alarm::DATA_START_STOP_POINT("start_stop_point");
 		const string Alarm::DATA_END_STOP_POINT("end_stop_point");
-		const string Alarm::DATA_REPEAT_INTERVAL("repeat_interval");
-		const string Alarm::DATA_WITH_ACK("with_ack");
-		const string Alarm::DATA_MULTIPLE_STOPS("multiple_stops");
-		const string Alarm::DATA_PLAY_TTS("play_tts");
-		const string Alarm::DATA_LIGHT("light");
-		const string Alarm::DATA_DIRECTION_SIGN_CODE("direction_sign_code");
-		const string Alarm::DATA_START_STOP_POINT("start_stop_point");
-		const string Alarm::DATA_END_STOP_POINT("end_stop_point");
 
 		const string Alarm::TAG_MESSAGE_ALTERNATIVE = "message_alternative";
 		const string Alarm::TAG_RECIPIENTS = "recipients";
@@ -113,66 +104,67 @@ namespace synthese
 
 		Alarm::Alarm(
 			util::RegistryKeyType key
-			):	Registrable(key),
-				Object<Alarm, AlarmRecord>(
-					Schema(
-						FIELD_VALUE_CONSTRUCTOR(Key, key),
-						FIELD_DEFAULT_CONSTRUCTOR(Name),
-						FIELD_VALUE_CONSTRUCTOR(Level, ALARM_LEVEL_INFO),
-						FIELD_DEFAULT_CONSTRUCTOR(ShortMessage),
-						FIELD_DEFAULT_CONSTRUCTOR(LongMessage),
-						FIELD_DEFAULT_CONSTRUCTOR(ParentScenario),
-						FIELD_VALUE_CONSTRUCTOR(RawEditor, false),
-						FIELD_VALUE_CONSTRUCTOR(Done, true),
-						FIELD_DEFAULT_CONSTRUCTOR(messages::MessagesSection),
-						FIELD_DEFAULT_CONSTRUCTOR(Calendar),
-						FIELD_DEFAULT_CONSTRUCTOR(DataSourceLinksWithoutUnderscore),
-						FIELD_DEFAULT_CONSTRUCTOR(DisplayDuration),
-						FIELD_DEFAULT_CONSTRUCTOR(DigitizedVersion),
-						FIELD_DEFAULT_CONSTRUCTOR(RepeatInterval),
-						FIELD_DEFAULT_CONSTRUCTOR(WithAck),
-						FIELD_DEFAULT_CONSTRUCTOR(MultipleStops),
-						FIELD_DEFAULT_CONSTRUCTOR(PlayTts),
-						FIELD_DEFAULT_CONSTRUCTOR(Light),
-						FIELD_DEFAULT_CONSTRUCTOR(DirectionSignCode),
-						FIELD_DEFAULT_CONSTRUCTOR(StartStopPoint),
-						FIELD_DEFAULT_CONSTRUCTOR(EndStopPoint)
-						)	)
+		):	Registrable(key),
+			Object<Alarm, AlarmRecord>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_VALUE_CONSTRUCTOR(Level, ALARM_LEVEL_INFO),
+					FIELD_DEFAULT_CONSTRUCTOR(ShortMessage),
+					FIELD_DEFAULT_CONSTRUCTOR(LongMessage),
+					FIELD_DEFAULT_CONSTRUCTOR(ParentScenario),
+					FIELD_VALUE_CONSTRUCTOR(RawEditor, false),
+					FIELD_VALUE_CONSTRUCTOR(Done, true),
+					FIELD_DEFAULT_CONSTRUCTOR(messages::MessagesSection),
+					FIELD_DEFAULT_CONSTRUCTOR(Calendar),
+					FIELD_DEFAULT_CONSTRUCTOR(DataSourceLinksWithoutUnderscore),
+					FIELD_DEFAULT_CONSTRUCTOR(DisplayDuration),
+					FIELD_DEFAULT_CONSTRUCTOR(DigitizedVersion),
+					FIELD_DEFAULT_CONSTRUCTOR(Tags),
+					FIELD_DEFAULT_CONSTRUCTOR(RepeatInterval),
+					FIELD_DEFAULT_CONSTRUCTOR(WithAck),
+					FIELD_DEFAULT_CONSTRUCTOR(MultipleStops),
+					FIELD_DEFAULT_CONSTRUCTOR(PlayTts),
+					FIELD_DEFAULT_CONSTRUCTOR(Light),
+					FIELD_DEFAULT_CONSTRUCTOR(DirectionSignCode),
+					FIELD_DEFAULT_CONSTRUCTOR(StartStopPoint),
+					FIELD_DEFAULT_CONSTRUCTOR(EndStopPoint)
+			)	)
 		{}
 
 
 
 		Alarm::Alarm(
 			const Alarm& source
-			):	Registrable(0),
-				Object<Alarm, AlarmRecord>(
-					Schema(
-						FIELD_VALUE_CONSTRUCTOR(Key, 0),
-						FIELD_DEFAULT_CONSTRUCTOR(Name),
-						FIELD_VALUE_CONSTRUCTOR(Level, source.getLevel()),
-						FIELD_VALUE_CONSTRUCTOR(ShortMessage, source.getShortMessage()),
-						FIELD_VALUE_CONSTRUCTOR(LongMessage, source.getLongMessage()),
-						FIELD_VALUE_CONSTRUCTOR(ParentScenario, source.get<ParentScenario>()),
-						FIELD_VALUE_CONSTRUCTOR(RawEditor, source.getRawEditor()),
-						FIELD_VALUE_CONSTRUCTOR(Done, source.getDone()),
-						FIELD_VALUE_CONSTRUCTOR(messages::MessagesSection, source.get<messages::MessagesSection>()),
-						FIELD_VALUE_CONSTRUCTOR(Calendar, source.get<Calendar>()),
-						FIELD_DEFAULT_CONSTRUCTOR(DataSourceLinksWithoutUnderscore),
-						FIELD_VALUE_CONSTRUCTOR(DisplayDuration, source.getDisplayDuration()),
-						FIELD_VALUE_CONSTRUCTOR(DigitizedVersion, source.getDigitizedVersion()),
-						FIELD_VALUE_CONSTRUCTOR(Tags, source.getTags()),
-						FIELD_VALUE_CONSTRUCTOR(RepeatInterval, source.getRepeatInterval()),
-						FIELD_VALUE_CONSTRUCTOR(WithAck, source.getWithAck()),
-						FIELD_VALUE_CONSTRUCTOR(MultipleStops, source.getMultipleStops()),
-						FIELD_VALUE_CONSTRUCTOR(PlayTts, source.getPlayTts()),
-						FIELD_VALUE_CONSTRUCTOR(Light, source.getLight()),
-						FIELD_VALUE_CONSTRUCTOR(DirectionSignCode, source.getDirectionSignCode()),
-						FIELD_VALUE_CONSTRUCTOR(StartStopPoint, source.getStartStopPoint()),
-						FIELD_VALUE_CONSTRUCTOR(EndStopPoint, source.getEndStopPoint())
-						)	)
+		):	Registrable(0),
+			Object<Alarm, AlarmRecord>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_VALUE_CONSTRUCTOR(Level, source.getLevel()),
+					FIELD_VALUE_CONSTRUCTOR(ShortMessage, source.getShortMessage()),
+					FIELD_VALUE_CONSTRUCTOR(LongMessage, source.getLongMessage()),
+					FIELD_VALUE_CONSTRUCTOR(ParentScenario, source.get<ParentScenario>()),
+					FIELD_VALUE_CONSTRUCTOR(RawEditor, source.getRawEditor()),
+					FIELD_VALUE_CONSTRUCTOR(Done, source.getDone()),
+					FIELD_VALUE_CONSTRUCTOR(messages::MessagesSection, source.get<messages::MessagesSection>()),
+					FIELD_VALUE_CONSTRUCTOR(Calendar, source.get<Calendar>()),
+					FIELD_DEFAULT_CONSTRUCTOR(DataSourceLinksWithoutUnderscore),
+					FIELD_VALUE_CONSTRUCTOR(DisplayDuration, source.getDisplayDuration()),
+					FIELD_VALUE_CONSTRUCTOR(DigitizedVersion, source.getDigitizedVersion()),
+					FIELD_VALUE_CONSTRUCTOR(Tags, source.getTags()),
+					FIELD_VALUE_CONSTRUCTOR(RepeatInterval, source.getRepeatInterval()),
+					FIELD_VALUE_CONSTRUCTOR(WithAck, source.getWithAck()),
+					FIELD_VALUE_CONSTRUCTOR(MultipleStops, source.getMultipleStops()),
+					FIELD_VALUE_CONSTRUCTOR(PlayTts, source.getPlayTts()),
+					FIELD_VALUE_CONSTRUCTOR(Light, source.getLight()),
+					FIELD_VALUE_CONSTRUCTOR(DirectionSignCode, source.getDirectionSignCode()),
+					FIELD_VALUE_CONSTRUCTOR(StartStopPoint, source.getStartStopPoint()),
+					FIELD_VALUE_CONSTRUCTOR(EndStopPoint, source.getEndStopPoint())
+			)	)
 		{}
 
-		
+
 		Alarm::~Alarm()
 		{}
 
@@ -192,8 +184,7 @@ namespace synthese
 			pm.insert(prefix + DATA_DISPLAY_DURATION, getDisplayDuration());
 			pm.insert(prefix + DATA_DIGITIZED_VERSION, getDigitizedVersion());
 
-			string tagsString = boost::algorithm::join(_tags, ",");
-			pm.insert(prefix + DATA_TAGS, tagsString);
+			pm.insert(prefix + DATA_TAGS, getTags());
 
 			if(withScenario && getScenario())
 			{
@@ -266,7 +257,7 @@ namespace synthese
 
 
 		//////////////////////////////////////////////////////////////////////////
-		/// Public view of _isOnBroadcastPoint.
+		/// Public view of _isOnBroadcastPoint using cache
 		bool Alarm::isOnBroadcastPoint(
 			const BroadcastPoint& point,
 			const util::ParametersMap& parameters
@@ -414,7 +405,7 @@ namespace synthese
 					const ScenarioCalendar::ApplicationPeriods::value_type& period,
 					getCalendar()->getApplicationPeriods()
 					) {
-					if(period->getValue(when))
+					if(period->isInside(when))
 					{
 						return true;
 					}
@@ -456,7 +447,7 @@ namespace synthese
 					const ScenarioCalendar::ApplicationPeriods::value_type& period,
 					getCalendar()->getApplicationPeriods()
 				){
-					if(period->getValue(when))
+					if(period->isInside(when))
 					{
 						result = period->getStart(when);
 					}
@@ -496,7 +487,7 @@ namespace synthese
 					const ScenarioCalendar::ApplicationPeriods::value_type& period,
 					getCalendar()->getApplicationPeriods()
 				){
-					if(period->getValue(when))
+					if(period->isInside(when))
 					{
 						result = period->getEnd(when);
 					}

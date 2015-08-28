@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 /// ScenarioSaveAction class implementation.
 ///	@file ScenarioSaveAction.cpp
 ///	@author Hugues Romain
@@ -877,7 +877,7 @@ namespace synthese
 				}
 				else
 				{
-					// Unimplemented ScenarioTemplateTableSync::CopyMessages(tpl.getKey(), *_tscenario, transaction);
+					ScenarioTemplateTableSync::CopyMessages(tpl.getKey(), *_tscenario, transaction);
 				}				
 			}
 
@@ -1033,10 +1033,7 @@ namespace synthese
 						message->setLongMessage(messageNode.second.get("content", string()));
 						message->setDisplayDuration(messageNode.second.get("displayDuration", 0));
 						message->setDigitizedVersion(messageNode.second.get("digitized_version", string()));
-						std::string tagsString = messageNode.second.get("tags", string());
-						std::set<string> tags;
-						boost::algorithm::split(tags, tagsString, is_any_of(","), token_compress_on );
-						message->setTags(tags);
+						message->setTags(messageNode.second.get("tags", string()));
 						message->setRepeatInterval(messageNode.second.get("repeat_interval", 0));
 						message->setWithAck(messageNode.second.get("with_ack", false));
 						message->setMultipleStops(messageNode.second.get("multiple_stops", false));
@@ -1230,9 +1227,7 @@ namespace synthese
 				message->setShortMessage(_messageToCreateTitle ? *_messageToCreateTitle : "Unique message");
 				message->setLongMessage(*_messageToCreate);
 				message->setLevel(*_level);
-				std::set<string> tags;
-				boost::algorithm::split(tags, _tags, is_any_of(","), token_compress_on );
-				message->setTags(tags);
+				message->setTags(_tags);
 				if (_display_duration) message->setDisplayDuration(*_display_duration);
 				message->setDigitizedVersion(_digitizedVersion);
 				message->setSection(_messageSection.get());

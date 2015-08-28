@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 /// SentScenarioTableSync class header.
 ///	@file SentScenarioTableSync.h
 ///	@author Hugues Romain
@@ -32,6 +32,7 @@
 #include "Alarm.h"
 #include "ScenarioTemplate.h"
 #include "ScenarioTableSync.h"
+#include "SentScenarioDao.hpp"
 
 
 #include <vector>
@@ -63,12 +64,16 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				SentScenarioTableSync,
 				SentScenario
-			>
+			>,
+			public SentScenarioDao
 		{
 		public:
 
 			SentScenarioTableSync() {}
 			~SentScenarioTableSync() {}
+
+			virtual std::vector<boost::shared_ptr<SentScenario> > list() const;
+			virtual void save(boost::shared_ptr<SentScenario>& sentScenario) const;
 
 
 			static SearchResult Search(
@@ -137,19 +142,12 @@ namespace synthese
 				boost::posix_time::ptime date(boost::posix_time::second_clock::local_time());
 				if(*inArchive)
 				{
-					query << " AND " <<
-						PeriodEnd::FIELD.name << " IS NOT NULL AND " <<
-						PeriodEnd::FIELD.name << "!='' AND " <<
-						PeriodEnd::FIELD.name << "<='" << to_iso_extended_string(date.date()) << " " << to_simple_string(date.time_of_day()) << "'"
+					query << " AND " << Archived::FIELD.name << " = 1 "
 					;
 				}
 				else
 				{
-					query << " AND (" <<
-						PeriodEnd::FIELD.name << " IS NULL OR " <<
-						PeriodEnd::FIELD.name << "='' OR " <<
-						PeriodEnd::FIELD.name << ">'" << to_iso_extended_string(date.date()) << " " << to_simple_string(date.time_of_day()) << "'" <<
-						")"
+					query << " AND " << Archived::FIELD.name << " = 0 "
 					;
 				}
 			}

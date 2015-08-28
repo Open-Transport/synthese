@@ -1,6 +1,5 @@
 <table class="table table-striped sortable">
   <thead>
-    
     <tr>
       <th data-defaultsort='disabled'></th>
       <th data-dateformat="DD-MM-YYYY hh:mm">début</th>
@@ -11,183 +10,244 @@
       <th>sections</th>
     </tr>
   </thead>
+  
+  <div class="hide" id="event_category" value="<@cat@>"></div>
+  <tbody>
 
- <div class="hide" id="event_category" value="<@cat@>"></div>
- <tbody>
-
- <?scenarii&
- 	t=0&
- 	archives=0&
- 	currently_displayed=<@cat=="active"@>&
- 	section_in=<@section@>&
- 	template=<{scenario&template=
-
-<@belongs_to_an_auto_section=0@>
-<{section&template=<@belongs_to_an_auto_section=<@belongs_to_an_auto_section||auto_activation@>@>}>
-
-<script>
-theevent["<@roid@>"] = {
-id: '<@id@>',
-scenario_id: '<@scenario_id@>',
-roid: '<@roid@>',
-name: '<@name@>',
-active: <@active@>,
-belongs_to_an_auto_section: <@belongs_to_an_auto_section@>,
-manual_override: <@manual_override@>,
-filtered: 0,
-<@hasWriteRights=0@>
-<@canArchive=1@>
-section: [<{section&template=
-<@hasReadRights=<@<@hasWriteRights@>||<#has_section_right&level=READ&sectionid=<@id@>#>@>@>
-<@hasWriteRights=<@<@hasWriteRights@>||<#has_section_right&level=WRITE&sectionid=<@id@>#>@>@>
-<@canArchive=<@<@canArchive@>&&<#has_section_right&level=DELETE_RIGHT&sectionid=<@id@>#>@>@>
-  { id: '<@id@>',
-    name: '<@name@>',
-    reading_right: '<@hasReadRights@>',
-  },
-}>],
-write_right_section: <@hasWriteRights@>,
-archiving_right_section: <@canArchive@>,
-calendar: [<{calendar&template=
- {
-  id: '<@id@>',
-  application_period:
-  [<{application_period&template=
-    { id: '<@id@>',
-      start_date: '<@start_time@>',
-      end_date: '<@end_time@>',
-      start_hour: '<@start_hour@>',
-      end_hour: '<@end_hour@>',
-      date: [<{date&template='<@date@>'}>]
-    },
-  }>],
-  message: 
-  [<{message&template=
-    {
-      <{recipients&template=
-        line_recipient:[ <{line&template=
-        { id: "<@link_id@>",
-          recipient_id: "<@id@>",
-          parameter: "<@link_parameter@>"
-        },
-        }> ],
-        stoparea_recipient:[ <{stoparea&template=
-        { id: "<@link_id@>",
-          recipient_id: "<@id@>",
-          parameter: "<@link_parameter@>"
-        },
-        }> ],
-        displayscreen_recipient:[ <{displayscreen&template=
-        { id: "<@link_id@>",
-          recipient_id: "<@id@>",
-          parameter: "<@link_parameter@>"
-        },
-        }> ]
-      }>
-    },
-  }>]
-},
-}>]
-};
-</script>
-	  <tr>
-	  <td>
-	   <?link&
-	     target=/events/event&
-	     section=<@section@>&
-	     roid=<@roid@>&
-	     class=btn btn-primary btn-mini btn-with-margins&
-	     text=Ouvrir&
-	   ?>
-	  </td>
-	  <td class="min-date">
-	    <script>
- 	      var dates = [];
- 	      <{calendar&template=<{application_period&template=if("<@start_time@>"){dates.push(Date.parse("<@start_time@>".replace(" ","T")));}if("<@end_time@>"){dates.push(Date.parse("<@end_time@>".replace(" ","T")));}}>}>
-     	      if (dates.length > 0) {
-     	        var min = new Date(Math.min.apply(null, dates));
-     	        var max = new Date(Math.max.apply(null, dates));
-     	        document.write(('0' + min.getDate()).slice(-2) + '-' + ('0' + (min.getMonth()+1)).slice(-2) + '-' +  min.getFullYear() + ' ' + ('0' + min.getHours()).slice(-2) + ':' + ('0' + min.getMinutes()).slice(-2));
-     	      }
- 	    </script>
- 	  </td>
-	  <td class="max-date">
-	    <script>if (dates.length > 0) { document.write(('0' + max.getDate()).slice(-2) + '-' + ('0' + (max.getMonth()+1)).slice(-2) + '-' +  max.getFullYear() + ' ' + ('0' + max.getHours()).slice(-2) + ':' + ('0' + max.getMinutes()).slice(-2));}</script>
-	  </td>
-	  <td><@name@></td>
-	  <td>
-            <a href="#mRecipientsList-<@roid@>-<@cat@>" data-toggle="modal" data-type="show_recipients" data-sid="<@roid@>" data-cat="<@cat@>">Aperçu des destinataires</a>
-            <div id="mRecipientsList-<@roid@>-<@cat@>" class="modal hide fade">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" data-type="close_recipients">\&times;</button>
-                <h3>Destinataires pour l'événement </h3>
-              </div>
-              <div class="modal-body">
-                 <#recipients_list&scenario_id=<@roid@>&cat=<@cat@>#>
-              </div>
-              <div class="modal-footer">
-                <a href="#" class="btn btn-primary" data-dismiss="modal" data-type="close_recipients">Fermer</a>
-              </div>
-            </div>
-	  </td>
-	  <td>
-	  <@sectionNames=@>
-	  <@hasRights=0@>
-	  <{section&template=
-	    <@hasRights=<@<@hasRights@>||<#has_section_right&level=WRITE&sectionid=<@id@>#>@>@>
-	    <?if&cond=<@sectionNames==''@>&then=<@sectionNames=<@name@>@>&else=<@sectionNames=<@sectionNames@> - <@name@>@>?>
-	   }>
-	   
-     <?if&
-         cond=<@belongs_to_an_auto_section&&<@!manual_override@>@>
-         &then=
-           <div class="label label-info">Auto</div>
-        &else=
-           <?if
-             &cond=<@active@>
-             &then=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>
-                    &then=
-                    <div class="label label-success">Actif</div>
-                  ?>
-             &else=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#> 
-                    &then=
-                    <div class="label">Inactif</div>
-                  ?>
-           ?>
-      ?>
-
-      <?if&
-         cond=<@active@>&
-         then=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&
-                then=
-                      <?link&target=<@p@>&section=<@section@>&
-                            a=scenario_save&actionParamsid=<@roid@>&actionParamena=0&
-                            class=btn btn-warning btn-mini btn-inactive&
-                            text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>&
-              ?>&
-         else=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>& 
-                then=
-                     <?link&target=<@p@>&section=<@section@>&
-                         a=scenario_save&actionParamsid=<@roid@>&actionParamena=1&
-                         class=btn btn-warning btn-mini btn-inactive&
-                         text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>&
-              ?>&
-      ?>
-           <?notification_events&scenario_id=<@scenario_id@>&template=
-             <?if&cond=<@0<<@failed_count@>@>&then=<i class="icon-warning-sign"></i>?>
-             <?if&cond=<@0<<@hold_count@>@>&then=<i class="icon-flag"></i>?>
-           ?>
-           <?notification_events&scenario_id=<@scenario_id@>&template=
-             <?if&cond=<@0<<@failed_count@>@>&then=<i class="icon-warning-sign"></i>?>
-             <?if&cond=<@0<<@hold_count@>@>&then=<i class="icon-flag"></i>?>
-           ?>
-	  </td>
-	  <td>
-	    <@sectionNames@>
-	  </td>
-	  </tr>
+<?scenarii&
+t=0&
+archives=0&
+currently_displayed=<@cat=="active"@>&
+section_in=<@section@>&
+template=<{scenario&template=
+	<@belongs_to_an_auto_section=0@>
+	<{section&template=
+		<@belongs_to_an_auto_section=<@belongs_to_an_auto_section||auto_activation@>@>
 	}>
- ?>
- </tbody>
+
+    <script>
+theevent["<@roid@>"] = {
+  id: '<@id@>',
+  scenario_id: '<@scenario_id@>',
+  roid: '<@roid@>',
+  name: '<@name@>',
+  active: <@active@>,
+  belongs_to_an_auto_section: <@belongs_to_an_auto_section@>,
+  manual_override: <@manual_override@>,
+  filtered: 0,
+	<@hasWriteRights=0@>
+	<@canArchive=1@>
+  section: [
+	<{section&template=
+		<@hasReadRights=<@<@hasWriteRights@>||<#has_section_right&level=READ&sectionid=<@id@>#>@>@>
+		<@hasWriteRights=<@<@hasWriteRights@>||<#has_section_right&level=WRITE&sectionid=<@id@>#>@>@>
+		<@canArchive=<@<@canArchive@>&&<#has_section_right&level=DELETE_RIGHT&sectionid=<@id@>#>@>@>
+    {
+      id: '<@id@>',
+      name: '<@name@>',
+      reading_right: '<@hasReadRights@>',
+    },
+	}>
+  ],
+  write_right_section: <@hasWriteRights@>,
+  archiving_right_section: <@canArchive@>,
+  calendar: [
+	<{calendar&template=
+    {
+      id: '<@id@>',
+      application_period: [
+		<{application_period&template=
+        {
+          id: '<@id@>',
+          start_date: '<@start_time@>',
+          end_date: '<@end_time@>',
+          start_hour: '<@start_hour@>',
+          end_hour: '<@end_hour@>',
+          date: [<{date&template='<@date@>'}>]
+        },
+		}>
+      ],
+      message: [
+		<{message&template=
+        {
+			<{recipients&template=
+          line_recipient:[
+				<{line&template=
+            {
+              id: "<@link_id@>",
+              recipient_id: "<@id@>",
+              parameter: "<@link_parameter@>"
+            },
+				}>
+            ],
+          stoparea_recipient:[
+				<{stoparea&template=
+            {
+              id: "<@link_id@>",
+              recipient_id: "<@id@>",
+              parameter: "<@link_parameter@>"
+            },
+				}>
+          ],
+          displayscreen_recipient:[
+				<{displayscreen&template=
+            {
+              id: "<@link_id@>",
+              recipient_id: "<@id@>",
+              parameter: "<@link_parameter@>"
+            },
+				}>
+          ]
+			}>
+        },
+		}>
+      ]
+    },
+	}>
+  ]
+};
+    </script>
+    <tr>
+      <td>
+        <?link&
+        target=/events/event&
+        section=<@section@>&
+        roid=<@roid@>&
+        class=btn btn-primary btn-mini btn-with-margins&
+        text=Ouvrir&
+        ?>
+      </td>
+      <td class="min-date">
+        <script>
+var dates = [];
+	<{calendar&template=
+		<{application_period&template=
+if("<@start_time@>"){
+  dates.push(Date.parse("<@start_time@>".replace(" ","T")));
+}
+if("<@end_time@>"){
+  dates.push(Date.parse("<@end_time@>".replace(" ","T")));
+}
+		}>
+	}>
+if (dates.length > 0) {
+  var min = new Date(Math.min.apply(null, dates));
+  var max = new Date(Math.max.apply(null, dates));
+  document.write(('0' + min.getDate()).slice(-2) + '-' + ('0' + (min.getMonth()+1)).slice(-2) + '-' +  min.getFullYear() + ' ' + ('0' + min.getHours()).slice(-2) + ':' + ('0' + min.getMinutes()).slice(-2));
+}
+        </script>
+      </td>
+      <td class="max-date">
+        <script>
+if (dates.length > 0) {
+  document.write(('0' + max.getDate()).slice(-2) + '-' + ('0' + (max.getMonth()+1)).slice(-2) + '-' +  max.getFullYear() + ' ' + ('0' + max.getHours()).slice(-2) + ':' + ('0' + max.getMinutes()).slice(-2));
+}
+        </script>
+      </td>
+      <td><@name@></td>
+      <td>
+        <a href="#mRecipientsList-<@roid@>-<@cat@>" data-toggle="modal" data-type="show_recipients" data-sid="<@roid@>" data-cat="<@cat@>">Aperçu des destinataires</a>
+        <div id="mRecipientsList-<@roid@>-<@cat@>" class="modal hide fade">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" data-type="close_recipients">\&times;</button>
+            <h3>Destinataires pour l'événement </h3>
+          </div>
+          <div class="modal-body">
+	<#recipients_list&scenario_id=<@roid@>&cat=<@cat@>#>
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="btn btn-primary" data-dismiss="modal" data-type="close_recipients">Fermer</a>
+          </div>
+        </div>
+      </td>
+      <td>
+	<@sectionNames=@>
+	<@hasRights=0@>
+	<{section&template=
+		<@hasRights=<@<@hasRights@>||<#has_section_right&level=WRITE&sectionid=<@id@>#>@>@>
+		<?if&cond=<@sectionNames==''@>&then=<@sectionNames=<@name@>@>&else=<@sectionNames=<@sectionNames@> - <@name@>@>?>
+	}>
+	<?if&
+	cond=<@belongs_to_an_auto_section&&<@!manual_override@>@>
+	&then=
+        <div class="label label-info">Auto</div>
+	&else=
+		<?if
+		&cond=<@active@>
+		&then=
+			<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>
+			&then=
+        <div class="label label-success">Actif</div>
+			?>
+		&else=
+			<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>
+			&then=
+        <div class="label">Inactif</div>
+			?>
+		?>
+	?>
+	<?if&
+	cond=<@active@>&
+	then=
+		<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&
+		then=
+        <?link&
+        target=<@p@>&
+        section=<@section@>&
+        a=scenario_save&
+        actionParamsid=<@roid@>&
+        actionParamena=0&
+        class=btn btn-warning btn-mini btn-inactive&
+        text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ?
+        ?>&
+		?>&
+	else=
+		<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&
+		then=
+        <?link&
+        target=<@p@>&
+        section=<@section@>&
+        a=scenario_save&
+        actionParamsid=<@roid@>&
+        actionParamena=1&
+        class=btn btn-warning btn-mini btn-inactive&
+        text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ?
+        ?>&
+		?>&
+	?>
+	<?notification_events&
+	scenario_id=<@scenario_id@>&
+	template=
+		<?if&
+		cond=<@0<<@failed_count@>@>&
+		then=
+        <i class="icon-warning-sign"></i>
+		?>
+		<?if&
+		cond=<@0<<@hold_count@>@>&
+		then=
+        <i class="icon-flag"></i>
+		?>
+	?>
+	<?notification_events&
+	scenario_id=<@scenario_id@>&
+	template=
+		<?if&
+		cond=<@0<<@failed_count@>@>&
+		then=
+        <i class="icon-warning-sign"></i>
+		?>
+		<?if&
+		cond=<@0<<@hold_count@>@>&
+		then=
+        <i class="icon-flag"></i>
+		?>
+	?>
+      </td>
+      <td>
+        <@sectionNames@>
+      </td>
+    </tr>
+}>?>
+  </tbody>
 </table>
-</div>

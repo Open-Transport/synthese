@@ -1,4 +1,4 @@
-
+﻿
 /** Alarm class header.
 	@file Alarm.h
 
@@ -63,8 +63,8 @@ namespace synthese
 		FIELD_POINTER(Calendar, ScenarioCalendar)
 		FIELD_SIZE_T(DisplayDuration)
 		FIELD_STRING(DigitizedVersion)
-		FIELD_INT(RepeatInterval)
 		FIELD_STRING(Tags)
+		FIELD_INT(RepeatInterval)
 		FIELD_BOOL(WithAck)
 		FIELD_BOOL(MultipleStops)
 		FIELD_BOOL(PlayTts)
@@ -73,7 +73,6 @@ namespace synthese
 		FIELD_INT(StartStopPoint)
 		FIELD_INT(EndStopPoint)
 
-			
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Name),
@@ -88,8 +87,8 @@ namespace synthese
 			FIELD(DataSourceLinksWithoutUnderscore),
 			FIELD(DisplayDuration),
 			FIELD(DigitizedVersion),
-			FIELD(RepeatInterval),
 			FIELD(Tags),
+			FIELD(RepeatInterval),
 			FIELD(WithAck),
 			FIELD(MultipleStops),
 			FIELD(PlayTts),
@@ -98,8 +97,7 @@ namespace synthese
 			FIELD(StartStopPoint),
 			FIELD(EndStopPoint)
 			> AlarmRecord;
-			
-		
+
 		class Alarm:
 			public Object<Alarm, AlarmRecord>,
 			public impex::ImportableTemplate<Alarm>
@@ -115,14 +113,6 @@ namespace synthese
 			static const std::string DATA_DISPLAY_DURATION;
 			static const std::string DATA_DIGITIZED_VERSION;
 			static const std::string DATA_TAGS;
-			static const std::string DATA_REPEAT_INTERVAL;
-			static const std::string DATA_WITH_ACK;
-			static const std::string DATA_MULTIPLE_STOPS;
-			static const std::string DATA_PLAY_TTS;
-			static const std::string DATA_LIGHT;
-			static const std::string DATA_DIRECTION_SIGN_CODE;
-			static const std::string DATA_START_STOP_POINT;
-			static const std::string DATA_END_STOP_POINT;
 			static const std::string DATA_REPEAT_INTERVAL;
 			static const std::string DATA_WITH_ACK;
 			static const std::string DATA_MULTIPLE_STOPS;
@@ -158,16 +148,16 @@ namespace synthese
 			> BroadcastPointsCache;
 
 			mutable BroadcastPointsCache _broadcastPointsCache;
-			
+
 		protected:
-			
+
 			// Links
 			//@{
 				mutable MessageAlternatives _messageAlternatives;
 				mutable LinkedObjects _linkedObjects;
 				mutable boost::mutex _linkedObjectsMutex;
 			//@}
-			
+
 			bool _isOnBroadcastPoint(
 				const BroadcastPoint& point,
 				const util::ParametersMap& parameters
@@ -178,62 +168,63 @@ namespace synthese
 			Alarm(
 				util::RegistryKeyType key = 0);
 			Alarm(const Alarm& source);
-			
+
 			virtual ~Alarm();
 
 			//! @name Getters
 			//@{
-			virtual const MessageAlternatives& getMessageAlternatives() const { return _messageAlternatives; }
-			
-			virtual const std::string&		getShortMessage()	const { return get<ShortMessage>(); }
-			virtual const std::string&		getLongMessage()	const { return get<LongMessage>(); }
-			virtual const AlarmLevel&		getLevel()			const { return get<Level>(); }
-			virtual const Scenario*			getScenario()		const;
-			virtual const ScenarioCalendar* getCalendar() const;
+				virtual const MessageAlternatives& getMessageAlternatives() const { return _messageAlternatives; }
 
-			virtual const MessagesSection*	getSection() const;
-			virtual bool					getRawEditor() const { return get<RawEditor>(); }
-			virtual bool					getDone() const { return get<Done>(); }
-			virtual std::size_t				getDisplayDuration() const { return get<DisplayDuration>(); }
-			virtual const std::string&		getDigitizedVersion() const { return get<DigitizedVersion>(); }
-			virtual const std::string&		getTags() const [ return get<Tags>(); }
-			virtual int						getRepeatInterval() const { return get<RepeatInterval>(); }
-			virtual bool					getWithAck() const { return get<WithAck>(); }
-			virtual bool					getMultipleStops() const { return get<MultipleStops>(); }
-			virtual bool					getPlayTts() const { return get<PlayTts>(); }
-			virtual bool					getLight() const { return get<Light>(); }
-			virtual int						getDirectionSignCode() const { return get<DirectionSignCode>(); }
-			virtual int						getStartStopPoint() const { return get<StartStopPoint>(); }
-			virtual int						getEndStopPoint() const { return get<EndStopPoint>(); }
+				virtual const std::string&		getShortMessage()	const { return get<ShortMessage>(); }
+				virtual const std::string&		getLongMessage()	const { return get<LongMessage>(); }
+				virtual const AlarmLevel&		getLevel()			const { return get<Level>(); }
+				virtual const Scenario*			getScenario()		const;
+				virtual const ScenarioCalendar* getCalendar() const;
+
+				virtual const MessagesSection*	getSection() const;
+				virtual bool					getRawEditor() const { return get<RawEditor>(); }
+				virtual bool					getDone() const { return get<Done>(); }
+				virtual std::size_t				getDisplayDuration() const { return get<DisplayDuration>(); }
+				virtual const std::string&		getDigitizedVersion() const { return get<DigitizedVersion>(); }
+				virtual const std::string&		getTags() const { return get<Tags>(); }
+				virtual int						getRepeatInterval() const { return get<RepeatInterval>(); }
+				virtual bool					getWithAck() const { return get<WithAck>(); }
+				virtual bool					getMultipleStops() const { return get<MultipleStops>(); }
+				virtual bool					getPlayTts() const { return get<PlayTts>(); }
+				virtual bool					getLight() const { return get<Light>(); }
+				virtual int						getDirectionSignCode() const { return get<DirectionSignCode>(); }
+				virtual int						getStartStopPoint() const { return get<StartStopPoint>(); }
+				virtual int						getEndStopPoint() const { return get<EndStopPoint>(); }
 
 			//@}
 
 			//! @name Setters
 			//@{
-			virtual void setLevel (const AlarmLevel& level) { set<Level>(level); }
-			virtual void setShortMessage( const std::string& message) { set<ShortMessage>(message); }
-			virtual void setLongMessage( const std::string& message) { set<LongMessage>(message); }
-			virtual void setScenario(const Scenario* scenario);
-			virtual void setRawEditor(bool value) { set<RawEditor>(value); }
-			virtual void setDone(bool value) { set<Done>(value); }
-			
-			virtual void setSection(const MessagesSection* value);
-			virtual void setCalendar(const ScenarioCalendar* value);
-			
-			virtual void setDisplayDuration(std::size_t value) { set<DisplayDuration>(value); }
-			virtual void setDigitizedVersion( const std::string& value) { set<DigitizedVersion>(value); }
-			virtual void setTags( const std::string value) { set<Tags>(value); }
-			virtual void setRepeatInterval(int value) { set<RepeatInterval>(value); }
-			virtual void setWithAck(bool value) { set<WithAck>(value); }
-			virtual void setMultipleStops(bool value) { set<MultipleStops>(value); }
-			virtual void setPlayTts(bool value) { set<PlayTts>(value); }
-			virtual void setLight(bool value) { set<Light>(value); }
-			virtual void setDirectionSignCode(int value) { set<DirectionSignCode>(value); }
-			virtual void setStartStopPoint(int value) { set<StartStopPoint>(value); }
-			virtual void setEndStopPoint(int value) { set<EndStopPoint>(value); }
+				virtual void setLevel (const AlarmLevel& level) { set<Level>(level); }
+				virtual void setShortMessage( const std::string& message) { set<ShortMessage>(message); }
+				virtual void setLongMessage( const std::string& message) { set<LongMessage>(message); }
+				virtual void setScenario(const Scenario* scenario);
+				virtual void setRawEditor(bool value) { set<RawEditor>(value); }
+				virtual void setDone(bool value) { set<Done>(value); }
+				
+				virtual void setSection(const MessagesSection* value);
+				virtual void setCalendar(const ScenarioCalendar* value);
+				
+				virtual void setDisplayDuration(std::size_t value) { set<DisplayDuration>(value); }
+				virtual void setDigitizedVersion( const std::string& value) { set<DigitizedVersion>(value); }
+				virtual void setTags( const std::string value) { set<Tags>(value); }
+				virtual void setRepeatInterval(int value) { set<RepeatInterval>(value); }
+				virtual void setWithAck(bool value) { set<WithAck>(value); }
+				virtual void setMultipleStops(bool value) { set<MultipleStops>(value); }
+				virtual void setPlayTts(bool value) { set<PlayTts>(value); }
+				virtual void setLight(bool value) { set<Light>(value); }
+				virtual void setDirectionSignCode(int value) { set<DirectionSignCode>(value); }
+				virtual void setStartStopPoint(int value) { set<StartStopPoint>(value); }
+				virtual void setEndStopPoint(int value) { set<EndStopPoint>(value); }
+			//@}
 
 			void setMessageAlternatives(const MessageAlternatives& value) const { _messageAlternatives = value; }
-				
+
 			void addLinkedObject(const AlarmObjectLink& link) const;
 			void removeLinkedObject(const AlarmObjectLink& link) const;
 
@@ -269,9 +260,6 @@ namespace synthese
 			boost::posix_time::ptime getApplicationEnd(
 				const boost::posix_time::ptime& when
 			) const;
-
-			
-			//@}
 
 
 			//! @name Modifiers
@@ -314,7 +302,6 @@ namespace synthese
 				
 				void clearBroadcastPointsCache() const;
 
-				  
 				LinkedObjects::mapped_type getLinkedObjects(
 					const std::string& recipientKey
 				) const;
@@ -323,14 +310,12 @@ namespace synthese
 				LinkedObjects & getLinkedObjects() const
 				{
 					return _linkedObjects;
-				}			
+				}
 
 			//@}
 		};
 
 		typedef std::vector<boost::shared_ptr<Alarm> > Alarms;
-		
-		
 }	}
 
 #endif

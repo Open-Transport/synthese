@@ -18,9 +18,9 @@ namespace synthese
 		{
 		private:
 
-		    const std::string _serverHost;      //!< Server host.
+			const std::string _serverHost;      //!< Server host.
 			const std::string _serverPort;              //!< Server port.
-		    const int _timeOut;                 //!< TCP time out in milliseconds. 0 means no timeout.
+			const int _timeOut;                 //!< TCP time out in milliseconds. 0 means no timeout.
 			const bool _outputHTTPHeaders;
 			const bool _acceptGzip;
 
@@ -33,7 +33,7 @@ namespace synthese
 
 		public:
 
-		    BasicClient (
+			BasicClient (
 				const std::string& serverHost,
 				const std::string serverPort = "8080",
 				int timeOut = 0,
@@ -41,7 +41,7 @@ namespace synthese
 				bool acceptGzip = true
 			);
 
-		    BasicClient (
+			BasicClient (
 				const std::string& serverHost,
 				const std::string serverPort,
 				boost::optional<int> connectionTimeout,	// used as timeOut
@@ -50,12 +50,12 @@ namespace synthese
 				bool acceptGzip = true
 			);
 
-		    /**
-		     * Sends a request to a server and writes received answer on an output stream.
-		     * @param out : The output stream to write on.
-		     * @param request : Request string to send to server (ex : fonction=rp&si=1&da=A)
-		     * @param clientIp : Client IP (only relevant in a CGI context)
-		     * @param clientURL : Client URL for link generation (only relevant in a CGI context)
+			/**
+			 * Sends a request to a server and writes received answer on an output stream.
+			 * @param out : The output stream to write on.
+			 * @param request : Request string to send to server (ex : fonction=rp&si=1&da=A)
+			 * @param clientIp : Client IP (only relevant in a CGI context)
+			 * @param clientURL : Client URL for link generation (only relevant in a CGI context)
 
 
 
@@ -67,7 +67,7 @@ namespace synthese
 
 
 
-		     */
+			*/
 			std::string get(
 				const std::string& url
 			) const;

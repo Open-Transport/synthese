@@ -1,4 +1,4 @@
-/** MessageApplicationPeriod class header.
+﻿/** MessageApplicationPeriod class header.
 	@file MessageApplicationPeriod.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -79,7 +79,7 @@ namespace synthese
 					@param time the time to check
 					@return true if the time is in the defined period
 				 */
-				bool getValue(const boost::posix_time::ptime& time) const;
+				bool isInside(const boost::posix_time::ptime& time) const;
 
 				/**
 					Return start timestamp for the specified date
@@ -109,10 +109,11 @@ namespace synthese
 					const boost::posix_time::ptime& date = boost::posix_time::not_a_date_time
 				) const;
 
-				virtual void addAdditionalParameters(
-					util::ParametersMap& map,
-					std::string prefix = std::string()
-				) const;
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if the specified time is in the defined period.
+				/// @param time the time to check
+				/// @return true if the time is in the defined period
+				bool isAfter(const boost::posix_time::ptime& time) const;
 			//@}
 		};
 }	}

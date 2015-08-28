@@ -93,11 +93,13 @@ namespace synthese
 				boost::shared_ptr<db::DBDirectTableSync> tableSync =
 					dynamic_pointer_cast<db::DBDirectTableSync, db::DBTableSync>(
 						db::DBModule::GetTableSync(util::decodeTableId(objectId)));
-				
-				_alarm = dynamic_pointer_cast<const Alarm, const Registrable>(tableSync->getRegistrable(
-																	  map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-																	  _getEnv(),
-																	  UP_LINKS_LOAD_LEVEL));
+
+				_alarm = dynamic_pointer_cast<const Alarm, const Registrable>(
+					tableSync->getRegistrable(
+						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+						_getEnv(),
+						UP_LINKS_LOAD_LEVEL
+				)	);
 			}
 			catch(...)
 			{

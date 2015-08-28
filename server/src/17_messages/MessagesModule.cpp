@@ -1,4 +1,4 @@
-
+﻿
 /** MessagesModule class implementation.
 	@file MessagesModule.cpp
 
@@ -276,7 +276,7 @@ namespace synthese
 		/// This thread updates every minute the list of enabled scenarii.
 		void MessagesModule::ScenariiActivationThread()
 		{
-			boost::shared_ptr<SentScenarioDao> sentScenarioDao(new ScenarioTableSync());
+			boost::shared_ptr<SentScenarioDao> sentScenarioDao(new SentScenarioTableSync());
 			boost::shared_ptr<ScenarioAutopilot> scenarioAutopilot(new ScenarioAutopilot(*sentScenarioDao));
 
 			while(true)
@@ -483,31 +483,6 @@ namespace synthese
 			}
 		}
 		
-		//////////////////////////////////////////////////////////////////////////
-		/// Updates the enabled scenarii
-		void MessagesModule::UpdateEnabledScenarii()
-		{
-			// Loop on all sent scenarii
-			SentScenarioTableSync::SearchResult scenarios;
-
-			scenarios = SentScenarioTableSync::Search(
-				Env::GetOfficialEnv(),
-				boost::optional<std::string>()
-			);
-			BOOST_FOREACH(const boost::shared_ptr<SentScenario>& scenario, scenarios)
-			{
-				if(!dynamic_cast<const SentScenario*>(scenario.get()))
-				{
-					continue;
-				}
-				SentScenario* sscenario = static_cast<SentScenario*>(scenario.get());
-				if (_enableScenarioIfAutoActivation(sscenario))
-				{
-					SentScenarioTableSync::Save(sscenario);
-				}
-			}
-		}
-		
 		bool MessagesModule::_enableScenarioIfAutoActivation( SentScenario* sscenario )
 		{
 			// Is the scenario associated to an auto_activation section ?
@@ -529,7 +504,7 @@ namespace synthese
 				{
 					BOOST_FOREACH( const ScenarioCalendar::ApplicationPeriods::value_type& period, calendar->getApplicationPeriods() )
 					{
-						if(period->getValue(now))
+						if(period->isInside(now))
 						{
 							shouldBeEnabled = true;
 							break;

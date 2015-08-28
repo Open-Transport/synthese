@@ -69,7 +69,7 @@ namespace synthese
 
 			static void CopyMessages(
 				util::RegistryKeyType sourceId,
-				SentScenario& dest,
+				Scenario& dest,
 				boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
 			);
 

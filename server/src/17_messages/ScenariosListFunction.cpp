@@ -245,7 +245,7 @@ namespace synthese
 				scenarios = newScenarios;
 			}
 
-			// TODO add an accesor virtul piure in scenario on sections!
+			// TODO add an accesor virtual pure in scenario on sections!
 			BOOST_FOREACH(const boost::shared_ptr<Scenario>& scenario, scenarios)
 			{
 				// Section filter

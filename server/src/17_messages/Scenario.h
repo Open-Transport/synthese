@@ -32,8 +32,6 @@
 
 namespace synthese
 {
-
-	
 	namespace messages
 	{
 		class MessagesSection;
@@ -65,7 +63,6 @@ namespace synthese
 			typedef std::set<ScenarioCalendar*> ScenarioCalendars;
 
 		private:
-			
 			mutable Messages _messages;
 			mutable ScenarioCalendars _calendars;
 
@@ -77,21 +74,19 @@ namespace synthese
 
 			/// @name Setters
 			//@{
-			void setCalendars(const ScenarioCalendars& value) const { _calendars = value; }
+				void setCalendars(const ScenarioCalendars& value) const { _calendars = value; }
 			//@}
 			
 			/// @name Getters
 			//@{
-			const Messages& getMessages() const { return _messages; }
-			const ScenarioCalendars& getCalendars() const { return _calendars; }
-			virtual Sections::Type& getSections() const {
-				throw "TODO : necessary because boost:optional on an abstract type is not possible"; }
+				const Messages& getMessages() const { return _messages; }
+				const ScenarioCalendars& getCalendars() const { return _calendars; }
+				virtual Sections::Type& getSections() const {
+					throw "TODO : necessary because boost:optional on an abstract type is not possible"; }
 			//@}
-							   
 		};
 		
 		typedef std::vector<boost::shared_ptr<Scenario> > Scenarios;
-		
 	}
 }
 

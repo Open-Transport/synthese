@@ -166,7 +166,7 @@ namespace synthese
 		/// @param transaction the transaction
 		void ScenarioTemplateTableSync::CopyMessages(
 			RegistryKeyType sourceId,
-			SentScenario& dest,
+			Scenario& dest,
 			optional<DBTransaction&> transaction
 		){
 			Env env;
@@ -218,7 +218,7 @@ namespace synthese
 
 				// Message creation
 				boost::shared_ptr<Alarm> alarm(new Alarm(*templateAlarm));
-				alarm->setScenario(static_cast<const SentScenario*>(&dest));
+				alarm->setScenario(&dest);
 				alarm->setCalendar(calendar.get());
 				
 				AlarmTableSync::Save(alarm.get(), transaction);

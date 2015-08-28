@@ -1,4 +1,4 @@
-
+﻿
 /** SentScenario class implementation.
 	@file SentScenario.cpp
 
@@ -48,6 +48,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(EventStart, "event_start", SQL_DATETIME)
 	FIELD_DEFINITION_OF_TYPE(EventEnd, "event_end", SQL_DATETIME)
 	FIELD_DEFINITION_OF_TYPE(Archived, "archived", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(ManualOverride, "manual_override", SQL_BOOLEAN)
 	
 	namespace messages
 	{
@@ -88,7 +89,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(Sections),
 					FIELD_DEFAULT_CONSTRUCTOR(EventStart),
 					FIELD_DEFAULT_CONSTRUCTOR(EventEnd),
-					FIELD_VALUE_CONSTRUCTOR(Archived, false)
+					FIELD_VALUE_CONSTRUCTOR(Archived, false),
+					FIELD_VALUE_CONSTRUCTOR(ManualOverride, false)
 					))
 		{}
 
@@ -112,7 +114,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(Sections),
 					FIELD_DEFAULT_CONSTRUCTOR(EventStart),
 					FIELD_DEFAULT_CONSTRUCTOR(EventEnd),
-					FIELD_VALUE_CONSTRUCTOR(Archived, false)
+					FIELD_VALUE_CONSTRUCTOR(Archived, false),
+					FIELD_VALUE_CONSTRUCTOR(ManualOverride, false)
 					))
 		{
 		}
@@ -301,6 +304,48 @@ namespace synthese
 		void SentScenario::unlink()
 		{
 			cleanDataSourceLinks(true);
+		}
+
+		bool SentScenario::belongsToAnAutomaticSection() const
+		{
+			BOOST_FOREACH(const MessagesSection* section, get<Sections>())
+			{
+				if (section->get<AutoActivation>())
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+
+		bool SentScenario::shouldBeEnabled(const boost::posix_time::ptime& time) const
+		{
+			BOOST_FOREACH(const ScenarioCalendar* calendar, getCalendars())
+			{
+				if (calendar->isInside(time))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+
+		bool SentScenario::shouldBeArchived(const boost::posix_time::ptime& time) const
+		{
+			if (getCalendars().empty())
+			{
+				return false;
+			}
+			BOOST_FOREACH(const ScenarioCalendar* calendar, getCalendars())
+			{
+				if (!calendar->isAfter(time))
+				{
+					return false;
+				}
+			}
+			return true;
 		}
 		
 }	}

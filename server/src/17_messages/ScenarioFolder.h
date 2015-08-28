@@ -58,19 +58,6 @@ namespace synthese
 				util::RegistryKeyType key = 0
 			);
 
-/*
-			//! @name Getters
-			//@{
-			ScenarioFolder*		getParent()	const { return get<Parent>(); }
-			//@}
-			
-			//! @name Setters
-			//@{
-				void	setName(const std::string& value);
-				void	setParent(ScenarioFolder* value);
-			//@}
-			*/
-
 			
 			//! @name Queries
 			//@{
@@ -80,17 +67,6 @@ namespace synthese
 					@date 2009
 				*/
 				std::string getFullName() const;
-
-
-/*
-				virtual void toParametersMap(
-					util::ParametersMap& map,
-					bool withAdditionalParameters,
-					boost::logic::tribool withFiles = boost::logic::indeterminate,
-					std::string prefix = std::string()
-				) const;
-*/
-			//@}
 
 		};
 	}

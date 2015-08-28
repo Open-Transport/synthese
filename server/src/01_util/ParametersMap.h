@@ -61,6 +61,7 @@ namespace synthese
 		{
 		public:
 
+			/// Virtual destructor for polymorphism delete
 			virtual ~ParametersMap ();
 
 			struct File
@@ -136,11 +137,6 @@ namespace synthese
 				const Map& source,
 				SerializationFormat format = FORMAT_INTERNAL
 			);
-
-
-
-                        /// Virtual destructor for polymorphism delete
-			virtual ~ParametersMap() { }
 
 
 

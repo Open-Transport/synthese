@@ -50,9 +50,6 @@ namespace synthese
 		{}
 
 
-		
-
-
 		void MessageAlternative::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			if(	get<Alarm>() &&

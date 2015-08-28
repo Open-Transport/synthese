@@ -1,131 +1,66 @@
 <ul class="breadcrumb">
- <li class="active">Administration</li>
+  <li class="active">Administration</li>
 </ul>
 
 <ul id="nav_tabs" class="nav nav-tabs">
- <#tab_title&default=1&id=message_types&title=Types de messages#>
- <#tab_title&id=message_tags&title=Mots clefs (tags de messages)#>
- <#tab_title&id=display_types&title=Types de bornes#>
- <#tab_title&id=notification_providers&title=Fournisseurs de notifications#>
- <#tab_title&id=broadcast_points&title=Autres diffuseurs#>
- <#tab_title&id=sections&title=Sections#>
- <#tab_title&id=log&title=Journal#>
- <#tab_title&id=system&title=Système#>
- <#tab_title&id=ineo&title=Connexion Ineo / Terminus#>
- <#tab_title&id=ineolog&title=Logs Ineo / Terminus#>
+  <#tab_title&default=1&id=message_types&title=Types de messages#>
+  <#tab_title&id=message_tags&title=Mots clefs (tags de messages)#>
+  <#tab_title&id=display_types&title=Types de bornes#>
+  <#tab_title&id=notification_providers&title=Fournisseurs de notifications#>
+  <#tab_title&id=broadcast_points&title=Autres diffuseurs#>
+  <#tab_title&id=sections&title=Sections#>
+  <#tab_title&id=log&title=Journal#>
+  <#tab_title&id=system&title=Système#>
+  <#tab_title&id=ineo&title=Connexion Ineo / Terminus#>
+  <#tab_title&id=ineolog&title=Logs Ineo / Terminus#>
 </ul>
 
 <div id="tab_content" class="tab-content">
 
-<#tab_div&default=1&id=message_types#>
+  <#tab_div&default=1&id=message_types#>
 
- <@mt_id=<@(tab=="message_types")?roid:""@>@>
- <div class="row-fluid">
-  <div class="span3" id="tree">
-   <ul class="nav nav-list well">
-    <li<@mt_id?"":" class=\"active\""@>>
-     <?link&
-       target=<@p@>&
-       tab=message_types&
-       text=Types de messages<div class="pull-right" id="mt_new_link"><i class="icon-plus <@mt_id?"":"icon-white"@>"></i></div>
-     ?>
-    </li>
-    <?message_types&
-      template=<{type&template=
- 	<li class="tree_1 <@(id==mt_id)?"active":""@>">
- 	 <?link&
-  	   target=<@p@>&
-   	   tab=message_types&
-   	   roid=<@id@>&
-  	   text=<@name@>
-   	      <@(id==mt_id)?("<div class=\"pull-right\" id=\"mt_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>
-      	 ?>
-	</li>
-    }>?>
-   </ul>
-  </div><div class="span6">
-   <?if&
-     cond=<@mt_id@>&
-     else=<div class="alert alert-info">Sélectionnez un type de message dans le menu ci-contre</div>&
-     then=<?form&
+<@mt_id=<@(tab=="message_types")?roid:""@>@>
+    <div class="row-fluid">
+      <div class="span3" id="tree">
+        <ul class="nav nav-list well">
+          <li<@mt_id?"":" class=\"active\""@>>
+            <?link&
             target=<@p@>&
             tab=message_types&
-            a=ObjectUpdate&
-            actionParam_object_id=<@mt_id@>&
-            roid=<@mt_id@>&
-            class=form-horizontal&
-          ?><?message_types&
-              roid=<@mt_id@>&
-              template=<{type&template=
-		 <div class="control-group">
-		  <label class="control-label">Nom</label>
-		  <div class="controls">
-		   <input type="text" name="actionParam_field_name" value="<@name@>" />
-		  </div>
-		 </div><div class="control-group">
-		  <label class="control-label">Longueur maximale</label>
-		  <div class="controls">
-		   <input type="text" name="actionParam_field_max_length" value="<@max_length@>" />
-		  </div>
-		 </div><div class="control-group">
-		  <div class="controls">
-		   <button type="submit" class="btn btn-warning">Modifier</button>
-		  </div>
-		 </div>}>
-          ?>
-          </form>
-   ?>
-  </div>
- </div>
-
-</div>
-<#tab_div&id=message_tags#>
-
-<@mtag_id=<@(tab=="message_tags")?roid:""@>@>
-  <div class="row-fluid">
-    <div class="span3" id="tree">
-      <ul class="nav nav-list well">
-        <li<@mtag_id?"":" class=\"active\""@>>
-          <?link&
-          target=<@p@>&
-          tab=message_tags&
-          text=Mots clefs<div class="pull-right" id="mtag_new_link"><i class="icon-plus <@mtag_id?"":"icon-white"@>"></i></div>
-          ?>
-        </li>
-<?message_tags&
-template=<{
-	tag&template=
-        <li class="tree_1 <@(id==mtag_id)?"active":""@>">
-          <?link&
-          target=<@p@>&
-          tab=message_tags&
-          roid=<@id@>&
-          text=<@name@>
-          <@(id==mtag_id)?("<div class=\"pull-right\" id=\"mtag_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>
-          ?>
-        </li>
-	}>
-?>
-      </ul>
-    </div>
-    <div class="span6">
+            text=Types de messages<div class="pull-right" id="mt_new_link"><i class="icon-plus <@mt_id?"":"icon-white"@>"></i></div>
+            ?>
+          </li>
+<?message_types&
+template=<{type&template=
+          <li class="tree_1 <@(id==mt_id)?"active":""@>">
+            <?link&
+            target=<@p@>&
+            tab=message_types&
+            roid=<@id@>&
+            text=<@name@>
+            <@(id==mt_id)?("<div class=\"pull-right\" id=\"mt_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>
+            ?>
+          </li>
+}>?>
+        </ul>
+      </div>
+      <div class="span6">
 <?if&
-cond=<@mtag_id@>&
+cond=<@mt_id@>&
 else=
-      <div class="alert alert-info">Sélectionnez un type de message dans le menu ci-contre</div>&
+        <div class="alert alert-info">Sélectionnez un type de message dans le menu ci-contre</div>&
 then=
-      <?form&
-      target=<@p@>&
-      tab=message_tags&
-      a=ObjectUpdate&
-      actionParam_object_id=<@mtag_id@>&
-      roid=<@mtag_id@>&
-      class=form-horizontal&
-      ?>
+        <?form&
+        target=<@p@>&
+        tab=message_types&
+        a=ObjectUpdate&
+        actionParam_object_id=<@mt_id@>&
+        roid=<@mt_id@>&
+        class=form-horizontal&
+        ?>
 	<?message_types&
-	roid=<@mtag_id@>&
-	template=<{
-		type&template=
+	roid=<@mt_id@>&
+	template=<{type&template=
         <div class="control-group">
           <label class="control-label">Nom</label>
           <div class="controls">
@@ -133,248 +68,324 @@ then=
           </div>
         </div>
         <div class="control-group">
-          <div class="controls">
-            <button type="submit" class="btn btn-warning">Modifier</button>
+          <label class="control-label">Longueur maximale</label>
+            <div class="controls">
+              <input type="text" name="actionParam_field_max_length" value="<@max_length@>" />
+            </div>
           </div>
-        </div>
-		}>
-	?>
-      </form>
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-warning">Modifier</button>
+            </div>
+          </div>
+	}>?>
+        </form>
 ?>
+      </div>
     </div>
   </div>
+  <#tab_div&id=message_tags#>
 
-</div><#tab_div&id=display_types#>
+<@mtag_id=<@(tab=="message_tags")?roid:""@>@>
+    <div class="row-fluid">
+      <div class="span3" id="tree">
+        <ul class="nav nav-list well">
+          <li<@mtag_id?"":" class=\"active\""@>>
+            <?link&
+            target=<@p@>&
+            tab=message_tags&
+            text=Mots clefs<div class="pull-right" id="mtag_new_link"><i class="icon-plus <@mtag_id?"":"icon-white"@>"></i></div>
+            ?>
+          </li>
+<?message_tags&
+template=<{
+	tag&template=
+          <li class="tree_1 <@(id==mtag_id)?"active":""@>">
+            <?link&
+            target=<@p@>&
+            tab=message_tags&
+            roid=<@id@>&
+            text=<@name@>
+            <@(id==mtag_id)?("<div class=\"pull-right\" id=\"mtag_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>
+            ?>
+          </li>
+}>?>
+        </ul>
+      </div>
+      <div class="span6">
+<?if&
+cond=<@mtag_id@>&
+else=
+        <div class="alert alert-info">Sélectionnez un type de message dans le menu ci-contre</div>&
+then=
+        <?form&
+        target=<@p@>&
+        tab=message_tags&
+        a=ObjectUpdate&
+        actionParam_object_id=<@mtag_id@>&
+        roid=<@mtag_id@>&
+        class=form-horizontal&
+        ?>
+	<?message_types&
+	roid=<@mtag_id@>&
+	template=<{
+		type&template=
+          <div class="control-group">
+            <label class="control-label">Nom</label>
+            <div class="controls">
+              <input type="text" name="actionParam_field_name" value="<@name@>" />
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-warning">Modifier</button>
+            </div>
+          </div>
+	}>?>
+        </form>
+?>
+      </div>
+    </div>
+  </div>
+  <#tab_div&id=display_types#>
 
- <@dt_id=<@(tab=="display_types")?roid:""@>@>
- <div class="row-fluid">
-  <div class="span3" id="tree">
-   <ul class="nav nav-list well">
-    <li<@dt_id?"":" class=\"active\""@>>
-     <?link&
-       target=<@p@>&
-       tab=display_types&
-       text=Types de bornes
-     ?>
-    </li>
-    <?display_types&
-      template=<{display_type&template=
- 	<li class="tree_1 <@(id==dt_id)?"active":""@>">
- 	 <?link&
-  	   target=<@p@>&
-   	   tab=display_types&
-   	   roid=<@id@>&
-  	   text=<@name@>
-      	 ?>
-	</li>}>
-    ?>
-   </ul>
-  </div><div class="span6">
-   <?if&
-     cond=<@dt_id@>&
-     else=<div class="alert alert-info">Sélectionnez un type de borne dans le menu ci-contre</div>&
-     then=<?form&
+<@dt_id=<@(tab=="display_types")?roid:""@>@>
+    <div class="row-fluid">
+      <div class="span3" id="tree">
+        <ul class="nav nav-list well">
+          <li<@dt_id?"":" class=\"active\""@>>
+            <?link&
             target=<@p@>&
             tab=display_types&
-            a=updatedisplaytype&
-            actionParamdtu_id=<@dt_id@>&
-            roid=<@dt_id@>&
-            class=form-horizontal&
-          ?><?display_types&
-              roid=<@dt_id@>&
-              template=<{display_type&template=<?if&cond=<@id==dt_id@>&then=
-		 <div class="control-group">
-		  <label class="control-label">Type de message</label>
-		  <div class="controls">
-		   <select name="actionParam_message_type_id">
-		    <option value="0">Message principal</option>
-		    <?message_types&
-		      template=<{type&template=<option value="<@id@>" <?if&cond=<@message_type_id==id@>&then=selected="true"?>><@name@></option>}>
-		    ?>
-		   </select>
-		  </div>
-		 </div><div class="control-group">
-		  <label class="control-label">Règle d'affichage</label>
-		  <div class="controls">
-		   <select name="actionParam_message_is_displayed_page_id">
-		    <option value="0">Règle standard</option>
-		    <?menu&
-		      root=17733086741528586&
-		      raw_data=1&
-		      template=<{page&template=<option value="<@id@>" <?if&cond=<@message_is_displayed_page_id==id@>&then=selected="true"?>><@title@></option>}>&
-		    ?>
-		   </select>
-		  </div>
-		 </div><div class="control-group">
-		  <div class="controls">
-		   <button type="submit" class="btn btn-warning">Modifier</button>
-		  </div>
-		 </div>?>}>
-          ?>
-          </form>
-   ?>
+            text=Types de bornes
+            ?>
+          </li>
+<?display_types&
+template=<{display_type&template=
+          <li class="tree_1 <@(id==dt_id)?"active":""@>">
+            <?link&
+            target=<@p@>&
+            tab=display_types&
+            roid=<@id@>&
+            text=<@name@>
+            ?>
+          </li>
+}>?>
+        </ul>
+      </div>
+      <div class="span6">
+<?if&
+cond=<@dt_id@>&
+else=
+        <div class="alert alert-info">Sélectionnez un type de borne dans le menu ci-contre</div>&
+then=
+        <?form&
+        target=<@p@>&
+        tab=display_types&
+        a=updatedisplaytype&
+        actionParamdtu_id=<@dt_id@>&
+        roid=<@dt_id@>&
+        class=form-horizontal&
+        ?>
+	<?display_types&
+	roid=<@dt_id@>&
+	template=<{display_type&template=
+		<?if&cond=<@id==dt_id@>&then=
+          <div class="control-group">
+            <label class="control-label">Type de message</label>
+            <div class="controls">
+              <select name="actionParam_message_type_id">
+                <option value="0">Message principal</option>
+			<?message_types&
+			template=<{type&template=
+        	        <option value="<@id@>" <?if&cond=<@message_type_id==id@>&then=selected="true"?>><@name@></option>
+			}>?>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Règle d'affichage</label>
+            <div class="controls">
+              <select name="actionParam_message_is_displayed_page_id">
+                <option value="0">Règle standard</option>
+			<?menu&
+			root=17733086741528586&
+			raw_data=1&
+			template=<{page&template=
+        	        <option value="<@id@>" <?if&cond=<@message_is_displayed_page_id==id@>&then=selected="true"?>><@title@></option>
+			}>?>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-warning">Modifier</button>
+            </div>
+          </div>
+		?>
+	}>?>
+        </form>
+?>
+      </div>
+    </div>
   </div>
- </div>
+  <#tab_div&id=notification_providers#>
 
-</div><#tab_div&id=notification_providers#>
-
- <@np_id=<@(tab=="notification_providers")?roid:""@>@>
- <div class="row-fluid">
-  <div class="span3" id="tree">
-   <ul class="nav nav-list well">
-    <li<@np_id?"":" class=\"active\""@>>
-     <?link&
-       target=<@p@>&
-       tab=notification_providers&
-       text=Fournisseurs de notifications<div class="pull-right" id="np_new_link"><i class="icon-plus <@np_id?"":"icon-white"@>"></i></div>
-     ?>
-    </li>
-    <?notification_providers&
-      template=<{provider&template=
-	<li class="tree_1 <@(id==np_id)?"active":""@>">
- 	 <?link&
-  	   target=<@p@>&
-   	   tab=notification_providers&
-   	   roid=<@id@>&
-  	   text=<@name@>
-   	      <@(id==np_id)?("<div class=\"pull-right\" id=\"np_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
-      	 ?>
-	</li>
-    }>?>
-    <li>
-   </ul>
-  </div><div class="span6">
-   <?if&
-     cond=<@np_id@>&
-     else=<div class="alert alert-info">Sélectionnez un fournisseur de notification dans le menu ci-contre</div>&
-     then=<?form&
+<@np_id=<@(tab=="notification_providers")?roid:""@>@>
+    <div class="row-fluid">
+      <div class="span3" id="tree">
+        <ul class="nav nav-list well">
+          <li<@np_id?"":" class=\"active\""@>>
+            <?link&
             target=<@p@>&
             tab=notification_providers&
-            a=ObjectUpdate&
-            actionParam_object_id=<@np_id@>&
-            class=form-horizontal&
-            roid=<@np_id@>&
-            form_id=np_update_parameters&
-            name=np_update_parameters&
-            actionParam_field_parameters=<@parameters@>
-          ?><?notification_providers&
-              roid=<@np_id@>&
-              template=<{provider&template=
-              
-		 <div class="control-group">
-		  <label class="control-label">Nom</label>
-		  <div class="controls">
-		   <input type="text" name="actionParam_field_name" value="<@name@>" />
-		  </div>
-		 </div>
-
-		 <div class="control-group">
-		  <label class="control-label">Type de notification</label>
-		  <div class="controls">
-		   <input type="text" name="channel_type" value="<@channel@>" readonly="true"/>
-		  </div>
-		 </div>
-
-               <h4>Paramètres génériques</h4>
-               
-  	   <div class="control-group">
-	    <label class="control-label">Type de message en début de période</label>
-	    <div class="controls">
-	     <select name="actionParam_field_begin_message_type_id">
-	      <option value="0">Message principal</option>
-	      <?message_types&template=<{type&template=<option value="<@id@>" <?if&cond=<@begin_message_type_id==id@>&then=selected="true"?>><@name@></option>}>?>
-	     </select>
-	    </div>
-	   </div>
-
-<!-- Disabled until business need requires it -->
-	   <div class="control-group">
-	    <label class="control-label">Notifier tout évènement en début de période</label>
-	    <div class="controls">
-	     <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_begin" <@subscribe_all_begin?"checked=\"true\"":""@> value="1" /> Oui</label>
-	     <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_begin" <@subscribe_all_begin?"":"checked=\"true\""@> value="0" /> Non</label>
-	    </div>
-	   </div>
-<!-- -->
-  	   <div class="control-group">
-	    <label class="control-label">Type de message en fin de période</label>
-	    <div class="controls">
-	     <select name="actionParam_field_end_message_type_id">
-	      <option value="0">Message principal</option>
-	      <?message_types&template=<{type&template=<option value="<@id@>" <?if&cond=<@end_message_type_id==id@>&then=selected="true"?>><@name@></option>}>?>
-	     </select>
-	    </div>
-	   </div>
-
-<!-- Disabled until business need requires it
-	   <div class="control-group">
-	    <label class="control-label">Notifier tout évènement en fin de période</label>
-	    <div class="controls">
-	     <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_end" <@subscribe_all_end?"checked=\"true\"":""@> value="1" /> Oui</label>
-	     <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_end" <@subscribe_all_end?"":"checked=\"true\""@> value="0" /> Non</label>
-	    </div>
-	   </div>
--->
-
-	   <div class="control-group">
-	    <label class="control-label">Délai entre tentatives</label>
-	    <div class="controls">
-	     <input type="text" name="actionParam_field_retry_attempt_delay" value="<@retry_attempt_delay?<@retry_attempt_delay@>:20@>" />
-             <span class="add-on">s</span>
-	    </div>
-	   </div>
-
-	   <div class="control-group">
-	    <label class="control-label">Nombre maximum de tentatives</label>
-	    <div class="controls">
-	     <input type="text" name="actionParam_field_maximum_retry_attempts" value="<@maximum_retry_attempts?<@maximum_retry_attempts@>:5@>" />
-	    </div>
-	   </div>
-
-	   <div class="control-group">
-	    <label class="control-label">Obliger une quittance manuelle</label>
-	    <div class="controls">
-	     <label class="radio inline"><input type="radio" name="actionParam_field_set_events_hold" <@set_events_hold?"checked=\"true\"":""@> value="1" /> Oui</label>
-	     <label class="radio inline"><input type="radio" name="actionParam_field_set_events_hold" <@set_events_hold?"":"checked=\"true\""@> value="0" /> Non</label>
-	    </div>
-	   </div>
-
-           <#channels/<@channel@>/form&for=template#>
-
-		 <div class="control-group">
-		  <div class="controls">
-		   <button type="submit" class="btn btn-warning">Enregistrer</button>
-		  </div>
-		 </div>}>
-          ?>
-          </form>
-   ?>
-  </div>
-<?if&cond=<@np_id@>&then=
-  <div id="np_templates" class="span3 well">
-    <h4>Test des champs générés</h4>
-    <p>Sélectionner un modèle</p>
-    <div class="controls"><ul class="nav nav-list well">
-     <li class="folder_element" element_id="0"><a>Bibliothèque</a></li>
-     <?scenarii&
-       t=1&
-       template=<{scenario&template=
-	<li class="np_template_element" style="padding-left:15px;" element_id="<@scenario_id@>"><a href="#"><@name@></a></li>
-     }>?>
-     <?ScenarioFoldersService&
-      root_id=0&
-      template=<{folder&recursive=1&template=
-	<li class="folder_element" style="padding-left:<@15+(depth*15)@>px;" element_id="<@id@>"><a><@name@></a></li>
-	<@recursive_content@>
-	<@folder_depth=<@depth@>@>
-	<?scenarii&
-	  t=1&
-	  f=<@id@>&
-	  template=<{scenario&template=
-		<li class="np_template_element" style="padding-left:<@15+(folder_depth*15)@>px;" element_id="<@scenario_id@>" <@(folder_id==id)?"active=\"1\"":""@>><a href="#"><@name@></a></li>
+            text=Fournisseurs de notifications<div class="pull-right" id="np_new_link"><i class="icon-plus <@np_id?"":"icon-white"@>"></i></div>
+            ?>
+          </li>
+<?notification_providers&
+template=<{provider&template=
+          <li class="tree_1 <@(id==np_id)?"active":""@>">
+            <?link&
+            target=<@p@>&
+            tab=notification_providers&
+            roid=<@id@>&
+            text=<@name@>
+            <@(id==np_id)?("<div class=\"pull-right\" id=\"np_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
+            ?>
+          </li>
+}>?>
+        </ul>
+      </div>
+      <div class="span6">
+<?if&
+cond=<@np_id@>&
+else=
+        <div class="alert alert-info">Sélectionnez un fournisseur de notification dans le menu ci-contre</div>&
+then=
+        <?form&
+        target=<@p@>&
+        tab=notification_providers&
+        a=ObjectUpdate&
+        actionParam_object_id=<@np_id@>&
+        class=form-horizontal&
+        roid=<@np_id@>&
+        form_id=np_update_parameters&
+        name=np_update_parameters&
+        actionParam_field_parameters=<@parameters@>
+        ?>
+	<?notification_providers&
+	roid=<@np_id@>&
+	template=<{provider&template=
+          <div class="control-group">
+            <label class="control-label">Nom</label>
+            <div class="controls">
+              <input type="text" name="actionParam_field_name" value="<@name@>" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Type de notification</label>
+            <div class="controls">
+              <input type="text" name="channel_type" value="<@channel@>" readonly="true"/>
+            </div>
+          </div>
+          <h4>Paramètres génériques</h4>
+          <div class="control-group">
+            <label class="control-label">Type de message en début de période</label>
+            <div class="controls">
+              <select name="actionParam_field_begin_message_type_id">
+                <option value="0">Message principal</option>
+		<?message_types&template=<{type&template=
+                <option value="<@id@>" <?if&cond=<@begin_message_type_id==id@>&then=selected="true"?>><@name@></option>
+		}>?>
+              </select>
+            </div>
+          </div>
+          <!-- Disabled until business need requires it -->
+          <div class="control-group">
+            <label class="control-label">Notifier tout évènement en début de période</label>
+            <div class="controls">
+              <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_begin" <@subscribe_all_begin?"checked=\"true\"":""@> value="1" /> Oui</label>
+              <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_begin" <@subscribe_all_begin?"":"checked=\"true\""@> value="0" /> Non</label>
+            </div>
+          </div>
+          <!-- -->
+          <div class="control-group">
+            <label class="control-label">Type de message en fin de période</label>
+            <div class="controls">
+              <select name="actionParam_field_end_message_type_id">
+                <option value="0">Message principal</option>
+		<?message_types&template=<{type&template=
+                <option value="<@id@>" <?if&cond=<@end_message_type_id==id@>&then=selected="true"?>><@name@></option>
+		}>?>
+              </select>
+            </div>
+          </div>
+          <!-- Disabled until business need requires it
+          <div class="control-group">
+            <label class="control-label">Notifier tout évènement en fin de période</label>
+            <div class="controls">
+              <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_end" <@subscribe_all_end?"checked=\"true\"":""@> value="1" /> Oui</label>
+              <label class="radio inline"><input type="radio" name="actionParam_field_subscribe_all_end" <@subscribe_all_end?"":"checked=\"true\""@> value="0" /> Non</label>
+            </div>
+          </div>
+          -->
+          <div class="control-group">
+            <label class="control-label">Délai entre tentatives</label>
+            <div class="controls">
+              <input type="text" name="actionParam_field_retry_attempt_delay" value="<@retry_attempt_delay?<@retry_attempt_delay@>:20@>" />
+              <span class="add-on">s</span>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Nombre maximum de tentatives</label>
+            <div class="controls">
+              <input type="text" name="actionParam_field_maximum_retry_attempts" value="<@maximum_retry_attempts?<@maximum_retry_attempts@>:5@>" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Obliger une quittance manuelle</label>
+            <div class="controls">
+              <label class="radio inline"><input type="radio" name="actionParam_field_set_events_hold" <@set_events_hold?"checked=\"true\"":""@> value="1" /> Oui</label>
+              <label class="radio inline"><input type="radio" name="actionParam_field_set_events_hold" <@set_events_hold?"":"checked=\"true\""@> value="0" /> Non</label>
+            </div>
+          </div>
+		<#channels/<@channel@>/form&for=template#>
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-warning">Enregistrer</button>
+            </div>
+          </div>
 	}>?>
-     }>?>
-    </ul></div>
+        </form>
+?>
+      </div>
+<?if&cond=<@np_id@>&then=
+      <div id="np_templates" class="span3 well">
+        <h4>Test des champs générés</h4>
+        <p>Sélectionner un modèle</p>
+        <div class="controls">
+          <ul class="nav nav-list well">
+            <li class="folder_element" element_id="0"><a>Bibliothèque</a></li>
+	<?scenarii&
+	t=1&
+	template=<{scenario&template=
+            <li class="np_template_element" style="padding-left:15px;" element_id="<@scenario_id@>"><a href="#"><@name@></a></li>
+	}>?>
+	<?ScenarioFoldersService&
+	root_id=0&
+	template=<{folder&recursive=1&template=
+            <li class="folder_element" style="padding-left:<@15+(depth*15)@>px;" element_id="<@id@>"><a><@name@></a></li>
+		<@recursive_content@>
+		<@folder_depth=<@depth@>@>
+		<?scenarii&
+		t=1&
+		f=<@id@>&
+		template=<{scenario&template=
+            <li class="np_template_element" style="padding-left:<@15+(folder_depth*15)@>px;" element_id="<@scenario_id@>" <@(folder_id==id)?"active=\"1\"":""@>><a href="#"><@name@></a></li>
+		}>?>
+	}>?>
+          </ul>
+        </div>
         <div class="control-group">
           <label class="control-label">Type de message</label>
           <div class="controls">
@@ -391,986 +402,1007 @@ then=
           </div>
         </div>
         <div id="np_test_results"/>
-     </div>
-   </div>
+        </div>
+      </div>
 ?>
-</div>
+    </div>
+  </div>
+  <#tab_div&id=broadcast_points#>
 
-</div><#tab_div&id=broadcast_points#>
-
- <@bp_id=<@((tab=="broadcast_points")&&roid)?roid:0@>@>
+<@bp_id=<@((tab=="broadcast_points")&&roid)?roid:0@>@>
  
- <div class="row-fluid">
-  <div class="span3" id="tree">
-   <ul class="nav nav-list well">
-    <li<@bp_id?"":" class=\"active\""@>>
-     <?link&
-       target=<@p@>&
-       tab=broadcast_points&
-       text=Autres diffuseurs<@bp_id?"":"<div class=\"pull-right\" id=\"bp_new_link\"><i class=\"icon-plus icon-white\"></i></div>"@>
-     ?>
-    </li>
-    <?custom_broadcast_points&
-      parent_id=0&
-      recursive=1&
-      template=<{broadcast_point&recursive=1&template=
- 	<li class="tree_<@depth+1@> <@(id==bp_id)?"active":""@>">
- 	 <?link&
-  	   target=<@p@>&
-   	   tab=broadcast_points&
-   	   roid=<@id@>&
-  	   text=<@name@>
-   	      <@(id==bp_id)?"<div class=\"pull-right\" id=\"bp_new_link\"><i class=\"icon-plus icon-white\"></i></div>":""@>
-   	      <@((!recursive_content)&&(id==bp_id))?("<div class=\"pull-right\" id=\"bp_remove_link\" element_id=\""+ id +"\" element_name=\""+ name +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>
-      	 ?>
-	</li>
-   	<@recursive_content@>   
-    }>?>
-   </ul>
-  </div><div class="span9">
-   <?if&
-     cond=<@bp_id@>&
-     then=
-      <?custom_broadcast_points&
+    <div class="row-fluid">
+      <div class="span3" id="tree">
+        <ul class="nav nav-list well">
+          <li<@bp_id?"":" class=\"active\""@>>
+            <?link&
+            target=<@p@>&
+            tab=broadcast_points&
+            text=Autres diffuseurs<@bp_id?"":"<div class=\"pull-right\" id=\"bp_new_link\"><i class=\"icon-plus icon-white\"></i></div>"@>
+            ?>
+          </li>
+<?custom_broadcast_points&
+parent_id=0&
+recursive=1&
+template=<{broadcast_point&recursive=1&template=
+          <li class="tree_<@depth+1@> <@(id==bp_id)?"active":""@>">
+            <?link&
+            target=<@p@>&
+            tab=broadcast_points&
+            roid=<@id@>&
+            text=<@name@>
+            <@(id==bp_id)?"<div class=\"pull-right\" id=\"bp_new_link\"><i class=\"icon-plus icon-white\"></i></div>":""@>
+            <@((!recursive_content)&&(id==bp_id))?("<div class=\"pull-right\" id=\"bp_remove_link\" element_id=\""+ id +"\" element_name=\""+ name +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>
+            ?>
+          </li>
+	<@recursive_content@>
+}>?>
+        </ul>
+      </div>
+      <div class="span9">
+<?if&
+cond=<@bp_id@>&
+then=
+	<?custom_broadcast_points&
 	roid=<@bp_id@>&
 	template=<{broadcast_point&template=
-		<?form&
-		  name=update&
-		  a=ObjectUpdate&
-		  actionParam_object_id=<@bp_id@>&
-		  target=<@p@>&
-		  class=form-horizontal&
-		  roid=<@roid@>&
-		  tab=broadcast_points&
-		?>
-		 <div class="control-group">
-		  <label class="control-label">Nom</label>
-		  <div class="controls">
-		   <input type="text" name="actionParam_field_name" value="<@name@>" />
-		  </div>
-		 </div>
-	
-		 <div class="control-group">
-		  <label class="control-label">Type de message</label>
-		  <div class="controls">
-		   <select name="actionParam_field_message_type_id">
-		    <option value="0">Message principal</option>
-		    <?message_types&template=<{type&template=<option value="<@id@>" <?if&cond=<@message_type_id==id@>&then=selected="true"?>><@name@></option>}>?>
-		   </select>
-		  </div>
-		 </div>
-	
-		 <div class="control-group">
-		  <label class="control-label">Règle de diffusion</label>
-		  <div class="controls">
-		   <textarea name="actionParam_field_broadcast_rule"><@broadcast_rule@></textarea>
-		  </div>
-		 </div>
-	
-		 <div class="control-group">
-		  <div class="controls">
-		   <button type="submit" class="btn btn-warning">Enregistrer</button>
-		  </div>
-		 </div>
-		</form>
-     }>?>&
-     else=
-      <div class="alert alert-info">Sélectionnez un diffuseur dans le menu ci-contre</div>
-   ?>
+        <?form&
+        name=update&
+        a=ObjectUpdate&
+        actionParam_object_id=<@bp_id@>&
+        target=<@p@>&
+        class=form-horizontal&
+        roid=<@roid@>&
+        tab=broadcast_points&
+        ?>
+          <div class="control-group">
+            <label class="control-label">Nom</label>
+            <div class="controls">
+              <input type="text" name="actionParam_field_name" value="<@name@>" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Type de message</label>
+            <div class="controls">
+              <select name="actionParam_field_message_type_id">
+                <option value="0">Message principal</option>
+	<?message_types&template=<{type&template=
+                <option value="<@id@>" <?if&cond=<@message_type_id==id@>&then=selected="true"?>><@name@></option>
+	}>?>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Règle de diffusion</label>
+            <div class="controls">
+              <textarea name="actionParam_field_broadcast_rule"><@broadcast_rule@></textarea>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-warning">Enregistrer</button>
+            </div>
+          </div>
+        </form>
+	}>?>&
+else=
+        <div class="alert alert-info">Sélectionnez un diffuseur dans le menu ci-contre</div>
+?>
+      </div>
+    </div>
   </div>
- </div>
+  <#tab_div&id=sections#>
 
-</div><#tab_div&id=sections#>
-
- <@s_id=<@(tab=="sections")?roid:""@>@>
- <div class="row-fluid">
-  <div class="span3" id="tree">
-   <ul class="nav nav-list well" id="s_list">
-    <li class="not_sortable <@s_id?"":"active"@>">
-     <?link&
-       target=<@p@>&
-       tab=sections&
-       text=Sections<div class="pull-right" action="s_new_link" element_rank="0"><i class="icon-plus <@s_id?"":"icon-white"@>"></i></div>
-     ?>
-    </li>
-    <?messages_sections&
-      template=<{section&
-        sort_up=<@rank@>&
-        template=
-	 	<li class="tree_1 <@(id==s_id)?"active":""@>" element_id="<@id@>">
-	 	 <?link&
-	  	   target=<@p@>&
-	   	   tab=sections&
-	   	   roid=<@id@>&
-	  	   text=<@name@>
-		      <div class="pull-right" action="s_new_link" element_rank="<@rank+1@>"><i class="icon-plus <@(id==s_id)?"icon-white":""@>"></i></div>
-	   	      <@(id==s_id)?("<div class=\"pull-right\" id=\"s_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
-	      	 ?>
-		</li>
-    }>?>
-   </ul>
-   <?form&
-     name=s_rank_form&
-     form_id=s_rank_form&
-     target=<@p@>&
-     tab=sections&
-     a=ObjectUpdate&
-     actionParam_object_id=0&
-     actionParam_field_rank=0&
-   ?></form>
-  </div><div class="span6">
-   <?if&
-     cond=<@s_id@>&
-     else=<div class="alert alert-info">Sélectionnez une section dans le menu ci-contre</div>&
-     then=<?form&
+<@s_id=<@(tab=="sections")?roid:""@>@>
+    <div class="row-fluid">
+      <div class="span3" id="tree">
+        <ul class="nav nav-list well" id="s_list">
+          <li class="not_sortable <@s_id?"":"active"@>">
+            <?link&
             target=<@p@>&
             tab=sections&
-            a=ObjectUpdate&
-            actionParam_object_id=<@s_id@>&
-            roid=<@s_id@>&
-            class=form-horizontal&
-          ?><?object&
-              roid=<@s_id@>&
-              template=
-		 <div class="control-group">
-		  <label class="control-label">Nom</label>
-		  <div class="controls">
-		   <input type="text" name="actionParam_field_name" value="<@name@>" />
-		  </div>
-		 </div><div class="control-group">
-		  <label class="control-label">Code</label>
-		  <div class="controls">
-		   <input type="text" name="actionParam_field_code" value="<@code@>" />
-		  </div>
-		 </div><div class="control-group">
-		  <label class="control-label">Couleur</label>
-		  <div class="controls">
-		   <input type="text" name="actionParam_field_color" value="<@color@>" />
-		  </div>
-		 </div><div class="control-group">
-		  <label class="control-label">Activation automatique des messages ?</label>
-		  <div class="controls">
-		   <select name="actionParam_field_auto_activation">
-		    <option value="0" <?if&cond=<@auto_activation@>&else=selected="true"?>>Non</option>
-		    <option value="1" <?if&cond=<@auto_activation@>&then=selected="true"?>>Oui</option>
-		   </select>
-		  </div>
-		 </div><div class="control-group">
-		  <div class="controls">
-		   <button type="submit" class="btn btn-warning">Enregistrer</button>
-		  </div>
-		 </div>
-          ?>
-          </form>
-   ?>
-  </div>
- </div>
-
-</div><#tab_div&id=log#>
-
-    <div class="pagination">
-    <ul>
-    <?if&cond=<@r>=150@>&then=<li><?link&target=<@p@>&r=0&text=1&tab=log?></li>?>
-    <?if&cond=<@r>=200@>&then=<li class="disabled"><a href="#">...</a></li>?>
-    <?if&cond=<@r>=100@>&then=<li><?link&target=<@p@>&r=<@r-100@>&text=<@(r/50)-1@>&tab=log?></li>?>
-    <?if&cond=<@r>=50@>&then=<li><?link&target=<@p@>&r=<@r-50@>&text=<@(r/50)@>&tab=log?></li>?>
-    <li class="active"><a href="#"><@1+(r/50)@></a></li>
-    <li><?link&target=<@p@>&r=<@r+50@>&text=<@(r/50)+2@>&tab=log?></li>
-    <li><?link&target=<@p@>&r=<@r+100@>&text=<@(r/50)+3@>&tab=log?></li>
-    </ul>
-    </div>
-<table class="table-striped table-condensed table">
-<thead><tr>
-<th>date</th>
-<th>utilisateur</th>
-<th>événement</th>
-<th>contenu</th>
-<th>action</th>
-</tr></thead>
-<tbody>
-<?db_log&
-	log_key=messages&
-	first=<@r@>&
-	template=<{entry&template=
-		<tr>
-		<td><@date@></td>
-		<td><{user&template=<@login@>}></td>
-		<td><@object_name@></td>
-		<td><@col0@></td>
-		<td><?substr&t=<@col1@>&n=200?></td>
-		</tr>
-	}>
+            text=Sections<div class="pull-right" action="s_new_link" element_rank="0"><i class="icon-plus <@s_id?"":"icon-white"@>"></i></div>
+            ?>
+          </li>
+<?messages_sections&
+template=<{section&sort_up=<@rank@>&template=
+          <li class="tree_1 <@(id==s_id)?"active":""@>" element_id="<@id@>">
+            <?link&
+            target=<@p@>&
+            tab=sections&
+            roid=<@id@>&
+            text=<@name@>
+            <div class="pull-right" action="s_new_link" element_rank="<@rank+1@>"><i class="icon-plus <@(id==s_id)?"icon-white":""@>"></i></div>
+            <@(id==s_id)?("<div class=\"pull-right\" id=\"s_remove_link\" element_name=\""+ name +"\" element_id=\""+ id +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
+            ?>
+          </li>
+}>?>
+        </ul>
+        <?form&
+        name=s_rank_form&
+        form_id=s_rank_form&
+        target=<@p@>&
+        tab=sections&
+        a=ObjectUpdate&
+        actionParam_object_id=0&
+        actionParam_field_rank=0&
+        ?>
+        </form>
+      </div>
+      <div class="span6">
+<?if&
+cond=<@s_id@>&
+else=
+        <div class="alert alert-info">Sélectionnez une section dans le menu ci-contre</div>&
+then=
+        <?form&
+        target=<@p@>&
+        tab=sections&
+        a=ObjectUpdate&
+        actionParam_object_id=<@s_id@>&
+        roid=<@s_id@>&
+        class=form-horizontal&
+        ?>
+	<?object&
+	roid=<@s_id@>&
+	template=
+          <div class="control-group">
+            <label class="control-label">Nom</label>
+            <div class="controls">
+              <input type="text" name="actionParam_field_name" value="<@name@>" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Code</label>
+            <div class="controls">
+              <input type="text" name="actionParam_field_code" value="<@code@>" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Couleur</label>
+            <div class="controls">
+              <input type="text" name="actionParam_field_color" value="<@color@>" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Activation automatique des messages ?</label>
+            <div class="controls">
+              <select name="actionParam_field_auto_activation">
+                <option value="0" <?if&cond=<@auto_activation@>&else=selected="true"?>>Non</option>
+                <option value="1" <?if&cond=<@auto_activation@>&then=selected="true"?>>Oui</option>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-warning">Enregistrer</button>
+            </div>
+          </div>
+	?>
+        </form>
 ?>
-</tbody>
-</table>
+      </div>
+    </div>
+  </div>
+  <#tab_div&id=log#>
+    <div class="pagination">
+      <ul>
+<?if&cond=<@r>=150@>&then=
+        <li><?link&target=<@p@>&r=0&text=1&tab=log?></li>
+?>
+<?if&cond=<@r>=200@>&then=
+        <li class="disabled"><a href="#">...</a></li>
+?>
+<?if&cond=<@r>=100@>&then=
+        <li><?link&target=<@p@>&r=<@r-100@>&text=<@(r/50)-1@>&tab=log?></li>
+?>
+<?if&cond=<@r>=50@>&then=
+        <li><?link&target=<@p@>&r=<@r-50@>&text=<@(r/50)@>&tab=log?></li>
+?>
+        <li class="active"><a href="#"><@1+(r/50)@></a></li>
+        <li><?link&target=<@p@>&r=<@r+50@>&text=<@(r/50)+2@>&tab=log?></li>
+        <li><?link&target=<@p@>&r=<@r+100@>&text=<@(r/50)+3@>&tab=log?></li>
+      </ul>
+    </div>
+    <table class="table-striped table-condensed table">
+      <thead>
+        <tr>
+          <th>date</th>
+          <th>utilisateur</th>
+          <th>événement</th>
+          <th>contenu</th>
+          <th>action</th>
+        </tr>
+      </thead>
+      <tbody>
+<?db_log&
+log_key=messages&
+first=<@r@>&
+template=<{entry&template=
+        <tr>
+          <td><@date@></td>
+          <td><{user&template=<@login@>}></td>
+          <td><@object_name@></td>
+          <td><@col0@></td>
+          <td><?substr&t=<@col1@>&n=200?></td>
+        </tr>
+}>?>
+      </tbody>
+    </table>
+  </div>
+  <#tab_div&id=system#>
+    <div class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label">Nom du serveur (:port)</label>
+        <div class="controls">
+          <?form&
+          target=<@p@>&
+          tab=system&
+          a=global_variable_update&
+          actionParam_variable=server_name&
+          actionParam_persistent=1&
+          class=form-inline&
+          ?>
+            <input type="text" name="actionParam_value" value="<@~global("server_name")@>" />
+            <button type="submit" class="btn btn-danger">Modifier</button>
+          </form>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">Adresse serveur SMTP</label>
+        <div class="controls">
+          <?form&
+          target=<@p@>&
+          tab=system&
+          a=global_variable_update&
+          actionParam_variable=smtp_server&
+          actionParam_persistent=1&
+          class=form-inline&
+          ?>
+            <input type="text" name="actionParam_value" value="<@~global("smtp_server")@>" / >
+            <button type="submit" class="btn btn-danger">Modifier</button>
+          </form>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">Port serveur SMTP</label>
+        <div class="controls">
+          <?form&
+          target=<@p@>&
+          tab=system&
+          a=global_variable_update&
+          actionParam_variable=smtp_port&
+          actionParam_persistent=1&
+          class=form-inline&
+          ?>
+            <input type="text" name="actionParam_value" value="<@~global("smtp_port")@>" />
+            <button type="submit" class="btn btn-danger">Modifier</button>
+          </form>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="selectMediaId">Site Médiathèque cible</label>
+        <div class="controls">
+          <?form&
+          target=<@p@>&
+          tab=system&
+          a=global_variable_update&
+          actionParam_variable=website_media_id&
+          actionParam_persistent=1&
+          class=form-inline&
+          ?>
+<@websiteFound=0@>
+<?websites&
+template=
+            <select name="selectMediaId" field="inputMediaId">
+              <option value="none">Aucun</option>
+	<{website&template=
+              <option value="<@id@>"<?if&cond=<@~global("website_media_id")==id@>&then= selected="selected"?>><@name@></option>
+		<?if&cond=<@~global("website_media_id")==id@>&then=<@websiteFound=1@>?>
+	}>
+            </select>
+?>
+<?if&cond=<@websiteFound@>&then=
+            <input type="hidden" id="inputMediaId" name="actionParam_value" value="<@~global("website_media_id")@>"/>
+&else=
+            <input type="hidden" id="inputMediaId" name="actionParam_value" value="none"/>
+?>
+            <button type="submit" id="submitMediaId" class="btn btn-danger">Modifier</button>
+          </form>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="msgDefaultURL">Préfixe pour les messages numérisés</label>
+        <div class="controls">
+          <?form&
+          target=<@p@>&
+          tab=system&
+          a=global_variable_update&
+          actionParam_variable=default_messages_url&
+          actionParam_persistent=1&
+          class=form-inline&
+          ?>
+            <input type="text" name="actionParam_value" value="<@~global("default_messages_url")@>" />
+            <button type="submit" class="btn btn-danger">Modifier</button>
+          </form>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="printAllSectionTab">Affichage de l'onglet <i>Toutes sections</i></label>
+        <div class="controls">
+          <?form&
+          target=<@p@>&
+          tab=system&
+          a=global_variable_update&
+          actionParam_variable=print_all_section_tab&
+          actionParam_persistent=1&
+          class=form-inline&
+          ?>
+            <select name="actionParam_value">
+              <option value="0">NON</option>
+              <option value="1" <?if&cond=<@~global("print_all_section_tab")==1@>&then= selected="selected"?>>OUI</option>
+            </select>
+            <button type="submit" class="btn btn-danger">Modifier</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <#tab_div&id=ineo#>
+    <div class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label" for="ineoTerminusPort">Port pour les sockets Ineo Terminus</label>
+        <div class="controls">
+          <?form&
+          target=<@p@>&
+          tab=ineo&
+          a=global_variable_update&
+          actionParam_variable=ineo_terminus_port&
+          actionParam_persistent=1&
+          class=form-inline&
+          ?>
+            <input type="text" name="actionParam_value" value="<@~global("ineo_terminus_port")@>" />
+            <button type="submit" class="btn btn-danger">Modifier</button>
+          </form>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="ineo_terminus_network">Réseau de transport concerné par la connexion Ineo Terminus</label>
+        <div class="controls">
+          <?form&
+          target=<@p@>&
+          tab=ineo&
+          a=global_variable_update&
+          actionParam_variable=ineo_terminus_network&
+          actionParam_persistent=1&
+          class=form-inline&
+          ?>
+<@networkFound=0@>
+<?PTNetworksListFunction&
+template=
+            <select name="ineo_terminus_network" field="inputIneoTerminusNetwork">
+              <option value="none">Aucun</option>
+	<{network&template=
+              <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_network")==id@>&then= selected="selected"?>><@name@></option>
+		<?if&cond=<@~global("ineo_terminus_network")==id@>&then=<@networkFound=1@>?>
+	}>
+            </select>
+?>
+<?if&cond=<@networkFound@>&then=
+            <input type="hidden" id="inputIneoTerminusNetwork" name="actionParam_value" value="<@~global("ineo_terminus_network")@>"/>
+&else=
+            <input type="hidden" id="inputIneoTerminusNetwork" name="actionParam_value" value="none"/>
+?>
+            <button type="submit" id="submitIneoTerminusNetwork" class="btn btn-danger">Modifier</button>
+          </form>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="ineo_terminus_datasource">Datasource concernée par la connexion Ineo Terminus</label>
+        <div class="controls">
+          <?form&
+          target=<@p@>&
+          tab=ineo&
+          a=global_variable_update&
+          actionParam_variable=ineo_terminus_datasource&
+          actionParam_persistent=1&
+          class=form-inline&
+          ?>
+<@datasourceFound=0@>
+<?data_sources&
+template=
+            <select name="ineo_terminus_datasource" field="inputIneoTerminusDatasource">
+              <option value="none">Aucun</option>
+	<{data_source&template=
+              <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_datasource")==id@>&then= selected="selected"?>><@name@></option>
+		<?if&cond=<@~global("ineo_terminus_datasource")==id@>&then=<@datasourceFound=1@>?>
+	}>
+            </select>
+?>
+<?if&cond=<@datasourceFound@>&then=
+            <input type="hidden" id="inputIneoTerminusDatasource" name="actionParam_value" value="<@~global("ineo_terminus_datasource")@>"/>
+&else=
+            <input type="hidden" id="inputIneoTerminusDatasource" name="actionParam_value" value="none"/>
+?>
+            <button type="submit" id="submitIneoTerminusDatasource" class="btn btn-danger">Modifier</button>
+          </form>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="ineoTerminusTickInterval">Intervalle minimale pour l'envoi des messages à travers le socket Ineo Terminus (s)</label>
+        <div class="controls">
+          <?form&
+          target=<@p@>&
+          tab=ineo&
+          a=global_variable_update&
+          actionParam_variable=ineo_terminus_tick_interval&
+          actionParam_persistent=1&
+          class=form-inline&
+          ?>
+            <input type="text" name="actionParam_value" value="<@~global("ineo_terminus_tick_interval")@>" />
+            <button type="submit" class="btn btn-danger">Modifier</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="ineo_terminus_passenger_fake_broadcast">Diffuseur associé aux messages Passenger reçus du SAE</label>
+      <div class="controls">
+        <?form&
+        target=<@p@>&
+        tab=ineo&
+        a=global_variable_update&
+        actionParam_variable=ineo_terminus_passenger_fake_broadcast&
+        actionParam_persistent=1&
+        class=form-inline&
+        ?>
+<@broadcastFound=0@>
+<?custom_broadcast_points&
+recursive=1&
+template=
+          <select name="ineo_terminus_passenger_fake_broadcast" field="inputIneoTerminusPassengerFakeBroadcast">
+            <option value="none">Aucun</option>
+	<{broadcast_point&recursive=1&template=
+            <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_passenger_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+		<?if&cond=<@~global("ineo_terminus_passenger_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+		<@recursive_content@>
+	}>
+          </select>
+?>
+<?if&cond=<@broadcastFound@>&then=
+          <input type="hidden" id="inputIneoTerminusPassengerFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_passenger_fake_broadcast")@>"/>
+&else=
+          <input type="hidden" id="inputIneoTerminusPassengerFakeBroadcast" name="actionParam_value" value="none"/>
+?>
+          <button type="submit" id="submitIneoTerminusPassengerFakeBroadcast" class="btn btn-danger">Modifier</button>
+        </form>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="ineo_terminus_driver_fake_broadcast">Diffuseur associé aux messages Driver reçus du SAE</label>
+      <div class="controls">
+        <?form&
+        target=<@p@>&
+        tab=ineo&
+        a=global_variable_update&
+        actionParam_variable=ineo_terminus_driver_fake_broadcast&
+        actionParam_persistent=1&
+        class=form-inline&
+        ?>
+<@broadcastFound=0@>
+<?custom_broadcast_points&
+recursive=1&
+template=
+          <select name="ineo_terminus_driver_fake_broadcast" field="inputIneoTerminusDriverFakeBroadcast">
+            <option value="none">Aucun</option>
+	<{broadcast_point&recursive=1&template=
+            <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_driver_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+		<?if&cond=<@~global("ineo_terminus_driver_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+		<@recursive_content@>
+	}>
+          </select>
+?>
+<?if&cond=<@broadcastFound@>&then=
+          <input type="hidden" id="inputIneoTerminusDriverFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_driver_fake_broadcast")@>"/>
+&else=
+          <input type="hidden" id="inputIneoTerminusDriverFakeBroadcast" name="actionParam_value" value="none"/>
+?>
+          <button type="submit" id="submitIneoTerminusDriverFakeBroadcast" class="btn btn-danger">Modifier</button>
+        </form>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="ineo_terminus_ppds_fake_broadcast">Diffuseur associé aux messages Ppds reçus du SAE</label>
+      <div class="controls">
+        <?form&
+        target=<@p@>&
+        tab=ineo&
+        a=global_variable_update&
+        actionParam_variable=ineo_terminus_ppds_fake_broadcast&
+        actionParam_persistent=1&
+        class=form-inline&
+        ?>
+<@broadcastFound=0@>
+<?custom_broadcast_points&
+recursive=1&
+template=
+          <select name="ineo_terminus_ppds_fake_broadcast" field="inputIneoTerminusPpdsFakeBroadcast">
+            <option value="none">Aucun</option>
+	<{broadcast_point&recursive=1&template=
+            <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_ppds_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+		<?if&cond=<@~global("ineo_terminus_ppds_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+		<@recursive_content@>
+	}>
+          </select>
+?>
+<?if&cond=<@broadcastFound@>&then=
+          <input type="hidden" id="inputIneoTerminusPpdsFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_ppds_fake_broadcast")@>"/>
+&else=
+          <input type="hidden" id="inputIneoTerminusPpdsFakeBroadcast" name="actionParam_value" value="none"/>
+?>
+          <button type="submit" id="submitIneoTerminusPpdsFakeBroadcast" class="btn btn-danger">Modifier</button>
+        </form>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="ineo_terminus_girouette_fake_broadcast">Diffuseur associé aux messages Girouette reçus du SAE</label>
+      <div class="controls">
+        <?form&
+        target=<@p@>&
+        tab=ineo&
+        a=global_variable_update&
+        actionParam_variable=ineo_terminus_girouette_fake_broadcast&
+        actionParam_persistent=1&
+        class=form-inline&
+        ?>
+<@broadcastFound=0@>
+<?custom_broadcast_points&
+recursive=1&
+template=
+          <select name="ineo_terminus_girouette_fake_broadcast" field="inputIneoTerminusGirouetteFakeBroadcast">
+            <option value="none">Aucun</option>
+	<{broadcast_point&recursive=1&template=
+            <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_girouette_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+		<?if&cond=<@~global("ineo_terminus_girouette_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+		<@recursive_content@>
+	}>
+          </select>
+?>
+<?if&cond=<@broadcastFound@>&then=
+          <input type="hidden" id="inputIneoTerminusGirouetteFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_girouette_fake_broadcast")@>"/>
+&else=
+          <input type="hidden" id="inputIneoTerminusGirouetteFakeBroadcast" name="actionParam_value" value="none"/>
+?>
+          <button type="submit" id="submitIneoTerminusGirouetteFakeBroadcast" class="btn btn-danger">Modifier</button>
+        </form>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="ineo_terminus_sonopassenger_fake_broadcast">Diffuseur associé aux messages SonoPassenger reçus du SAE</label>
+      <div class="controls">
+        <?form&
+        target=<@p@>&
+        tab=ineo&
+        a=global_variable_update&
+        actionParam_variable=ineo_terminus_sonopassenger_fake_broadcast&
+        actionParam_persistent=1&
+        class=form-inline&
+        ?>
+<@broadcastFound=0@>
+<?custom_broadcast_points&
+recursive=1&
+template=
+          <select name="ineo_terminus_sonopassenger_fake_broadcast" field="inputIneoTerminusSonoPassengerFakeBroadcast">
+            <option value="none">Aucun</option>
+	<{broadcast_point&recursive=1&template=
+            <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_sonopassenger_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+		<?if&cond=<@~global("ineo_terminus_sonopassenger_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+		<@recursive_content@>
+	}>
+          </select>
+?>
+<?if&cond=<@broadcastFound@>&then=
+          <input type="hidden" id="inputIneoTerminusSonoPassengerFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_sonopassenger_fake_broadcast")@>"/>
+&else=
+          <input type="hidden" id="inputIneoTerminusSonoPassengerFakeBroadcast" name="actionParam_value" value="none"/>
+?>
+          <button type="submit" id="submitIneoTerminusSonoPassengerFakeBroadcast" class="btn btn-danger">Modifier</button>
+        </form>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="ineo_terminus_sonodriver_fake_broadcast">Diffuseur associé aux messages SonoDriver reçus du SAE</label>
+      <div class="controls">
+        <?form&
+        target=<@p@>&
+        tab=ineo&
+        a=global_variable_update&
+        actionParam_variable=ineo_terminus_sonodriver_fake_broadcast&
+        actionParam_persistent=1&
+        class=form-inline&
+        ?>
+<@broadcastFound=0@>
+<?custom_broadcast_points&
+recursive=1&
+template=
+          <select name="ineo_terminus_sonodriver_fake_broadcast" field="inputIneoTerminusSonoDriverFakeBroadcast">
+            <option value="none">Aucun</option>
+	<{broadcast_point&recursive=1&template=
+            <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_sonodriver_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+		<?if&cond=<@~global("ineo_terminus_sonodriver_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+		<@recursive_content@>
+	}>
+          </select>
+?>
+<?if&cond=<@broadcastFound@>&then=
+          <input type="hidden" id="inputIneoTerminusSonoDriverFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_sonodriver_fake_broadcast")@>"/>
+&else=
+          <input type="hidden" id="inputIneoTerminusSonoDriverFakeBroadcast" name="actionParam_value" value="none"/>
+?>
+          <button type="submit" id="submitIneoTerminusSonoDriverFakeBroadcast" class="btn btn-danger">Modifier</button>
+        </form>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="ineo_terminus_sonostoppoint_fake_broadcast">Diffuseur associé aux messages SonoStopPoint reçus du SAE</label>
+      <div class="controls">
+        <?form&
+        target=<@p@>&
+        tab=ineo&
+        a=global_variable_update&
+        actionParam_variable=ineo_terminus_sonostoppoint_fake_broadcast&
+        actionParam_persistent=1&
+        class=form-inline&
+        ?>
 
-</div><#tab_div&id=system#>
-
- <div class="form-horizontal">
-  <div class="control-group">
-   <label class="control-label">Nom du serveur (:port)</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=system&
-      a=global_variable_update&
-      actionParam_variable=server_name&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-     <input type="text" name="actionParam_value" value="<@~global("server_name")@>" />
-     <button type="submit" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
+<@broadcastFound=0@>
+<?custom_broadcast_points&
+recursive=1&
+template=
+          <select name="ineo_terminus_sonostoppoint_fake_broadcast" field="inputIneoTerminusSonoStopPointFakeBroadcast">
+            <option value="none">Aucun</option>
+	<{broadcast_point&recursive=1&template=
+            <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_sonostoppoint_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+		<?if&cond=<@~global("ineo_terminus_sonostoppoint_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+		<@recursive_content@>
+	}>
+          </select>
+?>
+<?if&cond=<@broadcastFound@>&then=
+          <input type="hidden" id="inputIneoTerminusSonoStopPointFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_sonostoppoint_fake_broadcast")@>"/>
+&else=
+          <input type="hidden" id="inputIneoTerminusSonoStopPointFakeBroadcast" name="actionParam_value" value="none"/>
+?>
+          <button type="submit" id="submitIneoTerminusSonoStopPointFakeBroadcast" class="btn btn-danger">Modifier</button>
+        </form>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="ineo_terminus_bivgeneral_fake_broadcast">Diffuseur associé aux messages BivGeneral reçus du SAE</label>
+      <div class="controls">
+        <?form&
+        target=<@p@>&
+        tab=ineo&
+        a=global_variable_update&
+        actionParam_variable=ineo_terminus_bivgeneral_fake_broadcast&
+        actionParam_persistent=1&
+        class=form-inline&
+        ?>
+<@broadcastFound=0@>
+<?custom_broadcast_points&
+recursive=1&
+template=
+          <select name="ineo_terminus_bivgeneral_fake_broadcast" field="inputIneoTerminusBivGeneralFakeBroadcast">
+            <option value="none">Aucun</option>
+	<{broadcast_point&recursive=1&template=
+            <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_bivgeneral_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+		<?if&cond=<@~global("ineo_terminus_bivgeneral_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+		<@recursive_content@>
+	}>
+          </select>
+?>
+<?if&cond=<@broadcastFound@>&then=
+          <input type="hidden" id="inputIneoTerminusBivGeneralFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_bivgeneral_fake_broadcast")@>"/>
+&else=
+          <input type="hidden" id="inputIneoTerminusBivGeneralFakeBroadcast" name="actionParam_value" value="none"/>
+?>
+          <button type="submit" id="submitIneoTerminusBivGeneralFakeBroadcast" class="btn btn-danger">Modifier</button>
+        </form>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="ineo_terminus_bivlineauto_fake_broadcast">Diffuseur associé aux messages BivLineAuto reçus du SAE</label>
+      <div class="controls">
+        <?form&
+        target=<@p@>&
+        tab=ineo&
+        a=global_variable_update&
+        actionParam_variable=ineo_terminus_bivlineauto_fake_broadcast&
+        actionParam_persistent=1&
+        class=form-inline&
+        ?>
+<@broadcastFound=0@>
+<?custom_broadcast_points&
+recursive=1&
+template=
+          <select name="ineo_terminus_bivlineauto_fake_broadcast" field="inputIneoTerminusBivLineAutoFakeBroadcast">
+            <option value="none">Aucun</option>
+	<{broadcast_point&recursive=1&template=
+            <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_bivlineauto_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+		<?if&cond=<@~global("ineo_terminus_bivlineauto_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+		<@recursive_content@>
+	}>
+          </select>
+?>
+<?if&cond=<@broadcastFound@>&then=
+          <input type="hidden" id="inputIneoTerminusBivLineAutoFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_bivlineauto_fake_broadcast")@>"/>
+&else=
+          <input type="hidden" id="inputIneoTerminusBivLineAutoFakeBroadcast" name="actionParam_value" value="none"/>
+?>
+          <button type="submit" id="submitIneoTerminusBivLineAutoFakeBroadcast" class="btn btn-danger">Modifier</button>
+        </form>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="ineo_terminus_bivlineman_fake_broadcast">Diffuseur associé aux messages BivLineMan reçus du SAE</label>
+      <div class="controls">
+        <?form&
+        target=<@p@>&
+        tab=ineo&
+        a=global_variable_update&
+        actionParam_variable=ineo_terminus_bivlineman_fake_broadcast&
+        actionParam_persistent=1&
+        class=form-inline&
+        ?>
+<@broadcastFound=0@>
+<?custom_broadcast_points&
+recursive=1&
+template=
+          <select name="ineo_terminus_bivlineman_fake_broadcast" field="inputIneoTerminusBivLineManFakeBroadcast">
+            <option value="none">Aucun</option>
+	<{broadcast_point&recursive=1&template=
+            <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_bivlineman_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
+		<?if&cond=<@~global("ineo_terminus_bivlineman_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
+		<@recursive_content@>
+	}>
+          </select>
+?>
+<?if&cond=<@broadcastFound@>&then=
+          <input type="hidden" id="inputIneoTerminusBivLineManFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_bivlineman_fake_broadcast")@>"/>
+&else=
+          <input type="hidden" id="inputIneoTerminusBivLineManFakeBroadcast" name="actionParam_value" value="none"/>
+?>
+          <button type="submit" id="submitIneoTerminusBivLineManFakeBroadcast" class="btn btn-danger">Modifier</button>
+        </form>
+      </div>
+    </div>
   </div>
-  <div class="control-group">
-   <label class="control-label">Adresse serveur SMTP</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=system&
-      a=global_variable_update&
-      actionParam_variable=smtp_server&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-     <input type="text" name="actionParam_value" value="<@~global("smtp_server")@>" />
-     <button type="submit" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>	
-  <div class="control-group">
-   <label class="control-label">Port serveur SMTP</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=system&
-      a=global_variable_update&
-      actionParam_variable=smtp_port&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-     <input type="text" name="actionParam_value" value="<@~global("smtp_port")@>" />
-     <button type="submit" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="selectMediaId">Site Médiathèque cible</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=system&
-      a=global_variable_update&
-      actionParam_variable=website_media_id&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-    <@websiteFound=0@>
-     <?websites&
-       template=
-         <select name="selectMediaId" field="inputMediaId">
-           <option value="none">Aucun</option>
-           <{website&template=
-             <option value="<@id@>"<?if&cond=<@~global("website_media_id")==id@>&then= selected="selected"?>><@name@></option>
-             <?if&cond=<@~global("website_media_id")==id@>&then=<@websiteFound=1@>?>
-           }>
-         </select>
-    ?>
-    <?if&cond=<@websiteFound@>&then=
-    <input type="hidden" id="inputMediaId" name="actionParam_value" value="<@~global("website_media_id")@>"/>
-    &else=<input type="hidden" id="inputMediaId" name="actionParam_value" value="none"/>
-    ?>
-     <button type="submit" id="submitMediaId" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="msgDefaultURL">Préfixe pour les messages numérisés</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=system&
-      a=global_variable_update&
-      actionParam_variable=default_messages_url&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-     <input type="text" name="actionParam_value" value="<@~global("default_messages_url")@>" />
-     <button type="submit" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="printAllSectionTab">Affichage de l'onglet <i>Toutes sections</i></label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=system&
-      a=global_variable_update&
-      actionParam_variable=print_all_section_tab&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-     <select name="actionParam_value">
-       <option value="0">NON</option>
-       <option value="1" <?if&cond=<@~global("print_all_section_tab")==1@>&then= selected="selected"?>>OUI</option>
-     </select>
-     <button type="submit" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
- </div>
-
-</div><#tab_div&id=ineo#>
- <div class="form-horizontal">
-  <div class="control-group">
-   <label class="control-label" for="ineoTerminusPort">Port pour les sockets Ineo Terminus</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_port&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-     <input type="text" name="actionParam_value" value="<@~global("ineo_terminus_port")@>" />
-     <button type="submit" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="ineo_terminus_network">Réseau de transport concerné par la connexion Ineo Terminus</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_network&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-    <@networkFound=0@>
-     <?PTNetworksListFunction&
-       template=
-         <select name="ineo_terminus_network" field="inputIneoTerminusNetwork">
-           <option value="none">Aucun</option>
-           <{network&template=
-             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_network")==id@>&then= selected="selected"?>><@name@></option>
-             <?if&cond=<@~global("ineo_terminus_network")==id@>&then=<@networkFound=1@>?>
-           }>
-         </select>
-    ?>
-    <?if&cond=<@networkFound@>&then=
-    <input type="hidden" id="inputIneoTerminusNetwork" name="actionParam_value" value="<@~global("ineo_terminus_network")@>"/>
-    &else=<input type="hidden" id="inputIneoTerminusNetwork" name="actionParam_value" value="none"/>
-    ?>
-     <button type="submit" id="submitIneoTerminusNetwork" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="ineo_terminus_datasource">Datasource concernée par la connexion Ineo Terminus</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_datasource&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-    <@datasourceFound=0@>
-     <?data_sources&
-       template=
-         <select name="ineo_terminus_datasource" field="inputIneoTerminusDatasource">
-           <option value="none">Aucun</option>
-           <{data_source&template=
-             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_datasource")==id@>&then= selected="selected"?>><@name@></option>
-             <?if&cond=<@~global("ineo_terminus_datasource")==id@>&then=<@datasourceFound=1@>?>
-           }>
-         </select>
-    ?>
-    <?if&cond=<@datasourceFound@>&then=
-    <input type="hidden" id="inputIneoTerminusDatasource" name="actionParam_value" value="<@~global("ineo_terminus_datasource")@>"/>
-    &else=<input type="hidden" id="inputIneoTerminusDatasource" name="actionParam_value" value="none"/>
-    ?>
-     <button type="submit" id="submitIneoTerminusDatasource" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="ineoTerminusTickInterval">Intervalle minimale pour l'envoi des messages à travers le socket Ineo Terminus (s)</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_tick_interval&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-     <input type="text" name="actionParam_value" value="<@~global("ineo_terminus_tick_interval")@>" />
-     <button type="submit" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
- </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="ineo_terminus_passenger_fake_broadcast">Diffuseur associé aux messages Passenger reçus du SAE</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_passenger_fake_broadcast&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-    <@broadcastFound=0@>
-     <?custom_broadcast_points&
-       recursive=1&
-       template=
-         <select name="ineo_terminus_passenger_fake_broadcast" field="inputIneoTerminusPassengerFakeBroadcast">
-           <option value="none">Aucun</option>
-           <{broadcast_point&recursive=1&template=
-             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_passenger_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
-             <?if&cond=<@~global("ineo_terminus_passenger_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
-             <@recursive_content@>
-           }>
-         </select>
-    ?>
-    <?if&cond=<@broadcastFound@>&then=
-    <input type="hidden" id="inputIneoTerminusPassengerFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_passenger_fake_broadcast")@>"/>
-    &else=<input type="hidden" id="inputIneoTerminusPassengerFakeBroadcast" name="actionParam_value" value="none"/>
-    ?>
-     <button type="submit" id="submitIneoTerminusPassengerFakeBroadcast" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="ineo_terminus_driver_fake_broadcast">Diffuseur associé aux messages Driver reçus du SAE</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_driver_fake_broadcast&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-    <@broadcastFound=0@>
-     <?custom_broadcast_points&
-       recursive=1&
-       template=
-         <select name="ineo_terminus_driver_fake_broadcast" field="inputIneoTerminusDriverFakeBroadcast">
-           <option value="none">Aucun</option>
-           <{broadcast_point&recursive=1&template=
-             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_driver_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
-             <?if&cond=<@~global("ineo_terminus_driver_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
-             <@recursive_content@>
-           }>
-         </select>
-    ?>
-    <?if&cond=<@broadcastFound@>&then=
-    <input type="hidden" id="inputIneoTerminusDriverFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_driver_fake_broadcast")@>"/>
-    &else=<input type="hidden" id="inputIneoTerminusDriverFakeBroadcast" name="actionParam_value" value="none"/>
-    ?>
-     <button type="submit" id="submitIneoTerminusDriverFakeBroadcast" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="ineo_terminus_ppds_fake_broadcast">Diffuseur associé aux messages Ppds reçus du SAE</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_ppds_fake_broadcast&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-    <@broadcastFound=0@>
-     <?custom_broadcast_points&
-       recursive=1&
-       template=
-         <select name="ineo_terminus_ppds_fake_broadcast" field="inputIneoTerminusPpdsFakeBroadcast">
-           <option value="none">Aucun</option>
-           <{broadcast_point&recursive=1&template=
-             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_ppds_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
-             <?if&cond=<@~global("ineo_terminus_ppds_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
-             <@recursive_content@>
-           }>
-         </select>
-    ?>
-    <?if&cond=<@broadcastFound@>&then=
-    <input type="hidden" id="inputIneoTerminusPpdsFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_ppds_fake_broadcast")@>"/>
-    &else=<input type="hidden" id="inputIneoTerminusPpdsFakeBroadcast" name="actionParam_value" value="none"/>
-    ?>
-     <button type="submit" id="submitIneoTerminusPpdsFakeBroadcast" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="ineo_terminus_girouette_fake_broadcast">Diffuseur associé aux messages Girouette reçus du SAE</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_girouette_fake_broadcast&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-    <@broadcastFound=0@>
-     <?custom_broadcast_points&
-       recursive=1&
-       template=
-         <select name="ineo_terminus_girouette_fake_broadcast" field="inputIneoTerminusGirouetteFakeBroadcast">
-           <option value="none">Aucun</option>
-           <{broadcast_point&recursive=1&template=
-             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_girouette_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
-             <?if&cond=<@~global("ineo_terminus_girouette_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
-             <@recursive_content@>
-           }>
-         </select>
-    ?>
-    <?if&cond=<@broadcastFound@>&then=
-    <input type="hidden" id="inputIneoTerminusGirouetteFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_girouette_fake_broadcast")@>"/>
-    &else=<input type="hidden" id="inputIneoTerminusGirouetteFakeBroadcast" name="actionParam_value" value="none"/>
-    ?>
-     <button type="submit" id="submitIneoTerminusGirouetteFakeBroadcast" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="ineo_terminus_sonopassenger_fake_broadcast">Diffuseur associé aux messages SonoPassenger reçus du SAE</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_sonopassenger_fake_broadcast&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-    <@broadcastFound=0@>
-     <?custom_broadcast_points&
-       recursive=1&
-       template=
-         <select name="ineo_terminus_sonopassenger_fake_broadcast" field="inputIneoTerminusSonoPassengerFakeBroadcast">
-           <option value="none">Aucun</option>
-           <{broadcast_point&recursive=1&template=
-             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_sonopassenger_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
-             <?if&cond=<@~global("ineo_terminus_sonopassenger_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
-             <@recursive_content@>
-           }>
-         </select>
-    ?>
-    <?if&cond=<@broadcastFound@>&then=
-    <input type="hidden" id="inputIneoTerminusSonoPassengerFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_sonopassenger_fake_broadcast")@>"/>
-    &else=<input type="hidden" id="inputIneoTerminusSonoPassengerFakeBroadcast" name="actionParam_value" value="none"/>
-    ?>
-     <button type="submit" id="submitIneoTerminusSonoPassengerFakeBroadcast" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="ineo_terminus_sonodriver_fake_broadcast">Diffuseur associé aux messages SonoDriver reçus du SAE</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_sonodriver_fake_broadcast&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-    <@broadcastFound=0@>
-     <?custom_broadcast_points&
-       recursive=1&
-       template=
-         <select name="ineo_terminus_sonodriver_fake_broadcast" field="inputIneoTerminusSonoDriverFakeBroadcast">
-           <option value="none">Aucun</option>
-           <{broadcast_point&recursive=1&template=
-             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_sonodriver_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
-             <?if&cond=<@~global("ineo_terminus_sonodriver_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
-             <@recursive_content@>
-           }>
-         </select>
-    ?>
-    <?if&cond=<@broadcastFound@>&then=
-    <input type="hidden" id="inputIneoTerminusSonoDriverFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_sonodriver_fake_broadcast")@>"/>
-    &else=<input type="hidden" id="inputIneoTerminusSonoDriverFakeBroadcast" name="actionParam_value" value="none"/>
-    ?>
-     <button type="submit" id="submitIneoTerminusSonoDriverFakeBroadcast" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="ineo_terminus_sonostoppoint_fake_broadcast">Diffuseur associé aux messages SonoStopPoint reçus du SAE</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_sonostoppoint_fake_broadcast&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-    <@broadcastFound=0@>
-     <?custom_broadcast_points&
-       recursive=1&
-       template=
-         <select name="ineo_terminus_sonostoppoint_fake_broadcast" field="inputIneoTerminusSonoStopPointFakeBroadcast">
-           <option value="none">Aucun</option>
-           <{broadcast_point&recursive=1&template=
-             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_sonostoppoint_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
-             <?if&cond=<@~global("ineo_terminus_sonostoppoint_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
-             <@recursive_content@>
-           }>
-         </select>
-    ?>
-    <?if&cond=<@broadcastFound@>&then=
-    <input type="hidden" id="inputIneoTerminusSonoStopPointFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_sonostoppoint_fake_broadcast")@>"/>
-    &else=<input type="hidden" id="inputIneoTerminusSonoStopPointFakeBroadcast" name="actionParam_value" value="none"/>
-    ?>
-     <button type="submit" id="submitIneoTerminusSonoStopPointFakeBroadcast" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="ineo_terminus_bivgeneral_fake_broadcast">Diffuseur associé aux messages BivGeneral reçus du SAE</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_bivgeneral_fake_broadcast&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-    <@broadcastFound=0@>
-     <?custom_broadcast_points&
-       recursive=1&
-       template=
-         <select name="ineo_terminus_bivgeneral_fake_broadcast" field="inputIneoTerminusBivGeneralFakeBroadcast">
-           <option value="none">Aucun</option>
-           <{broadcast_point&recursive=1&template=
-             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_bivgeneral_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
-             <?if&cond=<@~global("ineo_terminus_bivgeneral_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
-             <@recursive_content@>
-           }>
-         </select>
-    ?>
-    <?if&cond=<@broadcastFound@>&then=
-    <input type="hidden" id="inputIneoTerminusBivGeneralFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_bivgeneral_fake_broadcast")@>"/>
-    &else=<input type="hidden" id="inputIneoTerminusBivGeneralFakeBroadcast" name="actionParam_value" value="none"/>
-    ?>
-     <button type="submit" id="submitIneoTerminusBivGeneralFakeBroadcast" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="ineo_terminus_bivlineauto_fake_broadcast">Diffuseur associé aux messages BivLineAuto reçus du SAE</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_bivlineauto_fake_broadcast&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-    <@broadcastFound=0@>
-     <?custom_broadcast_points&
-       recursive=1&
-       template=
-         <select name="ineo_terminus_bivlineauto_fake_broadcast" field="inputIneoTerminusBivLineAutoFakeBroadcast">
-           <option value="none">Aucun</option>
-           <{broadcast_point&recursive=1&template=
-             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_bivlineauto_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
-             <?if&cond=<@~global("ineo_terminus_bivlineauto_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
-             <@recursive_content@>
-           }>
-         </select>
-    ?>
-    <?if&cond=<@broadcastFound@>&then=
-    <input type="hidden" id="inputIneoTerminusBivLineAutoFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_bivlineauto_fake_broadcast")@>"/>
-    &else=<input type="hidden" id="inputIneoTerminusBivLineAutoFakeBroadcast" name="actionParam_value" value="none"/>
-    ?>
-     <button type="submit" id="submitIneoTerminusBivLineAutoFakeBroadcast" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-  
-  <div class="control-group">
-   <label class="control-label" for="ineo_terminus_bivlineman_fake_broadcast">Diffuseur associé aux messages BivLineMan reçus du SAE</label>
-   <div class="controls">
-    <?form&
-      target=<@p@>&
-      tab=ineo&
-      a=global_variable_update&
-      actionParam_variable=ineo_terminus_bivlineman_fake_broadcast&
-      actionParam_persistent=1&
-      class=form-inline&
-    ?>
-    <@broadcastFound=0@>
-     <?custom_broadcast_points&
-       recursive=1&
-       template=
-         <select name="ineo_terminus_bivlineman_fake_broadcast" field="inputIneoTerminusBivLineManFakeBroadcast">
-           <option value="none">Aucun</option>
-           <{broadcast_point&recursive=1&template=
-             <option value="<@id@>"<?if&cond=<@~global("ineo_terminus_bivlineman_fake_broadcast")==id@>&then= selected="selected"?>><@name@></option>
-             <?if&cond=<@~global("ineo_terminus_bivlineman_fake_broadcast")==id@>&then=<@broadcastFound=1@>?>
-             <@recursive_content@>
-           }>
-         </select>
-    ?>
-    <?if&cond=<@broadcastFound@>&then=
-    <input type="hidden" id="inputIneoTerminusBivLineManFakeBroadcast" name="actionParam_value" value="<@~global("ineo_terminus_bivlineman_fake_broadcast")@>"/>
-    &else=<input type="hidden" id="inputIneoTerminusBivLineManFakeBroadcast" name="actionParam_value" value="none"/>
-    ?>
-     <button type="submit" id="submitIneoTerminusBivLineManFakeBroadcast" class="btn btn-danger">Modifier</button>
-    </form>
-   </div>
-  </div>
-
-</div><#tab_div&id=ineolog#>
-
-  <div class="pagination">
-    <ul>
-<?if&cond=<@r>=150@>&then=<li><?link&target=<@p@>&r=0&text=1&tab=ineolog?></li>?>
-<?if&cond=<@r>=200@>&then=<li class="disabled"><a href="#">...</a></li>?>
-<?if&cond=<@r>=100@>&then=<li><?link&target=<@p@>&r=<@r-100@>&text=<@(r/50)-1@>&tab=ineolog?></li>?>
-<?if&cond=<@r>=50@>&then=<li><?link&target=<@p@>&r=<@r-50@>&text=<@(r/50)@>&tab=ineolog?></li>?>
-      <li class="active"><a href="#"><@1+(r/50)@></a></li>
-      <li><?link&target=<@p@>&r=<@r+50@>&text=<@(r/50)+2@>&tab=ineolog?></li>
-      <li><?link&target=<@p@>&r=<@r+100@>&text=<@(r/50)+3@>&tab=ineolog?></li>
-    </ul>
-  </div>
-  <table class="table-striped table-condensed table">
-    <thead>
-      <tr>
-        <th>date</th>
-        <th>Entête XML</th>
-        <th>Type de message</th>
-        <th>Message</th>
-        <th>ID de l'erreur Ineo</th>
-        <th>ID de la requête</th>
-      </tr>
-    </thead>
-    <tbody>
+  <#tab_div&id=ineolog#>
+    <div class="pagination">
+      <ul>
+<?if&cond=<@r>=150@>&then=
+        <li><?link&target=<@p@>&r=0&text=1&tab=ineolog?></li>
+?>
+<?if&cond=<@r>=200@>&then=
+        <li class="disabled"><a href="#">...</a></li>
+?>
+<?if&cond=<@r>=100@>&then=
+        <li><?link&target=<@p@>&r=<@r-100@>&text=<@(r/50)-1@>&tab=ineolog?></li>
+?>
+<?if&cond=<@r>=50@>&then=
+        <li><?link&target=<@p@>&r=<@r-50@>&text=<@(r/50)@>&tab=ineolog?></li>
+?>
+        <li class="active"><a href="#"><@1+(r/50)@></a></li>
+        <li><?link&target=<@p@>&r=<@r+50@>&text=<@(r/50)+2@>&tab=ineolog?></li>
+        <li><?link&target=<@p@>&r=<@r+100@>&text=<@(r/50)+3@>&tab=ineolog?></li>
+      </ul>
+    </div>
+    <table class="table-striped table-condensed table">
+      <thead>
+        <tr>
+          <th>date</th>
+          <th>Entête XML</th>
+          <th>Type de message</th>
+          <th>Message</th>
+          <th>ID de l'erreur Ineo</th>
+          <th>ID de la requête</th>
+        </tr>
+      </thead>
+      <tbody>
 <?db_log&
 log_key=ineoterminuserrormessages&
 first=<@r@>&
 template=<{entry&template=
-      <tr>
-        <td><@date@></td>
-        <td><@col0@></td>
-        <td><@col1@></td>
-        <td><@col2@></td>
-        <td><@col3@></td>
-        <td><@col4@></td>
-      </tr>
+        <tr>
+          <td><@date@></td>
+          <td><@col0@></td>
+          <td><@col1@></td>
+          <td><@col2@></td>
+          <td><@col3@></td>
+          <td><@col4@></td>
+        </tr>
 }>?>
-    </tbody>
-  </table>
-
-</div>
-
-
-<div class="modal hide fade" id="np_new_modal">
- <div class="modal-header">
-  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-  <h3>Nouveau fournisseur de notification</h3>
- </div>
- <?form&
-   name=np_new_form&
-   a=ObjectCreate&
-   actionParam_table_id=107&
-   target=<@p@>&
-   tab=notification_providers&
-   co=1&
-   class=form-horizontal
- ?>
-  <div class="modal-body">
-   <div class="control-group">
-    <label class="control-label">Nom</label>
-    <div class="controls">
-     <input type="text" name="actionParam_field_name" />
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="modal hide fade" id="np_new_modal">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3>Nouveau fournisseur de notification</h3>
     </div>
-    <br/>
-    <label class="control-label">Type de notification</label>
-    <div class="controls">
-      <select name="actionParam_field_channel">
-        <?notification_providers&list_channels=1&template=<{channel&template=
-        	<option value="<@key@>"><@key@></option>
-        }>?>
-       </select>
-      </div>
-   </div>
-  </div><div class="modal-footer">
-   <button class="btn btn-warning" type="submit">Créer le fournisseur</button>
-   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
-  </div>
- </form>
-</div>
-
-
-<div class="modal hide fade" id="bp_new_modal">
- <div class="modal-header">
-  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-  <h3>Nouveau diffuseur</h3>
- </div>
- <?form&
-   name=bp_newdir&
-   a=ObjectCreate&
-   actionParam_table_id=106&
-   target=<@p@>&
-   tab=broadcast_points&
-   co=1&
-   class=form-horizontal&
-   actionParam_field_up_id=<@bp_id@>
- ?>
-  <div class="modal-body">
-   <div class="control-group">
-    <label class="control-label">Nom</label>
-    <div class="controls">
-     <input type="text" name="actionParam_field_name" />
-    </div>
-   </div>
-  </div><div class="modal-footer">
-   <button class="btn btn-warning" type="submit">Créer le diffuseur</button>
-   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
-  </div>
- </form>
-</div>
-
-<div class="modal hide fade" id="mtag_new_modal">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3>Nouveau mot clef pour message</h3>
-  </div>
-  <?form&
-  name=mtag_new_form&
-  a=ObjectCreate&
-  actionParam_table_id=123&
-  target=<@p@>&
-  tab=message_tags&
-  co=1&
-  class=form-horizontal&
-  ?>
-    <div class="modal-body">
-      <div class="control-group">
-        <label class="control-label">Nom</label>
-        <div class="controls">
-          <input type="text" name="actionParam_field_name" />
+    <?form&
+    name=np_new_form&
+    a=ObjectCreate&
+    actionParam_table_id=107&
+    target=<@p@>&
+    tab=notification_providers&
+    co=1&
+    class=form-horizontal
+    ?>
+      <div class="modal-body">
+        <div class="control-group">
+          <label class="control-label">Nom</label>
+          <div class="controls">
+            <input type="text" name="actionParam_field_name" />
+          </div>
+          <br/>
+          <label class="control-label">Type de notification</label>
+          <div class="controls">
+            <select name="actionParam_field_channel">
+<?notification_providers&list_channels=1&template=<{channel&template=
+              <option value="<@key@>"><@key@></option>
+}>?>
+            </select>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-warning" type="submit">Créer le mot clef pour message</button>
-      <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
-    </div>
-  </form>
-</div>
-
-<div class="modal hide fade" id="mt_new_modal">
- <div class="modal-header">
-  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-  <h3>Nouveau type de message</h3>
- </div>
- <?form&
-   name=mt_new_form&
-   a=ObjectCreate&
-   actionParam_table_id=101&
-   target=<@p@>&
-   tab=message_types&
-   co=1&
-   class=form-horizontal&
- ?>
-  <div class="modal-body">
-   <div class="control-group">
-    <label class="control-label">Nom</label>
-    <div class="controls">
-     <input type="text" name="actionParam_field_name" />
-    </div>
-   </div>
-  </div><div class="modal-footer">
-   <button class="btn btn-warning" type="submit">Créer le type de message</button>
-   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+      <div class="modal-footer">
+        <button class="btn btn-warning" type="submit">Créer le fournisseur</button>
+        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+      </div>
+    </form>
   </div>
- </form>
-</div>
-
-<div class="modal hide fade" id="remove_modal">
- <div class="modal-header">
-  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-  <h3>Suppression <span id="remove_title"></span></h3>
- </div>
- <?form&
-   name=remove_form&
-   a=RemoveObjectAction&
-   target=<@p@>&
-   tab=&
-   open_subscriptions=0&
-   actionParamoi=0&
- ?>
-  <div class="modal-body">
-   <p>Etes-vous sûr de vouloir supprimer <span id="remove_name"></span> ?</p>
-  </div><div class="modal-footer">
-   <button class="btn btn-danger" type="submit">Oui</button>
-   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Non</button>
-  </div>
- </form>
-</div>
-
-<div class="modal hide fade" id="s_new_modal">
- <div class="modal-header">
-  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-  <h3>Nouvelle section</h3>
- </div>
- <?form&
-   name=s_new_form&
-   a=ObjectCreate&
-   actionParam_table_id=109&
-   target=<@p@>&
-   tab=sections&
-   co=1&
-   class=form-horizontal&
-   actionParam_field_rank=0&
- ?>
-  <div class="modal-body">
-   <div class="control-group">
-    <label class="control-label">Nom</label>
-    <div class="controls">
-     <input type="text" name="actionParam_field_name" />
+  
+  <div class="modal hide fade" id="bp_new_modal">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3>Nouveau diffuseur</h3>
     </div>
-   </div>
-  </div><div class="modal-footer">
-   <button class="btn btn-warning" type="submit">Créer la section</button>
-   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+    <?form&
+    name=bp_newdir&
+    a=ObjectCreate&
+    actionParam_table_id=106&
+    target=<@p@>&
+    tab=broadcast_points&
+    co=1&
+    class=form-horizontal&
+    actionParam_field_up_id=<@bp_id@>
+    ?>
+      <div class="modal-body">
+        <div class="control-group">
+          <label class="control-label">Nom</label>
+          <div class="controls">
+            <input type="text" name="actionParam_field_name" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-warning" type="submit">Créer le diffuseur</button>
+        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+      </div>
+    </form>
   </div>
- </form>
-</div>
-
-<script src="/terminus/js/admin.js"></script>
+  
+  <div class="modal hide fade" id="mtag_new_modal">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3>Nouveau mot clef pour message</h3>
+    </div>
+    <?form&
+    name=mtag_new_form&
+    a=ObjectCreate&
+    actionParam_table_id=123&
+    target=<@p@>&
+    tab=message_tags&
+    co=1&
+    class=form-horizontal&
+    ?>
+      <div class="modal-body">
+        <div class="control-group">
+          <label class="control-label">Nom</label>
+          <div class="controls">
+            <input type="text" name="actionParam_field_name" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-warning" type="submit">Créer le mot clef pour message</button>
+        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+      </div>
+    </form>
+  </div>
+  
+  <div class="modal hide fade" id="mt_new_modal">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3>Nouveau type de message</h3>
+    </div>
+    <?form&
+    name=mt_new_form&
+    a=ObjectCreate&
+    actionParam_table_id=101&
+    target=<@p@>&
+    tab=message_types&
+    co=1&
+    class=form-horizontal&
+    ?>
+      <div class="modal-body">
+        <div class="control-group">
+          <label class="control-label">Nom</label>
+          <div class="controls">
+            <input type="text" name="actionParam_field_name" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-warning" type="submit">Créer le type de message</button>
+        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+      </div>
+    </form>
+  </div>
+  
+  <div class="modal hide fade" id="remove_modal">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3>Suppression <span id="remove_title"></span></h3>
+    </div>
+    <?form&
+    name=remove_form&
+    a=RemoveObjectAction&
+    target=<@p@>&
+    tab=&
+    open_subscriptions=0&
+    actionParamoi=0&
+    ?>
+      <div class="modal-body">
+        <p>Etes-vous sûr de vouloir supprimer <span id="remove_name"></span> ?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" type="submit">Oui</button>
+        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Non</button>
+      </div>
+    </form>
+  </div>
+  
+  <div class="modal hide fade" id="s_new_modal">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3>Nouvelle section</h3>
+    </div>
+    <?form&
+    name=s_new_form&
+    a=ObjectCreate&
+    actionParam_table_id=109&
+    target=<@p@>&
+    tab=sections&
+    co=1&
+    class=form-horizontal&
+    actionParam_field_rank=0&
+    ?>
+      <div class="modal-body">
+        <div class="control-group">
+          <label class="control-label">Nom</label>
+          <div class="controls">
+            <input type="text" name="actionParam_field_name" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-warning" type="submit">Créer la section</button>
+        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+      </div>
+    </form>
+  </div>
+  
+  <script src="/terminus/js/admin.js"></script>

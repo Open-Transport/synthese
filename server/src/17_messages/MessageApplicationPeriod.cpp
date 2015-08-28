@@ -1,4 +1,4 @@
-/** MessageApplicationPeriod class implementation.
+﻿/** MessageApplicationPeriod class implementation.
 	@file MessageApplicationPeriod.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -87,7 +87,7 @@ namespace synthese
 
 
 
-		bool MessageApplicationPeriod::getValue( const boost::posix_time::ptime& time ) const
+		bool MessageApplicationPeriod::isInside( const boost::posix_time::ptime& time ) const
 		{
 			// If start time is defined, the current time must be after it
 			if(	!get<StartTime>().is_not_a_date_time() && time < get<StartTime>())
@@ -178,14 +178,9 @@ namespace synthese
 			return result;
 		}
 
-
-
-		void MessageApplicationPeriod::addAdditionalParameters(
-			util::ParametersMap& map,
-			std::string prefix /*= std::string() */
-		) const	{
-
-			BOOST_FOREACH(const date& d, getActiveDates())
+		bool MessageApplicationPeriod::isAfter( const boost::posix_time::ptime& time ) const
+		{
+			if(time > get<EndTime>())
 			{
 				return true;
 			}

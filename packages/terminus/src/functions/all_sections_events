@@ -1,17 +1,17 @@
 <div id="mSection" class="hide" value="<@section@>"></div>
 
 <script>
-   theevent = new Object();
-   filters = {
-     line_recipient:[],
-     stoparea_recipient:[],
-     displayscreen_recipient:[]
-   };
-   hiddenfilters = {
-     line_recipient:[],
-     stoparea_recipient:[],
-     displayscreen_recipient:[]
-   };
+theevent = new Object();
+filters = {
+  line_recipient:[],
+  stoparea_recipient:[],
+  displayscreen_recipient:[]
+};
+hiddenfilters = {
+  line_recipient:[],
+  stoparea_recipient:[],
+  displayscreen_recipient:[]
+};
 </script>
 <style>
   .close_tab { display:none; }
@@ -22,40 +22,36 @@
   label.checkbox { display:inline-block !important; }
 </style>
 <ul class="breadcrumb">
- <li class="active">Toutes sections</li>
+  <li class="active">Toutes sections</li>
 </ul>
-
 
 <div class="hero-unit-recipient_filters" id="mFilters">
   <div class="row-fluid">
-     <div class="span1">Filtres</div>
-     <div class="span2">
-       <select id="filter_operator">
-         <option value="0">ET</option>
-         <option value="1">OU</option>
-       </select>
-     </div>
-     <div class="span3">>Lignes<a href="#" class="btn btn-primary btn-mini" factory="line">Editer</a></div>
-     <div class="span3">>Arrêts<a href="#" class="btn btn-primary btn-mini" factory="stoparea">Editer</a></div>
-     <div class="span2">>Diffuseurs<a href="#" class="btn btn-primary btn-mini" factory="displayscreen">Editer</a></div>
-     <div class="span1">
-       <div class="btn-group">
-         <a class="btn disabled" href="#" id="allSectionLaunchFilter"><i class="icon-filter" title="Appliquer les filtres sélectionnés"></i></a>
-         <a class="btn disabled" href="#" id="clearFilters"><i type="button" class="icon-refresh" title="Effacer les filtres sélectionnés"></i></a>
-       </div>
-     </div>
+    <div class="span1">Filtres</div>
+    <div class="span2">
+      <select id="filter_operator">
+        <option value="0">ET</option>
+        <option value="1">OU</option>
+      </select>
+    </div>
+    <div class="span3">>Lignes<a href="#" class="btn btn-primary btn-mini" factory="line">Editer</a></div>
+    <div class="span3">>Arrêts<a href="#" class="btn btn-primary btn-mini" factory="stoparea">Editer</a></div>
+    <div class="span2">>Diffuseurs<a href="#" class="btn btn-primary btn-mini" factory="displayscreen">Editer</a></div>
+    <div class="span1">
+      <div class="btn-group">
+        <a class="btn disabled" href="#" id="allSectionLaunchFilter"><i class="icon-filter" title="Appliquer les filtres sélectionnés"></i></a>
+        <a class="btn disabled" href="#" id="clearFilters"><i type="button" class="icon-refresh" title="Effacer les filtres sélectionnés"></i></a>
+      </div>
+    </div>
   </div>
   <div class="row-fluid">
-     <div class="span2"></div>
-     <div class="span3" id="recipients_filter_line"></div>
-     <div class="span3" id="recipients_filter_stoparea"></div>
-     <div class="span3" id="recipients_filter_displayscreen"></div>
-     <div class="span1"></div>
+    <div class="span2"></div>
+    <div class="span3" id="recipients_filter_line"></div>
+    <div class="span3" id="recipients_filter_stoparea"></div>
+    <div class="span3" id="recipients_filter_displayscreen"></div>
+    <div class="span1"></div>
   </div>
 </div>
-
-
-
 
 <?action&a=SetSessionVariable&actionParamvariable=terminus_section&actionParamvalue=<@section@>?>
 <?action&a=SetSessionVariable&actionParamvariable=terminus_event&actionParamvalue=?>
@@ -64,27 +60,23 @@
   <div class="nav hide" id="scenarios_filt">
   </div>
 </div>
-
+  
 <div id="scenarios_on_tab">
-
-<ul class="nav nav-tabs">
- <#tab_title&default=1&id=diffusions&title=Diffusions en cours#>
- <#tab_title&id=programme&title=Diffusions programmées#>
-</ul>
-
-<div class="tab-content">
-<#tab_div&default=1&id=diffusions#>
+  <ul class="nav nav-tabs">
+<#tab_title&default=1&id=diffusions&title=Diffusions en cours#>
+<#tab_title&id=programme&title=Diffusions programmées#>
+  </ul>
+  <div class="tab-content">
+    <#tab_div&default=1&id=diffusions#>
 <#all_sections_scenarios_list&cat=active#>
+    </div>
 
-<#tab_div&id=programme#>
+    <#tab_div&id=programme#>
 <#all_sections_scenarios_list&cat=inactive#>
+    </div>
+  </div>
 </div>
-
-
-</div>
-
-
-
+  
 <div id="m_line" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
@@ -92,71 +84,73 @@
   </div>
   <div class="modal-body">
     <input type="text" class="input-medium search-query pull-right" action="search">
-    <?PTNetworksListFunction&
-    template=<{network&template=
-	<div>
-    <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@network_id@>" name="0"> Réseau <@name@></label>
-    <div style="padding-left:30px;" class="hide">
-      <?tree_folders&
-	    recursive=1&
-	    roid=<@network_id@>&
-      template=<{folder&template=
-      <div>
-        <@lines_menu=<?LinesListFunction2&
-		    ni=<@id@>&
-        with_directions=1&
-        template=<{line&template=
+<?PTNetworksListFunction&
+template=<{network&template=
+    <div>
+      <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@network_id@>" name="0"> Réseau <@name@></label>
+      <div style="padding-left:30px;" class="hide">
+	<?tree_folders&
+	recursive=1&
+	roid=<@network_id@>&
+	template=<{folder&template=
+        <div>
+		<@lines_menu=<?LinesListFunction2&
+		ni=<@id@>&
+		with_directions=1&
+		template=<{line&template=
+          <div>
+            <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" name="1"> <@line_short_name@> <@name@></label>
+            <div style="padding-left:30px;" class="hide">
+              <div>
+			<@direction=<{forward_direction&template=<@direction@> }>@>
+                <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="0" name="2"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"aller"@></label>
+			<@direction=@>
+              </div>
+              <div>
+			<@direction=<{backward_direction&template=<@direction@> }>@>
+                <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="1" name="2"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"retour"@></label>
+              </div>
+            </div>
+          </div>
+		}>?>@>
+		<?if&
+		cond=<@recursive_content@><@lines_menu@>&then=
+          <i class="icon-chevron-right openclose"></i>
+		?>
+          <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" name="2"> <@name@></label>
+          <div style="padding-left:30px;" class="hide">
+			<@recursive_content@>
+			<@lines_menu@>
+          </div>
+        </div>
+	}>?>
+	<?LinesListFunction2&
+	ni=<@network_id@>,0&
+	with_directions=1&
+	template=<{line&template=
         <div>
           <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" name="1"> <@line_short_name@> <@name@></label>
           <div style="padding-left:30px;" class="hide">
             <div>
-              <@direction=<{forward_direction&template=<@direction@> }>@>
+		<@direction=<{forward_direction&template=<@direction@> }>@>
               <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="0" name="2"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"aller"@></label>
-              <@direction=@>
+		<@direction=@>
             </div>
             <div>
-              <@direction=<{backward_direction&template=<@direction@> }>@>
+		<@direction=<{backward_direction&template=<@direction@> }>@>
               <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="1" name="2"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"retour"@></label>
             </div>
           </div>
         </div>
-        }>?>@>
-        <?if&cond=<@recursive_content@><@lines_menu@>&then=<i class="icon-chevron-right openclose"></i>?> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" name="2"> <@name@></label>
-        <div style="padding-left:30px;" class="hide">
-          <@recursive_content@>
-          <@lines_menu@>
-        </div>
+	}>?>
       </div>
-      }>?>
-      <?LinesListFunction2&
-	    ni=<@network_id@>,0&
-      with_directions=1&
-      template=<{line&template=
-      <div>
-        <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" name="1"> <@line_short_name@> <@name@></label>
-        <div style="padding-left:30px;" class="hide">
-          <div>
-            <@direction=<{forward_direction&template=<@direction@> }>@>
-            <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="0" name="2"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"aller"@></label>
-            <@direction=@>
-          </div>
-          <div>
-            <@direction=<{backward_direction&template=<@direction@> }>@>
-            <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="1" name="2"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"retour"@></label>
-          </div>
-        </div>
-      </div>
-      }>?>
     </div>
+}>?>
   </div>
-  }>?>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-primary" data-dismiss="modal"  >Sélectionner</a>
+  </div>
 </div>
-<div class="modal-footer">
-  <a href="#" class="btn btn-primary" data-dismiss="modal"  >Sélectionner</a>
-</div>
-</div>
-
-
 
 <div id="m_stoparea" class="modal hide fade">
   <div class="modal-header">
@@ -165,35 +159,37 @@
   </div>
   <div class="modal-body">
     <input type="text" class="input-medium search-query pull-right" action="search">
-    <?StopAreasListFunction&
-    group_by_cities=1&
-    output_stops=1&
-    stops_directions=3&
-    template=<{city&template=
-    	<div>
-    <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@city_id@>" name="0"> Commune <@city_name@></label>
-    <div style="padding-left:30px;" class="hide"><{stopArea&template=
-      <div>
-        <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>" name="1"> Arrêt commercial <@name@></label>
-        <@stop_area_name=<@name@>@>
-        <div style="padding-left:30px;" class="hide"><{stop&template=
-          <div>
-            <@direction=@>
-            <@direction=<{direction&template=<@direction@> }>@>
-            <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>" name="2"> Arrêt <@stop_area_name@> <@direction?("direction "+direction):operatorCode@></label>
+<?StopAreasListFunction&
+group_by_cities=1&
+output_stops=1&
+stops_directions=3&
+template=<{city&template=
+    <div>
+      <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@city_id@>" name="0"> Commune <@city_name@></label>
+      <div style="padding-left:30px;" class="hide">
+	<{stopArea&template=
+        <div>
+          <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>" name="1"> Arrêt commercial <@name@></label>
+		<@stop_area_name=<@name@>@>
+          <div style="padding-left:30px;" class="hide">
+		<{stop&template=
+            <div>
+			<@direction=@>
+			<@direction=<{direction&template=<@direction@> }>@>
+              <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>" name="2"> Arrêt <@stop_area_name@> <@direction?("direction "+direction):operatorCode@></label>
+            </div>
+		}>
           </div>
-          }></div>
+        </div>
+	}>
       </div>
-      }></div>
+    </div>
+}>?>
   </div>
-  }>?>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-primary" data-dismiss="modal" >Sélectionner</a>
+  </div>
 </div>
-<div class="modal-footer">
-  <a href="#" class="btn btn-primary" data-dismiss="modal" >Sélectionner</a>
-</div>
-</div>
-
-
 
 <div id="m_displayscreen" class="modal hide fade">
   <div class="modal-header">
@@ -208,57 +204,55 @@
         <div>
           <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="41" name="1"> Bornes</label>
           <div style="padding-left:30px;" class="hide">
-            <?display_types&
-      	     template=<{display_type&template=
-      	     	<div>
-            <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>" name="2"> Type <@name@></label>
-            <div style="padding-left:30px;" class="hide">
-              <@current_type_id=<@id@>@>
-              <?GetDepartureBoards&
-      	   	   template=<{screen&template=
-      	   	   	<?if&cond=<@type_id==current_type_id@>&then=
-              <div>
-                <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@screen_id@>" name="3"> Borne <@name@></label>
+<?display_types&
+template=<{display_type&template=
+            <div>
+              <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>" name="2"> Type <@name@></label>
+              <div style="padding-left:30px;" class="hide">
+	<@current_type_id=<@id@>@>
+	<?GetDepartureBoards&
+	template=<{screen&template=
+		<?if&cond=<@type_id==current_type_id@>&then=
+                <div>
+                  <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@screen_id@>" name="3"> Borne <@name@></label>
+                </div>
+		?>
+	}>?>
               </div>
-              ?>
-              }>?>
             </div>
+}>?>
           </div>
-          }>?>
         </div>
-      </div>
-      <div>
-        <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" value="107"> Fournisseurs de notifications</label>
-        <div style="padding-left:30px;" class="hide">
-           <?notification_providers&
-	     template=<{provider&template=
-	   <div>
-             <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> <@name@> (<@channel@>)</label>
-           </div>
-           }>?>
+        <div>
+          <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" value="107"> Fournisseurs de notifications</label>
+          <div style="padding-left:30px;" class="hide">
+<?notification_providers&
+template=<{provider&template=
+            <div>
+              <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> <@name@> (<@channel@>)</label>
+            </div>
+}>?>
+          </div>
         </div>
       </div>
     </div>
+    <div>
+      <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="106" name="1"> Autres diffuseurs</label>
+      <div style="padding-left:30px;" class="hide">
+<?custom_broadcast_points&
+recursive=1&
+template=<{broadcast_point&recursive=1&template=
+        <div>
+            <@recursive_content?"<i class=\"icon-chevron-right openclose\"></i> ":""@><label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>" name="2"> <@name@></label>
+            <@recursive_content?"<div style=\"padding-left:30px;\" class=\"hide\">":""@><@recursive_content@><@recursive_content?"</div>":""@>
+        </div>
+}>?>
+      </div>
+    </div>
   </div>
-  <div>
-    <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="106" name="1"> Autres diffuseurs</label>
-    <div style="padding-left:30px;" class="hide">
-      <?custom_broadcast_points&
-	     recursive=1&
-	     template=<{broadcast_point&recursive=1&template=
-	     	<div>
-      <@recursive_content?"<i class=\"icon-chevron-right openclose\"></i> ":""@><label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>" name="2"> <@name@></label>
-      <@recursive_content?("<div style=\"padding-left:30px; display:none;\">"+recursive_content+"</div>"):""@>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-primary" data-dismiss="modal" >Sélectionner</a>
   </div>
-  }>?>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="modal-footer">
-  <a href="#" class="btn btn-primary" data-dismiss="modal" >Sélectionner</a>
-</div>
 </div>
 
 

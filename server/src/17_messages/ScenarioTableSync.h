@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 /// ScenarioTableSync class header.
 ///	@file ScenarioTableSync.h
 ///	@author Hugues Romain
@@ -27,7 +27,6 @@
 
 #include "Scenario.h"
 #include "ScenarioTemplate.h"
-#include "SentScenarioDao.hpp"
 
 #include <string>
 
@@ -73,12 +72,6 @@ namespace synthese
 
 			ScenarioTableSync() {}
 			virtual ~ScenarioTableSync() {}
-
-
-
-
-			virtual std::vector<boost::shared_ptr<SentScenario> > list() const;
-			virtual void save(boost::shared_ptr<SentScenario>& sentScenario) const;
 
 		};
 }	}

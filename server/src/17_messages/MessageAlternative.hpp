@@ -39,8 +39,6 @@ namespace synthese
 		class Alarm;
 	}
 
-	
-	
 	typedef boost::fusion::map<
 		FIELD(Key),
 		FIELD(messages::Alarm),

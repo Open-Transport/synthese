@@ -1,16 +1,16 @@
 <@scenario_id=<@roid@>@>
 <?if&cond=<@scenario_id@>&then=
-<?scenario&
-  roid=<@scenario_id@>&
-template=
-
-<@belongs_to_an_auto_section=0@>
-<{section&template=<@belongs_to_an_auto_section=<@belongs_to_an_auto_section||auto_activation@>@>}>
-
-<@scenario_folder_id=<@folder_id@>@>
-<@in_archive=<@archived@>@>
-<@section_name=<@section?<?object&roid=<@section@>&template=<@name@>?>:title@>@>
-<@writeRightOnCurrentSection=<@<@is_template@>||<#has_section_right&level=WRITE&sectionid=<@section@>#>@>@>
+	<?scenario&
+	roid=<@scenario_id@>&
+	template=
+		<@belongs_to_an_auto_section=0@>
+		<{section&template=
+			<@belongs_to_an_auto_section=<@belongs_to_an_auto_section||auto_activation@>@>
+		}>
+		<@scenario_folder_id=<@folder_id@>@>
+		<@in_archive=<@archived@>@>
+		<@section_name=<@section?<?object&roid=<@section@>&template=<@name@>?>:title@>@>
+		<@writeRightOnCurrentSection=<@<@is_template@>||<#has_section_right&level=WRITE&sectionid=<@section@>#>@>@>
 
 <link rel="stylesheet" type="text/css" href="/lib/jscalendar/calendar-system.css">
 <script type="text/javascript" src="/lib/jscalendar/calendar_stripped.js"></script>
@@ -19,10 +19,7 @@ template=
 <script type="text/javascript" src="/terminus/img/Date.min.js"></script>
 <link href="/lib/bootstrap_datepicker/css/datepicker.css" rel="stylesheet">
 <script src="/lib/bootstrap_datepicker/js/bootstrap-datepicker-fr.js"></script>
-
 <script src="/lib/tiny_mce/tiny_mce.js"></script>
-<script>
-</script>
 <style>
   .close_tab { display:none; }
   .active .close_tab { display:inline-block; }
@@ -33,46 +30,65 @@ template=
 </style>
 
 <ul class="breadcrumb">
-  <?if&
-   cond=<@is_template@>&
-  then=
+		<?if&
+		cond=<@is_template@>&
+		then=
   <li>
     <?link&
-   	   target=/lib&
-   	 ?> <span class=\"divider\">/</span>
+    target=/lib&
+    ?> <span class=\"divider\">/</span>
   </li>
-  <?ScenarioFoldersService&
-	  root_id=0&
-	  template=<{folder&recursive=1&template=
-	   	<@recursive_content?("<li>"+<?link&target=/lib&roid=<@id@>&text=<@name@>?>+" <span class=\"divider\">/</span></li>"):""@>
-  <@(id==scenario_folder_id)?("<li>"+<?link&target=/lib&roid=<@id@>&text=<@name@>?>+" <span class=\"divider\">/</span></li>"):""@>
-  <@recursive_content@>
-  }>?>
+			<?ScenarioFoldersService&
+			root_id=0&
+			template=<{folder&recursive=1&template=
+				<@recursive_content?"
+  <li>
+    <?link&
+    target=/lib&
+    roid=<@id@>&
+    text=<@name@>
+    ?> <span class=\"divider\">/</span></li>
+				":""@>
+				<@(id==scenario_folder_id)?"
+  <li>
+    <?link&
+    target=/lib&
+    roid=<@id@>&
+    text=<@name@>
+    ?> <span class=\"divider\">/</span>
+  </li>"
+				:""@>
+				<@recursive_content@>
+			}>?>
   <li class="active"><@name@> <span class=\"divider\">/</span></li>
   <li class="active"><@section_name@></li>&
-  else=
+		else=
   <li>
     <?link&
-   	   target=/events&
-   	   section=<@section@>&
+    target=/events&
+    section=<@section@>&
     text=<@section_name@>&
     ?> <span class=\"divider\">/</span>
-  </li><li>
-  <?link&
-   	   target=/events&
-   	   section=<@section@>&
-  tab=<@in_archive?"archives":""@>&
-  text=<@in_archive?"Archives":"Diffusions"@>&
-  ?> <span class=\"divider\">/</span>
-</li><li>
+  </li>
+  <li>
+    <?link&
+    target=/events&
+    section=<@section@>&
+    tab=<@in_archive?"archives":""@>&
+    text=<@in_archive?"Archives":"Diffusions"@>&
+    ?> <span class=\"divider\">/</span>
+  </li>
+  <li>
   <li class="active"><@name@></li>
-  ?>
-  <?if&cond=<@in_archive@>&else=
+		?>
+		<?if&
+		cond=<@in_archive@>&
+		else=
   <div class="pull-right" style="margin-top:-6px;">
     <?form&
-	   form_id=the_form&
-	   name=the_form&
-	   target=<@p@>&
+    form_id=the_form&
+    name=the_form&
+    target=<@p@>&
     a=scenario_save&
     actionParamsid=<@scenario_id@>&
     actionParamnam=<@name@>&
@@ -86,398 +102,505 @@ template=
     section=<@section@>&
     roid=<@scenario_id@>&
     ?>
-    <?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&
-      then=<a class="btn" id="record_button">Enregistrer</a>&
-    ?>
+			<?if&
+			cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&
+			then=
+      <a class="btn" id="record_button">Enregistrer</a>&
+			?>
     </form>
   </div>
-  ?>
+		?>
 </ul>
 <div class="row-fluid">
-<div class="span3">
-
-  <ul class="nav nav-list well" id="menu">
-    <li id="mi_properties"><a href="#">Accueil évènement
-      <div class="pull-right" action="add_calendar" title="Nouveau calendrier"><i class="icon-plus"></i></div>
-    </a>
-    </li>
-  </ul>
-
-</div><div class="span9" id="main_div">
-
-<div id="properties" class="hide">
-
-  <div class="span7">
-    <h4>Propriétés</h4>
-
-    <table id="diffusion-properties" class="table table-striped">
-      <tbody>
-      <tr>
-        <td>Nom</td>
-        <td>
-          <?if&
-           cond=<@in_archive@>&
-          then=<@name@>&
-          else=<input type="text" name="actionParamnam" value="<@name@>" onchange="activateForm()">&
-          ?>
-        </td>
-      </tr>
-      <?if&
-       cond=<@is_template@>&
-      then=<span id=event_dates class="hide">&
-       else=<span id=event_dates>&
-       ?>
-          <?if&
-       cond=<@!is_template@>&
-       then=
-       <tr>
-         <td>Date de début</td>
-         <td>
-           <div class="controls">
-             <div class="input-append date" data-date-format="dd/mm/yyyy" data-date="">
-               <?if&
-       		  cond=<@event_start_date@>&
-               then=<input class="input-small" id="start_event_date_day" name="actionParam_event_start_date" type="text" value="<?substr&t=<@event_start_date@>&f=8&n=2?>/<?substr&t=<@event_start_date@>&f=5&n=2?>/<?substr&t=<@event_start_date@>&n=4?>" placeholder="JJ/MM/AAAA">&
-               else=<input class="input-small" id="start_event_date_day" name="actionParam_event_start_date" type="text" value="" placeholder="JJ/MM/AAAA">&
-               ?>
-           	  <span class="add-on">
-                  <i class="icon-th" id="dpStartEvent"></i>
-		  </span>
-             </div>
-             <input class="input-mini event-hour" name="actionParam_event_start_time" type="text" value="<?if&cond=<@event_start_date@>&then=<?substr&t=<@event_start_date@>&f=11&n=5?>?>" oncut="activateForm()" onpaste="activateForm()" onkeyup="activateForm()" placeholder="HH:MM" id="start_event_date_hour">
-           </div>
-         </td>
-       </tr>
-       ?>
-          <?if&
-       cond=<@!is_template@>&
-       then=
-       <tr>
-         <td>Date de fin</td>
-         <td>
-           <div class="controls">
-             <div class="input-append date" data-date-format="dd/mm/yyyy" data-date="">
-               <?if&
-       		cond=<@event_end_date@>&
-               then=<input class="input-small" id="end_event_date_day" name="actionParam_event_end_date" type="text" value="<?substr&t=<@event_end_date@>&f=8&n=2?>/<?substr&t=<@event_end_date@>&f=5&n=2?>/<?substr&t=<@event_end_date@>&n=4?>" placeholder="JJ/MM/AAAA">&
-               else=<input class="input-small" id="end_event_date_day" name="actionParam_event_end_date" type="text" value="" oncut="activateForm()" placeholder="JJ/MM/AAAA">
-               ?>
-            	  <span class="add-on">
-               	  <i class="icon-th" id="dpEndEvent"></i>
-		  </span>
-             </div>
-             <input class="input-mini event-hour" name="actionParam_event_end_time" type="text" value="<?if&cond=<@event_end_date@>&then=<?substr&t=<@event_end_date@>&f=11&n=5?>?>" oncut="activateForm()" onpaste="activateForm()" onkeyup="activateForm()" placeholder="HH:MM" id="end_event_date_hour">
-           </div>
-         </td>
-       </tr>&
-       ?>
-<!--       <tr>
-       	<td colspan="2"></td>
-       </tr>  -->
-      </tbody>
-    </table>
-
-    <h4>Résumé des messages</h4>
-    <table class="table table-striped table-condensed"><thead>
-    <tr><th>libellé</th><th>message principal</th></tr></thead><tbody>
-    <{calendar&template=<{message&template=
-    <tr><td><@title@></td><td class="message_overview"><?substr&t=<@content@>&n=50?>...</td><td><@tags@></td></tr>
-    }>}>
-    </tbody></table>
-
-  </div><div class="span5">
-
-  <div class="well">
-    <table style="width:100%">
-      <tr>
-        <td>
-          <?if&
-           cond=<@is_template@>&
-          then=<h4>Modèle de bibliothèque</h4>&
-          else=<h4>Statut : <?if
-	     		                    &cond=<@in_archive@>
-                              &then=<span class="label label-info">Archivé</span>
-                              &else=<?if
-                                     &cond=<@belongs_to_an_auto_section&&<@!manual_override@>@>
-                                     &then=
-                                      <span class="label label-info">Auto</span>
-                                     &else=
-                                      <span class="label <@active?"label-success":""@>"><@active?"Actif":"Inactif"@></span>
-                                    ?>
-                            ?>
-          ?></h4>
-        </td>
-          <?if&cond=<@is_template@>&else=
-          <?if&
-            cond=<@in_archive@>&
-            else=<td><h4>Archivage</h4></td>&
-          ?>?>
-      </tr>
-      <?if&cond=<@is_template@>&else=
-         <?if&
-           cond=<@in_archive@>&
-           else=<tr>
-          <td>
-            <?if&
-	      cond=<@active@>&
-              then=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&then=<?link&target=<@p@>&a=scenario_save&actionParamsid=<@scenario_id@>&roid=<@scenario_id@>&actionParamena=0&class=btn btn-warning btn-mini btn-inactive&text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>?>&
-              else=<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&then=<?link&target=<@p@>&a=scenario_save&actionParamsid=<@scenario_id@>&roid=<@scenario_id@>&actionParamena=1&class=btn btn-success btn-mini btn-inactive&text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>?>&
-            ?>
-          </td><td>
-            <@archivingAuthorized=1@>
-            <{section&template=
-		<@archivingAuthorized=<@<@archivingAuthorized@>&&<#has_section_right&level=DELETE_RIGHT&sectionid=<@id@>#>@>@>
-            }>
-            <?if&cond=<@archivingAuthorized@>&then=<?link&target=<@p@>&a=scenariostop&actionParams=<@scenario_id@>&actionParam_archive=1&roid=<@scenario_id@>&class=btn btn-danger btn-mini&text=<i class="icon-eject icon-white"></i>&confirm=Etes-vous sûr de vouloir clore et archiver l'événement ??>&
-            else=Archivage non autorisé?>
-          </td>
-          <?notification_events&scenario_id=<@scenario_id@>&template=
-             <?if&cond=<@0<<@hold_count@>||<@0<<@failed_count@>@>@>&then=
-               <tr><td><h4>Notifications</h4>
-               <span id="scenario_events_flags" scenario_id="<@scenario_id@>">
-               <?if&cond=<@0<<@failed_count@>@>&then=<p><i class="icon-warning-sign"></i>
-                 <@failed_count@> émission<?if&cond=<@1<<@failed_count@>@>&then=s?> en échec</p>
-               ?>
-               <?if&cond=<@0<<@hold_count@>@>&then=<p><i class="icon-flag"></i>
-                 <@hold_count@> émission<?if&cond=<@1<<@hold_count_count@>@>&then=s retenues&else= retenue?></p>
-               ?>
-               <?if&cond=<@hold_count@>&then=
-                 <?link&target=<@p@>&roid=<@scenario_id@>&text=Emettre les notifications (<@hold_count@>)&class=btn btn-primary btn-mini unhold_events_link?>
-               ?>
-               </span></td></tr>&
-          ?>?>
-          </tr>&
-      ?>?>
-    </table>
+  <div class="span3">
+    <ul class="nav nav-list well" id="menu">
+      <li id="mi_properties">
+        <a href="#">Accueil évènement
+          <div class="pull-right" action="add_calendar" title="Nouveau calendrier"><i class="icon-plus"></i></div>
+        </a>
+      </li>
+    </ul>
   </div>
-
-  <h4>Contextes</h4>
-
-  <{section&template=
-  <@active_section[<@id@>]=1@>
-  <@sections=<@sections+(sections?",":"")+id@>@>
-  }>
-
-  <table class="table table-striped table-condensed">
-    <?messages_sections&
-        template=<{section&template=
-         <tr>
-    <td><@name@></td>
-    <td><span class="label <@active_section[<@id@>]?"label-success":""@>"><@active_section[<@id@>]?"Actif":"Inactif"@></span></td>
-    <td>
-      <?if&
-	     cond=<@active_section[<@id@>]@>&
-      then=<?if&
-	           cond=<@(id!=section)&&(!is_template)@>&
-           then=<?if&cond=<#has_section_right&level=READ&sectionid=<@id@>#>&
-                  then=<?link&
-	          	target=<@p@>&
-                  	section=<@id@>&
-                  	roid=<@roid@>&
-                  	class=btn btn-primary btn-mini&
-                  	text=Basculer&
-           ?>?>?>&
-      else=<?if&
-	     cond=<@in_archive@>&
-             else=<?if&cond=<@<@writeRightOnCurrentSection@>&&<#has_section_right&level=WRITE&sectionid=<@id@>#>@>&
-                    then=<?link&
-		       target=<@p@>&
-        	       roid=<@roid@>&
-               	       section=<@section@>&
-	               a=scenario_save&
-        	       actionParamsid=<@roid@>&
-	               actionParam_field_sections=<@sections@>,<@id@>&
-	               class=btn btn-primary btn-mini btn-warning&
-	               text=Activer&
-	               confirm=Etes-vous sûr de vouloir activer la section <@name@> ?&
-            ?>?>?>&
-      ?>
-    </td>
-    </tr>
-    }>?>
-  </table>
-</div>
-</div>
-
-<div id="message" class="hide">
-  <input class="hide" id="default_digital_url" field="def_digital_msg_url" value="<@~global("default_messages_url")@>" />
-  <div class="row-fluid">
-    <div class="span7">
-      <h4><span class="badge badge-inverse" style="vertical-align:middle">1</span> Contenu</h4>
-      <div class="well">
-        <div class="row-fluid">
-          <div class="span7">
-            <label>Libellé<br />
-              <input type="text" field="title" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()">
-            </label>
+  <div class="span9" id="main_div">
+    <div id="properties" class="hide">
+      <div class="span7">
+        <h4>Propriétés</h4>
+        <table id="diffusion-properties" class="table table-striped">
+          <tbody>
+            <tr>
+              <td>Nom</td>
+              <td>
+		<?if&
+		cond=<@in_archive@>&
+		then=
+                <@name@>&
+		else=
+                <input type="text" name="actionParamnam" value="<@name@>" onchange="activateForm()">&
+		?>
+              </td>
+            </tr>
+		<?if&
+		cond=<@is_template@>&
+		then=
+            <span id=event_dates class="hide">&
+		else=
+            <span id=event_dates>&
+		?>
+            </span>
+		<?if&
+		cond=<@!is_template@>&
+		then=
+            <tr>
+              <td>Date de début</td>
+              <td>
+                <div class="controls">
+                  <div class="input-append date" data-date-format="dd/mm/yyyy" data-date="">
+			<?if&
+			cond=<@event_start_date@>&
+			then=
+                    <input class="input-small" id="start_event_date_day" name="actionParam_event_start_date" type="text" value="<?substr&t=<@event_start_date@>&f=8&n=2?>/<?substr&t=<@event_start_date@>&f=5&n=2?>/<?substr&t=<@event_start_date@>&n=4?>" placeholder="JJ/MM/AAAA">&
+			else=
+                    <input class="input-small" id="start_event_date_day" name="actionParam_event_start_date" type="text" value="" placeholder="JJ/MM/AAAA">&
+			?>
+                    <span class="add-on">
+                      <i class="icon-th" id="dpStartEvent"></i>
+                    </span>
+                  </div>
+                  <input class="input-mini event-hour" name="actionParam_event_start_time" type="text" value="<?if&cond=<@event_start_date@>&then=<?substr&t=<@event_start_date@>&f=11&n=5?>?>" oncut="activateForm()" onpaste="activateForm()" onkeyup="activateForm()" placeholder="HH:MM" id="start_event_date_hour">
+                </div>
+              </td>
+            </tr>
+		?>
+		<?if&
+		cond=<@!is_template@>&
+		then=
+            <tr>
+              <td>Date de fin</td>
+              <td>
+                <div class="controls">
+                  <div class="input-append date" data-date-format="dd/mm/yyyy" data-date="">
+			<?if&
+			cond=<@event_end_date@>&
+			then=
+                    <input class="input-small" id="end_event_date_day" name="actionParam_event_end_date" type="text" value="<?substr&t=<@event_end_date@>&f=8&n=2?>/<?substr&t=<@event_end_date@>&f=5&n=2?>/<?substr&t=<@event_end_date@>&n=4?>" placeholder="JJ/MM/AAAA">&
+			else=
+                    <input class="input-small" id="end_event_date_day" name="actionParam_event_end_date" type="text" value="" oncut="activateForm()" placeholder="JJ/MM/AAAA">
+			?>
+                    <span class="add-on">
+                      <i class="icon-th" id="dpEndEvent"></i>
+                    </span>
+                  </div>
+                  <input class="input-mini event-hour" name="actionParam_event_end_time" type="text" value="<?if&cond=<@event_end_date@>&then=<?substr&t=<@event_end_date@>&f=11&n=5?>?>" oncut="activateForm()" onpaste="activateForm()" onkeyup="activateForm()" placeholder="HH:MM" id="end_event_date_hour">
+                </div>
+              </td>
+            </tr>&
+		?>
+            <!-- <tr>
+              <td colspan="2"></td>
+            </tr>  -->
+          </tbody>
+        </table>
+        <h4>Résumé des messages</h4>
+        <table class="table table-striped table-condensed">
+          <thead>
+            <tr>
+              <th>libellé</th>
+              <th>message principal</th>
+            </tr>
+          </thead>
+          <tbody>
+		<{calendar&template=
+			<{message&template=
+            <tr>
+              <td><@title@></td>
+              <td class="message_overview"><?substr&t=<@content@>&n=50?>...</td>
+              <td><@tags@></td>
+            </tr>
+			}>
+		}>
+          </tbody>
+        </table>
+      </div>
+      <div class="span5">
+        <div class="well">
+          <table style="width:100%">
+            <tr>
+              <td>
+		<?if&
+		cond=<@is_template@>&
+		then=
+                <h4>Modèle de bibliothèque</h4>&
+		else=
+                <h4>Statut : 
+			<?if&
+			cond=<@in_archive@>&
+			then=
+                  <span class="label label-info">Archivé</span>&
+			else=
+				<?if&
+				cond=<@belongs_to_an_auto_section&&<@!manual_override@>@>&
+				then=
+                  <span class="label label-info">Auto</span>&
+				else=
+                  <span class="label <@active?"label-success":""@>"><@active?"Actif":"Inactif"@></span>
+				?>
+			?>
+		?>
+                </h4>
+              </td>
+		<?if&
+		cond=<@is_template@>&
+		else=
+			<?if&
+			cond=<@in_archive@>&
+			else=
+              <td><h4>Archivage</h4></td>&
+			?>
+		?>
+            </tr>
+		<?if&
+		cond=<@is_template@>&
+		else=
+			<?if&
+			cond=<@in_archive@>&
+			else=
+            <tr>
+              <td>
+				<?if&
+				cond=<@active@>&
+				then=
+					<?if&
+					cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&
+					then=
+                <?link&
+                target=<@p@>&
+                a=scenario_save&
+                actionParamsid=<@scenario_id@>&
+                roid=<@scenario_id@>&
+                actionParamena=0&
+                class=btn btn-warning btn-mini btn-inactive&
+                text=<i class="icon-pause icon-white"></i>&
+                confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ?
+                ?>
+					?>&
+				else=
+					<?if&
+					cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&
+					then=
+                <?link&
+                target=<@p@>&
+                a=scenario_save&
+                actionParamsid=<@scenario_id@>&
+                roid=<@scenario_id@>&
+                actionParamena=1&
+                class=btn btn-success btn-mini btn-inactive&
+                text=<i class="icon-play icon-white"></i>&
+                confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ?
+                ?>
+					?>&
+				?>
+              </td>
+              <td>
+				<@archivingAuthorized=1@>
+				<{section&template=
+					<@archivingAuthorized=<@<@archivingAuthorized@>&&<#has_section_right&level=DELETE_RIGHT&sectionid=<@id@>#>@>@>
+				}>
+				<?if&
+				cond=<@archivingAuthorized@>&
+				then=
+                <?link&
+                target=<@p@>&
+                a=scenariostop&
+                actionParams=<@scenario_id@>&
+                actionParam_archive=1&
+                roid=<@scenario_id@>&
+                class=btn btn-danger btn-mini&
+                text=<i class="icon-eject icon-white"></i>&
+                confirm=Etes-vous sûr de vouloir clore et archiver l'événement ?
+                ?>&
+				else=
+                Archivage non autorisé
+				?>
+              </td>
+				<?notification_events&
+				scenario_id=<@scenario_id@>&
+				template=
+					<?if&
+					cond=<@0<<@hold_count@>||<@0<<@failed_count@>@>@>&
+					then=
+              <td>
+                <h4>Notifications</h4>
+                <span id="scenario_events_flags" scenario_id="<@scenario_id@>">
+						<?if&
+						cond=<@0<<@failed_count@>@>&
+						then=
+                  <p>
+                    <i class="icon-warning-sign"></i><@failed_count@> émission<?if&cond=<@1<<@failed_count@>@>&then=s?> en échec
+                  </p>
+						?>
+						<?if&
+						cond=<@0<<@hold_count@>@>&
+						then=
+                  <p>
+                    <i class="icon-flag"></i><@hold_count@> émission<?if&cond=<@1<<@hold_count_count@>@>&then=s retenues&else= retenue?>
+                  </p>
+						?>
+						<?if&cond=<@hold_count@>&then=
+                  <?link&
+                  target=<@p@>&
+                  roid=<@scenario_id@>&
+                  text=Emettre les notifications (<@hold_count@>)&
+                  class=btn btn-primary btn-mini unhold_events_link
+                  ?>
+						?>
+                </span>
+              </td>&
+					?>
+				?>
+            </tr>&
+			?>
+		?>
+          </table>
+        </div>
+        <h4>Contextes</h4>
+		<{section&template=
+			<@active_section[<@id@>]=1@>
+			<@sections=<@sections+(sections?",":"")+id@>@>
+		}>
+        <table class="table table-striped table-condensed">
+		<?messages_sections&
+		template=<{section&template=
+          <tr>
+            <td><@name@></td>
+            <td><span class="label <@active_section[<@id@>]?"label-success":""@>"><@active_section[<@id@>]?"Actif":"Inactif"@></span></td>
+            <td>
+			<?if&
+			cond=<@active_section[<@id@>]@>&
+			then=
+				<?if&
+				cond=<@(id!=section)&&(!is_template)@>&
+				then=
+					<?if&
+					cond=<#has_section_right&level=READ&sectionid=<@id@>#>&
+					then=
+              <?link&
+              target=<@p@>&
+              section=<@id@>&
+              roid=<@roid@>&
+              class=btn btn-primary btn-mini&
+              text=Basculer&
+              ?>
+					?>
+				?>&
+			else=
+				<?if&
+				cond=<@in_archive@>&
+				else=
+					<?if&
+					cond=<@<@writeRightOnCurrentSection@>&&<#has_section_right&level=WRITE&sectionid=<@id@>#>@>&
+					then=
+              <?link&
+              target=<@p@>&
+              roid=<@roid@>&
+              section=<@section@>&
+              a=scenario_save&
+              actionParamsid=<@roid@>&
+              actionParam_field_sections=<@sections@>,<@id@>&
+              class=btn btn-primary btn-mini btn-warning&
+              text=Activer&
+              confirm=Etes-vous sûr de vouloir activer la section <@name@> ?&
+              ?>
+					?>
+				?>&
+			?>
+            </td>
+          </tr>
+		}>?>
+        </table>
+      </div>
+    </div>
+  
+    <div id="message" class="hide">
+      <input class="hide" id="default_digital_url" field="def_digital_msg_url" value="<@~global("default_messages_url")@>" />
+      <div class="row-fluid">
+        <div class="span7">
+          <h4><span class="badge badge-inverse" style="vertical-align:middle">1</span> Contenu</h4>
+          <div class="well">
+            <div class="row-fluid">
+              <div class="span7">
+                <label>Libellé<br />
+                  <input type="text" field="title" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()">
+                </label>
+              </div>
+            </div>
+            <div class="row-fluid">
+              <label>Texte principal
+                <div class="pull-right" id="chars_main"></div><br />
+                <textarea id="tinymce" class="mceEditor" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()" field="content"></textarea>
+              </label>
+		<?object&
+		roid=<@~global("website_media_id")@>&
+		template=
+			<?if&
+			cond=<@exceptions@>&
+			else=
+              <input type="hidden" field="m_image" onchange="activateForm()">
+              <span class="file-picture"></span>
+              <a href="#m_image" data-toggle="modal" field="m_image-link">Ajouter une image</a>
+			?>
+		?>
+            </div>
+            <div class="row-fluid">
+              <label>URL version numérisée
+                <input class="input-large" type="text" field="digitized_version" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()" placeholder="www.url_du_pdf.com">
+              </label>
+            </div>
           </div>
-        </div><div class="row-fluid">
-        <label>Texte principal<div class="pull-right" id="chars_main"></div><br />
-          <textarea id="tinymce" class="mceEditor" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()" field="content"></textarea>
-        </label>
-        <?object&roid=<@~global("website_media_id")@>&template=
-        <?if&cond=<@exceptions@>&else=
-        <input type="hidden" field="m_image" onchange="activateForm()">
-        <span class="file-picture"></span>
-        <a href="#m_image" data-toggle="modal" field="m_image-link">Ajouter une image</a>
-        ?>
-        ?>
-      </div><div class="row-fluid">
-          <label>URL version numérisée
-          	<input class="input-large" type="text" field="digitized_version" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()" placeholder="www.url_du_pdf.com">
-          </label>
-      </div>
-      </div>
-
-      <div id="alternatives">
-        <h4><span class="badge badge-inverse" style="vertical-align:middle">4</span> Variantes de contenus</h4>
-        <div class="well" id="table_alternatives">
-          <a class="btn btn-primary btn-mini" href="#" generate_alternative="all">Générer tout</a><br/>
-
-            <?message_types&
-             template=<{type&template=
-              
+          <div id="alternatives">
+            <h4><span class="badge badge-inverse" style="vertical-align:middle">4</span> Variantes de contenus</h4>
+            <div class="well" id="table_alternatives">
+              <a class="btn btn-primary btn-mini" href="#" generate_alternative="all">Générer tout</a><br/>
+		<?message_types&
+		template=<{type&template=
               <div class="row-fluid" type_id="<@id@>" max_length="<@max_length@>">
                 <div class="span2">
                   <@name@><br /><a href="#" class="btn btn-warning btn-mini" generate_alternative="specific">Générer</a>
                 </div>
                 <div class="span10">
-                  <textarea id="tinymce_ma<@item_rank@>"
-                            class="mceEditor"
-                            onkeyup="activateForm()"
-                            onpaste="activateForm()"
-                            oncut="activateForm()"
-                            field="message_alternative"
-                            limit="<@max_length@>">
+                  <textarea id="tinymce_ma<@item_rank@>" class="mceEditor" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()" field="message_alternative" limit="<@max_length@>">
                   </textarea>
                   <span field="counter"></span>
                 </div>
               </div>
               <br/>
-            }>?>
-
-
-          <!--
-          <table class="table table-condensed" id="table_alternatives">
-            <thead><tr><th>règle</th><th>message</th><th></th><th></th></tr></thead>
-            <tbody>
-            <?message_types&
-         template=<{type&template=
-        	<tr type_id="<@id@>" max_length="<@max_length@>">
-            <td><@name@><br /><a href="#" class="btn btn-warning btn-mini" generate_alternative="specific">Générer</a></td>
-            <td><textarea onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()" field="message_alternative" limit="<@max_length@>"></textarea><span field="counter"></span></td>
-            <td><br /><span field="check"></span></td>
-            </tr>
-            }>?>
-            </tbody>
-          </table>
-          <div class="row-fluid">
-      </div>
+		}>?>
+              <!--
+              <table class="table table-condensed" id="table_alternatives">
+                <thead>
+                  <tr>
+                    <th>règle</th>
+                    <th>message</th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+		<?message_types&
+		template=<{type&template=
+                  <tr type_id="<@id@>" max_length="<@max_length@>">
+                    <td><@name@><br /><a href="#" class="btn btn-warning btn-mini" generate_alternative="specific">Générer</a></td>
+                    <td><textarea onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()" field="message_alternative" limit="<@max_length@>"></textarea><span field="counter"></span></td>
+                    <td><br /><span field="check"></span></td>
+                  </tr>
+		}>?>
+                </tbody>
+              </table>
+              -->
+            </div>
+          </div>
+        </div>
+        <div class="span5">
+          <h4><span class="badge badge-inverse" style="vertical-align:middle">2</span> Destinataires</h4>
+          <div class="well">
+            <table class="table table-condensed">
+              <thead><tr><th>rubrique</th><th>destinataires</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>Lignes</td><td id="preview_recipients_line"></td><td><a class="btn btn-mini btn-primary" href="#" factory="line">Editer</a></td></tr>
+                <tr><td>Arrêts</td><td id="preview_recipients_stoparea"></td><td><a class="btn btn-mini btn-primary" href="#" factory="stoparea">Editer</a></td></tr>
+                <tr><td>Diffuseurs</td><td id="preview_recipients_displayscreen"></td><td><a class="btn btn-mini btn-primary" href="#" factory="displayscreen">Editer</a></td></tr>
+              </tbody>
+            </table>
+            <div class="alert hide" id="old_recipients_alert"><strong>ATTENTION !</strong> La liste des variantes de contenus n'est peut-être plus à jour. Veuillez enregistrer l'évènement pour tenir compte des dernières modifications.</div>
+          </div>
+        
+          <h4><span class="badge badge-inverse" style="vertical-align:middle" id="calendar_panel_id">3</span> Paramètres</h4>
+          <div class="well">
+            <label>Niveau
+              <select class="input-medium" field="level" onkeyup="activateForm()" onchange="activateForm()">
+                <option value="10">Complémentaire</option>
+                <option value="30">Alterné</option>
+                <option value="50">Prioritaire</option>
+              </select>
+            </label>
+            <label>Durée d'affichage
+              <input class="input-mini" value="" type="number" maxlength="3" field="displayDuration" min="1" max="100" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()"> secondes<span class="inline-help"> (nombre entre 1 et 100)</span>
+            </label>
+            <label>Durée entre chaque répétition du message
+              <input class="input-mini" value="" type="number" maxlength="3" field="repeat_interval" min="0" max="3600" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()"> secondes<span class="inline-help"> (nombre entre 0 et 3600)</span>
+            </label>
+            <label>Accusé de réception requis
+              <select class="input-medium" field="with_ack" onkeyup="activateForm()" onchange="activateForm()">
+                <option value="0">Non</option>
+                <option value="1">Oui</option>
+              </select>
+            </label>
+            <label>Message à chaque passage
+              <select class="input-medium" field="multiple_stops" onkeyup="activateForm()" onchange="activateForm()">
+                <option value="0">Non</option>
+                <option value="1">Oui</option>
+              </select>
+            </label>
+            <label>Lecture TTS pendant l'affichage
+              <select class="input-medium" field="play_tts" onkeyup="activateForm()" onchange="activateForm()">
+                <option value="0">Non</option>
+                <option value="1">Oui</option>
+              </select>
+            </label>
+            <label>Allumage LED clignotantes
+              <select class="input-medium" field="light" onkeyup="activateForm()" onchange="activateForm()">
+                <option value="0">Non</option>
+                <option value="1">Oui</option>
+              </select>
+            </label>
+            <label>Girouette pré-encodée
+              <select class="input-medium" field="direction_sign_code" onkeyup="activateForm()" onchange="activateForm()">
+		<?objectlist&
+		table_id=74&
+		template=
+			<{object&template=
+				<@direction_sign_code_delimiter_position=<?StrStr&text=<@data_source_links@>&match=|?>@>
+				<@direction_sign_code_value=<?substr&t=<@data_source_links@>&f=<@direction_sign_code_delimiter_position@>?>@>
+                <option value="<@direction_sign_code_value@>"><@direction_sign_code_value@> (<@displayed_text@>)</option>
+			}>
+		?>
+              </select>
+            </label>
+          </div>
+        
+          <h4><span class="badge badge-inverse" style="vertical-align:middle" id="calendar_panel_id">5</span> Calendrier</h4>
+          <div class="well">
+            <div class="form-inline"><select id="change_calendar_list"></select> <a href="#" id="change_calendar" class="btn btn-warning">Modifier</a></div>
+          </div>
+        
+          <h4><span class="badge badge-inverse" style="vertical-align:middle" id="tags_panel_id">5</span> Tags</h4>
+          <div class="well">
+            <table class="table table-condensed">
+              <thead><tr><th>tags</th><th></th></tr></thead>
+              <tbody>
+                <tr><td id="preview_tags"></td><td></td></tr>
+                <tr><td><a class="btn btn-mini btn-primary" href="#" inittags="inittags">Réinitialiser</a></td><td><a class="btn btn-mini btn-primary" href="#" edittags="edittags">Ajouter</a></td></tr>
+              </tbody>
+            </table>
+            <div class="alert hide" id="old_tags_alert"><strong>ATTENTION !</strong> La liste des tags n'est peut-être plus à jour. Veuillez enregistrer l'évènement pour tenir compte des dernières modifications.</div>
+          </div>
         </div>
       </div>
-
-    </div><div class="span5">
-    <h4><span class="badge badge-inverse" style="vertical-align:middle">2</span> Destinataires</h4>
-    <div class="well">
-      <table class="table table-condensed">
-        <thead><tr><th>rubrique</th><th>destinataires</th><th></th></tr></thead>
-        <tbody>
-        <tr><td>Lignes</td><td id="preview_recipients_line"></td><td><a class="btn btn-mini btn-primary" href="#" factory="line">Editer</a></td></tr>
-        <tr><td>Arrêts</td><td id="preview_recipients_stoparea"></td><td><a class="btn btn-mini btn-primary" href="#" factory="stoparea">Editer</a></td></tr>
-        <tr><td>Diffuseurs</td><td id="preview_recipients_displayscreen"></td><td><a class="btn btn-mini btn-primary" href="#" factory="displayscreen">Editer</a></td></tr>
-        </tbody>
-      </table>
-      <div class="alert hide" id="old_recipients_alert"><strong>ATTENTION !</strong> La liste des variantes de contenus n'est peut-être plus à jour. Veuillez enregistrer l'évènement pour tenir compte des dernières modifications.</div>
-    </div>
-
-    <h4><span class="badge badge-inverse" style="vertical-align:middle" id="calendar_panel_id">3</span> Paramètres</h4>
-    <div class="well">
-      <label>Niveau
-        <select class="input-medium" field="level" onkeyup="activateForm()" onchange="activateForm()">
-          <option value="10">Complémentaire</option>
-          <option value="30">Alterné</option>
-          <option value="50">Prioritaire</option>
-        </select>
-      </label>
-      <label>Durée d'affichage
-        <input class="input-mini" value="" type="number" maxlength="3" field="displayDuration" min="1" max="100" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()"> secondes<span class="inline-help"> (nombre entre 1 et 100)</span>
-      </label>
-      <label>Durée entre chaque répétition du message
-        <input class="input-mini" value="" type="number" maxlength="3" field="repeat_interval" min="0" max="3600" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()"> secondes<span class="inline-help"> (nombre entre 0 et 3600)</span>
-      </label>
-      <label>Accusé de réception requis
-        <select class="input-medium" field="with_ack" onkeyup="activateForm()" onchange="activateForm()">
-          <option value="0">Non</option>
-          <option value="1">Oui</option>
-        </select>
-      </label>
-      <label>Message à chaque passage
-        <select class="input-medium" field="multiple_stops" onkeyup="activateForm()" onchange="activateForm()">
-          <option value="0">Non</option>
-          <option value="1">Oui</option>
-        </select>
-      </label>
-      <label>Lecture TTS pendant l'affichage
-        <select class="input-medium" field="play_tts" onkeyup="activateForm()" onchange="activateForm()">
-          <option value="0">Non</option>
-          <option value="1">Oui</option>
-        </select>
-      </label>
-      <label>Allumage LED clignotantes
-        <select class="input-medium" field="light" onkeyup="activateForm()" onchange="activateForm()">
-          <option value="0">Non</option>
-          <option value="1">Oui</option>
-        </select>
-      </label>
-      <label>Girouette pré-encodée
-        <select class="input-medium" field="direction_sign_code" onkeyup="activateForm()" onchange="activateForm()">
-          <?objectlist&table_id=74&template=
-            <{object&template=
-              <@direction_sign_code_delimiter_position=<?StrStr&text=<@data_source_links@>&match=|?>@>
-              <@direction_sign_code_value=<?substr&t=<@data_source_links@>&f=<@direction_sign_code_delimiter_position@>?>@>
-              <option value="<@direction_sign_code_value@>"><@direction_sign_code_value@> (<@displayed_text@>)</option>
-            }>
-          ?>
-        </select>
-      </label>
-    </div>
-
-    <h4><span class="badge badge-inverse" style="vertical-align:middle" id="calendar_panel_id">5</span> Calendrier</h4>
-    <div class="well">
-      <div class="form-inline"><select id="change_calendar_list"></select> <a href="#" id="change_calendar" class="btn btn-warning">Modifier</a></div>
     </div>
     
-    <h4><span class="badge badge-inverse" style="vertical-align:middle" id="tags_panel_id">5</span> Tags</h4>
-    <div class="well">
-      <table class="table table-condensed">
-        <thead><tr><th>tags</th><th></th></tr></thead>
-        <tbody>
-          <tr><td id="preview_tags"></td><td></td></tr>
-          <tr><td><a class="btn btn-mini btn-primary" href="#" inittags="inittags">Réinitialiser</a></td><td><a class="btn btn-mini btn-primary" href="#" edittags="edittags">Ajouter</a></td></tr>
-        </tbody>
-      </table>
-      <div class="alert hide" id="old_tags_alert"><strong>ATTENTION !</strong> La liste des tags n'est peut-être plus à jour. Veuillez enregistrer l'évènement pour tenir compte des dernières modifications.</div>
-    </div>
-  </div>
-  </div>
-</div>
-
-<div id="calendar" class="hide">
-  <div class="row-fluid">
-    <div class="span8">
-      <div class="well"><a href="#" class="btn btn-warning btn-mini" id="new_period">Nouvelle phase de publication</a></div>
-      <div id="periods"></div>
-    </div>
-    <div class="span4">
-      <div class="well">
-        <label>Nom : <input field="name" type="text"></label>
+    <div id="calendar" class="hide">
+      <div class="row-fluid">
+        <div class="span8">
+          <div class="well"><a href="#" class="btn btn-warning btn-mini" id="new_period">Nouvelle phase de publication</a></div>
+          <div id="periods"></div>
+        </div>
+        <div class="span4">
+          <div class="well">
+            <label>Nom : <input field="name" type="text"></label>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
-</div>
-
-</div>
 </div>
 
 <div id="m_image" class="modal hide fade"><form class="form-horizontal">
@@ -486,7 +609,7 @@ template=
     <h3>Ajout d'un objet multimédia</h3>
   </div>
   <div class="modal-body">
-    <#mediatheque_selector#>
+<#mediatheque_selector#>
   </div>
   <div class="modal-footer">
     <a href="#" class="btn btn-primary" data-dismiss="modal" submit="m_image">Insérer</a>
@@ -501,71 +624,72 @@ template=
   </div>
   <div class="modal-body">
     <input type="text" class="input-medium search-query pull-right" action="search">
-    <?PTNetworksListFunction&
-    template=<{network&template=
-	<div>
-    <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@network_id@>"> Réseau <@name@></label>
-    <div style="padding-left:30px;" class="hide">
-      <?tree_folders&
-	    recursive=1&
-	    roid=<@network_id@>&
-      template=<{folder&template=
-      <div>
-        <@lines_menu=<?LinesListFunction2&
-		    ni=<@id@>&
-        with_directions=1&
-        template=<{line&template=
+		<?PTNetworksListFunction&
+		template=<{network&template=
+    <div>
+      <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@network_id@>"> Réseau <@name@></label>
+      <div style="padding-left:30px;" class="hide">
+			<?tree_folders&
+			recursive=1&
+			roid=<@network_id@>&
+			template=<{folder&template=
+        <div>
+				<@lines_menu=<?LinesListFunction2&
+				ni=<@id@>&
+				with_directions=1&
+				template=<{line&template=
+          <div>
+            <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>"> <@line_short_name@> <@name@></label>
+            <div style="padding-left:30px;" class="hide">
+              <div>
+					<@direction=<{forward_direction&template=<@direction@> }>@>
+                <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="0"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"aller"@></label>
+					<@direction=@>
+              </div>
+              <div>
+					<@direction=<{backward_direction&template=<@direction@> }>@>
+                <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="1"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"retour"@></label>
+              </div>
+            </div>
+          </div>
+				}>?>@>
+				<?if&
+				cond=<@recursive_content@><@lines_menu@>&
+				then=
+          <i class="icon-chevron-right openclose"></i>?> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>"> <@name@></label>
+          <div style="padding-left:30px;" class="hide">
+					<@recursive_content@>
+					<@lines_menu@>
+          </div>
+        </div>
+			}>?>
+			<?LinesListFunction2&
+			ni=<@network_id@>,0&
+			with_directions=1&
+			template=<{line&template=
         <div>
           <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>"> <@line_short_name@> <@name@></label>
           <div style="padding-left:30px;" class="hide">
             <div>
-              <@direction=<{forward_direction&template=<@direction@> }>@>
+				<@direction=<{forward_direction&template=<@direction@> }>@>
               <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="0"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"aller"@></label>
-              <@direction=@>
+				<@direction=@>
             </div>
             <div>
-              <@direction=<{backward_direction&template=<@direction@> }>@>
+				<@direction=<{backward_direction&template=<@direction@> }>@>
               <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="1"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"retour"@></label>
             </div>
           </div>
         </div>
-        }>?>@>
-        <?if&cond=<@recursive_content@><@lines_menu@>&then=<i class="icon-chevron-right openclose"></i>?> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>"> <@name@></label>
-        <div style="padding-left:30px;" class="hide">
-          <@recursive_content@>
-          <@lines_menu@>
-        </div>
+			}>?>
       </div>
-      }>?>
-      <?LinesListFunction2&
-	    ni=<@network_id@>,0&
-      with_directions=1&
-      template=<{line&template=
-      <div>
-        <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>"> <@line_short_name@> <@name@></label>
-        <div style="padding-left:30px;" class="hide">
-          <div>
-            <@direction=<{forward_direction&template=<@direction@> }>@>
-            <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="0"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"aller"@></label>
-            <@direction=@>
-          </div>
-          <div>
-            <@direction=<{backward_direction&template=<@direction@> }>@>
-            <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="1"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"retour"@></label>
-          </div>
-        </div>
-      </div>
-      }>?>
     </div>
+		}>?>
   </div>
-  }>?>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-primary" data-dismiss="modal" >Sélectionner</a>
+  </div>
 </div>
-<div class="modal-footer">
-  <a href="#" class="btn btn-primary" data-dismiss="modal" >Sélectionner</a>
-</div>
-</div>
-
-
 
 <div id="m_stoparea" class="modal hide fade">
   <div class="modal-header">
@@ -574,35 +698,37 @@ template=
   </div>
   <div class="modal-body">
     <input type="text" class="input-medium search-query pull-right" action="search">
-    <?StopAreasListFunction&
-    group_by_cities=1&
-    output_stops=1&
-    stops_directions=3&
-    template=<{city&template=
-    	<div>
-    <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@city_id@>"> Commune <@city_name@></label>
-    <div style="padding-left:30px;" class="hide"><{stopArea&template=
-      <div>
-        <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>"> Arrêt commercial <@name@></label>
-        <@stop_area_name=<@name@>@>
-        <div style="padding-left:30px;" class="hide"><{stop&template=
-          <div>
-            <@direction=@>
-            <@direction=<{direction&template=<@direction@> }>@>
-            <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>"> Arrêt <@stop_area_name@> <@direction?("direction "+direction):operatorCode@></label>
+		<?StopAreasListFunction&
+		group_by_cities=1&
+		output_stops=1&
+		stops_directions=3&
+		template=<{city&template=
+    <div>
+      <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@city_id@>"> Commune <@city_name@></label>
+      <div style="padding-left:30px;" class="hide">
+			<{stopArea&template=
+        <div>
+          <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>"> Arrêt commercial <@name@></label>
+				<@stop_area_name=<@name@>@>
+          <div style="padding-left:30px;" class="hide">
+				<{stop&template=
+            <div>
+					<@direction=@>
+					<@direction=<{direction&template=<@direction@> }>@>
+              <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>"> Arrêt <@stop_area_name@> <@direction?("direction "+direction):operatorCode@></label>
+            </div>
+				}>
           </div>
-          }></div>
+        </div>
+			}>
       </div>
-      }></div>
+    </div>
+		}>?>
   </div>
-  }>?>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-primary" data-dismiss="modal" >Sélectionner</a>
+  </div>
 </div>
-<div class="modal-footer">
-  <a href="#" class="btn btn-primary" data-dismiss="modal" >Sélectionner</a>
-</div>
-</div>
-
-
 
 <div id="m_displayscreen" class="modal hide fade">
   <div class="modal-header">
@@ -617,54 +743,53 @@ template=
         <div>
           <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="41"> Bornes</label>
           <div style="padding-left:30px;" class="hide">
-<?display_types&
-template=<{display_type&template=
+		<?display_types&
+		template=<{display_type&template=
             <div>
               <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> Type <@name@></label>
               <div style="padding-left:30px;" class="hide">
-	<@current_type_id=<@id@>@>
-	<?GetDepartureBoards&
-	template=<{screen&template=
-		<?if&cond=<@type_id==current_type_id@>&then=
+			<@current_type_id=<@id@>@>
+		<?GetDepartureBoards&
+		template=<{screen&template=
+			<?if&cond=<@type_id==current_type_id@>&then=
                 <div>
                   <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@screen_id@>"> Borne <@name@></label>
                 </div>
-		?>
-	}>?>
+			?>
+		}>?>
               </div>
             </div>
-}>?>
+		}>?>
           </div>
         </div>
       </div>
       <div>
         <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" value="107"> Fournisseurs de notifications</label>
         <div style="padding-left:30px;" class="hide">
-           <?notification_providers&
-	     template=<{provider&template=
-	   <div>
-             <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> <@name@> (<@channel@>)</label>
-           </div>
-           }>?>
+		<?notification_providers&
+		template=<{provider&template=
+          <div>
+            <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> <@name@> (<@channel@>)</label>
+          </div>
+		}>?>
         </div>
         <div>
           <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="106"> Autres diffuseurs</label>
           <div style="padding-left:30px;" class="hide">
-<?custom_broadcast_points&
-recursive=1&
-template=<{broadcast_point&recursive=1&template=
+		<?custom_broadcast_points&
+		recursive=1&
+		template=<{broadcast_point&recursive=1&template=
             <div>
               <@recursive_content?"<i class=\"icon-chevron-right openclose\"></i> ":""@><label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> <@name@></label>
-                <@recursive_content?"<div style=\"padding-left:30px;\" class=\"hide\">":""@><@recursive_content@><@recursive_content?"</div>":""@>
+              <@recursive_content?"<div style=\"padding-left:30px;\" class=\"hide\">":""@><@recursive_content@><@recursive_content?"</div>":""@>
             </div>
-}>?>
+		}>?>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
 
 <div id="m_tags" class="modal hide fade">
   <div class="modal-header">
@@ -674,14 +799,12 @@ template=<{broadcast_point&recursive=1&template=
   <div class="modal-body">
     <div>
       <div style="padding-left:30px;">
-<?message_tags&
-template=<{
-	tag&template=
+		<?message_tags&
+		template=<{tag&template=
       	 <div>
       	   <label class="checkbox"><input type="checkbox" value="<@id@>" tag="tags"><@name@></label>
       	 </div>
-	}>
-?>
+		}>?>
       </div>
     </div>
   </div>
@@ -690,128 +813,153 @@ template=<{
   </div>
 </div>
 
-
 <script>
-  function display_init()
-  {
-  <?if&cond=<@display=="calendar"@>&then=
-      open_calendar(calendar_by_rank[<@rank_to_display@>]);
-    display('calendar');
-    ?>
-  <?if&cond=<@display=="message"@>&then=
-      open_message(message_by_rank[<@rank_to_display@>]);
-    display('message');
-    ?>
-  <?if&cond=<@display@>&else=
-      display('properties');
-    ?>
-  }
-  $(function(){
-    tinyMCE.init({
-      mode : "specific_textareas",
-      editor_selector : "mceEditor",
-      handle_event_callback : "tinymce_event",
-      oninit : display_init,
-      language: 'fr',
-      theme: "advanced",
-      plugins: "fullscreen",
-      convert_urls: false,
-      //remove_linebreaks : false,
-      force_p_newlines : false,
-      forced_root_block : false,
-      force_br_newlines : false,
-      theme_advanced_resizing : true,
-      theme_advanced_resizing_max_width : 550,
-      theme_advanced_statusbar_location: 'bottom',
-      theme_advanced_buttons1 : "fullscreen,|,bold,italic,underline,strikethrough,|,removeformat,|,forecolor,backcolor,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect",
-      theme_advanced_buttons2 : "bullist,numlist,separator,outdent,indent,separator,undo,redo,|,link,unlink,image,hr,charmap,code,formatselect",
-    });
-
-    myEvent = {
-      calendar: [ <{calendar&template=
-        <@current_calendar_id=<@id@>@>
-    {
-      id: '<@id@>',
-          name: "<@name?name:"Calendrier par défaut"@>",
-        period:[ <{application_period&template=
-        { id: '<@id@>',
-          start_date: '<@start_time@>',
-          end_date: '<@end_time@>',
-          start_hour: '<@start_hour@>',
-          end_hour: '<@end_hour@>',
-          date: [ <{date&template=
+function display_init()
+{
+		<?if&cond=<@display=="calendar"@>&then=
+  open_calendar(calendar_by_rank[<@rank_to_display@>]);
+  display('calendar');
+		?>
+		<?if&cond=<@display=="message"@>&then=
+  open_message(message_by_rank[<@rank_to_display@>]);
+  display('message');
+		?>
+		<?if&cond=<@display@>&else=
+  display('properties');
+		?>
+}
+$(function(){
+  tinyMCE.init({
+    mode : "specific_textareas",
+    editor_selector : "mceEditor",
+    handle_event_callback : "tinymce_event",
+    oninit : display_init,
+    language: 'fr',
+    theme: "advanced",
+    plugins: "fullscreen",
+    convert_urls: false,
+    //remove_linebreaks : false,
+    force_p_newlines : false,
+    forced_root_block : false,
+    force_br_newlines : false,
+    theme_advanced_resizing : true,
+    theme_advanced_resizing_max_width : 550,
+    theme_advanced_statusbar_location: 'bottom',
+    theme_advanced_buttons1 : "fullscreen,|,bold,italic,underline,strikethrough,|,removeformat,|,forecolor,backcolor,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect",
+    theme_advanced_buttons2 : "bullist,numlist,separator,outdent,indent,separator,undo,redo,|,link,unlink,image,hr,charmap,code,formatselect",
+  });
+  
+  myEvent = {
+    calendar: [ 
+		<{calendar&template=
+			<@current_calendar_id=<@id@>@>
+      {
+        id: '<@id@>',
+        name: "<@name?name:"Calendrier par défaut"@>",
+        period:[
+			<{application_period&template=
+          {
+            id: '<@id@>',
+            start_date: '<@start_time@>',
+            end_date: '<@end_time@>',
+            start_hour: '<@start_hour@>',
+            end_hour: '<@end_hour@>',
+            date: [
+				<{date&template=
               '<@date@>',
-        }> ],
-      rank: <@item_rank@>
-    },
-  }> ],
-  message:[ <{message&template=<?if&cond=<@current_calendar_id==calendar_id@>&then=
-  <@content_a=<#str_replace&t=<@content@>&f=<?char&code=13?><?char&code=10?>&r=\\r\\n#>@>
-  <@content_b=<#str_replace&t=<@content@>&f=<?char&code=13?>&r=\\r#>@>
-  <@content_c=<#str_replace&t=<@content_b@>&f=<?char&code=10?>&r=\\n#>@>
-  {
-    id: "<@roid@>",
-    title: "<@title@>",
-    content: "<@content_c@>",
-    level: "<@priority@>",
-    tags: "<@tags@>",
-    displayDuration :<?if&cond=<@display_duration@>&then="<@display_duration@>"&else=""?>,
-    repeat_interval :<?if&cond=<@repeat_interval@>&then="<@repeat_interval@>"&else=""?>,
-    with_ack :<?if&cond=<@with_ack@>&then="<@with_ack@>"&else="0"?>,
-    multiple_stops :<?if&cond=<@multiple_stops@>&then="<@multiple_stops@>"&else="0"?>,
-    play_tts :<?if&cond=<@play_tts@>&then="<@play_tts@>"&else="0"?>,
-    light :<?if&cond=<@light@>&then="<@light@>"&else="0"?>,
-    direction_sign_code :<?if&cond=<@direction_sign_code@>&then="<@direction_sign_code@>"&else="0"?>,
-    digitized_version :"<@digitized_version@>",
-    alternative:[
-        <{message_alternative&template=
-          <@content_a=<#str_replace&t=<@content@>&f=<?char&code=13?><?char&code=10?>&r=\\r\\n#>@>
-          <@content_b=<#str_replace&t=<@content_a@>&f=<?char&code=13?>&r=\\r#>@>
-          <@content_c=<#str_replace&t=<@content_b@>&f=<?char&code=10?>&r=\\n#>@>
-
-          <@alternative_id[message_type_id]=<@id@>@>
-          <@alternative_content[message_type_id]=<@content_c@>@>
-        }>
-        <?message_types&
-          message_id=<@roid@>&
-          template=<{type&template=
-        { type_id: "<@id@>",
-          id: "<@alternative_id[id]@>",
-          content: "<@alternative_content[id]@>"
-        },
-        }>?>
-  ],
-  section:[
-    <{section&template={id: "<@id@>"}}>
-  ],
-  <{recipients&template=
-      line_recipient:[ <{line&template=
-  { id: "<@link_id@>",
-    recipient_id: "<@id@>",
-    parameter: "<@link_parameter@>"
-  },
-  }> ],
-  stoparea_recipient:[ <{stoparea&template=
-  { id: "<@link_id@>",
-    recipient_id: "<@id@>",
-    parameter: "<@link_parameter@>"
-  },
-  }> ],
-  displayscreen_recipient:[ <{displayscreen&template=
-  { id: "<@link_id@>",
-    recipient_id: "<@id@>",
-    parameter: "<@link_parameter@>"
-  },
-  }> ]
-  }>
-  },
-  ?>}> ]
-  }, }>
-  ]};
+				}>
+            ],
+            rank: <@item_rank@>
+          },
+			}>
+        ],
+        message:[
+			<{message&template=
+				<?if&cond=<@current_calendar_id==calendar_id@>&then=
+					<@content_a=<#str_replace&t=<@content@>&f=<?char&code=13?><?char&code=10?>&r=\\r\\n#>@>
+					<@content_b=<#str_replace&t=<@content@>&f=<?char&code=13?>&r=\\r#>@>
+					<@content_c=<#str_replace&t=<@content_b@>&f=<?char&code=10?>&r=\\n#>@>
+          {
+            id: "<@roid@>",
+            title: "<@title@>",
+            content: "<@content_c@>",
+            level: "<@priority@>",
+            tags: "<@tags@>",
+            displayDuration :<?if&cond=<@display_duration@>&then="<@display_duration@>"&else=""?>,
+            repeat_interval :<?if&cond=<@repeat_interval@>&then="<@repeat_interval@>"&else=""?>,
+            with_ack :<?if&cond=<@with_ack@>&then="<@with_ack@>"&else="0"?>,
+            multiple_stops :<?if&cond=<@multiple_stops@>&then="<@multiple_stops@>"&else="0"?>,
+            play_tts :<?if&cond=<@play_tts@>&then="<@play_tts@>"&else="0"?>,
+            light :<?if&cond=<@light@>&then="<@light@>"&else="0"?>,
+            direction_sign_code :<?if&cond=<@direction_sign_code@>&then="<@direction_sign_code@>"&else="0"?>,
+            digitized_version :"<@digitized_version@>",
+            alternative:[
+					<{message_alternative&template=
+						<@content_a=<#str_replace&t=<@content@>&f=<?char&code=13?><?char&code=10?>&r=\\r\\n#>@>
+						<@content_b=<#str_replace&t=<@content_a@>&f=<?char&code=13?>&r=\\r#>@>
+						<@content_c=<#str_replace&t=<@content_b@>&f=<?char&code=10?>&r=\\n#>@>
+						<@alternative_id[message_type_id]=<@id@>@>
+						<@alternative_content[message_type_id]=<@content_c@>@>
+					}>
+					<?message_types&
+					message_id=<@roid@>&
+					template=<{type&template=
+              {
+                type_id: "<@id@>",
+                id: "<@alternative_id[id]@>",
+                content: "<@alternative_content[id]@>"
+              },
+					}>?>
+            ],
+            section:[
+					<{section&template=
+              {
+                id: "<@id@>"
+              }
+					}>
+            ],
+					<{recipients&template=
+            line_recipient:[
+						<{line&template=
+              {
+                id: "<@link_id@>",
+                recipient_id: "<@id@>",
+                parameter: "<@link_parameter@>"
+              },
+						}>
+            ],
+            stoparea_recipient:[
+						<{stoparea&template=
+              {
+                id: "<@link_id@>",
+                recipient_id: "<@id@>",
+                parameter: "<@link_parameter@>"
+              },
+						}>
+            ],
+            displayscreen_recipient:[
+						<{displayscreen&template=
+              {
+                id: "<@link_id@>",
+                recipient_id: "<@id@>",
+                parameter: "<@link_parameter@>"
+              },
+						}>
+            ]
+					}>
+          },
+				?>
+			}>
+        ]
+      },
+		}>
+    ]
+  };
 
   build_divs();
 
-  });
+});
 </script>
 <script src="/terminus/js/event.js"></script>
-?>?>
+	?>
+?>

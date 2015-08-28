@@ -1,4 +1,4 @@
-
+﻿
 /** ScenarioTableSync class implementation.
 	@file ScenarioTableSync.cpp
 
@@ -194,6 +194,28 @@ namespace synthese
 										  name, inArchive, isActive, scenarioId, first,
 										  number, orderByDate, orderByName, raisingOrder, linkLevel);
 			return result;
+		}
+
+		std::vector<boost::shared_ptr<SentScenario> > SentScenarioTableSync::list() const
+		{
+			SentScenarioTableSync::SearchResult scenarios(
+				Search(
+					Env::GetOfficialEnv(),
+					boost::optional<std::string>()
+			)	);
+			std::vector<boost::shared_ptr<SentScenario> > sentScenarios;
+			BOOST_FOREACH(const boost::shared_ptr<Scenario>& scenario, scenarios)
+			{
+				sentScenarios.push_back(dynamic_pointer_cast<SentScenario, Scenario>(scenario));
+			}
+
+			return sentScenarios;
+		}
+
+
+		void SentScenarioTableSync::save(boost::shared_ptr<SentScenario>& sentScenario) const
+		{
+			SentScenarioTableSync::Save(sentScenario.get());
 		}
 
 

@@ -19,7 +19,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 #include "ScenarioAutopilot.hpp"
+#include "MessageApplicationPeriod.hpp"
 #include "MessagesSection.hpp"
+#include "Scenario.h"
 #include "SentScenario.h"
 #include "SentScenarioDao.hpp"
 #include "FakeClock.hpp"
@@ -86,7 +88,7 @@ struct single_scenario_on_single_application_period_fixture
 	{
 		scenarioSection.reset(new MessagesSection());
 		scenarioSection->set<AutoActivation>(true);
-		std::set<const MessagesSection*> scenarioSections;
+		std::set<MessagesSection*> scenarioSections;
 		scenarioSections.insert(scenarioSection.get());
 
 		scenarioCalendar.reset(new ScenarioCalendar);
@@ -102,7 +104,7 @@ struct single_scenario_on_single_application_period_fixture
 		sentScenario->setArchived(false);
 		sentScenario->setManualOverride(false);
 		sentScenario->setCalendars(scenarioCalendars);
-		sentScenario->setSections(scenarioSections);
+		sentScenario->set<Sections>(scenarioSections);
 
 		sentScenarioDao.reset(new SentScenarioDaoMock(sentScenario));
 

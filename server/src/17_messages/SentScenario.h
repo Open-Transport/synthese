@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 /// SentScenario class header.
 ///	@file SentScenario.h
 ///	@author Hugues Romain
@@ -49,6 +49,7 @@ namespace synthese
 		FIELD_PTIME(EventStart)
 		FIELD_PTIME(EventEnd)
 		FIELD_BOOL(Archived)
+		FIELD_BOOL(ManualOverride)
 		
 		
 		typedef boost::fusion::map<
@@ -62,7 +63,8 @@ namespace synthese
 			FIELD(Sections),
 			FIELD(EventStart),
 			FIELD(EventEnd),
-			FIELD(Archived)
+			FIELD(Archived),
+			FIELD(ManualOverride)
 			> SentScenarioRecord;
 
 		////////////////////////////////////////////////////////////////////
@@ -117,6 +119,7 @@ namespace synthese
 			const boost::posix_time::ptime&	getPeriodStart() const { return get<PeriodStart>(); }
 			const boost::posix_time::ptime&	getPeriodEnd() const { return get<PeriodEnd>(); }			 
 			bool getIsEnabled()	const { return get<Enabled>(); }
+			bool getManualOverride()	const { return get<ManualOverride>(); }
 			bool getArchived() const { return get<Archived>(); }
 			std::string getName() const { return get<Name>(); }
 			
@@ -145,7 +148,7 @@ namespace synthese
 				void setEventEnd ( const boost::posix_time::ptime& value) { set<EventEnd>(value); }
 				
 				void setIsEnabled(bool value){ set<Enabled>(value); }
-				void setManualOverride(bool value){ _manualOverride = value; }
+				void setManualOverride(bool value){ set<ManualOverride>(value); }
 				void setTemplate(const ScenarioTemplate* value);
 				void setArchived(bool value){ set<Archived>(value); }
 
