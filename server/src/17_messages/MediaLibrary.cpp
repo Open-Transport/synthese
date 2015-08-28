@@ -47,6 +47,7 @@ namespace synthese
 		FIELD_DEFINITION_OF_TYPE(ServerHostnamePort, "website_hostname_port", SQL_TEXT)
 		FIELD_DEFINITION_OF_TYPE(LibraryType, "type", SQL_INTEGER)
 		FIELD_DEFINITION_OF_TYPE(DefaultView, "default_view_mode", SQL_INTEGER)
+		FIELD_DEFINITION_OF_TYPE(AcceptedMediaTypes, "accepted_media_types", SQL_TEXT)
 
         const string MediaLibrary::TAG_WEBSITE_NAME = "website_name";
 
@@ -63,7 +64,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ServerHostnamePort),
 					FIELD_DEFAULT_CONSTRUCTOR(cms::Website),
 					FIELD_VALUE_CONSTRUCTOR(LibraryType, INTERNAL),
-					FIELD_VALUE_CONSTRUCTOR(DefaultView, THUMBNAILS)
+					FIELD_VALUE_CONSTRUCTOR(DefaultView, THUMBNAILS),
+					FIELD_DEFAULT_CONSTRUCTOR(AcceptedMediaTypes)
 				)	)
 		{ };
 

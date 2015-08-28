@@ -138,7 +138,7 @@
       <div class="modal-body">
         <div class="control-group">
           <div class="controls">
-            <input type="file" accept="image/*,text/css,text/csv,text/html,text/xml,text/plain,text/text,application/pdf" name="actionParam_content" id="uploadFieldModal" />
+            <input type="file" accept="*" name="actionParam_content" id="uploadFieldModal" />
           </div>
         </div>
       </div>

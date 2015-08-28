@@ -2,7 +2,7 @@
 <ul id="folders-list" class="nav nav-list well">
   <li><select id="selectMediaLibrary" data-id="<@medialibrary_id@>" data-website-id="<@current_website_id@>">
     <?media_libraries&template=<{medialibrary&template=
-    <option value="<@id@>" data-website-id="<@website_id@>" data-view-mode="<@default_view_mode@>" <?if&cond=<@id==medialibrary_id@>&then= selected="true"?>><@website_name@></option>}>?>
+    <option value="<@id@>" data-website-id="<@website_id@>" data-view-mode="<@default_view_mode@>" data-accepted-types="<@accepted_media_types@>" <?if&cond=<@id==medialibrary_id@>&then= selected="true"?>><@website_name@></option>}>?>
   </select></li><li class="divider"></li>
   <?menu&root=<@current_website_id@>&raw_data=1&min_depth=0&max_depth=9999&template=
   <li id="folders-root"<@folder_id?"":" class=\"active\""@>>
