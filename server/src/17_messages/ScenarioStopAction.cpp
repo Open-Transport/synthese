@@ -277,7 +277,7 @@ namespace synthese
 											// Existing links of this factory in the existent message
 											Alarm::LinkedObjects::mapped_type existingLinks(alarm->getLinkedObjects(linkType->getFactoryKey()));
 											boost::optional<const ptree&> recipientNode = messageNode.second.get_child_optional(linkType->getFactoryKey() + "_recipient");
-											size_t nbRecipientLinks = (recipientNode ? recipientNode.get().count("recipient_id") : 0);
+											size_t nbRecipientLinks = (recipientNode ? recipientNode.get().size() : 0);
 
 											// If the number of links differs between the existing alarm and the request then they do not match
 											if(nbRecipientLinks != existingLinks.size())

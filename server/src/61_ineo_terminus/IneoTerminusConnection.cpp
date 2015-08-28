@@ -41,6 +41,7 @@
 #include "IneoNotificationChannel.hpp"
 #include "IneoTerminusLog.hpp"
 #include "MessagesModule.h"
+#include "IneoFileFormat.hpp"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -1817,7 +1818,16 @@ namespace synthese
 					else
 					{
 						ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(*dataSource, Env::GetOfficialEnv());
-						set<StopPoint*> loadedStopPoints(stopPoints.get(recipient.name));
+						std::string stopPointCode1 = recipient.name;
+						std::string stopPointCode2 = synthese::data_exchange::IneoFileFormat::Importer_::MNLP_PREFIX + recipient.name;
+						set<StopPoint*> loadedStopPoints = stopPoints.get(stopPointCode1);
+
+						if(true == loadedStopPoints.empty())
+						{
+							// IneoFileFormat prefixes Ineo stop code identifiers with the string MNLP_**_
+							// So if no direct match is found, add the prefix and search again
+							loadedStopPoints = stopPoints.get(stopPointCode2);
+						}
 
 						BOOST_FOREACH(StopPoint* loadedStopPoint, loadedStopPoints)
 						{
@@ -1828,7 +1838,7 @@ namespace synthese
 
 						if(true == loadedStopPoints.empty())
 						{
-							util::Log::GetInstance().warn("Ineo Terminus : stop not found " + recipient.name);
+							util::Log::GetInstance().warn("Ineo Terminus : stop not found " + stopPointCode1 + " / " + stopPointCode2);
 							status = false;
 							errorCode = ArretInconnu;
 						}

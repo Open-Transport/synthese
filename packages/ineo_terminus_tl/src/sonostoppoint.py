@@ -185,7 +185,8 @@ if 'stoparea' in recipients:
         for stopCode in stopCodes:
           if stopCode[0] == datasource_id:
             childStopPoint = etree.SubElement(childStopPoints, "StopPoint")
-            childStopPoint.text = stopCode[1]
+            # Ineo stop point ids may start with "MNLP_**_", but this prefix must not be sent to Ineo
+            childStopPoint.text = (stopCode[1] if stopCode[1].startswith(ineo_stop_point_prefix) == False else stopCode[1][len(ineo_stop_point_prefix):])
 
     if recipientTableId == 7:
       # This 'stoparea' recipient is a stop area : apply message to all its stop points
@@ -199,7 +200,8 @@ if 'stoparea' in recipients:
           for stopCode in stopCodes:
             if stopCode[0] == datasource_id:
               childStopPoint = etree.SubElement(childStopPoints, "StopPoint")
-              childStopPoint.text = stopCode[1]
+              # Ineo stop point ids may start with "MNLP_**_", but this prefix must not be sent to Ineo
+              childStopPoint.text = (stopCode[1] if stopCode[1].startswith(ineo_stop_point_prefix) == False else stopCode[1][len(ineo_stop_point_prefix):])
 
 # Print resulting XML to output stream
 print(etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="iso-8859-1"))
