@@ -109,7 +109,7 @@ namespace synthese
 			{
 			}
 			
-			_patchDirectionBelfort = map.getDefault<bool>(PARAMETER_PATCH_DIRECTION_BELFORT, false);
+			_patchDirectionBelfort = map.getDefault<bool>(PARAMETER_PATCH_DIRECTION_BELFORT, true);
 		}
 
 
