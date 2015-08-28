@@ -164,12 +164,19 @@ configure_file(
 )
 
 
+# Python 2.7
+find_package(PythonLibs 2.7 REQUIRED)
+if(NOT PYTHONLIBS_FOUND)
+  message(FATAL_ERROR "Unable to find PythonLibs.")
+endif()
+
 include(FindPythonInterp)
 if(NOT PYTHONINTERP_FOUND)
   message(FATAL_ERROR "No Python interpreter found. Cannot continue.")
 endif()
 
 enable_testing()
+
 
 # See http://www.vtk.org/Wiki/CMake_RPATH_handling#Always_full_RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
