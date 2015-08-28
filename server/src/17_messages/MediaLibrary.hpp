@@ -65,6 +65,7 @@ namespace synthese
 		FIELD_STRING(ServerHostnamePort)
 		FIELD_ENUM(LibraryType, MediaLibraryType)
 		FIELD_ENUM(DefaultView, MediaLibraryView)
+		FIELD_STRING(AcceptedMediaTypes)
 
 		/** Entity framework persistent field declaration. */
 		typedef boost::fusion::map<
@@ -80,7 +81,10 @@ namespace synthese
 			FIELD(LibraryType),
 
 			// Default media library view: THUMBNAILS or LIST
-			FIELD(DefaultView)
+			FIELD(DefaultView),
+
+			// Accepted media / mime types for resources upload
+			FIELD(AcceptedMediaTypes)
 
 		> MediaLibraryRecord;
 

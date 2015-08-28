@@ -599,6 +599,13 @@
      </div>
 
      <div class="control-group">
+      <label class="control-label">Média supportés (mime types)</label>
+      <div class="controls">
+       <input type="text" name="actionParam_field_accepted_media_types" value="<@accepted_media_types@>" placeholder="image/*,application/pdf"/>
+      </div>
+     </div>
+
+     <div class="control-group">
       <div class="controls">
        <button type="submit" class="btn btn-warning">Enregistrer</button>
       </div>

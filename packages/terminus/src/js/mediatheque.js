@@ -53,6 +53,7 @@ function removeFileForm(elem, folderid, modal) {
 
 function uploadFileForm(elem, folderid, modal) {
   modal.find('[name="actionParam_up_id"]').val(folderid);
+  modal.find('[name="actionParam_content"]').attr('accept', $('#selectMediaLibrary').children('option:selected').attr('data-accepted-types'));
   modal.modal('show');
 }
 
