@@ -76,9 +76,9 @@
       if (!elem.attr('data-id') && typeof active_folder_id != 'undefined') {
         elem = $('#folders-list').find('[data-id='+active_folder_id+']');
       }
+      $('#file-actions').hide();
       if (elem.attr('data-id') || $('#file_search').val().length > 0) {
         $('#files-list').hide();
-        $('#file-actions').hide();
         $('#loader').show();
         $.ajax({
           type: 'GET',
