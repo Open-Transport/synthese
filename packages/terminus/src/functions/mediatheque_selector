@@ -91,6 +91,10 @@
         $('#files-list').html("<div class='alert alert-info'>Aucun élément n'est présent dans ce répertoire.</div>");
         selectRootFolder();
       }
+      if ($('#file_search').val().length > 0) {
+        $('#file_search').focus();
+        $('#file_search').select();
+      }
     }
     function selectRootFolder() {
       $('.holder-folder-id').removeAttr('data-id');
