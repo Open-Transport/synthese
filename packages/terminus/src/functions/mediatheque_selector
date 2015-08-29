@@ -23,7 +23,7 @@
   <@folder_data_id=<?if&cond=<@folder_id@>&then=data-id="<@folder_id@>"?>@>
   <div class="span9">
     <div class="form-search well well-small">
-      <input type="text" name="file_search" value="<@file_search@>" class="holder-folder-id" <@folder_data_id@> placeholder="Nom du fichier">
+      <input type="text" id="file_search" value="<@file_search@>" class="holder-folder-id" <@folder_data_id@> placeholder="Nom du fichier">
       <button id="search-button" type="button" class="btn btn-primary holder-folder-id" <@folder_data_id@> data-file-action="reloadFilesList">Rechercher</button>
       <div id="view-mode" data-active-mode="<@view_mode?1:0@>" class="btn-group btn-group-xs pull-right" data-toggle="buttons-radio">
         <button type="button" class="btn btn-primary holder-folder-id view-mode-button<@view_mode?"":" active"@>" data-mode="0" <@folder_data_id@> data-file-action="reloadFilesList">
@@ -50,25 +50,31 @@
     function changeListFiles(event, item) {
       var elem = $(this);
       if (typeof item != 'undefined') { elem = item; };
-      if (elem.attr('data-id')) {
-        // Copy folder id to live action buttons
-        $('.holder-folder-id').attr('data-id', elem.attr('data-id'));
+      if (elem.attr('data-id') || $('#file_search').val().length > 0) {
         $('#files-list').hide();
+        $('#file-actions').hide();
         $('#loader').show();
         $.ajax({
           type: 'GET',
           url: "/terminus/list_files",
           data: { folder_id: elem.attr('data-id'),
                   admin_mediatheque: $('#admin_mediatheque').length,
-                  file_search: $('[name="file_search"]').val(),
+                  file_search: $('#file_search').val(),
                   view_mode: $('#view-mode').attr('data-active-mode') },
         })
             .done(function (data, status) {
               if (status == "success") {
-                elem.parent().parent().children('.active').find('.folder-actions').hide();
-                elem.parent().parent().children('.active').removeClass('active');
-                elem.parent().addClass('active');
-                elem.parent().find('.folder-actions').show();
+                if (elem.attr('data-id')) {
+                  // Copy folder id to live action buttons and select folder item
+                  $('.holder-folder-id').attr('data-id', elem.attr('data-id'));
+                  elem.parent().parent().children('.active').find('.folder-actions').hide();
+                  elem.parent().parent().children('.active').removeClass('active');
+                  elem.parent().addClass('active');
+                  elem.parent().find('.folder-actions').show();
+                  $('#file-actions').show();
+                } else {
+                  selectRootFolder();
+                }
                 $('#files-list').html(data);
               } else {
                 addAlert();
@@ -80,17 +86,18 @@
             .always(function(data, status, error) {
               $('#loader').hide();
               $('#files-list').show();
-              $('#file-actions').show();
             });
       } else {
-        $('.holder-folder-id').removeAttr('data-id');
-        $('#file-actions').hide();
         $('#files-list').html("<div class='alert alert-info'>Aucun élément n'est présent dans ce répertoire.</div>");
-        $('#folders-list').children('.active').find('.folder-actions').hide();
-        $('#folders-list').children('.active').removeClass('active');
-        $('#folders-list').children().first().addClass('active');
-        $('#folders-list').children().first().find('.folder-actions').show();
+        selectRootFolder();
       }
+    }
+    function selectRootFolder() {
+      $('.holder-folder-id').removeAttr('data-id');
+      $('#folders-list').children('.active').find('.folder-actions').hide();
+      $('#folders-list').children('.active').removeClass('active');
+      $('#folders-list').children().first().addClass('active');
+      $('#folders-list').children().first().find('.folder-actions').show();
     }
 <?if&cond=<@admin_mediatheque@>&else=
     function selectFile(event, item) {
@@ -127,7 +134,7 @@
         $('#view-mode').attr('data-active-mode', $(this).attr('data-mode'));
       });
       $('[data-file-action="reloadFilesList"]').click(changeListFiles);
-      $('[name="file_search"]').keypress(function(event) {
+      $('#file_search').keypress(function(event) {
         var keycode = (event.keyCode ? event.keyCode : event.which);
         if (keycode == '13') { changeListFiles(event, $(this)); };
       });
