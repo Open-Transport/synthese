@@ -67,7 +67,8 @@ set(MODULES
 60_analysis
 61_data_exchange
 62_regulation
-63_settings)
+63_settings
+99_spike)
 
 if(WITH_MYSQL)
   list(APPEND MODULES 10_db/102_mysql)

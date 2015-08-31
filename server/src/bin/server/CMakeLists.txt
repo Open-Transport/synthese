@@ -1,7 +1,7 @@
 set_source_groups()
 # Build the generated.cpp.inc and includes.cpp.inc files.
 
-set(MODULES 00_framework 01_util 05_html 10_db 10_db/101_sqlite 11_interfaces 11_cms 12_security 13_dblog 14_admin 15_server 19_inter_synthese 16_impex)
+set(MODULES 00_framework 01_util 05_html 10_db 10_db/101_sqlite 11_interfaces 11_cms 12_security 13_dblog 14_admin 15_server 19_inter_synthese 16_impex 99_spike)
 
 set(gen_cpp_content "")
 set(inc_cpp_content "")
