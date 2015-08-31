@@ -33,10 +33,7 @@ namespace synthese
 	using namespace util;
 
 	CLASS_DEFINITION(FwChild1, "t991_fwchild1", 991)
-	//FIELD_DEFINITION_OF_TYPE(Kind, "kind", SQL_INTEGER)
-	//FIELD_DEFINITION_OF_TYPE(Line, "line_id", SQL_INTEGER)
-	//FIELD_DEFINITION_OF_TYPE(Service, "service_id", SQL_INTEGER)
-	//FIELD_DEFINITION_OF_TYPE(ExtraData, "extra_data", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Property1, "property1", SQL_TEXT)
 
 	namespace spike
 	{
@@ -46,11 +43,8 @@ namespace synthese
 		):	Registrable(id),
 			Object<FwChild1, FwChild1Schema>(
 				Schema(
-					FIELD_VALUE_CONSTRUCTOR(Key, id)//,
-					//FIELD_DEFAULT_CONSTRUCTOR(Kind),
-					//FIELD_DEFAULT_CONSTRUCTOR(Line),
-					//FIELD_DEFAULT_CONSTRUCTOR(Service),
-					//FIELD_DEFAULT_CONSTRUCTOR(ExtraData)
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Property1)
                     )
                 )
 		{}

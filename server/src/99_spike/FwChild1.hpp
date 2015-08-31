@@ -26,6 +26,7 @@
 #include "Object.hpp"
 
 #include "PointerField.hpp"
+#include "StringField.hpp"
 #include "EnumObjectField.hpp"
 
 #include "SchemaMacros.hpp"
@@ -39,16 +40,11 @@ namespace synthese
 	{
 		class FwChild1;
 
-		//FIELD_ENUM(Kind, spike::Fwchild1Type)
-		//FIELD_POINTER(Line, pt::CommercialLine)
-		//FIELD_POINTER(Service, pt::ScheduledService)
+		FIELD_STRING(Property1)
 
 		typedef boost::fusion::map<
-			FIELD(Key)
-			//FIELD(Kind),
-			//FIELD(Line),
-			//FIELD(Service),
-			//FIELD(ExtraData)
+			FIELD(Key),
+			FIELD(Property1)
 		> FwChild1Schema;
 
 		/** Fwchild1 class.
