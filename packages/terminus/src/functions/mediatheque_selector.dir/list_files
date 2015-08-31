@@ -13,7 +13,7 @@
       <{page&recursive=1&template=
         <?if&cond=<@mime_type=="/"@>&else=
           <?if&cond=<@file_search@>&then=
-            <?if&cond=<?StrStr&text=<@title@>&match=<@file_search@>?>&then=
+            <?if&cond=<?StrStr&insensitive=1&text=<@title@>&match=<@file_search@>?>&then=
               <@display=1@>&else=<@display=0@>
             ?>&else=<@display=1@>
           ?>

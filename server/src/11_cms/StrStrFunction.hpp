@@ -43,11 +43,13 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_TEXT;
 			static const std::string PARAMETER_MATCH;
+			static const std::string PARAMETER_INSENSITIVE;
 
 		protected:
 			/// Parameters
 				std::string _text;
 				std::string _match;
+				bool _insensitive;
 
 
 			//////////////////////////////////////////////////////////////////////////
