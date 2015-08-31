@@ -10,6 +10,8 @@ SpikeModule.inc.cpp
 
 FwChild1.hpp
 FwChild1.cpp
+FwChild2.hpp
+FwChild2.cpp
 
 )
 
