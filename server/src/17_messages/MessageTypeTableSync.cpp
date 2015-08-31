@@ -62,6 +62,8 @@ namespace synthese
 			util::RegistryKeyType object_id
 		){
 			//TODO Check user rights
+			//TODO Validate the message type is not used by BroadcastPoint
+			// implementations... Known to crash the instance.
 			return true;
 		}
 

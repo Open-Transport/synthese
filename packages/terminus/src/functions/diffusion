@@ -222,14 +222,14 @@ template=
             else=Archivage non autorisé?>
           </td>
           <?notification_events&scenario_id=<@scenario_id@>&template=
-             <?if&cond=<@0<<@hold_count@>||<@0<<@failed_count@>@>@>&then=
+             <?if&cond=<@hold_count>0||<@failed_count>0@>@>&then=
                <tr><td><h4>Notifications</h4>
                <span id="scenario_events_flags" scenario_id="<@scenario_id@>">
-               <?if&cond=<@0<<@failed_count@>@>&then=<p><i class="icon-warning-sign"></i>
-                 <@failed_count@> émission<?if&cond=<@1<<@failed_count@>@>&then=s?> en échec</p>
+               <?if&cond=<@failed_count>0@>&then=<p><i class="icon-warning-sign"></i>
+                 <@failed_count@> émission<?if&cond=<@failed_count>1@>&then=s?> en échec</p>
                ?>
-               <?if&cond=<@0<<@hold_count@>@>&then=<p><i class="icon-flag"></i>
-                 <@hold_count@> émission<?if&cond=<@1<<@hold_count_count@>@>&then=s retenues&else= retenue?></p>
+               <?if&cond=<@hold_count>0@>&then=<p><i class="icon-flag"></i>
+                 <@hold_count@> émission<?if&cond=<@hold_count>1@>&then=s retenues&else= retenue?></p>
                ?>
                <?if&cond=<@hold_count@>&then=
                  <?link&target=<@p@>&roid=<@scenario_id@>&text=Emettre les notifications (<@hold_count@>)&class=btn btn-primary btn-mini unhold_events_link?>

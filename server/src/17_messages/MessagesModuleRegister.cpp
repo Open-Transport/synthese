@@ -12,17 +12,11 @@
 #include "ScenarioTemplateTableSync.h"
 #include "ScenarioCalendarTableSync.hpp"
 #include "ScenarioFolderTableSync.h"
-#include "TextTemplateTableSync.h"
 #include "NotificationProviderTableSync.hpp"
 
 #include "BroadcastPointAlarmRecipient.hpp"
 
-#include "MessagesAdmin.h"
 #include "MessageAdmin.h"
-#include "MessagesScenarioAdmin.h"
-#include "MessagesLibraryAdmin.h"
-#include "MessagesTemplateLibraryAdmin.h"
-
 #include "MessagesRight.h"
 #include "MessagesLibraryRight.h"
 
@@ -46,11 +40,9 @@
 #include "SimpleMessageCreationAction.hpp"
 #include "UpdateAlarmMessagesFromTemplateAction.h"
 #include "NewMessageAction.h"
-#include "UpdateTextTemplateAction.h"
 #include "ScenarioStopAction.h"
 #include "ScenarioRemoveAction.h"
 #include "AddScenarioAction.h"
-#include "TextTemplateAddAction.h"
 #include "UpdateAlarmMessagesAction.h"
 #include "AlarmRemoveLinkAction.h"
 #include "AlarmAddLinkAction.h"
@@ -66,7 +58,6 @@
 #include "MessagesTypes.h"
 #include "MessagesSection.hpp"
 #include "Alarm.h"
-#include "TextTemplate.h"
 #include "ScenarioFolder.h"
 #include "SentScenario.h"
 #include "ScenarioTemplate.h"
@@ -96,14 +87,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::ScenarioFolderTableSync::integrate();
 	synthese::messages::ScenarioTemplateTableSync::integrate();
 	synthese::messages::SentScenarioTableSync::integrate();
-	synthese::messages::TextTemplateTableSync::integrate();
-
-	synthese::messages::MessagesAdmin::integrate();
 	synthese::messages::MessageAdmin::integrate();
-	synthese::messages::MessagesLibraryAdmin::integrate();
-	synthese::messages::MessagesTemplateLibraryAdmin::integrate();
-	synthese::messages::MessagesScenarioAdmin::integrate();
-
 	synthese::messages::MessagesRight::integrate();
 	synthese::messages::MessagesLibraryRight::integrate();
 
@@ -129,9 +113,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::ScenarioRemoveAction::integrate();
 	synthese::messages::UpdateAlarmMessagesFromTemplateAction::integrate();
 	synthese::messages::NewMessageAction::integrate();
-	synthese::messages::UpdateTextTemplateAction::integrate();
 	synthese::messages::AddScenarioAction::integrate();
-	synthese::messages::TextTemplateAddAction::integrate();
 	synthese::messages::UpdateAlarmMessagesAction::integrate();
 	synthese::messages::AlarmRemoveLinkAction::integrate();
 	synthese::messages::AlarmAddLinkAction::integrate();
@@ -156,11 +138,9 @@ void synthese::messages::moduleRegister()
 	INTEGRATE(synthese::messages::MessageType);
 	INTEGRATE(synthese::messages::ScenarioCalendar);
 	INTEGRATE(synthese::messages::Alarm);
-	synthese::util::Env::Integrate<synthese::messages::TextTemplate>();
 	INTEGRATE(synthese::messages::ScenarioFolder);
 	INTEGRATE(synthese::messages::ScenarioTemplate);
 	INTEGRATE(synthese::messages::SentScenario);
 	INTEGRATE(synthese::messages::CustomBroadcastPoint);
 	INTEGRATE(synthese::messages::MessagesSection);
-
 }

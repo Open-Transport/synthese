@@ -23,11 +23,11 @@
 
 #include <Alarm.h>
 #include <AlarmTableSync.h>
-#include <boost/lexical_cast.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <DBDirectTableSyncTemplate.hpp>
 #include <DBLogEntry.h>
 #include <DBTableSync.hpp>
 #include <DBTableSyncTemplate.hpp>
+#include <Env.h>
 #include <FactorableTemplate.h>
 #include <NotificationEvent.hpp>
 #include <NotificationLog.hpp>
@@ -36,6 +36,15 @@
 #include <Object.hpp>
 #include <Registrable.h>
 #include <SentScenario.h>
+#include <ScenarioTemplate.h>
+#include <Scenario.h>
+#include <SentScenarioTableSync.h>
+#include <ScenarioTemplateTableSync.h>
+#include <StringField.hpp>
+#include <UtilTypes.h>
+
+#include <boost/lexical_cast.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <sstream>
 #include <vector>
@@ -71,6 +80,12 @@ namespace synthese
 		}
 
 
+		std::string NotificationLog::getObjectColumnName() const
+		{
+			return "Evènement";
+		}
+
+
 
 		std::string NotificationLog::getObjectName(
 			RegistryKeyType id,
@@ -80,12 +95,52 @@ namespace synthese
 			{
 				RegistryTableType tableId = decodeTableId(id);
 				Env env;
-				if (tableId == AlarmTableSync::TABLE.ID)
+				if (tableId == SentScenarioTableSync::TABLE.ID)
+				{
+					boost::shared_ptr<const SentScenario> scenario(SentScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					return scenario->getName();
+				}
+				else if (tableId == ScenarioTemplateTableSync::TABLE.ID)
+				{
+					boost::shared_ptr<const ScenarioTemplate> scenario(ScenarioTemplateTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					return scenario->getName();
+				}
+				else if (tableId == AlarmTableSync::TABLE.ID)
 				{
 					boost::shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return alarm->getShortMessage();
 				}
 				else if (tableId == NotificationProviderTableSync::TABLE.ID)
+				{
+					boost::shared_ptr<const NotificationProvider> provider(NotificationProviderTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					return provider->getName();
+				}
+			}
+			catch (...)
+			{
+			}
+			return DBLog::getObjectName(id,searchRequest);
+		}
+
+
+
+		std::string NotificationLog::getObject2ColumnName() const
+		{
+			return "Fournisseur";
+		}
+
+
+
+
+		std::string NotificationLog::getObject2Name(
+			RegistryKeyType id,
+			const server::Request& searchRequest
+		) const	{
+			try
+			{
+				RegistryTableType tableId = decodeTableId(id);
+				Env env;
+				if (tableId == NotificationProviderTableSync::TABLE.ID)
 				{
 					boost::shared_ptr<const NotificationProvider> provider(NotificationProviderTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return provider->getName();
@@ -111,7 +166,7 @@ namespace synthese
 			content.push_back(lexical_cast<string>(alarm.getKey()));
 
 			stringstream text;
-			text << "Notification depuis '" << provider.get<Name>();
+			text << "Notification vers '" << provider.getName();
 
 			if (event->get<Status>() == FAILED)
 			{
@@ -127,15 +182,12 @@ namespace synthese
 			{
 				text << "' réussi pour le message '";
 			}
-			text << alarm.getShortMessage();
-			if (alarm.getScenario())
-			{
-				text << "' du scénario " << alarm.getScenario()->getName();
-			} else {
-				text << "'";
-			}
+			text << alarm.getShortMessage() << "'";
 			content.push_back(text.str());
-			_addEntry(FACTORY_KEY, level, content, NULL, provider.getKey(), alarm.getKey());
+			_addEntry(FACTORY_KEY, level, content, NULL,
+					(alarm.getScenario() ? alarm.getScenario()->getKey() : 0),
+					provider.getKey()
+			);
 		}
 
 		void NotificationLog::AddNotificationProviderFailure(
@@ -151,19 +203,17 @@ namespace synthese
 				content.push_back(string());
 			}
 			stringstream text;
-			text << "Echec depuis '" << provider->get<Name>();
+			text << "Echec vers '" << provider->getName();
 			if (alarm) {
 				text << "' pour le message '" << alarm->getShortMessage();
-				if (alarm->getScenario())
-				{
-					text << "' du scénario '" << alarm->getScenario()->getName();
-				}
 			}
 			text << "': " << details;
 			content.push_back(text.str());
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_ERROR, content, NULL, provider->getKey(),
-					(alarm ? alarm->getKey() : 0));
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_ERROR, content, NULL,
+					(alarm ? alarm->getScenario()->getKey() : 0),
+					provider->getKey()
+			);
 		}
 
 	} /* namespace messages */

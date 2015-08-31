@@ -501,17 +501,54 @@
 
 </div><#tab_div&id=log#>
 
-    <div class="pagination">
-    <ul>
-    <?if&cond=<@r>=150@>&then=<li><?link&target=<@p@>&r=0&text=1&tab=log?></li>?>
-    <?if&cond=<@r>=200@>&then=<li class="disabled"><a href="#">...</a></li>?>
-    <?if&cond=<@r>=100@>&then=<li><?link&target=<@p@>&r=<@r-100@>&text=<@(r/50)-1@>&tab=log?></li>?>
-    <?if&cond=<@r>=50@>&then=<li><?link&target=<@p@>&r=<@r-50@>&text=<@(r/50)@>&tab=log?></li>?>
-    <li class="active"><a href="#"><@1+(r/50)@></a></li>
-    <li><?link&target=<@p@>&r=<@r+50@>&text=<@(r/50)+2@>&tab=log?></li>
-    <li><?link&target=<@p@>&r=<@r+100@>&text=<@(r/50)+3@>&tab=log?></li>
-    </ul>
+  <?if&cond=<@log_key@>&else=<@log_key=messages@>?>
+  <?if&cond=<@page_size@>&else=<@page_size=20@>?>
+  <?form&
+    name=log_form&
+    form_id=log_form&
+    target=<@p@>&
+    tab=log&
+    r=0
+    ?>
+    <div class="row-fluid">
+      <span style="font-weight:bold; padding:10px;">Catégorie</span>
+      <select name="log_key" onchange="document.log_form.submit()">
+        <option value="messages" <?if&cond=<@log_key=="messages"@>&then= selected="selected"?>>Diffusion</option>
+        <option value="messageslibrary" <?if&cond=<@log_key=="messageslibrary"@>&then= selected="selected"?>>Bibliothèque</option>
+        <option value="messagesnotification" <?if&cond=<@log_key=="messagesnotification"@>&then= selected="selected"?>>Notifications</option>
+      </select>
+      <span style="font-weight:bold; padding:15px;">Filtres</span>
+      <span style="padding-right:15px;">Date
+        <span style="padding-left:10px;">
+          <input class="input-small logFilterField" type="text" placeholder="AAAA-MM-JJ" name="search_end_date" value="<@search_end_date@>" />
+        </span>
+      </span>
+      <span style="padding-right:15px;">Texte
+        <span style="padding-left:10px;">
+          <input class="logFilterField" type="text" name="search_text" value="<@search_text@>" />
+        </span>
+      </span>
+      <span>
+        <button type="submit" class="btn"><i class="icon-filter" title="Appliquer les filtres sélectionnés"></i></button>
+        <?link&target=<@p@>&r=0&tab=log&class=btn&text=<i type="button" class="icon-refresh" title="Effacer les filtres sélectionnés"></i>?>
+      </span>
     </div>
+  </form>
+
+  <div class="pagination">
+    <ul>
+      <?if&cond=<@r>=150@>&then=<li><?link&target=<@p@>&r=0&text=1&tab=log?></li>?>
+      <?if&cond=<@r>=200@>&then=<li class="disabled"><a href="#">...</a></li>?>
+      <?if&cond=<@r>=100@>&then=<li><?link&target=<@p@>&r=<@r-100@>&text=<@(r/50)-1@>&tab=log?></li>?>
+      <?if&cond=<@r>=50@>&then=<li><?link&target=<@p@>&r=<@r-50@>&text=<@(r/50)@>&tab=log?></li>?>
+        <li class="active"><a href="#"><@1+(r/50)@></a></li>
+        <?if&cond=<@number>50@>
+          <li><?link&target=<@p@>&r=<@r+50@>&text=<@(r/50)+2@>&tab=log?></li>
+          <li><?link&target=<@p@>&r=<@r+100@>&text=<@(r/50)+3@>&tab=log?></li>
+        ?>
+    </ul>
+  </div>
+
 <table class="table-striped table-condensed table">
 <thead><tr>
 <th>date</th>
@@ -522,8 +559,10 @@
 </tr></thead>
 <tbody>
 <?db_log&
-	log_key=messages&
+	log_key=<@log_key@>&
 	first=<@r@>&
+        text=<@search_text@>&
+        end_date=<@search_end_date@><?if&cond=<@search_end_date@>&then= 23:59:59.000?>&
 	template=<{entry&template=
 		<tr>
 		<td><@date@></td>

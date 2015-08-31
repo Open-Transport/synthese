@@ -39,9 +39,6 @@
 #include "ScenarioTemplate.h"
 #include "SentScenario.h"
 #include "DBDirectTableSync.hpp"
-#include "MessagesAdmin.h"
-#include "MessagesLibraryAdmin.h"
-#include "MessagesScenarioAdmin.h"
 #include "MessagesRight.h"
 #include "MessagesLibraryRight.h"
 #include "AdminActionFunctionRequest.hpp"
@@ -132,17 +129,6 @@ namespace synthese
 
 				AdminActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,MessageAdmin> templateRequest(_request, *this);
 				templateRequest.getAction()->setAlarmId(_alarm->getKey());
-
-				MessagesModule::Labels tl(MessagesModule::getTextTemplateLabels(_alarm->getLevel()));
-				if(!tl.empty())
-				{
-					HTMLForm fc(templateRequest.getHTMLForm("template"));
-					stream << fc.open() << "<p>";
-					stream << "Modèle : ";
-					stream << fc.getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, tl, optional<RegistryKeyType>());
-					stream << fc.getSubmitButton("Copier contenu");
-					stream << "</p>" << fc.close();
-				}
 
 				AdminActionFunctionRequest<UpdateAlarmMessagesAction,MessageAdmin> updateMessagesRequest(_request, *this);
 				updateMessagesRequest.getAction()->setAlarmId(_alarm->getKey());
@@ -286,16 +272,8 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const server::Request& request
 		) const {
-			const MessagesScenarioAdmin* ma(
-				dynamic_cast<const MessagesScenarioAdmin*>(&currentPage)
-			);
-
-			if(	!ma) return false;
-
-			if(!_alarm->getScenario())
-				return false;
-
-			return _alarm->getScenario()->getKey() == ma->getScenario()->getKey();
+			// Previous implementation test scenario visibility.
+			return true;
 		}
 
 		void MessageAdmin::setMessage(boost::shared_ptr<const Alarm> value)

@@ -149,7 +149,6 @@ $(function(){
   $('#s_list li').disableSelection();
   
   $('[field=inputMediaId]').on("change", changeMediaId);
-  
   $('[field=inputIneoTerminusNetwork]').on("change", changeIneoTerminusNetwork);
   $('[field=inputIneoTerminusDatasource]').on("change", changeIneoTerminusDatasource);
   $('[field=inputIneoTerminusPassengerFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
@@ -162,4 +161,13 @@ $(function(){
   $('[field=inputIneoTerminusBivGeneralFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
   $('[field=inputIneoTerminusBivLineAutoFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
   $('[field=inputIneoTerminusBivLineManFakeBroadcast]').on("change", changeIneoTerminusFakeBroadcast);
+
+  // Log tab
+  $(".logFilterField").keypress(function(event) {
+    if (event.which == 13 || event.which == 10) {
+        event.preventDefault();
+        $("#log_form").submit();
+    }
+  });
 });
+>>>>>>> terminus-multiprotocolbroadcastpoint
