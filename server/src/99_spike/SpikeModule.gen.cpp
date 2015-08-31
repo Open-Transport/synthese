@@ -1,0 +1,1 @@
+synthese::spike::moduleRegister();
