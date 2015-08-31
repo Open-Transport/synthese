@@ -71,7 +71,7 @@ namespace synthese
 			{
 				setScenarioId(map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID));
 			}
-			catch(ParametersMap::MissingParameterException e)
+			catch(ParametersMap::MissingParameterException& e)
 			{
 				throw ActionException(e, *this);
 			}

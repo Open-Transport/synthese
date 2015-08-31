@@ -33,8 +33,6 @@
 #include "MessagesLibraryRight.h"
 #include "Alarm.h"
 #include "AlarmTableSync.h"
-#include "TextTemplate.h"
-#include "TextTemplateTableSync.h"
 #include "MessagesModule.h"
 #include "ActionException.h"
 #include "Request.h"
@@ -81,9 +79,9 @@ namespace synthese
 			try
 			{
 				setAlarmId(map.get<RegistryKeyType>(PARAMETER_ALARM_ID));
-				_template = TextTemplateTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), *_env);
+				_template = AlarmTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), *_env);
 			}
-			catch(ObjectNotFoundException<TextTemplate>& e)
+			catch(ObjectNotFoundException<Alarm>& e)
 			{
 				throw ActionException("template", e, *this);
 			}

@@ -25,7 +25,6 @@
 #include "SentScenario.h"
 #include "SentScenarioTableSync.h"
 #include "Env.h"
-#include "MessagesRight.h"
 #include "Request.h"
 #include "ScenarioTemplate.h"
 

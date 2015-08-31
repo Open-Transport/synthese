@@ -54,10 +54,6 @@ MessageApplicationPeriod.hpp
 MessageApplicationPeriod.cpp
 MessageApplicationPeriodTableSync.cpp
 MessageApplicationPeriodTableSync.hpp
-MessagesAdmin.cpp
-MessagesAdmin.h
-MessagesLibraryAdmin.cpp
-MessagesLibraryAdmin.h
 MessagesLibraryLog.cpp
 MessagesLibraryLog.h
 MessagesLibraryRight.cpp
@@ -71,16 +67,12 @@ MessagesModule.h
 MessagesModule.inc.cpp
 MessagesRight.cpp
 MessagesRight.h
-MessagesScenarioAdmin.cpp
-MessagesScenarioAdmin.h
 MessagesSection.cpp
 MessagesSection.hpp
 MessagesSectionTableSync.cpp
 MessagesSectionTableSync.hpp
 MessagesSectionsService.cpp
 MessagesSectionsService.hpp
-MessagesTemplateLibraryAdmin.cpp
-MessagesTemplateLibraryAdmin.h
 MessagesTypes.h
 MessageTag.cpp
 MessageTag.hpp
@@ -157,20 +149,10 @@ SimpleMessageCreationAction.cpp
 SimpleMessageCreationAction.hpp
 SmtpNotificationChannel.hpp
 SmtpNotificationChannel.cpp
-TextTemplate.cpp
-TextTemplate.h
-TextTemplateAddAction.cpp
-TextTemplateAddAction.h
-TextTemplateFolderUpdateAction.cpp
-TextTemplateFolderUpdateAction.h
-TextTemplateTableSync.cpp
-TextTemplateTableSync.h
 UpdateAlarmMessagesAction.cpp
 UpdateAlarmMessagesAction.h
 UpdateAlarmMessagesFromTemplateAction.cpp
 UpdateAlarmMessagesFromTemplateAction.h
-UpdateTextTemplateAction.cpp
-UpdateTextTemplateAction.h
 )
 
 set_source_files_properties(MessagesModule.gen.cpp MessagesModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
