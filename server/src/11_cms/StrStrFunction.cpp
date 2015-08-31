@@ -25,6 +25,8 @@
 #include "Request.h"
 #include "StrStrFunction.hpp"
 
+#include <boost/algorithm/string/find.hpp>
+
 using namespace std;
 
 namespace synthese
@@ -39,6 +41,7 @@ namespace synthese
 	{
 		const string StrStrFunction::PARAMETER_TEXT("text");
 		const string StrStrFunction::PARAMETER_MATCH("match");
+		const string StrStrFunction::PARAMETER_INSENSITIVE("insensitive");
 
 
 		ParametersMap StrStrFunction::_getParametersMap() const
@@ -53,6 +56,7 @@ namespace synthese
 		{
 			_text = map.getDefault<string>(PARAMETER_TEXT);
 			_match = map.getDefault<string>(PARAMETER_MATCH);
+			_insensitive = map.getDefault<bool>(PARAMETER_INSENSITIVE);
 		}
 
 
@@ -65,7 +69,17 @@ namespace synthese
 			{
 				const char * text = _text.c_str();
 				const char * match = _match.c_str();
-				const char * ret = strstr(text,match);
+				const char * ret = NULL;
+				if (_insensitive) {
+					boost::iterator_range<const char *> it = boost::ifind_first(text,match);
+					if (it) {
+						ret = it.begin();
+					};
+				}
+				else
+				{
+					ret = strstr(text,match);
+				}
 				if (ret)
 				{
 					stream << ret - text + 1;
