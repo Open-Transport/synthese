@@ -51,7 +51,7 @@ namespace synthese
 		@ingroup m62
 		*/
 		class FwParent :
-			public Object<FwParent, FwParentSchema>
+			public virtual Object<FwParent, FwParentSchema>
 		{
 		public:
             
