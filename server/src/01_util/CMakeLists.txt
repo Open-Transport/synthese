@@ -52,6 +52,7 @@ RegistryKeyException.h
 RGBColor.cpp
 RGBColor.h
 shared_recursive_mutex.hpp
+Stacktrace.h
 StringUtils.cpp
 StringUtils.hpp
 T9Filter.h
