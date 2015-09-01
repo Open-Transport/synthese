@@ -40,6 +40,7 @@
 #include <errmsg.h>
 #include <geos/geom/Geometry.h>
 #include <geos/io/WKTWriter.h>
+#include "01_util/Stacktrace.h"
 
 using namespace geos::io;
 using namespace std;
@@ -80,6 +81,7 @@ namespace synthese
 		void cleanupThread(bool* initialized)
 		{
 			Log::GetInstance().debug("Cleaning up MySQL thread");
+			print_stacktrace();
 			mysql_thread_end();
 		}
 	}
