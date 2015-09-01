@@ -89,12 +89,12 @@ namespace synthese
 				std::string property2 = child1.get<Property2>();
 			}
 
-			FwChild2 child2;
+			/*FwChild2 child2;
 			{
 				std::string property0 = child2.get<Property0>();
 				std::string property1 = child2.get<Property1>();
 				std::string property2 = child2.get<Property2>();
-			}
+			}*/
 
 			FwParent& parent = child1;
 			{
