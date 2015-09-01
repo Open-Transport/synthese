@@ -33,6 +33,7 @@ namespace synthese
 	using namespace util;
 
 	CLASS_DEFINITION(FwChild2, "t992_fwchild2", 991)
+	FIELD_DEFINITION_OF_TYPE(Property0, "property0", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(Property2, "property2", SQL_TEXT)
 
 	namespace spike

@@ -32,21 +32,13 @@ namespace synthese
 	using namespace spike;
 	using namespace util;
 
-	CLASS_DEFINITION(FwParent, "t990_fwparent", 990)
-	FIELD_DEFINITION_OF_TYPE(Property0, "property0", SQL_TEXT)
 
 	namespace spike
 	{
 
 		FwParent::FwParent(
 			RegistryKeyType id
-		):	Registrable(id),
-			Object<FwParent, FwParentSchema>(
-				Schema(
-					FIELD_VALUE_CONSTRUCTOR(Key, id),
-					FIELD_DEFAULT_CONSTRUCTOR(Property0)
-                    )
-                )
+		):	Registrable(id)
 		{}
 
 

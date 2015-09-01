@@ -53,7 +53,7 @@ namespace synthese
 		@ingroup m62
 		*/
 		class FwChild2:
-			public FwParent
+			public FwParent, public Object<FwChild2, FwChild2Schema>
 		{
 		public:
             

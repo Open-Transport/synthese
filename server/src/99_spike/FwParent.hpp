@@ -38,20 +38,13 @@ namespace synthese
 {
 	namespace spike
 	{
-		class FwParent;
-
 		FIELD_STRING(Property0)
-
-		typedef boost::fusion::map<
-			FIELD(Key),
-			FIELD(Property0)
-		> FwParentSchema;
 
 		/** Fwparent class.
 		@ingroup m62
 		*/
 		class FwParent :
-			public virtual Object<FwParent, FwParentSchema>
+			public virtual util::Registrable
 		{
 		public:
             
