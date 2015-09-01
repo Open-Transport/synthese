@@ -9,7 +9,6 @@ SpikeModule.hpp
 SpikeModule.inc.cpp
 
 FwParent.hpp
-FwParent.cpp
 FwChild1.hpp
 FwChild1.cpp
 FwChild2.hpp

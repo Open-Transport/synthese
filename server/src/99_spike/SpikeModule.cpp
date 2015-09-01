@@ -24,6 +24,8 @@
 #include "SpikeModule.hpp"
 
 #include "01_util/threads/Thread.h"
+#include "FwChild1.hpp"
+#include "FwChild2.hpp"
 
 using namespace std;
 
@@ -79,6 +81,22 @@ namespace synthese
 
 		void SpikeModule::initialize()
 		{
+			FwChild1 child1;
+			{
+				std::string property0 = child1.get<Property0>();
+				std::string property1 = child1.get<Property1>();
+			}
+
+			/*FwChild2 child2;
+			{
+				std::string property0 = child2.get<Property0>();
+				std::string property2 = child2.get<Property2>();
+			}*/
+
+			FwParent& parent = child1;
+			{
+				std::string property0 = parent.get<Property0>();
+			}
 		}
 	}
 }

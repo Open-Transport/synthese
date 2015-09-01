@@ -41,7 +41,7 @@ namespace synthese
 		FwChild1::FwChild1(
 			RegistryKeyType id
 		):	Registrable(id),
-			Object<FwChild1, FwChild1Schema>(
+			FwParent<FwChild1, FwChild1Schema>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Property1)

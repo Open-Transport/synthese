@@ -25,6 +25,7 @@
 
 #include "Object.hpp"
 
+#include "FwParent.hpp"
 #include "PointerField.hpp"
 #include "StringField.hpp"
 #include "EnumObjectField.hpp"
@@ -51,7 +52,7 @@ namespace synthese
 		@ingroup m62
 		*/
 		class FwChild2:
-			public Object<FwChild2, FwChild2Schema>
+			public FwParent<FwChild2, FwChild2Schema>
 		{
 		public:
             

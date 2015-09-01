@@ -25,6 +25,7 @@
 
 #include "Object.hpp"
 
+#include "FwParent.hpp"
 #include "PointerField.hpp"
 #include "StringField.hpp"
 #include "EnumObjectField.hpp"
@@ -44,6 +45,7 @@ namespace synthese
 
 		typedef boost::fusion::map<
 			FIELD(Key),
+			FIELD(Property0),
 			FIELD(Property1)
 		> FwChild1Schema;
 
@@ -51,7 +53,7 @@ namespace synthese
 		@ingroup m62
 		*/
 		class FwChild1:
-			public Object<FwChild1, FwChild1Schema>
+			public FwParent<FwChild1, FwChild1Schema>
 		{
 		public:
             
