@@ -259,7 +259,7 @@ namespace synthese
 
 								const std::string nodeShortMsg = messageNode.second.get("title", string());
 								const std::string nodeLongMsg = messageNode.second.get("content", string());
-								int nodeRepeatInterval = boost::lexical_cast<int>(messageNode.second.get("repeat_interval", 0));
+								int nodeRepeatInterval = messageNode.second.get("repeat_interval", 0);
 
 								if ((alarmShortMsg == nodeShortMsg) && (alarmLongMsg == nodeLongMsg) &&	(alarmRepeatInterval == nodeRepeatInterval))
 								{
@@ -424,8 +424,16 @@ namespace synthese
 								// Loop on all recipient factories
 								BOOST_FOREACH(boost::shared_ptr<AlarmRecipient> linkType, Factory<AlarmRecipient>::GetNewCollection())
 								{
+									std::string linkTypeKey = linkType->getFactoryKey();
+
+									if("displayscreen" == linkTypeKey)
+									{
+										// For Ineo messages we do not want to delete "displayscreen" recipients, they indicate which type of message it is
+										continue;
+									}
+
 									// Existing links of this factory in the existent message
-									Alarm::LinkedObjects::mapped_type existingLinks(alarm->getLinkedObjects(linkType->getFactoryKey()));
+									Alarm::LinkedObjects::mapped_type existingLinks(alarm->getLinkedObjects(linkTypeKey));
 									boost::optional<const ptree&> recipientNode = messageNode.second.get_child_optional(linkType->getFactoryKey() + "_recipient");
 
 									BOOST_FOREACH(const AlarmObjectLink* link, existingLinks)
