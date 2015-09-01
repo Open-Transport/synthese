@@ -1005,8 +1005,8 @@ namespace synthese
 			BOOST_FOREACH(const Messaging& message, messages)
 			{
 				boost::shared_ptr<ParametersMap> periodPM(new ParametersMap);
-				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()));
-				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()));
+				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()) + " " + boost::posix_time::to_simple_string(message.startDate.time_of_day()));
+				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()) + " " + boost::posix_time::to_simple_string(message.stopDate.time_of_day()));
 				periodPM->insert("start_hour", message.startHour.is_not_a_date_time() ? "" : boost::posix_time::to_simple_string(message.startHour));
 				periodPM->insert("end_hour", message.stopHour.is_not_a_date_time() ? "" : boost::posix_time::to_simple_string(message.stopHour));
 				periodPM->insert("date", "");
@@ -1027,7 +1027,7 @@ namespace synthese
 				{
 					messagePM->insert("dispatching", "Repete");
 				}
-				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod));
+				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod * 60));
 				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
 				messagePM->insert("section", "");
 				messagePM->insert("alternative", "");
@@ -1385,6 +1385,8 @@ namespace synthese
 			}
 			string startDateStr("01/01/1970");
 			string stopDateStr("31/12/2037");
+			string startTimeStr("00:00:00");
+			string stopTimeStr("23:59:59");
 			message.startHour = boost::posix_time::not_a_date_time;
 			message.stopHour = boost::posix_time::not_a_date_time;
 			if (node.nChildNode("StartDate") > 0)
@@ -1400,18 +1402,20 @@ namespace synthese
 			if (node.nChildNode("StartTime") > 0)
 			{
 				XMLNode startTimeNode = node.getChildNode("StartTime", 0);
-				message.startHour = boost::posix_time::duration_from_string(startTimeNode.getText());
+				startTimeStr = startTimeNode.getText();
+				message.startHour = boost::posix_time::duration_from_string(startTimeStr);
 			}
 			if (node.nChildNode("StopTime") > 0)
 			{
 				XMLNode stopTimeNode = node.getChildNode("StopTime", 0);
+				stopTimeStr = stopTimeNode.getText();
 				message.stopHour = boost::posix_time::duration_from_string(stopTimeNode.getText());
 			}
 			message.startDate =	 XmlToolkit::GetIneoDateTime(
-				startDateStr + " 00:00:00"
+				startDateStr + " " + startTimeStr
 			);
 			message.stopDate =	XmlToolkit::GetIneoDateTime(
-				stopDateStr + " 23:59:59"
+				stopDateStr + " " + stopTimeStr
 			);
 			if (node.nChildNode("MultipleStop") > 0)
 			{

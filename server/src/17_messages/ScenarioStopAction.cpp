@@ -208,10 +208,7 @@ namespace synthese
 						continue;
 					}
 					SentScenario* sscenario = static_cast<SentScenario*>(scenario.get());
-					if (!sscenario->getIsEnabled())
-					{
-						continue;
-					}
+
 					// Loop on messages
 					bool allAlarmsFound(true);
 					Scenario::Messages alarms = sscenario->getMessages();
@@ -222,6 +219,7 @@ namespace synthese
 						{
 							continue;
 						}
+
 						BOOST_FOREACH(MessageApplicationPeriod* period, alarm->getCalendar()->getApplicationPeriods())
 						{
 							bool periodFound(false);
@@ -263,9 +261,15 @@ namespace synthese
 						{
 							BOOST_FOREACH(const ptree::value_type& messageNode, calendarNode.second.get_child("message"))
 							{
-								if (alarm->getShortMessage() == messageNode.second.get("title", string()) &&
-									alarm->getLongMessage() == messageNode.second.get("content", string()) &&
-									alarm->getRepeatInterval() == messageNode.second.get("repeat_interval", 0))
+								const std::string alarmShortMsg = alarm->getShortMessage();
+								const std::string alarmLongMsg = alarm->getLongMessage();
+								int alarmRepeatInterval = alarm->getRepeatInterval();
+
+								const std::string nodeShortMsg = messageNode.second.get("title", string());
+								const std::string nodeLongMsg = messageNode.second.get("content", string());
+								int nodeRepeatInterval = boost::lexical_cast<int>(messageNode.second.get("repeat_interval", 0));
+
+								if ((alarmShortMsg == nodeShortMsg) && (alarmLongMsg == nodeLongMsg) &&	(alarmRepeatInterval == nodeRepeatInterval))
 								{
 									bool identicalRecipients(true);
 									// Content of message is equal, verify recipients if needed
