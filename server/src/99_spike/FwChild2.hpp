@@ -64,6 +64,8 @@ namespace synthese
 			FwChild2(util::RegistryKeyType id=0);
 			~FwChild2();
 
+			virtual std::string getProperty0() const { return get<Property0>(); }
+
 		};
 }	}
 

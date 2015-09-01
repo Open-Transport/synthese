@@ -96,7 +96,7 @@ namespace synthese
 
 			FwParent& parent = child1;
 			{
-				std::string property0 = parent.get<Property0>();
+				std::string property0 = parent.getProperty0();
 			}
 		}
 	}

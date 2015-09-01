@@ -32,6 +32,7 @@ namespace synthese
 	using namespace spike;
 	using namespace util;
 
+	FIELD_DEFINITION_OF_TYPE(Property0, "property0", SQL_TEXT)
 
 	namespace spike
 	{

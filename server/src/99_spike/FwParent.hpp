@@ -46,14 +46,14 @@ namespace synthese
 		class FwParent :
 			public virtual util::Registrable
 		{
-		public:
-            
 		private:
 
 
 		public:
 			FwParent(util::RegistryKeyType id=0);
 			~FwParent();
+
+			virtual std::string getProperty0() const = 0;
 
 		};
 }	}

@@ -33,7 +33,6 @@ namespace synthese
 	using namespace util;
 
 	CLASS_DEFINITION(FwChild1, "t991_fwchild1", 991)
-	FIELD_DEFINITION_OF_TYPE(Property0, "property0", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(Property1, "property1", SQL_TEXT)
 
 	namespace spike
@@ -45,6 +44,7 @@ namespace synthese
 			Object<FwChild1, FwChild1Schema>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Property0),
 					FIELD_DEFAULT_CONSTRUCTOR(Property1)
                     )
                 )
