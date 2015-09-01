@@ -626,32 +626,17 @@ namespace synthese
 
 				if (tagName == "CheckStatusRequest")
 				{
-					bool requestSuccessful = _checkStatusRequest(childNode, response);
-
-					if(!requestSuccessful)
-					{
-						// TODO : log
-					}
+					_checkStatusRequest(childNode, response);
 				}
 
 				else if (_creationRequestTags.end() != _creationRequestTags.find(tagName))
 				{
-					bool requestSuccessful = _createMessageRequest(childNode, response);
-
-					if(!requestSuccessful)
-					{
-						// TODO : log
-					}
+					_createMessageRequest(childNode, response);
 				}
 
 				else if (_deletionRequestTags.end() != _deletionRequestTags.find(tagName))
 				{
-					bool requestSuccessful = _deleteMessageRequest(childNode, response);
-
-					if(!requestSuccessful)
-					{
-						// TODO : log
-					}
+					_deleteMessageRequest(childNode, response);
 				}
 
 				else if (_creationOrDeletionResponseTags.end() != _creationOrDeletionResponseTags.find(tagName))
@@ -666,12 +651,7 @@ namespace synthese
 
 				else if (_getStatesResponseTags.end() != _getStatesResponseTags.find(tagName))
 				{
-					bool requestSuccessful = _getStatesResponse(childNode, response);
-
-					if(!requestSuccessful)
-					{
-						// TODO : log
-					}
+					_getStatesResponse(childNode, response);
 				}
 
 				else
@@ -1121,26 +1101,51 @@ namespace synthese
 		{
 			bool status = true;
 
+			// Extract Ineo message type from tag name
+			std::string tagName(node.getName());
+			std::string ineoMessageType = tagName.substr(0, tagName.find("GetStatesResponse"));
+
 			// Check for mandatory nodes
 			int numIDNode = node.nChildNode("ID");
 			int numRequestIDNode = node.nChildNode("RequestID");
 			int numResponseTimeStampNode = node.nChildNode("ResponseTimeStamp");
 			int numResponseRefNode = node.nChildNode("ResponseRef");
 			int numMessagingStatesNode = node.nChildNode("MessagingStates");
+			int numErrorTypeNode = node.nChildNode("ErrorType");
 
-			status = ((1 == numIDNode) && (1 == numRequestIDNode) && (1 == numResponseTimeStampNode) && (1 == numResponseRefNode) && (1 == numMessagingStatesNode));
+			status = ((1 == numIDNode) && (1 == numRequestIDNode) && (1 == numResponseTimeStampNode) && (1 == numResponseRefNode));
 			if(false == status)
 			{
 				// Message is ill-formed, reply to Ineo with an error
-				util::Log::GetInstance().warn("Ineo Terminus : message misses mandatory nodes");
+				util::Log::GetInstance().warn("Ineo Terminus : " + tagName + " misses mandatory nodes");
 				return status;
 			}
 
-			// Extract Ineo message type from tag name
-			std::string tagName(node.getName());
-			std::string ineoMessageType = tagName.substr(0, tagName.find("GetStatesResponse"));
-			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
+			if(0 < numErrorTypeNode)
+			{
+				std::string errorType(node.getChildNode("ErrorType").getText());
+				std::string errorId(node.getChildNode("ErrorID").getText());
 
+				if("ProtocolError" == errorType && "3" == errorId)
+				{
+					// Ineo SAETR is not available, resend the XXXGetStatesRequest until a proper response is received
+					std::string stateRequest = IneoTerminusConnection::GetTheConnection()->_buildGetStatesRequest(ineoMessageType);
+					IneoTerminusConnection::GetTheConnection()->addMessage(stateRequest);
+				}
+
+				else
+				{
+					util::Log::GetInstance().warn("Ineo Terminus : " + tagName + " has error " + std::string(node.getChildNode("ErrorMessage").getText()));
+					IneoTerminusLog::AddIneoTerminusErrorMessageEntry(node);
+				}
+			}
+
+			if(1 != numMessagingStatesNode)
+			{
+				return status;
+			}
+
+			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
 			boost::shared_ptr<NotificationProvider> provider;
 			MessagesModule::ActivatedMessages activatedMessages;
 			typedef std::map< std::string, boost::shared_ptr<Alarm> > MessageMap;
