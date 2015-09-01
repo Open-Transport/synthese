@@ -30,6 +30,7 @@
 #include "EnumObjectField.hpp"
 
 #include "SchemaMacros.hpp"
+#include "FwParent.hpp"
 
 #include <set>
 #include <vector>
@@ -44,6 +45,7 @@ namespace synthese
 
 		typedef boost::fusion::map<
 			FIELD(Key),
+			FIELD(Property0),
 			FIELD(Property2)
 		> FwChild2Schema;
 
@@ -51,7 +53,7 @@ namespace synthese
 		@ingroup m62
 		*/
 		class FwChild2:
-			public Object<FwChild2, FwChild2Schema>
+			public FwParent
 		{
 		public:
             
