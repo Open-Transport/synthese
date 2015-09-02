@@ -36,7 +36,7 @@
 #include <Object.hpp>
 #include <Registrable.h>
 #include <SentScenario.h>
-#include <ScenarioTableSync.h>
+#include <SentScenarioTableSync.h>
 #include <StringField.hpp>
 #include <UtilTypes.h>
 
