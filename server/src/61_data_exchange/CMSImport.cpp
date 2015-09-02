@@ -229,6 +229,7 @@ namespace synthese
 
 				if(_isExcluded(_excludeListRegEx, pageName))
 				{
+					_logInfo("Excluding " + pageName);
 					continue;
 				}
 
