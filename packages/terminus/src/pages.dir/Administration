@@ -10,6 +10,7 @@
   <#tab_title&id=broadcast_points&title=Autres diffuseurs#>
   <#tab_title&id=sections&title=Sections#>
   <#tab_title&id=log&title=Journal#>
+  <#tab_title&id=media_libraries&title=Médiathèques#>
   <#tab_title&id=system&title=Système#>
   <#tab_title&id=ineo&title=Connexion Ineo / Terminus#>
   <#tab_title&id=ineolog&title=Logs Ineo / Terminus#>
@@ -673,24 +674,130 @@ template=<{entry&template=
       </tbody>
     </table>
   </div>
+  <#tab_div&id=media_libraries#>
+<@mlib_id=<@(tab=="media_libraries")?roid:""@>@>
+    <div class="row-fluid">
+      <div class="span3" id="tree">
+        <ul class="nav nav-list well">
+          <li<@mlib_id?"":" class=\"active\""@>>
+            <?link&
+            target=<@p@>&
+            tab=media_libraries&
+            text=Médiathèques<div class="pull-right" id="mlib_new_link" data-toggle="tooltip" data-placement="top" title="Ajouter une médiathèque"><i class="icon-plus <@mlib_id?"":"icon-white"@>"></i></div>
+            ?>
+          </li>
+<?media_libraries&
+template=<{medialibrary&template=
+          <li class="tree_1 <@(id==mlib_id)?"active":""@>">
+	<@site_name=<@website_name?website_name:"Aucun site cible"@>@>
+            <?link&
+            target=<@p@>&
+            tab=media_libraries&
+            roid=<@id@>&
+            text=<@site_name@>
+              <div class="pull-right">
+	<?if&
+	cond=<@id==mlib_id@>&
+	then=
+                <span id="mlib_remove_link" element_name="<@site_name@>" element_id="<@id@>" data-toggle="tooltip" data-placement="top" title="Supprimer"><i class="icon-remove icon-white"></i></span>
+	?>
+	<?if&
+	cond=<@~global("default_medialibrary_id")==id@>&
+	then=
+                <span data-toggle="tooltip" data-placement="top" title="Médiathèque par défaut"><i class="icon-star<?if&cond=<@id==mlib_id@>&then= icon-white?>"></i></span>
+	&else=
+		<?if&
+		cond=<@id==mlib_id@>&
+		then=
+                <?form&
+                name=mlib_set_default&
+                target=<@p@>&
+                tab=media_libraries&
+                a=global_variable_update&
+                actionParam_variable=default_medialibrary_id&
+                actionParam_persistent=1&
+                roid=<@id@>&
+                class=hide
+                ?>
+                  <input type="hidden" name="actionParam_value" value="<@id@>" />
+                </form>
+                <span id="mlib_star_link" element_name="<@site_name@>" element_id="<@id@>" data-toggle="tooltip" data-placement="top" title="Définir par défaut"><i class="icon-star-empty icon-white"></i></span>
+		?>
+	?>
+              </div>
+            ?>
+          </li>
+}>?>
+        </ul>
+        <?form&
+        name=mlib_new_form&
+        class=hide&
+        a=ObjectCreate&
+        actionParam_table_id=122&
+        target=<@p@>&
+        tab=media_libraries&
+        co=1&
+        ?>
+        </form>
+      </div>
+      <div class="span6">
+<?if&
+cond=<@mlib_id@>&
+else=
+        <div class="alert alert-info">Sélectionnez une médiathèque dans le menu ci-contre</div>&
+then=
+        <?form&
+        target=<@p@>&
+        tab=media_libraries&
+        a=ObjectUpdate&
+        actionParam_object_id=<@mlib_id@>&
+        class=form-horizontal&
+        roid=<@mlib_id@>&
+        form_id=mlib_update_parameters&
+        name=mlib_update_parameters&
+        actionParam_field_parameters=<@parameters@>
+        ?>
+	<?media_libraries&
+	roid=<@mlib_id@>&
+	template=<{medialibrary&template=
+          <div class="control-group">
+            <label class="control-label" for="selectWebsiteId">Site médiathèque cible</label>
+            <div class="controls">
+		<@websiteFound=0@>
+              <select name="selectWebsiteId" field="inputWebsiteId">
+		<?websites&template=<{website&template=
+                <option value="<@id@>"<?if&cond=<@website_id==id@>&then=<@websiteFound=1@> selected="true"?>><@name@></option>
+		}>?>
+		<?if&cond=<@websiteFound@>&else=
+                <option value="0" selected="true">Aucun</option>
+		?>
+              </select>
+		<?if&cond=<@websiteFound@>&then=
+              <input type="hidden" id="inputWebsiteId" name="actionParam_field_website_id" value="<@website_id@>"/>
+		&else=
+              <input type="hidden" id="inputWebsiteId" name="actionParam_field_website_id" value="0"/>
+		?>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Nom du serveur (:port)</label>
+            <div class="controls">
+              <input type="text" name="actionParam_field_website_hostname_port" value="<@website_hostname_port@>" />
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-warning">Enregistrer</button>
+            </div>
+          </div>
+	}>?>
+        </form>
+?>
+      </div>
+    </div>
+  </div>
   <#tab_div&id=system#>
     <div class="form-horizontal">
-      <div class="control-group">
-        <label class="control-label">Nom du serveur (:port)</label>
-        <div class="controls">
-          <?form&
-          target=<@p@>&
-          tab=system&
-          a=global_variable_update&
-          actionParam_variable=server_name&
-          actionParam_persistent=1&
-          class=form-inline&
-          ?>
-            <input type="text" name="actionParam_value" value="<@~global("server_name")@>" />
-            <button type="submit" class="btn btn-danger">Modifier</button>
-          </form>
-        </div>
-      </div>
       <div class="control-group">
         <label class="control-label">Adresse serveur SMTP</label>
         <div class="controls">
@@ -720,37 +827,6 @@ template=<{entry&template=
           ?>
             <input type="text" name="actionParam_value" value="<@~global("smtp_port")@>" />
             <button type="submit" class="btn btn-danger">Modifier</button>
-          </form>
-        </div>
-      </div>
-      <div class="control-group">
-        <label class="control-label" for="selectMediaId">Site Médiathèque cible</label>
-        <div class="controls">
-          <?form&
-          target=<@p@>&
-          tab=system&
-          a=global_variable_update&
-          actionParam_variable=website_media_id&
-          actionParam_persistent=1&
-          class=form-inline&
-          ?>
-<@websiteFound=0@>
-<?websites&
-template=
-            <select name="selectMediaId" field="inputMediaId">
-              <option value="none">Aucun</option>
-	<{website&template=
-              <option value="<@id@>"<?if&cond=<@~global("website_media_id")==id@>&then= selected="selected"?>><@name@></option>
-		<?if&cond=<@~global("website_media_id")==id@>&then=<@websiteFound=1@>?>
-	}>
-            </select>
-?>
-<?if&cond=<@websiteFound@>&then=
-            <input type="hidden" id="inputMediaId" name="actionParam_value" value="<@~global("website_media_id")@>"/>
-&else=
-            <input type="hidden" id="inputMediaId" name="actionParam_value" value="none"/>
-?>
-            <button type="submit" id="submitMediaId" class="btn btn-danger">Modifier</button>
           </form>
         </div>
       </div>
@@ -1443,6 +1519,43 @@ template=<{entry&template=
       </div>
       <div class="modal-footer">
         <button class="btn btn-warning" type="submit">Créer la section</button>
+        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+      </div>
+    </form>
+  </div>
+  
+  <div class="modal hide fade" id="mlib_new_modal">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3>Publication de médiathèque</h3>
+    </div>
+    <?form&
+    name=mlib_new_form&
+    a=ObjectCreate&
+    actionParam_table_id=122&
+    target=<@p@>&
+    tab=media_libraries&
+    co=1&
+    class=form-horizontal&
+    ?>
+      <div class="modal-body">
+        <div class="control-group">
+          <label class="control-label" for="selectWebsiteId">Site médiathèque cible</label>
+          <div class="controls">
+<?websites&
+template=
+            <select name="selectWebsiteId" field="websiteId">
+	<{website&template=
+              <option value="<@id@>"<?if&cond=<@first_website_id@>&else= selected="true"<@first_website_id=<@id@>@>?>><@name@></option>
+	}>
+            </select>
+?>
+            <input type="hidden" id="websiteId" name="actionParam_field_website_id" value="<@first_website_id@>"/>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-warning" type="submit">Ajouter la médiathèque</button>
         <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
       </div>
     </form>
