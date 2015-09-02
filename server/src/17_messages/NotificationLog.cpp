@@ -94,7 +94,7 @@ namespace synthese
 				Env env;
 				if (tableId == SentScenarioTableSync::TABLE.ID)
 				{
-					boost::shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					boost::shared_ptr<const SentScenario> scenario(SentScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return scenario->getName();
 				}
 				else if (tableId == NotificationProviderTableSync::TABLE.ID)
