@@ -257,7 +257,7 @@ Remarque
 								<xs:restriction base="xs:string">
 									<xs:minLength value="0"/>
 									<xs:maxLength value="21"/>
-									<xs:pattern value="^([^§μ]*)$"/>
+									<xs:pattern value="([^§μ]*)"/>
 								</xs:restriction>
 							</xs:simpleType>
 						</xs:element>
@@ -379,7 +379,7 @@ Règle métier :
 								<xs:restriction base="xs:string">
 									<xs:minLength value="0"/>
 									<xs:maxLength value="24"/>
-									<xs:pattern value="^([^μ§]*)$"/>
+									<xs:pattern value="([^μ§]*)"/>
 								</xs:restriction>
 							</xs:simpleType>
 						</xs:element>

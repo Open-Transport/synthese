@@ -204,7 +204,7 @@ Type de borne Nb ligne Taille
 								<xs:restriction base="xs:string">
 									<xs:minLength value="0"/>
 									<xs:maxLength value="200"/>
-									<xs:pattern value="^([^&amp;~#\{\[\|`\\@^°\]\}£$μù§²=_]*)$"/>
+									<xs:pattern value="([^&amp;~#\{\[\|`\\@^°\]\}£$μù§²=_]*)"/>
 								</xs:restriction>
 							</xs:simpleType>
 						</xs:element>
@@ -258,7 +258,7 @@ Type de borne Nb ligne Taille
 								<xs:restriction base="xs:string">
 									<xs:minLength value="0"/>
 									<xs:maxLength value="50"/>
-									<xs:pattern value="^([^&amp;~#{\[\|`\\@^°\]\}£$μù§²=_]*)$"/>
+									<xs:pattern value="([^&amp;~#{\[\|`\\@^°\]\}£$μù§²=_]*)"/>
 								</xs:restriction>
 							</xs:simpleType>
 						</xs:element>
@@ -330,7 +330,7 @@ Remarque :
 								<xs:restriction base="xs:string">
 									<xs:minLength value="1"/>
 									<xs:maxLength value="20"/>
-									<xs:pattern value="^([^&amp;~#\{\[\|`\\@\^°\]\}£$μù§²]*)$"/>
+									<xs:pattern value="([^&amp;~#\{\[\|`\\@\^°\]\}£$μù§²]*)"/>
 								</xs:restriction>
 							</xs:simpleType>
 						</xs:element>
@@ -735,7 +735,7 @@ Type de borne FixedText ScrollingText TtsText Remarque
 					<xs:restriction base="xs:string">
 						<xs:minLength value="1"/>
 						<xs:maxLength value="100"/>
-						<xs:pattern value="^([^&amp;~#\{\[\|`\\@^°\]\}£$μù§²=_]*)$"/>
+						<xs:pattern value="([^&amp;~#\{\[\|`\\@^°\]\}£$μù§²=_]*)"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
@@ -751,7 +751,7 @@ Type de borne FixedText ScrollingText TtsText Remarque
 					<xs:restriction base="xs:string">
 						<xs:minLength value="1"/>
 						<xs:maxLength value="100"/>
-						<xs:pattern value="^([^&amp;~#\{\[\|`\\@^°\]\}£$μù§²=_]*)$"/>
+						<xs:pattern value="([^&amp;~#\{\[\|`\\@^°\]\}£$μù§²=_]*)"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
