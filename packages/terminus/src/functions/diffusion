@@ -326,23 +326,23 @@
 				scenario_id=<@scenario_id@>&
 				template=
 					<?if&
-					cond=<@0<<@hold_count@>||<@0<<@failed_count@>@>@>&
+					cond=<@hold_count>0||<@failed_count>0@>@>&
 					then=
               <td>
                 <h4>Notifications</h4>
                 <span id="scenario_events_flags" scenario_id="<@scenario_id@>">
 						<?if&
-						cond=<@0<<@failed_count@>@>&
+						cond=<@failed_count>0@>&
 						then=
                   <p>
-                    <i class="icon-warning-sign"></i><@failed_count@> émission<?if&cond=<@1<<@failed_count@>@>&then=s?> en échec
+                    <i class="icon-warning-sign"></i><@failed_count@> émission<?if&cond=<@failed_count>1@>&then=s?> en échec
                   </p>
 						?>
 						<?if&
-						cond=<@0<<@hold_count@>@>&
+						cond=<@hold_count>0@>&
 						then=
                   <p>
-                    <i class="icon-flag"></i><@hold_count@> émission<?if&cond=<@1<<@hold_count_count@>@>&then=s retenues&else= retenue?>
+                    <i class="icon-flag"></i><@hold_count@> émission<?if&cond=<@hold_count>1@>&then=s retenues&else= retenue?>
                   </p>
 						?>
 						<?if&cond=<@hold_count@>&then=

@@ -219,7 +219,7 @@ if (dates.length > 0) {
 	scenario_id=<@scenario_id@>&
 	template=
 		<?if&
-		cond=<@0<<@failed_count@>@>&
+		cond=<@failed_count>0@>&
 		then=
         <i class="icon-warning-sign"></i>
 		?>
@@ -233,7 +233,7 @@ if (dates.length > 0) {
 	scenario_id=<@scenario_id@>&
 	template=
 		<?if&
-		cond=<@0<<@failed_count@>@>&
+		cond=<@hold_count>0@>&
 		then=
         <i class="icon-warning-sign"></i>
 		?>
