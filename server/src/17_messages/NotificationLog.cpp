@@ -92,7 +92,7 @@ namespace synthese
 			{
 				RegistryTableType tableId = decodeTableId(id);
 				Env env;
-				if (tableId == ScenarioTableSync::TABLE.ID)
+				if (tableId == SentScenarioTableSync::TABLE.ID)
 				{
 					boost::shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return scenario->getName();
