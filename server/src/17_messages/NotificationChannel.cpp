@@ -244,10 +244,13 @@ namespace synthese
 					boost::shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
 					if(line.get())
 					{
-						if(!firstLineInStream)
+						if(firstLineInStream)
+						{
+							firstLineInStream = false;
+						}
+						else
 						{
 							linesStream << VARIABLE_ID_SEPARATOR;
-							firstLineInStream = false;
 						}
 						linesStream << line->getName();
 					}
@@ -257,10 +260,13 @@ namespace synthese
 					boost::shared_ptr<const pt::TransportNetwork> network = Env::GetOfficialEnv().get<pt::TransportNetwork>(link->getObjectId());
 					if(network.get())
 					{
-						if(!firstLineInStream)
+						if(firstLineInStream)
+						{
+							firstLineInStream = false;
+						}
+						else
 						{
 							linesStream << VARIABLE_ID_SEPARATOR;
-							firstLineInStream = false;
 						}
 						linesStream << network->getName();
 					}
@@ -279,10 +285,13 @@ namespace synthese
 					boost::shared_ptr<const pt::StopArea> stop = Env::GetOfficialEnv().get<pt::StopArea>(link->getObjectId());
 					if(stop.get())
 					{
-						if(!firstStopInStream)
+						if(firstStopInStream)
+						{
+							firstStopInStream = false;
+						}
+						else
 						{
 							stopsStream << VARIABLE_ID_SEPARATOR;
-							firstStopInStream = false;
 						}
 						stopsStream << stop->getName();
 					}
@@ -292,10 +301,13 @@ namespace synthese
 					boost::shared_ptr<const geography::City> city = Env::GetOfficialEnv().get<geography::City>(link->getObjectId());
 					if(city.get())
 					{
-						if(!firstStopInStream)
+						if(firstStopInStream)
+						{
+							firstStopInStream = false;
+						}
+						else
 						{
 							stopsStream << VARIABLE_ID_SEPARATOR;
-							firstStopInStream = false;
 						}
 						stopsStream << city->getName();
 					}
