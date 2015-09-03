@@ -52,6 +52,7 @@ namespace synthese
 			static const std::string MODULE_PARAM_INEO_TERMINUS_NETWORK;
 			static const std::string MODULE_PARAM_INEO_TERMINUS_DATASOURCE;
 			static const std::string MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL;
+			static const std::string MODULE_PARAM_INEO_TERMINUS_XSD_LOCATION;
 			static const std::string MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST;
 			static const std::string MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST;
 			static const std::string MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST;
@@ -112,6 +113,7 @@ namespace synthese
 			util::RegistryKeyType _ineoNetworkID;
 			util::RegistryKeyType _ineoDatasource;
 			int _ineoTickInterval;
+			std::string _ineoXsdLocation;
 
 			mutable Status _status;
 
@@ -296,6 +298,7 @@ namespace synthese
 				void setIneoNetworkID(const util::RegistryKeyType& value){ _ineoNetworkID = value; }
 				void setIneoDatasource(const util::RegistryKeyType& value){ _ineoDatasource = value; }
 				void setIneoTickInterval(const int value) { _ineoTickInterval = value; }
+				void setIneoXSDLocation(const std::string& value){ _ineoXsdLocation = value; }
 				void setStatus(const Status& value){ _status = value; }
 			//@}
 
@@ -305,6 +308,7 @@ namespace synthese
 				const util::RegistryKeyType& getIneoNetworkID() const { return _ineoNetworkID; }
 				const util::RegistryKeyType& getIneoDatasource() const { return _ineoDatasource; }
 				int getIneoTickInterval() const { return _ineoTickInterval; }
+				const std::string& getIneoXSDLocation() const { return _ineoXsdLocation; }
 				const Status& getStatus() const { return _status; }
 			//@}
 			
