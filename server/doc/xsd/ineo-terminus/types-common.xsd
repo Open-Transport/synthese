@@ -1563,7 +1563,7 @@ Règle métier :
 		</xs:annotation>
 		<xs:restriction base="xs:string">
 			<xs:length value="10"/>
-			<xs:pattern value="^(0[1-9]|[1-2][0-9]|3[0-1])/(0[1-9]|1[0-2])/20(3[0-7]|[1-2][0-9])$"/>
+			<xs:pattern value="(0[1-9]|[1-2][0-9]|3[0-1])/(0[1-9]|1[0-2])/20(3[0-7]|[1-2][0-9])"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="Time">
@@ -1575,7 +1575,7 @@ Règle métier :
 		</xs:annotation>
 		<xs:restriction base="xs:string">
 			<xs:length value="8"/>
-			<xs:pattern value="^(3[0-5]|[0-2][0-9]):[0-5][0-9]:[0-5][0-9]$"/>
+			<xs:pattern value="(3[0-5]|[0-2][0-9]):[0-5][0-9]:[0-5][0-9]"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="DateTime">
@@ -1583,7 +1583,7 @@ Règle métier :
 			<xs:documentation source="IV.4.4">Date et Heure au format «JJ/MM/AAAA HH:MM:SS»</xs:documentation>
 		</xs:annotation>
 		<xs:restriction base="xs:string">
-			<xs:pattern value="^(0[1-9]|[1-2][0-9]|3[0-1])/(0[1-9]|1[0-2])/20(3[0-7]|[1-2][0-9]) (2[0-3]|[0-1][0-9]):[0-5][0-9]:[0-5][0-9]$"/>
+			<xs:pattern value="(0[1-9]|[1-2][0-9]|3[0-1])/(0[1-9]|1[0-2])/20(3[0-7]|[1-2][0-9]) (2[0-3]|[0-1][0-9]):[0-5][0-9]:[0-5][0-9]"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="RequestIdentifierType">
@@ -1726,7 +1726,7 @@ Remarque
 		<xs:restriction base="xs:string">
 			<xs:minLength value="6"/>
 			<xs:maxLength value="32"/>
-			<xs:pattern value="^\S(.*)\S$"/>
+			<xs:pattern value="\S(.*)\S"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="DriverDispatchingTypeEnum">
