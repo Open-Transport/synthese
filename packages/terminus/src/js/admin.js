@@ -103,6 +103,7 @@ function mlib_star_click()
 }
 
 function changeWebsiteId() 
+{
   var field = $(this);
   $('#' + field.attr('field')).val(field.val());
 }
