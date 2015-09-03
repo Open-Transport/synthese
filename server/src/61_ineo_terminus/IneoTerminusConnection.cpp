@@ -73,6 +73,7 @@ namespace synthese
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK = "ineo_terminus_network";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE = "ineo_terminus_datasource";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL = "ineo_terminus_tick_interval";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_XSD_LOCATION = "ineo_terminus_xsd_location";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST = "ineo_terminus_passenger_fake_broadcast";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST = "ineo_terminus_driver_fake_broadcast";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST = "ineo_terminus_ppds_fake_broadcast";
@@ -317,7 +318,15 @@ namespace synthese
 
 			// Build the request header
 			requestStream << INEO_TERMINUS_XML_HEADER << char(10);
-			requestStream << "<" << requestTag << ">" << char(10);
+
+			std::string xsdLocation = IneoTerminusConnection::GetTheConnection()->getIneoXSDLocation();
+			requestStream << "<" << requestTag;
+			if(false == xsdLocation.empty())
+			{
+				requestStream << " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"" << xsdLocation << "\"";
+			}
+			requestStream << ">" << char(10);
+
 			requestStream << "\t<ID>" << boost::lexical_cast<std::string>(getNextRequestID()) << "</ID>" << char(10);
 			requestStream << "\t<RequestTimeStamp>" << timestampStream.str() << "</RequestTimeStamp>" << char(10);
 			requestStream << "\t<RequestorRef>Terminus</RequestorRef>" << char(10);
@@ -381,6 +390,11 @@ namespace synthese
 				{
 					_theConnection->_status = offline;
 				}
+			}
+
+			if (name == MODULE_PARAM_INEO_TERMINUS_XSD_LOCATION)
+			{
+				_theConnection ->_ineoXsdLocation = value;
 			}
 
 			if(name == MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST)
@@ -733,19 +747,8 @@ namespace synthese
 		):	_io_service(ioService),
 			_network_id(network_id),
 			_datasource_id(datasource_id),
-			_acceptor(ioService)
+			_acceptor(ioService, tcp::endpoint(tcp::v4(), lexical_cast<int>(port)))
 		{
-			// Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
-			std::string address("0.0.0.0");
-			asio::ip::tcp::resolver resolver(_io_service);
-			asio::ip::tcp::resolver::query query(address, port);
-			asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
-
-			_acceptor.open(endpoint.protocol());
-			_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-			_acceptor.bind(endpoint);
-			_acceptor.listen();
-			
 			start_accept();
 		}
 
@@ -1263,9 +1266,9 @@ namespace synthese
 		{
 			std::stringstream responseStream;
 
-			string requestTag = requestNode.getName();
-			string requestId = requestNode.getChildNode("ID", 0).getText();
-			string requestTimestamp = requestNode.getChildNode("RequestTimeStamp", 0).getText();
+			std::string requestTag = requestNode.getName();
+			std::string requestId = requestNode.getChildNode("ID", 0).getText();
+			std::string requestTimestamp = requestNode.getChildNode("RequestTimeStamp", 0).getText();
 
 			// Build the response tag
 			std::string responseTag = requestTag;
@@ -1273,10 +1276,18 @@ namespace synthese
 
 			// Build the response header
 			responseStream << INEO_TERMINUS_XML_HEADER << char(10);
-			responseStream << "<" << responseTag << ">" << char(10);
+
+			std::string xsdLocation = IneoTerminusConnection::GetTheConnection()->getIneoXSDLocation();
+			responseStream << "<" << responseTag;
+			if(false == xsdLocation.empty())
+			{
+				responseStream << " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"" << xsdLocation << "\"";
+			}
+			responseStream << ">" << char(10);
+
 			responseStream << "\t<ID>" << boost::lexical_cast<std::string>(IneoTerminusConnection::GetTheConnection()->getNextRequestID()) << "</ID>" << char(10);
 			responseStream << "\t<RequestID>" << requestId << "</RequestID>" << char(10);
-			// Note : according to interface description 'ResponseTimeStamp' = 'RequestTimeStamp'
+			// Note : according to interface description 'ResponseTimeStamp' = 'RequestTimeStamp' but I suspect this is a typo
 			responseStream << "\t<ResponseTimeStamp>" << requestTimestamp << "</ResponseTimeStamp>" << char(10);
 			responseStream << "\t<ResponseRef>Terminus</ResponseRef>" << char(10);
 

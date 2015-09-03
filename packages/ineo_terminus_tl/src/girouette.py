@@ -92,7 +92,9 @@ class HTMLTextExtractor(HTMLParser):
 
 
 # Request headers
-root = etree.Element("Girouette" + type + "MessageRequest")
+namespace = "http://www.w3.org/2001/XMLSchema-instance"
+locationAttribute = "{%s}noNameSpaceSchemaLocation" % namespace
+root = etree.Element("Girouette" + type + "MessageRequest", attrib={locationAttribute: xsd_location} if len(xsd_location) > 0 else {})
 childID = etree.SubElement(root, "ID")
 childID.text = ID
 childRequestTimeStamp = etree.SubElement(root, "RequestTimeStamp")

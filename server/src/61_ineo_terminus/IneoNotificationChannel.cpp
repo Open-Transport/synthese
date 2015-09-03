@@ -133,6 +133,7 @@ namespace synthese
 			fields.insert("ID", requestID);
 			fields.insert("network_id", IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK));
 			fields.insert("datasource_id", IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE));
+			fields.insert("xsd_location", IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_XSD_LOCATION));
 			fields.insert("ineo_stop_point_prefix", synthese::data_exchange::IneoFileFormat::Importer_::MNLP_PREFIX);
 
 			if (provider->get<Parameters>().getDefault<RegistryKeyType>(PARAMETER_CMS_INTERPRETER, 0))
