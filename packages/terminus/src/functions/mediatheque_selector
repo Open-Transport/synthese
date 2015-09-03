@@ -118,6 +118,10 @@
         $('#folders-root').addClass('active');
         $('#folders-root').find('.folder-actions').show();
       }
+      if ($('#file_search').val().length > 0) {
+        $('#file_search').focus();
+        $('#file_search').select();
+      }
     }
 <?if&cond=<@admin_mediatheque@>&else=
     function selectFile(event, item) {
