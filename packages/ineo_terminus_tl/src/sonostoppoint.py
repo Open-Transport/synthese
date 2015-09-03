@@ -134,7 +134,7 @@ if int(needs_repeat_interval) != 0:
 # Extract HTML text lines 
 childText = etree.SubElement(childMessaging, "Text")
 htmlParser = HTMLTextExtractor()
-htmlParser.feed(message[0]["content"])
+htmlParser.feed(message_text)
 # 'Text' node accepts 1 line * ]0..300] characters
 lines = htmlParser.wrap_lines(1, 300)
 for line in lines:

@@ -123,7 +123,7 @@ if int(needs_direction_sign_code) != 0:
 # Extract HTML text lines 
 childText = etree.SubElement(childMessaging, "Text")
 htmlParser = HTMLTextExtractor()
-htmlParser.feed(message[0]["content"])
+htmlParser.feed(message_text)
 # 'Text' node accepts [1..4] lines * [0..25] characters
 lines = htmlParser.wrap_lines(4, 25)
 for line in lines:

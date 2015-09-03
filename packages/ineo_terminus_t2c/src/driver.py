@@ -184,7 +184,7 @@ else:
 # Extract HTML text lines 
 childText = etree.SubElement(childMessaging, "Text")
 htmlParser = HTMLTextExtractor()
-htmlParser.feed(message[0]["content"])
+htmlParser.feed(message_text)
 # 'Text' node accepts [1..3] line * [0..27] characters
 lines = htmlParser.wrap_lines(3, 27)
 for line in lines:

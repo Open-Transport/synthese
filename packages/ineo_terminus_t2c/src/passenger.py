@@ -189,7 +189,7 @@ childPriority.text = "oui" if priority >= 50 else "non"
 # Extract HTML text lines 
 childText = etree.SubElement(childMessaging, "Text")
 htmlParser = HTMLTextExtractor()
-htmlParser.feed(message[0]["content"])
+htmlParser.feed(message_text)
 # 'Text' node accepts [1..4] lines * [0..25] characters
 lines = htmlParser.wrap_lines(4, 25)
 for line in lines:
@@ -201,7 +201,7 @@ if int(needs_play_tts) != 0:
   if int(message[0]["play_tts"]) != 0:
     childTts = etree.SubElement(childMessaging, "Tts")
     htmlParser = HTMLTextExtractor()
-    htmlParser.feed(message[0]["content"])
+    htmlParser.feed(message_text)
     # 'Text' node accepts 1 line * [0..300] characters
     lines = htmlParser.wrap_lines(1, 300)
     for line in lines:
