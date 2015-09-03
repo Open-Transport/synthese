@@ -101,28 +101,42 @@ namespace synthese
 
 
 
-		bool NotificationChannel::_setMessageVariable(
-			ParametersMap& variables,
+		std::string NotificationChannel::_getMessageAlternative(
 			const Alarm* alarm,
-			boost::optional<MessageType&> type
+			const boost::optional<MessageType&> type,
+			bool& messageTypeFound
 		) {
-			bool result = true;
-			if (type) {
+			// Initialize message alternative with the long message of the alarm, in case we do not find the requested alternative
+			std::string messageAlternative = alarm->getLongMessage();
+			// If type is not set, set messageTypeFound to true
+			messageTypeFound = !type.is_initialized();
+
+			if(type)
+			{
 				Alarm::MessageAlternatives::const_iterator it(
 					alarm->getMessageAlternatives().find(&(*type))
 				);
+
 				if(it != alarm->getMessageAlternatives().end())
 				{
-					variables.insert(VARIABLE_MESSAGE, it->second->get<Content>());
-					return true;
-				}
-				else
-				{
-					// lacking message alternative for channel
-					result = false;
+					// Alternative message found, return its content
+					messageAlternative = it->second->get<Content>();
+					messageTypeFound = true;
 				}
 			}
-			variables.insert(VARIABLE_MESSAGE, alarm->getLongMessage());
+
+			return messageAlternative;
+		}
+
+
+		bool NotificationChannel::_setMessageVariable(
+			ParametersMap& variables,
+			const Alarm* alarm,
+			const boost::optional<MessageType&> type
+		) {
+			bool result = false;
+			std::string message = _getMessageAlternative(alarm, type, result);
+			variables.insert(VARIABLE_MESSAGE, message);
 			return result;
 		}
 
@@ -219,21 +233,17 @@ namespace synthese
 			scriptParameters.insert(VARIABLE_SHORT_MESSAGE, alarm->getShortMessage());
 			scriptParameters.insert(VARIABLE_URL, alarm->getDigitizedVersion());
 
-			// Use begin message by default
-			boost::optional<MessageType&> type = provider->get<MessageTypeBegin>();
-			if (eventType == END)
-			{
-				type = provider->get<MessageTypeEnd>();
-			}
+			// Add message alternative to parameters map
+			// Use begin message type by default
+			boost::optional<MessageType&> type = (END == eventType) ? provider->get<MessageTypeEnd>() : provider->get<MessageTypeBegin>();
 			bool messageTypeFound = _setMessageVariable(scriptParameters, alarm, type);
-			if (!messageTypeFound)
+			if (false == messageTypeFound)
 			{
-				const std::string details = "Type de message manquant: " + type->getName();
+				const std::string details = "Type de message manquant: " + (type ? type->getName() : "indéfini");
 				NotificationLog::AddNotificationProviderFailure(provider, details, alarm);
 			}
 
 			// Browse alarm linked objects to build lines and stops ID lists
-
 			std::stringstream linesStream;
 			bool firstLineInStream = true;
 			BOOST_FOREACH(const AlarmObjectLink* link, alarm->getLinkedObjects("line"))

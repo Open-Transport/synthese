@@ -95,6 +95,12 @@ namespace synthese
 				event->get<Time>()
 			);
 
+			// Retrieve alternative message for this event
+			boost::optional<MessageType&> messageType = (END == event->get<EventType>()) ? provider->get<MessageTypeEnd>() : provider->get<MessageTypeBegin>();
+			bool messageTypeFound = false;
+			std::string messageText = _getMessageAlternative(alarm, messageType, messageTypeFound);
+			fields.insert("message_text", messageText);
+
 			shared_ptr<ParametersMap> messagePM(new ParametersMap);
 			alarm->toParametersMap(*messagePM, true, "", true);
 			fields.insert("message", messagePM);

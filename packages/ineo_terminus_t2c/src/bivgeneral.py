@@ -130,7 +130,7 @@ childDuration.text = message[0]["display_duration"]
 # Text
 # Extract HTML text lines 
 htmlParser = HTMLTextExtractor()
-htmlParser.feed(message[0]["content"])
+htmlParser.feed(message_text)
 
 # TypeBIV = BUS4L
 childText1 = etree.SubElement(childMessaging, "Text")
