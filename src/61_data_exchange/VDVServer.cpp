@@ -593,10 +593,13 @@ namespace synthese
 						ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*plannedDataSource, Env::GetOfficialEnv());
 						BOOST_FOREACH(const ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Map::value_type& itLine, lines.getMap())
 						{
+							Log::GetInstance().debug("VDVServer : Loop sur lignes a la rechercher de services");
 							BOOST_FOREACH(const ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Map::mapped_type::value_type& line, itLine.second)
 							{
+								Log::GetInstance().debug("VDVServer : 2nd Loop sur lignes a la rechercher de services");
 								BOOST_FOREACH(Path* route, line->getPaths())
 								{
+									Log::GetInstance().debug("VDVServer : Loop sur paths a la rechercher de services");
 									// Avoid junctions
 									if(!dynamic_cast<JourneyPattern*>(route))
 									{
@@ -606,6 +609,7 @@ namespace synthese
 									boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 										*jp->sharedServicesMutex
 									);
+									Log::GetInstance().debug("VDVServer : Middle Loop sur paths a la rechercher de services");
 									BOOST_FOREACH(Service* tservice, jp->getAllServices())
 									{
 										ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
@@ -616,8 +620,11 @@ namespace synthese
 											services.push_back(curService);
 										}
 									}
+									Log::GetInstance().debug("VDVServer : End Loop sur paths a la rechercher de services");
 								}
+								Log::GetInstance().debug("VDVServer : End 2nd Loop sur lignes a la rechercher de services");
 							}
+							Log::GetInstance().debug("VDVServer : End Loop sur lignes a la rechercher de services");
 						}
 
 						//const CommercialLine& line(
