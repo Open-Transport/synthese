@@ -13,10 +13,10 @@
       <input type="text" id="file_search" value="<@file_search@>" class="holder-folder-id" <@folder_data_id@> placeholder="Nom du fichier">
       <button id="search-button" type="button" class="btn btn-primary holder-folder-id" <@folder_data_id@> data-file-action="reloadFilesList">Rechercher</button>
       <div id="view-mode" data-active-mode="<@view_mode@>" class="btn-group btn-group-xs pull-right" data-toggle="buttons-radio">
-        <button type="button" class="btn btn-primary holder-folder-id view-mode-button<@view_mode?"":" active"@>" data-mode="0" <@folder_data_id@> data-file-action="reloadFilesList">
+        <button type="button" class="btn btn-primary holder-folder-id view-mode-button<@view_mode?"":" active"@>" data-mode="0" <@folder_data_id@> data-file-action="reloadFilesList" data-toogle="tooltip" title="Vue par vignettes">
           <i class="icon-th-large icon-white"></i>
         </button>
-        <button type="button" class="btn btn-primary holder-folder-id view-mode-button<@view_mode?" active":""@>" data-mode="1" <@folder_data_id@> data-file-action="reloadFilesList">
+        <button type="button" class="btn btn-primary holder-folder-id view-mode-button<@view_mode?" active":""@>" data-mode="1" <@folder_data_id@> data-file-action="reloadFilesList" data-toogle="tooltip" title="Vue par liste">
           <i class="icon-list icon-white"></i>
         </button>
       </div>
