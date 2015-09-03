@@ -609,7 +609,7 @@ namespace synthese
 									boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 										*jp->sharedServicesMutex
 									);
-									Log::GetInstance().debug("VDVServer : Middle Loop sur paths a la rechercher de services");
+									Log::GetInstance().debug("VDVServer : Middle Loop sur paths a la rechercher de services " + lexical_cast<string>(jp->getKey()));
 									BOOST_FOREACH(Service* tservice, jp->getAllServices())
 									{
 										ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
