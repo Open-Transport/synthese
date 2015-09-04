@@ -457,7 +457,7 @@
             </div>
           </div>
           <div id="alternatives">
-            <h4><span class="badge badge-inverse" style="vertical-align:middle">4</span> Variantes de contenus</h4>
+            <h4><span class="badge badge-inverse" style="vertical-align:middle">3</span> Variantes de contenus</h4>
             <div class="well" id="table_alternatives">
               <a class="btn btn-primary btn-mini" href="#" generate_alternative="all">Générer tout</a><br/>
 		<?message_types&
