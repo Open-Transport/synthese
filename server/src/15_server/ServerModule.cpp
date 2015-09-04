@@ -256,15 +256,15 @@ namespace synthese
 			if (!e)
 			{
 				_new_connection->start();
-				_new_connection.reset(new HTTPConnection(_io_service, &ServerModule::HandleRequest));
-				_acceptor.async_accept(
-					_new_connection->socket(),
-					boost::bind(
-						&ServerModule::HandleAccept,
-						boost::asio::placeholders::error
-					)
-				);
 			}
+			_new_connection.reset(new HTTPConnection(_io_service, &ServerModule::HandleRequest));
+			_acceptor.async_accept(
+				_new_connection->socket(),
+				boost::bind(
+					&ServerModule::HandleAccept,
+					boost::asio::placeholders::error
+				)
+			);
 		}
 
 
