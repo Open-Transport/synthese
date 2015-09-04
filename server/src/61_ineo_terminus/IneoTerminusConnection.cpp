@@ -753,8 +753,19 @@ namespace synthese
 		):	_io_service(ioService),
 			_network_id(network_id),
 			_datasource_id(datasource_id),
-			_acceptor(ioService, tcp::endpoint(tcp::v4(), lexical_cast<int>(port)))
+			_acceptor(ioService)
 		{
+			// Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
+			std::string address("0.0.0.0");
+			asio::ip::tcp::resolver resolver(_io_service);
+			asio::ip::tcp::resolver::query query(address, port);
+			asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
+
+			_acceptor.open(endpoint.protocol());
+			_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+			_acceptor.bind(endpoint);
+			_acceptor.listen();
+			
 			start_accept();
 		}
 
