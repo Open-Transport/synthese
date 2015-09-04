@@ -567,14 +567,16 @@ function open_message(message)
       }
     });
     $('#alternatives').removeClass('hide');
-    $('#calendar_panel_id').html('4');
-    $('#tags_panel_id').html('5');
+    $('#properties_panel_id').html('4');
+    $('#calendar_panel_id').html('5');
+    $('#tags_panel_id').html('6');
   }
   else
   {
     $('#alternatives').addClass('hide');
-    $('#calendar_panel_id').html('3');
-    $('#tags_panel_id').html('4');
+    $('#properties_panel_id').html('3');
+    $('#calendar_panel_id').html('4');
+    $('#tags_panel_id').html('5');
   }
 
   update_object_preview('line', message);

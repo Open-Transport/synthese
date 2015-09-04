@@ -513,7 +513,7 @@
             <div class="alert hide" id="old_recipients_alert"><strong>ATTENTION !</strong> La liste des variantes de contenus n'est peut-être plus à jour. Veuillez enregistrer l'évènement pour tenir compte des dernières modifications.</div>
           </div>
         
-          <h4><span class="badge badge-inverse" style="vertical-align:middle" id="calendar_panel_id">3</span> Paramètres</h4>
+          <h4><span class="badge badge-inverse" style="vertical-align:middle" id="properties_panel_id">3</span> Paramètres</h4>
           <div class="well">
             <label>Niveau
               <select class="input-medium" field="level" onkeyup="activateForm()" onchange="activateForm()">
@@ -565,6 +565,11 @@
 		?>
               </select>
             </label>
+          </div>
+        
+          <h4><span class="badge badge-inverse" style="vertical-align:middle" id="calendar_panel_id">4</span> Calendrier</h4>
+          <div class="well">
+            <div class="form-inline"><select id="change_calendar_list"></select> <a href="#" id="change_calendar" class="btn btn-warning">Modifier</a></div>
           </div>
         
           <h4><span class="badge badge-inverse" style="vertical-align:middle" id="tags_panel_id">5</span> Tags</h4>
