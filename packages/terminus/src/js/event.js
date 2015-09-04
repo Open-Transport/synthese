@@ -176,7 +176,6 @@ function update_tags_preview(message)
 }
 
 function unhold_events_click()
-function unhold_events_click()
 {
   if(!confirm("Etes-vous sûr de vouloir libérer les notifications retenues de l\'événement ?")) return false;
   var scenario = $("#scenario_events_flags").attr('scenario_id');
