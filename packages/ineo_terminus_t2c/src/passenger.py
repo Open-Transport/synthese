@@ -207,7 +207,7 @@ if int(needs_play_tts) != 0:
     # 'Text' node accepts 1 line * [0..300] characters
     lines = htmlParser.wrap_lines(1, 300)
     for line in lines:
-      childLine = etree.SubElement(childText, "Line")
+      childLine = etree.SubElement(childTts, "Line")
       childLine.text = line
 
 # Recipients
