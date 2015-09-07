@@ -816,8 +816,23 @@ function tiny_mce_init()
   display_init();
 }
 
+
+function truncate_alternate_messages() {
+    var textAreas = $('#message textarea[field=message_alternative]');
+    for(var i=0; i<textAreas.length; ++i)
+    {
+      var field = tinyMCE.get(textAreas.eq(i).attr('id'));
+      var txt = field.getContent({format: 'text'});
+      var limitedTxt = txt.substring(0, textAreas.eq(i).attr('limit')).replace(/\n/ig,"<br>");
+      field.setContent(limitedTxt);
+    }
+}
+
+
 function save_click()
 {
+  truncate_alternate_messages();
+
   var event_start_date = null;
   var event_end_date = null;
   var current_message_id = (current_message != null ? current_message.id : 0);
