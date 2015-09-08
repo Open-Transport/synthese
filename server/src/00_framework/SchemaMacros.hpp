@@ -42,6 +42,12 @@
 	C(util::RegistryKeyType id=0);   \
 	virtual ~C()
 
+#define ABS_OBJECT_GETSET(F)    \
+	virtual std::string get##F() const = 0; \
+	virtual void set##F(const std::string& value) = 0
+
+
+
 #define OBJECT(ObjectClass_, Schema_)      \
 \
 public:\
@@ -50,7 +56,6 @@ public:\
 	static const std::string TABLE_NAME; \
 \
 	typedef Schema_ Schema; \
-	typedef util::Registry<ObjectClass_>	Registry; \
 	struct Vector: public PointersVectorField<Vector, ObjectClass_> {}; \
 	\
 private:\
@@ -335,7 +340,9 @@ public: \
 		boost::shared_ptr<ObjectClass_> object(new ObjectClass_); \
 		object->_schema = _schema; \
 		return boost::static_pointer_cast<ObjectBase, ObjectClass_>(object); \
-	}
+	}\
+\
+	typedef util::Registry<ObjectClass_>	Registry
 
 
 

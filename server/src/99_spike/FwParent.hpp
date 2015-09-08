@@ -52,8 +52,7 @@ namespace synthese
 
 			ABS_OBJECT(FwParent);
 
-			virtual std::string getProperty0() const = 0;
-
+			ABS_OBJECT_GETSET(Property0);
 
 		};
 }	}

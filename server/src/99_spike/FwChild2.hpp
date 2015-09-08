@@ -77,7 +77,7 @@ namespace synthese
 
 
 		public:
-			OBJECT(FwChild2, FwChild2Schema)
+			OBJECT(FwChild2, FwChild2Schema);
 
 			OBJECT_GETSET(Property0)
 			OBJECT_GETSET(Property2)

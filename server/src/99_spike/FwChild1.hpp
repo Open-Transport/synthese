@@ -80,7 +80,7 @@ namespace synthese
 
 		public:
 
-			OBJECT(FwChild1, FwChild1Schema)
+			OBJECT(FwChild1, FwChild1Schema);
 
 			OBJECT_GETSET(Property0)
 			OBJECT_GETSET(Property1)
