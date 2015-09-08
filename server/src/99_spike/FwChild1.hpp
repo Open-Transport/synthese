@@ -83,7 +83,7 @@ namespace synthese
 			OBJECT(FwChild1, FwChild1Schema)
 
 			OBJECT_GETSET(Property0)
-			//virtual std::string getProperty0() const { return get<Property0>(); }
+			OBJECT_GETSET(Property1)
 
 		};
 }	}

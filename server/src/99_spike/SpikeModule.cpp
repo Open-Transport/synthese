@@ -54,19 +54,19 @@ namespace synthese
 		{
 			FwChild1 child1;
 			{
-				child1.set<Property0>("c1p0");
-				child1.set<Property1>("c1p1");
-				std::string property0 = child1.get<Property0>();
-				std::string property1 = child1.get<Property1>();
+				child1.setProperty0("c1p0");
+				child1.setProperty1("c1p1");
+				std::string property0 = child1.getProperty0();
+				std::string property1 = child1.getProperty1();
 				std::cerr << "Child1 : " << "property0 = " << property0 << " ; property1 = " << property1 << std::endl;
 			}
 
 			FwChild2 child2;
 			{
-				child2.set<Property0>("c2p0");
-				child2.set<Property2>("c2p2");
-				std::string property0 = child2.get<Property0>();
-				std::string property2 = child2.get<Property2>();
+				child2.setProperty0("c2p0");
+				child2.setProperty2("c2p2");
+				std::string property0 = child2.getProperty0();
+				std::string property2 = child2.getProperty2();
 				std::cerr << "Child2 : " << "property0 = " << property0 << " ; property2 = " << property2 << std::endl;
 			}
 
