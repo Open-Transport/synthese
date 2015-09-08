@@ -75,8 +75,8 @@ namespace synthese
 		public:
 			RECORD_WRAPPER(FwChild1, FwChild1Schema)
 
-			RECORD_GETSET(Property0)
-			RECORD_GETSET(Property1)
+			RECORD_GETSET(Property0, std::string)
+			RECORD_GETSET(Property1, std::string)
 
 			TABLE_REGISTRY_DECL(FwChild1)
 		};

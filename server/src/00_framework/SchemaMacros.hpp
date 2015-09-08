@@ -340,9 +340,9 @@ public: \
 
 
 
-#define RECORD_GETSET(F)    \
-	virtual std::string get##F() const { return get<F>(); } \
-	virtual void set##F(const std::string& value) { set<F>(value); }
+#define RECORD_GETSET(FieldName_, Type_)    \
+	virtual Type_ get##FieldName_() const { return get<FieldName_>(); } \
+	virtual void set##FieldName_(const Type_& value) { set<FieldName_>(value); }
 
 #define RECORD_FIELD_IMPL(N, F, T) 	template<> const Field SimpleObjectFieldDefinition<N>::FIELD = Field(F, T);
 
