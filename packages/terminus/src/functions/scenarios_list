@@ -197,8 +197,7 @@ if (dates.length > 0) {
         <?link&target=<@p@>&section=<@section@>&
         a=scenario_save&actionParamsid=<@roid@>&actionParamena=0&
         class=btn btn-warning btn-mini btn-inactive&
-        text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ?
-        ?>&
+        text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>&
 		?>&
 	else=
 		<?if&
@@ -207,8 +206,7 @@ if (dates.length > 0) {
         <?link&target=<@p@>&section=<@section@>&
         a=scenario_save&actionParamsid=<@roid@>&actionParamena=1&
         class=btn btn-warning btn-mini btn-inactive&
-        text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ?
-        ?>&
+        text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>&
 		?>&
 	?>
 	<?notification_events&scenario_id=<@scenario_id@>&template=
@@ -245,8 +243,7 @@ if (dates.length > 0) {
         actionParam_archive=1&
         class=btn btn-danger btn-mini btn-with-margins&
         text=<i class="icon-eject icon-white"></i>&
-        confirm=Etes-vous sûr de vouloir clore et archiver l'événement ?&
-        ?>&
+        confirm=Etes-vous sûr de vouloir clore et archiver l'événement ??>&
 		else=
         Archivage non autorisé&
 		?>

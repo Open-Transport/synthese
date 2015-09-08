@@ -280,8 +280,7 @@
                 actionParamena=0&
                 class=btn btn-warning btn-mini btn-inactive&
                 text=<i class="icon-pause icon-white"></i>&
-                confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ?
-                ?>
+                confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>
 					?>&
 				else=
 					<?if&
@@ -295,8 +294,7 @@
                 actionParamena=1&
                 class=btn btn-success btn-mini btn-inactive&
                 text=<i class="icon-play icon-white"></i>&
-                confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ?
-                ?>
+                confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>
 					?>&
 				?>
               </td>
@@ -316,8 +314,7 @@
                 roid=<@scenario_id@>&
                 class=btn btn-danger btn-mini&
                 text=<i class="icon-eject icon-white"></i>&
-                confirm=Etes-vous sûr de vouloir clore et archiver l'événement ?
-                ?>&
+                confirm=Etes-vous sûr de vouloir clore et archiver l'événement ??>&
 				else=
                 Archivage non autorisé
 				?>
@@ -408,8 +405,7 @@
               actionParam_field_sections=<@sections@>,<@id@>&
               class=btn btn-primary btn-mini btn-warning&
               text=Activer&
-              confirm=Etes-vous sûr de vouloir activer la section <@name@> ?&
-              ?>
+              confirm=Etes-vous sûr de vouloir activer la section <@name@> ??>
 					?>
 				?>&
 			?>
