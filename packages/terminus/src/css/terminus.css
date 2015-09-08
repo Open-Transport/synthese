@@ -151,8 +151,11 @@ th {
 .thumbnail-selectable {
   cursor: help;
 }
-.thumbnail-list > img {
-  max-height: 20px;
+.thumbnail-list > img
+{
+  height: 20px;
+  width: auto;
+  margin-top: -3px;
 }
 .thumbnails li {
   margin-bottom: 10px;
@@ -221,8 +224,8 @@ th {
   vertical-align: middle;
 }
 .terminus-file.mini-file {
-  height: 60px;
-  width: 60px;
+  height: 20px;
+  width: 20px;
 }
 #loader {
   position: absolute;
