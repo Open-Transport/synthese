@@ -1057,6 +1057,7 @@ namespace synthese
 					{
 						// SYNTHESE has a matching scenario, try to stop it
 						scenarioStopAction.setScenario(sscenario);
+						scenarioStopAction.setArchive(true);
 						Request fakeRequest;
 						scenarioStopAction.run(fakeRequest);
 					}
