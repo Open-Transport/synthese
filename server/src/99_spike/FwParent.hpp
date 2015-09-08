@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_spike_Fwparent_hpp__
 #define SYNTHESE_spike_Fwparent_hpp__
 
-#include "Object.hpp"
+#include "ObjectBase.hpp"
 
 #include "PointerField.hpp"
 #include "StringField.hpp"
@@ -44,16 +44,16 @@ namespace synthese
 		@ingroup m62
 		*/
 		class FwParent :
-			public virtual util::Registrable
+			public ObjectBase
 		{
 		private:
 
-
 		public:
-			FwParent(util::RegistryKeyType id=0);
-			~FwParent();
+
+			ABS_OBJECT(FwParent);
 
 			virtual std::string getProperty0() const = 0;
+
 
 		};
 }	}

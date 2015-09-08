@@ -35,6 +35,23 @@
 #include <set>
 #include <vector>
 
+// includes from Object.hpp
+#include "PointerField.hpp"
+#include "NumericField.hpp"
+#include "ParametersMap.h"
+#include "PointersVectorField.hpp"
+#include "UtilTypes.h"
+#include <boost/fusion/container/map.hpp>
+#include <boost/fusion/include/for_each.hpp>
+#include <boost/fusion/include/at_key.hpp>
+#include <boost/fusion/sequence.hpp>
+#include <boost/optional.hpp>
+#include <boost/fusion/include/map.hpp>
+#include <boost/fusion/include/map_fwd.hpp>
+#include <boost/fusion/include/prior.hpp>
+#include <boost/fusion/include/end.hpp>
+// end of includes
+
 namespace synthese
 {
 	namespace spike
@@ -52,8 +69,7 @@ namespace synthese
 		/** Fwchild2 class.
 		@ingroup m62
 		*/
-		class FwChild2:
-			public FwParent, public Object<FwChild2, FwChild2Schema>
+		class FwChild2:	public FwParent
 		{
 		public:
             
@@ -61,11 +77,9 @@ namespace synthese
 
 
 		public:
-			FwChild2(util::RegistryKeyType id=0);
-			~FwChild2();
+			OBJECT(FwChild2, FwChild2Schema)
 
-			virtual std::string getProperty0() const { return get<Property0>(); }
-
+			OBJECT_GETSET(Property0)
 		};
 }	}
 

@@ -32,16 +32,15 @@ namespace synthese
 	using namespace spike;
 	using namespace util;
 
-	CLASS_DEFINITION(FwChild1, "t991_fwchild1", 991)
-	FIELD_DEFINITION_OF_TYPE(Property1, "property1", SQL_TEXT)
+	CLASS_DEFINITION2(FwChild1, "t991_fwchild1", 991)
+	FIELD_DEFINITION_OF_TYPE2(Property1, "property1", SQL_TEXT)
 
 	namespace spike
 	{
 
 		FwChild1::FwChild1(
 			RegistryKeyType id
-		):	Registrable(id),
-			Object<FwChild1, FwChild1Schema>(
+		):	FwChild1(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Property0),
