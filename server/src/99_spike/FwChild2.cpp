@@ -40,7 +40,7 @@ namespace synthese
 
 		FwChild2::FwChild2(
 			RegistryKeyType id
-		):	FwChild2(Schema(
+		):	_schema(Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Property0),
 					FIELD_DEFAULT_CONSTRUCTOR(Property2)

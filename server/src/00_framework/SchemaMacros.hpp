@@ -345,7 +345,9 @@ public: \
 
 #define FIELD_DEFINITION_OF_TYPE2(N, F, T) 	template<> const Field SimpleObjectFieldDefinition<N>::FIELD = Field(F, T);
 #define CLASS_DEFINITION2(N, T, NUM)	namespace util \
-	{ template<> const std::string util::Registry<N>::KEY(#N); } \
+	{ \
+	  template<> const std::string util::Registry<N>::KEY(#N); \
+	}\
 	const std::string N::CLASS_NAME = #N; \
 	const std::string N::TABLE_NAME = T; \
 	const util::RegistryTableType N::CLASS_NUMBER = NUM;

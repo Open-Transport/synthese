@@ -52,6 +52,38 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<SpikeModule>::Init()
 		{
+			FwChild1 child1;
+			{
+				child1.set<Property0>("c1p0");
+				child1.set<Property1>("c1p1");
+				std::string property0 = child1.get<Property0>();
+				std::string property1 = child1.get<Property1>();
+				std::cerr << "Child1 : " << "property0 = " << property0 << " ; property1 = " << property1 << std::endl;
+			}
+
+			FwChild2 child2;
+			{
+				child2.set<Property0>("c2p0");
+				child2.set<Property2>("c2p2");
+				std::string property0 = child2.get<Property0>();
+				std::string property2 = child2.get<Property2>();
+				std::cerr << "Child2 : " << "property0 = " << property0 << " ; property2 = " << property2 << std::endl;
+			}
+
+			{
+				FwParent& parent = child1;
+				{
+					std::string property0 = parent.getProperty0();
+					std::cerr << "Child1 as Parent : " << "property0 = " << property0 << std::endl;
+				}
+			}
+			{
+				FwParent& parent = child2;
+				{
+					std::string property0 = parent.getProperty0();
+					std::cerr << "Child2 as Parent : " << "property0 = " << property0 << std::endl;
+				}
+			}
 		}
 
 		template<> void ModuleClassTemplate<SpikeModule>::Start()
@@ -82,22 +114,6 @@ namespace synthese
 
 		void SpikeModule::initialize()
 		{
-			FwChild1 child1;
-			{
-				std::string property0 = child1.get<Property0>();
-				std::string property1 = child1.get<Property1>();
-			}
-
-			FwChild2 child2;
-			{
-				std::string property0 = child2.get<Property0>();
-				std::string property2 = child2.get<Property2>();
-			}
-
-			FwParent& parent = child1;
-			{
-				std::string property0 = parent.getProperty0();
-			}
 		}
 	}
 }
