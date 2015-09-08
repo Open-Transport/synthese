@@ -95,6 +95,12 @@ namespace synthese
 				event->get<Time>()
 			);
 
+			// Retrieve alternative message for this event
+			boost::optional<MessageType&> messageType = (END == event->get<EventType>()) ? provider->get<MessageTypeEnd>() : provider->get<MessageTypeBegin>();
+			bool messageTypeFound = false;
+			std::string messageText = _getMessageAlternative(alarm, messageType, messageTypeFound);
+			fields.insert("message_text", messageText);
+
 			shared_ptr<ParametersMap> messagePM(new ParametersMap);
 			alarm->toParametersMap(*messagePM, true, "", true);
 			fields.insert("message", messagePM);
@@ -127,6 +133,7 @@ namespace synthese
 			fields.insert("ID", requestID);
 			fields.insert("network_id", IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK));
 			fields.insert("datasource_id", IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE));
+			fields.insert("xsd_location", IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_XSD_LOCATION));
 			fields.insert("ineo_stop_point_prefix", synthese::data_exchange::IneoFileFormat::Importer_::MNLP_PREFIX);
 
 			if (provider->get<Parameters>().getDefault<RegistryKeyType>(PARAMETER_CMS_INTERPRETER, 0))

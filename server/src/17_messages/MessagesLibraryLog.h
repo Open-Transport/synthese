@@ -32,7 +32,6 @@ namespace synthese
 		class SentScenario;
 		class Alarm;
 		class ScenarioTemplate;
-		class TextTemplate;
 		class ScenarioFolder;
 
 		/** Journal concernant la bibliothèque de messages.
@@ -66,26 +65,6 @@ namespace synthese
 				const ScenarioTemplate* scenario
 				, const security::User* user
 			);
-
-			static void AddTemplateDeleteEntry(
-				const TextTemplate& text
-				, const security::User* user
-			);
-			static void AddTemplateUpdateEntry(
-				const TextTemplate& text
-				, const std::string& changes
-				, const security::User* user
-			);
-			static void AddTemplateCreationEntry(
-				const TextTemplate& text
-				, const security::User* user
-			);
-			static void AddTemplateFolderUpdateEntry(
-				const TextTemplate& text
-				, const std::string& changes
-				, const security::User* user
-			);
-
 
 			/** Adds an Alarm deletion entry.
 				@param alarm Pointer to the deleted alarm : must be linked with the scenario

@@ -27,7 +27,7 @@
                 <img src="<@my_url@>" data-toggle="tooltip" data-placement="top" title="<@title@>"/>
               &else=
                 <@type=<?substr&t=<@mime_type@>&f=<?StrStr&text=<@mime_type@>&match=/?>&n=<?strlen&t=<@mime_type@>?>?>@>
-                <span class="terminus-file mini-file <@type@>-file" data-toggle="tooltip" data-placement="top" title="<@title@>"></span>
+                <span class="pull-left terminus-file mini-file <@type@>-file" data-toggle="tooltip" data-placement="top" title="<@title@>"></span>
               ?>
               <span data-toggle="tooltip" data-placement="top" title="<@title@>"><@title@></span>
               <?if&cond=<@admin_mediatheque@>&then=<span class="remove-file-list" data-form-action="removeFile" id="<@id@>" data-id="<@folder_id@>" data-toggle="tooltip" data-placement="top" title="Remove <@title@>"><i class="icon-remove"></i></span>?>

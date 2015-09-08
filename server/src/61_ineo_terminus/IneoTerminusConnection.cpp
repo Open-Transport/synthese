@@ -73,6 +73,7 @@ namespace synthese
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK = "ineo_terminus_network";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE = "ineo_terminus_datasource";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL = "ineo_terminus_tick_interval";
+		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_XSD_LOCATION = "ineo_terminus_xsd_location";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST = "ineo_terminus_passenger_fake_broadcast";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST = "ineo_terminus_driver_fake_broadcast";
 		const string IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST = "ineo_terminus_ppds_fake_broadcast";
@@ -317,7 +318,15 @@ namespace synthese
 
 			// Build the request header
 			requestStream << INEO_TERMINUS_XML_HEADER << char(10);
-			requestStream << "<" << requestTag << ">" << char(10);
+
+			std::string xsdLocation = IneoTerminusConnection::GetTheConnection()->getIneoXSDLocation();
+			requestStream << "<" << requestTag;
+			if(false == xsdLocation.empty())
+			{
+				requestStream << " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"" << xsdLocation << "\"";
+			}
+			requestStream << ">" << char(10);
+
 			requestStream << "\t<ID>" << boost::lexical_cast<std::string>(getNextRequestID()) << "</ID>" << char(10);
 			requestStream << "\t<RequestTimeStamp>" << timestampStream.str() << "</RequestTimeStamp>" << char(10);
 			requestStream << "\t<RequestorRef>Terminus</RequestorRef>" << char(10);
@@ -381,6 +390,11 @@ namespace synthese
 				{
 					_theConnection->_status = offline;
 				}
+			}
+
+			if (name == MODULE_PARAM_INEO_TERMINUS_XSD_LOCATION)
+			{
+				_theConnection ->_ineoXsdLocation = value;
 			}
 
 			if(name == MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST)
@@ -626,32 +640,17 @@ namespace synthese
 
 				if (tagName == "CheckStatusRequest")
 				{
-					bool requestSuccessful = _checkStatusRequest(childNode, response);
-
-					if(!requestSuccessful)
-					{
-						// TODO : log
-					}
+					_checkStatusRequest(childNode, response);
 				}
 
 				else if (_creationRequestTags.end() != _creationRequestTags.find(tagName))
 				{
-					bool requestSuccessful = _createMessageRequest(childNode, response);
-
-					if(!requestSuccessful)
-					{
-						// TODO : log
-					}
+					_createMessageRequest(childNode, response);
 				}
 
 				else if (_deletionRequestTags.end() != _deletionRequestTags.find(tagName))
 				{
-					bool requestSuccessful = _deleteMessageRequest(childNode, response);
-
-					if(!requestSuccessful)
-					{
-						// TODO : log
-					}
+					_deleteMessageRequest(childNode, response);
 				}
 
 				else if (_creationOrDeletionResponseTags.end() != _creationOrDeletionResponseTags.find(tagName))
@@ -666,12 +665,7 @@ namespace synthese
 
 				else if (_getStatesResponseTags.end() != _getStatesResponseTags.find(tagName))
 				{
-					bool requestSuccessful = _getStatesResponse(childNode, response);
-
-					if(!requestSuccessful)
-					{
-						// TODO : log
-					}
+					_getStatesResponse(childNode, response);
 				}
 
 				else
@@ -753,19 +747,8 @@ namespace synthese
 		):	_io_service(ioService),
 			_network_id(network_id),
 			_datasource_id(datasource_id),
-			_acceptor(ioService)
+			_acceptor(ioService, tcp::endpoint(tcp::v4(), lexical_cast<int>(port)))
 		{
-			// Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
-			std::string address("0.0.0.0");
-			asio::ip::tcp::resolver resolver(_io_service);
-			asio::ip::tcp::resolver::query query(address, port);
-			asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
-
-			_acceptor.open(endpoint.protocol());
-			_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-			_acceptor.bind(endpoint);
-			_acceptor.listen();
-			
 			start_accept();
 		}
 
@@ -1005,8 +988,8 @@ namespace synthese
 			BOOST_FOREACH(const Messaging& message, messages)
 			{
 				boost::shared_ptr<ParametersMap> periodPM(new ParametersMap);
-				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()));
-				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()));
+				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()) + " " + boost::posix_time::to_simple_string(message.startDate.time_of_day()));
+				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()) + " " + boost::posix_time::to_simple_string(message.stopDate.time_of_day()));
 				periodPM->insert("start_hour", message.startHour.is_not_a_date_time() ? "" : boost::posix_time::to_simple_string(message.startHour));
 				periodPM->insert("end_hour", message.stopHour.is_not_a_date_time() ? "" : boost::posix_time::to_simple_string(message.stopHour));
 				periodPM->insert("date", "");
@@ -1027,7 +1010,7 @@ namespace synthese
 				{
 					messagePM->insert("dispatching", "Repete");
 				}
-				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod));
+				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod * 60));
 				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
 				messagePM->insert("section", "");
 				messagePM->insert("alternative", "");
@@ -1121,26 +1104,51 @@ namespace synthese
 		{
 			bool status = true;
 
+			// Extract Ineo message type from tag name
+			std::string tagName(node.getName());
+			std::string ineoMessageType = tagName.substr(0, tagName.find("GetStatesResponse"));
+
 			// Check for mandatory nodes
 			int numIDNode = node.nChildNode("ID");
 			int numRequestIDNode = node.nChildNode("RequestID");
 			int numResponseTimeStampNode = node.nChildNode("ResponseTimeStamp");
 			int numResponseRefNode = node.nChildNode("ResponseRef");
 			int numMessagingStatesNode = node.nChildNode("MessagingStates");
+			int numErrorTypeNode = node.nChildNode("ErrorType");
 
-			status = ((1 == numIDNode) && (1 == numRequestIDNode) && (1 == numResponseTimeStampNode) && (1 == numResponseRefNode) && (1 == numMessagingStatesNode));
+			status = ((1 == numIDNode) && (1 == numRequestIDNode) && (1 == numResponseTimeStampNode) && (1 == numResponseRefNode));
 			if(false == status)
 			{
 				// Message is ill-formed, reply to Ineo with an error
-				util::Log::GetInstance().warn("Ineo Terminus : message misses mandatory nodes");
+				util::Log::GetInstance().warn("Ineo Terminus : " + tagName + " misses mandatory nodes");
 				return status;
 			}
 
-			// Extract Ineo message type from tag name
-			std::string tagName(node.getName());
-			std::string ineoMessageType = tagName.substr(0, tagName.find("GetStatesResponse"));
-			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
+			if(0 < numErrorTypeNode)
+			{
+				std::string errorType(node.getChildNode("ErrorType").getText());
+				std::string errorId(node.getChildNode("ErrorID").getText());
 
+				if("ProtocolError" == errorType && "3" == errorId)
+				{
+					// Ineo SAETR is not available, resend the XXXGetStatesRequest until a proper response is received
+					std::string stateRequest = IneoTerminusConnection::GetTheConnection()->_buildGetStatesRequest(ineoMessageType);
+					IneoTerminusConnection::GetTheConnection()->addMessage(stateRequest);
+				}
+
+				else
+				{
+					util::Log::GetInstance().warn("Ineo Terminus : " + tagName + " has error " + std::string(node.getChildNode("ErrorMessage").getText()));
+					IneoTerminusLog::AddIneoTerminusErrorMessageEntry(node);
+				}
+			}
+
+			if(1 != numMessagingStatesNode)
+			{
+				return status;
+			}
+
+			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
 			boost::shared_ptr<NotificationProvider> provider;
 			MessagesModule::ActivatedMessages activatedMessages;
 			typedef std::map< std::string, boost::shared_ptr<Alarm> > MessageMap;
@@ -1258,9 +1266,9 @@ namespace synthese
 		{
 			std::stringstream responseStream;
 
-			string requestTag = requestNode.getName();
-			string requestId = requestNode.getChildNode("ID", 0).getText();
-			string requestTimestamp = requestNode.getChildNode("RequestTimeStamp", 0).getText();
+			std::string requestTag = requestNode.getName();
+			std::string requestId = requestNode.getChildNode("ID", 0).getText();
+			std::string requestTimestamp = requestNode.getChildNode("RequestTimeStamp", 0).getText();
 
 			// Build the response tag
 			std::string responseTag = requestTag;
@@ -1268,10 +1276,18 @@ namespace synthese
 
 			// Build the response header
 			responseStream << INEO_TERMINUS_XML_HEADER << char(10);
-			responseStream << "<" << responseTag << ">" << char(10);
+
+			std::string xsdLocation = IneoTerminusConnection::GetTheConnection()->getIneoXSDLocation();
+			responseStream << "<" << responseTag;
+			if(false == xsdLocation.empty())
+			{
+				responseStream << " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"" << xsdLocation << "\"";
+			}
+			responseStream << ">" << char(10);
+
 			responseStream << "\t<ID>" << boost::lexical_cast<std::string>(IneoTerminusConnection::GetTheConnection()->getNextRequestID()) << "</ID>" << char(10);
 			responseStream << "\t<RequestID>" << requestId << "</RequestID>" << char(10);
-			// Note : according to interface description 'ResponseTimeStamp' = 'RequestTimeStamp'
+			// Note : according to interface description 'ResponseTimeStamp' = 'RequestTimeStamp' but I suspect this is a typo
 			responseStream << "\t<ResponseTimeStamp>" << requestTimestamp << "</ResponseTimeStamp>" << char(10);
 			responseStream << "\t<ResponseRef>Terminus</ResponseRef>" << char(10);
 
@@ -1385,6 +1401,8 @@ namespace synthese
 			}
 			string startDateStr("01/01/1970");
 			string stopDateStr("31/12/2037");
+			string startTimeStr("00:00:00");
+			string stopTimeStr("23:59:59");
 			message.startHour = boost::posix_time::not_a_date_time;
 			message.stopHour = boost::posix_time::not_a_date_time;
 			if (node.nChildNode("StartDate") > 0)
@@ -1400,18 +1418,20 @@ namespace synthese
 			if (node.nChildNode("StartTime") > 0)
 			{
 				XMLNode startTimeNode = node.getChildNode("StartTime", 0);
-				message.startHour = boost::posix_time::duration_from_string(startTimeNode.getText());
+				startTimeStr = startTimeNode.getText();
+				message.startHour = boost::posix_time::duration_from_string(startTimeStr);
 			}
 			if (node.nChildNode("StopTime") > 0)
 			{
 				XMLNode stopTimeNode = node.getChildNode("StopTime", 0);
+				stopTimeStr = stopTimeNode.getText();
 				message.stopHour = boost::posix_time::duration_from_string(stopTimeNode.getText());
 			}
 			message.startDate =	 XmlToolkit::GetIneoDateTime(
-				startDateStr + " 00:00:00"
+				startDateStr + " " + startTimeStr
 			);
 			message.stopDate =	XmlToolkit::GetIneoDateTime(
-				stopDateStr + " 23:59:59"
+				stopDateStr + " " + stopTimeStr
 			);
 			if (node.nChildNode("MultipleStop") > 0)
 			{

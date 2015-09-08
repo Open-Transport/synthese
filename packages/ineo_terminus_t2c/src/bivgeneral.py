@@ -92,7 +92,9 @@ class HTMLTextExtractor(HTMLParser):
 
 
 # Request headers
-root = etree.Element("BivGeneral" + type + "MessageRequest")
+namespace = "http://www.w3.org/2001/XMLSchema-instance"
+locationAttribute = "{%s}noNameSpaceSchemaLocation" % namespace
+root = etree.Element("BivGeneral" + type + "MessageRequest", attrib={locationAttribute: xsd_location} if len(xsd_location) > 0 else {})
 childID = etree.SubElement(root, "ID")
 childID.text = ID
 childRequestTimeStamp = etree.SubElement(root, "RequestTimeStamp")
@@ -128,7 +130,7 @@ childDuration.text = message[0]["display_duration"]
 # Text
 # Extract HTML text lines 
 htmlParser = HTMLTextExtractor()
-htmlParser.feed(message[0]["content"])
+htmlParser.feed(message_text)
 
 # TypeBIV = BUS4L
 childText1 = etree.SubElement(childMessaging, "Text")

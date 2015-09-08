@@ -1,4 +1,3 @@
-﻿
 /** Alert class header.
 	@file Alert.hpp
 

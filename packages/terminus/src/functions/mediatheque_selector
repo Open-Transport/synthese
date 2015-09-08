@@ -29,7 +29,7 @@
         <div class='alert alert-info'>Aucun élément n'est présent dans ce répertoire.</div>
       </div>
       <div id="file-actions"<@folder_id?"":" style=\"display: none\""@>>
-        <?if&cond=<@admin_mediatheque@>&then=<hr><a data-form-action="uploadFile" <@folder_data_id@> class="btn btn-primary pull-right holder-folder-id">Uploader</a>?>
+        <?if&cond=<@admin_mediatheque@>&then=<hr><a data-form-action="uploadFile" <@folder_data_id@> class="btn btn-primary pull-right holder-folder-id">Ajouter</a>?>
       </div>
     </div>
   </div>

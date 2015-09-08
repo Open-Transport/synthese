@@ -92,7 +92,9 @@ class HTMLTextExtractor(HTMLParser):
 
 
 # Request headers
-root = etree.Element("BivLineMan" + type + "MessageRequest")
+namespace = "http://www.w3.org/2001/XMLSchema-instance"
+locationAttribute = "{%s}noNameSpaceSchemaLocation" % namespace
+root = etree.Element("BivLineMan" + type + "MessageRequest", attrib={locationAttribute: xsd_location} if len(xsd_location) > 0 else {})
 childID = etree.SubElement(root, "ID")
 childID.text = ID
 childRequestTimeStamp = etree.SubElement(root, "RequestTimeStamp")
@@ -113,7 +115,7 @@ if int(needs_play_tts) != 0:
   if int(message[0]["play_tts"]) != 0:
     childTts = etree.SubElement(childMessaging, "Tts")
     htmlParser = HTMLTextExtractor()
-    htmlParser.feed(message[0]["content"])
+    htmlParser.feed(message_text)
     # 'Tts' node accepts [1..6] lines * [0..25] characters
     lines = htmlParser.wrap_lines(6, 25)
     for line in lines:
@@ -138,7 +140,7 @@ childAlternance.text = "oui" if int(message[0]["priority"]) < 99 else "non"
 # Extract HTML text lines 
 childText = etree.SubElement(childMessaging, "Text")
 htmlParser = HTMLTextExtractor()
-htmlParser.feed(message[0]["content"])
+htmlParser.feed(message_text)
 # 'Text' node accepts [1..3] lines * [0..21] characters
 lines = htmlParser.wrap_lines(3, 21)
 for line in lines:

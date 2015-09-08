@@ -1,4 +1,4 @@
-﻿/** Alert class implementation.
+/** Alert class implementation.
 	@file Alert.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
