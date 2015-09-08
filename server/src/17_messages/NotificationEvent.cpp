@@ -35,6 +35,7 @@
 #include <Alarm.h>
 #include <StandardLoadSavePolicy.hpp>
 #include <UtilTypes.h>
+#include <Log.h>
 
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/special_defs.hpp>
@@ -164,6 +165,7 @@ namespace synthese
 			)	);
 
 			posix_time::ptime now = posix_time::second_clock::local_time();
+			bool creation = false;
 
 			if (resultEvents.size() > 0)
 			{
@@ -179,12 +181,19 @@ namespace synthese
 							&& result->get<LastAttempt>() < alarm.getApplicationEnd(now)))
 					{
 						result = createEvent(env, alarm, provider, type, false);
+						creation = true;
 					}
 				}
 			}
 			else
 			{
 				result = createEvent(env, alarm, provider, type, false);
+				creation = true;
+			}
+
+			if(false == creation)
+			{
+				util::Log::GetInstance().debug("Notification event already exists for alarm " + alarm.getShortMessage());
 			}
 
 			// Set or refresh event expiration for begin event only

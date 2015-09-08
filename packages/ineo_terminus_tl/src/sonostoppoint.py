@@ -92,7 +92,9 @@ class HTMLTextExtractor(HTMLParser):
 
 
 # Request headers
-root = etree.Element("SonoStopPoint" + type + "MessageRequest")
+namespace = "http://www.w3.org/2001/XMLSchema-instance"
+locationAttribute = "{%s}noNameSpaceSchemaLocation" % namespace
+root = etree.Element("SonoStopPoint" + type + "MessageRequest", attrib={locationAttribute: xsd_location} if len(xsd_location) > 0 else {})
 childID = etree.SubElement(root, "ID")
 childID.text = ID
 childRequestTimeStamp = etree.SubElement(root, "RequestTimeStamp")
@@ -134,7 +136,7 @@ if int(needs_repeat_interval) != 0:
 # Extract HTML text lines 
 childText = etree.SubElement(childMessaging, "Text")
 htmlParser = HTMLTextExtractor()
-htmlParser.feed(message[0]["content"])
+htmlParser.feed(message_text)
 # 'Text' node accepts 1 line * ]0..300] characters
 lines = htmlParser.wrap_lines(1, 300)
 for line in lines:

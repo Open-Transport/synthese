@@ -158,6 +158,20 @@ namespace synthese
 			*/
 			virtual void _addVariables(util::ParametersMap& variables) const { };
 
+			/**
+				Retrieve the message alternative of a message corresponding to the event type
+				@param provider reference to source notification provider
+				@param alarm the messages' holder
+				@param eventType type of the notification event (begin/end)
+				@param[out] messageTypeFound true if message alternative for type was found
+				@return message alternative if it was found, long message otherwise
+			*/
+			static std::string _getMessageAlternative(
+				const Alarm* alarm,
+				const boost::optional<MessageType&> type,
+				bool& messageTypeFound
+			);
+
 		private:
 			/**
 				Set message variable according to message type
@@ -169,7 +183,7 @@ namespace synthese
 			static bool _setMessageVariable(
 				util::ParametersMap& variables,
 				const Alarm* alarm,
-				boost::optional<MessageType&> type
+				const boost::optional<MessageType&> type
 			);
 
 			/**

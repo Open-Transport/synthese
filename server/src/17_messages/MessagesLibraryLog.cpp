@@ -25,9 +25,6 @@
 #include "ScenarioTemplate.h"
 #include "ScenarioTemplateTableSync.h"
 #include "AlarmTableSync.h"
-#include "TextTemplate.h"
-#include "TextTemplateTableSync.h"
-#include "MessagesLibraryRight.h"
 #include "Request.h"
 #include "SentScenario.h"
 #include "ScenarioFolder.h"
@@ -78,11 +75,6 @@ namespace synthese
 				{
 					boost::shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return alarm->getShortMessage();
-				}
-				else if (tableId == TextTemplateTableSync::TABLE.ID)
-				{
-					boost::shared_ptr<const TextTemplate> text(TextTemplateTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
-					return text->getName();
 				}
 				else if (tableId == ScenarioFolderTableSync::TABLE.ID)
 				{
@@ -210,45 +202,6 @@ namespace synthese
 			content.push_back("Répertoire de scénarios");
 			content.push_back("Suppression de "+ folder.getFullName());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, folder.getKey());
-		}
-
-
-		void MessagesLibraryLog::AddTemplateDeleteEntry( const TextTemplate& text , const security::User* user )
-		{
-			DBLog::ColumnsVector content;
-			content.push_back("Modèle de texte " + string((text.getAlarmLevel() == ALARM_LEVEL_WARNING) ? "prioritaire" : "complémentaire"));
-			content.push_back("Suppression");
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, text.getKey());
-		}
-
-
-
-		void MessagesLibraryLog::AddTemplateUpdateEntry( const TextTemplate& text , const std::string& changes , const security::User* user )
-		{
-			DBLog::ColumnsVector content;
-			content.push_back("Modèle de texte " + string((text.getAlarmLevel() == ALARM_LEVEL_WARNING) ? "prioritaire" : "complémentaire"));
-			content.push_back("Modification : " + changes);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, text.getKey());
-		}
-
-
-
-		void MessagesLibraryLog::AddTemplateCreationEntry( const TextTemplate& text , const security::User* user )
-		{
-			DBLog::ColumnsVector content;
-			content.push_back("Modèle de texte " + string((text.getAlarmLevel() == ALARM_LEVEL_WARNING) ? "prioritaire" : "complémentaire"));
-			content.push_back("Création");
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, text.getKey());
-		}
-
-
-
-		void MessagesLibraryLog::AddTemplateFolderUpdateEntry( const TextTemplate& text , const std::string& changes , const security::User* user )
-		{
-			DBLog::ColumnsVector content;
-			content.push_back("Répertoire de modèles de textes" + text.getName());
-			content.push_back("Modification : " + changes);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, text.getKey());
 		}
 
 

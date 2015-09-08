@@ -126,7 +126,9 @@ def convert_to_ineo_color( hexcolor ):
 
 
 # Request headers
-root = etree.Element("Passenger" + type + "MessageRequest")
+namespace = "http://www.w3.org/2001/XMLSchema-instance"
+locationAttribute = "{%s}noNameSpaceSchemaLocation" % namespace
+root = etree.Element("Passenger" + type + "MessageRequest", attrib={locationAttribute: xsd_location} if len(xsd_location) > 0 else {})
 childID = etree.SubElement(root, "ID")
 childID.text = ID
 childRequestTimeStamp = etree.SubElement(root, "RequestTimeStamp")
@@ -226,7 +228,7 @@ if int(needs_end_stop_point) != 0:
 # Extract HTML text lines 
 childText = etree.SubElement(childMessaging, "Text")
 htmlParser = HTMLTextExtractor()
-htmlParser.feed(message[0]["content"])
+htmlParser.feed(message_text)
 # 'Text' node accepts [1..4] lines * [0..25] characters
 lines = htmlParser.wrap_lines(4, 25)
 for line in lines:
@@ -238,7 +240,7 @@ if int(needs_play_tts) != 0:
   if int(message[0]["play_tts"]) != 0:
     childTts = etree.SubElement(childMessaging, "Tts")
     htmlParser = HTMLTextExtractor()
-    htmlParser.feed(message[0]["content"])
+    htmlParser.feed(message_text)
     # 'Text' node accepts 1 line * [0..300] characters
     lines = htmlParser.wrap_lines(1, 300)
     for line in lines:

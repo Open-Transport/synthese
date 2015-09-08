@@ -36,7 +36,10 @@
 #include <Object.hpp>
 #include <Registrable.h>
 #include <SentScenario.h>
+#include <ScenarioTemplate.h>
+#include <Scenario.h>
 #include <SentScenarioTableSync.h>
+#include <ScenarioTemplateTableSync.h>
 #include <StringField.hpp>
 #include <UtilTypes.h>
 
@@ -96,6 +99,16 @@ namespace synthese
 				{
 					boost::shared_ptr<const SentScenario> scenario(SentScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return scenario->getName();
+				}
+				else if (tableId == ScenarioTemplateTableSync::TABLE.ID)
+				{
+					boost::shared_ptr<const ScenarioTemplate> scenario(ScenarioTemplateTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					return scenario->getName();
+				}
+				else if (tableId == AlarmTableSync::TABLE.ID)
+				{
+					boost::shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					return alarm->getShortMessage();
 				}
 				else if (tableId == NotificationProviderTableSync::TABLE.ID)
 				{
