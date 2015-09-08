@@ -183,8 +183,7 @@ template=<{scenario&template=
           actionParams=<@roid@>&
           class=btn btn-danger btn-mini&
           text=Supprimer définitivement cet événement&
-          confirm=Etes-vous sûr de vouloir supprimer définitivement l'événement ?&
-          ?>
+          confirm=Etes-vous sûr de vouloir supprimer définitivement l'événement ??>
 	?>
         </td>
       </tr>
