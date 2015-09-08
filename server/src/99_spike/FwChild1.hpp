@@ -58,7 +58,6 @@ namespace synthese
 {
 	namespace spike
 	{
-		class FwChild1;
 
 		FIELD_STRING(Property1)
 
@@ -74,13 +73,14 @@ namespace synthese
 		class FwChild1:	public FwParent
 		{
 		public:
+			RECORD_WRAPPER(FwChild1, FwChild1Schema)
 
-			OBJECT(FwChild1, FwChild1Schema)
+			RECORD_GETSET(Property0)
+			RECORD_GETSET(Property1)
 
-			OBJECT_GETSET(Property0)
-			OBJECT_GETSET(Property1)
-
+			TABLE_REGISTRY_DECL(FwChild1)
 		};
-}	}
+	}
+}
 
 #endif // SYNTHESE_spike_Fwchild1_hpp__

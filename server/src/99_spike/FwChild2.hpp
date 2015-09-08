@@ -71,11 +71,14 @@ namespace synthese
 		class FwChild2:	public FwParent
 		{
 		public:
-			OBJECT(FwChild2, FwChild2Schema)
+			RECORD_WRAPPER(FwChild2, FwChild2Schema)
 
-			OBJECT_GETSET(Property0)
-			OBJECT_GETSET(Property2)
+			RECORD_GETSET(Property0)
+			RECORD_GETSET(Property2)
+
+			TABLE_REGISTRY_DECL(FwChild2)
 		};
-}	}
+	}
+}
 
 #endif // SYNTHESE_spike_Fwchild2_hpp__

@@ -40,7 +40,7 @@ namespace synthese
 	{
 		FIELD_STRING(Property0)
 
-		/** Fwparent class.
+		/** Fwparent abstract class.
 		@ingroup m62
 		*/
 		class FwParent :
@@ -50,9 +50,9 @@ namespace synthese
 
 		public:
 
-			ABS_OBJECT(FwParent)
+			ABSTRACT_OBJECT(FwParent)
 
-			ABS_OBJECT_GETSET(Property0)
+			ABSTRACT_GETSET(Property0)
 
 		};
 }	}

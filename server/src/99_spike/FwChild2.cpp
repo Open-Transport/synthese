@@ -24,7 +24,6 @@
 
 using namespace boost;
 using namespace std;
-using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -32,8 +31,9 @@ namespace synthese
 	using namespace spike;
 	using namespace util;
 
-	CLASS_DEFINITION2(FwChild2, "t992_fwchild2", 991)
-	FIELD_DEFINITION_OF_TYPE2(Property2, "property2", SQL_TEXT)
+	TABLE_REGISTRY_IMPL(FwChild2, "t992_fwchild2", 991)
+
+	RECORD_FIELD_IMPL(Property2, "property2", SQL_TEXT)
 
 	namespace spike
 	{
@@ -49,9 +49,4 @@ namespace synthese
 		{}
 
 
-
-		FwChild2::~FwChild2()
-		{
-
-		}
 }	}

@@ -36,25 +36,22 @@
 	template<> const std::string Object<N, N::Schema>::TABLE_NAME = T; \
 	template<> const util::RegistryTableType Object<N, N::Schema>::CLASS_NUMBER = NUM;
 
+// new macros defined below
+
+#define ABSTRACT_OBJECT(ObjectClass_)      \
+public:\
+	ObjectClass_(util::RegistryKeyType id=0);
 
 
-#define ABS_OBJECT(C)      \
-	C(util::RegistryKeyType id=0);   \
-	virtual ~C();
-
-#define ABS_OBJECT_GETSET(F)    \
+#define ABSTRACT_GETSET(F)    \
 	virtual std::string get##F() const = 0; \
 	virtual void set##F(const std::string& value) = 0;
 
-#define OBJECT(ObjectClass_, Schema_)      \
+
+#define RECORD_WRAPPER(ObjectClass_, Schema_)      \
 \
 public:\
-	static const std::string CLASS_NAME; \
-	static const util::RegistryTableType CLASS_NUMBER; \
-	static const std::string TABLE_NAME; \
-\
 	typedef Schema_ Schema; \
-	typedef util::Registry<ObjectClass_>	Registry; \
 	struct Vector: public PointersVectorField<Vector, ObjectClass_> {}; \
 	\
 private:\
@@ -75,7 +72,6 @@ public:\
 	} \
 \
 	ObjectClass_(util::RegistryKeyType id=0);   \
-	virtual ~ObjectClass_(); \
 \
 private: \
 	\
@@ -297,6 +293,7 @@ public: \
 	virtual util::RegistryTableType getClassNumber() const { return CLASS_NUMBER; } \
 	virtual const std::string& getClassName() const { return CLASS_NAME; } \
 	virtual const std::string& getTableName() const { return TABLE_NAME; } \
+\
 	virtual util::RegistryKeyType getKey() const { return get<Key>(); } \
 	virtual void setKey(util::RegistryKeyType value){ set<Key>(value); } \
 	\
@@ -343,12 +340,21 @@ public: \
 
 
 
-#define OBJECT_GETSET(F)    \
+#define RECORD_GETSET(F)    \
 	virtual std::string get##F() const { return get<F>(); } \
 	virtual void set##F(const std::string& value) { set<F>(value); }
 
-#define FIELD_DEFINITION_OF_TYPE2(N, F, T) 	template<> const Field SimpleObjectFieldDefinition<N>::FIELD = Field(F, T);
-#define CLASS_DEFINITION2(N, T, NUM)	namespace util \
+#define RECORD_FIELD_IMPL(N, F, T) 	template<> const Field SimpleObjectFieldDefinition<N>::FIELD = Field(F, T);
+
+
+#define TABLE_REGISTRY_DECL(ObjectClass_) \
+	static const std::string CLASS_NAME; \
+	static const util::RegistryTableType CLASS_NUMBER; \
+	static const std::string TABLE_NAME; \
+	typedef util::Registry<ObjectClass_>	Registry;
+
+
+#define TABLE_REGISTRY_IMPL(N, T, NUM)	namespace util \
 	{ \
 	  template<> const std::string util::Registry<N>::KEY(#N); \
 	}\

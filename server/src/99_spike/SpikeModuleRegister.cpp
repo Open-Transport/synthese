@@ -22,5 +22,4 @@ void synthese::spike::moduleRegister()
 	synthese::util::Env::Integrate<synthese::spike::FwChild1>();
 	synthese::util::Env::Integrate<synthese::spike::FwChild2>();
 
-
 }

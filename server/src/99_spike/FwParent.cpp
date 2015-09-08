@@ -24,7 +24,6 @@
 
 using namespace boost;
 using namespace std;
-using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -43,9 +42,4 @@ namespace synthese
 		{}
 
 
-
-		FwParent::~FwParent()
-		{
-
-		}
 }	}
