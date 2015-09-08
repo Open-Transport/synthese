@@ -74,13 +74,8 @@ namespace synthese
 		class FwChild1:	public FwParent
 		{
 		public:
-            
-		private:
 
-
-		public:
-
-			OBJECT(FwChild1, FwChild1Schema);
+			OBJECT(FwChild1, FwChild1Schema)
 
 			OBJECT_GETSET(Property0)
 			OBJECT_GETSET(Property1)

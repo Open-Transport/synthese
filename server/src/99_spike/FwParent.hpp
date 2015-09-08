@@ -50,9 +50,9 @@ namespace synthese
 
 		public:
 
-			ABS_OBJECT(FwParent);
+			ABS_OBJECT(FwParent)
 
-			ABS_OBJECT_GETSET(Property0);
+			ABS_OBJECT_GETSET(Property0)
 
 		};
 }	}

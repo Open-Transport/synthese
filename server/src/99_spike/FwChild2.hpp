@@ -56,7 +56,6 @@ namespace synthese
 {
 	namespace spike
 	{
-		class FwChild2;
 
 		FIELD_STRING(Property2)
 
@@ -72,12 +71,7 @@ namespace synthese
 		class FwChild2:	public FwParent
 		{
 		public:
-            
-		private:
-
-
-		public:
-			OBJECT(FwChild2, FwChild2Schema);
+			OBJECT(FwChild2, FwChild2Schema)
 
 			OBJECT_GETSET(Property0)
 			OBJECT_GETSET(Property2)
