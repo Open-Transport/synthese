@@ -41,7 +41,8 @@ class HTMLTextExtractor(HTMLParser):
 
   def feed(self, data):
     from HTMLParser import HTMLParser
-    HTMLParser.feed(self, data)
+    data_with_br = data.replace("\n", "<br/>")
+    HTMLParser.feed(self, data_with_br)
     if len(self.current_line) > 0:
       self.lines.append(self.current_line)
       self.current_line = ''
