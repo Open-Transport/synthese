@@ -20,10 +20,11 @@
           <?if&cond=<@display@>&then=
             <@file_found=1@>
             <@smart_url=<?object&roid=<@id@>&template=<@smart_url_path@>?>@>
+            <@my_url=http://<@host_and_port@><@site_url@><@smart_url@>@>
 <?if&cond=<@view_mode@>&then=
-            <span class="btn btn-left btn-with-margins thumbnail-list<?if&cond=<@admin_mediatheque@>&then="&else= thumbnail-selectable" data-file-action="selectFile" data-id="<@id@>" data-smart-url="<@smart_url@>"?>>
+            <span class="btn btn-left btn-with-margins thumbnail-list<?if&cond=<@admin_mediatheque@>&then="&else= thumbnail-selectable" data-file-action="selectFile" data-id="<@id@>" data-smart-url="<@my_url@>"?>>
               <?if&cond=<?StrStr&text=<@mime_type@>&match=image?>&then=
-                <@my_url=http://<@host_and_port@><@site_url@><@smart_url@>@>
+
                 <img src="<@my_url@>" data-toggle="tooltip" data-placement="top" title="<@title@>"/>
               &else=
                 <@type=<?substr&t=<@mime_type@>&f=<?StrStr&text=<@mime_type@>&match=/?>&n=<?strlen&t=<@mime_type@>?>?>@>
@@ -35,9 +36,8 @@
 &else=
             <li class="span2" style="position: relative;">
               <?if&cond=<@admin_mediatheque@>&then=<span&else=<a?>
-                href="#" class="thumbnail<?if&cond=<@admin_mediatheque@>&then="&else= thumbnail-selectable" data-file-action="selectFile" data-id="<@id@>" data-smart-url="<@smart_url@>"?>>
+                href="#" class="thumbnail<?if&cond=<@admin_mediatheque@>&then="&else= thumbnail-selectable" data-file-action="selectFile" data-id="<@id@>" data-smart-url="<@my_url@>"?>>
               <?if&cond=<?StrStr&text=<@mime_type@>&match=image?>&then=
-                <@my_url=http://<@host_and_port@><@site_url@><@smart_url@>@>
                 <img src="<@my_url@>" data-toggle="tooltip" data-placement="top" title="<@title@>"/>
               &else=
                 <@type=<?substr&t=<@mime_type@>&f=<?StrStr&text=<@mime_type@>&match=/?>&n=<?strlen&t=<@mime_type@>?>?>@>
