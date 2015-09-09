@@ -95,6 +95,7 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_OVERLOAD_LINES = "overload_lines";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_READ_ETAT_HORAIRE = "read_etat_horaire";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_READ_PROGRAMMATIONS = "read_programmations";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_DEST_DEMITOUR = "dest_demitour";
 		
 		recursive_mutex IneoBDSIFileFormat::Importer_::_tabRunningBdsiMutex;
 		set<RegistryKeyType> IneoBDSIFileFormat::Importer_::_runningBdsi;
@@ -208,6 +209,9 @@ namespace synthese
 
 			// Read programmations ?
 			_readProgrammations = map.getDefault<bool>(PARAMETER_READ_PROGRAMMATIONS, true);
+
+			// Change the destination in case of a demi-tour ?
+			_destDemitour = map.getDefault<bool>(PARAMETER_DEST_DEMITOUR, false);
 		}
 
 
@@ -254,8 +258,29 @@ namespace synthese
 						break;
 					}
 				}
+
+				std::string dest = chainage.destsms;
+
+				// If the last stop has changed, modify the destination
+				if ( _destDemitour && arretChns.back().ref != chainage.arretChns.back().ref )
+				{
+					Arret *destArret = arretChns.back().arret;
+					if (destArret)
+					{
+						pt::StopPoint *destStopPoint = destArret->syntheseStop;
+						if (destStopPoint)
+						{
+							const pt::StopArea *destStopArea = destStopPoint->getConnectionPlace();
+							if (destStopArea)
+							{
+								dest = destStopArea->getName();
+								_logDebug("Demi-tour : Using " + dest + " as destination instead of " + chainage.destsms + " for the new journeyPattern " + chainage.nom + "(" + chainage.ref + ") in line " + chainage.ligne->ref);
+							}
+						}
+					}
+				}
 				
-				newChainage = _createAndReturnChainage(chainages,arretChns,*(chainage.ligne),chainage.nom,chainage.sens,chainage.destsms,chainage.ref + "-" + lexical_cast<string>(horaires.size()));
+				newChainage = _createAndReturnChainage(chainages,arretChns,*(chainage.ligne),chainage.nom,chainage.sens,dest,chainage.ref + "-" + lexical_cast<string>(horaires.size()));
 				
 				// Jump over dead runs
 				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, arretChns)
