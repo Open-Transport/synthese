@@ -441,14 +441,15 @@
 			?>
 		}>?>
 		<?if&cond=<@medialibraryFound@>&then=
-              <input type="hidden" field="m_image" onchange="activateForm()">
-              <span class="file-picture"></span>
-              <a href="#m_image" data-toggle="modal" field="m_image-link">Ajouter une image</a>
+                <a href="#" data-media-field="image">Ajouter une image</a>
 		?>
             </div>
             <div class="row-fluid">
               <label>URL version numérisée
-                <input class="input-large" type="text" field="digitized_version" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()" placeholder="www.url_du_pdf.com">
+                <input class="input-large" type="text" field="digitized_version" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()" placeholder="www.url_du_pdf.com"/>
+                <?if&cond=<@medialibraryFound@>&then=
+                <span data-media-field="digitized_version" data-toogle="tooltip" data-placement="top" title="Obtenir depuis une médiathèque"><i class="icon-search"></i></span>
+		?>
               </label>
             </div>
           </div>
@@ -608,7 +609,7 @@
 <#mediatheque_selector#>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn btn-primary" data-dismiss="modal" submit="m_image">Insérer</a>
+    <a href="#" class="btn btn-primary" data-dismiss="modal" submit="m_image" data-field="image">Insérer</a>
     <a href="#" class="btn" data-dismiss="modal">Annuler</a>
   </div>
 </div>

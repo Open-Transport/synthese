@@ -1308,6 +1308,47 @@ function focus_on_input()
   $(this).find('input[type=text]').eq(0).focus();
 }
 
+function select_file() {
+  var elem = $(this);
+  $('.thumbnail-selectable.active').removeClass('active');
+  elem.addClass('active');
+}
+
+function submit_image() {
+  var pictureLink = $('.thumbnail-selectable.active');
+  if (pictureLink.length > 0) {
+    var ed = tinyMCE.get('tinymce');
+    var range = ed.selection.getRng();
+    var newNode = ed.getDoc().createElement("img");
+    newNode.src = pictureLink.children('img').attr('src');
+    range.insertNode(newNode);
+  }
+}
+
+function submit_digitized_version() {
+  var selection = $('.thumbnail-selectable.active');
+  if (selection.length > 0) {
+    $('[field="digitized_version"]').val(selection.attr('data-smart-url'));
+  }
+}
+
+function select_and_submit() { // for double-click
+  select_file.call($(this));
+  var submitFunction = window['submit_' + $('[submit="m_image"]').attr('data-field')];
+  submitFunction(); // submit_image or submit_digitized_version
+  $('#m_image').modal('hide');
+}
+
+function open_media_selector()
+{
+  var field = $(this).attr('data-media-field'); // "image" or "digitized_version"
+  var submitFunction = window['submit_' + field];
+  $('[submit="m_image"]').attr('data-field', field);
+  $('[submit="m_image"]').one('click', submitFunction); // modal insert button
+  $('#m_image').modal('show');
+  $('#search-button').trigger('click');
+  return false;
+}
 
 $(function(){
   $('#record_button').click(save_click);
@@ -1371,4 +1412,7 @@ $(function(){
   diffusionForm.find('input[name=actionParam_event_end_time]').bind('focusout', change_event_time);
   diffusionForm.find('.date').datepicker({format: 'dd/mm/yyyy'}).on('changeDate', pick_event_date);;
 
+  $('[data-media-field]').click(open_media_selector);
+  $(document).on('click', '[data-file-action="selectFile"]', select_file);
+  $(document).on('dblclick', '[data-file-action="selectFile"]', select_and_submit);
   });

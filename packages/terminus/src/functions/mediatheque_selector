@@ -130,29 +130,6 @@
       $('#folders-root').addClass('active');
       $('#folders-root').find('.folder-actions').show();
     }
-<?if&cond=<@admin_mediatheque@>&else=
-    function selectFile(event, item) {
-      var elem = $(this);
-      if (typeof item != 'undefined') { elem = item; };
-      $('.thumbnail-selectable.active').removeClass('active');
-      elem.addClass('active');
-    }
-    function submitFileForm() {
-      var pictureLink = $('.thumbnail-selectable.active');
-      if (pictureLink.length > 0) {
-        var ed = tinyMCE.get('tinymce');
-        var range = ed.selection.getRng();
-        var newNode = ed.getDoc().createElement("img");
-        newNode.src = pictureLink.children('img').attr('src');
-        range.insertNode(newNode);
-      }
-    }
-    function selectAndSubmitFileForm(event) {
-      selectFile(event, $(this));
-      submitFileForm();
-      $('#m_image').modal('hide');
-    }
-?>
     function addAlert() {
       if ($('#files-list').find('.alert').length > 0) {
         $('#files-list').find('.alert').last().after("<div class='alert alert-error'>Une erreur est survenue lors de l'opération.</div>");
@@ -168,15 +145,12 @@
       $(document).on('click', '[data-file-action="reloadFilesList"]', changeListFiles);
       $('#file_search').keypress(function(event) {
         var keycode = (event.keyCode ? event.keyCode : event.which);
-        if (keycode == '13') { changeListFiles(event, $(this).attr('data-id')); };
+        if (keycode == '13') { changeListFiles.call($(this), event); };
       });
 <?if&cond=<@admin_mediatheque@>&then=
       loadFoldersList("<@medialibrary_id@>"<?if&cond=<@folder_id@>&then=, "<@folder_id@>"?>);
 &else=
       loadFoldersList("<@medialibrary_id@>");
-      $(document).on('click', '[data-file-action="selectFile"]', selectFile);
-      $(document).on('dblclick', '[data-file-action="selectFile"]', selectAndSubmitFileForm);
-      $(document).on('click', '[submit="m_image"]', submitFileForm);
 ?>
     });
   </script>
