@@ -76,3 +76,8 @@
   label=Lire la table PROGRAMMATION&
   name=read_programmations&
 #>
+
+<#forms/yes_no_input&
+  label=Changer la destination en cas de demi-tour&
+  name=dest_demitour&
+#>
