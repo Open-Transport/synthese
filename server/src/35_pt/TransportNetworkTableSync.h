@@ -59,6 +59,7 @@ namespace synthese
 			static const std::string COL_LANG;
 			static const std::string COL_CONTACT_ID;
 			static const std::string COL_FARE_CONTACT_ID;
+			static const std::string COL_COUNTRY_CODE;
 
 
 

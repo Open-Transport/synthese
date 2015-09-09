@@ -64,6 +64,7 @@ namespace synthese
 		const string TransportNetworkUpdateAction::PARAMETER_LANG = Action_PARAMETER_PREFIX + "lang";
 		const string TransportNetworkUpdateAction::PARAMETER_CONTACT_ID = Action_PARAMETER_PREFIX + "contact_id";
 		const string TransportNetworkUpdateAction::PARAMETER_FARE_CONTACT_ID = Action_PARAMETER_PREFIX + "fare_contact_id";
+		const string TransportNetworkUpdateAction::PARAMETER_COUNTRY_CODE = Action_PARAMETER_PREFIX + "country_code";
 
 
 		ParametersMap TransportNetworkUpdateAction::getParametersMap() const
@@ -80,6 +81,10 @@ namespace synthese
 			if(_image)
 			{
 				map.insert(PARAMETER_IMAGE, *_image);
+			}
+			if (_countryCode)
+			{
+				map.insert(PARAMETER_COUNTRY_CODE, *_countryCode);
 			}
 
 			// Importable
@@ -235,6 +240,11 @@ namespace synthese
 				{
 					_fareContact = boost::shared_ptr<ReservationContact>();
 			}	}
+
+			if (map.isDefined(PARAMETER_COUNTRY_CODE))
+			{
+				_countryCode = map.get<string>(PARAMETER_COUNTRY_CODE);
+			}
 		}
 
 
@@ -299,6 +309,12 @@ namespace synthese
 				_network->setFareContact(
 					_fareContact->get()
 				);
+			}
+
+			// Country code
+			if (_countryCode)
+			{
+				_network->setCountryCode(*_countryCode);
 			}
 
 			// Action

@@ -64,6 +64,7 @@ namespace synthese
 			static const std::string DATA_NETWORK_ID;
 			static const std::string DATA_NAME;
 			static const std::string DATA_IMAGE;
+			static const std::string DATA_COUNTRY_CODE;
 
 		protected:
 			calendar::CalendarTemplate* _daysCalendarsParent;
@@ -74,13 +75,15 @@ namespace synthese
 			std::string _lang;
 			pt::ReservationContact* _contact;
 			pt::ReservationContact* _fareContact;
+			std::string _country_code;
 
 		public:
 
 			TransportNetwork (
 				util::RegistryKeyType id = 0,
 				std::string name = std::string(),
-				std::string image = std::string()
+				std::string image = std::string(),
+				std::string country_code = std::string()
 			);
 			~TransportNetwork ();
 
@@ -94,6 +97,7 @@ namespace synthese
 				std::string getLang() const { return _lang; }
 				pt::ReservationContact* getContact() const { return _contact; }
 				pt::ReservationContact* getFareContact() const { return _fareContact; }
+				std::string getCountryCode() const { return _country_code; }
 			//@}
 
 			//! @name Setters
@@ -106,6 +110,7 @@ namespace synthese
 				void setLang(const std::string& value){ _lang = value; }
 				void setContact(pt::ReservationContact* value){ _contact = value; }
 				void setFareContact(pt::ReservationContact* value){ _fareContact = value; }
+				void setCountryCode(std::string value){ _country_code = value; }
 			//@}
 
 			/// @name Modifiers

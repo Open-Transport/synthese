@@ -66,6 +66,7 @@ namespace synthese
 		const string TransportNetworkTableSync::COL_LANG("lang");
 		const string TransportNetworkTableSync::COL_CONTACT_ID("contact_id");
 		const string TransportNetworkTableSync::COL_FARE_CONTACT_ID("fare_contact_id");
+		const string TransportNetworkTableSync::COL_COUNTRY_CODE("country_code");
 	}
 
 	namespace db
@@ -88,6 +89,7 @@ namespace synthese
 			Field(TransportNetworkTableSync::COL_LANG, SQL_TEXT),
 			Field(TransportNetworkTableSync::COL_CONTACT_ID, SQL_INTEGER),
 			Field(TransportNetworkTableSync::COL_FARE_CONTACT_ID, SQL_INTEGER),
+			Field(TransportNetworkTableSync::COL_COUNTRY_CODE, SQL_TEXT),
 			Field()
 		};
 
@@ -138,6 +140,7 @@ namespace synthese
 			query.addField(object->getLang());
 			query.addField(object->getContact() ? object->getContact()->getKey() : RegistryKeyType(0));
 			query.addField(object->getFareContact() ? object->getFareContact()->getKey() : RegistryKeyType(0));
+			query.addField(object->getCountryCode());
 			query.execute(transaction);
 		}
 
@@ -244,5 +247,5 @@ namespace synthese
 				result.push_back(std::make_pair(network->getKey(), network->getName()));
 			}
 			return result;
-		} ;
+		}
 }	}

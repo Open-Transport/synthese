@@ -270,6 +270,7 @@ namespace synthese
 						network.getFareContact() ? boost::lexical_cast<std::string>(network.getFareContact()->getKey()) : ""
 					)
 				);
+				stream << p.cell("Code pays", p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_COUNTRY_CODE, network.getCountryCode()));
 
 				stream << p.close();
 

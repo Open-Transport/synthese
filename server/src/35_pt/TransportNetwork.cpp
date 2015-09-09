@@ -54,13 +54,15 @@ namespace synthese
 		const string TransportNetwork::DATA_NETWORK_ID("network_id");
 		const string TransportNetwork::DATA_NAME("name");
 		const string TransportNetwork::DATA_IMAGE("image");
+		const string TransportNetwork::DATA_COUNTRY_CODE("country_code");
 
 
 
 		TransportNetwork::TransportNetwork(
 			util::RegistryKeyType id,
 			std::string name,
-			std::string image
+			std::string image,
+			std::string country_code
 		):	util::Registrable(id),
 			graph::PathClass(),
 			_daysCalendarsParent(NULL),
@@ -68,7 +70,8 @@ namespace synthese
 			_timeZone(""),
 			_lang(""),
 			_contact(NULL),
-			_fareContact(NULL)
+			_fareContact(NULL),
+			_country_code(country_code)
 		{}
 
 
@@ -119,6 +122,7 @@ namespace synthese
 			pm.insert(prefix + DATA_NETWORK_ID, getKey());
 			pm.insert(prefix + DATA_NAME, getName());
 			pm.insert(prefix + DATA_IMAGE, getImage());
+			pm.insert(prefix + DATA_COUNTRY_CODE, getCountryCode());
 		}
 
 
@@ -305,6 +309,19 @@ namespace synthese
 				{
 					_fareContact = value;
 					result = true;
+				}
+			}
+
+			// Country code
+			if (record.isDefined(TransportNetworkTableSync::COL_COUNTRY_CODE))
+			{
+				std::string country_code(
+					record.get<string>(TransportNetworkTableSync::COL_COUNTRY_CODE)
+				);
+				if(country_code != _country_code)
+				{
+					result = true;
+					_country_code = country_code;
 				}
 			}
 
