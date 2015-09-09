@@ -108,7 +108,8 @@ childMessaging = etree.SubElement(root, "Messaging")
 # Ineo SAE requires the name to be defined as ‘XXXX aaaaaaaaaaaaaaaaaaaaaaaaaaa’ where 'XXXX' is a unique message id
 childName = etree.SubElement(childMessaging, "Name")
 messageID = int(message[0]["message_id"]) % 10000
-childName.text = "{:04d} {:.27s}".format(messageID, message[0]["title"])
+messageTitle = unicode(message[0]["title"], "utf-8", "ignore")
+childName.text = u"{:04d} {:.27s}".format(messageID, messageTitle)
 
 # Dispatching
 childDispatching = etree.SubElement(childMessaging, "Dispatching")
@@ -179,7 +180,8 @@ if int(needs_end_stop_point) != 0:
 # Extract HTML text lines 
 childText = etree.SubElement(childMessaging, "Text")
 htmlParser = HTMLTextExtractor()
-htmlParser.feed(message_text)
+unicode_message_text = unicode(message_text, "utf-8", "ignore")
+htmlParser.feed(unicode_message_text)
 # 'Text' node accepts 1 line * ]0..300] characters
 lines = htmlParser.wrap_lines(1, 300)
 for line in lines:
