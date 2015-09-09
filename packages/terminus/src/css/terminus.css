@@ -227,6 +227,9 @@ th {
   height: 20px;
   width: 20px;
 }
+#selectMediaLibrary {
+  width: auto;
+}
 #loader {
   position: absolute;
   z-index: 999;
