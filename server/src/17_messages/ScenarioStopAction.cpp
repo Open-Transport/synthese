@@ -232,8 +232,8 @@ namespace synthese
 									string endDateStr(periodNode.second.get("end_date", string()));
 									ptime endDate = endDateStr.empty() ? ptime(not_a_date_time) : time_from_string(endDateStr);
 
-									if (period->getStart() == startDate &&
-										period->getEnd() == endDate)
+									if (period->get<StartTime>() == startDate &&
+										period->get<EndTime>() == endDate)
 									{
 										periodFound = true;
 										break;
