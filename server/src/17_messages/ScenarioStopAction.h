@@ -85,6 +85,10 @@ namespace synthese
 
 			void setScenario(SentScenario* value){ _scenario = value; }
 
+			void setRemove(bool remove) { _remove = remove; }
+
+			void setArchive(bool archive) { _archive = archive; }
+
 			void deleteAlarmObjectLinks(
 				boost::optional<boost::property_tree::ptree> messagesAndCalendars,
 				server::Request& request

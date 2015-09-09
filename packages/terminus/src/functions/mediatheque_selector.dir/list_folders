@@ -7,14 +7,14 @@
   <?menu&root=<@current_website_id@>&raw_data=1&min_depth=0&max_depth=9999&template=
   <li id="folders-root"<@folder_id?"":" class=\"active\""@>>
   <a href="#" data-file-action="reloadFilesList"><@current_website_name@>
-  <?if&cond=<@admin_mediatheque@>&then=<span class="folder-actions"<@folder_id?" style=\"display: none\"":""@>><span class="pull-right" data-form-action="addFolder" data-parent="si"><i class="icon-plus icon-white"></i></span></span>?></a>
+  <?if&cond=<@admin_mediatheque@>&then=<span class="folder-actions"<@folder_id?" style=\"display: none\"":""@>><span class="pull-right" data-form-action="addFolder" data-parent="si" data-toggle="tooltip" data-placement="top" title="Ajouter un répertoire"><i class="icon-plus icon-white"></i></span></span>?></a>
   </li>
   <{page&recursive=1&template=
   <?if&cond=<@mime_type=="/"@>&then=
   <li class="tree_<@depth+1@><?if&cond=<@id==folder_id@>&then= active?>" file_id="<@id@>" file_type="<@mime_type@>" file_path="<@smart_url_path@>">
     <a href="#" data-id="<@id@>" data-file-action="reloadFilesList" data-title="<@title@>"><@title@><?if&cond=<@smart_url_path@>&then= - <@smart_url_path@>?>
-    <?if&cond=<@admin_mediatheque@>&then=<span class="folder-actions"<?if&cond=<@id==folder_id@>&else= style="display: none"?>><span class="pull-right" data-form-action="addFolder" data-parent="pi"><i class="icon-plus icon-white"></i></span><span class="pull-right" data-form-action="renameFolder"><i class="icon-edit icon-white"></i></span>
-      <?if&cond=<@recursive_content@>&else=<span class="pull-right" data-form-action="removeFolder"><i class="icon-remove icon-white"></i></span>?>
+    <?if&cond=<@admin_mediatheque@>&then=<span class="folder-actions"<?if&cond=<@id==folder_id@>&else= style="display: none"?>><span class="pull-right" data-form-action="addFolder" data-parent="pi" data-toggle="tooltip" data-placement="top" title="Ajouter un répertoire"><i class="icon-plus icon-white"></i></span><span class="pull-right" data-form-action="renameFolder" data-toggle="tooltip" data-placement="top" title="Renommer le répertoire"><i class="icon-edit icon-white"></i></span>
+      <?if&cond=<@recursive_content@>&else=<span class="pull-right" data-form-action="removeFolder" data-toggle="tooltip" data-placement="top" title="Supprimer le répertoire"><i class="icon-remove icon-white"></i></span>?>
     </span>?></a>
   </li>
   ?>

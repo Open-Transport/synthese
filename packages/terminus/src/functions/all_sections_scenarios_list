@@ -198,8 +198,7 @@ if (dates.length > 0) {
         actionParamsid=<@roid@>&
         actionParamena=0&
         class=btn btn-warning btn-mini btn-inactive&
-        text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ?
-        ?>&
+        text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>&
 		?>&
 	else=
 		<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&
@@ -211,8 +210,7 @@ if (dates.length > 0) {
         actionParamsid=<@roid@>&
         actionParamena=1&
         class=btn btn-warning btn-mini btn-inactive&
-        text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ?
-        ?>&
+        text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>&
 		?>&
 	?>
 	<?notification_events&

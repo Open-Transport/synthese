@@ -112,6 +112,7 @@ namespace synthese
 				static const std::string PARAMETER_OVERLOAD_LINES;
 				static const std::string PARAMETER_READ_ETAT_HORAIRE;
 				static const std::string PARAMETER_READ_PROGRAMMATIONS;
+				static const std::string PARAMETER_DEST_DEMITOUR;
 
 			private:
 				// Vector to avoid reentrance and mutex to protect this vector
@@ -139,6 +140,7 @@ namespace synthese
 				std::string _strOverloadLines;
 				bool _readEtatHoraire;
 				bool _readProgrammations;
+				bool _destDemitour;
 
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;

@@ -158,6 +158,68 @@ BOOST_AUTO_TEST_CASE (outOfHourRangeShouldNotBeInsideInfiniteApplicationPeriod)
 }
 
 
+BOOST_AUTO_TEST_CASE (oneSecondBeforeStartOfPeriodShouldNotBeInsideApplicationPeriodWithHourIntervalSpanningOverTwoDays)
+{
+	boost::shared_ptr<MessageApplicationPeriod> messageApplicationPeriod =
+			createMessageApplicationPeriod(ptime(date(2015, Jul, 10), hours(22) + minutes(30)),
+										   ptime(date(2015, Jul, 12), hours(22) + minutes(30)),
+										   hours(22), hours(26));
+	BOOST_CHECK_EQUAL(false, messageApplicationPeriod->isInside(ptime(date(2015, Jul, 10), hours(22) + minutes(30) - seconds(1))));
+}
+
+
+BOOST_AUTO_TEST_CASE (oneSecondAfterEndOfPeriodShouldNotBeInsideApplicationPeriodWithHourIntervalSpanningOverTwoDays)
+{
+	boost::shared_ptr<MessageApplicationPeriod> messageApplicationPeriod =
+			createMessageApplicationPeriod(ptime(date(2015, Jul, 10), hours(22) + minutes(30)),
+										   ptime(date(2015, Jul, 12), hours(22) + minutes(30)),
+										   hours(22), hours(26));
+	BOOST_CHECK_EQUAL(false, messageApplicationPeriod->isInside(ptime(date(2015, Jul, 12), hours(22) + minutes(30) + seconds(1))));
+}
+
+
+BOOST_AUTO_TEST_CASE (startOfHourRangeShouldBeInsideApplicationPeriodWithHourIntervalSpanningOverTwoDays)
+{
+	boost::shared_ptr<MessageApplicationPeriod> messageApplicationPeriod =
+			createMessageApplicationPeriod(ptime(date(2015, Jul, 10), hours(22) + minutes(30)),
+										   ptime(date(2015, Jul, 12), hours(22) + minutes(30)),
+										   hours(22), hours(26));
+	// This one is rejected because StartTime.time_of_day() > StartHour
+	BOOST_CHECK_EQUAL(false, messageApplicationPeriod->isInside(ptime(date(2015, Jul, 10), hours(22))));
+	// Those ones shall pass
+	BOOST_CHECK_EQUAL(true, messageApplicationPeriod->isInside(ptime(date(2015, Jul, 11), hours(22))));
+	BOOST_CHECK_EQUAL(true, messageApplicationPeriod->isInside(ptime(date(2015, Jul, 12), hours(22))));
+}
+
+
+BOOST_AUTO_TEST_CASE (middleOfHourRangeShouldBeInsideApplicationPeriodWithHourIntervalSpanningOverTwoDays)
+{
+	boost::shared_ptr<MessageApplicationPeriod> messageApplicationPeriod =
+			createMessageApplicationPeriod(ptime(date(2015, Jul, 10), hours(22) + minutes(30)),
+										   ptime(date(2015, Jul, 12), hours(22) + minutes(30)),
+										   hours(22), hours(26));
+	// Those ones shall pass
+	BOOST_CHECK_EQUAL(true, messageApplicationPeriod->isInside(ptime(date(2015, Jul, 10), hours(24))));
+	BOOST_CHECK_EQUAL(true, messageApplicationPeriod->isInside(ptime(date(2015, Jul, 11), hours(24))));
+	// This one is rejected because EndTime.time_of_day() < test date
+	BOOST_CHECK_EQUAL(false, messageApplicationPeriod->isInside(ptime(date(2015, Jul, 12), hours(24))));
+}
+
+
+BOOST_AUTO_TEST_CASE (endOfHourRangeShouldBeInsideApplicationPeriodWithHourIntervalSpanningOverTwoDays)
+{
+	boost::shared_ptr<MessageApplicationPeriod> messageApplicationPeriod =
+			createMessageApplicationPeriod(ptime(date(2015, Jul, 10), hours(22) + minutes(30)),
+										   ptime(date(2015, Jul, 12), hours(22) + minutes(30)),
+										   hours(22), hours(26));
+	// Those ones shall pass
+	BOOST_CHECK_EQUAL(true, messageApplicationPeriod->isInside(ptime(date(2015, Jul, 10), hours(26))));
+	BOOST_CHECK_EQUAL(true, messageApplicationPeriod->isInside(ptime(date(2015, Jul, 11), hours(26))));
+	// This one is rejected because EndTime.time_of_day() < EndHour
+	BOOST_CHECK_EQUAL(false, messageApplicationPeriod->isInside(ptime(date(2015, Jul, 12), hours(26))));
+}
+
+
 BOOST_AUTO_TEST_CASE (startOfPeriodShouldNotBeAfterApplicationPeriod)
 {
 	boost::shared_ptr<MessageApplicationPeriod> messageApplicationPeriod =
