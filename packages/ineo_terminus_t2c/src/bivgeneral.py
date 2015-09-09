@@ -41,7 +41,8 @@ class HTMLTextExtractor(HTMLParser):
 
   def feed(self, data):
     from HTMLParser import HTMLParser
-    HTMLParser.feed(self, data)
+    data_with_br = data.replace("\n", "<br/>")
+    HTMLParser.feed(self, data_with_br)
     if len(self.current_line) > 0:
       self.lines.append(self.current_line)
       self.current_line = ''
@@ -108,7 +109,8 @@ childMessaging = etree.SubElement(root, "Messaging")
 # Ineo SAE requires the name to be defined as ‘XXXX aaaaaaaaaaaaaaaaaaaaaaaaaaa’ where 'XXXX' is a unique message id
 childName = etree.SubElement(childMessaging, "Name")
 messageID = int(message[0]["message_id"]) % 10000
-childName.text = "{:04d} {:.27s}".format(messageID, message[0]["title"])
+messageTitle = unicode(message[0]["title"], "utf-8", "ignore")
+childName.text = u"{:04d} {:.27s}".format(messageID, messageTitle)
 
 # {Start,Stop}{Date,Time}
 childStartDate = etree.SubElement(childMessaging, "StartDate")
@@ -130,7 +132,8 @@ childDuration.text = message[0]["display_duration"]
 # Text
 # Extract HTML text lines 
 htmlParser = HTMLTextExtractor()
-htmlParser.feed(message_text)
+unicode_message_text = unicode(message_text, "utf-8", "ignore")
+htmlParser.feed(unicode_message_text)
 
 # TypeBIV = BUS4L
 childText1 = etree.SubElement(childMessaging, "Text")
