@@ -372,16 +372,23 @@ namespace synthese
 				
 				Log::GetInstance().warn("VDVServer : Ecriture d'abonnement pour l'arret " + lexical_cast<string>(subscription->get<StopArea>()->getKey()));
 
-				aboAnfrage << 
-					"<AZBID>" << (
-						get<DataSource>() ?
-						subscription->get<StopArea>()->getACodeBySource(*get<DataSource>()) :
-						lexical_cast<string>(subscription->get<StopArea>()->getKey())
-					) << "</AZBID>" <<
-					"<Vorschauzeit>" << (subscription->get<TimeSpan>().total_seconds() / 60)  << "</Vorschauzeit>" <<
-					"<Hysterese>60</Hysterese>" <<
-					"</AboAZB>"
-				;
+				if (subscription->get<StopArea>()->hasLinkWithSource(*get<DataSource>()))
+				{
+					aboAnfrage << 
+						"<AZBID>" << (
+							get<DataSource>() ?
+							subscription->get<StopArea>()->getACodeBySource(*get<DataSource>()) :
+							lexical_cast<string>(subscription->get<StopArea>()->getKey())
+						) << "</AZBID>" <<
+						"<Vorschauzeit>" << (subscription->get<TimeSpan>().total_seconds() / 60)  << "</Vorschauzeit>" <<
+						"<Hysterese>60</Hysterese>" <<
+						"</AboAZB>"
+					;
+				}
+				else
+				{
+					Log::GetInstance().error("VDVServer : Failed to generate Abo for StopArea " + lexical_cast<string>(subscription->get<StopArea>()->getKey()));
+				}
 			}
 
 			aboAnfrage << "</AboAnfrage>";
@@ -558,7 +565,8 @@ namespace synthese
 						XMLNode AZBFahrplanlageNode = AZBNachrichtNode.getChildNode("AZBFahrplanlage", cptAZBFahrplanlage);
 						// Verify that the AZBID is the right one for the subscription
 						string readAZBID = AZBFahrplanlageNode.getChildNode("AZBID").getText();
-						if (readAZBID != currentSubscription->get<StopArea>()->getACodeBySource(*get<DataSource>()))
+						if (currentSubscription->get<StopArea>()->hasLinkWithSource(*get<DataSource>()) &&
+							readAZBID != currentSubscription->get<StopArea>()->getACodeBySource(*get<DataSource>()))
 						{
 							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un AZBNachtricht avec un AZBID ne correspondant à l'abonnement");
 							break;
@@ -610,7 +618,8 @@ namespace synthese
 									{
 										ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
 										if(!curService) continue;
-										if (curService->getACodeBySource(*plannedDataSource) == vectServiceCode[1])
+										if (curService->hasLinkWithSource(*plannedDataSource) &&
+											curService->getACodeBySource(*plannedDataSource) == vectServiceCode[1])
 										{
 											// Add the service to vect
 											services.push_back(curService);

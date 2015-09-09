@@ -301,13 +301,15 @@ namespace synthese
 							}
 							Log::GetInstance().debug("VDVDataSupply : Network " + lexical_cast<string>(network.getKey()));
 							string networkId = "";
-							try {
+							if (network.hasLinkWithSource(*_vdvClient->get<DataSource>()))
+							{
 								networkId = network.getACodeBySource(
 									*_vdvClient->get<DataSource>()
 								);
 							}
-							catch (...) {
-								Log::GetInstance().debug("VDVDataSupply : Exception reading network code of " + lexical_cast<string>(network.getKey()));
+							else
+							{
+								Log::GetInstance().error("VDVDataSupply : Failed to read network code of " + lexical_cast<string>(network.getKey()));
 							}
 							Log::GetInstance().debug("VDVDataSupply : Network id " + networkId);
 							string serviceNumber;
@@ -362,122 +364,132 @@ namespace synthese
 								);
 							expirationTime -= diff_from_utc;
 
-							// XML generation
-							result << "<AZBFahrplanlage Zst=\"";
-							ToXsdDateTime(result, now);
-							result << "\" VerfallZst=\"";
-							ToXsdDateTime(result, expirationTime);
+							// XML generation if everything can be written
+							if (it.second->getStopArea()->hasLinkWithSource(*_vdvClient->get<DataSource>()) &&
+								line.hasLinkWithSource(*_vdvClient->get<DataSource>()))
+							{
+								result << "<AZBFahrplanlage Zst=\"";
+								ToXsdDateTime(result, now);
+								result << "\" VerfallZst=\"";
+								ToXsdDateTime(result, expirationTime);
 
-							// Halt ID
-							string haltID = "";
-							if (sp.getDepartureEdge()->getFromVertex() &&
-								dynamic_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex()))
-							{
-								const StopPoint* ps_test = static_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex());
-								try {
-									haltID = ps_test->getACodeBySource(*_vdvClient->get<DataSource>());
-								}
-								catch (...) {
-									Log::GetInstance().debug("VDVDataSupply : Exception reading stop point code of " + lexical_cast<string>(ps_test->getKey()));
-								}
-							}
-							Log::GetInstance().debug("VDVDataSupply : HaltID " + haltID);
-							Log::GetInstance().debug("VDVDataSupply : Betriebstag " + to_iso_extended_string((sp.getOriginDateTime() - diff_from_utc).date()));
-							try {
-								Log::GetInstance().debug("VDVDataSupply : LinienID " + line.getACodeBySource(*_vdvClient->get<DataSource>()));
-							}
-							catch (...) {
-								Log::GetInstance().debug("VDVDataSupply : Exception reading line code of " + lexical_cast<string>(line.getKey()));
-							}
-							Log::GetInstance().debug("VDVDataSupply : LinienText " + line.getShortName());
-							Log::GetInstance().debug("VDVDataSupply : RichtungsID " + _vdvClient->getDirectionID(jp));
-							string networkName = network.getName();
-							trim(networkName);
-							Log::GetInstance().debug("VDVDataSupply : Betreiber " + networkName);
-							bool inStopArea = false;
-							if(arrivalDateTime.is_not_a_date_time())
-							{
-								if(!plannedArrivalDateTime.is_not_a_date_time())
+								// Halt ID
+								string haltID = "";
+								if (sp.getDepartureEdge()->getFromVertex() &&
+									dynamic_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex()))
 								{
-									time_duration timeToStop = plannedArrivalDateTime - now;
-									if (timeToStop < time_duration(0,0,30))
+									const StopPoint* ps_test = static_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex());
+									if (ps_test->hasLinkWithSource(*_vdvClient->get<DataSource>()))
 									{
-										inStopArea = true;
-										if(!plannedDepartureDateTime.is_not_a_date_time())
+										haltID = ps_test->getACodeBySource(*_vdvClient->get<DataSource>());
+									}
+									else
+									{
+										Log::GetInstance().error("VDVDataSupply : Failed to read stop point code of " + lexical_cast<string>(ps_test->getKey()));
+									}
+								}
+								Log::GetInstance().debug("VDVDataSupply : HaltID " + haltID);
+								Log::GetInstance().debug("VDVDataSupply : Betriebstag " + to_iso_extended_string((sp.getOriginDateTime() - diff_from_utc).date()));
+								Log::GetInstance().debug("VDVDataSupply : LinienID " + line.getACodeBySource(*_vdvClient->get<DataSource>()));
+								Log::GetInstance().debug("VDVDataSupply : LinienText " + line.getShortName());
+								Log::GetInstance().debug("VDVDataSupply : RichtungsID " + _vdvClient->getDirectionID(jp));
+								string networkName = network.getName();
+								trim(networkName);
+								Log::GetInstance().debug("VDVDataSupply : Betreiber " + networkName);
+								bool inStopArea = false;
+								if(arrivalDateTime.is_not_a_date_time())
+								{
+									if(!plannedArrivalDateTime.is_not_a_date_time())
+									{
+										time_duration timeToStop = plannedArrivalDateTime - now;
+										if (timeToStop < time_duration(0,0,30))
 										{
-											time_duration timeToLeave = plannedDepartureDateTime - now;
-											if (timeToLeave > time_duration(0,0,-30))
+											inStopArea = true;
+											if(!plannedDepartureDateTime.is_not_a_date_time())
 											{
-												inStopArea = false;
+												time_duration timeToLeave = plannedDepartureDateTime - now;
+												if (timeToLeave > time_duration(0,0,-30))
+												{
+													inStopArea = false;
+												}
 											}
 										}
 									}
 								}
+								else
+								{
+									if(!arrivalDateTime.is_not_a_date_time())
+									{
+										time_duration timeToStop = arrivalDateTime - now;
+										if (timeToStop < time_duration(0,0,30))
+										{
+											inStopArea = true;
+											if(!departureDateTime.is_not_a_date_time())
+											{
+												time_duration timeToLeave = departureDateTime - now;
+												if (timeToLeave > time_duration(0,0,-30))
+												{
+													inStopArea = false;
+												}
+											}
+										}
+									}
+								}
+								result <<
+									"\">" <<
+									"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
+									"<FahrtID>" <<
+									"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
+									"<Betriebstag>" << to_iso_extended_string((sp.getOriginDateTime() - diff_from_utc).date()) << "</Betriebstag>" <<
+									"</FahrtID>" <<
+									"<HstSeqZaehler>1</HstSeqZaehler>" <<
+									"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
+									"<LinienText>" << line.getShortName() << "</LinienText>" <<
+									"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
+									"<RichtungsText>" << direction << "</RichtungsText>" <<
+									"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
+									"<ZielHst>" << direction << "</ZielHst>" <<
+									"<AufAZB>" << (inStopArea ? "true" : "false") << "</AufAZB>" <<
+									"<FahrtStatus>" << (isRealTime ? "Ist" : "Soll") << "</FahrtStatus>"
+								;
+								if(!plannedArrivalDateTime.is_not_a_date_time())
+								{
+									result << "<AnkunftszeitAZBPlan>";
+									ToXsdDateTime(result, plannedArrivalDateTime);
+									result << "</AnkunftszeitAZBPlan>";
+								}
+								if(!arrivalDateTime.is_not_a_date_time())
+								{
+									result << "<AnkunftszeitAZBPrognose>";
+									ToXsdDateTime(result, arrivalDateTime);
+									result << "</AnkunftszeitAZBPrognose>";
+								}
+								if(!plannedDepartureDateTime.is_not_a_date_time())
+								{
+									result << "<AbfahrtszeitAZBPlan>";
+									ToXsdDateTime(result, plannedDepartureDateTime);
+									result << "</AbfahrtszeitAZBPlan>";
+								}
+								if(!departureDateTime.is_not_a_date_time())
+								{
+									result << "<AbfahrtszeitAZBPrognose>";
+									ToXsdDateTime(result, departureDateTime);
+									result << "</AbfahrtszeitAZBPrognose>";
+								}
+								result << "<HaltID>" << haltID << "</HaltID>";
+								result << "<FahrtInfo><Betreiber>" << networkName << "</Betreiber></FahrtInfo>";
+								result << "</AZBFahrplanlage>";
+								Log::GetInstance().debug("VDVDataSupply : End of AZBFahrplanlage");
 							}
 							else
 							{
-								if(!arrivalDateTime.is_not_a_date_time())
-								{
-									time_duration timeToStop = arrivalDateTime - now;
-									if (timeToStop < time_duration(0,0,30))
-									{
-										inStopArea = true;
-										if(!departureDateTime.is_not_a_date_time())
-										{
-											time_duration timeToLeave = departureDateTime - now;
-											if (timeToLeave > time_duration(0,0,-30))
-											{
-												inStopArea = false;
-											}
-										}
-									}
-								}
+								// Log error so that a log analyser can throw an alert on some data
+								Log::GetInstance().error("VDVDataSupply : Failed to generate AZBFahrplanlage for StopArea " +
+									lexical_cast<string>(it.second->getStopArea()->getKey()) +
+									" or for its ligne " +
+									lexical_cast<string>(line.getKey())
+								);
 							}
-							result <<
-								"\">" <<
-								"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
-								"<FahrtID>" <<
-								"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
-								"<Betriebstag>" << to_iso_extended_string((sp.getOriginDateTime() - diff_from_utc).date()) << "</Betriebstag>" <<
-								"</FahrtID>" <<
-								"<HstSeqZaehler>1</HstSeqZaehler>" <<
-								"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
-								"<LinienText>" << line.getShortName() << "</LinienText>" <<
-								"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
-								"<RichtungsText>" << direction << "</RichtungsText>" <<
-								"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
-								"<ZielHst>" << direction << "</ZielHst>" <<
-								"<AufAZB>" << (inStopArea ? "true" : "false") << "</AufAZB>" <<
-								"<FahrtStatus>" << (isRealTime ? "Ist" : "Soll") << "</FahrtStatus>"
-							;
-							if(!plannedArrivalDateTime.is_not_a_date_time())
-							{
-								result << "<AnkunftszeitAZBPlan>";
-								ToXsdDateTime(result, plannedArrivalDateTime);
-								result << "</AnkunftszeitAZBPlan>";
-							}
-							if(!arrivalDateTime.is_not_a_date_time())
-							{
-								result << "<AnkunftszeitAZBPrognose>";
-								ToXsdDateTime(result, arrivalDateTime);
-								result << "</AnkunftszeitAZBPrognose>";
-							}
-							if(!plannedDepartureDateTime.is_not_a_date_time())
-							{
-								result << "<AbfahrtszeitAZBPlan>";
-								ToXsdDateTime(result, plannedDepartureDateTime);
-								result << "</AbfahrtszeitAZBPlan>";
-							}
-							if(!departureDateTime.is_not_a_date_time())
-							{
-								result << "<AbfahrtszeitAZBPrognose>";
-								ToXsdDateTime(result, departureDateTime);
-								result << "</AbfahrtszeitAZBPrognose>";
-							}
-							result << "<HaltID>" << haltID << "</HaltID>";
-							result << "<FahrtInfo><Betreiber>" << networkName << "</Betreiber></FahrtInfo>";
-							result << "</AZBFahrplanlage>";
-							Log::GetInstance().debug("VDVDataSupply : End of AZBFahrplanlage");
 						}
 
 						// Deletions
@@ -510,13 +522,15 @@ namespace synthese
 								continue;
 							}
 							string networkId = "";
-							try {
+							if (network.hasLinkWithSource(*_vdvClient->get<DataSource>()))
+							{
 								networkId = network.getACodeBySource(
 									*_vdvClient->get<DataSource>()
 								);
 							}
-							catch (...) {
-								Log::GetInstance().debug("VDVDataSupply : Exception reading network code of " + lexical_cast<string>(network.getKey()));
+							else
+							{
+								Log::GetInstance().error("VDVDataSupply : Failed to read network code of " + lexical_cast<string>(network.getKey()));
 							}
 							string serviceNumber;
 							if(!networkId.empty())
@@ -560,26 +574,39 @@ namespace synthese
 							}
 							provenance = iconv.convert(provenance);
 						
-							// XML generation
-							result <<
-								"<AZBFahrtLoeschen Zst=\"";
-							ToXsdDateTime(result, now);
-							result <<
-								"\">" <<
-								"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
-								"<FahrtID>" <<
-								"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
-								"<Betriebstag>" << to_iso_extended_string((sp.getOriginDateTime() - diff_from_utc).date()) << "</Betriebstag>" <<
-								"</FahrtID>" <<
-								"<HstSeqZaehler>1</HstSeqZaehler>" <<
-								"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
-								"<LinienText>" << line.getShortName() << "</LinienText>" <<
-								"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
-								"<RichtungsText>" << direction << "</RichtungsText>" <<
-								"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
-								"<Ursache></Ursache>" <<
-								"</AZBFahrtLoeschen>"
-							;
+							// XML generation if eveything can be written
+							if (it.second->getStopArea()->hasLinkWithSource(*_vdvClient->get<DataSource>()) &&
+								line.hasLinkWithSource(*_vdvClient->get<DataSource>()))
+							{
+								result <<
+									"<AZBFahrtLoeschen Zst=\"";
+								ToXsdDateTime(result, now);
+								result <<
+									"\">" <<
+									"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
+									"<FahrtID>" <<
+									"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
+									"<Betriebstag>" << to_iso_extended_string((sp.getOriginDateTime() - diff_from_utc).date()) << "</Betriebstag>" <<
+									"</FahrtID>" <<
+									"<HstSeqZaehler>1</HstSeqZaehler>" <<
+									"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
+									"<LinienText>" << line.getShortName() << "</LinienText>" <<
+									"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
+									"<RichtungsText>" << direction << "</RichtungsText>" <<
+									"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
+									"<Ursache></Ursache>" <<
+									"</AZBFahrtLoeschen>"
+								;
+							}
+							else
+							{
+								// Log error so that a log analyser can throw an alert on some data
+								Log::GetInstance().error("VDVDataSupply : Failed to generate AZBFahrtLoeschen for StopArea " +
+									lexical_cast<string>(it.second->getStopArea()->getKey()) +
+									" or for its ligne " +
+									lexical_cast<string>(line.getKey())
+								);
+							}
 						}
 					}
 					catch (...)
