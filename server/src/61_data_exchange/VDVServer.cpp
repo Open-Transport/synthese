@@ -575,15 +575,26 @@ namespace synthese
 						// Searching if service exists by FahrtBezeichner code
 						string serviceCode = AZBFahrplanlageNode.getChildNode("FahrtID").getChildNode("FahrtBezeichner").getText();
 						vector<string> vectServiceCode;
-						split(vectServiceCode, serviceCode, is_any_of("-"));
-						if (vectServiceCode.size() != 3)
+						split(vectServiceCode, serviceCode, is_any_of(":"));
+						string localServiceCode("");
+						if (vectServiceCode.size() != 4)
 						{
-							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un service avec un code différent de XXX-XXXX-XXXX");
-							continue;
+							// FahrtBezeichner is not XX:XX:XXXXX:XXX ; it can be the old format XXX-XXXXX-XXX
+							split(vectServiceCode, serviceCode, is_any_of("-"));
+							if (vectServiceCode.size() != 3)
+							{
+								Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un service indecodable " + serviceCode);
+								continue;
+							}
+							localServiceCode = vectServiceCode[1];
+						}
+						else
+						{
+							localServiceCode = vectServiceCode[2];
 						}
 						// Service code is on 5 characters in the planned datasource
-						while (vectServiceCode[1].size() < 5)
-							vectServiceCode[1] = "0" + vectServiceCode[1];
+						while (localServiceCode.size() < 5)
+							localServiceCode = "0" + localServiceCode;
 						
 
 						ScheduledService* service(

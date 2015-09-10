@@ -301,6 +301,11 @@ namespace synthese
 							}
 							Log::GetInstance().debug("VDVDataSupply : Network " + lexical_cast<string>(network.getKey()));
 							string networkId = "";
+							bool oldfFormatServiceCode(false); // Old format if no country code
+							if (network.get<CountryCode>().empty())
+							{
+								oldfFormatServiceCode = true;
+							}
 							if (network.hasLinkWithSource(*_vdvClient->get<DataSource>()))
 							{
 								networkId = network.getACodeBySource(
@@ -313,9 +318,20 @@ namespace synthese
 							}
 							Log::GetInstance().debug("VDVDataSupply : Network id " + networkId);
 							string serviceNumber;
-							if(!networkId.empty())
+							if (!oldfFormatServiceCode)
 							{
-								serviceNumber = networkId + "-";
+								serviceNumber = network.get<CountryCode>();
+								if(!networkId.empty())
+								{
+									serviceNumber += ":" + networkId + ":";
+								}
+							}
+							else
+							{
+								if(!networkId.empty())
+								{
+									serviceNumber = networkId + "-";
+								}
 							}
 							if(sp.getService()->getServiceNumber().empty())
 							{
@@ -325,7 +341,15 @@ namespace synthese
 							{
 								serviceNumber += sp.getService()->getServiceNumber();
 							}
-							serviceNumber += "-" + lexical_cast<string>(sp.getService()->getKey());
+							if (!oldfFormatServiceCode)
+							{
+								serviceNumber += ":";
+							}
+							else
+							{
+								serviceNumber += "-";
+							}
+							serviceNumber += lexical_cast<string>(sp.getService()->getKey());
 							Log::GetInstance().debug("VDVDataSupply : Service number " + serviceNumber);
 							string direction;
 							if(jp.getDirectionObj())
@@ -521,6 +545,11 @@ namespace synthese
 							{
 								continue;
 							}
+							bool oldfFormatServiceCode(false); // Old format if no country code
+							if (network.get<CountryCode>().empty())
+							{
+								oldfFormatServiceCode = true;
+							}
 							string networkId = "";
 							if (network.hasLinkWithSource(*_vdvClient->get<DataSource>()))
 							{
@@ -533,9 +562,20 @@ namespace synthese
 								Log::GetInstance().error("VDVDataSupply : Failed to read network code of " + lexical_cast<string>(network.getKey()));
 							}
 							string serviceNumber;
-							if(!networkId.empty())
+							if (!oldfFormatServiceCode)
 							{
-								serviceNumber = networkId + "-";
+								serviceNumber = network.get<CountryCode>();
+								if(!networkId.empty())
+								{
+									serviceNumber += ":" + networkId + ":";
+								}
+							}
+							else
+							{
+								if(!networkId.empty())
+								{
+									serviceNumber = networkId + "-";
+								}
 							}
 							if(sp.getService()->getServiceNumber().empty())
 							{
@@ -545,7 +585,15 @@ namespace synthese
 							{
 								serviceNumber += sp.getService()->getServiceNumber();
 							}
-							serviceNumber += "-" + lexical_cast<string>(sp.getService()->getKey());
+							if (!oldfFormatServiceCode)
+							{
+								serviceNumber += ":";
+							}
+							else
+							{
+								serviceNumber += "-";
+							}
+							serviceNumber += lexical_cast<string>(sp.getService()->getKey());
 							string direction;
 							if(jp.getDirectionObj())
 							{
