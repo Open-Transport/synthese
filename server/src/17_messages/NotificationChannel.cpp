@@ -113,15 +113,18 @@ namespace synthese
 
 			if(type)
 			{
-				Alarm::MessageAlternatives::const_iterator it(
-					alarm->getMessageAlternatives().find(&(*type))
-				);
+				util::RegistryKeyType typeKey = type.get().getKey();
 
-				if(it != alarm->getMessageAlternatives().end())
+				BOOST_FOREACH(const Alarm::MessageAlternatives::value_type& alternative, alarm->getMessageAlternatives())
 				{
-					// Alternative message found, return its content
-					messageAlternative = it->second->get<Content>();
-					messageTypeFound = true;
+					const MessageType* alternativeType = alternative.first;
+					const MessageAlternative* alternativeText = alternative.second;
+					if(alternativeType->getKey() == typeKey)
+					{
+						// Alternative message found, return its content
+						messageAlternative = alternativeText->get<Content>();
+						messageTypeFound = true;
+					}
 				}
 			}
 
