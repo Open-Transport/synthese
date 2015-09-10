@@ -233,14 +233,14 @@ namespace synthese
 				stream << p.open();
 				stream << p.cell("ID", lexical_cast<string>(network.getKey()));
 				stream << p.cell("Nom", p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_NAME, network.getName()));
-				stream << p.cell("Image", p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_IMAGE, network.getImage()));
+				stream << p.cell("Image", p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_IMAGE, network.get<Image>()));
 				stream << p.cell(
 					"Parent des calendriers de jours",
 					p.getForm().getSelectInput(
 						TransportNetworkUpdateAction::PARAMETER_DAYS_CALENDARS_PARENT_ID,
 						CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
 						optional<RegistryKeyType>(
-							network.getDaysCalendarsParent() ? network.getDaysCalendarsParent()->getKey() : RegistryKeyType(0)
+							network.get<DaysCalendarParent>() ? network.get<DaysCalendarParent>()->getKey() : RegistryKeyType(0)
 						)
 				)	);
 				stream << p.cell(
@@ -249,27 +249,28 @@ namespace synthese
 						TransportNetworkUpdateAction::PARAMETER_PERIODS_CALENDARS_PARENT_ID,
 						CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
 						optional<RegistryKeyType>(
-							network.getPeriodsCalendarsParent() ? network.getPeriodsCalendarsParent()->getKey() : RegistryKeyType(0)
+							network.get<PeriodsCalendarParent>() ? network.get<PeriodsCalendarParent>()->getKey() : RegistryKeyType(0)
 						)
 				)	);
 				stream << p.cell("Langue principale<br /><a href='http://www.loc.gov/standards/iso639-2/php/code_list.php'>Format : ISO 639</a>",
-								 p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_LANG, network.getLang()));
+								 p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_LANG, network.get<Lang>()));
 				stream << p.cell("Timezone<br /><a href='http://en.wikipedia.org/wiki/List_of_tz_zones'>Format : TZ</a>",
-								 p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_TIMEZONE, network.getTimezone()));
+								 p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_TIMEZONE, network.get<Timezone>()));
 				stream << p.cell(
 					"ID Contact",
 					p.getForm().getTextInput(
 						TransportNetworkUpdateAction::PARAMETER_CONTACT_ID,
-						network.getContact() ? boost::lexical_cast<std::string>(network.getContact()->getKey()) : ""
+						network.get<Contact>() ? boost::lexical_cast<std::string>(network.get<Contact>()->getKey()) : ""
 					)
 				);
 				stream << p.cell(
 					"ID Contact pour l'achat de billets",
 					p.getForm().getTextInput(
 						TransportNetworkUpdateAction::PARAMETER_FARE_CONTACT_ID,
-						network.getFareContact() ? boost::lexical_cast<std::string>(network.getFareContact()->getKey()) : ""
+						network.get<FareContact>() ? boost::lexical_cast<std::string>(network.get<FareContact>()->getKey()) : ""
 					)
 				);
+				stream << p.cell("Code pays", p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_COUNTRY_CODE, network.get<CountryCode>()));
 
 				stream << p.close();
 

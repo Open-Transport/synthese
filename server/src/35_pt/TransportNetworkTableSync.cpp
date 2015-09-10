@@ -55,19 +55,6 @@ namespace synthese
 		"35.20.02 Network transport"
 	);
 
-	namespace pt
-	{
-		const string TransportNetworkTableSync::COL_NAME("name");
-		const string TransportNetworkTableSync::COL_CREATOR_ID("creator_id");
-		const string TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID("days_calendars_parent_id");
-		const string TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID("periods_calendars_parent_id");
-		const string TransportNetworkTableSync::COL_IMAGE("image");
-		const string TransportNetworkTableSync::COL_TIMEZONE("timezone");
-		const string TransportNetworkTableSync::COL_LANG("lang");
-		const string TransportNetworkTableSync::COL_CONTACT_ID("contact_id");
-		const string TransportNetworkTableSync::COL_FARE_CONTACT_ID("fare_contact_id");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<TransportNetworkTableSync>::TABLE(
@@ -78,16 +65,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<TransportNetworkTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(TransportNetworkTableSync::COL_NAME, SQL_TEXT),
-			Field(TransportNetworkTableSync::COL_CREATOR_ID, SQL_TEXT),
-			Field(TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID, SQL_INTEGER),
-			Field(TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID, SQL_INTEGER),
-			Field(TransportNetworkTableSync::COL_IMAGE, SQL_TEXT),
-			Field(TransportNetworkTableSync::COL_TIMEZONE, SQL_TEXT),
-			Field(TransportNetworkTableSync::COL_LANG, SQL_TEXT),
-			Field(TransportNetworkTableSync::COL_CONTACT_ID, SQL_INTEGER),
-			Field(TransportNetworkTableSync::COL_FARE_CONTACT_ID, SQL_INTEGER),
 			Field()
 		};
 
@@ -97,56 +74,10 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<TransportNetworkTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(TransportNetworkTableSync::COL_CREATOR_ID.c_str(), ""));
-			r.push_back(DBTableSync::Index(TransportNetworkTableSync::COL_NAME.c_str(), ""));
+			r.push_back(DBTableSync::Index(DataSourceLinksWithoutUnderscore::FIELD.name.c_str(), ""));
+			r.push_back(DBTableSync::Index(SimpleObjectFieldDefinition<Name>::FIELD.name.c_str(), ""));
 			return r;
 		};
-
-
-
-		template<>
-		void OldLoadSavePolicy<TransportNetworkTableSync,TransportNetwork>::Load(
-			TransportNetwork* obj,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			DBModule::LoadObjects(obj->getLinkedObjectsIds(*rows), env, linkLevel);
-			obj->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				obj->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<TransportNetworkTableSync,TransportNetwork>::Save(
-			TransportNetwork* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<TransportNetworkTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-			query.addField(object->getDaysCalendarsParent() ? object->getDaysCalendarsParent()->getKey() : RegistryKeyType(0));
-			query.addField(object->getPeriodsCalendarsParent() ? object->getPeriodsCalendarsParent()->getKey() : RegistryKeyType(0));
-			query.addField(object->getImage());
-			query.addField(object->getTimezone());
-			query.addField(object->getLang());
-			query.addField(object->getContact() ? object->getContact()->getKey() : RegistryKeyType(0));
-			query.addField(object->getFareContact() ? object->getFareContact()->getKey() : RegistryKeyType(0));
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<TransportNetworkTableSync,TransportNetwork>::Unlink(
-			TransportNetwork* object
-		){
-		}
 
 
 
@@ -204,15 +135,15 @@ namespace synthese
 			SelectQuery<TransportNetworkTableSync> query;
 			if(!name.empty())
 			{
-				query.addWhereField(COL_NAME, name, ComposedExpression::OP_LIKE);
+				query.addWhereField(SimpleObjectFieldDefinition<Name>::FIELD.name, name, ComposedExpression::OP_LIKE);
 			}
 			if (!creatorId.empty())
 			{
-				query.addWhereField(COL_CREATOR_ID, creatorId, ComposedExpression::OP_LIKE);
+				query.addWhereField(DataSourceLinksWithoutUnderscore::FIELD.name, creatorId, ComposedExpression::OP_LIKE);
 			}
 			if(orderByName)
 			{
-				query.addOrderField(COL_NAME, raisingOrder);
+				query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 			}
 			if(number)
 			{
@@ -236,7 +167,7 @@ namespace synthese
 
 			SelectQuery<TransportNetworkTableSync> query;
 			Env env;
-			if(prefix) query.addWhereField(TransportNetworkTableSync::COL_NAME, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
+			if(prefix) query.addWhereField(SimpleObjectFieldDefinition<Name>::FIELD.name, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
 			if(limit) query.setNumber(*limit);
 			TransportNetworkTableSync::SearchResult networks(TransportNetworkTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
 			BOOST_FOREACH(const boost::shared_ptr<TransportNetwork>& network, networks)
@@ -244,5 +175,5 @@ namespace synthese
 				result.push_back(std::make_pair(network->getKey(), network->getName()));
 			}
 			return result;
-		} ;
+		}
 }	}

@@ -64,6 +64,7 @@ namespace synthese
 		const string TransportNetworkUpdateAction::PARAMETER_LANG = Action_PARAMETER_PREFIX + "lang";
 		const string TransportNetworkUpdateAction::PARAMETER_CONTACT_ID = Action_PARAMETER_PREFIX + "contact_id";
 		const string TransportNetworkUpdateAction::PARAMETER_FARE_CONTACT_ID = Action_PARAMETER_PREFIX + "fare_contact_id";
+		const string TransportNetworkUpdateAction::PARAMETER_COUNTRY_CODE = Action_PARAMETER_PREFIX + "country_code";
 
 
 		ParametersMap TransportNetworkUpdateAction::getParametersMap() const
@@ -80,6 +81,10 @@ namespace synthese
 			if(_image)
 			{
 				map.insert(PARAMETER_IMAGE, *_image);
+			}
+			if (_countryCode)
+			{
+				map.insert(PARAMETER_COUNTRY_CODE, *_countryCode);
 			}
 
 			// Importable
@@ -149,10 +154,7 @@ namespace synthese
 				{
 					throw ActionException("No such days calendar id");
 				}
-				else
-				{
-					_daysCalendarsParent = boost::shared_ptr<CalendarTemplate>();
-			}	}
+			}
 
 			// Periods calendars parent
 			if(map.isDefined(PARAMETER_PERIODS_CALENDARS_PARENT_ID))
@@ -168,10 +170,7 @@ namespace synthese
 				{
 					throw ActionException("No such periods calendar id");
 				}
-				else
-				{
-					_periodsCalendarsParent = boost::shared_ptr<CalendarTemplate>();
-			}	}
+			}
 
 			// Language
 			if(map.isDefined(PARAMETER_LANG))
@@ -205,10 +204,6 @@ namespace synthese
 				{
 					throw ActionException("No such contact id");
 				}
-				else
-				{
-					_contact = boost::shared_ptr<ReservationContact>();
-				}
 			}
 
 			// Fare contact (Optional)
@@ -231,10 +226,12 @@ namespace synthese
 				{
 					throw ActionException("No such fare contact id");
 				}
-				else
-				{
-					_fareContact = boost::shared_ptr<ReservationContact>();
-			}	}
+			}
+
+			if (map.isDefined(PARAMETER_COUNTRY_CODE))
+			{
+				_countryCode = map.get<string>(PARAMETER_COUNTRY_CODE);
+			}
 		}
 
 
@@ -245,13 +242,13 @@ namespace synthese
 			// Name
 			if(_name)
 			{
-				_network->setName(*_name);
+				_network->set<Name>(*_name);
 			}
 
 			// Image
 			if(_image)
 			{
-				_network->setImage(*_image);
+				_network->set<Image>(*_image);
 			}
 
 			// Data source links
@@ -260,45 +257,51 @@ namespace synthese
 			// Days calendars parent
 			if(_daysCalendarsParent)
 			{
-				_network->setDaysCalendarsParent(
-					_daysCalendarsParent->get()
+				_network->set<DaysCalendarParent>(
+					*(_daysCalendarsParent->get())
 				);
 			}
 
 			// Periods calendars parent
 			if(_periodsCalendarsParent)
 			{
-				_network->setPeriodsCalendarsParent(
-					_periodsCalendarsParent->get()
+				_network->set<PeriodsCalendarParent>(
+					*(_periodsCalendarsParent->get())
 				);
 			}
 
 			// Language
 			if (_lang)
 			{
-				_network->setLang(*_lang);
+				_network->set<Lang>(*_lang);
 			}
 
 			// Timezone
 			if (_timeZone)
 			{
-				_network->setTimezone(*_timeZone);
+				_network->set<Timezone>(*_timeZone);
 			}
 
 			// Contact
 			if (_contact)
 			{
-				_network->setContact(
-					_contact->get()
+				_network->set<Contact>(
+					*(_contact->get())
 				);
 			}
 
 			// Fare contact
 			if (_fareContact)
 			{
-				_network->setFareContact(
-					_fareContact->get()
+				_network->set<FareContact>(
+					*(_fareContact->get())
 				);
+			}
+
+			// Country code
+			if (_countryCode)
+			{
+				_network->set<CountryCode>(*_countryCode);
 			}
 
 			// Action

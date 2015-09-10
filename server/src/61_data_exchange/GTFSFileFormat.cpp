@@ -1512,17 +1512,17 @@ namespace synthese
 			BOOST_FOREACH(Registry<TransportNetwork>::value_type myAgency, Env::GetOfficialEnv().getRegistry<TransportNetwork>())
 			{
 				// If a fare contact and/or a contact exists, use them
-				std::string url = myAgency.second->getContact() ? myAgency.second->getContact()->get<WebsiteURL>() : "";
-				std::string phone = myAgency.second->getContact() ? myAgency.second->getContact()->get<PhoneExchangeNumber>() : "";
-				std::string fareUrl = myAgency.second->getFareContact() ? myAgency.second->getFareContact()->get<WebsiteURL>() : "";
+				std::string url = myAgency.second->get<Contact>() ? myAgency.second->get<Contact>()->get<WebsiteURL>() : "";
+				std::string phone = myAgency.second->get<Contact>() ? myAgency.second->get<Contact>()->get<PhoneExchangeNumber>() : "";
+				std::string fareUrl = myAgency.second->get<FareContact>() ? myAgency.second->get<FareContact>()->get<WebsiteURL>() : "";
 
 				agencyTxt << _key(myAgency.first) << "," // agency_id
 					<< _Str(myAgency.second->getName()) << "," // agency_name
 					<< url << "," // agency_url
 					<< fareUrl << "," // agency_fare_url
-					<< myAgency.second->getTimezone() <<"," // agency_timezone
+					<< myAgency.second->get<Timezone>() <<"," // agency_timezone
 					<< phone <<"," // agency_phone
-					<< myAgency.second->getLang() // agency_lang
+					<< myAgency.second->get<Lang>() // agency_lang
 					<< endl;
 			}
 			// END AGENCY.TXT

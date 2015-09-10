@@ -58,6 +58,7 @@ namespace synthese
 			static const std::string PARAMETER_LANG;
 			static const std::string PARAMETER_CONTACT_ID;
 			static const std::string PARAMETER_FARE_CONTACT_ID;
+			static const std::string PARAMETER_COUNTRY_CODE;
 
 		private:
 			boost::shared_ptr<TransportNetwork> _network;
@@ -69,6 +70,7 @@ namespace synthese
 			boost::optional<std::string> _lang;
 			boost::optional<boost::shared_ptr<pt::ReservationContact> > _contact;
 			boost::optional<boost::shared_ptr<pt::ReservationContact> > _fareContact;
+			boost::optional<std::string> _countryCode;
 
 
 		protected:
