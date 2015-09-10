@@ -137,6 +137,8 @@ childStopTime = etree.SubElement(childMessaging, "StopTime")
 childStopTime.text = "23:59:00"
 
 # Alternance
+childAlternance = etree.SubElement(childMessaging, "Alternance")
+childAlternance.text = "oui" if int(message[0]["priority"]) < 99 else "non"
 
 # Text
 # Extract HTML text lines 
