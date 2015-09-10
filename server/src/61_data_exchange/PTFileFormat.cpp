@@ -166,22 +166,22 @@ namespace synthese
 					"Creation of the network with key "+ id +" ("+ name + ")"
 				);
 			}
-			network->setName(name);
+			network->set<Name>(name);
 
 			// Optional values
 
 			// Timezone and language
 			if (!timezone.empty())
-				network->setTimezone(timezone);
+				network->set<Timezone>(timezone);
 			if (!lang.empty())
-				network->setLang(lang);
+				network->set<Lang>(lang);
 
 			// URL and phone
 			// These are placed in a contact, so we check if a compatible one exists or create a new one
 			// Compatible means it has the same phone and URL
 			if ( ! url.empty() || ! phone.empty() )
 			{
-				pt::ReservationContact* contact(NULL);
+				boost::shared_ptr<pt::ReservationContact> contact;
 
 				// Search for a contact with this phone and website
 				BOOST_FOREACH(
@@ -193,7 +193,7 @@ namespace synthese
 							(crtContact.second->get<WebsiteURL>() == url || url.empty())
 						)
 					{
-						contact = crtContact.second.get();
+						contact = crtContact.second;
 						_logInfo(
 								"Using contact with key "+ boost::lexical_cast<std::string>(contact->getKey()) +" ("+ contact->get<Name>() +") for network "+ id +" ("+ name +")"
 						);
@@ -204,9 +204,9 @@ namespace synthese
 				// Not found, creating a new one
 				if (!contact)
 				{
-					contact = new ReservationContact(
+					contact.reset(new ReservationContact(
 							pt::ReservationContactTableSync::getId()
-					);
+					)	);
 					contact->set<Name>(network->getName());
 					contact->set<PhoneExchangeNumber>(phone);
 					contact->set<WebsiteURL>(url);
@@ -221,7 +221,7 @@ namespace synthese
 					);
 				}
 
-				network->setContact(contact);
+				network->set<Contact>(*contact);
 			}
 
 			// Fare URL (to buy tickets)
@@ -229,7 +229,7 @@ namespace synthese
 			// If a contact has this same URL, use it. Else, create a new one.
 			if ( ! fareUrl.empty() )
 			{
-				pt::ReservationContact* fareContact(NULL);
+				boost::shared_ptr<pt::ReservationContact> fareContact;
 
 				// Search for a contact with this same URL
 				BOOST_FOREACH(
@@ -238,7 +238,7 @@ namespace synthese
 				){
 					if (crtContact.second->get<WebsiteURL>() == fareUrl)
 					{
-						fareContact = crtContact.second.get();
+						fareContact = crtContact.second;
 						_logInfo(
 								"Using fare contact with key "+ boost::lexical_cast<std::string>(fareContact->getKey()) +" ("+ fareContact->get<Name>() +") for network "+ id +" ("+ name +")"
 						);
@@ -249,9 +249,9 @@ namespace synthese
 				// Not found, creating a new one
 				if (!fareContact)
 				{
-					fareContact = new ReservationContact(
+					fareContact.reset(new ReservationContact(
 							pt::ReservationContactTableSync::getId()
-					);
+					)	);
 					fareContact->set<Name>(network->getName() + " Fare");
 					fareContact->set<WebsiteURL>(fareUrl);
 
@@ -265,7 +265,7 @@ namespace synthese
 					);
 				}
 
-				network->setFareContact(fareContact);
+				network->set<FareContact>(*fareContact);
 			}
 
 			return network;

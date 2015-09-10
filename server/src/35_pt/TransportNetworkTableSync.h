@@ -29,7 +29,6 @@
 #include "TransportNetwork.h"
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -44,25 +43,10 @@ namespace synthese
 		class TransportNetworkTableSync:
 			public db::DBDirectTableSyncTemplate<
 				TransportNetworkTableSync,
-				TransportNetwork,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				TransportNetwork
 			>
 		{
 		 public:
-			static const std::string COL_NAME;
-			static const std::string COL_CREATOR_ID;
-			static const std::string COL_DAYS_CALENDARS_PARENT_ID;
-			static const std::string COL_PERIODS_CALENDARS_PARENT_ID;
-			static const std::string COL_IMAGE;
-			static const std::string COL_TIMEZONE;
-			static const std::string COL_LANG;
-			static const std::string COL_CONTACT_ID;
-			static const std::string COL_FARE_CONTACT_ID;
-			static const std::string COL_COUNTRY_CODE;
-
-
-
 			/** Network search.
 				@param name Part of the name of the server
 				@param first First JourneyPattern object to answer

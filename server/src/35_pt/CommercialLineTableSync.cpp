@@ -374,7 +374,7 @@ namespace synthese
 
 			if (orderByNetwork)
 				query << " ORDER BY "
-					<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=l." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
+					<< "(SELECT n." << SimpleObjectFieldDefinition<Name>::FIELD.name << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=l." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
 					<< ",l." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
 			else if (orderByName)
 				query << " ORDER BY l." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
@@ -408,7 +408,7 @@ namespace synthese
 				<< getSQLLinesList(rights, totalControl, neededLevel, mustBeBookable, "*");
 			if (orderByNetwork)
 				query << " ORDER BY "
-				<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
+				<< "(SELECT n." << SimpleObjectFieldDefinition<Name>::FIELD.name << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
 				<< "," << TABLE.NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (orderByName)
 				query << " ORDER BY " << TABLE.NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");

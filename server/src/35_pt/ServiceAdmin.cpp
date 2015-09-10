@@ -561,8 +561,8 @@ namespace synthese
 					stream,
 					*_service,
 					updateRequest,
-					network->getDaysCalendarsParent() ? optional<RegistryKeyType>(network->getDaysCalendarsParent()->getKey()) : optional<RegistryKeyType>(),
-					network->getPeriodsCalendarsParent() ? optional<RegistryKeyType>(network->getPeriodsCalendarsParent()->getKey()) : optional<RegistryKeyType>()
+					network->get<DaysCalendarParent>() ? optional<RegistryKeyType>(network->get<DaysCalendarParent>()->getKey()) : optional<RegistryKeyType>(),
+					network->get<PeriodsCalendarParent>() ? optional<RegistryKeyType>(network->get<PeriodsCalendarParent>()->getKey()) : optional<RegistryKeyType>()
 				);
 			}
 

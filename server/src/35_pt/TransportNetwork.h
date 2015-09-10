@@ -23,17 +23,43 @@
 #ifndef SYNTHESE_ENV_TRANSPORTNETWORK_H
 #define SYNTHESE_ENV_TRANSPORTNETWORK_H
 
-#include "Registrable.h"
-#include "Registry.h"
-#include "PathClass.h"
+#include "Object.hpp"
+
+#include "CalendarTemplate.h"
+#include "DataSourceLinksField.hpp"
 #include "ImportableTemplate.hpp"
+#include "PathClass.h"
+#include "Registry.h"
+#include "ReservationContact.h"
 #include "TreeFolderRoot.hpp"
 
 namespace synthese
 {
-	namespace calendar
+	namespace pt
 	{
-		class CalendarTemplate;
+		FIELD_DATASOURCE_LINKS(DataSourceLinksWithoutUnderscore)
+		FIELD_POINTER(DaysCalendarParent, calendar::CalendarTemplate)
+		FIELD_POINTER(PeriodsCalendarParent, calendar::CalendarTemplate)
+		FIELD_STRING(Image)
+		FIELD_STRING(Timezone)
+		FIELD_STRING(Lang)
+		FIELD_POINTER(Contact, pt::ReservationContact)
+		FIELD_POINTER(FareContact, pt::ReservationContact)
+		FIELD_STRING(CountryCode)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(DataSourceLinksWithoutUnderscore),
+			FIELD(DaysCalendarParent),
+			FIELD(PeriodsCalendarParent),
+			FIELD(Image),
+			FIELD(Timezone),
+			FIELD(Lang),
+			FIELD(Contact),
+			FIELD(FareContact),
+			FIELD(CountryCode)
+		> TransportNetworkSchema;
 	}
 
 	namespace util
@@ -43,40 +69,17 @@ namespace synthese
 
 	namespace pt
 	{
-		class ReservationContact;
-
 		//////////////////////////////////////////////////////////////////////////
 		/// Transport network class.
 		/// TRIDENT OK
 		///	@ingroup m35
 		//////////////////////////////////////////////////////////////////////////
 		class TransportNetwork:
-			virtual public util::Registrable,
+			public virtual Object<TransportNetwork, TransportNetworkSchema>,
 			public graph::PathClass,
 			public impex::ImportableTemplate<TransportNetwork>,
 			public tree::TreeFolderRoot
 		{
-		public:
-			/// Chosen registry class.
-			typedef util::Registry<TransportNetwork> Registry;
-
-		private:
-			static const std::string DATA_NETWORK_ID;
-			static const std::string DATA_NAME;
-			static const std::string DATA_IMAGE;
-			static const std::string DATA_COUNTRY_CODE;
-
-		protected:
-			calendar::CalendarTemplate* _daysCalendarsParent;
-			calendar::CalendarTemplate* _periodsCalendarsParent;
-			std::string _name;
-			std::string _image;
-			std::string _timeZone;
-			std::string _lang;
-			pt::ReservationContact* _contact;
-			pt::ReservationContact* _fareContact;
-			std::string _country_code;
-
 		public:
 
 			TransportNetwork (
@@ -87,66 +90,13 @@ namespace synthese
 			);
 			~TransportNetwork ();
 
-			//! @name Getters
-			//@{
-				calendar::CalendarTemplate* getDaysCalendarsParent() const { return _daysCalendarsParent; }
-				calendar::CalendarTemplate* getPeriodsCalendarsParent() const { return _periodsCalendarsParent; }
-				virtual std::string getName() const { return _name; }
-				virtual std::string getImage() const { return _image; }
-				std::string getTimezone() const { return _timeZone; }
-				std::string getLang() const { return _lang; }
-				pt::ReservationContact* getContact() const { return _contact; }
-				pt::ReservationContact* getFareContact() const { return _fareContact; }
-				std::string getCountryCode() const { return _country_code; }
-			//@}
-
-			//! @name Setters
-			//@{
-				void setDaysCalendarsParent(calendar::CalendarTemplate* value){ _daysCalendarsParent = value; }
-				void setPeriodsCalendarsParent(calendar::CalendarTemplate* value){ _periodsCalendarsParent = value; }
-				void setName(const std::string& value){ _name = value; }
-				void setImage(const std::string& value){ _image = value; }
-				void setTimezone(const std::string& value){ _timeZone = value; }
-				void setLang(const std::string& value){ _lang = value; }
-				void setContact(pt::ReservationContact* value){ _contact = value; }
-				void setFareContact(pt::ReservationContact* value){ _fareContact = value; }
-				void setCountryCode(std::string value){ _country_code = value; }
-			//@}
-
-			/// @name Modifiers
-			//@{
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
-			//@}
-
 			//! @name Services
 			//@{
+				virtual std::string getName() const { return get<Name>(); }
+
 				virtual std::string getRuleUserName() const { return "Réseau " + getName(); }
 
 				virtual PathClass::Identifier getIdentifier() const;
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Exporter.
-				//////////////////////////////////////////////////////////////////////////
-				/// @param pm parameters map to populate
-				/// @param prefix prefix to add to the field names
-				/// @author Hugues Romain
-				/// @since 3.3.0
-				/// @date 2011
-				virtual void toParametersMap(
-					util::ParametersMap& pm,
-					bool withAdditionalParameters,
-					boost::logic::tribool withFiles = boost::logic::indeterminate,
-					std::string prefix = std::string()
-				) const;
-
-				virtual LinkedObjectsIds getLinkedObjectsIds(
-					const Record& record
-				) const;
-
-				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 			//@}
 		};
 	}

@@ -791,7 +791,7 @@ namespace synthese
 					"\" >";
 				stream <<"<network id=\""<< commercialLine->getNetwork()->getKey() <<
 					"\" name=\""      << commercialLine->getNetwork()->getName() <<
-					"\" image=\""      << commercialLine->getNetwork()->getImage() <<
+					"\" image=\""      << commercialLine->getNetwork()->get<Image>() <<
 					"\" />";
 				stream << "</line>";
 			}
@@ -862,7 +862,7 @@ namespace synthese
 					"\" >";
 				stream <<"<network id=\""<< serviceReal.commercialLine->getNetwork()->getKey() <<
 					"\" name=\""      << serviceReal.commercialLine->getNetwork()->getName() <<
-					"\" image=\""      << serviceReal.commercialLine->getNetwork()->getImage() <<
+					"\" image=\""      << serviceReal.commercialLine->getNetwork()->get<Image>() <<
 					"\" />";
 				stream << "</line>";
 			}
