@@ -195,6 +195,7 @@ if int(needs_play_tts) != 0:
 if int(needs_start_stop_point) != 0:
   startStopPointId = int(message[0]["start_stop_point"])
   if startStopPointId > 0:
+    childStartStopPoint = etree.SubElement(childMessaging, "StartStopPoint")
     # Convert this SYNTHESE stop point id into an Ineo stop point id
     parameters = { "roid": startStopPointId }
     stopPointPM = synthese.service("object", parameters)
@@ -203,13 +204,13 @@ if int(needs_start_stop_point) != 0:
       stopCodes = map(lambda x: x.split('|'), stopPointPM["operator_code"].split(','))
       for stopCode in stopCodes:
         if stopCode[0] == datasource_id:
-          childStartStopPoint = etree.SubElement(childMessaging, "StartStopPoint")
           # Ineo stop point ids may start with "MNLP_**_", but this prefix must not be sent to Ineo
           childStartStopPoint.text = (stopCode[1] if stopCode[1].startswith(ineo_stop_point_prefix) == False else stopCode[1][len(ineo_stop_point_prefix):])
 
 if int(needs_end_stop_point) != 0:
   endStopPointId = int(message[0]["end_stop_point"])
   if endStopPointId > 0:
+    childEndStopPoint = etree.SubElement(childMessaging, "EndStopPoint")
     # Convert this SYNTHESE stop point id into an Ineo stop point id
     parameters = { "roid": endStopPointId }
     stopPointPM = synthese.service("object", parameters)
@@ -218,7 +219,6 @@ if int(needs_end_stop_point) != 0:
       stopCodes = map(lambda x: x.split('|'), stopPointPM["operator_code"].split(','))
       for stopCode in stopCodes:
         if stopCode[0] == datasource_id:
-          childEndStopPoint = etree.SubElement(childMessaging, "EndStopPoint")
           # Ineo stop point ids may start with "MNLP_**_", but this prefix must not be sent to Ineo
           childEndStopPoint.text = (stopCode[1] if stopCode[1].startswith(ineo_stop_point_prefix) == False else stopCode[1][len(ineo_stop_point_prefix):])
 
