@@ -557,6 +557,11 @@ namespace synthese
 				util::Log::GetInstance().debug("HafasFileFormat : lecture du fichier METABHF");
 				while(_loadLine())
 				{
+					// Commented lines
+					if(_getField(0, 1) == "*")
+					{
+						continue;
+					}
 					// Inter stop duration
 					if(_getField(7,1) != ":")
 					{
