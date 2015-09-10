@@ -70,8 +70,8 @@ namespace synthese
 		FIELD_BOOL(PlayTts)
 		FIELD_BOOL(Light)
 		FIELD_INT(DirectionSignCode)
-		FIELD_INT(StartStopPoint)
-		FIELD_INT(EndStopPoint)
+		FIELD_ID(StartStopPoint)
+		FIELD_ID(EndStopPoint)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -193,8 +193,8 @@ namespace synthese
 				virtual bool					getPlayTts() const { return get<PlayTts>(); }
 				virtual bool					getLight() const { return get<Light>(); }
 				virtual int						getDirectionSignCode() const { return get<DirectionSignCode>(); }
-				virtual int						getStartStopPoint() const { return get<StartStopPoint>(); }
-				virtual int						getEndStopPoint() const { return get<EndStopPoint>(); }
+				virtual synthese::util::RegistryKeyType		getStartStopPoint() const { return get<StartStopPoint>(); }
+				virtual synthese::util::RegistryKeyType		getEndStopPoint() const { return get<EndStopPoint>(); }
 
 			//@}
 
@@ -219,8 +219,8 @@ namespace synthese
 				virtual void setPlayTts(bool value) { set<PlayTts>(value); }
 				virtual void setLight(bool value) { set<Light>(value); }
 				virtual void setDirectionSignCode(int value) { set<DirectionSignCode>(value); }
-				virtual void setStartStopPoint(int value) { set<StartStopPoint>(value); }
-				virtual void setEndStopPoint(int value) { set<EndStopPoint>(value); }
+				virtual void setStartStopPoint(synthese::util::RegistryKeyType value) { set<StartStopPoint>(value); }
+				virtual void setEndStopPoint(synthese::util::RegistryKeyType value) { set<EndStopPoint>(value); }
 			//@}
 
 			void setMessageAlternatives(const MessageAlternatives& value) const { _messageAlternatives = value; }

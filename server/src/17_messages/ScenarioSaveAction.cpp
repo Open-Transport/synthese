@@ -1040,8 +1040,9 @@ namespace synthese
 						message->setPlayTts(messageNode.second.get("play_tts", false));
 						message->setLight(messageNode.second.get("light", false));
 						message->setDirectionSignCode(messageNode.second.get("direction_sign_code", 0));
-						message->setStartStopPoint(messageNode.second.get("start_stop_point", 0));
-						message->setEndStopPoint(messageNode.second.get("end_stop_point", 0));
+						message->setStartStopPoint(messageNode.second.get<util::RegistryKeyType>("start_stop_point", 0));
+						message->setEndStopPoint(messageNode.second.get<util::RegistryKeyType>("end_stop_point", 0));
+
 						BOOST_FOREACH(const ptree::value_type& sectionNode, messageNode.second.get_child("section"))
 						{
 							RegistryKeyType sectionId(sectionNode.second.get("id", RegistryKeyType(0)));

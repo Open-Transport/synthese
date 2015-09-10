@@ -40,6 +40,11 @@
 namespace synthese
 {
 
+	namespace pt
+	{
+		class StopPoint;
+	}
+
 	namespace ineo_terminus
 	{
 		/** IneoTerminusConnection class.
@@ -252,6 +257,8 @@ namespace synthese
 
 				//generic writers
 				bool _addRecipientsPM(util::ParametersMap& pm, std::vector<IneoTerminusConnection::Recipient>, IneoApplicationError& errorCode);
+
+				std::set<synthese::pt::StopPoint*> _findIneoStopPoint(const std::string& ineoStopPointCode);
 			};
 
 			class tcp_server

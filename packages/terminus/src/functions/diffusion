@@ -551,6 +551,7 @@
             </label>
             <label>Girouette pré-encodée
               <select class="input-medium" field="direction_sign_code" onkeyup="activateForm()" onchange="activateForm()">
+                <option value="-1">Aucune</option>
 		<?objectlist&
 		table_id=74&
 		template=
@@ -561,6 +562,12 @@
 			}>
 		?>
               </select>
+            </label>
+            <label>Affichage sur tronçon : arrêt de début
+              <input value="" type="number" maxlength="20" field="start_stop_point" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()">
+            </label>
+            <label>Affichage sur tronçon : arrêt de fin
+              <input value="" type="number" maxlength="20" field="end_stop_point"  onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()">
             </label>
           </div>
         
@@ -888,7 +895,9 @@ $(function(){
             multiple_stops :<?if&cond=<@multiple_stops@>&then="<@multiple_stops@>"&else="0"?>,
             play_tts :<?if&cond=<@play_tts@>&then="<@play_tts@>"&else="0"?>,
             light :<?if&cond=<@light@>&then="<@light@>"&else="0"?>,
-            direction_sign_code :<?if&cond=<@direction_sign_code@>&then="<@direction_sign_code@>"&else="0"?>,
+            direction_sign_code :<?if&cond=<@direction_sign_code@>&then="<@direction_sign_code@>"&else="-1"?>,
+            start_stop_point :<?if&cond=<@start_stop_point@>&then="<@start_stop_point@>"&else="0"?>,
+            end_stop_point :<?if&cond=<@end_stop_point@>&then="<@end_stop_point@>"&else="0"?>,
             digitized_version :"<@digitized_version@>",
             alternative:[
 					<{message_alternative&template=

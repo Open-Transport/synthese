@@ -1025,6 +1025,43 @@ namespace synthese
 				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
 				messagePM->insert("section", "");
 				messagePM->insert("alternative", "");
+				messagePM->insert("with_ack", message.confirm);
+				messagePM->insert("multiple_stops", message.multipleStop);
+				messagePM->insert("play_tts", message.ttsBroadcasting);
+				messagePM->insert("light", message.diodFlashing);
+				messagePM->insert("direction_sign_code", message.codeGirouette);
+
+				if(false == message.startStopPoint.empty())
+				{
+					std::set<StopPoint*> startStopPoints = _findIneoStopPoint(message.startStopPoint);
+
+					if(false == startStopPoints.empty())
+					{
+						std::set<StopPoint*>::iterator firstStopPoint = startStopPoints.begin();
+						messagePM->insert("start_stop_point", (*firstStopPoint)->getKey());
+					}
+
+					else
+					{
+						util::Log::GetInstance().warn("Ineo Terminus : start stop point " + message.startStopPoint + " could not be found");
+					}
+				}
+
+				if(false == message.endStopPoint.empty())
+				{
+					std::set<StopPoint*> endStopPoints = _findIneoStopPoint(message.endStopPoint);
+
+					if(false == endStopPoints.empty())
+					{
+						std::set<StopPoint*>::iterator firstStopPoint = endStopPoints.begin();
+						messagePM->insert("end_stop_point", (*firstStopPoint)->getKey());
+					}
+
+					else
+					{
+						util::Log::GetInstance().warn("Ineo Terminus : end stop point " + message.endStopPoint + " could not be found");
+					}
+				}
 
 				IneoApplicationError recipientsErrorCode = AucuneErreur;
 				bool recipientsFound = _addRecipientsPM(*messagePM, message.recipients, recipientsErrorCode);
@@ -1683,8 +1720,40 @@ namespace synthese
 				messagePM->insert("play_tts", message.ttsBroadcasting);
 				messagePM->insert("light", message.diodFlashing);
 				messagePM->insert("direction_sign_code", message.codeGirouette);
-				messagePM->insert("start_stop_point", message.startStopPoint);
-				messagePM->insert("end_stop_point", message.endStopPoint);
+
+				if(false == message.startStopPoint.empty())
+				{
+					std::set<StopPoint*> startStopPoints = _findIneoStopPoint(message.startStopPoint);
+
+					if(false == startStopPoints.empty())
+					{
+						std::set<StopPoint*>::iterator firstStopPoint = startStopPoints.begin();
+						util::RegistryKeyType firstStopPointKey = (*firstStopPoint)->getKey();
+						messagePM->insert("start_stop_point", firstStopPointKey);
+					}
+
+					else
+					{
+						util::Log::GetInstance().warn("Ineo Terminus : start stop point " + message.startStopPoint + " could not be found");
+					}
+				}
+
+				if(false == message.endStopPoint.empty())
+				{
+					std::set<StopPoint*> endStopPoints = _findIneoStopPoint(message.endStopPoint);
+
+					if(false == endStopPoints.empty())
+					{
+						std::set<StopPoint*>::iterator firstStopPoint = endStopPoints.begin();
+						util::RegistryKeyType firstStopPointKey = (*firstStopPoint)->getKey();
+						messagePM->insert("end_stop_point", firstStopPointKey);
+					}
+
+					else
+					{
+						util::Log::GetInstance().warn("Ineo Terminus : end stop point " + message.endStopPoint + " could not be found");
+					}
+				}
 
 				IneoApplicationError recipientsErrorCode = AucuneErreur;
 				bool recipientsFound = _addRecipientsPM(*messagePM, message.recipients, recipientsErrorCode);
@@ -2026,6 +2095,41 @@ namespace synthese
 			}
 
 			return status;
+		}
+
+
+		std::set<StopPoint*> IneoTerminusConnection::tcp_connection::_findIneoStopPoint(const std::string& ineoStopPointCode)
+		{
+			boost::shared_ptr<const impex::DataSource> dataSource;
+			std::set<StopPoint*> loadedStopPoints;
+
+			// Get the DataSource object that will be used to query lines and stop points by their Ineo code
+			try
+			{
+				dataSource = DataSourceTableSync::Get(_datasource_id, Env::GetOfficialEnv());
+			}
+
+			catch(synthese::util::ObjectNotFoundException<impex::DataSource>&)
+			{
+				util::Log::GetInstance().warn("Ineo Terminus : data source " + boost::lexical_cast<string>(_datasource_id) + " does not exist");
+			}
+
+			if(NULL != dataSource.get())
+			{
+				ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(*dataSource, Env::GetOfficialEnv());
+				std::string stopPointCode1 = ineoStopPointCode;
+				std::string stopPointCode2 = synthese::data_exchange::IneoFileFormat::Importer_::MNLP_PREFIX + ineoStopPointCode;
+				loadedStopPoints = stopPoints.get(stopPointCode1);
+
+				if(true == loadedStopPoints.empty())
+				{
+					// IneoFileFormat prefixes Ineo stop code identifiers with the string MNLP_**_
+					// So if no direct match is found, add the prefix and search again
+					loadedStopPoints = stopPoints.get(stopPointCode2);
+				}
+			}
+
+			return loadedStopPoints;
 		}
 }	}
 

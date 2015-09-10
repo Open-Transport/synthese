@@ -74,6 +74,8 @@ function copyContent(contentRank)
     play_tts: document.getElementById('play_tts_'+ contentRank).value,
     light: document.getElementById('light_'+ contentRank).value,
     direction_sign_code: document.getElementById('direction_sign_code_'+ contentRank).value,
+    start_stop_point: document.getElementById('start_stop_point_'+ contentRank).value,
+    end_stop_point: document.getElementById('end_stop_point_'+ contentRank).value,
     alternatives: {},
     recipients: {}
   });

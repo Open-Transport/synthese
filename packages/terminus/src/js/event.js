@@ -532,6 +532,8 @@ function open_message(message)
   $('#message [field=play_tts]').val(message.play_tts);
   $('#message [field=light]').val(message.light);
   $('#message [field=direction_sign_code]').val(message.direction_sign_code);
+  $('#message [field=start_stop_point]').val(message.start_stop_point);
+  $('#message [field=end_stop_point]').val(message.end_stop_point);
   if (message.digitized_version != "")
   {
     $('#message input[field=digitized_version]').val(message.digitized_version);
@@ -619,6 +621,8 @@ function close_message()
     current_message.play_tts = $('#message [field=play_tts]').val();
     current_message.light = $('#message [field=light]').val();
     current_message.direction_sign_code = $('#message [field=direction_sign_code]').val();
+    current_message.start_stop_point = $('#message [field=start_stop_point]').val();
+    current_message.end_stop_point = $('#message [field=end_stop_point]').val();
     if ($('#message [field=digitized_version]').val() == $('#message input[field=def_digital_msg_url]').val())
     {
       current_message.digitized_version = "";
@@ -673,6 +677,8 @@ function copy_message_click()
    play_tts: message.play_tts,
    light: message.light,
    direction_sign_code: message.direction_sign_code,
+   start_stop_point: message.start_stop_point,
+   end_stop_point: message.end_stop_point,
    digitized_version: message.digitized_version,
    alternative:[],
    section: message.section,
@@ -754,6 +760,8 @@ function create_message_click()
    play_tts:"",
    light:"",
    direction_sign_code:"",
+   start_stop_point:"",
+   end_stop_point:"",
    digitized_version: $('#message input[field=def_digital_msg_url]').val() != undefined ? $('#message input[field=def_digital_msg_url]').val() : "",
    alternative:[],
    section:[],
@@ -1002,6 +1010,24 @@ function change_message_direction_sign_code()
   if (typeof $(this).val() != 'undefined') {
     var disp_dur = $(this).val();
     $('#message input[field=direction_sign_code]').val(disp_dur);
+    activateForm();
+  }
+}
+
+function change_message_start_stop_point()
+{
+  if (typeof $(this).val() != 'undefined') {
+    var disp_dur = $(this).val();
+    $('#message input[field=start_stop_point]').val(disp_dur);
+    activateForm();
+  }
+}
+
+function change_message_end_stop_point()
+{
+  if (typeof $(this).val() != 'undefined') {
+    var disp_dur = $(this).val();
+    $('#message input[field=end_stop_point]').val(disp_dur);
     activateForm();
   }
 }
@@ -1392,6 +1418,12 @@ $(function(){
   $('#message input[field=direction_sign_code]').bind('keyup', change_message_direction_sign_code);
   $('#message input[field=direction_sign_code]').bind('cut', change_message_direction_sign_code);
   $('#message input[field=direction_sign_code]').bind('paste', change_message_direction_sign_code);
+  $('#message input[field=start_stop_point]').bind('keyup', change_message_start_stop_point);
+  $('#message input[field=start_stop_point]').bind('cut', change_message_start_stop_point);
+  $('#message input[field=start_stop_point]').bind('paste', change_message_start_stop_point);
+  $('#message input[field=end_stop_point]').bind('keyup', change_message_end_stop_point);
+  $('#message input[field=end_stop_point]').bind('cut', change_message_end_stop_point);
+  $('#message input[field=end_stop_point]').bind('paste', change_message_end_stop_point);
   $('#message input[field=digitized_version]').bind('keyup', change_message_digitized_version);
   $('#message input[field=digitized_version]').bind('cut', change_message_digitized_version);
   $('#message input[field=digitized_version]').bind('paste', change_message_digitized_version);
