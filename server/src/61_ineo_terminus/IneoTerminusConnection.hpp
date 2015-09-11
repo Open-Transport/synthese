@@ -33,6 +33,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
+#include <boost/logic/tribool.hpp>
 #include <set>
 #include <deque>
 #include <string>
@@ -191,26 +192,26 @@ namespace synthese
 					boost::posix_time::time_duration startHour;
 					boost::posix_time::time_duration stopHour;
 					int repeatPeriod;
-					bool inhibition;
+					boost::logic::tribool inhibition;
 					std::string color;
 					int codeGirouette;
-					bool activateHeadJingle;
-					bool activateBackJingle;
-					bool confirm;
+					boost::logic::tribool activateHeadJingle;
+					boost::logic::tribool activateBackJingle;
+					boost::logic::tribool confirm;
 					std::string startStopPoint;
 					std::string endStopPoint;
 					bool diodFlashing;
-					bool alternance;
-					bool multipleStop;
-					bool terminusOrStop;
+					boost::logic::tribool alternance;
+					boost::logic::tribool multipleStop;
+					boost::logic::tribool terminusOrStop;
 					std::string way;
 					std::string stopPoint;
 					int numberShow;
-					bool ttsBroadcasting;
-					bool jingle;
+					boost::logic::tribool ttsBroadcasting;
+					boost::logic::tribool jingle;
 					std::string chaining;
-					bool priority;
-					bool varying;
+					boost::logic::tribool priority;
+					boost::logic::tribool varying;
 					int duration;
 					std::string content;
 					std::string contentTts;

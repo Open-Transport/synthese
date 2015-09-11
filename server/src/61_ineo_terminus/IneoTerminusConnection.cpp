@@ -806,26 +806,26 @@ namespace synthese
 			startDate = boost::posix_time::not_a_date_time;
 			stopDate = boost::posix_time::not_a_date_time;
 			repeatPeriod = 0;
-			inhibition = false;
+			inhibition = boost::logic::indeterminate;
 			color = "";
 			codeGirouette = 0;
-			activateHeadJingle = false;
-			activateBackJingle = false;
-			confirm = false;
+			activateHeadJingle = boost::logic::indeterminate;
+			activateBackJingle = boost::logic::indeterminate;
+			confirm = boost::logic::indeterminate;
 			startStopPoint = "";
 			endStopPoint = "";
-			diodFlashing = false;
-			alternance = false;
-			multipleStop = false;
-			terminusOrStop = false;
+			diodFlashing = boost::logic::indeterminate;
+			alternance = boost::logic::indeterminate;
+			multipleStop = boost::logic::indeterminate;
+			terminusOrStop = boost::logic::indeterminate;
 			way = "";
 			stopPoint = "";
 			numberShow = 0;
-			ttsBroadcasting = false;
-			jingle = false;
+			ttsBroadcasting = boost::logic::indeterminate;
+			jingle = boost::logic::indeterminate;
 			chaining = "";
-			priority = false;
-			varying = false;
+			priority = boost::logic::indeterminate;
+			varying = boost::logic::indeterminate;
 			duration = 0;
 			content = "";
 			contentTts = "";
@@ -1104,6 +1104,7 @@ namespace synthese
 					if (sscenario)
 					{
 						// SYNTHESE has a matching scenario, try to stop it
+						util::Log::GetInstance().debug("Ineo Terminus : scenario " + sscenario->getName() + " deleted due to Ineo delete request");
 						scenarioStopAction.setScenario(sscenario);
 						scenarioStopAction.setArchive(true);
 						Request fakeRequest;
@@ -1115,6 +1116,7 @@ namespace synthese
 						sscenario = scenarioStopAction.findScenarioByMessagesAndCalendars(boost::optional<boost::property_tree::ptree>(messagesAndCalendars), false);
 						if (sscenario)
 						{
+							util::Log::GetInstance().debug("Ineo Terminus : scenario " + sscenario->getName() + " updated due to Ineo delete request");
 							// The delete requests only concerns recipients
 							scenarioStopAction.setScenario(sscenario);
 							Request fakeRequest;
@@ -1699,6 +1701,7 @@ namespace synthese
 				messagePM->insert("title", message.name);
 				messagePM->insert("content", message.content);
 				messagePM->insert("color", message.color);
+
 				if (message.dispatching == Immediat)
 				{
 					messagePM->insert("dispatching", "Immediat");
@@ -1711,6 +1714,23 @@ namespace synthese
 				{
 					messagePM->insert("dispatching", "Repete");
 				}
+
+				// Alarm level is set by different attributes depending on the type of the message
+				AlarmLevel level = ALARM_LEVEL_INFO;
+				if(false == boost::logic::indeterminate(message.alternance))
+				{
+					level = (message.alternance ? ALARM_LEVEL_ALTERNATE : ALARM_LEVEL_WARNING);
+				}
+				if(false == boost::logic::indeterminate(message.priority))
+				{
+					level = (message.priority ? ALARM_LEVEL_WARNING : ALARM_LEVEL_ALTERNATE);
+				}
+				if(false == boost::logic::indeterminate(message.varying))
+				{
+					level = (message.varying ? ALARM_LEVEL_ALTERNATE : ALARM_LEVEL_WARNING);
+				}
+				messagePM->insert("level", level);
+
 				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod * 60));
 				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
 				messagePM->insert("section", "");
