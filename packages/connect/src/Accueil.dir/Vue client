@@ -150,6 +150,9 @@
 	  <td>Code du client</td>
 	  <td><input type="text" value="<@client_control_centre_code@>" name="actionParam_field_client_control_centre_code" /></td>
 	 </tr><tr>
+	  <td>URL du service</td>
+	  <td><input type="text" value="<@service_url@>" name="actionParam_field_service_url" /></td>
+	 </tr><tr>
 	  <td>Code du service</td>
 	  <td><input type="text" value="<@service_code@>" name="actionParam_field_service_code" /></td>
 	 </tr><tr>
@@ -164,7 +167,17 @@
 	   <select name="actionParam_field_data_source_id">
 	    <option<@(0==data_source_id)?" selected=\"true\"":""@>>(aucune)</option>
 	    <?data_sources&template=<{data_source&template=
-	    	<option<@(id==data_source_id)?" selected=\"true\"":""@>><@name@></option>
+	    	<option<@(id==data_source_id)?" selected=\"true\"":""@> value=<@id@>><@name@></option>
+	    }>?>
+	   </select>
+	  </td>
+	 </tr><tr>
+	  <td>Source des données plannifiées</td>
+	  <td>
+	   <select name="actionParam_field_planned_datasource_id">
+	    <option<@(0==planned_datasource_id)?" selected=\"true\"":""@>>(aucune)</option>
+	    <?data_sources&template=<{data_source&template=
+	    	<option<@(id==planned_datasource_id)?" selected=\"true\"":""@> value=<@id@>><@name@></option>
 	    }>?>
 	   </select>
 	  </td>
@@ -198,6 +211,7 @@
 	  <td>
 	   <select name="actionParam_field_stop_area_id">
 	    <?StopAreasListFunction&
+		  data_source_filter=<@data_source_id@>&
 	      template=<{stopArea&template=
 	  	<option<@(stop_id==stop_area_id)?" selected=\"true\"":""@> value="<@stop_id@>"><@stop_name@></option>
 	    }>?>
