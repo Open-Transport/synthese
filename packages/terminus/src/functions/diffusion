@@ -631,11 +631,11 @@
 		<?PTNetworksListFunction&
 		template=<{network&template=
     <div>
-      <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@network_id@>"> Réseau <@name@></label>
+      <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>"> Réseau <@name@></label>
       <div style="padding-left:30px;" class="hide">
 			<?tree_folders&
 			recursive=1&
-			roid=<@network_id@>&
+			roid=<@id@>&
 			template=<{folder&template=
         <div>
 				<@lines_menu=<?LinesListFunction2&
@@ -668,7 +668,7 @@
         </div>
 			}>?>
 			<?LinesListFunction2&
-			ni=<@network_id@>,0&
+			ni=<@id@>,0&
 			with_directions=1&
 			template=<{line&template=
         <div>

@@ -162,7 +162,7 @@
 		
 		<?PTNetworksListFunction&
 		  template=<{network&template=
-		  	<@network_name[network_id]=<@name@>@>
+		  	<@network_name[id]=<@name@>@>
 		  }>
 		?>
 		<?form&
@@ -181,7 +181,7 @@
 		 <tr class="warning">
 		  <td><select name="actionParam_field_perimeter">
 		   <?PTNetworksListFunction&
-		     template=<{network&template=<option value="<@network_id@>"><@name@></option>}>
+		     template=<{network&template=<option value="<@id@>"><@name@></option>}>
 		   ?>
 		  </select></td>
 		  <td></td>
@@ -220,7 +220,7 @@
 		
 		<?PTNetworksListFunction&
 		  template=<{network&template=
-		  	<@network_name[network_id]=<@name@>@>
+		  	<@network_name[id]=<@name@>@>
 		  }>
 		?>
 		<?form&
@@ -239,7 +239,7 @@
 		 <tr class="warning">
 		  <td><select name="actionParam_field_perimeter">
 		   <?PTNetworksListFunction&
-		     template=<{network&template=<option value="<@network_id@>"><@name@></option>}>
+		     template=<{network&template=<option value="<@id@>"><@name@></option>}>
 		   ?>
 		  </select></td>
 		  <td></td>
