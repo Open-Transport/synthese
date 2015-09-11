@@ -36,6 +36,7 @@ namespace synthese
 
 	FIELD_DEFINITION_OF_TYPE(SubscriptionDuration, "subscription_duration", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(TimeSpan, "time_span", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(VDVSubscriptionType, "vdv_subscription_type", SQL_INTEGER)
 	
 	namespace data_exchange
 	{
@@ -54,7 +55,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(VDVServer),
 					FIELD_DEFAULT_CONSTRUCTOR(StopArea),
 					FIELD_VALUE_CONSTRUCTOR(SubscriptionDuration, hours(24)),
-					FIELD_VALUE_CONSTRUCTOR(TimeSpan, minutes(60))
+					FIELD_VALUE_CONSTRUCTOR(TimeSpan, minutes(60)),
+					FIELD_VALUE_CONSTRUCTOR(VDVSubscriptionType, Dfi)
 			)	),
 			_expiration(not_a_date_time),
 			_online(false)

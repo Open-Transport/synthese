@@ -138,7 +138,13 @@ namespace synthese
 						);
 						if(!stopArea)
 						{
-							continue;
+							// Try without first char (may be a Z or a S before the DIDOK code)
+							string stopCode = azbidNode.getText();
+							stopArea = _client->get<DataSource>()->getObjectByCode<StopArea>(stopCode.substr(1));
+							if (!stopArea)
+							{
+								continue;
+							}
 						}
 						subscription->setStopArea(stopArea);
 					}

@@ -25,6 +25,7 @@
 
 #include "Object.hpp"
 
+#include "EnumObjectField.hpp"
 #include "MinutesField.hpp"
 #include "NumericField.hpp"
 #include "StopArea.hpp"
@@ -36,8 +37,15 @@ namespace synthese
 {
 	namespace data_exchange
 	{
+		enum VDVSubscriptionTypeEnum
+		{
+			Dfi = 0,
+			Ans = 1
+		};
+
 		FIELD_MINUTES(SubscriptionDuration)
 		FIELD_MINUTES(TimeSpan)
+		FIELD_ENUM(VDVSubscriptionType, VDVSubscriptionTypeEnum)
 			
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -45,7 +53,8 @@ namespace synthese
 			FIELD(VDVServer),
 			FIELD(pt::StopArea),
 			FIELD(SubscriptionDuration),
-			FIELD(TimeSpan)
+			FIELD(TimeSpan),
+			FIELD(VDVSubscriptionType)
 		> VDVServerSubscriptionRecord;
 
 

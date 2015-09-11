@@ -354,18 +354,23 @@ namespace synthese
 				);
 				subscription->setExpiration(expirationTime);
 				expirationTime -= diff_from_utc;
+				string aboTag("AboAZB");
+				if (subscription->get<VDVSubscriptionType>() == Ans)
+				{
+					aboTag = "AboASB";
+				}
 				if (get<CutAboId>())
 				{
 					// Some systems do not support unsigned long long int but only int so we exchange the final
 					// part of the AboID
 					int smallAboId = (int)(subscription->get<Key>());
 					aboAnfrage <<
-						"<AboAZB AboID=\"" << smallAboId << "\" VerfallZst=\"";
+						"<" << aboTag << " AboID=\"" << smallAboId << "\" VerfallZst=\"";
 				}
 				else
 				{
 					aboAnfrage <<
-						"<AboAZB AboID=\"" << subscription->get<Key>() << "\" VerfallZst=\"";
+						"<" << aboTag << " AboID=\"" << subscription->get<Key>() << "\" VerfallZst=\"";
 				}
 				ToXsdDateTime(aboAnfrage, expirationTime);
 				aboAnfrage << "\">";
@@ -374,15 +379,30 @@ namespace synthese
 
 				if (subscription->get<StopArea>()->hasLinkWithSource(*get<DataSource>()))
 				{
+					string stopAreaCode = subscription->get<StopArea>()->getACodeBySource(*get<DataSource>());
+					string stopAreaCodeTag("AZBID");
+					if (subscription->get<VDVSubscriptionType>() == Dfi)
+					{
+						if (stopAreaCode.at(0) != 'Z')
+						{
+							stopAreaCode = "Z" + stopAreaCode;
+						}
+					}
+					else if (subscription->get<VDVSubscriptionType>() == Ans)
+					{
+						stopAreaCodeTag = "ASBID";
+						if (stopAreaCode.at(0) != 'S')
+						{
+							stopAreaCode = "S" + stopAreaCode;
+						}
+					}
 					aboAnfrage << 
-						"<AZBID>" << (
-							get<DataSource>() ?
-							subscription->get<StopArea>()->getACodeBySource(*get<DataSource>()) :
-							lexical_cast<string>(subscription->get<StopArea>()->getKey())
-						) << "</AZBID>" <<
+						"<" << stopAreaCodeTag << ">" <<
+						stopAreaCode <<
+						"</" << stopAreaCodeTag << ">" <<
 						"<Vorschauzeit>" << (subscription->get<TimeSpan>().total_seconds() / 60)  << "</Vorschauzeit>" <<
 						"<Hysterese>60</Hysterese>" <<
-						"</AboAZB>"
+						"</" << aboTag << ">"
 					;
 				}
 				else
@@ -446,8 +466,6 @@ namespace synthese
 			this_thread::sleep(boost::posix_time::seconds(5));
 			
 			boost::shared_lock<boost::shared_mutex> lockVDV(ServerModule::IneoBDSIAgainstVDVMutex);
-
-			date today(day_clock::local_day());
 
 			// Local variables
 			ptime now(second_clock::local_time());
@@ -526,29 +544,7 @@ namespace synthese
 					XMLNode AZBNachrichtNode = datenAbrufenAntwortNode.getChildNode("AZBNachricht", cptAZBNachricht);
 					// Get the id of the subscription to find it
 					string aboId = AZBNachrichtNode.getAttribute("AboID");
-					VDVServerSubscription* currentSubscription = NULL;
-					BOOST_FOREACH(VDVServerSubscription* subscription, _subscriptions)
-					{
-						if (get<CutAboId>())
-						{
-							// Some systems do not support unsigned long long int but only int so we exchange the final
-							// part of the AboID
-							int smallAboId = (int)(subscription->get<Key>());
-							if (lexical_cast<string>(smallAboId) == aboId)
-							{
-								currentSubscription = subscription;
-								break;
-							}
-						}
-						else
-						{
-							if (lexical_cast<string>(subscription->getKey()) == aboId)
-							{
-								currentSubscription = subscription;
-								break;
-							}
-						}
-					}
+					VDVServerSubscription* currentSubscription = _getSubscription(aboId);
 					
 					// If no corresponding subscription, log it and continue
 					if (!currentSubscription)
@@ -557,16 +553,14 @@ namespace synthese
 						continue;
 					}
 					
-					// Loop on AZBFahrplanlage => new service or RTupdate services
+					// Loop on AZBFahrplanlage => RTupdate services
 					int numAZBFahrplanlage = AZBNachrichtNode.nChildNode("AZBFahrplanlage");
-					DBTransaction transaction;
 					for (int cptAZBFahrplanlage = 0;cptAZBFahrplanlage<numAZBFahrplanlage;cptAZBFahrplanlage++)
 					{
 						XMLNode AZBFahrplanlageNode = AZBNachrichtNode.getChildNode("AZBFahrplanlage", cptAZBFahrplanlage);
 						// Verify that the AZBID is the right one for the subscription
 						string readAZBID = AZBFahrplanlageNode.getChildNode("AZBID").getText();
-						if (currentSubscription->get<StopArea>()->hasLinkWithSource(*get<DataSource>()) &&
-							readAZBID != currentSubscription->get<StopArea>()->getACodeBySource(*get<DataSource>()))
+						if (!_checkStop(currentSubscription, readAZBID))
 						{
 							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un AZBNachtricht avec un AZBID ne correspondant à l'abonnement");
 							break;
@@ -574,120 +568,13 @@ namespace synthese
 						
 						// Searching if service exists by FahrtBezeichner code
 						string serviceCode = AZBFahrplanlageNode.getChildNode("FahrtID").getChildNode("FahrtBezeichner").getText();
-						vector<string> vectServiceCode;
-						split(vectServiceCode, serviceCode, is_any_of(":"));
-						string localServiceCode("");
-						if (vectServiceCode.size() != 4)
-						{
-							// FahrtBezeichner is not XX:XX:XXXXX:XXX ; it can be the old format XXX-XXXXX-XXX
-							split(vectServiceCode, serviceCode, is_any_of("-"));
-							if (vectServiceCode.size() != 3)
-							{
-								Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un service indecodable " + serviceCode);
-								continue;
-							}
-							localServiceCode = vectServiceCode[1];
-						}
-						else
-						{
-							localServiceCode = vectServiceCode[2];
-						}
-						// Service code is on 5 characters in the planned datasource
-						while (localServiceCode.size() < 5)
-							localServiceCode = "0" + localServiceCode;
-						
-
-						ScheduledService* service(
-							plannedDataSource->getObjectByCode<ScheduledService>(vectServiceCode[1])
-						);
-
-						// TODO : it can exist more than one service with this service code
-						// we should get all of them and select :
-						// - one already activated for today (theorical calendar OK)
+						ScheduledService* service = _getService(serviceCode, plannedDataSource);
 						if (service)
 						{
-							Log::GetInstance().debug("VDVServer : Service par défaut : " + lexical_cast<string>(service->getKey()));
-						}
-						vector<ScheduledService*> services;
-						ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*plannedDataSource, Env::GetOfficialEnv());
-						BOOST_FOREACH(const ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Map::value_type& itLine, lines.getMap())
-						{
-							BOOST_FOREACH(const ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Map::mapped_type::value_type& line, itLine.second)
-							{
-								BOOST_FOREACH(Path* route, line->getPaths())
-								{
-									// Avoid junctions
-									if(!dynamic_cast<JourneyPattern*>(route))
-									{
-										continue;
-									}
-									JourneyPattern* jp(static_cast<JourneyPattern*>(route));
-									boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-										*jp->sharedServicesMutex
-									);
-									BOOST_FOREACH(Service* tservice, jp->getAllServices())
-									{
-										ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
-										if(!curService) continue;
-										if (curService->hasLinkWithSource(*plannedDataSource) &&
-											curService->getACodeBySource(*plannedDataSource) == vectServiceCode[1])
-										{
-											// Add the service to vect
-											services.push_back(curService);
-										}
-									}
-								}
-							}
-						}
-
-						//const CommercialLine& line(
-						//    *static_cast<CommercialLine*>(service->getPath()->getPathGroup())
-						//);
-						
-						Log::GetInstance().debug("VDVServer : On a trouve : " + lexical_cast<string>(services.size()) + " services candidats");
-						int numTheoricalActivatedServices(0);
-						BOOST_FOREACH(ScheduledService* sservice, services)
-						{
-							if (sservice->isActive(today))
-							{
-								numTheoricalActivatedServices++;
-								service = sservice;
-							}
-						}
-						
-						if (numTheoricalActivatedServices != 1)
-						{
-							Log::GetInstance().debug("VDVServer : " + lexical_cast<string>(numTheoricalActivatedServices) + " services candidats sont théoriquement activés aujourd'hui");
-						}
-						else
-						{
-							Log::GetInstance().debug("VDVServer : un seul service candidat est théoriquement activé aujourd'hui");
-						}
-						
-						if (service)
-						{
-							// UPDATE RT OF THE SERVICE
-							SchedulesBasedService::Schedules departureSchedules(
-								service->getDepartureSchedules(true, true)
-							);
-							SchedulesBasedService::Schedules arrivalSchedules(
-								service->getArrivalSchedules(true, true)
-							);
 							// Search the rank of the stop of the subscription
-							size_t rank(0);
-							JourneyPattern* route(static_cast<JourneyPattern*>(service->getPath()));
-							for (size_t cptRank(0);cptRank<route->getScheduledStopsNumber();cptRank++)
-							{
-								const StopArea* lineStopArea(
-									dynamic_cast<const StopPoint*>(&*route->getLineStop(cptRank, true)->get<LineNode>())->getConnectionPlace()
-								);
-								if (lineStopArea &&
-									lineStopArea->getKey() == currentSubscription->get<StopArea>()->getKey())
-								{
-									rank = cptRank;
-									break;
-								}
-							}
+							size_t rank = _getRank(service, currentSubscription);
+
+							// Read the received schedules
 							ptime rtArrivalDate(not_a_date_time);
 							int numAnkunftszeitAZBPrognose = AZBFahrplanlageNode.nChildNode("AnkunftszeitAZBPrognose");
 							if (numAnkunftszeitAZBPrognose > 0)
@@ -706,39 +593,73 @@ namespace synthese
 							}
 							time_duration rtDepartureTime = rtDepartureDate.is_not_a_date_time() ? not_a_date_time : rtDepartureDate.time_of_day();
 							time_duration rtArrivalTime = rtArrivalDate.is_not_a_date_time()? not_a_date_time : rtArrivalDate.time_of_day();
-							if (!rtDepartureTime.is_not_a_date_time())
-							{
-								// No hysteresis control (TO-DO ?)
-								departureSchedules[rank] = rtDepartureTime;
-							}
-							if (!rtArrivalTime.is_not_a_date_time())
-							{
-								// No hysteresis control (TO-DO ?)
-								arrivalSchedules[rank] = rtArrivalTime;
-							}
-							
-							Log::GetInstance().debug("VDVServer : Mise à jour TR du service");
-							
-							// Link the service to the RT datasource
-							Importable::DataSourceLinks links(service->getDataSourceLinks());
-							links.erase(&*(get<DataSource>()));
-							links.insert(make_pair(&*(get<DataSource>()), serviceCode));
-							service->setDataSourceLinksWithoutRegistration(links);
 
-							// Set the service active
-							service->setActive(today);
+							_updateService(service, serviceCode, rtDepartureTime, rtArrivalTime, rank);
 
-							// Update RT
-							service->setRealTimeSchedules(departureSchedules, arrivalSchedules);
-							
-							// Save the updated service
-							ScheduledServiceTableSync::Save(service, transaction);
-							
 							continue;
 						}
 						
 						// The service is not found in the theorical data, it has to be created
-						Log::GetInstance().warn("VDVServer : Réception d'un DatenAbrufenAntwort contenant un service non connu (" + vectServiceCode[1] + "), création du service non codée");
+						Log::GetInstance().warn("VDVServer : Réception d'un DatenAbrufenAntwort contenant un service non connu (" + serviceCode + "), création du service non codée");
+						// TO-DO ? : code the creation of the service (why not in a different network to easily detect errors in HAFAS or special events received ?)
+					}
+				}
+				// Loop on Zubringernachricht to link with a subscription
+				int numZubringernachricht = datenAbrufenAntwortNode.nChildNode("Zubringernachricht");
+				for (int cptZubringernachricht = 0;cptZubringernachricht<numZubringernachricht;cptZubringernachricht++)
+				{
+					XMLNode ZubringernachrichtNode = datenAbrufenAntwortNode.getChildNode("Zubringernachricht", cptZubringernachricht);
+					// Get the id of the subscription to find it
+					string aboId = ZubringernachrichtNode.getAttribute("AboID");
+					VDVServerSubscription* currentSubscription = _getSubscription(aboId);
+
+					// If no corresponding subscription, log it and continue
+					if (!currentSubscription)
+					{
+						Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un Zubringernachricht ne correspondant à aucun abonnement");
+						continue;
+					}
+
+					// Loop on ASBFahrplanlage => RTupdate services
+					int numASBFahrplanlage = ZubringernachrichtNode.nChildNode("ASBFahrplanlage");
+					for (int cptASBFahrplanlage = 0;cptASBFahrplanlage<numASBFahrplanlage;cptASBFahrplanlage++)
+					{
+						XMLNode ASBFahrplanlageNode = ZubringernachrichtNode.getChildNode("ASBFahrplanlage", cptASBFahrplanlage);
+						// Verify that the ASBID is the right one for the subscription
+						string readASBID = ASBFahrplanlageNode.getChildNode("ASBID").getText();
+						if (!_checkStop(currentSubscription, readASBID))
+						{
+							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un Zubringernachricht avec un ASBID ne correspondant à l'abonnement");
+							break;
+						}
+
+						// Searching if service exists by FahrtBezeichner code
+						string serviceCode = ASBFahrplanlageNode.getChildNode("FahrtID").getChildNode("FahrtBezeichner").getText();
+						ScheduledService* service = _getService(serviceCode, plannedDataSource);
+
+						if (service)
+						{
+							// Search the rank of the stop of the subscription
+							size_t rank = _getRank(service, currentSubscription);
+
+							// Read the received schedules
+							ptime rtArrivalDate(not_a_date_time);
+							int numAnkunftszeitASBPrognose = ASBFahrplanlageNode.nChildNode("AnkunftszeitASBPrognose");
+							if (numAnkunftszeitASBPrognose > 0)
+							{
+								XMLNode nodeRTArrivalTime = ASBFahrplanlageNode.getChildNode("AnkunftszeitASBPrognose");
+								rtArrivalDate = XmlToolkit::GetXsdDateTime(
+									nodeRTArrivalTime.getText()) + diff_from_utc; //We are supposed to receive the UTC time
+							}
+							time_duration rtArrivalTime = rtArrivalDate.is_not_a_date_time()? not_a_date_time : rtArrivalDate.time_of_day();
+
+							_updateService(service, serviceCode, rtArrivalTime, rtArrivalTime, rank); // For ANS subscriptions, we only care of arrival time
+
+							continue;
+						}
+
+						// The service is not found in the theorical data, it has to be created
+						Log::GetInstance().warn("VDVServer : Réception d'un DatenAbrufenAntwort contenant un service non connu (" + serviceCode + "), création du service non codée");
 						// TO-DO ? : code the creation of the service (why not in a different network to easily detect errors in HAFAS or special events received ?)
 					}
 				}
@@ -796,4 +717,203 @@ namespace synthese
 				logFile << content;
 			}
 		}
+
+		VDVServerSubscription* VDVServer::_getSubscription(std::string aboId) const
+		{
+			VDVServerSubscription* subscriptionFound = NULL;
+			BOOST_FOREACH(VDVServerSubscription* subscription, _subscriptions)
+			{
+				if (get<CutAboId>())
+				{
+					// Some systems do not support unsigned long long int but only int so we exchange the final
+					// part of the AboID
+					int smallAboId = (int)(subscription->get<Key>());
+					if (lexical_cast<string>(smallAboId) == aboId)
+					{
+						subscriptionFound = subscription;
+						break;
+					}
+				}
+				else
+				{
+					if (lexical_cast<string>(subscription->getKey()) == aboId)
+					{
+						subscriptionFound = subscription;
+						break;
+					}
+				}
+			}
+
+			return subscriptionFound;
+		}
+
+		bool VDVServer::_checkStop(VDVServerSubscription* subscription, std::string stopCode) const
+		{
+			if (subscription->get<StopArea>()->hasLinkWithSource(*get<DataSource>()))
+			{
+				string stopAreaCode = subscription->get<StopArea>()->getACodeBySource(*get<DataSource>());
+				if ((stopAreaCode.size() == 7 && stopAreaCode == stopCode.substr(1)) ||
+					((stopAreaCode.size() == 8 && stopAreaCode == stopCode)))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		pt::ScheduledService* VDVServer::_getService(std::string serviceCode, boost::shared_ptr<impex::DataSource> plannedDataSource) const
+		{
+			vector<string> vectServiceCode;
+			split(vectServiceCode, serviceCode, is_any_of(":"));
+			string localServiceCode("");
+			if (vectServiceCode.size() != 4)
+			{
+				// FahrtBezeichner is not XX:XX:XXXXX:XXX ; it can be the old format XXX-XXXXX-XXX
+				split(vectServiceCode, serviceCode, is_any_of("-"));
+				if (vectServiceCode.size() != 3)
+				{
+					Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un service indecodable " + serviceCode);
+					return NULL;
+				}
+				localServiceCode = vectServiceCode[1];
+			}
+			else
+			{
+				localServiceCode = vectServiceCode[2];
+			}
+			// Service code is on 5 characters in the planned datasource
+			while (localServiceCode.size() < 5)
+				localServiceCode = "0" + localServiceCode;
+
+
+			ScheduledService* service(
+				plannedDataSource->getObjectByCode<ScheduledService>(vectServiceCode[1])
+			);
+
+			// it can exist more than one service with this service code
+			// we should get all of them and select :
+			// - one already activated for today (theorical calendar OK)
+			if (service)
+			{
+				Log::GetInstance().debug("VDVServer : Service par défaut : " + lexical_cast<string>(service->getKey()));
+			}
+			vector<ScheduledService*> services;
+			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*plannedDataSource, Env::GetOfficialEnv());
+			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Map::value_type& itLine, lines.getMap())
+			{
+				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Map::mapped_type::value_type& line, itLine.second)
+				{
+					BOOST_FOREACH(Path* route, line->getPaths())
+					{
+						// Avoid junctions
+						if(!dynamic_cast<JourneyPattern*>(route))
+						{
+							continue;
+						}
+						JourneyPattern* jp(static_cast<JourneyPattern*>(route));
+						boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+							*jp->sharedServicesMutex
+						);
+						BOOST_FOREACH(Service* tservice, jp->getAllServices())
+						{
+							ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
+							if(!curService) continue;
+							if (curService->hasLinkWithSource(*plannedDataSource) &&
+								curService->getACodeBySource(*plannedDataSource) == vectServiceCode[1])
+							{
+								// Add the service to vect
+								services.push_back(curService);
+							}
+						}
+					}
+				}
+			}
+
+			Log::GetInstance().debug("VDVServer : On a trouve : " + lexical_cast<string>(services.size()) + " services candidats");
+			int numTheoricalActivatedServices(0);
+			date today(day_clock::local_day());
+			BOOST_FOREACH(ScheduledService* sservice, services)
+			{
+				if (sservice->isActive(today))
+				{
+					numTheoricalActivatedServices++;
+					service = sservice;
+				}
+			}
+
+			if (numTheoricalActivatedServices != 1)
+			{
+				Log::GetInstance().debug("VDVServer : " + lexical_cast<string>(numTheoricalActivatedServices) + " services candidats sont théoriquement activés aujourd'hui");
+			}
+			else
+			{
+				Log::GetInstance().debug("VDVServer : un seul service candidat est théoriquement activé aujourd'hui");
+			}
+
+			return service;
+		}
+
+		size_t VDVServer::_getRank(pt::ScheduledService* service, VDVServerSubscription* subscription) const
+		{
+			JourneyPattern* route(static_cast<JourneyPattern*>(service->getPath()));
+			for (size_t cptRank(0);cptRank<route->getScheduledStopsNumber();cptRank++)
+			{
+				const StopArea* lineStopArea(
+					dynamic_cast<const StopPoint*>(&*route->getLineStop(cptRank, true)->get<LineNode>())->getConnectionPlace()
+				);
+				if (lineStopArea &&
+					lineStopArea->getKey() == subscription->get<StopArea>()->getKey())
+				{
+					return cptRank;
+				}
+			}
+
+			return 0;
+		}
+
+		void VDVServer::_updateService(
+			pt::ScheduledService* service,
+			std::string serviceCode,
+			boost::posix_time::time_duration rtDepartureTime,
+			boost::posix_time::time_duration rtArrivalTime,
+			size_t rank
+		) const
+		{
+			SchedulesBasedService::Schedules departureSchedules(
+				service->getDepartureSchedules(true, true)
+			);
+			SchedulesBasedService::Schedules arrivalSchedules(
+				service->getArrivalSchedules(true, true)
+			);
+			if (!rtDepartureTime.is_not_a_date_time())
+			{
+				// No hysteresis control
+				departureSchedules[rank] = rtDepartureTime;
+			}
+			if (!rtArrivalTime.is_not_a_date_time())
+			{
+				// No hysteresis control
+				arrivalSchedules[rank] = rtArrivalTime;
+			}
+
+			Log::GetInstance().debug("VDVServer : Mise à jour TR du service");
+
+			// Link the service to the RT datasource
+			Importable::DataSourceLinks links(service->getDataSourceLinks());
+			links.erase(&*(get<DataSource>()));
+			links.insert(make_pair(&*(get<DataSource>()), serviceCode));
+			service->setDataSourceLinksWithoutRegistration(links);
+
+			// Set the service active
+			date today(day_clock::local_day());
+			service->setActive(today);
+
+			// Update RT
+			service->setRealTimeSchedules(departureSchedules, arrivalSchedules);
+
+			// Save the updated service
+			ScheduledServiceTableSync::Save(service);
+		}
+
 }	}

@@ -459,9 +459,18 @@ namespace synthese
 										}
 									}
 								}
+								string stopCode = it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>());
+								if (stopCode.size() == 7)
+								{
+									stopCode = "Z" + stopCode;
+								}
+								else if (stopCode.size() == 8 && stopCode.at(0) == 'S')
+								{
+									stopCode = "Z" + stopCode.substr(1);
+								}
 								result <<
 									"\">" <<
-									"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
+									"<AZBID>" << stopCode << "</AZBID>" <<
 									"<FahrtID>" <<
 									"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
 									"<Betriebstag>" << to_iso_extended_string((sp.getOriginDateTime() - diff_from_utc).date()) << "</Betriebstag>" <<
@@ -629,9 +638,18 @@ namespace synthese
 								result <<
 									"<AZBFahrtLoeschen Zst=\"";
 								ToXsdDateTime(result, now);
+								string stopCode = it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>());
+								if (stopCode.size() == 7)
+								{
+									stopCode = "Z" + stopCode;
+								}
+								else if (stopCode.size() == 8 && stopCode.at(0) == 'S')
+								{
+									stopCode = "Z" + stopCode.substr(1);
+								}
 								result <<
 									"\">" <<
-									"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
+									"<AZBID>" << stopCode << "</AZBID>" <<
 									"<FahrtID>" <<
 									"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
 									"<Betriebstag>" << to_iso_extended_string((sp.getOriginDateTime() - diff_from_utc).date()) << "</Betriebstag>" <<

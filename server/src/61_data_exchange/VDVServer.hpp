@@ -27,6 +27,7 @@
 
 #include "DataSource.h"
 #include "NumericField.hpp"
+#include "ScheduledService.h"
 #include "SchemaMacros.hpp"
 #include "StringField.hpp"
 #include "PointersVectorField.hpp"
@@ -95,7 +96,19 @@ namespace synthese
 			mutable bool _online;
 
 			std::string _getURL( const std::string& request ) const;
-			
+
+			VDVServerSubscription* _getSubscription(std::string aboId) const;
+			bool _checkStop(VDVServerSubscription* subscription, std::string stopCode) const;
+			pt::ScheduledService* _getService(std::string serviceCode, boost::shared_ptr<impex::DataSource> plannedDataSource) const;
+			size_t _getRank(pt::ScheduledService* service, VDVServerSubscription* subscription) const;
+			void _updateService(
+				pt::ScheduledService* service,
+				std::string serviceCode,
+				boost::posix_time::time_duration rtDepartureTime,
+				boost::posix_time::time_duration rtArrivalTime,
+				size_t rank
+			) const;
+
 		public:
 			VDVServer(util::RegistryKeyType id = 0);
 
