@@ -1699,8 +1699,22 @@ namespace synthese
 
 				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
 				messagePM->insert("title", message.name);
-				messagePM->insert("content", message.content);
-				messagePM->insert("color", message.color);
+
+				std::string messageContent = message.content;
+				if (false == message.color.empty())
+				{
+					std::string htmlColor = "green";
+					if("Orange" == message.color)
+					{
+						htmlColor = "orange";
+					}
+					if("Rouge" == message.color)
+					{
+						htmlColor = "red";
+					}
+					messageContent = "<font color=\\\"" + htmlColor + "\\\">" + message.content + "</font>";
+				}
+				messagePM->insert("content", messageContent);
 
 				if (message.dispatching == Immediat)
 				{
