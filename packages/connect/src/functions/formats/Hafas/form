@@ -105,6 +105,11 @@
   name=try_to_read_line_short_name&
 #>
 
+<#forms/yes_no_input&
+  label=Combiner moyen de transport et nom court de la ligne&
+  name=concatenate_transport_short_name&
+#>
+
 <h3>Retraitement des données</h3>
 
 <#forms/text_input&

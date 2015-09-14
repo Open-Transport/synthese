@@ -98,6 +98,7 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME = "complete_empty_stop_area_name";
 		const string HafasFileFormat::Importer_::PARAMETER_NO_GLEIS_FILE = "no_gleis_file";
 		const string HafasFileFormat::Importer_::PARAMETER_TRY_TO_READ_LINE_SHORT_NAME = "try_to_read_line_short_name";
+		const string HafasFileFormat::Importer_::PARAMETER_CONCATENATE_TRANSPORT_SHORT_NAME = "concatenate_transport_short_name";
 		const string HafasFileFormat::Importer_::PARAMETER_READ_WAYBACK = "read_way_back";
 		const string HafasFileFormat::Importer_::PARAMETER_CALENDAR_DEFAULT_CODE = "calendar_default_code";
 		const string HafasFileFormat::Importer_::PARAMETER_2015_CARPOSTAL_FORMAT = "format_carpostal_2015";
@@ -970,6 +971,9 @@ namespace synthese
 
 			// try to read lin short name
 			pm.insert(PARAMETER_TRY_TO_READ_LINE_SHORT_NAME, _tryToReadShortName);
+
+			// concatenate transport and short name
+			pm.insert(PARAMETER_CONCATENATE_TRANSPORT_SHORT_NAME, _concatenateTransportShortName);
 			
 			// Read wayback
 			pm.insert(PARAMETER_READ_WAYBACK, _readWayback);
@@ -1055,7 +1059,10 @@ namespace synthese
 			
 			// Line short name
 			_tryToReadShortName = pm.getDefault<bool>(PARAMETER_TRY_TO_READ_LINE_SHORT_NAME, false);
-			
+
+			// Concatneate transport and short name
+			_concatenateTransportShortName = pm.getDefault<bool>(PARAMETER_CONCATENATE_TRANSPORT_SHORT_NAME, false);
+
 			// Read wayback
 			_readWayback = pm.getDefault<bool>(PARAMETER_READ_WAYBACK, false);
 
@@ -1504,7 +1511,16 @@ namespace synthese
 
 				// Update the short name if possible
 				if (_tryToReadShortName && !zug.lineShortName.empty())
-					line->setShortName(zug.lineShortName);
+				{
+					if (_concatenateTransportShortName)
+					{
+						line->setShortName(zug.transportModeCode + zug.lineShortName);
+					}
+					else
+					{
+						line->setShortName(zug.lineShortName);
+					}
+				}
 
 				// Wayback
 				int numericServiceNumber(0);

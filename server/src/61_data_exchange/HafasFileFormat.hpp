@@ -138,6 +138,7 @@ namespace synthese
 				static const std::string PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME;
 				static const std::string PARAMETER_NO_GLEIS_FILE;
 				static const std::string PARAMETER_TRY_TO_READ_LINE_SHORT_NAME;
+				static const std::string PARAMETER_CONCATENATE_TRANSPORT_SHORT_NAME;
 				static const std::string PARAMETER_READ_WAYBACK;
 				static const std::string PARAMETER_CALENDAR_DEFAULT_CODE;
 				static const std::string PARAMETER_2015_CARPOSTAL_FORMAT;
@@ -175,6 +176,7 @@ namespace synthese
 					std::string _complete_empty_stop_area_name;
 					bool _noGleisFile;
 					bool _tryToReadShortName;
+					bool _concatenateTransportShortName;
 					bool _readWayback;
 					size_t _defaultCalendarCode;
 					bool _formatCarpostal2015;
