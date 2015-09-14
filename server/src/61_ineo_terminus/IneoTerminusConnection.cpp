@@ -1745,6 +1745,10 @@ namespace synthese
 				}
 				messagePM->insert("level", level);
 
+				if(0 < message.duration)
+				{
+					messagePM->insert("displayDuration", message.duration);
+				}
 				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod * 60));
 				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
 				messagePM->insert("section", "");
