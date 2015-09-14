@@ -1,58 +1,65 @@
 <?vdv_servers_list&
-  subscription_id=<@roid@>&
-  template=<{server&template=
-
-	<ul class="breadcrumb">
-	<li><?link&target=/&text=Connect?> <span class="divider">/</span></li>
-	<li><?link&target=/client?> <span class="divider">/</span></li>
-	<li><?link&target=/client/vdv&roid=<@id@>&tab=subscriptions&text=Serveur VDV <@name@> (<@address@>:<@port@>)?> <span class="divider">/</span></li>
-	<h1>Abonnement <@name@> (<@stop_area_id@>)</h1>
-	</ul>
-	
-	<{subscription&template=<?if&cond=<@id==roid@>&then=
-		
-		<?form&
-		  a=ObjectUpdate&
-		  actionParam_object_id=<@id@>&
-		  target=<@p@>&
-		  roid=<@roid@>&
+subscription_id=<@roid@>&
+template=<{server&template=
+<ul class="breadcrumb">
+  <li><?link&target=/&text=Connect?> <span class="divider">/</span></li>
+  <li><?link&target=/client?> <span class="divider">/</span></li>
+  <li><?link&target=/client&roid=<@id@>&tab=subscriptions&text=Serveur VDV <@name@> (<@address@>:<@port@>)?> <span class="divider">/</span></li>
+</ul>
+<h1>Abonnement <@name@> (<@stop_area_id@>)</h1>
+	<{subscription&template=
+		<?if&cond=<@id==roid@>&then=
+<?form&
+a=ObjectUpdate&
+actionParam_object_id=<@id@>&
+target=<@p@>&
+roid=<@roid@>&
+?>
+  <table class="table table-striped table-condensed">
+    <tr>
+      <td>Nom</td>
+      <td><input type="text" name="actionParam_field_name" value="<@name@>" /></td>
+    </tr><tr>
+      <td>Arrêt</td>
+      <td>
+        <select name="actionParam_field_stop_area_id">
+			<?StopAreasListFunction&
+			data_source_filter=<@data_source_id@>&
+			template=<{stopArea&template=
+          <option<@(stop_id==stop_area_id)?" selected=\"true\"":""@> value="<@stop_id@>"><@stop_name@></option>
+			}>?>
+        </select>
+      </td>
+    </tr><tr>
+      <td>Durée d'abonnement</td>
+      <td>
+        <div class="input-append">
+          <input type="text" class="input-mini" name="actionParam_field_subscription_duration" value="<@subscription_duration@>" />
+          <span class="add-on">min</span>
+        </div>
+      </td>
+    </tr><tr>
+      <td>Visibilité</td>
+      <td>
+        <div class="input-append">
+          <input type="text" class="input-mini" name="actionParam_field_time_span" value="<@time_span@>" />
+          <span class="add-on">min</span>
+        </div>
+      </td>
+    </tr><tr>
+      <td>Type d'abonnement</td>
+      <td>
+        <select name="actionParam_field_vdv_subscription_type">
+          <option<@(0==vdv_subscription_type)?" selected=\"true\"":""@> value="0">DFI</option>
+          <option<@(1==vdv_subscription_type)?" selected=\"true\"":""@> value="1">ANS</option>
+        </select>
+      </td>
+    </tr><tr>
+      <td></td>
+      <td><button class="btn btn-warning" type="submit">Enregistrer</button></td>
+    </tr>
+  </table>
+</form>
 		?>
-		 <table class="table table-striped table-condensed">
-		  <tr>
-		   <td>Nom</td>
-		   <td><input type="text" name="actionParam_field_name" value="<@name@>" /></td>
-		  </tr><tr>
-		   <td>Arrêt</td>
-		   <td>
-		    <select name="actionParam_field_stop_area_id">
-		     <?StopAreasListFunction&
-		       template=<{stopArea&template=
-		  	<option<@(stop_id==stop_area_id)?" selected=\"true\"":""@> value="<@stop_id@>"><@stop_name@></option>
-		       }>
-		     ?>
-		    </select>
-		   </td>
-		  </tr><tr>
-		   <td>Durée d'abonnement</td>
-		   <td>
-		    <div class="input-append">
-		     <input type="text" class="input-mini" name="actionParam_field_subscription_duration" value="<@subscription_duration@>" />
-		     <span class="add-on">min</span>
-		    </div>
-		   </td>
-		  </tr><tr>
-		   <td>Visibilité</td>
-		   <td>
-		    <div class="input-append">
-		     <input type="text" class="input-mini" name="actionParam_field_time_span" value="<@time_span@>" />
-		     <span class="add-on">min</span>
-		    </div>
-		   </td>
-		  </tr><tr>
-		   <td></td>
-		   <td><button class="btn btn-warning" type="submit">Enregistrer</button></td>
-		  </tr>
-		 </table>
-		</form>
-	?>}>
+	}>
 }>?>

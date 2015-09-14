@@ -1,520 +1,514 @@
 <ul class="breadcrumb">
-<li><?link&target=/&text=Connect?> <span class="divider">/</span></li>
-<li class="active">Vue client</li>
+  <li><?link&target=/&text=Connect?> <span class="divider">/</span></li>
+  <li class="active">Vue client</li>
 </ul>
 
 <div class="row-fluid">
   <div class="span3" id="tree">
-   <ul class="nav nav-list well">
-    <li class="<@roid?"":"active"@>">
-     <?link&
-       target=<@p@>&
-       text=Serveurs connectés
-            <div class="pull-right" id="connection_add_link"><i class="icon-plus <@roid?"":"icon-white"@>"></i></div>&
-     ?>
-    </li>
-    <li class="tree_1<@(roid=="nce")?" active":""@>">
-     <?link&
-       target=<@p@>&
-       roid=nce&
-       text=<span class="status status-1">\&nbsp;</span>
-        <span data-content="name">NCE Inéo</span>
-     ?>
-    </li>
-    <?vdv_servers_list&template=<{server&template=
-     	<li class="tree_1<@(roid==id)?" active":""@>">
-     	 <?link&
-     	   target=<@p@>&
-     	   roid=<@id@>&
-     	   text=<span class="status status-1">\&nbsp;</span>
-     	        <span data-content="name"><@name?name:"(sans nom)"@> (VDV)</span>
-     	        <@(id==roid)?("<div class=\"pull-right\" id=\"connection_remove_link\" data-id=\""+ id +"\" data-placement=\"right\" data-toggle=\"tooltip\" title=\"Supprimer la connexion "+ name +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
-     	 ?>
-     	</li>
-    }>?>
-    <?imports&template=<{import&template=
-     	<li class="tree_1<@(roid==id)?" active":""@>">
-     	 <?link&
-     	   target=<@p@>&
-     	   roid=<@id@>&
-     	   text=<span class="status status-<@active@>">\&nbsp;</span>
-     	        <span data-content="name"><@name?name:"(sans nom)"@> (<@file_format@>)</span>
-     	        <@(id==roid)?("<div class=\"pull-right\" id=\"connection_remove_link\" data-id=\""+ id +"\" data-placement=\"right\" data-toggle=\"tooltip\" title=\"Supprimer la connexion "+ name +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
-     	 ?>
-     	</li>
-     }>?>
-   </ul>
-  </div><div class="span9">
-   <?if&
-     cond=<@roid=="nce"@>&
-     then=
-     	<div class="form-horizontal">
-	 <div class="control-group">
-	  <label class="control-label" for="prop-name">Adresse</label>
-	  <div class="controls">
-	   <?form&
-	     a=global_variable_update&
-	     actionParam_variable=ineo_nce_host&
-	     actionParam_persistent=1&
-	     class=form-inline&
-	     target=<@p@>&
-	     roid=nce&
-	   ?>
-	    <input type="text" value="<@~global("ineo_nce_host")@>" name="actionParam_value" />
-	    <button class="btn btn-warning" type="submit">Modifier</button>
-	   </form>
-	  </div>
-	 </div>
-	 <div class="control-group">
-	  <label class="control-label" for="prop-name">Port</label>
-	  <div class="controls">
-	   <?form&
-	     a=global_variable_update&
-	     actionParam_variable=ineo_nce_port&
-	     actionParam_persistent=1&
-	     class=form-inline&
-	     target=<@p@>&
-	     roid=nce&
-	   ?>
-	    <input type="text" value="<@~global("ineo_nce_port")@>" name="actionParam_value" />
-	    <button class="btn btn-warning" type="submit">Modifier</button>
-	   </form>
-	  </div>
-	 </div>
-	 <div class="control-group">
-	  <label class="control-label" for="prop-name">ID source de données</label>
-	  <div class="controls">
-	   <?form&
-	     a=global_variable_update&
-	     actionParam_variable=ineo_nce_datasource_id&
-	     actionParam_persistent=1&
-	     class=form-inline&
-	     target=<@p@>&
-	     roid=nce&
-	   ?>
-	    <input type="text" value="<@~global("ineo_nce_datasource_id")@>" name="actionParam_value" />
-	    <button class="btn btn-warning" type="submit">Modifier</button>
-	   </form>
-	  </div>
-	 </div>
-	 <div class="control-group">
-	  <label class="control-label" for="prop-name">Statut</label>
-	  <div class="controls">
-	  <?nce_status&
-	    template=
-	      <?if&cond=<@status=="connect"@>&then=Non connecté, tentative de connexion en cours...?>
-	      <?if&cond=<@status=="online"@>&then=Connecté?>
-	      <?if&cond=<@status=="offline"@>&then=Non connecté?>
-	  ?>
-	  </div>
-	 </div>
-	</div>&
-     else=
-     <?if&
-       cond=<@~decode_table(roid)==97@>&
-       then=<?object&roid=<@roid@>&additional_parameters=1&template=
-	<@tabs["properties"]=Propriétés@>
-	<@tabs["subscriptions"]=Abonnements@>
-	<@tab=<@tab?tab:"properties"@>@>
-
-	<ul class="nav nav-tabs"><{tabs&template=
-	 <li <@(tab==id)?" class=\"active\"":""@>><a href="#<@id@>" data-toggle="tab"><@value@></a></li>
-	}></ul>
-
-	<div class="tab-content">
-
-	<div class="tab-pane <@(tab=="properties")?"active":""@>" id="properties">
-
-	<?form&
-	  target=<@p@>&
-	  name=props&
-	  a=ObjectUpdate&
-	  actionParam_object_id=<@roid@>&
-	  roid=<@roid@>&
-	  tab=properties&
+    <ul class="nav nav-list well">
+      <li class="<@roid?"":"active"@>">
+        <?link&
+        target=<@p@>&
+        text=Serveurs connectés
+        <div class="pull-right" id="connection_add_link"><i class="icon-plus <@roid?"":"icon-white"@>"></i></div>&?>
+      </li>
+      <li class="tree_1<@(roid=="nce")?" active":""@>">
+        <?link&
+        target=<@p@>&
+        roid=nce&
+        text=<span class="status status-1">\&nbsp;</span>
+        <span data-content="name">NCE Inéo</span>?>
+      </li>
+<?vdv_servers_list&template=<{server&template=
+      <li class="tree_1<@(roid==id)?" active":""@>">
+        <?link&
+        target=<@p@>&
+        roid=<@id@>&
+        text=<span class="status status-1">\&nbsp;</span>
+        <span data-content="name"><@name?name:"(sans nom)"@> (VDV)</span>
+        <@(id==roid)?("<div class=\"pull-right\" id=\"connection_remove_link\" data-id=\""+ id +"\" data-placement=\"right\" data-toggle=\"tooltip\" title=\"Supprimer la connexion "+ name +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&?>
+      </li>
+}>?>
+<?imports&template=<{import&template=
+      <li class="tree_1<@(roid==id)?" active":""@>">
+        <?link&
+        target=<@p@>&
+        roid=<@id@>&
+        text=<span class="status status-<@active@>">\&nbsp;</span>
+        <span data-content="name"><@name?name:"(sans nom)"@> (<@file_format@>)</span>
+        <@(id==roid)?("<div class=\"pull-right\" id=\"connection_remove_link\" data-id=\""+ id +"\" data-placement=\"right\" data-toggle=\"tooltip\" title=\"Supprimer la connexion "+ name +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&?>
+      </li>
+}>?>
+    </ul>
+  </div>
+  <div class="span9">
+<?if&
+cond=<@roid=="nce"@>&
+then=
+    <div class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label" for="prop-name">Adresse</label>
+        <div class="controls">
+          <?form&
+          a=global_variable_update&
+          actionParam_variable=ineo_nce_host&
+          actionParam_persistent=1&
+          class=form-inline&
+          target=<@p@>&
+          roid=nce&
+          ?>
+            <input type="text" value="<@~global("ineo_nce_host")@>" name="actionParam_value" />
+            <button class="btn btn-warning" type="submit">Modifier</button>
+          </form>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="prop-name">Port</label>
+        <div class="controls">
+          <?form&
+          a=global_variable_update&
+          actionParam_variable=ineo_nce_port&
+          actionParam_persistent=1&
+          class=form-inline&
+          target=<@p@>&
+          roid=nce&
+          ?>
+            <input type="text" value="<@~global("ineo_nce_port")@>" name="actionParam_value" />
+            <button class="btn btn-warning" type="submit">Modifier</button>
+          </form>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="prop-name">ID source de données</label>
+        <div class="controls">
+          <?form&
+          a=global_variable_update&
+          actionParam_variable=ineo_nce_datasource_id&
+          actionParam_persistent=1&
+          class=form-inline&
+          target=<@p@>&
+          roid=nce&
+          ?>
+            <input type="text" value="<@~global("ineo_nce_datasource_id")@>" name="actionParam_value" />
+            <button class="btn btn-warning" type="submit">Modifier</button>
+          </form>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="prop-name">Statut</label>
+        <div class="controls">
+	<?nce_status&
+	template=
+		<?if&cond=<@status=="connect"@>&then=Non connecté, tentative de connexion en cours...?>
+		<?if&cond=<@status=="online"@>&then=Connecté?>
+		<?if&cond=<@status=="offline"@>&then=Non connecté?>
 	?>
-	<table class="table table-striped table-condensed">
-	 <tr>
-	  <td>Nom</td>
-	  <td><input type="text" value="<@name@>" name="actionParam_field_name" /></td>
-	 </tr><tr>
-	  <td>Adresse</td>
-	  <td><input type="text" value="<@address@>" name="actionParam_field_address" /></td>
-	 </tr><tr>
-	  <td>Port</td>
-	  <td><input type="text" value="<@port@>" name="actionParam_field_port" /></td>
-	 </tr><tr>
-	  <td>Code du serveur</td>
-	  <td><input type="text" value="<@server_control_centre_code@>" name="actionParam_field_server_control_centre_code" /></td>
-	 </tr><tr>
-	  <td>Code du client</td>
-	  <td><input type="text" value="<@client_control_centre_code@>" name="actionParam_field_client_control_centre_code" /></td>
-	 </tr><tr>
-	  <td>URL du service</td>
-	  <td><input type="text" value="<@service_url@>" name="actionParam_field_service_url" /></td>
-	 </tr><tr>
-	  <td>Code du service</td>
-	  <td><input type="text" value="<@service_code@>" name="actionParam_field_service_code" /></td>
-	 </tr><tr>
-	  <td>Couper les identifiants d'abonnement</td>
-	  <td>
-	   <label class="radio inline"><input type="radio" name="actionParam_cut_abo_id" value="1" <@cut_abo_id?"checked=\"true\"":""@> is_parameter="true" /> OUI</label>
-	   <label class="radio inline"><input type="radio" name="actionParam_cut_abo_id" value="0" <@cut_abo_id?"":"checked=\"true\""@> is_parameter="true" /> NON</label>
-	  </td>
-	 </tr><tr>
-	  <td>Source de données</td>
-	  <td>
-	   <select name="actionParam_field_data_source_id">
-	    <option<@(0==data_source_id)?" selected=\"true\"":""@>>(aucune)</option>
-	    <?data_sources&template=<{data_source&template=
-	    	<option<@(id==data_source_id)?" selected=\"true\"":""@> value=<@id@>><@name@></option>
-	    }>?>
-	   </select>
-	  </td>
-	 </tr><tr>
-	  <td>Source des données plannifiées</td>
-	  <td>
-	   <select name="actionParam_field_planned_datasource_id">
-	    <option<@(0==planned_datasource_id)?" selected=\"true\"":""@>>(aucune)</option>
-	    <?data_sources&template=<{data_source&template=
-	    	<option<@(id==planned_datasource_id)?" selected=\"true\"":""@> value=<@id@>><@name@></option>
-	    }>?>
-	   </select>
-	  </td>
-	 </tr><tr>
-	  <td>Répertoire de log (trace)</td>
-	  <td><input type="text" value="<@trace_path@>" name="actionParam_field_trace_path" /></td>
-	 </tr><tr>
-	  <td></td>
-	  <td><button type="submit" class="btn btn-warning">Enregistrer</button></td>
-	 </tr>	 
-	</table>
-	</form>
-
-	</div>
-	<div class="tab-pane <@(tab=="subscriptions")?"active":""@>" id="subscriptions">
-	
-	<?form&
-	  target=/client/vdv/subscription&
-	  name=add_subscription&
-	  a=ObjectCreate&
-	  actionParam_table_id=98&
-	  actionParam_field_vdv_server_id=<@roid@>&
-	  co=1&
+        </div>
+      </div>
+    </div>&
+else=
+	<?if&
+	cond=<@~decode_table(roid)==97@>&
+	then=
+		<?object&roid=<@roid@>&additional_parameters=1&template=
+			<@tabs["properties"]=Propriétés@>
+			<@tabs["subscriptions"]=Abonnements@>
+			<@tab=<@tab?tab:"properties"@>@>
+    <ul class="nav nav-tabs">
+			<{tabs&template=
+      <li <@(tab==id)?" class=\"active\"":""@>><a href="#<@id@>" data-toggle="tab"><@value@></a></li>
+			}>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane <@(tab=="properties")?"active":""@>" id="properties">
+        <?form&
+        target=<@p@>&
+        name=props&
+        a=ObjectUpdate&
+        actionParam_object_id=<@roid@>&
+        roid=<@roid@>&
+        tab=properties&
+        ?>
+          <table class="table table-striped table-condensed">
+            <tr>
+              <td>Nom</td>
+              <td><input type="text" value="<@name@>" name="actionParam_field_name" /></td>
+            </tr>
+            <tr>
+              <td>Adresse</td>
+              <td><input type="text" value="<@address@>" name="actionParam_field_address" /></td>
+            </tr>
+            <tr>
+              <td>Port</td>
+              <td><input type="text" value="<@port@>" name="actionParam_field_port" /></td>
+            </tr>
+            <tr>
+              <td>Code du serveur</td>
+              <td><input type="text" value="<@server_control_centre_code@>" name="actionParam_field_server_control_centre_code" /></td>
+            </tr>
+            <tr>
+              <td>Code du client</td>
+              <td><input type="text" value="<@client_control_centre_code@>" name="actionParam_field_client_control_centre_code" /></td>
+            </tr>
+            <tr>
+              <td>URL du service</td>
+              <td><input type="text" value="<@service_url@>" name="actionParam_field_service_url" /></td>
+            </tr>
+            <tr>
+              <td>Code du service</td>
+              <td><input type="text" value="<@service_code@>" name="actionParam_field_service_code" /></td>
+            </tr>
+            <tr>
+              <td>Couper les identifiants d'abonnement</td>
+              <td>
+                <label class="radio inline"><input type="radio" name="actionParam_cut_abo_id" value="1" <@cut_abo_id?"checked=\"true\"":""@> is_parameter="true" /> OUI</label>
+                <label class="radio inline"><input type="radio" name="actionParam_cut_abo_id" value="0" <@cut_abo_id?"":"checked=\"true\""@> is_parameter="true" /> NON</label>
+              </td>
+            </tr>
+            <tr>
+              <td>Source de données</td>
+              <td>
+                <select name="actionParam_field_data_source_id">
+                  <option<@(0==data_source_id)?" selected=\"true\"":""@>>(aucune)</option>
+			<?data_sources&template=<{data_source&template=
+                  <option<@(id==data_source_id)?" selected=\"true\"":""@> value=<@id@>><@name@></option>
+			}>?>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Source des données plannifiées</td>
+              <td>
+                <select name="actionParam_field_planned_datasource_id">
+                  <option<@(0==planned_datasource_id)?" selected=\"true\"":""@>>(aucune)</option>
+			<?data_sources&template=<{data_source&template=
+                  <option<@(id==planned_datasource_id)?" selected=\"true\"":""@> value=<@id@>><@name@></option>
+			}>?>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Répertoire de log (trace)</td>
+              <td><input type="text" value="<@trace_path@>" name="actionParam_field_trace_path" /></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td><button type="submit" class="btn btn-warning">Enregistrer</button></td>
+            </tr>	 
+          </table>
+        </form>
+      </div>
+      <div class="tab-pane <@(tab=="subscriptions")?"active":""@>" id="subscriptions">
+        <?form&
+        target=/client/vdv/subscription&
+        name=add_subscription&
+        a=ObjectCreate&
+        actionParam_table_id=98&
+        actionParam_field_vdv_server_id=<@roid@>&
+        co=1&
+        ?>
+          <table class="table table-striped table-condensed">
+            <thead>
+              <tr><th></th><th>nom</th><th>arrêt</th><th>statut</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr class="warning">
+                <td></td>
+                <td><input type="text" name="actionParam_field_name" /></td>
+                <td>
+                  <select name="actionParam_field_stop_area_id">
+			<?StopAreasListFunction&
+			data_source_filter=<@data_source_id@>&
+			template=<{stopArea&template=
+                    <option<@(stop_id==stop_area_id)?" selected=\"true\"":""@> value="<@stop_id@>"><@stop_name@></option>
+			}>?>
+                  </select>
+                </td>
+                <td></td>
+                <td>
+                  <button type="submit" class="btn btn-warning">Ajouter</button>
+                </td>
+              </tr>
+			<{subscription&template=
+              <tr>
+                <td>
+                  <?link&
+                  target=/client/vdv/subscription&
+                  roid=<@id@>&
+                  text=Ouvrir&
+                  class=btn btn-mini btn-primary&?>
+                </td>
+                <td><@name@></td>
+                <td>
+				<?StopAreasListFunction&
+				template=<{stopArea&template=
+					<?if&cond=<@stop_id==stop_area_id@>&then=
+                  <@stop_name@>
+					?>
+				}>?>
+                </td>
+                <td>
+                  <span class="label label-<@online?"success":"important"@>"><@online?"Actif":"Inactif"@></span>
+                </td>
+                <td>
+                  <?link&
+                  target=<@p@>&
+                  a=RemoveObjectAction&
+                  actionParamoi=<@id@>&
+                  roid=<@roid@>&
+                  tab=subscriptions&
+                  text=Supprimer&
+                  confirm=Etes-vous sûr de vouloir supprimer l'abonnement ?&
+                  class=btn btn-mini btn-danger&?>
+                </td>
+              </tr>
+			}>
+            </tbody>
+          </table>
+        </form>
+      </div>
+    </div>
+		?>
 	?>
-	<table class="table table-striped table-condensed"><thead>
-	 <tr><th></th><th>nom</th><th>arrêt</th><th>statut</th><th></th></tr>
-	</thead><tbody>
-	 <tr class="warning">
-	  <td></td>
-	  <td><input type="text" name="actionParam_field_name" /></td>
-	  <td>
-	   <select name="actionParam_field_stop_area_id">
-	    <?StopAreasListFunction&
-		  data_source_filter=<@data_source_id@>&
-	      template=<{stopArea&template=
-	  	<option<@(stop_id==stop_area_id)?" selected=\"true\"":""@> value="<@stop_id@>"><@stop_name@></option>
-	    }>?>
-	   </select>
-	  </td>
-	  <td></td>
-	  <td>
-	   <button type="submit" class="btn btn-warning">Ajouter</button>
-	  </td>
-	 </tr>
-	 <{subscription&template=
-	 	<tr>
-	 	 <td>
-	 	  <?link&
-	 	    target=/client/vdv/subscription&
-	 	    roid=<@id@>&
-	 	    text=Ouvrir&
-	 	    class=btn btn-mini btn-primary&
-	 	  ?>
-	 	 </td>
-	 	 <td><@name@></td>
-	 	 <td>
-		  <?StopAreasListFunction&
-		    template=<{stopArea&template=<?if&cond=<@stop_id==stop_area_id@>&then=
-		    	<@stop_name@>
-		    ?>}>
-		  ?>
-	 	 </td><td>
-	 	  <span class="label label-<@online?"success":"important"@>"><@online?"Actif":"Inactif"@></span>
-	 	 </td><td>
-	 	  <?link&
-	 	    target=<@p@>&
-	 	    a=RemoveObjectAction&
-	 	    actionParamoi=<@id@>&
-	 	    roid=<@roid@>&
-	 	    tab=subscriptions&
-	 	    text=Supprimer&
-	 	    confirm=Etes-vous sûr de vouloir supprimer l'abonnement ?&
-	 	    class=btn btn-mini btn-danger&
-	 	  ?>
-	 	 </td>
-	 	</tr>
-	 }>
-	</tbody></table>
-
-	
-	</div>
-	</div>
-
-       
-     ?>?>
-     <?if&
-       cond=<@~decode_table(roid)==105@>&
-       then=
-       
-        <@import:=<?object&roid=<@roid@>&additional_parameters=1?>@>
-	
-	<@tabs["properties"]=Propriétés@>
-	<@tabs["parameters"]=Paramètres par défaut@>
-	<@tabs["run"]=Exécution@>
-	<@tabs["doc"]=Documentation@>
-	<@tabs["format"]=Format@>
-	<@tab=<@tab?tab:"properties"@>@>
-	
-	<ul class="nav nav-tabs"><{tabs&template=
-	 <li <@(tab==id)?" class=\"active\"":""@>><a href="#<@id@>" data-toggle="tab"><@value@></a></li>
-	}></ul>
-
-	<div class="tab-content">
-	<div class="tab-pane <@(tab=="properties")?"active":""@>" id="properties">
-	 <?form&
-	   target=<@p@>&
-	   a=ObjectUpdate&
-	   actionParam_object_id=<@import.id@>&
-	   roid=<@import.id@>&
-	   class=form-horizontal&
-	   tab=properties&
-	 ?>
-	  <div class="control-group">
-	   <label class="control-label">Type</label>
-	   <div class="controls"><@import.file_format@></div>
-	  </div>
-	  <div class="control-group">
-	   <label class="control-label">Nom</label>
-	   <div class="controls"><input type="text" class="input-medium" name="actionParam_field_name" value="<@import.name@>" /></div>
-	  </div>
-	     <div class="control-group">
-	      <label class="control-label">Système d'identifiants</label>
-	      <div class="controls">
-	       <select name="actionParam_field_data_source_id">
-	      	<option value="" <@import.data_source_id?"":"selected=\"true\""@>>(non défini)</option>
-	        <?data_sources&template=<{data_source&template=
-	        	<option value="<@id@>" <@(id==import.data_source_id)?"selected=\"true\"":""@>><@name@></option>
-	        }>?>
-	       </select>
-	      </div>
-	     </div>
-		  <div class="control-group">
-	   <label class="control-label">Import automatique actif</label>
-	   <div class="controls">
-	    <select name="actionParam_field_active" class="input-small">
-	     <option value="1" <@import.active?"selected\=\"true\"":""@>>OUI</option>
-	     <option value="0" <@import.active?"":"selected=\"true\""@>>NON</option>
-	    </select>
-	   </div>
-	  </div>
-	  <?if&cond=<@import.active@>&then=
-		  <div class="control-group">
-		   <label class="control-label">Secondes entre imports</label>
-		   <div class="controls">
-		    <input type="text" class="input-mini" name="actionParam_field_auto_import_delay" value="<@import.auto_import_delay@>" />
-		   </div>
-		  </div>
-	  	  <div class="control-group">
-		   <label class="control-label">Import à heure fixe</label>
-		   <div class="controls">
-		    <input type="text" class="input-mini" name="actionParam_field_auto_import_time" value="<@import.auto_import_time@>" />
-		   </div>
-		  </div>
-	  ?>
-	  <div class="control-group">
-	   <label class="control-label">Emplacement des logs</label>
-	   <div class="controls"><input type="text" class="input-medium" name="actionParam_field_log_path" value="<@import.log_path@>" /></div>
-	  </div><div class="control-group">
-	   <label class="control-label">Niveau minimum de log</label>
-	   <div class="controls">
- 	    <select name="actionParam_field_min_log_level">
-	     <option value="0" <@(import.min_log_level==0)?"selected=\"selected\"":""@>>Tous</option>
-	     <option value="10" <@(import.min_log_level==10)?"selected=\"selected\"":""@>>Debug</option>
-	     <option value="20" <@(import.min_log_level==20)?"selected=\"selected\"":""@>>Load</option>
-	     <option value="25" <@(import.min_log_level==25)?"selected=\"selected\"":""@>>Création</option>
-	     <option value="30" <@(import.min_log_level==30)?"selected=\"selected\"":""@>>Information</option>
-	     <option value="40" <@(import.min_log_level==40)?"selected=\"selected\"":""@>>Attention</option>
-	     <option value="50" <@(import.min_log_level==50)?"selected=\"selected\"":""@>>Notifications</option>
-	     <option value="60" <@(import.min_log_level==60)?"selected=\"selected\"":""@>>Erreur</option>
-	     <option value="99" <@(import.min_log_level==99)?"selected=\"selected\"":""@>>Pas de log</option>
-	    </select>
-	   </div>
-	   <div class="control-group">
-	   <label class="control-label">Interdire l'exécution</label>
-	   <div class="controls">
-	    <select name="actionParam_field_forbidden" class="input-small">
-	     <option value="1" <@import.forbidden?"selected\=\"true\"":""@>>OUI</option>
-	     <option value="0" <@import.forbidden?"":"selected=\"true\""@>>NON</option>
-	    </select>
-	   </div>
-	  </div>
-	  </div><div class="control-group">
-	   <div class="controls"><button class="btn btn-warning">Enregistrer</button></div>
-	  </div>
-		 
-	 </form>
-
-	</div><div class="tab-pane <@(tab=="parameters")?"active":""@>" id="parameters">
-	 <?form&
-	   target=<@p@>&
-	   name=update_parameters&
-	   a=ObjectUpdate&
-	   actionParam_object_id=<@import.id@>&
-	   roid=<@import.id@>&
-	   class=form-horizontal&
-	   tab=parameters&
-	   actionParam_field_parameters=<@parameters@>&
-	   form_id=update_parameters&
-	 ?>
-	  <#formats/<@import.file_format@>/form&for=template#>
-	  <div class="control-group">
-	   <div class="controls"><button class="btn btn-warning">Enregistrer</button></div>
-	  </div>
-	 </form>
-	</div><div class="tab-pane <@(tab=="run")?"active":""@>" id="run">
-	
-	 <?if&cond=<@run_import@>&then=
-	   <div class="well">
-	    <h3>Résultat de l'exécution<@(run_import==1)?" (simulation)":""@></h3>
-	    
-	    <@result:=<?ImportFunction&
-	      import_id=<@import.id@>&
-	      di=<@run_import-1@>&
-	      repeat_parameters=1&
-	      output_logs=1&
-	    ?>@>
-	    
-    	    <p>Heure de démarrage : <@result.import_start_time@> - Heure de fin : <@result.import_end_time@><br />
-    	    Statut : <@result.success?"Réussi":"Echec"@> - Simulation : <@(run_import-1)?"NON":"OUI"@></p>
-	    
-	   </div>
-	 ?>
-	
-	 <?form&
-	   target=<@p@>&
-	   roid=<@import.id@>&
-	   class=form-horizontal&
-	   tab=run&
-	 ?>
-	  <#formats/<@import.file_format@>/form&for=execution#>
-	  <div class="control-group">
-	   <label class="control-label">Simulation</label>
-	   <div class="controls">
-	    <label class="radio inline"><input name="run_import" type="radio" value="1" checked="true" /> OUI</label>
-	    <label class="radio inline"><input name="run_import" type="radio" value="2" /> NON</label>
-	   </div>
-	  </div>
-	  <div class="control-group">
-	   <label class="control-label">Niveau de log</label>
-	   <div class="controls">
-	    <?if&cond=<@min_log_level==""@>&then=<@min_log_level=import.min_log_level@>?>
-	    <select name="min_log_level">
-	     <option value="0" <@(min_log_level==0)?"selected=\"selected\"":""@>>Tous</option>
-	     <option value="10" <@(min_log_level==10)?"selected=\"selected\"":""@>>Debug</option>
-	     <option value="20" <@(min_log_level==20)?"selected=\"selected\"":""@>>Load</option>
-	     <option value="25" <@(min_log_level==25)?"selected=\"selected\"":""@>>Création</option>
-	     <option value="30" <@(min_log_level==30)?"selected=\"selected\"":""@>>Information</option>
-	     <option value="40" <@(min_log_level==40)?"selected=\"selected\"":""@>>Attention</option>
-	     <option value="50" <@(min_log_level==50)?"selected=\"selected\"":""@>>Notifications</option>
-	     <option value="60" <@(min_log_level==60)?"selected=\"selected\"":""@>>Erreur</option>
-	     <option value="99" <@(min_log_level==99)?"selected=\"selected\"":""@>>Pas de log</option>
-	    </select>
-	   </div>
-	  </div>
-	  <div class="control-group">
-	   <div class="controls"><button class="btn btn-danger">Exécuter import</button></div>
-	  </div>
-	 </form>
-	 
- 	 <?if&cond=<@run_import@>&then=
-	   <div class="well">
-	    <h3>Journal d'import</h3>
-	    
-    	    <p>Heure de démarrage : <@result.import_start_time@> - Heure de fin : <@result.import_end_time@><br />
-    	    Statut : <@result.success?"Réussi":"Echec"@> - Simulation : <@(run_import-1)?"NON":"OUI"@></p>
-	    
-	    <?if&cond=<@exceptions@>&then=
-	  	<div class="alert"><strong>Exception</strong> <@exceptions@></div>
-	    ?>
-	    
-	    <table class="table table-condensed table-striped">
-	    <{result.log_entry&template=
-	    	<tr><td class="log_<@level@>"><@level@></td><td><@text@></td></tr>
-	    }></table>
-
-	   </div>
-	 ?>
-
-	</div><div class="tab-pane <@(tab=="doc")?"active":""@>" id="doc">
-	
-	 <div>
-	  <div class="pull-right btn btn-warning" id="doc_switch">Modifier</div>
-	  <div class="pull-right btn btn-primary" style="display:none" id="doc_cancel">Annuler</div>
-	  <div id="doc_view"><@documentation@></div>
-	  <div id="doc_edit" style="display:none"><textarea id="mce_editor" class="mceEditor" save_url="/connect?a=ObjectUpdate\&actionParam_object_id=<@roid@>\&co=0\&nr=1"><@documentation@></textarea></div>
-	 </div>
-
-	</div><div class="tab-pane <@(tab=="format")?"active":""@>" id="format">
-	
-	 <#formats/<@file_format@>/doc#>
-	 
-	</div></div>
-	
-	<script type="text/javascript" src="/lib/tiny_mce/tiny_mce.js"></script>
-	<script type="text/javascript" src="/connect/js/import.js"></script>
-
-     ?>?>
-   
+	<?if&
+	cond=<@~decode_table(roid)==105@>&
+	then=
+		<@import:=<?object&roid=<@roid@>&additional_parameters=1?>@>
+		<@tabs["properties"]=Propriétés@>
+		<@tabs["parameters"]=Paramètres par défaut@>
+		<@tabs["run"]=Exécution@>
+		<@tabs["doc"]=Documentation@>
+		<@tabs["format"]=Format@>
+		<@tab=<@tab?tab:"properties"@>@>
+    <ul class="nav nav-tabs">
+		<{tabs&template=
+      <li <@(tab==id)?" class=\"active\"":""@>><a href="#<@id@>" data-toggle="tab"><@value@></a></li>
+		}>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane <@(tab=="properties")?"active":""@>" id="properties">
+        <?form&
+        target=<@p@>&
+        a=ObjectUpdate&
+        actionParam_object_id=<@import.id@>&
+        roid=<@import.id@>&
+        class=form-horizontal&
+        tab=properties&
+        ?>
+          <div class="control-group">
+            <label class="control-label">Type</label>
+            <div class="controls"><@import.file_format@></div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Nom</label>
+            <div class="controls">
+              <input type="text" class="input-medium" name="actionParam_field_name" value="<@import.name@>" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Système d'identifiants</label>
+            <div class="controls">
+              <select name="actionParam_field_data_source_id">
+                <option value="" <@import.data_source_id?"":"selected=\"true\""@>>(non défini)</option>
+		<?data_sources&template=<{data_source&template=
+                <option value="<@id@>" <@(id==import.data_source_id)?"selected=\"true\"":""@>><@name@></option>
+		}>?>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Import automatique actif</label>
+            <div class="controls">
+              <select name="actionParam_field_active" class="input-small">
+                <option value="1" <@import.active?"selected\=\"true\"":""@>>OUI</option>
+                <option value="0" <@import.active?"":"selected=\"true\""@>>NON</option>
+              </select>
+            </div>
+          </div>
+		<?if&cond=<@import.active@>&then=
+          <div class="control-group">
+            <label class="control-label">Secondes entre imports</label>
+            <div class="controls">
+              <input type="text" class="input-mini" name="actionParam_field_auto_import_delay" value="<@import.auto_import_delay@>" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Import à heure fixe</label>
+            <div class="controls">
+              <input type="text" class="input-mini" name="actionParam_field_auto_import_time" value="<@import.auto_import_time@>" />
+            </div>
+          </div>
+		?>
+          <div class="control-group">
+            <label class="control-label">Emplacement des logs</label>
+            <div class="controls"><input type="text" class="input-medium" name="actionParam_field_log_path" value="<@import.log_path@>" /></div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Niveau minimum de log</label>
+            <div class="controls">
+              <select name="actionParam_field_min_log_level">
+                <option value="0" <@(import.min_log_level==0)?"selected=\"selected\"":""@>>Tous</option>
+                <option value="10" <@(import.min_log_level==10)?"selected=\"selected\"":""@>>Debug</option>
+                <option value="20" <@(import.min_log_level==20)?"selected=\"selected\"":""@>>Load</option>
+                <option value="25" <@(import.min_log_level==25)?"selected=\"selected\"":""@>>Création</option>
+                <option value="30" <@(import.min_log_level==30)?"selected=\"selected\"":""@>>Information</option>
+                <option value="40" <@(import.min_log_level==40)?"selected=\"selected\"":""@>>Attention</option>
+                <option value="50" <@(import.min_log_level==50)?"selected=\"selected\"":""@>>Notifications</option>
+                <option value="60" <@(import.min_log_level==60)?"selected=\"selected\"":""@>>Erreur</option>
+                <option value="99" <@(import.min_log_level==99)?"selected=\"selected\"":""@>>Pas de log</option>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Interdire l'exécution</label>
+            <div class="controls">
+              <select name="actionParam_field_forbidden" class="input-small">
+                <option value="1" <@import.forbidden?"selected\=\"true\"":""@>>OUI</option>
+                <option value="0" <@import.forbidden?"":"selected=\"true\""@>>NON</option>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="controls"><button class="btn btn-warning">Enregistrer</button></div>
+          </div>
+        </form>
+      </div>
+      <div class="tab-pane <@(tab=="parameters")?"active":""@>" id="parameters">
+        <?form&
+        target=<@p@>&
+        name=update_parameters&
+        a=ObjectUpdate&
+        actionParam_object_id=<@import.id@>&
+        roid=<@import.id@>&
+        class=form-horizontal&
+        tab=parameters&
+        actionParam_field_parameters=<@parameters@>&
+        form_id=update_parameters&
+        ?>
+		<#formats/<@import.file_format@>/form&for=template#>
+          <div class="control-group">
+            <div class="controls"><button class="btn btn-warning">Enregistrer</button></div>
+          </div>
+        </form>
+      </div>
+      <div class="tab-pane <@(tab=="run")?"active":""@>" id="run">
+		<?if&cond=<@run_import@>&then=
+        <div class="well">
+          <h3>Résultat de l'exécution<@(run_import==1)?" (simulation)":""@></h3>
+			<@result:=<?ImportFunction&
+			import_id=<@import.id@>&
+			di=<@run_import-1@>&
+			repeat_parameters=1&
+			output_logs=1&
+			?>@>
+          <p>Heure de démarrage : <@result.import_start_time@> - Heure de fin : <@result.import_end_time@><br />
+          Statut : <@result.success?"Réussi":"Echec"@> - Simulation : <@(run_import-1)?"NON":"OUI"@></p>
+        </div>
+		?>
+        <?form&
+        target=<@p@>&
+        roid=<@import.id@>&
+        class=form-horizontal&
+        tab=run&
+        ?>
+		<#formats/<@import.file_format@>/form&for=execution#>
+          <div class="control-group">
+            <label class="control-label">Simulation</label>
+            <div class="controls">
+              <label class="radio inline"><input name="run_import" type="radio" value="1" checked="true" /> OUI</label>
+              <label class="radio inline"><input name="run_import" type="radio" value="2" /> NON</label>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Niveau de log</label>
+            <div class="controls">
+		<?if&cond=<@min_log_level==""@>&then=<@min_log_level=import.min_log_level@>?>
+              <select name="min_log_level">
+                <option value="0" <@(min_log_level==0)?"selected=\"selected\"":""@>>Tous</option>
+                <option value="10" <@(min_log_level==10)?"selected=\"selected\"":""@>>Debug</option>
+                <option value="20" <@(min_log_level==20)?"selected=\"selected\"":""@>>Load</option>
+                <option value="25" <@(min_log_level==25)?"selected=\"selected\"":""@>>Création</option>
+                <option value="30" <@(min_log_level==30)?"selected=\"selected\"":""@>>Information</option>
+                <option value="40" <@(min_log_level==40)?"selected=\"selected\"":""@>>Attention</option>
+                <option value="50" <@(min_log_level==50)?"selected=\"selected\"":""@>>Notifications</option>
+                <option value="60" <@(min_log_level==60)?"selected=\"selected\"":""@>>Erreur</option>
+                <option value="99" <@(min_log_level==99)?"selected=\"selected\"":""@>>Pas de log</option>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="controls"><button class="btn btn-danger">Exécuter import</button></div>
+          </div>
+        </form>
+		<?if&cond=<@run_import@>&then=
+        <div class="well">
+          <h3>Journal d'import</h3>
+          <p>Heure de démarrage : <@result.import_start_time@> - Heure de fin : <@result.import_end_time@><br />
+          Statut : <@result.success?"Réussi":"Echec"@> - Simulation : <@(run_import-1)?"NON":"OUI"@></p>
+			<?if&cond=<@exceptions@>&then=
+          <div class="alert"><strong>Exception</strong> <@exceptions@></div>
+			?>
+          <table class="table table-condensed table-striped">
+			<{result.log_entry&template=
+            <tr><td class="log_<@level@>"><@level@></td><td><@text@></td></tr>
+			}>
+          </table>
+        </div>
+		?>
+      </div>
+      <div class="tab-pane <@(tab=="doc")?"active":""@>" id="doc">
+        <div>
+          <div class="pull-right btn btn-warning" id="doc_switch">Modifier</div>
+          <div class="pull-right btn btn-primary" style="display:none" id="doc_cancel">Annuler</div>
+          <div id="doc_view"><@documentation@></div>
+          <div id="doc_edit" style="display:none"><textarea id="mce_editor" class="mceEditor" save_url="/connect?a=ObjectUpdate\&actionParam_object_id=<@roid@>\&co=0\&nr=1"><@documentation@></textarea></div>
+        </div>
+      </div>
+      <div class="tab-pane <@(tab=="format")?"active":""@>" id="format">
+		<#formats/<@file_format@>/doc#>
+      </div>
+    </div>
+    <script type="text/javascript" src="/lib/tiny_mce/tiny_mce.js"></script>
+    <script type="text/javascript" src="/connect/js/import.js"></script>
+	?>
+?>
   </div>
 </div>
 
 
 <div id="new_connection" class="modal hide fade">
- <div class="modal-header">
-  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-  <h3>Nouvelle connexion</h3>
- </div>
- <div class="modal-body">
-  <ul class="nav nav-tabs">
-   <li class="active"><a href="#vdv" data-toggle="tab">VDV</a></li>
-   <li><a href="#import" data-toggle="tab">Import</a></li>
-  </ul>
-  <div class="tab-content">
-   <div class="tab-pane active" id="vdv">
-   
-    <?form&
-      name=new_vdv&
-      target=<@p@>&
-      a=ObjectCreate&
-      actionParam_table_id=97&
-      class=form-horizontal&
-      co=1&
-    ?>
-     <div class="control-group">
-      <label class="control-label">Nom</label>
-      <div class="controls"><input type="text" class="input-medium" name="actionParam_field_name" /></div>
-     </div>
-     <div class="control-group">
-      <div class="controls">
-       <button type="submit" class="btn btn-warning">Ajouter</button>
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Nouvelle connexion</h3>
+  </div>
+  <div class="modal-body">
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#vdv" data-toggle="tab">VDV</a></li>
+      <li><a href="#import" data-toggle="tab">Import</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="vdv">
+        <?form&
+        name=new_vdv&
+        target=<@p@>&
+        a=ObjectCreate&
+        actionParam_table_id=97&
+        class=form-horizontal&
+        co=1&
+        ?>
+          <div class="control-group">
+            <label class="control-label">Nom</label>
+            <div class="controls"><input type="text" class="input-medium" name="actionParam_field_name" /></div>
+          </div>
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-warning">Ajouter</button>
+            </div>
+          </div>
+        </form>
       </div>
-     </div>
-    </form>
-   </div>
-
-   <div class="tab-pane" id="import">
-    <?form&
+      <div class="tab-pane" id="import">
+      <?form&
       name=new_import&
       target=<@p@>&
       a=ObjectCreate&
@@ -522,58 +516,61 @@
       class=form-horizontal&
       co=1&
       form_id=new_import_form&
-    ?>
-     <div class="control-group">
-      <label class="control-label">Nom</label>
-      <div class="controls"><input type="text" class="input-medium" name="actionParam_field_name" /></div>
-     </div><div class="control-group">
-      <label class="control-label">Type de connexion</label>
-      <div class="controls">
-       <select name="actionParam_field_file_format">
-        <?file_formats&template=<{format&template=
-        	<option value="<@key@>"><@key@></option>
-        }>?>
-       </select>
-      </div>
-     </div>
-     <div class="control-group">
-      <div class="controls">
-       <button type="submit" class="btn btn-warning">Ajouter</button>
-      </div>
-     </div>
-    </form>
-    <script>
-     $('#new_import_form').submit(function(){
-      return true;
-     });
-    </script>
-   </div>
-
+      ?>
+        <div class="control-group">
+          <label class="control-label">Nom</label>
+          <div class="controls"><input type="text" class="input-medium" name="actionParam_field_name" /></div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Type de connexion</label>
+          <div class="controls">
+            <select name="actionParam_field_file_format">
+<?file_formats&template=<{format&template=
+              <option value="<@key@>"><@key@></option>
+}>?>
+            </select>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <button type="submit" class="btn btn-warning">Ajouter</button>
+          </div>
+        </div>
+      </form>
+      <script>
+$('#new_import_form').submit(function(){
+  return true;
+});
+      </script>
+    </div>
   </div>
- </div>
- <div class="modal-footer">
-  <a href="#" data-dismiss="modal" class="btn btn-primary">Fermer</a>
- </div>
+  <div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn btn-primary">Fermer</a>
+  </div>
 </div>
 
-		<div class="hide modal fade" id="connection_remove_modal">
-		   <?form&
-		     name=connection_remove&
-		     target=<@p@>&
-		     a=RemoveObjectAction&
-		     actionParam_object_id=<@roid@>&
-		   ?>
-		   <div class="modal-header">
-		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
-		    <h3>Confirmation de suppression</h3>
-		   </div><div class="modal-body">
-		    <p>Etes-vous sûr de vouloir supprimer la connexiom <@name@> ?</p>
-		    <p>Note : cela ne supprimera pas les objets qui ont été importées avec celle-ci.</p>
-		   </div><div class="modal-footer">
-		    <button type="submit" class="btn btn-danger">Oui</button>
-		    <a href="#" class="btn btn-primary" data-dismiss="modal">Non</a>
-		   </div>
-		   </form>
-		</div>
+
+<div class="hide modal fade" id="connection_remove_modal">
+  <?form&
+  name=connection_remove&
+  target=<@p@>&
+  a=RemoveObjectAction&
+  actionParam_object_id=<@roid@>&
+  ?>
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
+      <h3>Confirmation de suppression</h3>
+    </div>
+    <div class="modal-body">
+      <p>Etes-vous sûr de vouloir supprimer la connexiom <@name@> ?</p>
+      <p>Note : cela ne supprimera pas les objets qui ont été importées avec celle-ci.</p>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-danger">Oui</button>
+      <a href="#" class="btn btn-primary" data-dismiss="modal">Non</a>
+    </div>
+  </form>
+</div>
+
 
 <script src="/connect/js/client.js"></script>
