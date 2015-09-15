@@ -355,15 +355,17 @@ BOOST_AUTO_TEST_CASE (scheduledVScontinuous)
 	//
 
 	vector<boost::shared_ptr<TestScheduledService> > tssVector;
+	int cptss(0);
 	for(time_duration t(0,0,0); t < hours(11); t+=hours(1))
 	{
-		tssVector.push_back(boost::shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp1, t)));
+		tssVector.push_back(boost::shared_ptr<TestScheduledService>(new TestScheduledService(cptss, "", jp1, t)));
+		cptss++;
 	}
-	tssVector.push_back(boost::shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp1, time_duration(8, 15, 0))));
+	tssVector.push_back(boost::shared_ptr<TestScheduledService>(new TestScheduledService(cptss, "", jp1, time_duration(8, 15, 0))));
 	// The schedules of the non priority continuous line CL2
-	TestContinuousService tcs2(0, "CONT1", jp2, time_duration(2,30,0), time_duration(1,0,0));
-	TestContinuousService tc32(1, "CONT2", jp2, time_duration(4,30,0), time_duration(2,0,0));
-	TestContinuousService tc33(1, "CONT3", jp2, time_duration(7,30,0), time_duration(2,0,0));
+	TestContinuousService tcs2(100, "CONT1", jp2, time_duration(2,30,0), time_duration(1,0,0));
+	TestContinuousService tc32(101, "CONT2", jp2, time_duration(4,30,0), time_duration(2,0,0));
+	TestContinuousService tc33(102, "CONT3", jp2, time_duration(7,30,0), time_duration(2,0,0));
 
 
 	AlgorithmLogger logger;
@@ -519,7 +521,7 @@ BOOST_AUTO_TEST_CASE (continuousVScontinuous)
 
 	JourneyPattern jp2;
 	CommercialLine cl2;
-	cl1.addPath(&jp2);
+	cl2.addPath(&jp2);
 	cl2.setShortName("CONTI2");
 	jp2.setCommercialLine(&cl2);
 	TestJourney tj2(jp2, testAreaMap);
@@ -536,8 +538,8 @@ BOOST_AUTO_TEST_CASE (continuousVScontinuous)
 	TestContinuousService tcs1(0, "CONTI1/1", jp1, time_duration(0, 0,0), time_duration(2,0,0));
 	TestContinuousService tcs2(1, "CONIT1/2", jp1, time_duration(3, 0,0), time_duration(1,0,0));
 	// The schedules of the non priority continuous line CONTI2
-	TestContinuousService tcs5(0, "CONTI2/1", jp2, time_duration(0, 0,0), time_duration(0,30,0));
-	TestContinuousService tcs6(0, "CONTI2/2", jp2, time_duration(1, 0,0), time_duration(4, 0,0));
+	TestContinuousService tcs5(2, "CONTI2/1", jp2, time_duration(0, 0,0), time_duration(0,30,0));
+	TestContinuousService tcs6(3, "CONTI2/2", jp2, time_duration(1, 0,0), time_duration(4, 0,0));
 
 
 	AlgorithmLogger logger;

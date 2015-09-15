@@ -216,20 +216,23 @@ namespace synthese
 						journey.getDuration() - minutes(1)
 					);
 					TimeSlotRoutePlanner tsr(
-						_originVam,
-						_destinationVam,
-						journey,
-						_whatToSearch,
-						_graphToUse,
-						maxDuration,
-						_maxSolutionsNumber ? *_maxSolutionsNumber - result.size() : _maxSolutionsNumber,
-						_accessParameters,
-						_planningOrder,
-						_vmax,
-						_ignoreReservation,
-						_logger,
-						_maxTransferDuration,
-						_reservationRulesDelayType
+						_originVam,					// Origin VAM
+						_destinationVam,			// Destination VAM
+						journey,					// ContinuousService to break
+						_whatToSearch,				// What to search
+						_graphToUse,				// Graph to use
+						maxDuration,				// Max duration
+						_maxSolutionsNumber ? *_maxSolutionsNumber - result.size() : _maxSolutionsNumber,	// Maxsolution number
+						_accessParameters,			// Access parameters
+						_planningOrder,				// Planning order
+						_vmax,						// V max
+						_ignoreReservation,			// Ignore reservation
+						_logger,					// Logger
+						_maxTransferDuration,		// Max transfer duration
+						boost::optional<double>(),	// Min max duration ratio filter
+						true,						// Enable theorical
+						true,						// Enable real time
+						_reservationRulesDelayType	// RESERVATION_INTERNAL_DELAY
 					);
 					Result subResult(_MergeSubResultAndParentContinuousService(journey, tsr.run()));
 
