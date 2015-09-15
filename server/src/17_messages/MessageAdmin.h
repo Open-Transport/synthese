@@ -43,8 +43,8 @@ namespace synthese
 				- SYNTHESE Admin - Message - [Nom]
 
 			<i>Barre de navigation</i> :
-				- Lien vers synthese::interfaces::AdminHome
-				- Lien vers synthese::interfaces::MessagesAdmin
+				- Lien vers synthese::admin::HomeAdmin
+				- Lien vers synthese::messages::MessagesAdmin
 				- Texte [Nom]
 
 			<i>Zone de contenu</i> : <b>Formulaire d'édition</b> :

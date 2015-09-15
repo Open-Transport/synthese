@@ -37,8 +37,6 @@
 #include "ResultHTMLTable.h"
 #include "PropertiesHTMLTable.h"
 #include "HTMLModule.h"
-#include "Interface.h"
-#include "InterfaceTableSync.h"
 #include "StaticFunctionRequest.h"
 #include "Profile.h"
 #include "JourneyPattern.hpp"
@@ -69,7 +67,6 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace pt_website;

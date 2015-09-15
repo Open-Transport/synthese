@@ -725,10 +725,11 @@ namespace synthese
 						++rank;
 					}
 
+					string routeId(lexical_cast<string>(run.second.route->id));
 					JourneyPattern* journeyPattern(
 						_createOrUpdateRoute(
 							*run.second.route->line,
-							lexical_cast<string>(run.second.route->id),
+							routeId,
 							run.second.route->name,
 							optional<const string&>(),
 							optional<Destination*>(),

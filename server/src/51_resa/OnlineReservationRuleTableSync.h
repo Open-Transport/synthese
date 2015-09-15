@@ -61,7 +61,6 @@ namespace synthese
 			static const std::string COL_THRESHOLDS;
 			static const std::string COL_SENDER_EMAIL;
 			static const std::string COL_SENDER_NAME;
-			static const std::string COL_EMAIL_INTERFACE_ID;
 			static const std::string COL_CONFIRMATION_EMAIL_CMS_ID;
 			static const std::string COL_CANCELLATION_EMAIL_CMS_ID;
 			static const std::string COL_PASSWORD_EMAIL_CMS_ID;

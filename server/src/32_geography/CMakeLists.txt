@@ -7,8 +7,6 @@ CityAlias.cpp
 CityAlias.hpp
 CityAliasTableSync.cpp
 CityAliasTableSync.hpp
-CityNameValueInterfaceElement.cpp
-CityNameValueInterfaceElement.h
 CityTableSync.cpp
 CityTableSync.h
 GeographyModule.cpp
@@ -50,7 +48,6 @@ add_library(32_geography ${geography_SRCS})
 
 target_link_libraries(32_geography
   07_lexical_matcher
-  11_interfaces
   18_graph
   00_framework
   proj

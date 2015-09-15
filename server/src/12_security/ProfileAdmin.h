@@ -38,8 +38,8 @@ namespace synthese
 			@image latex cap_admin_profile.png "Maquette d'écran d'édition de profil" width=14cm
 
 			<i>Barre de navigation</i> :
-				- Lien vers synthese::interfaces::HomeAdmin
-				- Lien vers synthese::interfaces::ProfilesAdmin
+				- Lien vers synthese::admin::HomeAdmin
+				- Lien vers synthese::security::ProfilesAdmin
 				- Nom du profil
 
 			<i>Zone de contenus</i> :

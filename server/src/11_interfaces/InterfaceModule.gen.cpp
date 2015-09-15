@@ -1,1 +1,0 @@
-synthese::interfaces::moduleRegister();

@@ -27,12 +27,6 @@ GlobalVariableUpdateService.cpp
 GlobalVariableUpdateService.hpp
 HardwareInformationService.cpp
 HardwareInformationService.hpp
-HtmlFormCalendarFieldInterfaceElement.cpp
-HtmlFormCalendarFieldInterfaceElement.h
-HtmlFormFieldInterfaceElement.cpp
-HtmlFormFieldInterfaceElement.h
-HtmlFormInterfaceElement.cpp
-HtmlFormInterfaceElement.h
 HTTPClient.cpp
 HTTPClient.hpp
 HTTPConnection.cpp
@@ -46,8 +40,6 @@ HTTPRequestParser.cpp
 HTTPRequestParser.hpp
 LoginAction.cpp
 LoginAction.h
-LoginInterfacePage.cpp
-LoginInterfacePage.h
 LoginToken.cpp
 LoginToken.hpp
 LogoutAction.cpp
@@ -76,8 +68,6 @@ ServerModule.h
 ServerModule.inc.cpp
 ServerModuleException.cpp
 ServerModuleException.h
-ServerModuleVersionInterfaceElement.cpp
-ServerModuleVersionInterfaceElement.h
 ServerTypes.h
 Session.cpp
 Session.h
@@ -100,8 +90,6 @@ ThreadKillAction.cpp
 ThreadKillAction.h
 ThreadsAdmin.cpp
 ThreadsAdmin.h
-ValidSessionInterfaceElement.cpp
-ValidSessionInterfaceElement.h
 version.h.in
 VersionService.cpp
 VersionService.hpp
@@ -123,7 +111,6 @@ target_link_libraries(15_server
   01_util
   05_html
   10_db
-  11_interfaces
   12_security
   13_dblog
   14_admin

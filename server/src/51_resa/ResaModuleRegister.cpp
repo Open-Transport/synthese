@@ -23,20 +23,9 @@
 #include "FreeDRTAvailableSlotsService.hpp"
 #include "XMLReservationFunction.h"
 #include "ResaCustomerHtmlOptionListFunction.h"
-#include "ReservationEditFunction.h"
 #include "ReservationFunction.h"
 #include "CSVResaStatisticsFunction.h"
 #include "ReservationsListService.hpp"
-
-#include "ReservationItemInterfacePage.h"
-#include "ReservationConfirmationEMailInterfacePage.h"
-#include "ReservationConfirmationEMailItemInterfacePage.h"
-#include "CustomerPasswordEMailContentInterfacePage.h"
-#include "ReservationConfirmationEMailSubjectInterfacePage.h"
-#include "CustomerPasswordEMailSubjectInterfacePage.h"
-#include "ReservationEditInterfacePage.h"
-#include "ReservationCancellationEMailSubjectInterfacePage.h"
-#include "ReservationCancellationEMailContentInterfacePage.h"
 
 #include "BookableCommercialLineAdmin.h"
 #include "BookableCommercialLinesAdmin.h"
@@ -81,20 +70,9 @@ void synthese::resa::moduleRegister()
 	synthese::resa::FreeDRTAvailableSlotsService::integrate();
 	synthese::resa::XMLReservationFunction::integrate();
 	synthese::resa::ResaCustomerHtmlOptionListFunction::integrate();
-	synthese::resa::ReservationEditFunction::integrate();
 	synthese::resa::ReservationFunction::integrate();
 	synthese::resa::CSVResaStatisticsFunction::integrate();
 	synthese::resa::ReservationsListService::integrate();
-
-	synthese::resa::ReservationItemInterfacePage::integrate();
-	synthese::resa::ReservationConfirmationEMailInterfacePage::integrate();
-	synthese::resa::ReservationConfirmationEMailItemInterfacePage::integrate();
-	synthese::resa::CustomerPasswordEMailContentInterfacePage::integrate();
-	synthese::resa::ReservationConfirmationEMailSubjectInterfacePage::integrate();
-	synthese::resa::CustomerPasswordEMailSubjectInterfacePage::integrate();
-	synthese::resa::ReservationEditInterfacePage::integrate();
-	synthese::resa::ReservationCancellationEMailSubjectInterfacePage::integrate();
-	synthese::resa::ReservationCancellationEMailContentInterfacePage::integrate();
 
 	synthese::resa::ReservationTableSync::integrate();
 	synthese::resa::ReservationTransactionTableSync::integrate();

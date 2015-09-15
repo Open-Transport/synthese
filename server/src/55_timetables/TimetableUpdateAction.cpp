@@ -35,8 +35,6 @@
 #include "User.h"
 #include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"
-#include "Interface.h"
-#include "InterfaceTableSync.h"
 
 using namespace std;
 
@@ -46,8 +44,7 @@ namespace synthese
 	using namespace security;
 	using namespace calendar;
 	using namespace util;
-	using namespace interfaces;
-
+	
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, timetables::TimetableUpdateAction>::FACTORY_KEY("TimetableUpdateAction");

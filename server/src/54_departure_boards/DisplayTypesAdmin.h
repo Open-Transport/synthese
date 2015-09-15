@@ -46,7 +46,6 @@ namespace synthese
 			<i>Zone de contenus</i> :
 				-# <b>Tableau liste des types</b> : Les colonnes suivantes sont présentes, et permettent d'éditer directement les types d'afficheurs :
 					- <tt>Nom</tt> : Texte devant être non vide
-					- <tt>Interface</tt> : Liste de choix présentant les interfaces installées (exemple : Lumiplan, HTML charte 1, HTML charte 2, etc.)
 					- <tt>Lignes</tt> : Nombre de départs affichés sous forme de liste de choix proposant les nombres de 1 à 50
 					- <tt>Actions</tt> : Boutons :
 						- <tt>Ouvrir</tt> : enregistre les modifications effectuées sur la ligne du tableau correspondante. Si un champ ne respecte pas les règles énumérées, un message d'erreur empêche l'enregistrement des modifications :
@@ -69,13 +68,11 @@ namespace synthese
 			public admin::AdminInterfaceElementTemplate<DisplayTypesAdmin>
 		{
 			boost::optional<std::string>				_searchName;
-			boost::optional<util::RegistryKeyType>		_searchInterfaceId;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 
 		public:
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_INTERFACE_ID;
-
+			
 
 
 			/** Initialization of the parameters from a request.

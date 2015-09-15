@@ -28,11 +28,6 @@
 
 namespace synthese
 {
-	namespace interfaces
-	{
-		class Interface;
-	}
-
 	namespace departure_boards
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -53,14 +48,10 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_INTERFACE_ID;
 			static const std::string PARAMETER_ROWS_NUMBER;
-			static const std::string PARAMETER_MONITORING_INTERFACE_ID;
 
 		private:
 			std::string _name;
-			boost::shared_ptr<const interfaces::Interface>	_interface;
-			boost::shared_ptr<const interfaces::Interface>	_monitoringInterface;
 			int	_rows_number;
 
 		protected:

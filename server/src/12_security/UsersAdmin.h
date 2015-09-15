@@ -39,7 +39,7 @@ namespace synthese
 			@image latex cap_admin_users.png "Maquette de l'écran de recherche d'utilisateur" width=14cm
 
 			<i>Barre de navigation</i> :
-				- Lien vers synthese::interfaces::HomeAdmin
+				- Lien vers synthese::admin::HomeAdmin
 				- Texte <tt>Utilisateurs</tt>
 
 			<i>Zone de contenus</i> :
@@ -55,7 +55,7 @@ namespace synthese
 					-# <tt>Login</tt> : login de l'utilisateur
 					-# <tt>Nom</tt> : prénom et nom de l'utilisateur
 					-# <tt>Profil</tt> : profil de l'utilisateur
-					-# Bouton <tt>Editer</tt> : conduit vers la page synthese::interfaces::UserAdmin pour l'utilisateur affiché sur la ligne
+					-# Bouton <tt>Editer</tt> : conduit vers la page synthese::security::UserAdmin pour l'utilisateur affiché sur la ligne
 				-# <b>Ligne d'ajout d'utilisateur</b> :
 					-# Champ <tt>Login</tt> : champ texte. Entrer ici le login de l'utilisateur. Celui-ci doit être unique. En cas de tentative de création d'utilisateur avec un login déjà pris, la création est abandonnée et un message d'erreur apparait :
 						@code L'utilisateur ne peut être créé car le login entré est déjà pris. Veuillez choisir un autre login @endcode
@@ -64,7 +64,7 @@ namespace synthese
 					-# Champ <tt>Nom</tt> : champ texte. Entrer ici le nom de famille de l'utilisateur. Ce champ est obligatoire. S'il n'est pas rempli la création est abandonnée et un message d'erreur apparait :
 						@code L'utilisateur ne peut être créé car le nom n'est pas renseigné. Veuillez renseigner le champ nom. @endcode
                     -# Champ <tt>Profil</tt> : liste de choix. Sélectionner ici un profil d'habilitations. Champ obligatoire.
-					-# Bouton <tt>Ajouter</tt> : crée l'utilisateur en fonction des valeur saisies. La saisie des informations personnelles de l'utilisateur se poursuit sur l'écran synthese::interfaces::UserAdmin.
+					-# Bouton <tt>Ajouter</tt> : crée l'utilisateur en fonction des valeur saisies. La saisie des informations personnelles de l'utilisateur se poursuit sur l'écran synthese::security::UserAdmin.
 				-# Un maximum de 50 entrées est affiché à l'écran. En cas de dépassement de ce nombre d'après les critères de recherche, un lien <tt>Entrées suivantes</tt> apparait et permet de visualiser les entrées suivantes. A partir de la seconde page, un lien <tt>Entrées précédentes</tt> apparait également.
 				-# Un <b>Bouton de suppression</b> permet de supprimer les utilisateurs sélectionnés grâce aux cases à cocher. Après confirmation par une boite de dialogue, la suppression est effectuée pour chaque utilisateur :
 					- l'utilisateur est réellement supprimé si il n'est à l'origine d'aucune entrée de journal

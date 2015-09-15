@@ -22,8 +22,6 @@
 
 #include "CreateDisplayTypeAction.h"
 
-#include "Interface.h"
-#include "InterfaceTableSync.h"
 #include "Profile.h"
 #include "Session.h"
 #include "User.h"
@@ -42,7 +40,6 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
-	using namespace interfaces;
 	using namespace security;
 
 
@@ -54,11 +51,7 @@ namespace synthese
 	namespace departure_boards
 	{
 		const string CreateDisplayTypeAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
-		const string CreateDisplayTypeAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "di";
 		const string CreateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action_PARAMETER_PREFIX + "ro";
-		const string CreateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID(
-			Action_PARAMETER_PREFIX + "mi"
-		);
 
 
 
@@ -66,10 +59,6 @@ namespace synthese
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_NAME, _name);
-			if (_interface.get())
-				map.insert(PARAMETER_INTERFACE_ID, _interface->getKey());
-			if(_monitoringInterface.get())
-				map.insert(PARAMETER_MONITORING_INTERFACE_ID, _monitoringInterface->getKey());
 			map.insert(PARAMETER_ROWS_NUMBER, _rows_number);
 			return map;
 		}
@@ -83,7 +72,7 @@ namespace synthese
 			if (_name.empty())
 				throw ActionException("Le nom ne peut être vide.");
 			Env env;
-			DisplayTypeTableSync::Search(env, _name, optional<RegistryKeyType>(), 0, 1);
+			DisplayTypeTableSync::Search(env, _name, 0, 1);
 			if (!env.getRegistry<DisplayType>().empty())
 				throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
 
@@ -91,42 +80,14 @@ namespace synthese
 			_rows_number = map.get<int>(PARAMETER_ROWS_NUMBER);
 			if (_rows_number < 0)
 				throw ActionException("Un nombre positif de lignes doit être choisi");
-
-			// Interface
-			if(map.getDefault<RegistryKeyType>(PARAMETER_INTERFACE_ID, 0)) try
-			{
-				_interface = InterfaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID), *_env);
-			}
-			catch (ObjectNotFoundException<Interface>& e)
-			{
-				throw ActionException("Interface d'affichage", e, *this);
-			}
-
-			// Monitoring Interface
-			optional<RegistryKeyType> id = map.getOptional<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID);
-			if(id && *id > 0)
-			try
-			{
-				_monitoringInterface = InterfaceTableSync::Get(*id, *_env);
-			}
-			catch (ObjectNotFoundException<Interface>& e)
-			{
-				throw ActionException("Interface de supervision", e, *this);
-			}
 		}
+
+
 
 		void CreateDisplayTypeAction::run(Request& request)
 		{
 			DisplayType dt;
 			dt.set<Name>(_name);
-			if (_interface)
-			{
-				dt.set<DisplayInterface>(*(const_cast<Interface*>(_interface.get())));
-			}
-			if (_monitoringInterface)
-			{
-				dt.set<MonitoringInterface>(*(const_cast<Interface*>(_monitoringInterface.get())));
-			}
 			dt.set<RowsNumber>(_rows_number);
 			DisplayTypeTableSync::Save(&dt);
 

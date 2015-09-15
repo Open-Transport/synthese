@@ -25,7 +25,6 @@
 #ifndef SYNTHESE_LineMarkerInterfacePage_H__
 #define SYNTHESE_LineMarkerInterfacePage_H__
 
-#include "InterfacePage.h"
 #include "FactorableTemplate.h"
 #include "ParametersMap.h"
 
@@ -64,7 +63,7 @@ namespace synthese
 				- network_name : Network name
 
 		*/
-		class LineMarkerInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, LineMarkerInterfacePage>
+		class LineMarkerInterfacePage
 		{
 		public:
 			static const std::string DATA_STYLE_NAME;
@@ -77,30 +76,6 @@ namespace synthese
 			static const std::string DATA_RANK_IS_ODD;
 			static const std::string DATA_NETWORK_ID;
 			static const std::string DATA_NETWORK_NAME;
-
-
-			LineMarkerInterfacePage();
-
-			/** Display of line of schedule sheet.
-				@param stream Stream to write on
-				@param vars Execution variables
-				@param tableOpeningHTML HTML d'ouverture du tableau (RIEN = Pas d'ouverture du tableau)
-				@param tableClosingHTML HTML de fermeture du tableau (RIEN = Pas de fermeture du tableau)
-				@param pixelWidth Largeur de la case en pixels
-				@param pixelHeight Hauteur de la case en pixels
-				@param commercialLine Commercial JourneyPattern to display
-				@param request Request
-			*/
-			void display(
-				std::ostream& stream
-				, interfaces::VariablesMap& vars
-				, const std::string& tableOpeningHTML
-				, const std::string& tableClosingHTML
-				, int pixelWidth
-				, int pixelHeight
-				, const pt::CommercialLine& commercialLine
-				, const server::Request* request = NULL
-			) const;
 
 
 			/** Display of line of schedule sheet.

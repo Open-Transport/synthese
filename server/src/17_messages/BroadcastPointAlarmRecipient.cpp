@@ -63,7 +63,6 @@ namespace synthese
 	using namespace server;
 	using namespace pt;
 	using namespace admin;
-	using namespace interfaces;
 	using namespace html;
 	using namespace security;
 	using namespace impex;
