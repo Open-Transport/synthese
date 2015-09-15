@@ -5,6 +5,7 @@ class _Node:
         self.node_dir = "node_%d" % node_id
         self.db_file = "config.db3"
         self.port = 9090 + node_id
+        self.ineo_port = 4563 + node_id
         self.host = "127.0.0.1"
         self.url = "http://%s:%d" % (self.host, self.port)
         self.process_handle = None
