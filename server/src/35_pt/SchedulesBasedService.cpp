@@ -1001,14 +1001,12 @@ namespace synthese
 						ptime ptEnd(time); ptEnd += range;
 						range = ptEnd - newTime;
 						time = newTime;
-						return false;
 					}
 				}
 				// Calc the new range
 				if(time < period.begin() && range > period.begin() - time)
 				{
 					range = period.begin() - time;
-					return false;
 				}
 			}
 			return false;

@@ -21,10 +21,12 @@
 */
 
 #include "RoutePlanningIntermediateJourney.hpp"
-#include "VertexAccessMap.h"
+
 #include "Edge.h"
 #include "Hub.h"
 #include "JourneyTemplates.h"
+#include "Service.h"
+#include "VertexAccessMap.h"
 
 #include <boost/logic/tribool.hpp>
 
@@ -333,7 +335,7 @@ namespace synthese
 					return distance1 < distance2;
 				}
 
-				return this < &other;
+				// if we can not decide by time neither by distance, we use the other checks
 			}
 
 			// Else best bet to reach the destination
@@ -350,7 +352,13 @@ namespace synthese
 				return _phase == DEPARTURE_TO_ARRIVAL ? getEndTime() < other.getEndTime() : other.getEndTime() < getEndTime();
 			}
 
-			// Priority 4 : addresses order (to differentiate journeys in all cases)
+			// Priority 4 (to differentiate journeys in all cases) : nonsense : first service key (better than pointer adress for unit tests)
+			if (this->getFirstJourneyLeg().getService()->getKey() != other.getFirstJourneyLeg().getService()->getKey())
+			{
+				return this->getFirstJourneyLeg().getService()->getKey() < other.getFirstJourneyLeg().getService()->getKey();
+			}
+
+			// Priority 5 : addresses order (to differentiate journeys in all cases)
 			return this < &other;
 		}
 

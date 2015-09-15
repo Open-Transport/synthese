@@ -43,8 +43,7 @@ set(DEPS
 boost_test(IntegralSearch "${DEPS}" "RoutePlannerTestData.inc.hpp;RoutePlannerTestData.hpp")
 boost_test(PTRoutePlannerResult "${DEPS}")
 boost_test(RoutePlanner "${DEPS}" "RoutePlannerTestData.inc.hpp;RoutePlannerTestData.hpp")
-# Test deactivated waiting for http://youtrack.rcsmobility.com/issue/tc-128
-# boost_test(NonConcurrency "${DEPS}")
+boost_test(NonConcurrency "${DEPS}")
 
 # This is not a test, but we'll keep it here for now.
 # add_executable(ImportRoutePlannerTestData ImportRoutePlannerTestData.cpp RoutePlannerTestData.inc.hpp RoutePlannerTestData.hpp)

@@ -238,13 +238,15 @@ namespace synthese
 						return servicePointer;
 				}	}
 
+				// We try for tommorow, if time of day is less than 03:00, we jump to next operation day which starts at 03:00
+				// else we jump to next day
 				if (departureMoment.time_of_day().hours() < 3)
 				{
 					departureMoment = ptime(departureMoment.date(), hours(3));
 				}
 				else
 				{
-					departureMoment = ptime(departureMoment.date(), hours(27));
+					departureMoment = ptime(departureMoment.date(), hours(24));
 				}
 
 				next = departureIndex[0].get(RTData);
