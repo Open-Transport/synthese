@@ -27,7 +27,6 @@
 
 #include "ObjectSiteLink.h"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -43,16 +42,10 @@ namespace synthese
 		class ObjectSiteLinkTableSync:
 			public db::DBDirectTableSyncTemplate<
 				ObjectSiteLinkTableSync,
-				ObjectSiteLink,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				ObjectSiteLink
 			>
 		{
 		public:
-			static const std::string COL_OBJECT_ID;
-			static const std::string COL_SITE_ID;
-
-
 			/** ObjectSiteLink search.
 				(other search parameters)
 				@param first First ObjectSiteLink object to answer

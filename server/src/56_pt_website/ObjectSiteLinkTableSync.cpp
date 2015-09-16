@@ -50,12 +50,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,ObjectSiteLinkTableSync>::FACTORY_KEY("56.11 Object Website Links");
 	}
 
-	namespace pt_website
-	{
-		const string ObjectSiteLinkTableSync::COL_OBJECT_ID("object_id");
-		const string ObjectSiteLinkTableSync::COL_SITE_ID("site_id");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<ObjectSiteLinkTableSync>::TABLE(
@@ -65,9 +59,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<ObjectSiteLinkTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(ObjectSiteLinkTableSync::COL_OBJECT_ID, SQL_INTEGER),
-			Field(ObjectSiteLinkTableSync::COL_SITE_ID, SQL_INTEGER),
 			Field()
 		};
 
@@ -77,57 +68,9 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<ObjectSiteLinkTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(ObjectSiteLinkTableSync::COL_SITE_ID.c_str(), ""));
-			r.push_back(DBTableSync::Index(ObjectSiteLinkTableSync::COL_OBJECT_ID.c_str(), ""));
+			r.push_back(DBTableSync::Index(Site::FIELD.name.c_str(), ""));
+			r.push_back(DBTableSync::Index(ObjectId::FIELD.name.c_str(), ""));
 			return r;
-		}
-
-
-
-		template<> void OldLoadSavePolicy<ObjectSiteLinkTableSync,ObjectSiteLink>::Load(
-			ObjectSiteLink* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			object->setObjectId(rows->getLongLong(ObjectSiteLinkTableSync::COL_OBJECT_ID));
-			RegistryKeyType id(rows->getLongLong(ObjectSiteLinkTableSync::COL_SITE_ID));
-			try
-			{
-				object->setSite(PTServiceConfigTableSync::Get(id, env, linkLevel).get());
-			}
-			catch(Exception e)
-			{
-			}
-
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				if(decodeTableId(object->getObjectId()) == CityTableSync::TABLE.ID)
-				{
-					boost::shared_ptr<PTServiceConfig> site(PTServiceConfigTableSync::GetEditable(id, env, linkLevel));
-					boost::shared_ptr<City> city(CityTableSync::GetEditable(object->getObjectId(), env, linkLevel));
-					site->addCity(city);
-				}
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<ObjectSiteLinkTableSync,ObjectSiteLink>::Save(
-			ObjectSiteLink* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<ObjectSiteLinkTableSync> query(*object);
-			query.addField(object->getObjectId());
-			query.addField(object->getSite() ? object->getSite()->getKey() : RegistryKeyType(0));
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<ObjectSiteLinkTableSync,ObjectSiteLink>::Unlink(
-			ObjectSiteLink* obj
-		){
 		}
 
 
@@ -181,15 +124,15 @@ namespace synthese
 			SelectQuery<ObjectSiteLinkTableSync> query;
 			if (siteId)
 			{
-				query.addWhereField(COL_SITE_ID, *siteId);
+				query.addWhereField(Site::FIELD.name, *siteId);
 			}
 			if(objectId)
 			{
-				query.addWhereField(COL_OBJECT_ID, *objectId);
+				query.addWhereField(ObjectId::FIELD.name, *objectId);
 			}
 			if(objectTableId)
 			{
-				query.addWhereField(COL_OBJECT_ID + " & " + lexical_cast<string>(0xFFFF000000000000LL), util::encodeUId(*objectTableId, 0, 0));
+				query.addWhereField(ObjectId::FIELD.name + " & " + lexical_cast<string>(0xFFFF000000000000LL), util::encodeUId(*objectTableId, 0, 0));
 			}
 			if (number)
 			{

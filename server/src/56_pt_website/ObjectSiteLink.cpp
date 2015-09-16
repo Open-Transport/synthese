@@ -21,27 +21,30 @@
 */
 
 #include "ObjectSiteLink.h"
-#include "Registry.h"
 
 using namespace std;
 
 namespace synthese
 {
+	using namespace pt_website;
 	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<pt_website::ObjectSiteLink>::KEY("ObjectSiteLink");
-	}
+	CLASS_DEFINITION(ObjectSiteLink, "t001_object_site_links", 1)
+	FIELD_DEFINITION_OF_OBJECT(ObjectSiteLink, "object_site_link_id", "object_site_link_ids")
+
+	FIELD_DEFINITION_OF_TYPE(ObjectId, "object_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Site, "site_id", SQL_INTEGER)
 
 	namespace pt_website
 	{
 		ObjectSiteLink::ObjectSiteLink(
 			RegistryKeyType id
 		):	Registrable(id),
-			_site(NULL)
-		{
-
-		}
+			Object<ObjectSiteLink, ObjectSiteLinkSchema> (
+				Schema (
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(ObjectId),
+					FIELD_DEFAULT_CONSTRUCTOR(Site)
+		)	) {}
 	}
 }

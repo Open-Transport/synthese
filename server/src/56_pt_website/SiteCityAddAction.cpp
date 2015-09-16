@@ -25,16 +25,17 @@
 #include "SiteCityAddAction.hpp"
 
 #include "ActionException.h"
+#include "City.h"
 #include "ParametersMap.h"
+#include "GeographyModule.h"
+#include "ObjectSiteLinkTableSync.h"
 #include "Profile.h"
+#include "PTServiceConfig.hpp"
+#include "PTServiceConfigTableSync.hpp"
+#include "Request.h"
 #include "Session.h"
 #include "TransportWebsiteRight.h"
 #include "User.h"
-#include "Request.h"
-#include "GeographyModule.h"
-#include "PTServiceConfig.hpp"
-#include "City.h"
-#include "ObjectSiteLinkTableSync.h"
 
 using namespace std;
 
@@ -77,9 +78,7 @@ namespace synthese
 		{
 			try
 			{
-				_config = Env::GetOfficialEnv().get<PTServiceConfig>(
-					map.get<RegistryKeyType>(PARAMETER_SITE_ID)
-				);
+				_config = PTServiceConfigTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_SITE_ID), *_env);
 			}
 			catch(ObjectNotFoundException<PTServiceConfig>&)
 			{
@@ -104,8 +103,8 @@ namespace synthese
 			Request& request
 		){
 			ObjectSiteLink link;
-			link.setSite(_config.get());
-			link.setObjectId(_city->getKey());
+			link.set<Site>(*_config);
+			link.set<ObjectId>(_city->getKey());
 			ObjectSiteLinkTableSync::Save(&link);
 
 //			::AddCreationEntry(object, request.getUser().get());

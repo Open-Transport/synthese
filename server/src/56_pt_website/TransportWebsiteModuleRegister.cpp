@@ -63,7 +63,7 @@ void synthese::pt_website::moduleRegister()
 	synthese::pt_website::TransportWebsiteRight::integrate();
 
 	// Registries
-	synthese::util::Env::Integrate<synthese::pt_website::ObjectSiteLink>();
+	INTEGRATE(synthese::pt_website::ObjectSiteLink);
 	INTEGRATE(synthese::pt_website::PTServiceConfig);
 	synthese::util::Env::Integrate<synthese::pt_website::SiteCommercialLineLink>();
 	synthese::util::Env::Integrate<synthese::pt_website::RollingStockFilter>();
