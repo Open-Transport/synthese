@@ -164,8 +164,10 @@ if int(needs_start_stop_point) != 0:
       stopCodes = map(lambda x: x.split('|'), stopPointPM["operator_code"].split(','))
       for stopCode in stopCodes:
         if stopCode[0] == datasource_id:
-          # Ineo stop point ids may start with "MNLP_**_", but this prefix must not be sent to Ineo
-          childStartStopPoint.text = (stopCode[1] if stopCode[1].startswith(ineo_stop_point_prefix) == False else stopCode[1][len(ineo_stop_point_prefix):])
+          # Ineo stop point ids start with "MNLP_**_", but this prefix must not be sent to Ineo
+          if stopCode[1].startswith(ineo_stop_point_prefix):
+            childStartStopPoint.text = stopCode[1][len(ineo_stop_point_prefix):]
+            break
 
 if int(needs_end_stop_point) != 0:
   endStopPointId = int(message[0]["end_stop_point"])
@@ -179,8 +181,10 @@ if int(needs_end_stop_point) != 0:
       stopCodes = map(lambda x: x.split('|'), stopPointPM["operator_code"].split(','))
       for stopCode in stopCodes:
         if stopCode[0] == datasource_id:
-          # Ineo stop point ids may start with "MNLP_**_", but this prefix must not be sent to Ineo
-          childEndStopPoint.text = (stopCode[1] if stopCode[1].startswith(ineo_stop_point_prefix) == False else stopCode[1][len(ineo_stop_point_prefix):])
+          # Ineo stop point ids start with "MNLP_**_", but this prefix must not be sent to Ineo
+          if stopCode[1].startswith(ineo_stop_point_prefix):
+            childEndStopPoint.text = stopCode[1][len(ineo_stop_point_prefix):]
+            break
 
 # Chaining
 

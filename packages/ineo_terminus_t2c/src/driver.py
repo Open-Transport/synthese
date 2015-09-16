@@ -150,10 +150,12 @@ if 'stoparea' in recipients:
       stopCodes = map(lambda x: x.split('|'), stopPointPM["operator_code"].split(','))
       for stopCode in stopCodes:
         if stopCode[0] == datasource_id:
-          # A stop point was found, change value of EndStopPoint to "non" to apply message to this stop point
-          childEndStopPoint.text = "non"
-          # Ineo stop point ids may start with "MNLP_**_", but this prefix must not be sent to Ineo
-          childStopPoint.text = (stopCode[1] if stopCode[1].startswith(ineo_stop_point_prefix) == False else stopCode[1][len(ineo_stop_point_prefix):])
+          # Ineo stop point ids start with "MNLP_**_", but this prefix must not be sent to Ineo
+          if stopCode[1].startswith(ineo_stop_point_prefix):
+            # A stop point was found, change value of EndStopPoint to "non" to apply message to this stop point
+            childEndStopPoint.text = "non"
+            childStopPoint.text = stopCode[1][len(ineo_stop_point_prefix):]
+            break
 
   if recipientTableId == 7:
     # This 'stoparea' recipient is a stop area : retrieve the Ineo code of one of its stop points
@@ -166,10 +168,12 @@ if 'stoparea' in recipients:
         stopCodes = map(lambda x: x.split('|'), stop["operator_code"].split(','))
         for stopCode in stopCodes:
           if stopCode[0] == datasource_id:
-            # A stop point was found, change value of EndStopPoint to "non" to apply message to this stop point
-            childEndStopPoint.text = "non"
-            # Ineo stop point ids may start with "MNLP_**_", but this prefix must not be sent to Ineo
-            childStopPoint.text = (stopCode[1] if stopCode[1].startswith(ineo_stop_point_prefix) == False else stopCode[1][len(ineo_stop_point_prefix):])
+            # Ineo stop point ids start with "MNLP_**_", but this prefix must not be sent to Ineo
+            if stopCode[1].startswith(ineo_stop_point_prefix):
+              # A stop point was found, change value of EndStopPoint to "non" to apply message to this stop point
+              childEndStopPoint.text = "non"
+              childStopPoint.text = stopCode[1][len(ineo_stop_point_prefix):]
+              break
 
 # Modify Way depending on StopPoint value
 if childEndStopPoint.text == "oui":
