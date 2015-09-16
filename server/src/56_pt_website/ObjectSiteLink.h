@@ -23,38 +23,31 @@
 #ifndef SYNTHESE_transportwebsite_ObjectSiteLink_h__
 #define SYNTHESE_transportwebsite_ObjectSiteLink_h__
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
+
+#include "PTServiceConfig.hpp"
 
 namespace synthese
 {
 	namespace pt_website
 	{
-		class PTServiceConfig;
+		FIELD_INT(ObjectId)
+		FIELD_POINTER(Site, pt_website::PTServiceConfig)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(ObjectId),
+			FIELD(Site)
+		> ObjectSiteLinkSchema;
 
 		/** ObjectSiteLink class.
 			@ingroup m56
 		*/
 		class ObjectSiteLink
-		:	public virtual util::Registrable
+		:	public virtual Object<ObjectSiteLink, ObjectSiteLinkSchema>
 		{
 		public:
-
-			/// Chosen registry class.
-			typedef util::Registry<ObjectSiteLink>	Registry;
-
-		protected:
-			util::RegistryKeyType			_objectId;
-			const PTServiceConfig*	_site;
-
-		public:
 			ObjectSiteLink(util::RegistryKeyType id = 0);
-
-			util::RegistryKeyType			getObjectId()	const { return _objectId; }
-			const PTServiceConfig*	getSite()		const { return _site; }
-
-			void setObjectId(util::RegistryKeyType value) { _objectId = value; }
-			void setSite(const PTServiceConfig* site) { _site = site; }
 		};
 	}
 }

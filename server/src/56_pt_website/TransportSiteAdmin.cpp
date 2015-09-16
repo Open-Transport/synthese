@@ -118,9 +118,7 @@ namespace synthese
 			// Config
 			try
 			{
-				_config = Env::GetOfficialEnv().get<PTServiceConfig>(
-					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
-				);
+				_config = PTServiceConfigTableSync::GetEditable(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID), *_env);
 			}
 			catch (ObjectNotFoundException<PTServiceConfig>&)
 			{
@@ -243,9 +241,9 @@ namespace synthese
 					cityRemoveRequest.getAction()->setObjectId(link->getKey());
 
 					stream << t.row();
-					if(Env::GetOfficialEnv().getRegistry<City>().contains(link->getObjectId()))
+					if(Env::GetOfficialEnv().getRegistry<City>().contains(link->get<ObjectId>()))
 					{
-						boost::shared_ptr<const City> city(Env::GetOfficialEnv().get<City>(link->getObjectId()));
+						boost::shared_ptr<const City> city(Env::GetOfficialEnv().get<City>(link->get<ObjectId>()));
 
 						openCityRequest.getPage()->setCity(city);
 
@@ -254,7 +252,7 @@ namespace synthese
 					}
 					else
 					{
-						stream << t.col() << "Inconsistent city " << link->getObjectId();
+						stream << t.col() << "Inconsistent city " << link->get<ObjectId>();
 						stream << t.col();
 					}
 					stream << t.col() << HTMLModule::getLinkButton(cityRemoveRequest.getHTMLForm().getURL(), "Supprimer", "Etes-vous sûe de vouloir supprimer le lien ?");
@@ -415,7 +413,7 @@ namespace synthese
 					boost::shared_ptr<TransportSiteAdmin> p(
 						getNewPage<TransportSiteAdmin>()
 					);
-					p->_config = const_pointer_cast<const PTServiceConfig>(site);
+					p->_config = site;
 					links.push_back(p);
 				}
 			}

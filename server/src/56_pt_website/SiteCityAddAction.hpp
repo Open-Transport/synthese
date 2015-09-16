@@ -61,7 +61,7 @@ namespace synthese
 			static const std::string PARAMETER_CITY_NAME;
 
 		private:
-			boost::shared_ptr<const PTServiceConfig> _config;
+			boost::shared_ptr<PTServiceConfig> _config;
 			geography::City* _city;
 
 		protected:
@@ -98,7 +98,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setConfig(boost::shared_ptr<const PTServiceConfig> value) { _config = value; }
+				void setConfig(boost::shared_ptr<PTServiceConfig> value) { _config = value; }
 			//@}
 		};
 	}

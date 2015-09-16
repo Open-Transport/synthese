@@ -71,15 +71,15 @@ namespace synthese
 			static const std::string TAB_ROUTE_PLANNING;
 
 		private:
-			boost::shared_ptr<const PTServiceConfig>	_config;
+			boost::shared_ptr<PTServiceConfig>	_config;
 			pt_journey_planner::PTJourneyPlannerService	_journeyPlanner;
 			bool							_pt_journey_planning;
 
 		public:
 			TransportSiteAdmin();
 
-			boost::shared_ptr<const PTServiceConfig> getSite() const { return _config; }
-			void setSite(boost::shared_ptr<const PTServiceConfig> value){ _config = value; }
+			boost::shared_ptr<PTServiceConfig> getSite() const { return _config; }
+			void setSite(boost::shared_ptr<PTServiceConfig> value){ _config = value; }
 
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
