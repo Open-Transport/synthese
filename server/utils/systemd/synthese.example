@@ -1,0 +1,42 @@
+# Synthese example configuration
+# This file should be modified and moved as /etc/sysconfig/synthese
+
+# DB connection string
+# For MySQL  : 
+# For SQLite : sqlite://path=/var/synthese.db3
+DBCONN="sqlite://path=/var/lib/synthese/synthese.db3"
+
+# PID file
+# Use "-" for no PID file
+PIDFILE="-"
+
+# Log file
+# Use "-" to print on the standard output (to journald)
+LOGFILE="-"
+
+# Log level
+# -1=trace, 0=debug, 1=info, 2=warning, 3=error, 4=fatal, 5=no logs
+LOGLEVEL="0"
+
+# Node ID
+# Instance unique identifier, which is used in the object ID
+# See https://extranet.rcsmobility.com/projects/fondation-synthese/wiki/Num%C3%A9rotation_des_instances_SYNTHESE
+NODEID="999"
+
+# Web server port
+PORT="8086"
+
+# Parameters
+# In this variable can be set any other Synthese parameters.
+# It will be appended to the s3-server command line
+PARAMS=""
+
+# Prefix
+# Base directory for the Synthese installation.
+# Used only by the generic services
+PREFIX="/usr"
+
+# Watchdog debug
+# If not empty, will generate a dump when stopping Synthese because of a timeout
+# Used only by the watchdog
+WATCHDOG_DEBUG=""

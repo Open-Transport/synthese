@@ -1,0 +1,27 @@
+[Unit]
+Description=Synthese IV server (%i)
+Documentation=https://extranet.rcsmobility.com/projects/synthese/wiki/
+After=mysql.service
+
+[Service]
+Type=simple
+
+EnvironmentFile=-/etc/sysconfig/synthese-%i
+
+ExecStart=/bin/sh -c '\
+export LD_LIBRARY_PATH="${PREFIX}/lib:$LD_LIBRARY_PATH"; \
+${PREFIX}/bin/s3-server \
+--dbconn ${DBCONN} \
+--pidfile ${PIDFILE} \
+--logfile ${LOGFILE} \
+--param node_id=${NODEID} \
+--param log_level=${LOGLEVEL} \
+--param port=${PORT} \
+${PARAMS}'
+
+Restart=always
+	
+
+[Install]
+WantedBy=multi-user.target
+
