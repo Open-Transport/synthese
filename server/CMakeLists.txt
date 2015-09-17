@@ -20,6 +20,7 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
 
 project(synthese3)
 
+
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(cmake/MacroOptionalFindPackage.cmake)
 
@@ -28,6 +29,42 @@ include(cmake/MacroOptionalFindPackage.cmake)
 # (see http://www.itk.org/Wiki/BuildingWinDLL)
 if(UNIX)
   set(BUILD_SHARED_LIBS ON)
+endif()
+
+# Expat
+
+find_package(Expat)
+if(NOT EXPAT_FOUND)
+  message(FATAL_ERROR "Expat not found")
+endif()
+
+# Proj
+
+find_package(Proj)
+if(NOT PROJ_FOUND)
+  message(FATAL_ERROR "Proj not found")
+endif()
+
+# Geos
+
+find_package(Geos)
+if(NOT GEOS_FOUND)
+  message(FATAL_ERROR "Geos not found")
+endif()
+message(========================= ${GEOS_LIBRARIES})
+
+# Geosc
+
+find_package(Geosc)
+if(NOT GEOSC_FOUND)
+  message(FATAL_ERROR "Geosc not found")
+endif()
+
+# Spatialite
+
+find_package(Spatialite)
+if(NOT SPATIALITE_FOUND)
+  message(FATAL_ERROR "Spatialite not found")
 endif()
 
 # Boost
