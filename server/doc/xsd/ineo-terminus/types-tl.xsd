@@ -65,8 +65,16 @@ Règle métier :
  - présent que lorsque Dispatching = Immediat</xs:documentation>
 							</xs:annotation>
 						</xs:element>
-						<xs:element name="Text"/>
-						<xs:element name="Recipients"/>
+						<xs:element name="Text" type="DriverMessageTextType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Texte du message</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Recipients" type="DriverMessagingRecipientEnum">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Type et liste des destinataires</xs:documentation>
+							</xs:annotation>
+						</xs:element>
 					</xs:sequence>
 				</xs:extension>
 			</xs:complexContent>
@@ -358,7 +366,7 @@ Règle métier :
 								<xs:documentation>Texte du message</xs:documentation>
 							</xs:annotation>
 						</xs:element>
-						<xs:element name="Recipients" type="BivLineManMessagingRecipientEnum">
+						<xs:element name="Recipients" type="BivLineManMessagingRecipient">
 							<xs:annotation>
 								<xs:documentation>Type et liste des destinataires</xs:documentation>
 							</xs:annotation>
@@ -1093,7 +1101,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="BivLineAutoGetStatesResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.14">Etat des messageries ligne manuelle</xs:documentation>
+			<xs:documentation source="IV.2.14">Etat des messageries ligne automatique</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -1119,7 +1127,7 @@ Règle métier :
 						<xs:sequence>
 							<xs:element name="MessagingStates" type="BivLineAutoMessagingStateListStructure">
 								<xs:annotation>
-									<xs:documentation>Liste des messageries de prise de service</xs:documentation>
+									<xs:documentation>Liste des messageries ligne automatique</xs:documentation>
 								</xs:annotation>
 							</xs:element>
 						</xs:sequence>
@@ -1637,7 +1645,7 @@ Règle métier :
 		<xs:sequence>
 			<xs:element name="MessagingState" type="SonoStopPointMessagingStateStructure" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
-					<xs:documentation>Etat d’une messagerie sonore conducteur</xs:documentation>
+					<xs:documentation>Etat d’une messagerie sonore arrêt</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>

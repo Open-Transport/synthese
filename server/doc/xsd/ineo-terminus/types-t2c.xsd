@@ -2,6 +2,63 @@
 <!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:redefine schemaLocation="types-common.xsd">
+		<xs:complexType name="DriverMessagingStructure">
+			<xs:annotation>
+				<xs:documentation source="IV.3.4">Structure de la messagerie conducteur</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="DriverMessagingStructure">
+					<xs:sequence>
+						<xs:element name="MultipleStop" type="Boolean" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Nombre de passages
+
+Règles métier :
+ - non = premier passage, oui = à tous les passages
+ - omis lorsque Dispatching = Immediat</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="EndStopPoint" type="Boolean" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Terminus ou arrêt
+
+Règles métier :
+ - non = à un arrêt, oui = au terminus
+ - omis lorsque Dispatching = Immediat</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Way" type="WayEnumType" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Sens de circulation
+
+Règles métier :
+ - omis lorsque Dispatching = Immediat
+ - omis lorsque EndStopPoint = oui</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StopPoint" type="StopPointIdentifierType" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Arrêt
+
+Règles métier :
+ - omis lorsque Dispatching = Immediat
+ - omis lorsque EndStopPoint = oui</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Text" type="DriverMessageTextType">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Texte du message</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Recipients" type="DriverMessagingRecipientEnum">
+							<xs:annotation>
+								<xs:documentation source="IV.3.4">Type et liste des destinataires</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
 		<xs:complexType name="DriverListType">
 			<xs:annotation>
 				<xs:documentation source="IV.3.8">Liste de conducteurs</xs:documentation>
@@ -303,7 +360,7 @@ Remarque
  - Il y a « LineCount » « LineMessageMan » (le contenu associé à l’attribut est vide lorsqu’il n’y a pas de message à afficher).</xs:documentation>
 							</xs:annotation>
 						</xs:element>
-						<xs:element name="LineMessageTts" maxOccurs="unbounded">
+						<xs:element name="LineMessageTts" type="BivLineMessageTtsType" maxOccurs="unbounded">
 							<xs:annotation>
 								<xs:documentation source="IV.3.3">Message ligne TTS
 
@@ -345,7 +402,7 @@ Remarque :
 			<xs:complexContent>
 				<xs:extension base="BivLineManMessagingStructure">
 					<xs:sequence>
-						<xs:element name="Tts" type="BivLineManMessageTtsType" minOccurs="0">
+						<xs:element name="Tts" type="BivLineMessageTtsType" minOccurs="0">
 							<xs:annotation>
 								<xs:documentation>Texte tts du message</xs:documentation>
 							</xs:annotation>
@@ -360,12 +417,27 @@ Remarque :
 								<xs:documentation>Date de fin</xs:documentation>
 							</xs:annotation>
 						</xs:element>
+						<xs:element name="StartTime" type="Time">
+							<xs:annotation>
+								<xs:documentation>Heure de début</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StopTime" type="Time">
+							<xs:annotation>
+								<xs:documentation>Heure de fin</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Alternance" type="Boolean">
+							<xs:annotation>
+								<xs:documentation>Alternance avec les temps d’attente</xs:documentation>
+							</xs:annotation>
+						</xs:element>
 						<xs:element name="Text" type="BivLineMessageTextType">
 							<xs:annotation>
 								<xs:documentation>Texte du message</xs:documentation>
 							</xs:annotation>
 						</xs:element>
-						<xs:element name="Recipients" type="BivLineManMessagingRecipientEnum">
+						<xs:element name="Recipients" type="BivLineManMessagingRecipient">
 							<xs:annotation>
 								<xs:documentation>Type et liste des destinataires</xs:documentation>
 							</xs:annotation>
@@ -592,7 +664,7 @@ Type de borne FixedText ScrollingText TtsText Remarque
 					<xs:documentation>Texte fixe du message</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="ScrollingText" type="BivGeneralScrollingTextType" minOccurs="0">
+			<xs:element name="ScrollingText" type="BivGeneralMessageScrollingTextType" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>Text défilant du message</xs:documentation>
 				</xs:annotation>
@@ -604,6 +676,16 @@ Type de borne FixedText ScrollingText TtsText Remarque
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
+	<xs:simpleType name="WayEnumType">
+		<xs:annotation>
+			<xs:documentation source="IV.4.38">Enumération des sens filtrant les chaînages destinataires</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ALLER"/>
+			<xs:enumeration value="RETOUR"/>
+			<xs:enumeration value="ALLER/RETOUR"/>
+		</xs:restriction>
+	</xs:simpleType>
 	<xs:simpleType name="BivGeneralMessageTypeBivEnum">
 		<xs:annotation>
 			<xs:documentation source="IV.3.41">Types de borne pour une messagerie commerciale</xs:documentation>
@@ -676,7 +758,11 @@ Type de borne FixedText ScrollingText TtsText Remarque
 			<xs:documentation source="IV.3.44">Liste de groupes</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="Group" type="GroupIdentifierType" maxOccurs="unbounded"/>
+			<xs:element name="Group" type="GroupIdentifierType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Identifiant du groupe</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 	<!--IV.4 Types simples-->
@@ -722,7 +808,7 @@ Type de borne FixedText ScrollingText TtsText Remarque
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="BivGeneralScrollingTextType">
+	<xs:complexType name="BivGeneralMessageScrollingTextType">
 		<xs:annotation>
 			<xs:documentation source="IV.4.33">Texte défilant du message commercial</xs:documentation>
 		</xs:annotation>
@@ -752,21 +838,6 @@ Type de borne FixedText ScrollingText TtsText Remarque
 						<xs:minLength value="1"/>
 						<xs:maxLength value="100"/>
 						<xs:pattern value="([^&amp;~#\{\[\|`\\@^°\]\}£$μù§²=_]*)"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="BivLineManMessageTtsType">
-		<xs:annotation>
-			<xs:documentation source="IV.4.36">Texte tts du message ligne</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="Line" maxOccurs="6">
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:minLength value="1"/>
-						<xs:maxLength value="25"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>

@@ -38,7 +38,7 @@
 					<xs:documentation>Horodatage de la demande</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="ReponseRef" type="ResponseRefType">
+			<xs:element name="ResponseRef" type="ResponseRefType">
 				<xs:annotation>
 					<xs:documentation>Elément permettant d’identifier le fournisseur de la réponse de manière unique</xs:documentation>
 				</xs:annotation>
@@ -66,6 +66,11 @@
 			<xs:enumeration value="3">
 				<xs:annotation>
 					<xs:documentation>SAETR indisponible</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>SAETR absent</xs:documentation>
 				</xs:annotation>
 			</xs:enumeration>
 			<xs:enumeration value="10">
@@ -214,7 +219,7 @@
 			</xs:complexContent>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="TerminalGetStatesRequest">
+	<xs:element name="TerminalGetStatesRequest" type="Request">
 		<xs:annotation>
 			<xs:documentation source="IV.2.3">Demande de l’état de toutes les bornes</xs:documentation>
 		</xs:annotation>
@@ -225,7 +230,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
-				<xs:extension base="Request">
+				<xs:extension base="Response">
 					<xs:choice>
 						<xs:sequence>
 							<xs:element name="ErrorType" type="ErrorTypeEnum">
@@ -372,7 +377,11 @@
 			<xs:complexContent>
 				<xs:extension base="Request">
 					<xs:sequence>
-						<xs:element name="Messaging" type="DriverMessagingStructure"/>
+						<xs:element name="Messaging" type="DriverMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie supprimée</xs:documentation>
+							</xs:annotation>
+						</xs:element>
 					</xs:sequence>
 				</xs:extension>
 			</xs:complexContent>
@@ -520,7 +529,11 @@
 			<xs:complexContent>
 				<xs:extension base="Request">
 					<xs:sequence>
-						<xs:element name="Messaging" type="PassengerMessagingStructure"/>
+						<xs:element name="Messaging" type="PassengerMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie supprimée</xs:documentation>
+							</xs:annotation>
+						</xs:element>
 					</xs:sequence>
 				</xs:extension>
 			</xs:complexContent>
@@ -668,7 +681,11 @@
 			<xs:complexContent>
 				<xs:extension base="Request">
 					<xs:sequence>
-						<xs:element name="Messaging" type="PpdsMessagingStructure"/>
+						<xs:element name="Messaging" type="PpdsMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie supprimée</xs:documentation>
+							</xs:annotation>
+						</xs:element>
 					</xs:sequence>
 				</xs:extension>
 			</xs:complexContent>
@@ -816,7 +833,11 @@
 			<xs:complexContent>
 				<xs:extension base="Request">
 					<xs:sequence>
-						<xs:element name="Messaging" type="BivGeneralMessagingStructure"/>
+						<xs:element name="Messaging" type="BivGeneralMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie supprimée</xs:documentation>
+							</xs:annotation>
+						</xs:element>
 					</xs:sequence>
 				</xs:extension>
 			</xs:complexContent>
@@ -892,7 +913,7 @@
 						<xs:sequence>
 							<xs:element name="MessagingStates" type="BivGeneralMessagingStateListStructure">
 								<xs:annotation>
-									<xs:documentation>Liste des messageries de prise de service</xs:documentation>
+									<xs:documentation>Liste des messageries commerciale</xs:documentation>
 								</xs:annotation>
 							</xs:element>
 						</xs:sequence>
@@ -964,7 +985,11 @@
 			<xs:complexContent>
 				<xs:extension base="Request">
 					<xs:sequence>
-						<xs:element name="Messaging" type="BivLineManMessagingStructure"/>
+						<xs:element name="Messaging" type="BivLineManMessagingStructure">
+							<xs:annotation>
+								<xs:documentation>Messagerie supprimée</xs:documentation>
+							</xs:annotation>
+						</xs:element>
 					</xs:sequence>
 				</xs:extension>
 			</xs:complexContent>
@@ -1040,7 +1065,7 @@
 						<xs:sequence>
 							<xs:element name="MessagingStates" type="BivLineManMessagingStateListStructure">
 								<xs:annotation>
-									<xs:documentation>Liste des messageries de prise de service</xs:documentation>
+									<xs:documentation>Liste des messageries ligne manuelle</xs:documentation>
 								</xs:annotation>
 							</xs:element>
 						</xs:sequence>
@@ -1077,7 +1102,7 @@
 					<xs:documentation>Nom de la borne</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="LineCount">
+			<xs:element name="LineCount" type="xs:unsignedInt">
 				<xs:annotation>
 					<xs:documentation>Nombre de lignes de la borne</xs:documentation>
 				</xs:annotation>
@@ -1280,12 +1305,12 @@ Règle métier :
 					<xs:documentation source="IV.3.12">Date de fin</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="StartTime" minOccurs="0">
+			<xs:element name="StartTime" type="Time" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation source="IV.3.12">Heure de début</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="StopTime" minOccurs="0">
+			<xs:element name="StopTime" type="Time" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation source="IV.3.12">Heure de fin</xs:documentation>
 				</xs:annotation>
@@ -1297,14 +1322,14 @@ Règle métier :
 			<xs:documentation source="IV.3.14">Structure pour la liste d’états des messageries passager</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="MessagingState" type="PassengerMessaginsStateStructure" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="MessagingState" type="PassengerMessagingStateStructure" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation source="IV.3.14">Etat d’une messagerie passager</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="PassengerMessaginsStateStructure">
+	<xs:complexType name="PassengerMessagingStateStructure">
 		<xs:annotation>
 			<xs:documentation source="IV.3.15">Structure d’état d’une messagerie passager</xs:documentation>
 		</xs:annotation>
@@ -1385,7 +1410,7 @@ Règle métier T2C :
 			<xs:documentation source="IV.3.20">Structure pour la liste d’états des messageries de prise de service</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="MessagingState" type="PpdsMessagingStateStructure">
+			<xs:element name="MessagingState" type="PpdsMessagingStateStructure" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation source="IV.3.20">Etat d’une messagerie de prise de service</xs:documentation>
 				</xs:annotation>
@@ -1433,7 +1458,7 @@ Règle métier T2C :
 	</xs:complexType>
 	<xs:complexType name="BivGeneralMessagingRecipientEnum">
 		<xs:annotation>
-			<xs:documentation source="IV.3.35">Destinataires d’une messagerie sonore arrêt</xs:documentation>
+			<xs:documentation source="IV.3.42">Destinataires d’une messagerie commerciale</xs:documentation>
 		</xs:annotation>
 	</xs:complexType>
 	<xs:complexType name="BivGeneralMessagingStateListStructure">
@@ -1477,7 +1502,7 @@ Règle métier T2C :
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="BivLineManMessagingRecipientEnum">
+	<xs:complexType name="BivLineManMessagingRecipient">
 		<xs:annotation>
 			<xs:documentation source="IV.3.50">Destinataires d’une messagerie ligne manuelle</xs:documentation>
 		</xs:annotation>
@@ -1508,7 +1533,7 @@ Règle métier T2C :
 	</xs:complexType>
 	<xs:complexType name="BivLineManMessagingStateStructure">
 		<xs:annotation>
-			<xs:documentation source="IV.3.48">Structure d’état d’une messagerie commerciale</xs:documentation>
+			<xs:documentation source="IV.3.48">Structure d’état d’une messagerie ligne manuelle</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="Messaging" type="BivLineManMessagingStructure">
