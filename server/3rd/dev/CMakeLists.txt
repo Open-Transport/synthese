@@ -1,7 +1,3 @@
-add_subdirectory(expat)
-add_subdirectory(geos)
 add_subdirectory(haru)
 add_subdirectory(zlib)
 add_subdirectory(png)
-add_subdirectory(proj)
-add_subdirectory(spatialite)
