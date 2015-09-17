@@ -228,4 +228,7 @@ if("${GIT_TAG}" STREQUAL "")
     set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-snapshot-${CPACK_SYSTEM_NAME}")
 endif()
 
+# OpenSuse RPM package settings
+include(cmake/opensuse.cmake)
+
 include(CPack)
