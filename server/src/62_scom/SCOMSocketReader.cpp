@@ -176,18 +176,12 @@ namespace synthese
 		// Close the socket, stop the main loop and stop the background thread
 		void SCOMSocketReader::Stop ()
 		{
-			_next = STOP;
-            Log::GetInstance().debug("SCOM : STOP ");
-			_close();
-            Log::GetInstance().debug("SCOM : Close ");
+            _next = STOP;
+            _close();
             _ios->stop();
-            Log::GetInstance().debug("SCOM : ios stop ");
             _followIos->stop();
-            Log::GetInstance().debug("SCOM : follow join ");
-			_thread->interrupt();
-            Log::GetInstance().debug("SCOM : interrupt ");
-			_followThread->interrupt();
-            Log::GetInstance().debug("SCOM : follow interrupt ");
+            _thread->interrupt();
+            _followThread->interrupt();
 			// Isn't there a function from server::ServerModule to remove the thread?
 		}
 
