@@ -2595,9 +2595,33 @@ namespace synthese
 			if(row.first.getService())
 			{
 				static_cast<const StopPoint*>(row.first.getDepartureEdge()->getFromVertex())->getConnectionPlace()->toParametersMap(pm, true);
+                
+                ptime adaptedTime = row.first.getDepartureDateTime();
+
+				// Fetch the time from SCOM if enabled
+				#ifdef WITH_SCOM
+				if (_scom)
+				{
+					const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(row.first.getService()->getPath());
+
+					std::string dest =
+								journeyPattern->getDirection().empty() && journeyPattern->getDirectionObj() ?
+                                journeyPattern->getDirectionObj()->get<DisplayedText>() :
+								journeyPattern->getDirection();
+
+					// Check object before calling them
+					adaptedTime = scom::SCOMModule::GetSCOMData()->GetWaitingTime(
+							_screen.get()->getCodeBySources(),
+							journeyPattern->getCommercialLine()->getShortName(),
+							dest,
+							row.first.getDepartureDateTime(),
+							requestTime
+					);
+				}
+				#endif
 
 				// Waiting time
-				time_duration waitingTime(row.first.getDepartureDateTime() - requestTime);
+				time_duration waitingTime(adaptedTime - requestTime);
 				pm.insert(DATA_WAITING_TIME, to_simple_string(waitingTime));
 
 				time_duration blinkingDelay(minutes(screen.get<BlinkingDelay>()));
