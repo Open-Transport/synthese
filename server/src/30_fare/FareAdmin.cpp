@@ -124,14 +124,14 @@ namespace synthese
 				stream << t.cell("ID", lexical_cast<string>(_fare->getKey()));
 				stream << t.cell("Nom", t.getForm().GetTextInput(FareUpdateAction::PARAMETER_NAME, _fare->getName()));
 				stream << t.cell("Type", _fare->getType() ? FareType::GetTypeName(_fare->getType()->getTypeNumber()) : string());
-				stream << t.cell("Monnaie", t.getForm().GetTextInput(FareUpdateAction::PARAMETER_CURRENCY, _fare->getCurrency()));
+				stream << t.cell("Monnaie", t.getForm().GetTextInput(FareUpdateAction::PARAMETER_CURRENCY, _fare->get<Currency>()));
 				stream << t.cell("Nombre de correspondances autorisées (vide : illimité)",
-								t.getForm().getTextInput(
-									FareUpdateAction::PARAMETER_PERMITTED_CONNECTIONS_NUMBER,
-									_fare->getPermittedConnectionsNumber() ? lexical_cast<string>(*_fare->getPermittedConnectionsNumber()) : string()
-								));
-				stream << t.cell("Continuité obligatoire", t.getForm().getOuiNonRadioInput(FareUpdateAction::PARAMETER_REQUIRED_CONTINUITY, _fare->isRequiredContinuity()));
-				stream << t.cell("Durée de validité (en minutes)", t.getForm().getTextInput(FareUpdateAction::PARAMETER_VALIDITY_PERIOD, lexical_cast<string>(_fare->getValidityPeriod())));
+					t.getForm().getTextInput(
+						FareUpdateAction::PARAMETER_PERMITTED_CONNECTIONS_NUMBER,
+						(_fare->get<PermittedConnectionsNumber>() != 0) ? lexical_cast<string>(_fare->get<PermittedConnectionsNumber>()) : string()
+				)	);
+				stream << t.cell("Continuité obligatoire", t.getForm().getOuiNonRadioInput(FareUpdateAction::PARAMETER_REQUIRED_CONTINUITY, _fare->get<RequiredContinuity>()));
+				stream << t.cell("Durée de validité (en minutes)", t.getForm().getTextInput(FareUpdateAction::PARAMETER_VALIDITY_PERIOD, lexical_cast<string>(_fare->get<ValidityPeriod>())));
 
 				// Specific properties
 				if(_fare->getType())

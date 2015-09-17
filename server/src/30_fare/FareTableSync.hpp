@@ -31,7 +31,6 @@
 #include "Fare.hpp"
 #include "FareType.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -47,61 +46,10 @@ namespace synthese
 		class FareTableSync:
 			public db::DBDirectTableSyncTemplate<
 				FareTableSync,
-				Fare,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				Fare
 			>
 		{
-		private:
-			static const std::string ROWS_SEPARATOR;
-			static const std::string FIELDS_SEPARATOR;
-
 		public:
-			static const std::string COL_NAME;
-			static const std::string COL_FARETYPE;
-			static const std::string COL_CURRENCY;
-			static const std::string COL_PERMITTED_CONNECTIONS_NUMBER;
-			static const std::string COL_REQUIRED_CONTINUITY;
-			static const std::string COL_VALIDITY_PERIOD;
-
-			static const std::string COL_ACCESS;
-			static const std::string COL_SLICES;
-			static const std::string COL_UNIT_PRICE;
-			static const std::string COL_MATRIX;
-			static const std::string COL_SUB_FARES;
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Builds storage string.
-			/// Each slice is separated by , . The fields are
-			/// separated by | .
-			//////////////////////////////////////////////////////////////////////////
-			/// @param object the object to serialize
-			/// @return the serialized string corresponding to the object
-			/// @author Gaël Sauvanet
-			/// @since 3.3.0
-			/// @date 2011
-			static std::string SerializeSlices(
-				const FareType::Slices& object
-			);
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Reads storage string.
-			//////////////////////////////////////////////////////////////////////////
-			/// @param object the object to update
-			/// @param serializedString string to read
-			/// @author Gaël Sauvanet
-			/// @since 3.3.0
-			/// @date 2011
-			static FareType::Slices GetSlicesFromSerializedString(
-				const std::string& serializedString
-			);
-
-
-
 			//////////////////////////////////////////////////////////////////////////
 			/// Fare search.
 			/// @param env Environment to populate when loading objects

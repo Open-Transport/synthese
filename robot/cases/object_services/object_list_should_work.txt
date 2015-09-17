@@ -11,7 +11,8 @@ Singleton Object List Should Work For Any Table
     ${SCENARIOS_TABLE_ID}
     ${CITIES_TABLE_ID}
     ${SCENARIO_FOLDER_TABLE_ID}
-	${OBJECT_SITE_LINKS_TABLE_ID}
+    ${OBJECT_SITE_LINKS_TABLE_ID}
+    ${FARES_TABLE_ID}
     
 
 Empty Object List Should Work For Any Table
@@ -20,7 +21,8 @@ Empty Object List Should Work For Any Table
     ${SCENARIOS_TABLE_ID}
     ${CITIES_TABLE_ID}
     ${SCENARIO_FOLDER_TABLE_ID}
-	${OBJECT_SITE_LINKS_TABLE_ID}
+    ${OBJECT_SITE_LINKS_TABLE_ID}
+    ${FARES_TABLE_ID}
     
 
 *** Keywords ***

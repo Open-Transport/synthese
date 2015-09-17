@@ -3259,7 +3259,7 @@ namespace synthese
 					ParametersMap pmTicket(getTemplateParameters());
 					pmTicket.insert(DATA_TICKET_PRICE, ticket.getPrice());
 					pmTicket.insert(DATA_TICKET_NAME, ticket.getFare() ? ticket.getFare()->getName() : string());
-					pmTicket.insert(DATA_TICKET_CURRENCY, ticket.getFare() ? ticket.getFare()->getCurrency() : string());
+					pmTicket.insert(DATA_TICKET_CURRENCY, ticket.getFare() ? ticket.getFare()->get<Currency>() : string());
 					_ticketCellPage->display(sTickets, request, pmTicket);
 				}
 				pm.insert(DATA_TICKETS, sTickets.str());

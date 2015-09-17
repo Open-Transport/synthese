@@ -23,10 +23,12 @@
 #ifndef SYNTHESE_ENV_FARE_H
 #define SYNTHESE_ENV_FARE_H
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
+
+#include "EnumObjectField.hpp"
 #include "FareType.hpp"
 #include "ServicePointer.h"
+#include "StringField.hpp"
 
 #include <string>
 #include <vector>
@@ -37,24 +39,43 @@ namespace synthese
 {
 	namespace fare
 	{
+		FIELD_ENUM(FareTypeEnum, fare::FareType::FareTypeNumber)
+		FIELD_STRING(Currency)
+		FIELD_INT(PermittedConnectionsNumber)
+		FIELD_BOOL(RequiredContinuity)
+		FIELD_INT(ValidityPeriod)
+		FIELD_DOUBLE(Access)
+		FIELD_STRING(Slices)
+		FIELD_DOUBLE(UnitPrice)
+		FIELD_STRING(Matrix)
+		FIELD_STRING(SubFares)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(FareTypeEnum),
+			FIELD(Currency),
+			FIELD(PermittedConnectionsNumber),
+			FIELD(RequiredContinuity),
+			FIELD(ValidityPeriod),
+			FIELD(Access),
+			FIELD(Slices),
+			FIELD(UnitPrice),
+			FIELD(Matrix),
+			FIELD(SubFares)
+		> FareSchema;
+
 		/** Fare handling class
 			@ingroup m30
 		*/
 		class Fare:
-			public virtual util::Registrable
+			public virtual Object<Fare, FareSchema>
 		{
-		 public:
-			/// Chosen registry class.
-			typedef util::Registry<Fare>	Registry;
+		private:
+			static const std::string ROWS_SEPARATOR;
+			static const std::string FIELDS_SEPARATOR;
 
-		 private:
-
-			std::string _name; //!< Fare name
 			boost::shared_ptr<FareType> _type; //!< Fare type
-			std::string _currency; //!< Fare currency
-			boost::optional<int> _permittedConnectionsNumber; //!< Number of permitted connections
-			bool _requiredContinuity; //!< continuity requirement
-			int _validityPeriod; //!< Maximal validity period (minutes)
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -79,22 +100,21 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				virtual std::string getName() const { return _name; }
+				virtual std::string getName() const { return get<Name>(); }
 				const boost::shared_ptr<FareType> getType() const { return _type; }
-				const std::string& getCurrency() const { return _currency; }
-				const boost::optional<int> getPermittedConnectionsNumber() const { return _permittedConnectionsNumber; }
-				bool isRequiredContinuity() const { return _requiredContinuity; }
-				int getValidityPeriod() const { return _validityPeriod; }
 			//@}
 
-			//! @name Setters
+			//! @name Modifiers
 			//@{
-				void setName(const std::string& name) { _name = name; }
-				void setCurrency(const std::string& currency) { _currency = currency; }
-				void setPermittedConnectionsNumber(const boost::optional<int> permittedConnectionsNumber) { _permittedConnectionsNumber = permittedConnectionsNumber; }
-				void setRequiredContinuity(const bool requiredContinuity) { _requiredContinuity = requiredContinuity; }
-				void setValidityPeriod(const int validityPeriod) { _validityPeriod = validityPeriod; }
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 			//@}
+			
+			static FareType::Slices GetSlicesFromSerializedString(
+				const std::string& serializedString
+			);
+			static std::string SerializeSlices(
+				const FareType::Slices& object
+			);
 		};
 	}
 }
