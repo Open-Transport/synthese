@@ -201,7 +201,7 @@ namespace synthese
 			}
 			else
 			{
-				_fare->setPermittedConnectionsNumber(0);
+				_fare->set<PermittedConnectionsNumber>(0);
 			}
 			if(_requiredContinuity)
 			{
