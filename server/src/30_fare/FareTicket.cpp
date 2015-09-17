@@ -58,23 +58,23 @@ namespace synthese
 				return false;
 
 			// test continuity
-			if(_fare->isRequiredContinuity()
-					&& lastService != NULL
-					&& lastService != getLastService())
+			if(_fare->get<RequiredContinuity>()
+				&& lastService != NULL
+				&& lastService != getLastService())
 			{
 				return false;
 			}
 
 			// test the number of permitted connections
-			if(_fare->getPermittedConnectionsNumber()
-					&& _fare->getPermittedConnectionsNumber() <= getNumberOfConnections())
+			if(_fare->get<PermittedConnectionsNumber>() != 0
+				&& _fare->get<PermittedConnectionsNumber>() <= getNumberOfConnections())
 			{
 				return false;
 			}
 
 			// test validity period of the ticket
 			boost::posix_time::time_duration period = newService->getArrivalDateTime() - getStartTime();
-			if(_fare->getValidityPeriod() < period.minutes())
+			if(_fare->get<ValidityPeriod>() < period.minutes())
 				return false;
 
 			return true;

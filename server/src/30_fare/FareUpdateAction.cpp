@@ -98,7 +98,7 @@ namespace synthese
 			}
 			if(_slices)
 			{
-				map.insert(PARAMETER_SLICES, FareTableSync::SerializeSlices(*_slices));
+				map.insert(PARAMETER_SLICES, Fare::SerializeSlices(*_slices));
 			}
 			if(_isUnitPrice)
 			{
@@ -160,7 +160,7 @@ namespace synthese
 			}
 			if(map.isDefined(PARAMETER_SLICES))
 			{
-				_slices = FareTableSync::GetSlicesFromSerializedString(
+				_slices = Fare::GetSlicesFromSerializedString(
 					map.get<string>(PARAMETER_SLICES)
 				);
 			}
@@ -185,54 +185,52 @@ namespace synthese
 		){
 			if(_name)
 			{
-				_fare->setName(*_name);
+				_fare->set<Name>(*_name);
 			}
 			if(_type)
 			{
-				_fare->setTypeNumber(*_type);
+				_fare->set<FareTypeEnum>(*_type);
 			}
 			if(_currency)
 			{
-				_fare->setCurrency(*_currency);
+				_fare->set<Currency>(*_currency);
 			}
 			if(_permittedConnectionsNumber)
 			{
-				_fare->setPermittedConnectionsNumber(*_permittedConnectionsNumber);
+				_fare->set<PermittedConnectionsNumber>(*_permittedConnectionsNumber);
 			}
 			else
 			{
-				_fare->setPermittedConnectionsNumber(boost::optional<int>());
+				_fare->setPermittedConnectionsNumber(0);
 			}
 			if(_requiredContinuity)
 			{
-				_fare->setRequiredContinuity(*_requiredContinuity);
+				_fare->set<RequiredContinuity>(*_requiredContinuity);
 			}
 			if(_validityPeriod)
 			{
-				_fare->setValidityPeriod(*_validityPeriod);
+				_fare->set<ValidityPeriod>(*_validityPeriod);
 			}
 			if(_fare->getType())
 			{
 				if(_accessPrice)
 				{
 					_fare->getType()->setAccessPrice(*_accessPrice);
+					// Update Access price in Fare object for DB record
+					_fare->set<Access>(*_accessPrice);
 				}
 				if(_slices)
 				{
 					_fare->getType()->setSlices(*_slices);
+					// Update Slices in Fare object for DB record
+					_fare->set<Slices>(Fare::SerializeSlices(*_slices));
 				}
 				if(_isUnitPrice)
 				{
 					_fare->getType()->setIsUnitPrice(*_isUnitPrice);
+					// Update Unit price in Fare object for DB record
+					_fare->set<UnitPrice>(*_isUnitPrice);
 				}
-/*				if(_matrix)
-				{
-					_fare->getType()->setMatrix(*_matrix);
-				}
-				if(_subFares)
-				{
-					_fare->getType()->setSubFares(*_subFares);
-				}*/
 			}
 
 			FareTableSync::Save(_fare.get());

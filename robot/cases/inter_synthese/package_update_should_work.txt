@@ -47,3 +47,12 @@ First Update Of An InterSynthese Package With Only One Default ObjectSiteLink Sh
     Package "package2" Is Updated From Node 0
     Check Synthese Object Exists  ${created_object_id}
 
+First Update Of An InterSynthese Package With Only One Default Fare Should Work
+    On Node 0
+    ${http_response}=    Create Synthese Object    ${FARES_TABLE_ID}
+    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    Package "package2" Containing Object ${created_object_id} Is Created
+    On Node 1
+    Package "package2" Is Updated From Node 0
+    Check Synthese Object Exists  ${created_object_id}
+
