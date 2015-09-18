@@ -750,8 +750,22 @@ namespace synthese
 					time_duration nextArrivalTime = run.second.schedules.front().dept;
 					BOOST_FOREACH(const HanoverTheoricalSchedule& schedule, run.second.schedules)
 					{
-						arrivals.push_back(nextArrivalTime);
-						departures.push_back(schedule.dept);
+						if(nextArrivalTime.seconds())
+						{
+							arrivals.push_back(nextArrivalTime + seconds(60 - nextArrivalTime.seconds()));
+						}
+						else
+						{
+							arrivals.push_back(nextArrivalTime);
+						}
+						if(schedule.dept.seconds())
+						{
+							departures.push_back(schedule.dept - seconds(schedule.dept.seconds()));
+						}
+						else
+						{
+							departures.push_back(schedule.dept);
+						}
 						nextArrivalTime = schedule.dept;
 					}
 
