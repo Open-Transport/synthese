@@ -1359,10 +1359,13 @@ namespace synthese
 					util::Log::GetInstance().warn("IneoTerminusConnection : Message avec Dispatching inconnu : ");
 				}
 			}
+
+			// Define default time period : start time and stop time match Ineo exploitation period
+			// TODO : change start time and stop time constants to be configuration parameters
 			string startDateStr("01/01/1970");
 			string stopDateStr("31/12/2037");
-			string startTimeStr("00:00:00");
-			string stopTimeStr("23:59:59");
+			string startTimeStr("03:00:00");
+			string stopTimeStr("27:00:00");
 			message.startHour = boost::posix_time::not_a_date_time;
 			message.stopHour = boost::posix_time::not_a_date_time;
 			if (node.nChildNode("StartDate") > 0)

@@ -118,9 +118,9 @@ childStartDate.text = "01/01/1970"
 childStopDate = etree.SubElement(childMessaging, "StopDate")
 childStopDate.text = "31/12/2037"
 childStartTime = etree.SubElement(childMessaging, "StartTime")
-childStartTime.text = "00:00:00"
+childStartTime.text = "03:00:00"
 childStopTime = etree.SubElement(childMessaging, "StopTime")
-childStopTime.text = "23:59:00"
+childStopTime.text = "27:00:00"
 
 # Varying
 
