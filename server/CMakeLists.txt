@@ -79,6 +79,14 @@ if(NOT SPATIALITE_FOUND)
   message(FATAL_ERROR "Spatialite not found")
 endif()
 
+# IConv
+if(WIN32)
+  find_package(Iconv)
+  if(NOT ICONV_FOUND)
+    message(FATAL_ERROR "Iconv not found")
+  endif()
+endif()
+
 # Boost
 
 set(Boost_ADDITIONAL_VERSIONS "1.57")
@@ -182,11 +190,11 @@ if(WIN32)
   # This is to avoid:
   # warning C4250: 'xxx' : inherits 'yyy' via dominance
   add_definitions(/wd4250)
-  
+
   # iconv
   add_library(iconv STATIC IMPORTED)
   set_property(TARGET iconv PROPERTY IMPORTED_LOCATION
-    "${PROJECT_SOURCE_DIR}/3rd/dev/iconv/lib/libiconv.lib")
+    "${ICONV_LIBRARIES}")
 
   # expat
   add_definitions(-DXML_STATIC)
@@ -213,9 +221,17 @@ configure_file(
 )
 
 # Python 2.7
-find_package(PythonLibs 2.7 REQUIRED)
-if(NOT PYTHONLIBS_FOUND)
-  message(FATAL_ERROR "Unable to find PythonLibs.")
+if(WIN32)
+  # TODO : FindPythonLibs does not work under windows 64 bits ; for now define
+  # manually PYTHON_INCLUDE_DIR and PYTHON_LIBRARY
+  # For instance :
+  set (PYTHON_INCLUDE_DIR "C:/Python27/include")
+  set (PYTHON_LIBRARY "C:/Python27/libs/python27.lib")
+else()
+  find_package(PythonLibs 2.7 REQUIRED)
+  if(NOT PYTHONLIBS_FOUND)
+    message(FATAL_ERROR "Unable to find PythonLibs.")
+  endif()
 endif()
 
 include(FindPythonInterp)

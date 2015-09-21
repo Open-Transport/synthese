@@ -40,14 +40,14 @@ namespace synthese
 	using namespace util;
 
 	CLASS_DEFINITION(MediaLibrary, "t122_media_libraries", 122)
+	FIELD_DEFINITION_OF_OBJECT(MediaLibrary, "media_library_id", "media_library_ids")
+
+	FIELD_DEFINITION_OF_TYPE(ServerHostnamePort, "website_hostname_port", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(LibraryType, "type", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(DefaultView, "default_view_mode", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(AcceptedMediaTypes, "accepted_media_types", SQL_TEXT)
 
 	namespace messages {
-		FIELD_DEFINITION_OF_OBJECT(MediaLibrary, "media_library_id", "media_library_ids")
-
-		FIELD_DEFINITION_OF_TYPE(ServerHostnamePort, "website_hostname_port", SQL_TEXT)
-		FIELD_DEFINITION_OF_TYPE(LibraryType, "type", SQL_INTEGER)
-		FIELD_DEFINITION_OF_TYPE(DefaultView, "default_view_mode", SQL_INTEGER)
-		FIELD_DEFINITION_OF_TYPE(AcceptedMediaTypes, "accepted_media_types", SQL_TEXT)
 
         const string MediaLibrary::TAG_WEBSITE_NAME = "website_name";
 

@@ -54,14 +54,15 @@ namespace synthese
 
 	CLASS_DEFINITION(NotificationEvent, "t108_notification_events", 108)
 
-	namespace messages {
-		FIELD_DEFINITION_OF_OBJECT(NotificationEvent, "notification_event_id", "notification_event_ids")
+	FIELD_DEFINITION_OF_OBJECT(NotificationEvent, "notification_event_id", "notification_event_ids")
 
-		FIELD_DEFINITION_OF_TYPE(EventType, "type", SQL_INTEGER)
-		FIELD_DEFINITION_OF_TYPE(Status, "status", SQL_INTEGER)
-		FIELD_DEFINITION_OF_TYPE(Expiration, "expiration", SQL_DATETIME)
-		FIELD_DEFINITION_OF_TYPE(Attempts, "attempts", SQL_INTEGER)
-		FIELD_DEFINITION_OF_TYPE(LastAttempt, "last_attempt", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(EventType, "type", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Status, "status", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Expiration, "expiration", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(Attempts, "attempts", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(LastAttempt, "last_attempt", SQL_DATETIME)
+
+	namespace messages {
 
 		/// Default constructor as a Registrable
 		/// @param id registry key type

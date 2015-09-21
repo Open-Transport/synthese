@@ -127,7 +127,7 @@ namespace synthese
 						alarm->getKey()
 				)	);
 
-				BOOST_FOREACH(const shared_ptr<NotificationEvent> event, resultEvents)
+				BOOST_FOREACH(const boost::shared_ptr<NotificationEvent> event, resultEvents)
 				{
 					if (event->get<Status>() == HOLD)
 					{
