@@ -398,7 +398,7 @@ Règle métier :
 	</xs:redefine>
 	<xs:element name="GirouetteCreateMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.15">Demande de création d’une messagerie de girouette</xs:documentation>
+			<xs:documentation source="IV.2.27">Demande de création d’une messagerie de girouette</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -416,7 +416,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="GirouetteCreateMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie de girouette</xs:documentation>
+			<xs:documentation source="IV.2.28">Réponse à une demande de création d’une messagerie de girouette</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -453,7 +453,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="GirouetteDeleteMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie de girouette</xs:documentation>
+			<xs:documentation source="IV.2.29">Demande de suppression d’une messagerie de girouette</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -467,7 +467,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="GirouetteDeleteMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie de girouette</xs:documentation>
+			<xs:documentation source="IV.2.30">Réponse à une demande de suppression d’une messagerie de girouette</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -504,12 +504,12 @@ Règle métier :
 	</xs:element>
 	<xs:element name="GirouetteGetStatesRequest" type="Request">
 		<xs:annotation>
-			<xs:documentation source="IV.2.13">Demande de l’état des messageries de girouette</xs:documentation>
+			<xs:documentation source="IV.2.31">Demande de l’état des messageries de girouette</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="GirouetteGetStatesResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.14">Etat des messageries de girouette</xs:documentation>
+			<xs:documentation source="IV.2.32">Etat des messageries de girouette</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -546,7 +546,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoPassengerCreateMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.15">Demande de création d’une messagerie sonore passager</xs:documentation>
+			<xs:documentation source="IV.2.33">Demande de création d’une messagerie sonore passager</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -564,7 +564,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoPassengerCreateMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie sonore passager</xs:documentation>
+			<xs:documentation source="IV.2.34">Réponse à une demande de création d’une messagerie sonore passager</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -601,7 +601,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoPassengerDeleteMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie sonore passager</xs:documentation>
+			<xs:documentation source="IV.2.35">Demande de suppression d’une messagerie sonore passager</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -615,7 +615,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoPassengerDeleteMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie sonore passager</xs:documentation>
+			<xs:documentation source="IV.2.36">Réponse à une demande de suppression d’une messagerie sonore passager</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -652,12 +652,12 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoPassengerGetStatesRequest" type="Request">
 		<xs:annotation>
-			<xs:documentation source="IV.2.13">Demande de l’état des messageries sonore passager</xs:documentation>
+			<xs:documentation source="IV.2.37">Demande de l’état des messageries sonore passager</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="SonoPassengerGetStatesResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.14">Etat des messageries sonore passager</xs:documentation>
+			<xs:documentation source="IV.2.38">Etat des messageries sonore passager</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -694,7 +694,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoDriverCreateMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.15">Demande de création d’une messagerie sonore conducteur</xs:documentation>
+			<xs:documentation source="IV.2.39">Demande de création d’une messagerie sonore conducteur</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -712,7 +712,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoDriverCreateMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie sonore conducteur</xs:documentation>
+			<xs:documentation source="IV.2.40">Réponse à une demande de création d’une messagerie sonore conducteur</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -749,7 +749,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoDriverDeleteMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie sonore conducteur</xs:documentation>
+			<xs:documentation source="IV.2.41">Demande de suppression d’une messagerie sonore conducteur</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -763,7 +763,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoDriverDeleteMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie sonore conducteur</xs:documentation>
+			<xs:documentation source="IV.2.42">Réponse à une demande de suppression d’une messagerie sonore conducteur</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -800,12 +800,12 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoDriverGetStatesRequest" type="Request">
 		<xs:annotation>
-			<xs:documentation source="IV.2.13">Demande de l’état des messageries sonore conducteur</xs:documentation>
+			<xs:documentation source="IV.2.43">Demande de l’état des messageries sonore conducteur</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="SonoDriverGetStatesResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.14">Etat des messageries sonore conducteur</xs:documentation>
+			<xs:documentation source="IV.2.44">Etat des messageries sonore conducteur</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -842,7 +842,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoStopPointCreateMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.15">Demande de création d’une messagerie sonore arrêt</xs:documentation>
+			<xs:documentation source="IV.2.45">Demande de création d’une messagerie sonore arrêt</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -860,7 +860,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoStopPointCreateMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie sonore arrêt</xs:documentation>
+			<xs:documentation source="IV.2.46">Réponse à une demande de création d’une messagerie sonore arrêt</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -897,7 +897,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoStopPointDeleteMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie sonore arrêt</xs:documentation>
+			<xs:documentation source="IV.2.47">Demande de suppression d’une messagerie sonore arrêt</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -911,7 +911,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoStopPointDeleteMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie sonore arrêt</xs:documentation>
+			<xs:documentation source="IV.2.48">Réponse à une demande de suppression d’une messagerie sonore arrêt</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -948,12 +948,12 @@ Règle métier :
 	</xs:element>
 	<xs:element name="SonoStopPointGetStatesRequest" type="Request">
 		<xs:annotation>
-			<xs:documentation source="IV.2.13">Demande de l’état des messageries sonore arrêt</xs:documentation>
+			<xs:documentation source="IV.2.49">Demande de l’état des messageries sonore arrêt</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="SonoStopPointGetStatesResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.14">Etat des messageries sonore arrêt</xs:documentation>
+			<xs:documentation source="IV.2.50">Etat des messageries sonore arrêt</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -990,7 +990,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="BivLineAutoCreateMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.15">Demande de création d’une messagerie ligne automatique</xs:documentation>
+			<xs:documentation source="IV.2.63">Demande de création d’une messagerie ligne automatique</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -1008,7 +1008,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="BivLineAutoCreateMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie ligne automatique</xs:documentation>
+			<xs:documentation source="IV.2.64">Réponse à une demande de création d’une messagerie ligne automatique</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -1045,7 +1045,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="BivLineAutoDeleteMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie ligne automatique</xs:documentation>
+			<xs:documentation source="IV.2.65">Demande de suppression d’une messagerie ligne automatique</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -1059,7 +1059,7 @@ Règle métier :
 	</xs:element>
 	<xs:element name="BivLineAutoDeleteMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie ligne automatique</xs:documentation>
+			<xs:documentation source="IV.2.66">Réponse à une demande de suppression d’une messagerie ligne automatique</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -1096,12 +1096,12 @@ Règle métier :
 	</xs:element>
 	<xs:element name="BivLineAutoGetStatesRequest" type="Request">
 		<xs:annotation>
-			<xs:documentation source="IV.2.13">Demande de l’état des messageries ligne automatique</xs:documentation>
+			<xs:documentation source="IV.2.67">Demande de l’état des messageries ligne automatique</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="BivLineAutoGetStatesResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.14">Etat des messageries ligne automatique</xs:documentation>
+			<xs:documentation source="IV.2.68">Etat des messageries ligne automatique</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -1358,12 +1358,12 @@ Règle métier :
 			</xs:element>
 			<xs:element name="Text" type="SonoMessageTextType">
 				<xs:annotation>
-					<xs:documentation source="IV.3.22">Texte du message</xs:documentation>
+					<xs:documentation source="IV.4.30">Texte du message</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="Recipients" type="SonoPassengerMessagingRecipientEnum">
 				<xs:annotation>
-					<xs:documentation source="IV.3.22">Type et liste des destinataires</xs:documentation>
+					<xs:documentation source="IV.3.27">Type et liste des destinataires</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
@@ -1482,12 +1482,12 @@ Règle métier :
 			</xs:element>
 			<xs:element name="Text" type="SonoMessageTextType">
 				<xs:annotation>
-					<xs:documentation source="IV.3.22">Texte du message</xs:documentation>
+					<xs:documentation source="IV.4.30">Texte du message</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="Recipients" type="SonoDriverMessagingRecipientEnum">
 				<xs:annotation>
-					<xs:documentation source="IV.3.22">Type et liste des destinataires</xs:documentation>
+					<xs:documentation source="IV.3.31">Type et liste des destinataires</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
@@ -1606,12 +1606,12 @@ Règle métier :
 			</xs:element>
 			<xs:element name="Text" type="SonoMessageTextType">
 				<xs:annotation>
-					<xs:documentation source="IV.3.22">Texte du message</xs:documentation>
+					<xs:documentation source="IV.4.30">Texte du message</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="Recipients" type="SonoStopPointMessagingRecipientEnum">
 				<xs:annotation>
-					<xs:documentation source="IV.3.22">Type et liste des destinataires</xs:documentation>
+					<xs:documentation source="IV.3.35">Type et liste des destinataires</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>

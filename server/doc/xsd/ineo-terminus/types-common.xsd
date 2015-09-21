@@ -486,7 +486,7 @@
 	</xs:element>
 	<xs:element name="PassengerCreateMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie passager</xs:documentation>
+			<xs:documentation source="IV.2.16">Réponse à une demande de création d’une messagerie passager</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -523,7 +523,7 @@
 	</xs:element>
 	<xs:element name="PassengerDeleteMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie passager</xs:documentation>
+			<xs:documentation source="IV.2.17">Demande de suppression d’une messagerie passager</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -541,7 +541,7 @@
 	</xs:element>
 	<xs:element name="PassengerDeleteMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie passager</xs:documentation>
+			<xs:documentation source="IV.2.18">Réponse à une demande de suppression d’une messagerie passager</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -578,12 +578,12 @@
 	</xs:element>
 	<xs:element name="PassengerGetStatesRequest" type="Request">
 		<xs:annotation>
-			<xs:documentation source="IV.2.13">Demande de l’état des messageries passager</xs:documentation>
+			<xs:documentation source="IV.2.19">Demande de l’état des messageries passager</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="PassengerGetStatesResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.14">Etat des messageries passager</xs:documentation>
+			<xs:documentation source="IV.2.20">Etat des messageries passager</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -620,7 +620,7 @@
 	</xs:element>
 	<xs:element name="PpdsCreateMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.15">Demande de création d’une messagerie de prise de service</xs:documentation>
+			<xs:documentation source="IV.2.21">Demande de création d’une messagerie de prise de service</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -638,7 +638,7 @@
 	</xs:element>
 	<xs:element name="PpdsCreateMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie de prise de service</xs:documentation>
+			<xs:documentation source="IV.2.22">Réponse à une demande de création d’une messagerie de prise de service</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -675,7 +675,7 @@
 	</xs:element>
 	<xs:element name="PpdsDeleteMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie de prise de service</xs:documentation>
+			<xs:documentation source="IV.2.23">Demande de suppression d’une messagerie de prise de service</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -693,7 +693,7 @@
 	</xs:element>
 	<xs:element name="PpdsDeleteMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie de prise de service</xs:documentation>
+			<xs:documentation source="IV.2.24">Réponse à une demande de suppression d’une messagerie de prise de service</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -730,12 +730,12 @@
 	</xs:element>
 	<xs:element name="PpdsGetStatesRequest" type="Request">
 		<xs:annotation>
-			<xs:documentation source="IV.2.13">Demande de l’état des messageries de prise de service</xs:documentation>
+			<xs:documentation source="IV.2.25">Demande de l’état des messageries de prise de service</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="PpdsGetStatesResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.14">Etat des messageries de prise de service</xs:documentation>
+			<xs:documentation source="IV.2.26">Etat des messageries de prise de service</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -772,7 +772,7 @@
 	</xs:element>
 	<xs:element name="BivGeneralCreateMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.15">Demande de création d’une messagerie commerciale</xs:documentation>
+			<xs:documentation source="IV.2.51">Demande de création d’une messagerie commerciale</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -790,7 +790,7 @@
 	</xs:element>
 	<xs:element name="BivGeneralCreateMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie commerciale</xs:documentation>
+			<xs:documentation source="IV.2.52">Réponse à une demande de création d’une messagerie commerciale</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -827,7 +827,7 @@
 	</xs:element>
 	<xs:element name="BivGeneralDeleteMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie commerciale</xs:documentation>
+			<xs:documentation source="IV.2.53">Demande de suppression d’une messagerie commerciale</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -845,7 +845,7 @@
 	</xs:element>
 	<xs:element name="BivGeneralDeleteMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie commerciale</xs:documentation>
+			<xs:documentation source="IV.2.54">Réponse à une demande de suppression d’une messagerie commerciale</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -882,12 +882,12 @@
 	</xs:element>
 	<xs:element name="BivGeneralGetStatesRequest" type="Request">
 		<xs:annotation>
-			<xs:documentation source="IV.2.13">Demande de l’état des messageries commerciale</xs:documentation>
+			<xs:documentation source="IV.2.55">Demande de l’état des messageries commerciale</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="BivGeneralGetStatesResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.14">Etat des messageries commerciales</xs:documentation>
+			<xs:documentation source="IV.2.56">Etat des messageries commerciales</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -924,7 +924,7 @@
 	</xs:element>
 	<xs:element name="BivLineManCreateMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.15">Demande de création d’une messagerie ligne manuelle</xs:documentation>
+			<xs:documentation source="IV.2.57">Demande de création d’une messagerie ligne manuelle</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -942,7 +942,7 @@
 	</xs:element>
 	<xs:element name="BivLineManCreateMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.10">Réponse à une demande de création d’une messagerie ligne manuelle</xs:documentation>
+			<xs:documentation source="IV.2.58">Réponse à une demande de création d’une messagerie ligne manuelle</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -979,7 +979,7 @@
 	</xs:element>
 	<xs:element name="BivLineManDeleteMessageRequest">
 		<xs:annotation>
-			<xs:documentation source="IV.2.11">Demande de suppression d’une messagerie ligne manuelle</xs:documentation>
+			<xs:documentation source="IV.2.59">Demande de suppression d’une messagerie ligne manuelle</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -997,7 +997,7 @@
 	</xs:element>
 	<xs:element name="BivLineManDeleteMessageResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.12">Réponse à une demande de suppression d’une messagerie ligne manuelle</xs:documentation>
+			<xs:documentation source="IV.2.60">Réponse à une demande de suppression d’une messagerie ligne manuelle</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -1034,12 +1034,12 @@
 	</xs:element>
 	<xs:element name="BivLineManGetStatesRequest" type="Request">
 		<xs:annotation>
-			<xs:documentation source="IV.2.13">Demande de l’état des messageries ligne manuelle</xs:documentation>
+			<xs:documentation source="IV.2.61">Demande de l’état des messageries ligne manuelle</xs:documentation>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="BivLineManGetStatesResponse">
 		<xs:annotation>
-			<xs:documentation source="IV.2.14">Etat des messageries ligne manuelle</xs:documentation>
+			<xs:documentation source="IV.2.62">Etat des messageries ligne manuelle</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:complexContent>
@@ -1533,7 +1533,7 @@ Règle métier T2C :
 	</xs:complexType>
 	<xs:complexType name="BivLineManMessagingStateStructure">
 		<xs:annotation>
-			<xs:documentation source="IV.3.48">Structure d’état d’une messagerie ligne manuelle</xs:documentation>
+			<xs:documentation source="IV.3.52">Structure d’état d’une messagerie ligne manuelle</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="Messaging" type="BivLineManMessagingStructure">
