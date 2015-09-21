@@ -43,16 +43,16 @@ namespace synthese
 			_acceptGzip(acceptGzip)
 		{}
 
-	    BasicClient (
+		BasicClient::BasicClient(
 			const std::string& serverHost,
 			const std::string serverPort,
 			boost::optional<int> connectionTimeout,
 			boost::optional<int> readTimeout,
-			bool outputHTTPHeaders = false,
-			bool acceptGzip = true
+			bool outputHTTPHeaders,
+			bool acceptGzip
 		):	_serverHost (serverHost),
 			_serverPort (serverPort),
-			_timeOut (connectionTimeout == boost::none ? 0, connectionTimeout),
+			_timeOut (connectionTimeout == boost::none ? 0 : connectionTimeout),
 			_outputHTTPHeaders(outputHTTPHeaders),
 			_acceptGzip(acceptGzip)
 		{}

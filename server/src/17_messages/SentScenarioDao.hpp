@@ -34,8 +34,9 @@ namespace messages
 {
 	class SentScenario;
 
-	struct SentScenarioDao
+	class SentScenarioDao
 	{
+	public:
 		virtual std::vector<boost::shared_ptr<SentScenario> > list() const = 0;
 		virtual void save(boost::shared_ptr<SentScenario>& sentScenario) const = 0;
 	};

@@ -32,7 +32,7 @@
 #include <EnumObjectField.hpp>
 #include <NumericField.hpp>
 #include <StringField.hpp>
-#include <Website.hpp>
+#include <Webpage.h>
 
 #include <boost/fusion/container/map.hpp>
 #include <boost/fusion/support/pair.hpp>
