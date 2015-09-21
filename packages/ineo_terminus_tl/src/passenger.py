@@ -172,7 +172,7 @@ if int(needs_repeat_interval) != 0:
 
 # Inhibition
 childInhibition = etree.SubElement(childMessaging, "Inhibition")
-childInhibition.text = "non"
+childInhibition.text = "oui" if int(message[0]["priority"]) >= 50 else "non"
 
 # Color
 childColor = etree.SubElement(childMessaging, "Color")

@@ -996,96 +996,7 @@ namespace synthese
 
 			// Build a parameters map from the data of the request
 			boost::shared_ptr<ParametersMap> messagesAndCalendarsPM(new ParametersMap);
-			BOOST_FOREACH(const Messaging& message, messages)
-			{
-				boost::shared_ptr<ParametersMap> periodPM(new ParametersMap);
-				periodPM->insert("start_date", boost::gregorian::to_iso_extended_string(message.startDate.date()) + " " + boost::posix_time::to_simple_string(message.startDate.time_of_day()));
-				periodPM->insert("end_date", boost::gregorian::to_iso_extended_string(message.stopDate.date()) + " " + boost::posix_time::to_simple_string(message.stopDate.time_of_day()));
-				periodPM->insert("start_hour", message.startHour.is_not_a_date_time() ? "" : boost::posix_time::to_simple_string(message.startHour));
-				periodPM->insert("end_hour", message.stopHour.is_not_a_date_time() ? "" : boost::posix_time::to_simple_string(message.stopHour));
-				periodPM->insert("date", "");
-
-				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
-				messagePM->insert("title", message.name);
-				messagePM->insert("content", message.content);
-				messagePM->insert("color", message.color);
-				if (message.dispatching == Immediat)
-				{
-					messagePM->insert("dispatching", "Immediat");
-				}
-				else if (message.dispatching == Differe)
-				{
-					messagePM->insert("dispatching", "Differe");
-				}
-				else if (message.dispatching == Repete)
-				{
-					messagePM->insert("dispatching", "Repete");
-				}
-				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod * 60));
-				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
-				messagePM->insert("section", "");
-				messagePM->insert("alternative", "");
-				messagePM->insert("with_ack", message.confirm);
-				messagePM->insert("multiple_stops", message.multipleStop);
-				messagePM->insert("play_tts", message.ttsBroadcasting);
-				messagePM->insert("light", message.diodFlashing);
-				messagePM->insert("direction_sign_code", message.codeGirouette);
-
-				if(false == message.startStopPoint.empty())
-				{
-					std::set<StopPoint*> startStopPoints = _findIneoStopPoint(message.startStopPoint);
-
-					if(false == startStopPoints.empty())
-					{
-						std::set<StopPoint*>::iterator firstStopPoint = startStopPoints.begin();
-						messagePM->insert("start_stop_point", (*firstStopPoint)->getKey());
-					}
-
-					else
-					{
-						util::Log::GetInstance().warn("Ineo Terminus : start stop point " + message.startStopPoint + " could not be found");
-					}
-				}
-
-				if(false == message.endStopPoint.empty())
-				{
-					std::set<StopPoint*> endStopPoints = _findIneoStopPoint(message.endStopPoint);
-
-					if(false == endStopPoints.empty())
-					{
-						std::set<StopPoint*>::iterator firstStopPoint = endStopPoints.begin();
-						messagePM->insert("end_stop_point", (*firstStopPoint)->getKey());
-					}
-
-					else
-					{
-						util::Log::GetInstance().warn("Ineo Terminus : end stop point " + message.endStopPoint + " could not be found");
-					}
-				}
-
-				IneoApplicationError recipientsErrorCode = AucuneErreur;
-				bool recipientsFound = _addRecipientsPM(*messagePM, message.recipients, recipientsErrorCode);
-
-				if(false == recipientsFound)
-				{
-					// At least one recipient could not be found, reply to Ineo with an error
-					errorCode = recipientsErrorCode;
-					status = false;
-				}
-
-				if(0 != fakeBroadCastPoint)
-				{
-					// If a fake broadcast point was configured for this message type, add it as a recipient
-					boost::shared_ptr<ParametersMap> displayRecipientPM(new ParametersMap);
-					displayRecipientPM->insert("recipient_id", fakeBroadCastPoint);
-					messagePM->insert("displayscreen_recipient", displayRecipientPM);
-				}
-
-				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
-				calendarPM->insert("period", periodPM);
-				calendarPM->insert("message", messagePM);
-				messagesAndCalendarsPM->insert("calendar", calendarPM);
-			}
+			status = _buildMessagingParametersMap(messages, fakeBroadCastPoint, messagesAndCalendarsPM, errorCode);
 
 			if(true == status)
 			{
@@ -1682,10 +1593,14 @@ namespace synthese
 		}
 
 
-		bool IneoTerminusConnection::tcp_connection::_createMessages(std::vector<Messaging> messages, RegistryKeyType fakeBroadCastPoint, IneoApplicationError& errorCode)
+		bool IneoTerminusConnection::tcp_connection::_buildMessagingParametersMap(
+			std::vector<Messaging> messages,
+			RegistryKeyType fakeBroadCastPoint,
+			boost::shared_ptr<ParametersMap> parametersMap,
+			IneoApplicationError& errorCode
+		)
 		{
 			bool status = true;
-			boost::shared_ptr<ParametersMap> messagesAndCalendarsPM(new ParametersMap);
 
 			// Fill the parameters map from the vector of messages
 			BOOST_FOREACH(const Messaging& message, messages)
@@ -1743,6 +1658,10 @@ namespace synthese
 				{
 					level = (message.varying ? ALARM_LEVEL_ALTERNATE : ALARM_LEVEL_WARNING);
 				}
+				if(false == boost::logic::indeterminate(message.inhibition))
+				{
+					level = (message.inhibition ? ALARM_LEVEL_WARNING : ALARM_LEVEL_ALTERNATE);
+				}
 				messagePM->insert("level", level);
 
 				if(0 < message.duration)
@@ -1750,7 +1669,6 @@ namespace synthese
 					messagePM->insert("displayDuration", message.duration);
 				}
 				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod * 60));
-				messagePM->insert("inhibition", (message.inhibition ? "oui" : "non"));
 				messagePM->insert("section", "");
 				messagePM->insert("alternative", "");
 				messagePM->insert("with_ack", message.confirm);
@@ -1814,8 +1732,17 @@ namespace synthese
 				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 				calendarPM->insert("period", periodPM);
 				calendarPM->insert("message", messagePM);
-				messagesAndCalendarsPM->insert("calendar", calendarPM);
+				parametersMap->insert("calendar", calendarPM);
 			}
+
+			return status;
+		}
+
+
+		bool IneoTerminusConnection::tcp_connection::_createMessages(std::vector<Messaging> messages, RegistryKeyType fakeBroadCastPoint, IneoApplicationError& errorCode)
+		{
+			boost::shared_ptr<ParametersMap> messagesAndCalendarsPM(new ParametersMap);
+			bool status = _buildMessagingParametersMap(messages, fakeBroadCastPoint, messagesAndCalendarsPM, errorCode);
 
 			if(true == status)
 			{

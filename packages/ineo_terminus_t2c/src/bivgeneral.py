@@ -120,7 +120,7 @@ childStopDate.text = "31/12/2037"
 
 # Varying
 childVarying = etree.SubElement(childMessaging, "Varying")
-childVarying.text = "oui" if int(message[0]["priority"]) < 99 else "non"
+childVarying.text = "oui" if int(message[0]["priority"]) < 50 else "non"
 
 # Duration
 childDuration = etree.SubElement(childMessaging, "Duration")

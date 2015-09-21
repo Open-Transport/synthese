@@ -254,6 +254,14 @@ namespace synthese
 				// generic parsers
 				std::vector<IneoTerminusConnection::Recipient> _readRecipients(XMLNode node);
 				Messaging _readMessagingNode(XMLNode node, std::string messagerieName);
+
+				bool _buildMessagingParametersMap(
+					std::vector<Messaging> messages,
+					util::RegistryKeyType fakeBroadCastPoint,
+					boost::shared_ptr<util::ParametersMap> parametersMap,
+					IneoApplicationError& errorCode
+				);
+
 				bool _createMessages(std::vector<Messaging> messages, util::RegistryKeyType fakeBroadCastPoint, IneoApplicationError& errorCode);
 
 				//generic writers
