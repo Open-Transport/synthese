@@ -160,7 +160,8 @@ namespace synthese
 			_scenario(NULL),
 			_dataSource(NULL),
 			_stopDateTime(second_clock::local_time()),
-			_remove(false)
+			_remove(false),
+			_archive(false)
 		{}
 
 
@@ -208,6 +209,11 @@ namespace synthese
 						continue;
 					}
 					SentScenario* sscenario = static_cast<SentScenario*>(scenario.get());
+					if (!sscenario->getIsEnabled())
+					{
+						// Match only enabled scenarios because "delete" scenarios are actually archived
+						continue;
+					}
 
 					// Loop on messages
 					bool allAlarmsFound(true);
