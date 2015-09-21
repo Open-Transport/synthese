@@ -27,8 +27,8 @@ target_link_libraries(06_openstreetmap
   01_util
   # Forward dependencies:
   #34_road
-  expat
-  proj
+  ${EXPAT_LIBRARIES}  
+  ${PROJ_LIBRARIES}
 )
 
 install(TARGETS 06_openstreetmap DESTINATION lib)

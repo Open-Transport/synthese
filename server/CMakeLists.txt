@@ -31,6 +31,12 @@ if(UNIX)
   set(BUILD_SHARED_LIBS ON)
 endif()
 
+# Zlib
+find_package(Zlib)
+if(NOT ZLIB_FOUND)
+  message(FATAL_ERROR "Zlib not found")
+endif()
+
 # Expat
 
 find_package(Expat)
@@ -51,13 +57,19 @@ find_package(Geos)
 if(NOT GEOS_FOUND)
   message(FATAL_ERROR "Geos not found")
 endif()
-message(========================= ${GEOS_LIBRARIES})
 
 # Geosc
 
 find_package(Geosc)
 if(NOT GEOSC_FOUND)
   message(FATAL_ERROR "Geosc not found")
+endif()
+
+# Haru
+
+find_package(Haru)
+if(NOT HARU_FOUND)
+  message(FATAL_ERROR "Haru not found")
 endif()
 
 # Spatialite

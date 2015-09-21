@@ -7,33 +7,23 @@
 
 include(cmake/LibFindMacros.cmake)
 
-# Include dir
 if(WIN32)
-   find_path(GEOS_INCLUDE_DIR 
-      geos.h
-      PATHS
-      $ENV{GEOS_DIR}/include 
-      $ENV{HOME}/rcs/geos/include
-      NO_DEFAULT_PATH
-   )
-   find_library(GEOS_LIBRARY 
-      geos
-      PATHS 
-      $ENV{GEOS_DIR}/lib 
-      $ENV{HOME}/rcs/geos/lib
-      NO_DEFAULT_PATH
-   )
-
-else(WIN32)
-   find_path(GEOS_INCLUDE_DIR 
-      NAMES geos.h
-      PATHS $ENV{GEOS_DIR}/include /opt/rcs/geos/include /usr/local/include /usr/include
-      NO_DEFAULT_PATH
-   )
 
    IF(DEFINED ENV{GEOS_DIR})
+     find_path(GEOS_INCLUDE_DIR geos.h PATHS $ENV{GEOS_DIR}/include $ENV{HOME}/rcs/geos/include NO_DEFAULT_PATH)
+     find_library(GEOS_LIBRARY geos PATHS $ENV{GEOS_DIR}/lib $ENV{HOME}/rcs/geos/lib NO_DEFAULT_PATH)
+   ELSE()
+     find_path(GEOS_INCLUDE_DIR geos.h PATHS $ENV{HOME}/rcs/geos/include NO_DEFAULT_PATH)
+     find_library(GEOS_LIBRARY geos PATHS $ENV{HOME}/rcs/geos/lib NO_DEFAULT_PATH)
+   ENDIF()
+
+else(WIN32)
+
+   IF(DEFINED ENV{GEOS_DIR})
+   	  find_path(GEOS_INCLUDE_DIR NAMES geos.h PATHS $ENV{GEOS_DIR}/include /opt/rcs/geos/include /usr/local/include /usr/include NO_DEFAULT_PATH)
       find_library(GEOS_LIBRARY NAMES geos PATHS $ENV{GEOS_DIR}/lib /opt/rcs/geos/lib /usr/local/lib /usr/lib NO_DEFAULT_PATH)
    ELSE()
+      find_path(GEOS_INCLUDE_DIR NAMES geos.h PATHS /opt/rcs/geos/include /usr/local/include /usr/include NO_DEFAULT_PATH)
       find_library(GEOS_LIBRARY NAMES geos PATHS /opt/rcs/geos/lib /usr/local/lib /usr/lib NO_DEFAULT_PATH)
    ENDIF()
 

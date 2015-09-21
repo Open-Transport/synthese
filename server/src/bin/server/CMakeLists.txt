@@ -44,6 +44,7 @@ endforeach(module)
 
 target_link_libraries(s3-server ${Boost_LIBRARIES})
 target_link_libraries(s3-server ${PYTHON_LIBRARY})
+target_link_libraries(s3-server ${ZLIB_LIBRARIES})
 
 if(UNIX)
   target_link_libraries(s3-server pthread)

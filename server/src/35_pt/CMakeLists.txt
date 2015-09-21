@@ -273,7 +273,7 @@ target_link_libraries(35_pt
   # Forward dependencies:
   #11_cms
   #39_map
-  expat
+  ${EXPAT_LIBRARIES}
 )
 
 # To prevent "fatal error LNK1106: invalid file or disk full: cannot seek to 0x..."
