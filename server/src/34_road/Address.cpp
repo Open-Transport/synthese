@@ -82,7 +82,7 @@ namespace synthese
 			{
 				// Chunk linked with the house
 				{
-					double distance(_metricOffset - _roadChunk->getMetricOffset());
+					double distance(_metricOffset);
 					result.insert(
 						_roadChunk->getFromCrossing(),
 						VertexAccess(
@@ -96,7 +96,7 @@ namespace synthese
 				{
 					assert(static_cast<RoadChunkEdge*>(_roadChunk->getForwardEdge().getNext()));
 
-					double distance(_roadChunk->getForwardEdge().getEndMetricOffset() - _metricOffset);
+					double distance(_roadChunk->getForwardEdge().getEndMetricOffset() - _roadChunk->getMetricOffset() - _metricOffset);
 					result.insert(
 						_roadChunk->getForwardEdge().getNext()->getFromVertex(),
 						VertexAccess(
