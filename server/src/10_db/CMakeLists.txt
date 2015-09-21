@@ -91,7 +91,7 @@ target_link_libraries(10_db
   # Forward dependencies:
   #15_server
   19_inter_synthese
-  spatialite
+  ${SPATIALITE_LIBRARIES}
 )
 
 if(WITH_MYSQL)

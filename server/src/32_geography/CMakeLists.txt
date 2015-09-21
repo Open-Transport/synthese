@@ -50,7 +50,7 @@ target_link_libraries(32_geography
   07_lexical_matcher
   18_graph
   00_framework
-  proj
+  ${PROJ_LIBRARIES}
 )
 
 install(TARGETS 32_geography DESTINATION lib)

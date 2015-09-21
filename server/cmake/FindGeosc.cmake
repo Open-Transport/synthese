@@ -7,34 +7,29 @@
 
 include(cmake/LibFindMacros.cmake)
 
-# Include dir
+
 if(WIN32)
-   find_path(GEOSC_INCLUDE_DIR 
-      geos_c.h
-      PATHS
-      $ENV{GEOSC_DIR}/capi 
-      $ENV{HOME}/rcs/geos/capi
-      NO_DEFAULT_PATH
-   )
-   find_library(GEOSC_LIBRARY 
-      geosc
-      PATHS 
-      $ENV{GEOSC_DIR}/lib 
-      $ENV{HOME}/rcs/geos/lib
-      NO_DEFAULT_PATH
-   )
+
+   IF(DEFINED ENV{GEOSC_DIR})
+      find_path(GEOSC_INCLUDE_DIR geos_c.h PATHS $ENV{GEOSC_DIR}/capi $ENV{HOME}/rcs/geos/capi NO_DEFAULT_PATH)
+      find_library(GEOSC_LIBRARY geosc PATHS $ENV{GEOSC_DIR}/lib $ENV{HOME}/rcs/geos/lib NO_DEFAULT_PATH)
+   ELSE()
+      find_path(GEOSC_INCLUDE_DIR geos_c.h PATHS $ENV{HOME}/rcs/geos/capi NO_DEFAULT_PATH)
+      find_library(GEOSC_LIBRARY geosc PATHS $ENV{HOME}/rcs/geos/lib NO_DEFAULT_PATH)
+   ENDIF()
 
 else(WIN32)
-   find_path(GEOSC_INCLUDE_DIR 
-      NAMES geos_c.h
-      PATHS $ENV{GEOSC_DIR}/capi /opt/rcs/geos/include /usr/local/include /usr/include
-      NO_DEFAULT_PATH
-   )
-   find_library(GEOSC_LIBRARY 
-      NAMES geosc
-      PATHS $ENV{GEOSC_DIR}/lib /opt/rcs/geos/lib /usr/local/lib /usr/lib
-      NO_DEFAULT_PATH
-   )
+
+   IF(DEFINED ENV{GEOSC_DIR})
+      find_path(GEOSC_INCLUDE_DIR NAMES geos_c.h PATHS $ENV{GEOSC_DIR}/capi /opt/rcs/geos/include /usr/local/include /usr/include NO_DEFAULT_PATH)
+      find_library(GEOSC_LIBRARY NAMES geosc PATHS $ENV{GEOSC_DIR}/lib /opt/rcs/geos/lib /usr/local/lib /usr/lib NO_DEFAULT_PATH)
+   ELSE()
+      find_path(GEOSC_INCLUDE_DIR NAMES geos_c.h PATHS /opt/rcs/geos/include /usr/local/include /usr/include NO_DEFAULT_PATH)
+      find_library(GEOSC_LIBRARY NAMES geosc PATHS /opt/rcs/geos/lib /usr/local/lib /usr/lib NO_DEFAULT_PATH)
+   ENDIF()
+
+
+
 endif(WIN32)
 
 set(GEOSC_PROCESS_INCLUDES GEOSC_INCLUDE_DIR)
