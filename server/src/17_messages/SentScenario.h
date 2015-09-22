@@ -88,6 +88,7 @@ namespace synthese
 			static const std::string DATA_CODE;
 			static const std::string DATA_VALUE;
 			static const std::string DATA_MANUAL_OVERRIDE;
+			static const std::string DATA_DATASOURCE_LINK;
 
 			static const std::string TAG_VARIABLE;
 			static const std::string TAG_MESSAGE;

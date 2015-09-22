@@ -32,6 +32,7 @@ theevent["<@roid@>"] = {
   roid: '<@roid@>',
   name: '<@name@>',
   active: <@active@>,
+  datasource_links: <@datasource_links@>,
   belongs_to_an_auto_section: <@belongs_to_an_auto_section@>,
   manual_override: <@manual_override@>,
   filtered: 0,
@@ -186,10 +187,15 @@ if (dates.length > 0) {
 			?>
 		?>
 	?>
+
+	<@eventIsExternal=<?strlen&t=<@datasource_links@>?>@>
+	<@sectionIsWritable=<#has_section_right&level=WRITE&sectionid=<@section@>#>@>
+	<@eventCanBeModified=<@<@eventIsExternal==0@>&&<@sectionIsWritable@>@>@>
+
 	<?if&
 	cond=<@active@>&
 	then=
-		<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&
+		<?if&cond=<@eventCanBeModified@>&
 		then=
         <?link&
         target=<@p@>&
@@ -201,7 +207,7 @@ if (dates.length > 0) {
         text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>&
 		?>&
 	else=
-		<?if&cond=<#has_section_right&level=WRITE&sectionid=<@section@>#>&
+		<?if&cond=<@eventCanBeModified@>&
 		then=
         <?link&
         target=<@p@>&

@@ -65,13 +65,13 @@ namespace synthese
 		const std::string SentScenario::DATA_CODE = "code";
 		const std::string SentScenario::DATA_VALUE = "value";
 		const std::string SentScenario::DATA_MANUAL_OVERRIDE = "manual_override";
+		const std::string SentScenario::DATA_DATASOURCE_LINK = "datasource_links";
 
 		const std::string SentScenario::TAG_VARIABLE = "variable";
 		const std::string SentScenario::TAG_MESSAGE = "message";
 		const std::string SentScenario::TAG_TEMPLATE_SCENARIO = "template_scenario";
 		const std::string SentScenario::TAG_SECTION = "section";
 		const std::string SentScenario::TAG_CALENDAR = "calendar";
-
 
 
 		SentScenario::SentScenario(
@@ -159,7 +159,7 @@ namespace synthese
 
 		ScenarioTemplate* SentScenario::getTemplate() const
 		{
-			return get<Template>().get_ptr();
+			return (get<Template>() ? get<Template>().get_ptr() : NULL);
 		}
 
 
@@ -185,11 +185,11 @@ namespace synthese
 			// is template
 			pm.insert(DATA_IS_TEMPLATE, false);
 
-			// is template
+			// archived
 			pm.insert(DATA_ARCHIVED, getArchived());
 
-			if(	getTemplate()
-			){
+			if(NULL != getTemplate())
+			{
 				// Template scenario
 				boost::shared_ptr<ParametersMap> templatePM(new ParametersMap);
 				getTemplate()->toParametersMap(*templatePM, true);
@@ -290,9 +290,11 @@ namespace synthese
 			// active
 			pm.insert(DATA_ACTIVE, getIsEnabled());
 
-			// active
+			// manual override
 			pm.insert(DATA_MANUAL_OVERRIDE, getManualOverride());
 
+			// data sources
+			pm.insert(DATA_DATASOURCE_LINK, get<DataSourceLinksWithoutUnderscore>());
 		}
 
 		void SentScenario::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
