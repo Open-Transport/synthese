@@ -14,8 +14,13 @@ The following prerequisites must be fulfilled in order to build synthese server.
 ``` 
 * boost development library (>= 1.57). For seamless integration, a prebuilt tarball of boost 1.57 including all necessary boost components to build synthese is provided alongside synthese package.
 ```
-# wget http://ci.rcsmobility.com/job/boost157-Linux-x86_64/lastSuccessfulBuild/artifact/boost_1_57_0/boost157-dev-Linux-x86_64.tar.gz
+# wget http://ci.rcsmobility.com/~build/boost/boost157-dev-Linux-x86_64.tar.gz
 # tar xzf boost157-dev-Linux-x86_64.tar.gz -C /
+``` 
+* Third party development libraries. A prebuilt tarball of all third-party dependencies is provided alongside synthese package.
+```
+# wget http://ci.rcsmobility.com/~build/3rd/3rd-dev-Linux-x86_64.tar.gz
+# tar xzf 3rd-dev-Linux-x86_64.tar.gz -C /opt/rcs/
 ``` 
 
 ## Synthese Server Build 
@@ -68,6 +73,31 @@ Our standard Windows build is achieved from scratch under Windows 8.1 with Visua
 > bootstrap --with-libraries=chrono,date_time,random,filesystem,iostreams,program_options,regex,system,test,thread,zlib
 > bjam runtime-link=static architecture=x86 address-model=64 install
 ```
+
+* Build third party development libraries needed by Synthese. Sample process is provided for zlib.
+```
+> git clone http://git.rcsmobility.com/rcsmobility/zlib
+```
+* create an out-of-tree build dir and cd into it
+```
+$ mkdir build ; cd build
+``` 
+* generate Visual Studio 2013 projects for Debug
+```
+> cmake -DCMAKE_BUILD_TYPE=debug -G "Visual Studio 12 2013 Win64" ..
+```
+* ...or for Release
+```
+> cmake -G "Visual Studio 12 2013 Win64" ..
+```
+* then launch Visual Studio 2013 ; note this is important to force x64 toolchain (32 bits toolchain version might freeze at link time). Environment variable can be set once for all as well.
+```
+> set PreferredToolArchitecture=x64
+> devenv
+```
+* in Visual Studio, open build/zlib.sln and execute INSTALL target
+
+* Repeat this process for png, expat, geos, proj, haru, iconv, spatialite (in this order!)
 
 ## Synthese Server Build 
 From server subfolder, in a proper local git workspace :
