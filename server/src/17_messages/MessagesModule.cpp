@@ -511,6 +511,37 @@ namespace synthese
 			return false;
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Lists the message to display on a broadcast point according to the
+		/// specified parameters and a specific date.
+		/// This function doesn't use the cache.
+		/// @param broadcastPoint the broadcast point to check
+		/// @param parameters the broadcast parameters
+		/// @return the list of the messages to display
+		MessagesModule::ActivatedMessages MessagesModule::GetActivatedMessagesAt(
+			const BroadcastPoint& broadcastPoint,
+			const util::ParametersMap& parameters,
+			const boost::posix_time::ptime& date
+		){
+			// Initialisation of the result
+			ActivatedMessages result;
+
+			// Fetch all messages on the broadcast point and activated at the requested start date
+			BOOST_FOREACH(const Alarm::Registry::value_type& message, Env::GetOfficialEnv().getRegistry<Alarm>())
+			{
+				if (
+                    message.second->isOnBroadcastPoint(broadcastPoint, parameters)
+					&&
+                    message.second->isApplicable(date)
+				   )
+				{
+                    result.insert(message.second);
+				}
+			}
+
+			return result;
+		}
+
 
 
 		//////////////////////////////////////////////////////////////////////////

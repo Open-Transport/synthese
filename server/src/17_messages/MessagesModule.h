@@ -108,6 +108,12 @@ namespace synthese
 				const util::ParametersMap& parameters
 			);
 
+			static ActivatedMessages GetActivatedMessagesAt(
+				const BroadcastPoint& broadcastPoint,
+				const util::ParametersMap& parameters,
+				const boost::posix_time::ptime& date
+			);
+
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
 
 			/** Labels list containing each scenario template ordered by folder, indicating the full path in the folder tree.
