@@ -767,6 +767,7 @@ namespace synthese
 			vector<string> vectServiceCode;
 			split(vectServiceCode, serviceCode, is_any_of(":"));
 			string localServiceCode("");
+			Log::GetInstance().debug("VDVServer : ServiceCode : " + serviceCode);
 			if (vectServiceCode.size() != 4)
 			{
 				// FahrtBezeichner is not XX:XX:XXXXX:XXX ; it can be the old format XXX-XXXXX-XXX
