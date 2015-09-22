@@ -236,7 +236,7 @@ namespace synthese
 				@return true if the message must be displayed at the specified time
 			*/
 			bool isApplicable(
-				boost::posix_time::ptime& when
+				const boost::posix_time::ptime& when
 			) const;
 
 			/**

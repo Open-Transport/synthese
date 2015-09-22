@@ -1176,7 +1176,11 @@ namespace synthese
 				
 				GetMessagesFunction f(
 					_broadcastPoint,
-					parameters
+					parameters,
+					boost::optional<size_t>(),
+					true,
+					true,
+					startDate
 				);
 				messagesOnBroadCastPoint = f.run(stream, request);
 			}

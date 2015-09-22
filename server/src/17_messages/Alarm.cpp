@@ -384,7 +384,7 @@ namespace synthese
 			_broadcastPointsCache.clear();
 		}
 
-		bool Alarm::isApplicable( boost::posix_time::ptime& when ) const
+		bool Alarm::isApplicable( const boost::posix_time::ptime& when ) const
 		{
 			if (belongsToTemplate())
 			{

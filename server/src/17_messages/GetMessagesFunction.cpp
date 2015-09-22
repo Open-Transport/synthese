@@ -191,9 +191,23 @@ namespace synthese
 			MessagesModule::ActivatedMessages messages;
 			if (_broadcastPoint)
 			{
-				messages = MessagesModule::GetActivatedMessages(
-					*_broadcastPoint,
-					_parameters);
+				// If the date is now (more or less 60 seconds), use the cached function
+				time_duration diff = second_clock::local_time() - _date;
+				if ( abs(diff.total_seconds()) < 60 )
+				{
+					messages = MessagesModule::GetActivatedMessages(
+						*_broadcastPoint,
+						_parameters
+					);
+				}
+				else
+				{
+					messages = MessagesModule::GetActivatedMessagesAt(
+						*_broadcastPoint,
+						_parameters,
+						_date
+					);
+				}
 			}
 
 			size_t number(0);
