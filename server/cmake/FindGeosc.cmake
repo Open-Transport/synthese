@@ -21,10 +21,10 @@ if(WIN32)
 else(WIN32)
 
    IF(DEFINED ENV{GEOSC_DIR})
-      find_path(GEOSC_INCLUDE_DIR NAMES geos_c.h PATHS $ENV{GEOSC_DIR}/capi /opt/rcs/geos/include /usr/local/include /usr/include NO_DEFAULT_PATH)
+      find_path(GEOSC_INCLUDE_DIR NAMES geos_c.h PATHS $ENV{GEOSC_DIR}/capi /opt/rcs/geos/capi /usr/local/include /usr/include NO_DEFAULT_PATH)
       find_library(GEOSC_LIBRARY NAMES geosc PATHS $ENV{GEOSC_DIR}/lib /opt/rcs/geos/lib /usr/local/lib /usr/lib NO_DEFAULT_PATH)
    ELSE()
-      find_path(GEOSC_INCLUDE_DIR NAMES geos_c.h PATHS /opt/rcs/geos/include /usr/local/include /usr/include NO_DEFAULT_PATH)
+      find_path(GEOSC_INCLUDE_DIR NAMES geos_c.h PATHS /opt/rcs/geos/capi /usr/local/include /usr/include NO_DEFAULT_PATH)
       find_library(GEOSC_LIBRARY NAMES geosc PATHS /opt/rcs/geos/lib /usr/local/lib /usr/lib NO_DEFAULT_PATH)
    ENDIF()
 
