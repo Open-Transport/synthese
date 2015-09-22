@@ -36,102 +36,106 @@ using namespace std;
 
 namespace synthese
 {
-    using namespace util;
-    using namespace vehicle;
+	using namespace util;
+	using namespace vehicle;
     
-    namespace regulation
-    {
+	namespace regulation
+	{
 
-        CallbackRequestAlertProcessor::CallbackRequestAlertProcessor()
-            : AlertProcessor()
-        {
-        }
+		CallbackRequestAlertProcessor::CallbackRequestAlertProcessor()
+			: AlertProcessor()
+		{
+		}
 
         
-        void
-        CallbackRequestAlertProcessor::processAlerts()
-        {
-            AlertTableSync::SearchResult callbackRequestAlerts(AlertTableSync::Search(Env::GetOfficialEnv(), ALERT_TYPE_CALLBACKREQUEST));
+		void
+		CallbackRequestAlertProcessor::processAlerts()
+		{
+			AlertTableSync::SearchResult callbackRequestAlerts(AlertTableSync::Search(Env::GetOfficialEnv(), ALERT_TYPE_CALLBACKREQUEST));
 
-            std::map<util::RegistryKeyType, boost::shared_ptr<VehicleCall> > latestVehicleCalls;
+			std::map<util::RegistryKeyType, boost::shared_ptr<VehicleCall> > latestVehicleCalls;
 			BOOST_FOREACH(const VehicleCall::Registry::value_type& itVehicleCall,
-                          Env::GetOfficialEnv().getRegistry<VehicleCall>())
-            {
-                
-                boost::shared_ptr<VehicleCall> vehicleCall = itVehicleCall.second;
-                boost::optional<Vehicle&> vehicle = vehicleCall->get<Vehicle>();
+				Env::GetOfficialEnv().getRegistry<VehicleCall>())
+			{
+				boost::shared_ptr<VehicleCall> vehicleCall = itVehicleCall.second;
+				boost::optional<Vehicle&> vehicle = vehicleCall->get<Vehicle>();
 
-                if (!vehicle) continue;
-            
-                std::map<util::RegistryKeyType, boost::shared_ptr<VehicleCall> >::const_iterator latestVehicleCallIt(
-                    latestVehicleCalls.find(vehicle->getKey()));
-                if ((latestVehicleCallIt == latestVehicleCalls.end()) ||
-                    (vehicleCall->get<CallTime>() > latestVehicleCallIt->second->get<CallTime>()))
-                {
-                    latestVehicleCalls[vehicle->getKey()] = vehicleCall;
-                }
+				if (!vehicle) continue;
+
+				std::map<util::RegistryKeyType, boost::shared_ptr<VehicleCall> >::const_iterator latestVehicleCallIt(
+				latestVehicleCalls.find(vehicle->getKey()));
+				if ((latestVehicleCallIt == latestVehicleCalls.end()) ||
+				(vehicleCall->get<CallTime>() > latestVehicleCallIt->second->get<CallTime>()))
+				{
+					latestVehicleCalls[vehicle->getKey()] = vehicleCall;
+				}
             }
 
-            for (std::map<util::RegistryKeyType, boost::shared_ptr<VehicleCall> >::iterator itVehicleCall = latestVehicleCalls.begin();
-                 itVehicleCall != latestVehicleCalls.end();
-                 ++itVehicleCall)
-            {
-                boost::shared_ptr<VehicleCall> vehicleCall = itVehicleCall->second;
-                boost::optional<Vehicle&> vehicle = vehicleCall->get<Vehicle>();
+				for (std::map<util::RegistryKeyType, boost::shared_ptr<VehicleCall> >::iterator itVehicleCall = latestVehicleCalls.begin();
+					itVehicleCall != latestVehicleCalls.end();
+					++itVehicleCall)
+			{
+				boost::shared_ptr<VehicleCall> vehicleCall = itVehicleCall->second;
+				boost::optional<Vehicle&> vehicle = vehicleCall->get<Vehicle>();
 
-                VehiclePositionTableSync::SearchResult vehiclePositions(
-                    VehiclePositionTableSync::Search(Env::GetOfficialEnv(), vehicle->getKey()));
+				VehiclePositionTableSync::SearchResult vehiclePositions(
+					VehiclePositionTableSync::Search(Env::GetOfficialEnv(), vehicle->getKey()));
 
-                if (vehiclePositions.empty()) continue;
-                boost::shared_ptr<const VehiclePosition> vehiclePosition = *vehiclePositions.begin();
+				if (vehiclePositions.empty()) continue;
+				boost::shared_ptr<const VehiclePosition> vehiclePosition = *vehiclePositions.begin();
 
-                pt::ScheduledService* scheduledService = vehiclePosition->getService();
-                const pt::JourneyPattern* journeyPattern(scheduledService->getRoute());
+				pt::ScheduledService* scheduledService = vehiclePosition->getService();
+				if(NULL == scheduledService) continue;
+
+				const pt::JourneyPattern* journeyPattern(scheduledService->getRoute());
+				if(NULL == journeyPattern) continue;
+
 				pt::CommercialLine* commercialLine(journeyPattern->getCommercialLine());
-                
-                util::RegistryKeyType commercialLineId(commercialLine->getKey());
-                bool wasExisting(false);
-                BOOST_FOREACH(const boost::shared_ptr<Alert>& callbackRequestAlert, callbackRequestAlerts)
-                {
-                    if (commercialLineId != callbackRequestAlert->get<Line>().get().getKey()) continue;
-                    if (scheduledService->getKey() != callbackRequestAlert->get<Service>().get().getKey()) continue;
-                
-                    wasExisting = true;
+				if(NULL == commercialLine) continue;
 
-                    // check if need update
-                    util::ParametersMap extraDataPM;
-                    extraDataPM.insert("priority", vehicleCall->get<Priority>());
-                    std::stringstream extraDataStream;
-                    extraDataPM.outputJSON(extraDataStream, "extraData");
-                    if (extraDataStream.str() != callbackRequestAlert->get<ExtraData>())
-                    {
-                        //std::cerr << " old JSON : " << callbackRequestAlert->get<ExtraData>() << std::endl;
-                        //std::cerr << " new JSON : " << extraDataStream.str() << std::endl;
-                        //std::cerr << " Need update !!!!" << std::endl;
-                        callbackRequestAlert->set<ExtraData>(extraDataStream.str());
-                        AlertTableSync::Save(callbackRequestAlert.get());
-                    }
-                    break;
-                }
-                    
-                if (!wasExisting)
-                {
-                    Alert callbackRequestAlert;
-                    callbackRequestAlert.set<Kind>(ALERT_TYPE_CALLBACKREQUEST);
-                    callbackRequestAlert.set<Service>(*scheduledService);
-                    callbackRequestAlert.set<Line>(*commercialLine);
-                    
-                    util::ParametersMap extraDataPM;
-                    extraDataPM.insert("priority", vehicleCall->get<Priority>());
-                    std::stringstream extraDataStream;
-                    extraDataPM.outputJSON(extraDataStream, "extraData");
-                    callbackRequestAlert.set<ExtraData>(extraDataStream.str());
+				util::RegistryKeyType commercialLineId(commercialLine->getKey());
+				bool wasExisting(false);
+				BOOST_FOREACH(const boost::shared_ptr<Alert>& callbackRequestAlert, callbackRequestAlerts)
+				{
+					if (commercialLineId != callbackRequestAlert->get<Line>().get().getKey()) continue;
+					if (scheduledService->getKey() != callbackRequestAlert->get<Service>().get().getKey()) continue;
 
-                    AlertTableSync::Save(&callbackRequestAlert);
-                }
-            }
+					wasExisting = true;
 
-        }
+					// check if need update
+					util::ParametersMap extraDataPM;
+					extraDataPM.insert("priority", vehicleCall->get<Priority>());
+					std::stringstream extraDataStream;
+					extraDataPM.outputJSON(extraDataStream, "extraData");
+					if (extraDataStream.str() != callbackRequestAlert->get<ExtraData>())
+					{
+						//std::cerr << " old JSON : " << callbackRequestAlert->get<ExtraData>() << std::endl;
+						//std::cerr << " new JSON : " << extraDataStream.str() << std::endl;
+						//std::cerr << " Need update !!!!" << std::endl;
+						callbackRequestAlert->set<ExtraData>(extraDataStream.str());
+						AlertTableSync::Save(callbackRequestAlert.get());
+					}
+					break;
+				}
 
-    }
+				if (!wasExisting)
+				{
+					Alert callbackRequestAlert;
+					callbackRequestAlert.set<Kind>(ALERT_TYPE_CALLBACKREQUEST);
+					callbackRequestAlert.set<Service>(*scheduledService);
+					callbackRequestAlert.set<Line>(*commercialLine);
+
+					util::ParametersMap extraDataPM;
+					extraDataPM.insert("priority", vehicleCall->get<Priority>());
+					std::stringstream extraDataStream;
+					extraDataPM.outputJSON(extraDataStream, "extraData");
+					callbackRequestAlert.set<ExtraData>(extraDataStream.str());
+
+					AlertTableSync::Save(&callbackRequestAlert);
+				}
+			}
+
+		}
+
+	}
 }
