@@ -29,5 +29,5 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(EndTime, "end_time", SQL_DATETIME)
 	FIELD_DEFINITION_OF_TYPE(StartTime, "start_time", SQL_DATETIME)
 	FIELD_DEFINITION_OF_TYPE(Time, "time", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(LastUpdate, "last_update", SQL_DATETIME)
 }
-
