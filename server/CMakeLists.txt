@@ -253,7 +253,6 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 # Global variables.
 include(global_vars.cmake)
 
-add_subdirectory(3rd)
 add_subdirectory(src)
 
 OPTION(WITH_TEST "Build and install test" ON)
