@@ -789,7 +789,7 @@ namespace synthese
 
 
 			ScheduledService* service(
-				plannedDataSource->getObjectByCode<ScheduledService>(vectServiceCode[1])
+				plannedDataSource->getObjectByCode<ScheduledService>(localServiceCode)
 			);
 
 			// it can exist more than one service with this service code
