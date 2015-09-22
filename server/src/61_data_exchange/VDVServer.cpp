@@ -821,7 +821,7 @@ namespace synthese
 							ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
 							if(!curService) continue;
 							if (curService->hasLinkWithSource(*plannedDataSource) &&
-								curService->getACodeBySource(*plannedDataSource) == vectServiceCode[1])
+								curService->getACodeBySource(*plannedDataSource) == localServiceCode)
 							{
 								// Add the service to vect
 								services.push_back(curService);
