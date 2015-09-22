@@ -231,6 +231,8 @@ for contentLine in contentLines:
 # Recipients
 childRecipients = etree.SubElement(childMessaging, "Recipients")
 recipients = message[0]["recipients"][0]
+
+# Network and commercial line recipients
 hasAllNetwork = False
 if "line" in recipients:
   # Scan the 'line' recipients to check if the whole transport network is selected
@@ -257,6 +259,27 @@ if "line" in recipients:
           childInWard.text = "non" if linkParameters == "1" else "oui"
           childOutWard = etree.SubElement(childLineWay, "OutWard")
           childOutWard.text = "non" if linkParameters == "0" else "oui"
+
+# Display screen recipients (bivs)
+childBivs = etree.SubElement(childRecipients, "Bivs")
+if "displayscreen" in recipients:
+  # Scan the 'line' recipients to check if the whole transport network is selected
+  for screen in recipients["displayscreen"]:
+    screenId = int(screen["id"])
+    screenTableId = (screenId / (2**48))
+    if screenTableId == 41:
+      parameters = { "roid": screenId }
+      screenPM = synthese.service("object", parameters)
+      screenCodesStr = screenPM["data_source_links"]
+      screenCodes = map(lambda x: x.split('|'), screenCodesStr.split(','))
+      for screenCode in screenCodes:
+        if screenCode[0] == datasource_id:
+          childBiv = etree.SubElement(childBivs, "Biv")
+          childBiv.text = screenCode[1]
+# If no valid display screen was found, remove empty node
+if len(childBivs) == 0:
+  childRecipients.remove(childBivs)
+
 
 # Print resulting XML to output stream
 print(etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="iso-8859-1"))

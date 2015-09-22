@@ -26,6 +26,8 @@
 #include "CommercialLineTableSync.h"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
+#include "DisplayScreen.h"
+#include "DisplayScreenTableSync.h"
 #include "DataSourceTableSync.h"
 #include "ImportableTableSync.hpp"
 #include "IneoTerminusModule.hpp"
@@ -66,6 +68,7 @@ namespace synthese
 	using namespace pt;
 	using namespace util;
 	using namespace server;
+	using namespace departure_boards;
 	
 	namespace ineo_terminus
 	{
@@ -1963,14 +1966,14 @@ namespace synthese
 			// Iterate through recipients
 			BOOST_FOREACH(const IneoTerminusConnection::Recipient& recipient, recipients)
 			{
-				if (recipient.type == "AllNetwork")
+				if ("AllNetwork" == recipient.type)
 				{
 					boost::shared_ptr<ParametersMap> lineRecipientPM(new ParametersMap);
 					lineRecipientPM->insert("recipient_id", _network_id);
 					pm.insert("line_recipient", lineRecipientPM);
 				}
 
-				else if (recipient.type == "Line")
+				else if ("Line" == recipient.type)
 				{
 					if(NULL == dataSource.get())
 					{
@@ -2005,7 +2008,7 @@ namespace synthese
 					}
 				}
 
-				else if (recipient.type == "StopPoint")
+				else if ("StopPoint" == recipient.type)
 				{
 					if(NULL == dataSource.get())
 					{
@@ -2043,13 +2046,41 @@ namespace synthese
 					}
 				}
 
+				else if ("Biv" == recipient.type)
+				{
+					if(NULL == dataSource.get())
+					{
+						status = false;
+						errorCode = BorneInconnue;
+					}
+
+					else
+					{
+						ImportableTableSync::ObjectBySource<DisplayScreenTableSync> screens(*dataSource, Env::GetOfficialEnv());
+						set<DisplayScreen*> loadedScreens = screens.get(recipient.name);
+
+						BOOST_FOREACH(DisplayScreen* loadedScreen, loadedScreens)
+						{
+							boost::shared_ptr<ParametersMap> screenRecipientPM(new ParametersMap);
+							screenRecipientPM->insert("recipient_id", loadedScreen->getKey());
+							pm.insert("displayscreen_recipient", screenRecipientPM);
+						}
+
+						if(true == loadedScreens.empty())
+						{
+							util::Log::GetInstance().warn("Ineo Terminus : display screen not found " + recipient.name);
+							status = false;
+							errorCode = BorneInconnue;
+						}
+					}
+				}
+
+
 				// The following recipient types are not processed by SYNTHESE
 				else if (
 						  (recipient.type == "Vehicule") ||
 						  (recipient.type == "Car") ||
 						  (recipient.type == "CarService") ||
-						  (recipient.type == "LineWay") ||
-						  (recipient.type == "Biv") ||
 						  (recipient.type == "Group")
 						)
 				{

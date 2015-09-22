@@ -43,6 +43,7 @@
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
+#include "CustomBroadcastPointTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -440,28 +441,35 @@ namespace synthese
 								{
 									std::string linkTypeKey = linkType->getFactoryKey();
 
-									if("displayscreen" == linkTypeKey)
-									{
-										// For Ineo messages we do not want to delete "displayscreen" recipients, they indicate which type of message it is
-										continue;
-									}
-
 									// Existing links of this factory in the existent message
 									Alarm::LinkedObjects::mapped_type existingLinks(alarm->getLinkedObjects(linkTypeKey));
-									boost::optional<const ptree&> recipientNode = messageNode.second.get_child_optional(linkType->getFactoryKey() + "_recipient");
+									boost::optional<const ptree&> recipientNode = messageNode.second.get_child_optional(linkTypeKey + "_recipient");
 
-									BOOST_FOREACH(const AlarmObjectLink* link, existingLinks)
+									if(recipientNode)
 									{
-										// Loop on recipients of the ptree
-										BOOST_FOREACH(const ptree::value_type& linkNode, recipientNode.get())
+										BOOST_FOREACH(const AlarmObjectLink* link, existingLinks)
 										{
-											if (link->getObjectId() == linkNode.second.get("recipient_id", RegistryKeyType(0)) &&
-												link->getParameter() == linkNode.second.get("parameter", string()))
+											RegistryKeyType linkId = link->getObjectId();
+											RegistryTableType linkTableId = decodeTableId(linkId);
+
+											if(("displayscreen" == linkTypeKey) && (CustomBroadcastPointTableSync::TABLE.ID == linkTableId))
 											{
-												// Delete this link
-												DBTransaction transaction;
-												AlarmObjectLinkTableSync::Remove(request.getSession().get(), link->getKey(), transaction, false);
-												transaction.run();
+												// Ineo messages have custom broadcast point recipients that must not be deleted
+												// because they indicate the type of the message (Passenger, Driver,...)
+												continue;
+											}
+
+											// Loop on recipients of the ptree
+											BOOST_FOREACH(const ptree::value_type& linkNode, recipientNode.get())
+											{
+												if (linkId == linkNode.second.get("recipient_id", RegistryKeyType(0)) &&
+													link->getParameter() == linkNode.second.get("parameter", string()))
+												{
+													// Delete this link
+													DBTransaction transaction;
+													AlarmObjectLinkTableSync::Remove(request.getSession().get(), link->getKey(), transaction, false);
+													transaction.run();
+												}
 											}
 										}
 									}
