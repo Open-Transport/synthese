@@ -40,7 +40,6 @@ namespace synthese
 		class Alarm;
 		class ScenarioTemplate;
 		class MessagesSection;
-		class ScenarioTemplate;
 
 		FIELD_BOOL(Enabled)
 		FIELD_PTIME(PeriodStart)
