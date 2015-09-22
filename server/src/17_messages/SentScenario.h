@@ -32,15 +32,14 @@
 #include <string>
 #include "PtimeField.hpp"
 #include "PointersSetField.hpp"
+#include "ScenarioTemplate.h"
 
 namespace synthese
 {
 	namespace messages
 	{
 		class Alarm;
-		class ScenarioTemplate;
 		class MessagesSection;
-		class ScenarioTemplate;
 
 		FIELD_BOOL(Enabled)
 		FIELD_PTIME(PeriodStart)

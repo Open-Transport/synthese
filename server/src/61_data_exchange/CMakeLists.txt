@@ -151,7 +151,7 @@ target_link_libraries(61_data_exchange
   33_algorithm
   37_pt_operation
   38_vehicle
-  expat
+  ${EXPAT_LIBRARIES}
 )
 
 install(TARGETS 61_data_exchange DESTINATION lib)

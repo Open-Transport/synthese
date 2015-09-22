@@ -23,7 +23,7 @@ add_library(61_ineo_terminus ${ineo_terminus_SRCS})
 target_link_libraries(61_ineo_terminus
   01_util
   17_messages
-  expat
+  ${EXPAT_LIBRARIES}
 )
 
 install(TARGETS 61_ineo_terminus DESTINATION lib)

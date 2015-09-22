@@ -29,12 +29,12 @@
 #include "PointersSetField.hpp"
 #include "DataSourceLinksField.hpp"
 #include "ImportableTemplate.hpp"
+#include "MessagesSection.hpp"
 
 namespace synthese
 {
 	namespace messages
 	{
-		class MessagesSection;
 		class Alarm;
 		class ScenarioCalendar;
 

@@ -1,7 +1,0 @@
-#!/bin/bash
-
-rm -f /usr/bin/mvn
-
-exit 0
-
-

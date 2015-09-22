@@ -25,7 +25,10 @@
 #include "EMail.h"
 #include "Log.h"
 
+#ifndef WIN32
 #include <sys/resource.h> // for getrusage
+#endif#
+
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -274,10 +277,11 @@ namespace synthese
 		){
 
 			ptime now(microsec_clock::local_time());
+#ifndef WIN32
 			struct rusage usageStart;
 			getrusage(RUSAGE_THREAD, &usageStart);
+#endif
 			string requestName("");
-
 			try
 			{
 				Log::GetInstance ().debug (req.ipaddr +  " # Received request : " +
@@ -440,6 +444,7 @@ namespace synthese
 				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error);
 			}
 
+#ifndef WIN32
 			struct rusage usageEnd;
 			getrusage(RUSAGE_THREAD, &usageEnd);
 			time_duration cpuUsage( (seconds(usageEnd.ru_utime.tv_sec) + microsec(usageEnd.ru_utime.tv_usec)) -
@@ -451,7 +456,7 @@ namespace synthese
 									   + " cpu: " + lexical_cast<string>(cpuUsage.total_milliseconds())
 									   + " status: " + lexical_cast<string>(rep.status)
 									   + " request: " + requestName);
-
+#endif
 			SetCurrentThreadWaiting();
 		}
 

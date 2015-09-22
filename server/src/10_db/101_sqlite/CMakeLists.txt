@@ -23,7 +23,7 @@ set_source_files_properties(SQLiteModule.gen.cpp SQLiteModule.inc.cpp PROPERTIES
 add_library(10_db_sqlite ${db_sqlite_SRCS})
 
 target_link_libraries(10_db_sqlite
-  spatialite
+  ${SPATIALITE_LIBRARIES}
 )
 
 install(TARGETS 10_db_sqlite DESTINATION lib)

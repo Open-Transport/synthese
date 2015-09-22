@@ -41,8 +41,8 @@ namespace synthese
 {
 	namespace cms
 	{
-		class Webpage;
 		class WebsiteConfig;
+		class Webpage;
 
 		FIELD_STRING(HostName)
 		FIELD_STRING(ClientURL)

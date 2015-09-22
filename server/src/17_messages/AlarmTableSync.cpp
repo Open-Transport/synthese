@@ -74,6 +74,7 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<AlarmTableSync>::_FIELDS[]=
 		{
+			Field()
 		};
 
 		

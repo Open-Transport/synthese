@@ -26,6 +26,7 @@
 #define SYNTHESE_ScenarioTemplate_h__
 
 #include "Scenario.h"
+#include "ScenarioFolder.h"
 
 #include <map>
 #include <string>
@@ -35,7 +36,6 @@ namespace synthese
 	namespace messages
 	{
 		class Alarm;
-		class ScenarioFolder;		 
 		class MessagesSection;
 
 		FIELD_POINTER(Folder, ScenarioFolder)

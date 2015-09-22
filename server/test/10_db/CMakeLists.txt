@@ -13,7 +13,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/16_impex")
 include_directories("${PROJECT_SOURCE_DIR}/src/19_inter_synthese")
 
 set(DEPS
-  geos
+  ${GEOS_LIBRARIES}
   59_road_journey_planner
   56_pt_website
   11_cms

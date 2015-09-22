@@ -66,21 +66,21 @@ namespace synthese
 
 	CLASS_DEFINITION(messages::NotificationProvider, "t107_notification_providers", 107)
 
+	FIELD_DEFINITION_OF_OBJECT(NotificationProvider, "notification_provider_id", "notification_provider_ids")
+
+	FIELD_DEFINITION_OF_TYPE(NotificationChannelKey, "channel", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(SubscribeAllBegin, "subscribe_all_begin", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(SubscribeAllEnd, "subscribe_all_end", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(SubscribeUpdates, "subscribe_updates", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(SetEventsHold, "set_events_hold", SQL_BOOLEAN)
+
+	FIELD_DEFINITION_OF_TYPE(RetryAttemptDelay, "retry_attempt_delay", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MaximumRetryAttempts, "maximum_retry_attempts", SQL_INTEGER)
+
 	template<> const Field SimpleObjectFieldDefinition<MessageTypeBegin>::FIELD = Field("begin_message_type_id", SQL_INTEGER);
 	template<> const Field SimpleObjectFieldDefinition<MessageTypeEnd>::FIELD = Field("end_message_type_id", SQL_INTEGER);
 
 	namespace messages {
-		FIELD_DEFINITION_OF_OBJECT(NotificationProvider, "notification_provider_id", "notification_provider_ids")
-
-		FIELD_DEFINITION_OF_TYPE(NotificationChannelKey, "channel", SQL_TEXT)
-		FIELD_DEFINITION_OF_TYPE(SubscribeAllBegin, "subscribe_all_begin", SQL_BOOLEAN)
-		FIELD_DEFINITION_OF_TYPE(SubscribeAllEnd, "subscribe_all_end", SQL_BOOLEAN)
-		FIELD_DEFINITION_OF_TYPE(SubscribeUpdates, "subscribe_updates", SQL_BOOLEAN)
-		FIELD_DEFINITION_OF_TYPE(SetEventsHold, "set_events_hold", SQL_BOOLEAN)
-
-		FIELD_DEFINITION_OF_TYPE(RetryAttemptDelay, "retry_attempt_delay", SQL_INTEGER)
-		FIELD_DEFINITION_OF_TYPE(MaximumRetryAttempts, "maximum_retry_attempts", SQL_INTEGER)
-
 
 		// Get list of registered notification providers, implementation of NotificationProvider
 		NotificationProvider::NotificationChannelsList NotificationProvider::GetNotificationChannels()
