@@ -37,6 +37,12 @@ if(NOT ZLIB_FOUND)
   message(FATAL_ERROR "Zlib not found")
 endif()
 
+# Png
+find_package(Png)
+if(NOT PNG_FOUND)
+  message(FATAL_ERROR "Png not found")
+endif()
+
 # Expat
 
 find_package(Expat)
