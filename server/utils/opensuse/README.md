@@ -4,11 +4,26 @@ In this directory are placed the files used specificly for OpenSuse.
 
 All the procedures described here where tested on an OpenSuse 13.2.
 
+## 3rd party libs
+
+Synthese needs some 3rd party libs, which version and local modifications are specific enough that they are incompatible with the system ones.
+
+To create a RPM containing only the necessary 3rd party libraries for Synthese (as root):
+ 
+	wget "http://ci.rcsmobility.com/~build/3rd/3rd-dev-Linux-x86_64.tar.gz" -O /usr/src/packages/SOURCES/3rd-dev-Linux-x86_64.tar.gz
+	rpmbuild -bb 3rd-synthese.spec
+	
+This will download, build and create a package at ```usr/src/packages/RPMS/x86_64/3rd-synthese-1.0-0.x86_64.rpm```
+
+A development version, containing the include files can be create using :
+
+	rpmbuild -bb 3rd-synthese-devel.spec
+
 ## Boost
 
 Synthese needs a specific version of the boost library (version 1.57.0 at this time).
 
-To create a RPM containing only the necessary boost libraries for Synthese :
+To create a RPM containing only the necessary boost libraries for Synthese (as root) :
 ``` 
 wget "http://downloads.sourceforge.net/project/boost/boost/1.57.0/boost_1_57_0.tar.gz" -O /usr/src/packages/SOURCES/boost_1_57_0.tar.gz
 rpmbuild -bb boost-synthese.spec
