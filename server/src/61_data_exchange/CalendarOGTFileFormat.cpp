@@ -103,7 +103,16 @@ namespace synthese
 
 			BOOST_FOREACH(CalendarDatesMap::value_type& aCalendarPair, calendarDates)
 			{
-				const string& calendarName(aCalendarPair.first);
+				// Calendar name : if the .xml extension exists, remove it
+				string calendarName(aCalendarPair.first);
+
+				boost::filesystem::path p(calendarName);
+
+				if (p.extension() == ".xml")
+				{
+					 calendarName.erase(calendarName.length() - 4);
+				}
+
 				const DayList& datesList(aCalendarPair.second);
 
 				_logDebug(
