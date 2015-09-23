@@ -11,7 +11,7 @@ EnvironmentFile=/etc/sysconfig/synthese
 
 ExecPreStart=/bin/chmod +x ${PREFIX}/share/synthese/bin/watchdog.sh
 
-ExecStart=/usr/share/synthese/bin/watchdog.sh ${PORT} ${WATCHDOG_DEBUG}
+ExecStart=/bin/bash -c '${PREFIX}/share/synthese/bin/watchdog.sh ${PORT} ${WATCHDOG_DEBUG}
 
 Restart=always
 	

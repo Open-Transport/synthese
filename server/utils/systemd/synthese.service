@@ -8,7 +8,9 @@ Type=simple
 
 EnvironmentFile=/etc/sysconfig/synthese
 
-ExecStart=/usr/bin/s3-server \
+ExecStart=/bin/sh -c '\
+export LD_LIBRARY_PATH="${PREFIX}/lib:$LD_LIBRARY_PATH"; \
+${PREFIX}/bin/s3-server \
 --dbconn ${DBCONN} \
 --pidfile ${PIDFILE} \
 --logfile ${LOGFILE} \

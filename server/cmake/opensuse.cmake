@@ -58,8 +58,9 @@ if(OPENSUSE_RPM_132)
       share/synthese/bin
   )
 
-  # We depend on Boost 1.57
+  # We depend on Boost 1.57 and the 3rd party libs
   set(CPACK_RPM_PACKAGE_REQUIRES "boost-synthese = 1.57.0")
+  set(CPACK_RPM_PACKAGE_REQUIRES "3rd-synthese")
 
   # Scripts
   set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/utils/opensuse/postin.sh)
