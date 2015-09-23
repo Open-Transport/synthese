@@ -121,6 +121,8 @@ namespace synthese
 			static bool GetVDVClientActive() { return _vdvClientActive; }
 			static bool GetVDVServerActive() { return _vdvServerActive; }
 			static boost::posix_time::ptime& GetVDVStartingTime() { return _vdvStartingTime; }
+
+			static void Init();
 		};
 	}
 	/** @} */

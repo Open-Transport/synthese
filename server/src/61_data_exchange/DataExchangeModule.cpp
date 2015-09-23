@@ -60,7 +60,7 @@ namespace synthese
 		DataExchangeModule::VDVServers DataExchangeModule::_vdvServers;
 		bool DataExchangeModule::_vdvClientActive = true;
 		bool DataExchangeModule::_vdvServerActive = true;
-		ptime DataExchangeModule::_vdvStartingTime = second_clock::local_time();
+		ptime DataExchangeModule::_vdvStartingTime;
 		const string DataExchangeModule::MODULE_PARAM_VDV_SERVER_ACTIVE = "vdv_server_active";
 		const string DataExchangeModule::MODULE_PARAM_VDV_CLIENT_ACTIVE = "vdv_client_active";
 	}
@@ -316,5 +316,10 @@ namespace synthese
 
 				}
 			}
+		}
+
+		void DataExchangeModule::Init()
+		{
+			_vdvStartingTime = second_clock::local_time();
 		}
 }	}
