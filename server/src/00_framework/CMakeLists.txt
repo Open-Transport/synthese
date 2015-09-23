@@ -59,6 +59,7 @@ target_link_libraries(
   00_framework
   ${Boost_LIBRARIES}
   ${GEOS_LIBRARIES}
+  ${GEOSC_LIBRARIES}
   ${PROJ_LIBRARIES}
 )
 
