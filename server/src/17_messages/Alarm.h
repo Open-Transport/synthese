@@ -27,6 +27,7 @@
 #include "PointerField2.hpp"
 #include "EnumObjectField.hpp"
 #include "DataSourceLinksField.hpp"
+#include "PtimeField.hpp"
 
 #include "ImportableTemplate.hpp"
 #include "MessagesTypes.h"
@@ -95,7 +96,8 @@ namespace synthese
 			FIELD(Light),
 			FIELD(DirectionSignCode),
 			FIELD(StartStopPoint),
-			FIELD(EndStopPoint)
+			FIELD(EndStopPoint),
+			FIELD(LastUpdate)
 			> AlarmRecord;
 
 		class Alarm:
@@ -121,6 +123,7 @@ namespace synthese
 			static const std::string DATA_DIRECTION_SIGN_CODE;
 			static const std::string DATA_START_STOP_POINT;
 			static const std::string DATA_END_STOP_POINT;
+			static const std::string DATA_LAST_UPDATE;
 
 			static const std::string TAG_MESSAGE_ALTERNATIVE;
 			static const std::string TAG_RECIPIENTS;
@@ -163,6 +166,9 @@ namespace synthese
 				const util::ParametersMap& parameters
 			) const;
 
+			/** Set last update timestamp to "now". */
+			void updated();
+
 		public:
 
 			Alarm(
@@ -195,38 +201,39 @@ namespace synthese
 				virtual int						getDirectionSignCode() const { return get<DirectionSignCode>(); }
 				virtual synthese::util::RegistryKeyType		getStartStopPoint() const { return get<StartStopPoint>(); }
 				virtual synthese::util::RegistryKeyType		getEndStopPoint() const { return get<EndStopPoint>(); }
+				const boost::posix_time::ptime& getLastUpdate() const { return get<LastUpdate>(); }
 
 			//@}
 
 			//! @name Setters
 			//@{
-				virtual void setLevel (const AlarmLevel& level) { set<Level>(level); }
-				virtual void setShortMessage( const std::string& message) { set<ShortMessage>(message); }
-				virtual void setLongMessage( const std::string& message) { set<LongMessage>(message); }
+				virtual void setLevel (const AlarmLevel& level) { set<Level>(level); updated(); }
+				virtual void setShortMessage( const std::string& message) { set<ShortMessage>(message); updated(); }
+				virtual void setLongMessage( const std::string& message) { set<LongMessage>(message); updated(); }
 				virtual void setScenario(const Scenario* scenario);
 				virtual void setRawEditor(bool value) { set<RawEditor>(value); }
-				virtual void setDone(bool value) { set<Done>(value); }
+				virtual void setDone(bool value) { set<Done>(value); updated(); }
 				
 				virtual void setSection(const MessagesSection* value);
 				virtual void setCalendar(const ScenarioCalendar* value);
 				
-				virtual void setDisplayDuration(std::size_t value) { set<DisplayDuration>(value); }
-				virtual void setDigitizedVersion( const std::string& value) { set<DigitizedVersion>(value); }
-				virtual void setTags( const std::string value) { set<Tags>(value); }
-				virtual void setRepeatInterval(int value) { set<RepeatInterval>(value); }
-				virtual void setWithAck(bool value) { set<WithAck>(value); }
-				virtual void setMultipleStops(bool value) { set<MultipleStops>(value); }
-				virtual void setPlayTts(bool value) { set<PlayTts>(value); }
-				virtual void setLight(bool value) { set<Light>(value); }
-				virtual void setDirectionSignCode(int value) { set<DirectionSignCode>(value); }
-				virtual void setStartStopPoint(synthese::util::RegistryKeyType value) { set<StartStopPoint>(value); }
-				virtual void setEndStopPoint(synthese::util::RegistryKeyType value) { set<EndStopPoint>(value); }
+				virtual void setDisplayDuration(std::size_t value) { set<DisplayDuration>(value); updated(); }
+				virtual void setDigitizedVersion( const std::string& value) { set<DigitizedVersion>(value); updated(); }
+				virtual void setTags( const std::string value) { set<Tags>(value); updated(); }
+				virtual void setRepeatInterval(int value) { set<RepeatInterval>(value); updated(); }
+				virtual void setWithAck(bool value) { set<WithAck>(value); updated(); }
+				virtual void setMultipleStops(bool value) { set<MultipleStops>(value); updated(); }
+				virtual void setPlayTts(bool value) { set<PlayTts>(value); updated(); }
+				virtual void setLight(bool value) { set<Light>(value); updated(); }
+				virtual void setDirectionSignCode(int value) { set<DirectionSignCode>(value); updated(); }
+				virtual void setStartStopPoint(synthese::util::RegistryKeyType value) { set<StartStopPoint>(value); updated(); }
+				virtual void setEndStopPoint(synthese::util::RegistryKeyType value) { set<EndStopPoint>(value); updated(); }
 			//@}
 
-			void setMessageAlternatives(const MessageAlternatives& value) const { _messageAlternatives = value; }
+			void setMessageAlternatives(const MessageAlternatives& value) { _messageAlternatives = value; updated(); }
 
-			void addLinkedObject(const AlarmObjectLink& link) const;
-			void removeLinkedObject(const AlarmObjectLink& link) const;
+			void addLinkedObject(const AlarmObjectLink& link);
+			void removeLinkedObject(const AlarmObjectLink& link);
 
 			bool belongsToTemplate() const;
 

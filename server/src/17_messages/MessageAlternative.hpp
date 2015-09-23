@@ -43,7 +43,8 @@ namespace synthese
 		FIELD(Key),
 		FIELD(messages::Alarm),
 		FIELD(messages::MessageType),
-		FIELD(Content)
+		FIELD(Content),
+		FIELD(LastUpdate)
 	> MessageAlternativeRecord;
 
 	namespace messages
@@ -61,6 +62,17 @@ namespace synthese
 			MessageAlternative(
 				util::RegistryKeyType id = 0
 			);
+
+			//! @name Getters
+			//@{
+				const std::string& getContent() const { return get<Content>(); }
+				const boost::posix_time::ptime getLastUpdate() const { return get<LastUpdate>(); }
+			//@}
+
+			//! @name Setters
+			//@{
+				void setContent(const std::string& content);
+			//@}
 
 			//! @name Modifiers
 			//@{

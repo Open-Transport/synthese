@@ -92,6 +92,7 @@ namespace synthese
 		const string Alarm::DATA_DIRECTION_SIGN_CODE("direction_sign_code");
 		const string Alarm::DATA_START_STOP_POINT("start_stop_point");
 		const string Alarm::DATA_END_STOP_POINT("end_stop_point");
+		const string Alarm::DATA_LAST_UPDATE("last_update");
 
 		const string Alarm::TAG_MESSAGE_ALTERNATIVE = "message_alternative";
 		const string Alarm::TAG_RECIPIENTS = "recipients";
@@ -128,7 +129,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(Light),
 					FIELD_DEFAULT_CONSTRUCTOR(DirectionSignCode),
 					FIELD_DEFAULT_CONSTRUCTOR(StartStopPoint),
-					FIELD_DEFAULT_CONSTRUCTOR(EndStopPoint)
+					FIELD_DEFAULT_CONSTRUCTOR(EndStopPoint),
+					FIELD_VALUE_CONSTRUCTOR(LastUpdate, posix_time::second_clock::local_time())
 			)	)
 		{}
 
@@ -160,7 +162,8 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Light, source.getLight()),
 					FIELD_VALUE_CONSTRUCTOR(DirectionSignCode, source.getDirectionSignCode()),
 					FIELD_VALUE_CONSTRUCTOR(StartStopPoint, source.getStartStopPoint()),
-					FIELD_VALUE_CONSTRUCTOR(EndStopPoint, source.getEndStopPoint())
+					FIELD_VALUE_CONSTRUCTOR(EndStopPoint, source.getEndStopPoint()),
+					FIELD_VALUE_CONSTRUCTOR(LastUpdate, posix_time::second_clock::local_time())
 			)	)
 		{}
 
@@ -234,6 +237,7 @@ namespace synthese
 			pm.insert(prefix + DATA_DIRECTION_SIGN_CODE, getDirectionSignCode());
 			pm.insert(prefix + DATA_START_STOP_POINT, getStartStopPoint());
 			pm.insert(prefix + DATA_END_STOP_POINT, getEndStopPoint());
+			pm.insert(prefix + DATA_LAST_UPDATE, getLastUpdate());
 
 			dataSourceLinksToParametersMap(pm);
 
@@ -282,7 +286,7 @@ namespace synthese
 
 		void Alarm::addLinkedObject(
 			const AlarmObjectLink& link
-		) const	{
+		) {
 			// Locks the cache
 			mutex::scoped_lock(_linkedObjectsMutex);
 
@@ -301,11 +305,12 @@ namespace synthese
 				).first;
 			}
 			it->second.insert(&link);
+			updated();
 		}
 
 
 
-		void Alarm::removeLinkedObject( const AlarmObjectLink& link ) const
+		void Alarm::removeLinkedObject( const AlarmObjectLink& link )
 		{
 			// Locks the cache
 			mutex::scoped_lock(_linkedObjectsMutex);
@@ -318,6 +323,7 @@ namespace synthese
 			if(it != _linkedObjects.end())
 			{
 				it->second.erase(&link);
+				updated();
 			}
 		}
 
@@ -532,6 +538,7 @@ namespace synthese
 			set<ParentScenario>(value
 								? boost::optional<Scenario&>(*const_cast<Scenario*>(value))
 								: boost::none);
+			updated();
 		}
 
 		
@@ -541,6 +548,7 @@ namespace synthese
 			set<MessagesSection>(value
 								 ? boost::optional<MessagesSection&>(*const_cast<MessagesSection*>(value))
 								 : boost::none);
+			updated();
 		}
 
 		
@@ -550,6 +558,7 @@ namespace synthese
 			set<Calendar>(value
 						  ? boost::optional<ScenarioCalendar&>(*const_cast<ScenarioCalendar*>(value))
 						  : boost::none);
+			updated();
 		}
 
 		
@@ -579,6 +588,11 @@ namespace synthese
 			}
 		}
 
+
+		void Alarm::updated()
+		{
+			set<LastUpdate>(boost::posix_time::second_clock::local_time());
+		}
 		
 		
 }	}
