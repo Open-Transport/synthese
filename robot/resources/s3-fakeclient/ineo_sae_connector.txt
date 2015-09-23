@@ -32,7 +32,7 @@ Delete Message From Ineo SAEIV
     [Return]  ${request}
 
 Ineo SAEIV Sends 
-    [Arguments]  ${request_message}
+    [Arguments]  ${request}
     ${response}=  Send Sync  ${saeiv_connection}  ${request}
     [Return]  ${response}
 
