@@ -100,7 +100,7 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DEFAULT_CITY_ID = "default_city_id";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DEFAULT_TRANSFER_DURATION = "stop_area_default_transfer_duration";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_NON_COMMERCIAL = "non_commercial";
-		const string IneoBDSIFileFormat::Importer_::PARAMETER_READ_DEST_SMS = "read_dest_sms";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_READ_DEST = "read_dest";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_OVERLOAD_LINES = "overload_lines";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_READ_ETAT_HORAIRE = "read_etat_horaire";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_READ_PROGRAMMATIONS = "read_programmations";
@@ -222,8 +222,9 @@ namespace synthese
 			// Eliminate non-commercial services
 			_nonCommercial = map.getDefault<bool>(PARAMETER_NON_COMMERCIAL, false);
 
-			// Read destSMS ?
-			_readDestSMS = map.getDefault<bool>(PARAMETER_READ_DEST_SMS, false);
+            // Read a destination ?
+			_destinationField = static_cast<_destinationFieldType>(map.getDefault<int>(PARAMETER_READ_DEST, 0));
+
 			_strOverloadLines = map.getDefault<string>(PARAMETER_OVERLOAD_LINES);
 
 			// Read etat horaire ?
@@ -290,7 +291,7 @@ namespace synthese
 					}
 				}
 
-				std::string dest = chainage.destsms;
+				std::string dest = chainage.destination;
 
 				// If the last stop has changed, modify the destination
 				if ( _destDemitour && arretChns.back().ref != chainage.arretChns.back().ref )
@@ -305,13 +306,13 @@ namespace synthese
 							if (destStopArea)
 							{
 								dest = destStopArea->getName();
-								_logDebug("Demi-tour : Using " + dest + " as destination instead of " + chainage.destsms + " for the new journeyPattern " + chainage.nom + "(" + chainage.ref + ") in line " + chainage.ligne->ref);
+								_logDebug("Demi-tour : Using " + dest + " as destination instead of " + chainage.destination + " for the new journeyPattern " + chainage.nom + "(" + chainage.ref + ") in line " + chainage.ligne->ref);
 							}
 						}
 					}
 				}
 				
-				newChainage = _createAndReturnChainage(chainages,arretChns,*(chainage.ligne),chainage.nom,chainage.sens,dest,chainage.ref + "-" + lexical_cast<string>(horaires.size()));
+				newChainage = _createAndReturnChainage(chainages,arretChns,*(chainage.ligne),chainage.nom,dest,chainage.sens,chainage.ref + "-" + lexical_cast<string>(horaires.size()));
 				
 				// Jump over dead runs
 				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, arretChns)
@@ -364,7 +365,7 @@ namespace synthese
 				course.horaires = horaires;
 				course.chainage = &chainage;
 				course.syntheseService = NULL;
-			course.handicapped = handicapped;
+				course.handicapped = handicapped;
 
 				// Trace
 				_logLoadDetail(
@@ -380,8 +381,8 @@ namespace synthese
 			const Chainage::ArretChns& arretchns,
 			const Ligne& ligne,
 			const std::string& nom,
+			const string &destination,
 			bool sens,
-			const std::string& destsms,
 			const std::string& ref
 		) const	{
 
@@ -404,8 +405,8 @@ namespace synthese
 			chainage.ref = ref;
 			chainage.ligne = &ligne;
 			chainage.nom = nom;
+			chainage.destination = destination;
 			chainage.sens = sens;
-			chainage.destsms = destsms;
 			chainage.arretChns = arretchns;
 			_logLoadDetail(
 				"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"OK"
@@ -418,8 +419,8 @@ namespace synthese
 			const Chainage::ArretChns& arretchns,
 			const Ligne& ligne,
 			const std::string& nom,
+			const string &destination,
 			bool sens,
-			const std::string& destsms,
 			const std::string& ref
 		) const	{
 		
@@ -442,8 +443,8 @@ namespace synthese
 			chainage.ref = ref;
 			chainage.ligne = &ligne;
 			chainage.nom = nom;
+			chainage.destination = destination;
 			chainage.sens = sens;
-			chainage.destsms = destsms;
 			chainage.arretChns = arretchns;
 			_logLoadDetail(
 				"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"OK"
@@ -859,15 +860,16 @@ namespace synthese
 						_database +".CHAINAGE.nom,"+
 						_database +".CHAINAGE.sens,"+
 						_database +".CHAINAGE.ligne "+
-						(_readDestSMS ? "," + _database +".DEST.destsms " : "")+
+						(_destinationField == DESTINATION ? "," + _database +".DEST.nom AS destination " : "")+
+						(_destinationField == DESTSMS ? "," + _database +".DEST.destsms AS destination  " : "")+
 					" FROM "+
-						(_readDestSMS ? _database +".DEST, " : "")+
+						(_destinationField ? _database +".DEST, " : "")+
 						_database +".ARRETCHN "+
 						" INNER JOIN "+ _database +".CHAINAGE ON "+
 							_database +".CHAINAGE.ref="+ _database +".ARRETCHN.chainage AND "+ _database +".CHAINAGE.jour="+ _database +".ARRETCHN.jour "+
 					"WHERE "+
 						_database +".CHAINAGE.jour="+ todayStr +
-						(_readDestSMS ? " AND "+ _database +".CHAINAGE.dest="+ _database +".DEST.ref "+"AND "+ _database +".CHAINAGE.jour="+ _database +".DEST.jour " : "")+
+						(_destinationField ? " AND "+ _database +".CHAINAGE.dest="+ _database +".DEST.ref "+"AND "+ _database +".CHAINAGE.jour="+ _database +".DEST.jour " : "")+
 					" ORDER BY "+
 						_database +".ARRETCHN.chainage, "+
 						_database +".ARRETCHN.pos"
@@ -877,7 +879,7 @@ namespace synthese
 				const Ligne* ligne(NULL);
 				Chainage::ArretChns arretChns;
 				bool sens(false);
-				string destsms;
+				string destination = "";
 				string nom;
 				while(chainageResult->next())
 				{
@@ -893,8 +895,8 @@ namespace synthese
 							arretChns,
 							*ligne,
 							nom,
+							destination,
 							sens,
-							destsms,
 							lastRef
 						);
 					}
@@ -904,20 +906,28 @@ namespace synthese
 					{
 						string ligneRef(chainageResult->get<string>("ligne"));
 						nom = chainageResult->getText("nom");
-						if (_readDestSMS)
+						Log::GetInstance().debug("DESTNONE");
+
+						if (_destinationField != NONE)
 						{
-							destsms = chainageResult->getText("destsms");
-							vector<string> overloadLines;
-							split(overloadLines, _strOverloadLines, is_any_of(","));
-							BOOST_FOREACH(string overload, overloadLines)
-							{
-								if (destsms == overload)
-								{
-									ligneRef = destsms;
-									_logLoad("OVERLOAD LOAD FOR " + destsms);
-									break;
-								}
-							}
+					 		destination = chainageResult->getText("destination");
+							Log::GetInstance().debug("DESTDEST");
+
+					 		if (_destinationField == DESTSMS)
+					 		{
+								 Log::GetInstance().debug("DESTSMS");
+					 			vector<string> overloadLines;
+					 			split(overloadLines, _strOverloadLines, is_any_of(","));
+					 			BOOST_FOREACH(string overload, overloadLines)
+					 			{
+									 if (destination == overload)
+									 {
+									 	ligneRef = destination;
+									 	_logLoad("OVERLOAD LOAD FOR " + destination);
+									 	break;
+									 }
+					 			}
+					 		}
 						}
 
 						// Check of the ligne
@@ -983,8 +993,8 @@ namespace synthese
 						arretChns,
 						*ligne,
 						nom,
+						destination,
 						sens,
-						destsms,
 						lastRef
 					);
 				}
@@ -1816,7 +1826,7 @@ namespace synthese
 			_stopCodeToLower(false),
 			_autoCreateStops(false),
 			_nonCommercial(false),
-			_readDestSMS(false),
+			_destinationField(NONE),
 			_readEtatHoraire(true),
 			_readProgrammations(true)
 		{}
@@ -2347,6 +2357,7 @@ namespace synthese
 				jp->setWayBack(sens);
 				jp->setName(nom);
 				jp->addCodeBySource(realTimeDataSource, ref);
+				jp->setDirection(destination);
 				ligne->syntheseLine->addPath(jp.get());
 
 				// Stops

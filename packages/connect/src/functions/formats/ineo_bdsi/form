@@ -56,9 +56,15 @@
   name=send_deactivations_by_inter_synthese&
 #>
 
-<#forms/yes_no_input&
-  label=Lire le champ DEST.SMS&
-  name=read_dest_sms&
+<#forms/radio_inputs&
+  label=Destination des parcours&
+  name=read_dest&
+  label1=Aucune&
+  value1=0&
+  label2=Destination&
+  value2=1&
+  label3=Champ DESTSMS&
+  value3=2&
 #>
 
 <#forms/text_input&

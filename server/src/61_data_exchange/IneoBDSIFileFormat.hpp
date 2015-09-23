@@ -108,13 +108,21 @@ namespace synthese
 				static const std::string PARAMETER_DEFAULT_CITY_ID;
 				static const std::string PARAMETER_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_NON_COMMERCIAL;
-				static const std::string PARAMETER_READ_DEST_SMS;
+				static const std::string PARAMETER_READ_DEST;
 				static const std::string PARAMETER_OVERLOAD_LINES;
 				static const std::string PARAMETER_READ_ETAT_HORAIRE;
 				static const std::string PARAMETER_READ_PROGRAMMATIONS;
 				static const std::string PARAMETER_DEST_DEMITOUR;
 
 			private:
+
+				// Possible destinations to import
+				enum _destinationFieldType {
+					 NONE = 0,
+					 DESTINATION = 1,
+					 DESTSMS = 2
+				};
+
 				// Vector to avoid reentrance and mutex to protect this vector
 				static boost::recursive_mutex _tabRunningBdsiMutex;
 				static std::set<util::RegistryKeyType> _runningBdsi;
@@ -136,7 +144,7 @@ namespace synthese
 				boost::shared_ptr<const geography::City> _defaultCity;
 				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
 				bool _nonCommercial;
-				bool _readDestSMS;
+				_destinationFieldType _destinationField;
 				std::string _strOverloadLines;
 				bool _readEtatHoraire;
 				bool _readProgrammations;
@@ -177,9 +185,9 @@ namespace synthese
 				{
 					std::string ref;
 					std::string nom;
+					std::string destination;
 					const Ligne* ligne;
 					bool sens;
-					std::string destsms;
 					typedef std::vector<ArretChn> ArretChns;
 					ArretChns arretChns;
 
@@ -198,8 +206,8 @@ namespace synthese
 					const Chainage::ArretChns& arretchns,
 					const Ligne& ligne,
 					const std::string& nom,
+					const std::string& destination,
 					bool sens,
-					const std::string& destsms,
 					const std::string& chainageRef
 				) const;
 				Chainage* _createAndReturnChainage(
@@ -207,8 +215,8 @@ namespace synthese
 					const Chainage::ArretChns& arretchns,
 					const Ligne& ligne,
 					const std::string& nom,
+					const std::string& destination,
 					bool sens,
-					const std::string& destsms,
 					const std::string& chainageRef
 				) const;
 
