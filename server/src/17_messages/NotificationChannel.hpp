@@ -145,6 +145,20 @@ namespace synthese
 			*/
 			virtual bool notifyEvent(const boost::shared_ptr<NotificationEvent> event) = 0;
 
+			/**
+				Check if an alarm requires for an update event.
+				Compare BEGIN event timestamps with Alarm and MessageAlternative update timestamps.
+				May throw exception, will be caught and written to notification log.
+
+				This method allows a NotificationChannel derived class to either enforce
+				update event or to add specific checks.
+
+				@param alarm update alarm
+				@param beginEvent BEGIN notification event for the corresponding alarm and provider
+				@return true if an UPDATE notification event must be created
+			*/
+			virtual bool checkForUpdate(const Alarm* alarm, boost::shared_ptr<NotificationEvent> beginEvent);
+
 		protected:
 			/**
 				Get a list of parameter names that are implemented as script fields
@@ -159,14 +173,26 @@ namespace synthese
 			virtual void _addVariables(util::ParametersMap& variables) const { };
 
 			/**
-				Retrieve the message alternative of a message corresponding to the event type
-				@param provider reference to source notification provider
-				@param alarm the messages' holder
-				@param eventType type of the notification event (begin/end)
+				Retrieve the message corresponding to the notification provider message type
+				@param alarm the messages holder
+				@param type message type
 				@param[out] messageTypeFound true if message alternative for type was found
-				@return message alternative if it was found, long message otherwise
+				@return message alternative if it was found, alarm long message otherwise
 			*/
 			static std::string _getMessageAlternative(
+				const Alarm* alarm,
+				const boost::optional<MessageType&> type,
+				bool& messageTypeFound
+			);
+
+			/**
+				Retrieve the message update timestamp corresponding to the notification provider message type
+				@param alarm the messages holder
+				@param type message type
+				@param[out] messageTypeFound true if message alternative for type was found
+				@return message alternative if it was found, alarm long message otherwise
+			*/
+			static boost::posix_time::ptime _getMessageUpdate(
 				const Alarm* alarm,
 				const boost::optional<MessageType&> type,
 				bool& messageTypeFound

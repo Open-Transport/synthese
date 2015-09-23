@@ -63,6 +63,16 @@ namespace synthese
 		FIELD_DEFINITION_OF_TYPE(Attempts, "attempts", SQL_INTEGER)
 		FIELD_DEFINITION_OF_TYPE(LastAttempt, "last_attempt", SQL_DATETIME)
 
+		const char* NotificationEvent::TYPE_NAMES[] =
+			{
+				"NONE",
+				"BEGIN",
+				"END",
+				"REMINDER",
+				"BEFORE_UPDATE",
+				"UPDATE"
+			};
+
 		/// Default constructor as a Registrable
 		/// @param id registry key type
 		NotificationEvent::NotificationEvent(
@@ -151,11 +161,10 @@ namespace synthese
 
 
 
-		boost::shared_ptr<NotificationEvent> NotificationEvent::findOrCreateEvent(
+		boost::shared_ptr<NotificationEvent> NotificationEvent::findLastEvent(
 			const Alarm& alarm,
 			const NotificationProvider* provider,
-			const NotificationType type,
-			const bool hold_event /* = false */
+			const NotificationType type
 		) {
 			boost::shared_ptr<NotificationEvent> result;
 			Env env = Env::GetOfficialEnv();
@@ -164,13 +173,26 @@ namespace synthese
 					env, alarm.getKey(), provider->getKey(), type, 0, 1
 			)	);
 
-			posix_time::ptime now = posix_time::second_clock::local_time();
-			bool creation = false;
-
 			if (resultEvents.size() > 0)
 			{
 				result = resultEvents[0];
+			}
+			return result;
+		}
 
+		boost::shared_ptr<NotificationEvent> NotificationEvent::findOrCreateEvent(
+			const Alarm& alarm,
+			const NotificationProvider* provider,
+			const NotificationType type,
+			const bool hold_event /* = false */
+		) {
+			posix_time::ptime now = posix_time::second_clock::local_time();
+			bool creation = false;
+			Env env = Env::GetOfficialEnv();
+
+			boost::shared_ptr<NotificationEvent> result = findLastEvent(alarm, provider, type);
+			if (result)
+			{
 				// If event corresponds to a previous application
 				// period of the same alarm, create a new event
 				if (!result->get<LastAttempt>().is_not_a_date_time())
@@ -178,7 +200,8 @@ namespace synthese
 					if ((type == BEGIN
 						&& result->get<LastAttempt>() < alarm.getApplicationStart(now))
 						|| (type == END
-							&& result->get<LastAttempt>() < alarm.getApplicationEnd(now)))
+							&& result->get<LastAttempt>() < alarm.getApplicationEnd(now))
+						|| (type == UPDATE)) // TODO: add constraint, check last event is BEGIN
 					{
 						result = createEvent(env, alarm, provider, type, false);
 						creation = true;
@@ -207,6 +230,24 @@ namespace synthese
 				else
 				{
 					result->set<Expiration>(alarm.getApplicationEnd(now));
+				}
+			}
+			else if (type == UPDATE)
+			{
+				// For UPDATE, set expiration on corresponding BEGIN event which may still runs
+				NotificationEventTableSync::SearchResult runningBeginEvent(
+					NotificationEventTableSync::Search(
+						env, alarm.getKey(), provider->getKey(), BEGIN
+				)	);
+
+				BOOST_FOREACH(const shared_ptr<NotificationEvent> beginEvent, runningBeginEvent)
+				{
+					if (beginEvent->get<Status>() < FAILED)
+					{
+						// BEGIN or IN_PROGRESS
+						beginEvent->set<Expiration>(now);
+						NotificationEventTableSync::Save(beginEvent.get());
+					}
 				}
 			}
 

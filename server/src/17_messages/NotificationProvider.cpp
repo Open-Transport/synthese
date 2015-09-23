@@ -120,7 +120,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(MessageTypeEnd),
 					FIELD_VALUE_CONSTRUCTOR(SubscribeAllBegin, false),
 					FIELD_VALUE_CONSTRUCTOR(SubscribeAllEnd, false),
-					FIELD_VALUE_CONSTRUCTOR(SubscribeUpdates, false),
+					FIELD_VALUE_CONSTRUCTOR(SubscribeUpdates, true),
 					FIELD_VALUE_CONSTRUCTOR(SetEventsHold, false),
 					FIELD_DEFAULT_CONSTRUCTOR(RetryAttemptDelay),
 					FIELD_DEFAULT_CONSTRUCTOR(MaximumRetryAttempts),
@@ -350,7 +350,7 @@ namespace synthese
 				// Since we don't want to add another NotificationEvent into the database, we create a fake one that is only used to generate the message
 				// NotificationEvent ctor requires non const Alarm and NotificationProvider, hence the const_cast usage
 				NotificationProvider* self = const_cast<NotificationProvider*>(this);
-				const boost::shared_ptr<NotificationEvent> fakeEvent(new NotificationEvent(0, const_cast<Alarm&>(message), *self, END));
+				const boost::shared_ptr<NotificationEvent> fakeEvent(new NotificationEvent(0, const_cast<Alarm&>(message), *self, BEFORE_UPDATE));
 				self->notify(fakeEvent);
 			}
 		}
@@ -364,12 +364,17 @@ namespace synthese
 			// If this NotificationProvider registers to message updates and it is an explicit recipient of this message
 			if(get<SubscribeUpdates>() && isRecipient(message.getLinkedObjects()))
 			{
-				// NotificationProvider does not process Alarm, it requires a NotificationEvent
-				// Since we don't want to add another NotificationEvent into the database, we create a fake one that is only used to generate the message
-				// NotificationEvent ctor requires non const Alarm and NotificationProvider, hence the const_cast usage
+				boost::shared_ptr<NotificationEvent> beginEvent = NotificationEvent::findLastEvent(message, this, BEGIN);
+				bool updateRequired = true;
 				NotificationProvider* self = const_cast<NotificationProvider*>(this);
-				const boost::shared_ptr<NotificationEvent> fakeEvent(new NotificationEvent(0, const_cast<Alarm&>(message), *self, BEGIN));
-				self->notify(fakeEvent);
+				boost::shared_ptr<NotificationChannel> channel = self->getNotificationChannel();
+				if (channel) {
+					updateRequired = channel->checkForUpdate(&message, beginEvent);
+				}
+				if (updateRequired) {
+					const bool holdEvent = this->get<SetEventsHold>();
+					NotificationEvent::findOrCreateEvent(message, this, UPDATE, holdEvent);
+				}
 			}
 		}
 

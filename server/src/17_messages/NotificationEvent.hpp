@@ -44,15 +44,18 @@ namespace synthese
 	{
 		/**
 			Notification event type enumeration.
-			BEGIN and END are created by NotificationProvider.
+			BEGIN, UPDATE and END are created by NotificationProvider.
 			REMINDER may be created by a NotificationChannel derived class.
+			BEFORE_UPDATE is a "fake" event, it is not stored in DB nor retried.
 		 */
 		typedef enum
 		{
 			NONE = 0,
 			BEGIN = 1,
 			END = 2,
-			REMINDER = 3
+			REMINDER = 3,
+			BEFORE_UPDATE = 4,
+			UPDATE = 5
 		} NotificationType;
 
 		/**
@@ -134,6 +137,12 @@ namespace synthese
 			*/
 			static const std::string ATTR_KEY;
 
+			/**
+			 * NotificationType names.
+			 * Should be replaced by std::vector<std::string> with C++11 initialization lists.
+			 */
+			static const char* TYPE_NAMES[];
+
 			/** Default constructor for registry. */
 			NotificationEvent(
 				util::RegistryKeyType id = 0
@@ -187,6 +196,19 @@ namespace synthese
 				const NotificationProvider* provider,
 				const NotificationType type,
 				const bool saveNow = true
+			);
+
+			/**
+				Search for an existing notification event for an alarm and type.
+
+				@param reference to notified alarm
+				@param provider reference to source provider
+				@param type event type
+			*/
+			static boost::shared_ptr<NotificationEvent> findLastEvent(
+				const Alarm& alarm,
+				const NotificationProvider* provider,
+				const NotificationType type
 			);
 
 			/**

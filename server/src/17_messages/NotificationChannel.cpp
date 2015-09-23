@@ -122,7 +122,7 @@ namespace synthese
 					if(alternativeType->getKey() == typeKey)
 					{
 						// Alternative message found, return its content
-						messageAlternative = alternativeText->get<Content>();
+						messageAlternative = alternativeText->getContent();
 						messageTypeFound = true;
 					}
 				}
@@ -173,7 +173,7 @@ namespace synthese
 				const string beginIso = to_iso_string(begin);
 				variables.insert(VARIABLE_APPLICATION_BEGIN, beginTime);
 				variables.insert(VARIABLE_APPLICATION_BEGIN_ISO, beginIso);
-				if (eventType == BEGIN)
+				if (eventType != END)
 				{
 					variables.insert(VARIABLE_EVENT_TIME, beginTime);
 					variables.insert(VARIABLE_EVENT_TIME_ISO, beginIso);
@@ -224,15 +224,7 @@ namespace synthese
 			// Generate variables for rendering
 			ParametersMap scriptParameters;
 
-			if (eventType == BEGIN)
-			{
-				scriptParameters.insert(VARIABLE_EVENT_TYPE, string("BEGIN"));
-			}
-			else if (eventType == END)
-			{
-				scriptParameters.insert(VARIABLE_EVENT_TYPE, string("END"));
-			}
-
+			scriptParameters.insert(VARIABLE_EVENT_TYPE, string(NotificationEvent::TYPE_NAMES[eventType]));
 			scriptParameters.insert(VARIABLE_SHORT_MESSAGE, alarm->getShortMessage());
 			scriptParameters.insert(VARIABLE_URL, alarm->getDigitizedVersion());
 
@@ -376,4 +368,66 @@ namespace synthese
 			return result;
 		}
 	}
+
+
+
+	ptime NotificationChannel::_getMessageUpdate(
+		const Alarm* alarm,
+		const boost::optional<MessageType&> type,
+		bool& messageTypeFound
+	) {
+		// Initialize with alarm message update timestamp, in case we do not find the requested alternative
+		ptime result = alarm->getLastUpdate();
+		// If type is not set, set messageTypeFound to true
+		messageTypeFound = !type.is_initialized();
+
+		if(type)
+		{
+			util::RegistryKeyType typeKey = type.get().getKey();
+
+			BOOST_FOREACH(const Alarm::MessageAlternatives::value_type& alternative, alarm->getMessageAlternatives())
+			{
+				const MessageType* alternativeType = alternative.first;
+				const MessageAlternative* alternativeMessage = alternative.second;
+				if(alternativeType->getKey() == typeKey)
+				{
+					// Alternative message found, return its content
+					result = alternativeMessage->getLastUpdate();
+					messageTypeFound = true;
+				}
+			}
+		}
+		return result;
+	}
+
+
+
+	bool NotificationChannel::checkForUpdate(const Alarm* alarm, boost::shared_ptr<NotificationEvent> beginEvent)
+	{
+		boost::optional<NotificationProvider&> provider = beginEvent->get<NotificationProvider>();
+		boost::optional<MessageType&> type =
+			(END == beginEvent->get<EventType>())
+				? provider->get<MessageTypeEnd>()
+				: provider->get<MessageTypeBegin>();
+		bool messageTypeFound = false;
+		ptime messageUpdate = _getMessageUpdate(alarm, type, messageTypeFound);
+
+		if (false == messageTypeFound)
+		{
+			const std::string details = "Type de message manquant: " + (type ? type->getName() : "indéfini");
+			NotificationLog::AddNotificationProviderFailure(&(provider.get()), details, alarm);
+		}
+
+		bool result = false;
+		if (beginEvent->get<LastAttempt>().is_not_a_date_time())
+		{
+			result = (messageUpdate > beginEvent->get<Time>());
+		}
+		else
+		{
+			result = (messageUpdate > beginEvent->get<LastAttempt>());
+		}
+		return result;
+	}
+
 }
