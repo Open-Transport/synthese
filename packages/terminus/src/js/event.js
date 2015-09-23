@@ -276,6 +276,7 @@ function generate_alternative_click()
       field.setContent(limitedTxt);
     }
     $('#alternatives textarea.mceEditor').each(update_chars_alternative);
+    activateForm();
   }
   else
   {
@@ -293,6 +294,7 @@ function generate_alternative_click()
     txt = txt.substring(0, limit).replace(/\n/ig,"<br>");
     field.setContent(txt);
     $('#alternatives textarea.mceEditor').each(update_chars_alternative);
+    activateForm();
   }
   return false;
 }
