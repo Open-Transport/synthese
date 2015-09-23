@@ -25,9 +25,11 @@
 
 #include <vector>
 
+#include "Object.hpp"
+
 #include "IncludingPlace.h"
-#include "Registry.h"
 #include "NamedPlaceTemplate.h"
+#include "StringField.hpp"
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4250 )
@@ -37,20 +39,28 @@ namespace synthese
 {
 	namespace geography
 	{
+		FIELD_ID(AliasedPlaceId)
+		FIELD_POINTER(ParentCity, geography::City)
+		FIELD_BOOL(IsCityMainConnection)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(AliasedPlaceId),
+			FIELD(ParentCity),
+			FIELD(IsCityMainConnection)
+		> PlaceAliasSchema;
+
 		/** Place alias.
 
 			@ingroup m32
 		*/
 		class PlaceAlias:
+			public virtual Object<PlaceAlias, PlaceAliasSchema>,
 			public IncludingPlace<NamedPlace>,
 			public NamedPlaceTemplate<PlaceAlias>
 		{
 		public:
-			/// Chosen registry class.
-			typedef util::Registry<PlaceAlias>	Registry;
-
-
-
 			PlaceAlias(
 				util::RegistryKeyType id = 0
 			);
@@ -81,6 +91,11 @@ namespace synthese
 			virtual std::string getNameForAllPlacesMatcher(
 				std::string text = std::string()
 			) const;
+
+			virtual std::string getName() const { return get<Name>(); }
+
+			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+			virtual void unlink();
 		};
 	}
 }

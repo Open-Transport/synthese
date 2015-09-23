@@ -26,7 +26,6 @@
 #include "PlaceAlias.h"
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 #include <vector>
 #include <string>
@@ -42,17 +41,10 @@ namespace synthese
 		class PlaceAliasTableSync:
 			public db::DBDirectTableSyncTemplate<
 				PlaceAliasTableSync,
-				PlaceAlias,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				PlaceAlias
 			>
 		{
 		public:
-			static const std::string COL_NAME;
-			static const std::string COL_ALIASEDPLACEID;
-			static const std::string COL_CITYID;
-			static const std::string COL_ISCITYMAINCONNECTION;
-
 			PlaceAliasTableSync() {}
 
 

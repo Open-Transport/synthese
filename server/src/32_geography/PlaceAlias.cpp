@@ -21,7 +21,12 @@
 */
 
 #include "PlaceAlias.h"
-#include "Registry.h"
+
+#include "City.h"
+#include "Fetcher.h"
+#include "GeographyModule.h"
+#include "PTModule.h"
+#include "StopArea.hpp"
 
 using namespace std;
 
@@ -32,16 +37,31 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<PlaceAlias>::KEY("PlaceAlias");
 		template<> const string FactorableTemplate<NamedPlace, PlaceAlias>::FACTORY_KEY("PlaceAlias");
 	}
+
+	CLASS_DEFINITION(PlaceAlias, "t011_place_aliases", 11)
+	FIELD_DEFINITION_OF_OBJECT(PlaceAlias, "place_alias_id", "place_alias_ids")
+
+	FIELD_DEFINITION_OF_TYPE(AliasedPlaceId, "aliased_place_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(ParentCity, "city_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(IsCityMainConnection, "is_city_main_connection", SQL_BOOLEAN)
 
 	namespace geography
 	{
 		PlaceAlias::PlaceAlias(
 			RegistryKeyType id
 		):	Registrable(id),
-			IncludingPlace<NamedPlace>()
+			Object<PlaceAlias, PlaceAliasSchema> (
+				Schema (
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(AliasedPlaceId),
+					FIELD_DEFAULT_CONSTRUCTOR(ParentCity),
+					FIELD_DEFAULT_CONSTRUCTOR(IsCityMainConnection)
+			)	),
+			IncludingPlace<NamedPlace>(),
+			NamedPlaceTemplate<PlaceAlias>()
 		{}
 
 
@@ -82,6 +102,76 @@ namespace synthese
 		std::string PlaceAlias::getNameForAllPlacesMatcher(std::string text) const
 		{
 			return getAliasedPlace()->getNameForAllPlacesMatcher(getName());
+		}
+
+		void PlaceAlias::link(
+			util::Env& env,
+			bool withAlgorithmOptimizations /*= false*/
+		){
+			if (get<ParentCity>())
+			{
+				setCity(&*get<ParentCity>());
+			}
+			setAliasedPlace(db::Fetcher<NamedPlace>::Fetch(get<AliasedPlaceId>(), env).get());
+
+			// Registration to city matcher
+			if(getCity())
+			{
+				const_cast<City*>(getCity())->addPlaceToMatcher(env.getEditableSPtr(this));
+				if (get<IsCityMainConnection>())
+				{
+					getCity()->addIncludedPlace(*this);
+				}
+			}
+
+			// Registration to all places matcher
+			if(	&env == &Env::GetOfficialEnv() &&
+				withAlgorithmOptimizations
+			){
+				GeographyModule::GetGeneralAllPlacesMatcher().add(
+					getFullName(),
+					env.getEditableSPtr(this)
+				);
+			}
+			
+			if(	&env == &Env::GetOfficialEnv() &&
+				getCity() &&
+				withAlgorithmOptimizations &&
+				dynamic_cast<const pt::StopArea*>(getAliasedPlace())
+			){
+				const pt::StopArea* stopArea = static_cast<const pt::StopArea*>(getAliasedPlace());
+				pt::PTModule::GetGeneralStopsMatcher().add(
+					getFullName(),
+					env.getEditableSPtr(const_cast<pt::StopArea*>(stopArea))
+				);
+			}
+		}
+
+
+		void PlaceAlias::unlink()
+		{
+			// City matcher
+			City* city(const_cast<City*>(getCity()));
+			if (city != NULL)
+			{
+				city->removePlaceFromMatcher(*this);
+			}
+
+			if(Env::GetOfficialEnv().contains(*this))
+			{
+				// General all places
+				GeographyModule::GetGeneralAllPlacesMatcher().remove(
+					getFullName()
+				);
+			}
+
+			if(Env::GetOfficialEnv().contains(*this))
+			{
+				// General public places
+				pt::PTModule::GetGeneralStopsMatcher().remove(
+					getFullName()
+				);
+			}
 		}
 	}
 }

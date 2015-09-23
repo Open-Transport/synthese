@@ -31,6 +31,7 @@
 #include "TransportNetworkRight.h"
 #include "User.h"
 #include "Request.h"
+#include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
 #include "CityTableSync.h"
 #include "PlaceAliasTableSync.h"
@@ -149,16 +150,19 @@ namespace synthese
 			if(_name)
 			{
 				_alias->setName(*_name);
+				_alias->set<Name>(*_name);
 			}
 
 			if(_city)
 			{
 				_alias->setCity(_city->get());
+				_alias->set<ParentCity>(*_city->get());
 			}
 
 			if(_stopArea)
 			{
 				_alias->setAliasedPlace(_stopArea->get());
+				_alias->set<AliasedPlaceId>((*_stopArea)->getKey());
 			}
 
 			if(_isCityMainPlace && _alias->getCity())
@@ -171,6 +175,7 @@ namespace synthese
 				{
 					const_cast<City*>(_alias->getCity())->removeIncludedPlace(*_alias);
 				}
+				_alias->set<IsCityMainConnection>(*_isCityMainPlace);
 			}
 
 			PlaceAliasTableSync::Save(_alias.get());
