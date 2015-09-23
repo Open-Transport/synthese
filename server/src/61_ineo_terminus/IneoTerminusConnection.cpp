@@ -164,7 +164,7 @@ namespace synthese
 			if(1 == _livingConnections.size())
 			{
 				// Upon first connection or reconnection from Ineo SAE, we need to synchronize the messages between the 2 systems
-				_synchronizeMessages();
+				synchronizeMessages();
 			}
 		}
 
@@ -256,7 +256,7 @@ namespace synthese
 		}
 
 
-		void IneoTerminusConnection::_synchronizeMessages()
+		void IneoTerminusConnection::synchronizeMessages()
 		{
 			util::Log::GetInstance().info("Synchronizing messages with Ineo SAE");
 

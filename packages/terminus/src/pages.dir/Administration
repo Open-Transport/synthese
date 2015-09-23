@@ -885,6 +885,15 @@ then=
   <#tab_div&id=ineo#>
     <div class="form-horizontal">
       <div class="control-group">
+        <?link&
+        target=<@p@>&
+        tab=ineo&
+        a=IneoTerminusSynchronize&
+        class=btn btn-danger&
+        text=Synchroniser les messages&
+        confirm=Etes-vous sûr de vouloir synchroniser les messages avec le SAE ??>
+      </div>
+      <div class="control-group">
         <label class="control-label" for="ineoTerminusPort">Port pour les sockets Ineo Terminus</label>
         <div class="controls">
           <?form&

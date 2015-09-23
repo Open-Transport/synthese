@@ -303,7 +303,6 @@ namespace synthese
 
 			IneoTerminusConnection();
 			void _sendMessage();
-			void _synchronizeMessages();
 			const std::string _buildGetStatesRequest(const std::string& ineoMessageType);
 
 		public:
@@ -333,6 +332,8 @@ namespace synthese
 			void setActiveConnection(tcp_connection* active_connection);
 
 			void addMessage(std::string new_message);
+
+			void synchronizeMessages();
 
 			static void RunThread();
 

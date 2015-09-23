@@ -12,6 +12,8 @@ set(ineo_terminus_SRCS
   IneoTerminusConnection.hpp
   IneoTerminusLog.cpp
   IneoTerminusLog.hpp
+  IneoTerminusSynchronizeAction.cpp
+  IneoTerminusSynchronizeAction.hpp
 )
 
 set_source_files_properties(IneoTerminusModule.gen.cpp IneoTerminusModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
