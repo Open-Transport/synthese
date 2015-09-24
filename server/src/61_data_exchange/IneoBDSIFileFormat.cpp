@@ -906,16 +906,13 @@ namespace synthese
 					{
 						string ligneRef(chainageResult->get<string>("ligne"));
 						nom = chainageResult->getText("nom");
-						Log::GetInstance().debug("DESTNONE");
 
 						if (_destinationField != NONE)
 						{
 					 		destination = chainageResult->getText("destination");
-							Log::GetInstance().debug("DESTDEST");
 
 					 		if (_destinationField == DESTSMS)
 					 		{
-								 Log::GetInstance().debug("DESTSMS");
 					 			vector<string> overloadLines;
 					 			split(overloadLines, _strOverloadLines, is_any_of(","));
 					 			BOOST_FOREACH(string overload, overloadLines)
