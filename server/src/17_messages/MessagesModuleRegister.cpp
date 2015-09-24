@@ -3,9 +3,11 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTableSync.h"
 #include "CustomBroadcastPointTableSync.hpp"
+#include "MediaLibraryTableSync.hpp"
 #include "MessageAlternativeTableSync.hpp"
 #include "MessageApplicationPeriodTableSync.hpp"
 #include "MessagesSectionTableSync.hpp"
+#include "MessageTagTableSync.hpp"
 #include "MessageTypeTableSync.hpp"
 #include "NotificationEventTableSync.hpp"
 #include "SentScenarioTableSync.h"
@@ -26,7 +28,9 @@
 
 #include "CustomBroadcastPointsService.hpp"
 #include "GetMessagesFunction.hpp"
+#include "MediaLibrariesService.hpp"
 #include "MessagesSectionsService.hpp"
+#include "MessageTagsService.hpp"
 #include "MessageTypesService.hpp"
 #include "ScenariosListFunction.hpp"
 #include "ScenarioDisplayFunction.hpp"
@@ -54,6 +58,7 @@
 #include "CustomBroadcastPoint.hpp"
 #include "NotificationEvent.hpp"
 #include "NotificationProvider.hpp"
+#include "MediaLibrary.hpp"
 #include "MessageAlternative.hpp"
 #include "MessagesTypes.h"
 #include "MessagesSection.hpp"
@@ -78,9 +83,11 @@ void synthese::messages::moduleRegister()
 	synthese::messages::AlarmTableSync::integrate();
 	synthese::messages::CustomBroadcastPointTableSync::integrate();
 	synthese::messages::NotificationProviderTableSync::integrate();
+	synthese::messages::MediaLibraryTableSync::integrate();
 	synthese::messages::MessageAlternativeTableSync::integrate();
 	synthese::messages::MessageApplicationPeriodTableSync::integrate();
 	synthese::messages::MessagesSectionTableSync::integrate();
+	synthese::messages::MessageTagTableSync::integrate();
 	synthese::messages::MessageTypeTableSync::integrate();
 	synthese::messages::NotificationEventTableSync::integrate();
 	synthese::messages::ScenarioCalendarTableSync::integrate();
@@ -100,7 +107,9 @@ void synthese::messages::moduleRegister()
 	synthese::messages::NotificationProvidersService::integrate();
 	synthese::messages::NotificationProviderTestService::integrate();
 	synthese::messages::NotificationEventsService::integrate();
+	synthese::messages::MediaLibrariesService::integrate();
 	synthese::messages::MessagesSectionsService::integrate();
+	synthese::messages::MessageTagsService::integrate();
 	synthese::messages::MessageTypesService::integrate();
 	synthese::messages::ScenariosListFunction::integrate();
 	synthese::messages::ScenarioDisplayFunction::integrate();
@@ -133,8 +142,10 @@ void synthese::messages::moduleRegister()
 	//INTEGRATE(synthese::messages::AlarmObjectLink);
 	INTEGRATE(synthese::messages::NotificationEvent);
 	INTEGRATE(synthese::messages::NotificationProvider);
+	INTEGRATE(synthese::messages::MediaLibrary);
 	INTEGRATE(synthese::messages::MessageAlternative);
 	INTEGRATE(synthese::messages::MessageApplicationPeriod);
+	INTEGRATE(synthese::messages::MessageTag);
 	INTEGRATE(synthese::messages::MessageType);
 	INTEGRATE(synthese::messages::ScenarioCalendar);
 	INTEGRATE(synthese::messages::Alarm);
