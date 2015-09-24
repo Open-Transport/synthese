@@ -27,7 +27,7 @@
 
 #ifndef WIN32
 #include <sys/resource.h> // for getrusage
-#endif#
+#endif
 
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
