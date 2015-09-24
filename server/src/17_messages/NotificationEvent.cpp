@@ -21,21 +21,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <AlarmTableSync.h>
-#include <DBDirectTableSyncTemplate.hpp>
-#include <DBTableSyncTemplate.hpp>
-#include <Env.h>
-#include <Field.hpp>
-#include <NotificationEvent.hpp>
-#include <NotificationEventTableSync.hpp>
-#include <NotificationProvider.hpp>
-#include <NotificationProviderTableSync.hpp>
-#include <Registrable.h>
-#include <Registry.h>
-#include <Alarm.h>
-#include <StandardLoadSavePolicy.hpp>
-#include <UtilTypes.h>
-#include <Log.h>
+#include "Alarm.h"
+#include "AlarmTableSync.h"
+#include "Env.h"
+#include "Field.hpp"
+#include "Log.h"
+#include "NotificationEvent.hpp"
+#include "NotificationEventTableSync.hpp"
+#include "NotificationProvider.hpp"
+#include "NotificationProviderTableSync.hpp"
+#include "Registry.h"
+#include "UtilTypes.h"
 
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/special_defs.hpp>
@@ -180,76 +176,55 @@ namespace synthese
 			return result;
 		}
 
+
+
 		boost::shared_ptr<NotificationEvent> NotificationEvent::findOrCreateEvent(
 			const Alarm& alarm,
 			const NotificationProvider* provider,
 			const NotificationType type,
 			const bool hold_event /* = false */
 		) {
-			posix_time::ptime now = posix_time::second_clock::local_time();
 			bool creation = false;
-			Env env = Env::GetOfficialEnv();
 
 			boost::shared_ptr<NotificationEvent> result = findLastEvent(alarm, provider, type);
 			if (result)
 			{
-				// If event corresponds to a previous application
+				// If last event corresponds to a previous application
 				// period of the same alarm, create a new event
-				if (!result->get<LastAttempt>().is_not_a_date_time())
+				if (!result->get<LastAttempt>().is_not_a_date_time()
+					 && result->get<Status>() >= FAILED)
 				{
-					if ((type == BEGIN
-						&& result->get<LastAttempt>() < alarm.getApplicationStart(now))
-						|| (type == END
-							&& result->get<LastAttempt>() < alarm.getApplicationEnd(now))
-						|| (type == UPDATE)) // TODO: add constraint, check last event is BEGIN
+					if (type == BEGIN
+						&& result->get<Time>() < alarm.getLastActivationStart())
 					{
-						result = createEvent(env, alarm, provider, type, false);
+						creation = true;
+					}
+					if (type == END
+						&& result->get<Time>() < alarm.getLastActivationEnd())
+					{
+						creation = true;
+					}
+					if (type == UPDATE || type == REMINDER)
+					{
 						creation = true;
 					}
 				}
 			}
 			else
 			{
-				result = createEvent(env, alarm, provider, type, false);
-				creation = true;
+				creation = true; // no previous event
 			}
 
 			if(false == creation)
 			{
 				util::Log::GetInstance().debug("Notification event already exists for alarm " + alarm.getShortMessage());
 			}
-
-			// Set or refresh event expiration for begin event only
-			if (type == BEGIN)
+			else
 			{
-				if (!alarm.isApplicable(now))
-				{
-					// Alarm is no longer active right now. Should be discarded
-					result->set<Expiration>(now);
-				}
-				else
-				{
-					result->set<Expiration>(alarm.getApplicationEnd(now));
-				}
+				result = createEvent(Env::GetOfficialEnv(), alarm, provider, type, false);
 			}
-			else if (type == UPDATE)
-			{
-				// For UPDATE, set expiration on corresponding BEGIN event which may still runs
-				NotificationEventTableSync::SearchResult runningBeginEvent(
-					NotificationEventTableSync::Search(
-						env, alarm.getKey(), provider->getKey(), BEGIN
-				)	);
 
-				BOOST_FOREACH(const shared_ptr<NotificationEvent> beginEvent, runningBeginEvent)
-				{
-					if (beginEvent->get<Status>() < FAILED)
-					{
-						// BEGIN or IN_PROGRESS
-						beginEvent->set<Expiration>(now);
-						NotificationEventTableSync::Save(beginEvent.get());
-					}
-				}
-			}
+			result->expireEvents();
 
 			if (hold_event)
 			{
@@ -258,6 +233,58 @@ namespace synthese
 
 			NotificationEventTableSync::Save(result.get());
 			return result;
+		}
+
+
+
+		void NotificationEvent::expireEvents()
+		{
+			const posix_time::ptime now = posix_time::second_clock::local_time();
+			const Alarm alarm = get<Alarm>().get();
+			const NotificationProvider* provider = &(get<NotificationProvider>().get());
+			const NotificationType type = get<EventType>();
+
+			// Set or refresh event expiration for begin event only
+			if (type != END)
+			{
+				if (!alarm.isApplicable(now))
+				{
+					// Alarm is no longer active right now. Should be discarded
+					set<Expiration>(now);
+				}
+				else
+				{
+					// May be not_a_date_time is not end date specified
+					set<Expiration>(alarm.getApplicationEnd(now));
+				}
+			}
+
+			// Get previous event according to this event type
+			boost::shared_ptr<NotificationEvent> previousEvent;
+			if (type == BEGIN)
+			{
+				previousEvent = findLastEvent(alarm, provider, END);
+			}
+			else if (type == UPDATE || type == END)
+			{
+				previousEvent = findLastEvent(alarm, provider, BEGIN);
+			}
+			// Expire previous event
+			if (previousEvent)
+			{
+				previousEvent->set<Expiration>(now);
+				NotificationEventTableSync::Save(previousEvent.get());
+			}
+			// In case of END, also expire UPDATE event if any
+			if (type == END)
+			{
+				previousEvent = findLastEvent(alarm, provider, UPDATE);
+				if (previousEvent)
+				{
+					previousEvent->set<Expiration>(now);
+					NotificationEventTableSync::Save(previousEvent.get());
+				}
+			}
 		}
 
 	}

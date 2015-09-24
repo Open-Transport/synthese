@@ -24,14 +24,14 @@
 #ifndef SYNTHESE_messages_NotificationEvent_hpp__
 #define SYNTHESE_messages_NotificationEvent_hpp__
 
-#include <Alarm.h>
-#include <EnumObjectField.hpp>
-#include <NotificationProvider.hpp>
-#include <NumericField.hpp>
-#include <Object.hpp>
-#include <PointerField.hpp>
-#include <PtimeField.hpp>
-#include <SchemaMacros.hpp>
+#include "Alarm.h"
+#include "EnumObjectField.hpp"
+#include "NotificationProvider.hpp"
+#include "NumericField.hpp"
+#include "Object.hpp"
+#include "PointerField.hpp"
+#include "PtimeField.hpp"
+#include "SchemaMacros.hpp"
 
 #include <boost/fusion/container/map.hpp>
 #include <boost/fusion/support/pair.hpp>
@@ -166,15 +166,11 @@ namespace synthese
 			/** Virtual destructor. */
 			virtual ~NotificationEvent() { };
 
-
-
 			/**
 				Test if the event has expired
 				@return true if expired
 			*/
 			bool isExpired() const;
-
-
 
 			/**
 				Mark this event as successfuly notified.
@@ -229,6 +225,9 @@ namespace synthese
 				const NotificationType type,
 				const bool hold_event = false
 			);
+
+		protected:
+			void expireEvents();
 
 		};
 	}
