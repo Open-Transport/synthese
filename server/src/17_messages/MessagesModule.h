@@ -94,7 +94,6 @@ namespace synthese
 			static bool _messagesActivationRanOnce;
 			static bool _scenariosActivationRanOnce;
 
-			static bool _selectMessagesToActivate(const Alarm& object);
 			static bool _selectAlarm(const Alarm& object);
 			static bool _enableScenarioIfAutoActivation(SentScenario* sscenario);
 

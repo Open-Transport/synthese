@@ -73,6 +73,8 @@ namespace synthese
 		FIELD_INT(DirectionSignCode)
 		FIELD_ID(StartStopPoint)
 		FIELD_ID(EndStopPoint)
+		FIELD_PTIME(LastActivationStart)
+		FIELD_PTIME(LastActivationEnd)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -97,7 +99,9 @@ namespace synthese
 			FIELD(DirectionSignCode),
 			FIELD(StartStopPoint),
 			FIELD(EndStopPoint),
-			FIELD(LastUpdate)
+			FIELD(LastUpdate),
+			FIELD(LastActivationStart),
+			FIELD(LastActivationEnd)
 			> AlarmRecord;
 
 		class Alarm:
@@ -201,7 +205,9 @@ namespace synthese
 				virtual int						getDirectionSignCode() const { return get<DirectionSignCode>(); }
 				virtual synthese::util::RegistryKeyType		getStartStopPoint() const { return get<StartStopPoint>(); }
 				virtual synthese::util::RegistryKeyType		getEndStopPoint() const { return get<EndStopPoint>(); }
-				const boost::posix_time::ptime& getLastUpdate() const { return get<LastUpdate>(); }
+				const boost::posix_time::ptime getLastUpdate() const { return get<LastUpdate>(); }
+				const boost::posix_time::ptime getLastActivationStart() const { return get<LastActivationStart>(); }
+				const boost::posix_time::ptime getLastActivationEnd() const { return get<LastActivationEnd>(); }
 
 			//@}
 
@@ -243,7 +249,7 @@ namespace synthese
 				@return true if the message must be displayed at the specified time
 			*/
 			bool isApplicable(
-				boost::posix_time::ptime& when
+				const boost::posix_time::ptime& when
 			) const;
 
 			/**
@@ -251,7 +257,7 @@ namespace synthese
 				If alarm is not applicable at "when", posix_time::not_a_date_time is returned.
 
 				@param when the time to check
-				@return start date for the application period or not_a_date_time if no end date
+				@return start date for the application period or not_a_date_time if no start date
 			*/
 			boost::posix_time::ptime getApplicationStart(
 				const boost::posix_time::ptime& when
@@ -268,11 +274,23 @@ namespace synthese
 				const boost::posix_time::ptime& when
 			) const;
 
+			/**
+				Test if Alarm has already been activated by user action.
+
+				@return true if current date after LastActivationStart but not after LastActivationEnd
+			*/
+			bool isActivated() const;
 
 			//! @name Modifiers
 			//@{
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
+
+				/** Alarm is now activated */
+				void activationStarted();
+
+				/** Alarm activation just ended */
+				void activationEnded();
 			//@}
 
 			
@@ -318,7 +336,6 @@ namespace synthese
 				{
 					return _linkedObjects;
 				}
-
 			//@}
 		};
 

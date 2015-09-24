@@ -69,6 +69,8 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(DirectionSignCode, "direction_sign_code", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(StartStopPoint, "start_stop_point", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(EndStopPoint, "end_stop_point", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(LastActivationStart, "last_activation_start", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(LastActivationEnd, "last_activation_end", SQL_DATETIME)
 
 
 	
@@ -130,7 +132,9 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(DirectionSignCode),
 					FIELD_DEFAULT_CONSTRUCTOR(StartStopPoint),
 					FIELD_DEFAULT_CONSTRUCTOR(EndStopPoint),
-					FIELD_VALUE_CONSTRUCTOR(LastUpdate, posix_time::second_clock::local_time())
+					FIELD_VALUE_CONSTRUCTOR(LastUpdate, posix_time::second_clock::local_time()),
+					FIELD_VALUE_CONSTRUCTOR(LastActivationStart, posix_time::not_a_date_time),
+					FIELD_VALUE_CONSTRUCTOR(LastActivationEnd, posix_time::not_a_date_time)
 			)	)
 		{}
 
@@ -163,7 +167,9 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(DirectionSignCode, source.getDirectionSignCode()),
 					FIELD_VALUE_CONSTRUCTOR(StartStopPoint, source.getStartStopPoint()),
 					FIELD_VALUE_CONSTRUCTOR(EndStopPoint, source.getEndStopPoint()),
-					FIELD_VALUE_CONSTRUCTOR(LastUpdate, posix_time::second_clock::local_time())
+					FIELD_VALUE_CONSTRUCTOR(LastUpdate, posix_time::second_clock::local_time()),
+					FIELD_VALUE_CONSTRUCTOR(LastActivationStart, posix_time::not_a_date_time),
+					FIELD_VALUE_CONSTRUCTOR(LastActivationEnd, posix_time::not_a_date_time)
 			)	)
 		{}
 
@@ -390,7 +396,7 @@ namespace synthese
 			_broadcastPointsCache.clear();
 		}
 
-		bool Alarm::isApplicable( boost::posix_time::ptime& when ) const
+		bool Alarm::isApplicable( const boost::posix_time::ptime& when ) const
 		{
 			if (belongsToTemplate())
 			{
@@ -567,10 +573,6 @@ namespace synthese
 			if (get<ParentScenario>())
 			{
 				get<ParentScenario>()->addMessage(*this);
-				if (!belongsToTemplate())
-				{
-					MessagesModule::UpdateActivatedMessages();
-				}
 			}
 		}
 
@@ -583,7 +585,6 @@ namespace synthese
 				if (!belongsToTemplate())
 				{
 					setScenario(NULL);
-					MessagesModule::UpdateActivatedMessages();
 				}
 			}
 		}
@@ -591,9 +592,30 @@ namespace synthese
 
 		void Alarm::updated()
 		{
-			set<LastUpdate>(boost::posix_time::second_clock::local_time());
+			set<LastUpdate>(posix_time::second_clock::local_time());
 		}
 		
-		
+
+		void Alarm::activationStarted()
+		{
+			set<LastActivationStart>(posix_time::second_clock::local_time());
+		}
+
+
+		void Alarm::activationEnded()
+		{
+			set<LastActivationEnd>(posix_time::second_clock::local_time());
+		}
+
+
+		bool Alarm::isActivated() const
+		{
+			posix_time::ptime now = posix_time::second_clock::local_time();
+			return !get<LastActivationStart>().is_not_a_date_time()
+					&& get<LastActivationStart>() < now
+					&& (get<LastActivationEnd>().is_not_a_date_time()
+						|| get<LastActivationEnd>() < get<LastActivationStart>());
+		}
+
 }	}
 
