@@ -204,6 +204,8 @@ if (dates.length > 0) {
         a=scenario_save&actionParamsid=<@roid@>&actionParamena=0&
         class=btn btn-warning btn-mini btn-inactive&
         text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>&
+		else=
+	    <button type="button" class="btn btn-default btn-mini btn-inactive disabled"><i class="icon-pause icon-white"></i></button>
 		?>&
 	else=
 		<?if&
@@ -213,6 +215,8 @@ if (dates.length > 0) {
         a=scenario_save&actionParamsid=<@roid@>&actionParamena=1&
         class=btn btn-warning btn-mini btn-inactive&
         text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>&
+		else=
+	    <button type="button" class="btn btn-default btn-mini btn-inactive disabled"><i class="icon-play icon-white"></i></button>
 		?>&
 	?>
 	<?notification_events&scenario_id=<@scenario_id@>&template=
@@ -251,7 +255,7 @@ if (dates.length > 0) {
         text=<i class="icon-eject icon-white"></i>&
         confirm=Etes-vous sûr de vouloir clore et archiver l'événement ??>&
 		else=
-        Archivage non autorisé&
+        <button type="button" class="btn btn-default btn-mini btn-with-margins disabled"><i class="icon-eject icon-white"></i></button>
 		?>
 	?>
       </td>

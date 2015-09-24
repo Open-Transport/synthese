@@ -285,6 +285,8 @@
                 class=btn btn-warning btn-mini btn-inactive&
                 text=<i class="icon-pause icon-white"></i>&
                 confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>
+					&else=
+		        <button type="button" class="btn btn-default btn-mini btn-inactive disabled"><i class="icon-pause icon-white"></i></button>
 					?>&
 				else=
 					<?if&
@@ -299,6 +301,8 @@
                 class=btn btn-success btn-mini btn-inactive&
                 text=<i class="icon-play icon-white"></i>&
                 confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>
+					&else=
+		        <button type="button" class="btn btn-default btn-mini btn-inactive disabled"><i class="icon-play icon-white"></i></button>
 					?>&
 				?>
               </td>
@@ -320,7 +324,7 @@
                 text=<i class="icon-eject icon-white"></i>&
                 confirm=Etes-vous sûr de vouloir clore et archiver l'événement ??>&
 				else=
-                Archivage non autorisé
+                <button type="button" class="btn btn-default btn-mini disabled"><i class="icon-eject icon-white"></i></button>
 				?>
               </td>
 				<?notification_events&
@@ -567,11 +571,15 @@
 		?>
               </select>
             </label>
-            <label>Affichage sur tronçon : arrêt de début
-              <input value="" type="number" maxlength="20" field="start_stop_point" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()">
+            <label>Depuis l'arrêt
+              <select class="input-large" field="start_stop_point" onkeyup="activateForm()" onchange="activateForm()">
+                <option value="-1">Aucun</option>
+              </select>
             </label>
-            <label>Affichage sur tronçon : arrêt de fin
-              <input value="" type="number" maxlength="20" field="end_stop_point"  onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()">
+            <label>Jusqu'à l'arrêt
+              <select class="input-large" field="end_stop_point" onkeyup="activateForm()" onchange="activateForm()">
+                <option value="-1">Aucun</option>
+              </select>
             </label>
           </div>
         

@@ -294,7 +294,7 @@ namespace synthese
 			pm.insert(DATA_MANUAL_OVERRIDE, getManualOverride());
 
 			// data sources
-			pm.insert(DATA_DATASOURCE_LINK, get<DataSourceLinksWithoutUnderscore>());
+			pm.insert(DATA_DATASOURCE_LINK, DataSourceLinksWithoutUnderscore::Serialize(_dataSourceLinks));
 		}
 
 		void SentScenario::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )

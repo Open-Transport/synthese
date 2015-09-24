@@ -205,6 +205,8 @@ if (dates.length > 0) {
         actionParamena=0&
         class=btn btn-warning btn-mini btn-inactive&
         text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>&
+		else=
+		<button type="button" class="btn btn-default btn-mini btn-inactive disabled"><i class="icon-pause icon-white"></i></button>
 		?>&
 	else=
 		<?if&cond=<@eventCanBeModified@>&
@@ -217,6 +219,8 @@ if (dates.length > 0) {
         actionParamena=1&
         class=btn btn-warning btn-mini btn-inactive&
         text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>&
+		else=
+		<button type="button" class="btn btn-default btn-mini btn-inactive disabled"><i class="icon-play icon-white"></i></button>
 		?>&
 	?>
 	<?notification_events&
