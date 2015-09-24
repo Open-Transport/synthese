@@ -23,9 +23,9 @@
 #ifndef SYNTHESE_messages_NotificationChannel_hpp__
 #define SYNTHESE_messages_NotificationChannel_hpp__
 
-#include <FactoryBase.h>
-#include <NotificationEvent.hpp>
-#include <StringField.hpp>
+#include "FactoryBase.h"
+#include "NotificationEvent.hpp"
+#include "StringField.hpp"
 
 #include <string>
 #include <vector>

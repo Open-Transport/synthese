@@ -21,25 +21,25 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <Alarm.h>
-#include <AlarmObjectLink.h>
-#include <CMSScript.hpp>
-#include <CityTableSync.h>
-#include <CommercialLine.h>
-#include <CommercialLineTableSync.h>
-#include <Env.h>
-#include <MessageAlternative.hpp>
-#include <MessageType.hpp>
-#include <NamedPlace.h>
-#include <NotificationChannel.hpp>
-#include <NotificationLog.hpp>
-#include <NotificationProvider.hpp>
-#include <Object.hpp>
-#include <ParametersMap.h>
-#include <ParametersMapField.hpp>
-#include <StopArea.hpp>
-#include <StopAreaTableSync.hpp>
-#include <TransportNetworkTableSync.h>
+#include "Alarm.h"
+#include "AlarmObjectLink.h"
+#include "CMSScript.hpp"
+#include "CityTableSync.h"
+#include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
+#include "Env.h"
+#include "MessageAlternative.hpp"
+#include "MessageType.hpp"
+#include "NamedPlace.h"
+#include "NotificationChannel.hpp"
+#include "NotificationLog.hpp"
+#include "NotificationProvider.hpp"
+#include "Object.hpp"
+#include "ParametersMap.h"
+#include "ParametersMapField.hpp"
+#include "StopArea.hpp"
+#include "StopAreaTableSync.hpp"
+#include "TransportNetworkTableSync.h"
 
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -192,6 +192,12 @@ namespace synthese
 					variables.insert(VARIABLE_EVENT_TIME, endTime);
 					variables.insert(VARIABLE_EVENT_TIME_ISO, endIso);
 				}
+			}
+
+			if (begin.is_not_a_date_time() && end.is_not_a_date_time())
+			{
+				variables.insert(VARIABLE_EVENT_TIME, eventTime);
+				variables.insert(VARIABLE_EVENT_TIME_ISO, to_iso_string(eventTime));
 			}
 		}
 
