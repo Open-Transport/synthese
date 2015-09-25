@@ -506,7 +506,7 @@ namespace synthese
 							_mnlp_prefix + _getValue("NLP1"),
 							_mnlp_prefix + _getValue("NLP2")
 						);
-						sequence = dataSource.getActualCoordinateSystem().getGeometryFactory().getCoordinateSequenceFactory()->create(0, 2);
+						sequence = dataSource.getActualCoordinateSystem().getGeometryFactory().getCoordinateSequenceFactory()->create((size_t)0, 2);
 
 						if(_points[_getValue("NLP1")].get())
 						{

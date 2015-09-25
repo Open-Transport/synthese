@@ -71,7 +71,7 @@ namespace synthese
 			const CoordinatesSystem& spatialReference
 		):	_geometry(
 			geometry.get() ?
-			boost::static_pointer_cast<G, geos::geom::Geometry>(
+			boost::dynamic_pointer_cast<G, geos::geom::Geometry>(
 				spatialReference.convertGeometry(static_cast<geos::geom::Geometry&>(*geometry))
 			):
 			boost::shared_ptr<G>()

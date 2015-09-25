@@ -95,7 +95,7 @@ namespace synthese
 		){
 			// Geometry
 			boost::shared_ptr<Point> point(
-				static_pointer_cast<Point, Geometry>(
+				dynamic_pointer_cast<Point, Geometry>(
 					rows->getGeometryFromWKT(TABLE_COL_GEOMETRY)
 			)	);
 			if(point.get())

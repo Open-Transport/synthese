@@ -233,7 +233,7 @@ namespace synthese
 			{
 				WKTReader reader(&CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory());
 				_geometry = boost::shared_ptr<LineString>(
-					static_cast<LineString*>(
+					dynamic_cast<LineString*>(
 						reader.read(map.get<string>(ObjectUpdateAction::GetInputName<LineStringGeometry>()))
 				)	);
 				_clearGeom = false;

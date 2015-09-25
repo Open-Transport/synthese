@@ -352,7 +352,7 @@ void testTypes(const TestBackend& testBackend)
 			BOOST_CHECK_EQUAL(date(2011, 03, 30), TestTypesTableSync::AddedRows->getDate("date"));
 			BOOST_CHECK_EQUAL(ptime(date(1995, 12, 07), time_duration(13, 25, 10)), TestTypesTableSync::AddedRows->getDateTime("timestamp"));
 
-			boost::shared_ptr<Point> point = boost::static_pointer_cast<Point, Geometry>(
+			boost::shared_ptr<Point> point = boost::dynamic_pointer_cast<Point, Geometry>(
 				TestTypesTableSync::AddedRows->getGeometryFromWKT("geometry")
 			);
 			BOOST_CHECK_CLOSE(6.0, point->getX(), 1.0);

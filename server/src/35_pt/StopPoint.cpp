@@ -375,7 +375,7 @@ namespace synthese
 				geos::io::WKTWriter writer;
 				pm.insert(
 					prefix + TABLE_COL_GEOMETRY,
-					writer.write(static_pointer_cast<geos::geom::Geometry, Point>(getGeometry()).get())
+					writer.write(dynamic_pointer_cast<geos::geom::Geometry, Point>(getGeometry()).get())
 				);
 			}
 			else
@@ -513,7 +513,7 @@ namespace synthese
 				boost::shared_ptr<Point> value;
 				if(!record.get<string>(TABLE_COL_GEOMETRY).empty())
 				{
-					value = static_pointer_cast<Point, geos::geom::Geometry>(
+					value = dynamic_pointer_cast<Point, geos::geom::Geometry>(
 						record.getGeometryFromWKT(TABLE_COL_GEOMETRY)
 					);
 				}

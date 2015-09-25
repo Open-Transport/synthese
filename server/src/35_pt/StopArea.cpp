@@ -899,7 +899,7 @@ namespace synthese
 					boost::shared_ptr<Point> point;
 					if(!record.get<string>(TABLE_COL_GEOMETRY).empty())
 					{
-						point =	static_pointer_cast<Point, Geometry>(
+						point =	dynamic_pointer_cast<Point, Geometry>(
 							record.getGeometryFromWKT(TABLE_COL_GEOMETRY)
 						);
 					}

@@ -533,7 +533,7 @@ namespace synthese
 							if(customChunk->getFromVertex()->getKey() == chunk->getNext()->getFromVertex()->getKey())
 							{
 								resultGeometry = boost::shared_ptr<LineString>(
-									static_cast<LineString*>(customChunkGeometry.extractLine(0, geometryOffset)
+									dynamic_cast<LineString*>(customChunkGeometry.extractLine(0, geometryOffset)
 								));
 							}
 							// next chunk of proj share the same vertex than the next chunk of first, use the reverse chunk and build geometry from the end to our offset

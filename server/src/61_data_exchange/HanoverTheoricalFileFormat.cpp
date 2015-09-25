@@ -405,7 +405,7 @@ namespace synthese
 					{
 						offsetSum = 0;
 						linkStops.clear();
-						sequence = dataSource.getActualCoordinateSystem().getGeometryFactory().getCoordinateSequenceFactory()->create(0, 2);
+						sequence = dataSource.getActualCoordinateSystem().getGeometryFactory().getCoordinateSequenceFactory()->create((size_t)0, 2);
 					}
 					lastLinkId = id;
 					string stopref(result->get<string>("sto_graph_key"));

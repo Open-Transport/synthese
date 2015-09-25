@@ -94,7 +94,7 @@ namespace synthese
 
 			try
 			{
-				return boost::static_pointer_cast<T, geos::geom::Geometry>(
+				return boost::dynamic_pointer_cast<T, geos::geom::Geometry>(
 					CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
 						*boost::shared_ptr<geos::geom::Geometry>(reader.read(s))
 				)	);
@@ -180,7 +180,7 @@ namespace synthese
 		){
 			content.push_back(
 				Cell(
-					boost::static_pointer_cast<geos::geom::Geometry, T>(fieldObject)
+					boost::dynamic_pointer_cast<geos::geom::Geometry, T>(fieldObject)
 			)	);
 		}
 

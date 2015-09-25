@@ -164,7 +164,7 @@ namespace synthese
 			query.addField(object->getNonWalkable());
 			query.addField(object->getNonDrivable());
 			query.addField(object->getNonBikable());
-			query.addField(static_pointer_cast<Geometry,LineString>(object->getGeometry()));
+			query.addField(dynamic_pointer_cast<Geometry,LineString>(object->getGeometry()));
 			query.execute(transaction);
 		}
 

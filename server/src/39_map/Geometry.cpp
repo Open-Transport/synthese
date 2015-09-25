@@ -21,6 +21,7 @@
 */
 
 #include "Geometry.h"
+#include "math.h"
 
 using namespace geos::geom;
 using namespace std;
