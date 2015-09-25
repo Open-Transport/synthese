@@ -102,7 +102,5 @@ endif(WITH_MYSQL)
 add_subdirectory(101_sqlite)
 target_link_libraries(10_db 10_db_sqlite)
 
-add_subdirectory(103_svn)
-
 install(TARGETS 10_db DESTINATION lib)
 

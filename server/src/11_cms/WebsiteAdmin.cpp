@@ -45,9 +45,6 @@
 #include "ServerModule.h"
 #include "Session.h"
 #include "StaticFunctionRequest.h"
-#include "SVNCommitAction.hpp"
-#include "SVNUpdateAction.hpp"
-#include "SVNWorkingCopyCreateAction.hpp"
 #include "ObjectUpdateAction.hpp"
 #include "User.h"
 #include "WebPageAdmin.h"
@@ -73,7 +70,6 @@ namespace synthese
 	using namespace admin;
 	using namespace cms;
 	using namespace db;
-	using namespace db::svn;
 	using namespace html;
 	using namespace impex;
 	using namespace security;
@@ -99,7 +95,6 @@ namespace synthese
 		const string WebsiteAdmin::TAB_PROPERTIES("pr");
 		const string WebsiteAdmin::TAB_WEB_PAGES("wp");
 		const string WebsiteAdmin::TAB_CONFIG("config");
-		const string WebsiteAdmin::TAB_SVN_STORAGE("sr");
 
 
 
@@ -251,154 +246,6 @@ namespace synthese
 				stream << f.close();
 			}
 
-
-			////////////////////////////////////////////////////////////////////
-			// TAB SVN STORAGE
-			if (openTabContent(stream, TAB_SVN_STORAGE))
-			{
-				if(_site->get<SVNWorkingCopy>().getRepo().getURL().empty())
-				{ // Not using SVN sotrage currently
-
-					stream << "<h1>Création d'un stockage Subversion</h1>";
-
-					stream << "<p class=\"info\">Ce site n'est pas stocké dans un dépôt subversion.<br />Utiliser le formulaire ci-dessous pour créer un nouveau stockage Subversion pour ce site.<br />ATTENTION : l'adresse fournie doit correspondre à un répertoire non existant sur le dépôt.</p>";
-
-					AdminActionFunctionRequest<SVNWorkingCopyCreateAction, WebsiteAdmin> createRequest(request, *this);
-					createRequest.getAction()->setObject(
-						static_pointer_cast<ObjectBase, Website>(
-							const_pointer_cast<Website>(
-								_site
-					)	)	);
-
-					PropertiesHTMLTable pt(createRequest.getHTMLForm("svn"));
-					stream << pt.open();
-					stream << pt.cell(
-						"URL",
-						pt.getForm().getTextInput(
-							SVNWorkingCopyCreateAction::PARAMETER_REPO_URL,
-							string()
-					)	);
-					stream << pt.cell(
-						"Utilisateur",
-						pt.getForm().getTextInput(
-							SVNWorkingCopyCreateAction::PARAMETER_USER,
-							request.getSession()->getUser()->getLogin()
-					)	);
-					stream << pt.cell(
-						"Mot de passe",
-						pt.getForm().getPasswordInput(
-							SVNWorkingCopyCreateAction::PARAMETER_PASSWORD,
-							string()
-					)	);
-					stream << pt.cell(
-						"Ne pas commiter, sauvegarde uniquement en local",
-						pt.getForm().getCheckBox(
-						SVNWorkingCopyCreateAction::PARAMETER_NO_COMMIT,
-						string(),
-						false
-					)	);
-					stream << pt.close();
-				}
-				else
-				{
-					//////////////////////////////////////////////////////////////////////////
-					// Update
-					{
-						stream << "<h1>SVN Repository</h1>";
-
-						HTMLList l;
-						stream << l.open();
-						stream << l.element();
-						stream << HTMLModule::getHTMLLink(_site->get<SVNWorkingCopy>().getRepo().getURL(),
-														  _site->get<SVNWorkingCopy>().getRepo().getURL());
-						stream << l.close();
-
-						stream << "<h1>SVN Update</h1>";
-
-						AdminActionFunctionRequest<SVNUpdateAction, WebsiteAdmin> updateRequest(request, *this);
-						updateRequest.getAction()->setObject(
-							static_pointer_cast<ObjectBase, Website>(
-								const_pointer_cast<Website>(
-									_site
-						)	)	);
-
-						PropertiesHTMLTable pt(updateRequest.getHTMLForm("svn_up"));
-						stream << pt.open();
-						stream << pt.cell(
-							"Utilisateur",
-							pt.getForm().getTextInput(
-								SVNUpdateAction::PARAMETER_USER,
-								request.getSession()->getUser()->getLogin()
-						)	);
-						stream << pt.cell(
-							"Mot de passe",
-							pt.getForm().getPasswordInput(
-								SVNUpdateAction::PARAMETER_PASSWORD,
-								string()
-						)	);
-						stream << pt.cell(
-							"Écraser mes modifications",
-							pt.getForm().getCheckBox(
-								SVNUpdateAction::PARAMETER_NO_WC_SAVE,
-								string(),
-								false
-						)	);
-						stream << pt.close();
-					}
-
-
-					//////////////////////////////////////////////////////////////////////////
-					// Commit
-					{
-						stream << "<h1>SVN Commit</h1>";
-
-						AdminActionFunctionRequest<SVNCommitAction, WebsiteAdmin> commitRequest(request, *this);
-						commitRequest.getAction()->setObject(
-							static_pointer_cast<ObjectBase, Website>(
-								const_pointer_cast<Website>(
-									_site
-						)	)	);
-
-						PropertiesHTMLTable pt(commitRequest.getHTMLForm("svn_ci"));
-						stream << pt.open();
-						stream << pt.cell(
-							"Message",
-							pt.getForm().getTextInput(
-								SVNCommitAction::PARAMETER_MESSAGE,
-								string()
-						)	);
-						stream << pt.cell(
-							"Utilisateur",
-							pt.getForm().getTextInput(
-								SVNCommitAction::PARAMETER_USER,
-								request.getSession()->getUser()->getLogin()
-						)	);
-						stream << pt.cell(
-							"Mot de passe",
-							pt.getForm().getPasswordInput(
-								SVNCommitAction::PARAMETER_PASSWORD,
-								string()
-						)	);
-						stream << pt.cell(
-							"Ne pas commiter, sauvegarde uniquement en local",
-							pt.getForm().getCheckBox(
-								SVNCommitAction::PARAMETER_NO_COMMIT,
-								string(),
-								false
-						)	);
-						stream << pt.cell(
-							"Ne pas mettre à jour la copie de travail",
-							pt.getForm().getCheckBox(
-								SVNCommitAction::PARAMETER_NO_UPDATE,
-								string(),
-								false
-						)	);
-						stream << pt.close();
-					}
-				}
-			}
-
-
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
 			closeTabContent(stream);
@@ -488,7 +335,6 @@ namespace synthese
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
 			_tabs.push_back(Tab("Pages web", TAB_WEB_PAGES, true));
 			_tabs.push_back(Tab("Configuration", TAB_CONFIG, true));
-			_tabs.push_back(Tab("SVN", TAB_SVN_STORAGE, true));
 
 			_tabBuilded = true;
 		}
