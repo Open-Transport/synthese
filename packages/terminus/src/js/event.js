@@ -64,6 +64,35 @@ function change_recipient()
   $('#old_recipients_alert').removeClass('hide');
 }
 
+function update_start_end_stop_points(message)
+{
+  var lineRecipients = message['line_recipient'];
+  var disableStopPointSelects = true;
+
+  if(1 == lineRecipients.length)
+  {
+    var lineId = lineRecipients[0].recipient_id;
+    var lineTableId = Math.floor(lineId / Math.pow(2, 48));
+
+    if(42 == lineTableId)
+    {
+	  // Only one commercial line is selected as a recipient : enable the {start,end}_stop_point select fields
+	  $('select[field="start_stop_point"]').prop('disabled', false);
+	  $('select[field="end_stop_point"]').prop('disabled', false);
+	  disableStopPointSelects = false;
+    }
+  }
+
+  if(true == disableStopPointSelects)
+  {
+	// Disable the {start,end}_stop_point select fields and set them to default value
+    $('select[field="start_stop_point"]').val("0");
+    $('select[field="start_stop_point"]').prop('disabled', true);
+    $('select[field="end_stop_point"]').val("0");
+    $('select[field="end_stop_point"]').prop('disabled', true);
+  }
+}
+
 function show_recipients_click()
 {
   var recipient = $(this).attr('factory');
@@ -167,6 +196,12 @@ function update_object_preview(recipient, message)
     s = "Aucun";
   }
   $('#preview_recipients_'+ recipient).html(s);
+
+  if("line" == recipient)
+  {
+    // if line recipients changed, update stop point selects
+    update_start_end_stop_points(message);
+  }
 }
 
 function update_tags_preview(message)
@@ -536,6 +571,9 @@ function open_message(message)
   $('#message [field=direction_sign_code]').val(message.direction_sign_code);
   $('#message [field=start_stop_point]').val(message.start_stop_point);
   $('#message [field=end_stop_point]').val(message.end_stop_point);
+
+  console.log("open_message : start_stop_point=" + message.start_stop_point + ", end_stop_point=" + message.end_stop_point);
+
   if (message.digitized_version != "")
   {
     $('#message input[field=digitized_version]').val(message.digitized_version);

@@ -574,11 +574,41 @@
             <label>Depuis l'arrêt
               <select class="input-large" field="start_stop_point" onkeyup="activateForm()" onchange="activateForm()">
                 <option value="-1">Aucun</option>
+		<?StopAreasListFunction&group_by_cities=1&output_stops=1&stops_directions=3&template=
+			<{city&template=
+				<@city_name=<@name@>@>
+				<{stopArea&template=
+					<@stop_area_name=<@name@>@>
+					<{stop&template=
+						<@direction=@>
+						<@direction=<{direction&template=<@direction@>}>@>
+						<@option_label=<@city_name@> <@stop_area_name@> <@direction?("dir " + direction):operatorCode@>@>
+						<@option_value=<@id@>@>
+                <option value="<@option_value@>"><@option_label@></option>
+					}>
+				}>
+			}>
+		?>
               </select>
             </label>
-            <label>Jusqu'à l'arrêt
+            <label>Jusque l'arrêt
               <select class="input-large" field="end_stop_point" onkeyup="activateForm()" onchange="activateForm()">
                 <option value="-1">Aucun</option>
+		<?StopAreasListFunction&group_by_cities=1&output_stops=1&stops_directions=3&template=
+			<{city&template=
+				<@city_name=<@name@>@>
+				<{stopArea&template=
+					<@stop_area_name=<@name@>@>
+					<{stop&template=
+						<@direction=@>
+						<@direction=<{direction&template=<@direction@>}>@>
+						<@option_label=<@city_name@> <@stop_area_name@> <@direction?("dir " + direction):operatorCode@>@>
+						<@option_value=<@id@>@>
+                <option value="<@option_value@>"><@option_label@></option>
+					}>
+				}>
+			}>
+		?>
               </select>
             </label>
           </div>

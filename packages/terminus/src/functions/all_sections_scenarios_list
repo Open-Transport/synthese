@@ -32,7 +32,7 @@ theevent["<@roid@>"] = {
   roid: '<@roid@>',
   name: '<@name@>',
   active: <@active@>,
-  datasource_links: <@datasource_links@>,
+  datasource_links: '<@datasource_links@>',
   belongs_to_an_auto_section: <@belongs_to_an_auto_section@>,
   manual_override: <@manual_override@>,
   filtered: 0,
