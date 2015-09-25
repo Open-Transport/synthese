@@ -493,12 +493,12 @@ namespace synthese
 				}
 				if(dynamic_cast<Point*>(_geometry.get()))
 				{
-					Point* point(static_cast<Point*>(_geometry.get()));
+					Point* point(dynamic_cast<Point*>(_geometry.get()));
 					os << "\"type\":\"Point\",\"coordinates\":[" << fixed << point->getCoordinate()->x << "," << fixed << point->getCoordinate()->y << "]";
 				}
 				else if(dynamic_cast<LineString*>(_geometry.get()))
 				{
-					LineString* lineString(static_cast<LineString*>(_geometry.get()));
+					LineString* lineString(dynamic_cast<LineString*>(_geometry.get()));
 					os << "\"type\":\"LineString\",\"coordinates\":[";
 					for(size_t i(0); i<lineString->getCoordinatesRO()->getSize(); ++i)
 					{
