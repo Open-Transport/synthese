@@ -290,7 +290,7 @@ namespace synthese
 					}
 
 					const GeometryFactory& geometryFactory(CoordinatesSystem::GetDefaultGeometryFactory());
-					boost::shared_ptr<CoordinateSequence> cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+					boost::shared_ptr<CoordinateSequence> cs(geometryFactory.getCoordinateSequenceFactory()->create((size_t)0, 2));
 					boost::shared_ptr<Crossing> startCrossing;
 					size_t rank(0);
 					MetricOffset metricOffset(0);
@@ -332,7 +332,7 @@ namespace synthese
 
 						if(!isLast)
 						{
-							cs.reset(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+							cs.reset(geometryFactory.getCoordinateSequenceFactory()->create((size_t)0, 2));
 							cs->add(*point->getCoordinate());
 						}
 						++rank;
