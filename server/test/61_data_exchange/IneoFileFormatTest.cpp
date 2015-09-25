@@ -36,6 +36,7 @@
 #include "UtilTypes.h"
 
 #include <boost/test/auto_unit_test.hpp>
+#include <boost/filesystem.hpp>
 
 using namespace synthese::admin;
 using namespace synthese::data_exchange;
