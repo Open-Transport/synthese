@@ -37,12 +37,6 @@ if(NOT ZLIB_FOUND)
   message(FATAL_ERROR "Zlib not found")
 endif()
 
-# Png
-find_package(Png)
-if(NOT PNG_FOUND)
-  message(FATAL_ERROR "Png not found")
-endif()
-
 # Expat
 
 find_package(Expat)
@@ -69,13 +63,6 @@ endif()
 find_package(Geosc)
 if(NOT GEOSC_FOUND)
   message(FATAL_ERROR "Geosc not found")
-endif()
-
-# Haru
-
-find_package(Haru)
-if(NOT HARU_FOUND)
-  message(FATAL_ERROR "Haru not found")
 endif()
 
 # Spatialite
@@ -110,7 +97,6 @@ if(WIN32)
   set(Boost_USE_STATIC_RUNTIME ON)
 else()
   add_definitions(-DBOOST_ALL_DYN_LINK)
-  add_definitions(-DPNG_NO_MMX_CODE)
 endif()
 
 add_definitions(-DFUSION_MAX_VECTOR_SIZE=40)
