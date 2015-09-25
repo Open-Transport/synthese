@@ -24,6 +24,7 @@
 #ifndef SYNTHESE_db_mysql_MySQLDB_h__
 #define SYNTHESE_db_mysql_MySQLDB_h__
 
+#define HAVE_INT64 // Let MySQL not to typedef int64 (conflicts with libgeos)
 #include "DB.hpp"
 #include "DBRecord.hpp"
 #include "FactorableTemplate.h"

@@ -32,6 +32,7 @@
 #include <proj_api.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
+#define HAVE_INT64_T_64 // Let geos not to typedef int64 (conflicts with MySQL)
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/PrecisionModel.h>
 #include <geos/geom/CoordinateFilter.h>
