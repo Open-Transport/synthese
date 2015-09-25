@@ -50,7 +50,7 @@ namespace synthese
 	boost::shared_ptr<geos::geom::Point> CoordinatesSystem::convertPoint(
 		const geos::geom::Point& source
 	) const	{
-		return static_pointer_cast<Point,Geometry>(convertGeometry(static_cast<const Geometry&>(source)));
+		return dynamic_pointer_cast<Point>(convertGeometry(source));
 	}
 
 
