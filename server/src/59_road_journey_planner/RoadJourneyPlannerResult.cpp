@@ -202,7 +202,7 @@ namespace synthese
 							}
 						}
 					}
-					geoms.push_back(static_cast<geos::geom::Geometry*>(gf.createLineString(coords)));
+					geoms.push_back(dynamic_cast<geos::geom::Geometry*>(gf.createLineString(coords)));
 				}
 			}
 			geos::geom::GeometryCollection *geom = gf.createGeometryCollection(geoms);

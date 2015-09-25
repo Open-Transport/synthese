@@ -57,7 +57,7 @@ namespace synthese
 		/// @param geometry geometry to copy
 		WithGeometry(
 			const boost::shared_ptr<G>& geometry
-		):	_geometry(geometry.get() ? static_cast<G*>(geometry->clone()) : NULL)
+		):	_geometry(geometry.get() ? dynamic_cast<G*>(geometry->clone()) : NULL)
 		{}
 
 

@@ -147,7 +147,7 @@ namespace synthese
 			{
 				WKTReader reader(&CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory());
 				_point.reset(
-					static_cast<Point*>(
+					dynamic_cast<Point*>(
 						reader.read(
 							map.get<string>(
 								ObjectUpdateAction::GetInputName<PointGeometry>()

@@ -453,7 +453,7 @@ namespace synthese
 						{
 							// Build a custom geometry according to their offsets
 							resultGeometry = boost::shared_ptr<LineString>(
-								static_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, chunkOffset - chunk->getMetricOffset())
+								dynamic_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, chunkOffset - chunk->getMetricOffset())
 							));
 
 							// If the offset of the start is bigger than the one from the end, use the reverse chunk
@@ -511,7 +511,7 @@ namespace synthese
 							if(customChunk->getFromVertex()->getKey() == chunk->getFromVertex()->getKey())
 							{
 								resultGeometry = boost::shared_ptr<LineString>(
-									static_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, 0)
+									dynamic_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, 0)
 								));
 								useReverseChunk = true;
 							}
@@ -520,7 +520,7 @@ namespace synthese
 							else if(customChunk->getNext()->getFromVertex()->getKey() == chunk->getFromVertex()->getKey())
 							{
 								resultGeometry = boost::shared_ptr<LineString>(
-									static_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, chunkLength)
+									dynamic_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, chunkLength)
 								));
 							}
 						}
@@ -541,7 +541,7 @@ namespace synthese
 							else if(customChunk->getNext()->getFromVertex()->getKey() == chunk->getNext()->getFromVertex()->getKey())
 							{
 								resultGeometry = boost::shared_ptr<LineString>(
-									static_cast<LineString*>(customChunkGeometry.extractLine(chunkLength, geometryOffset)
+									dynamic_cast<LineString*>(customChunkGeometry.extractLine(chunkLength, geometryOffset)
 								));
 								useReverseChunk = true;
 							}
@@ -553,7 +553,7 @@ namespace synthese
 						path.insert(
 							insertPosition,
 							(useReverseChunk ?
-								&(static_cast<const RoadChunkEdge*>(customChunk->getNext())->getRoadChunk()->getReverseEdge()) :
+								&(dynamic_cast<const RoadChunkEdge*>(customChunk->getNext())->getRoadChunk()->getReverseEdge()) :
 								customChunk)
 						);
 					}
@@ -676,7 +676,7 @@ namespace synthese
 				// Standing on the current path as long as we can (the path don't change and we aren't at the end of the vector yet)
 				Path* currentPath = startChunk->getParentPath();
 				MetricOffset startMetricOffset = startChunk->getMetricOffset();
-				CoordinateSequence* customSequence(CoordinatesSystem::GetDefaultGeometryFactory().getCoordinateSequenceFactory()->create(0, 2));
+				CoordinateSequence* customSequence(CoordinatesSystem::GetDefaultGeometryFactory().getCoordinateSequenceFactory()->create((size_t)0, 2));
 
 				do {
 					// Build custom geometry for the service

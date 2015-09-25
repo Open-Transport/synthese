@@ -138,7 +138,7 @@ namespace synthese
 					boost::shared_ptr<Point> houseCoord(
 						dataSource.getActualCoordinateSystem().createPoint(node->getLon(), node->getLat())
 					);
-					housesNodesWithGeom.push_back(make_pair(node, static_cast<Point*>(houseCoord->clone())));
+					housesNodesWithGeom.push_back(make_pair(node, dynamic_cast<Point*>(houseCoord->clone())));
 				}
 			}
 

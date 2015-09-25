@@ -338,7 +338,7 @@ namespace synthese
 				CoordinatesSystem::GetDefaultGeometryFactory()
 			);
 
-			CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+			CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create((size_t)0, 2));
 			bool drtAreaSequence = false;
 			bool hasDRTArea = false;
 			Coordinate previousCoordinates;
@@ -396,7 +396,7 @@ namespace synthese
 			}
 			else if (hasDRTArea)
 			{
-				CoordinateSequence* csTwoPoints(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+				CoordinateSequence* csTwoPoints(geometryFactory.getCoordinateSequenceFactory()->create((size_t)0, 2));
 				csTwoPoints->add(cs->getAt(0));
 				csTwoPoints->add(cs->getAt(cs->getSize()-1));
 				return boost::shared_ptr<LineString>(geometryFactory.createLineString(csTwoPoints));

@@ -81,7 +81,7 @@ namespace synthese
 					const std::string& _htmlPopup,
 					std::size_t _width,
 					std::size_t _height
-				):	point(static_cast<geos::geom::Point*>(_point.clone())),
+				):	point(dynamic_cast<geos::geom::Point*>(_point.clone())),
 					icon(_icon),
 					editionIcon(_editionIcon),
 					waitingIcon(_waitingIcon),
@@ -101,7 +101,7 @@ namespace synthese
 				MapLineString(
 					const geos::geom::LineString& _lineString,
 					const std::string& _updateRequest
-				):	lineString(static_cast<geos::geom::LineString*>(_lineString.clone())),
+				):	lineString(dynamic_cast<geos::geom::LineString*>(_lineString.clone())),
 					updateRequest(_updateRequest)
 				{}
 			};

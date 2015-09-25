@@ -139,7 +139,7 @@ namespace synthese
 				{
 					geos::io::WKTReader reader(&CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory());
 					_point.reset(
-						static_cast<geos::geom::Point*>(
+						dynamic_cast<geos::geom::Point*>(
 							reader.read(
 								map.get<string>(
 									ObjectUpdateAction::GetInputName<PointGeometry>()

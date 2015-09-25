@@ -602,7 +602,7 @@ namespace synthese
 
 			// Geos factories
 			const GeometryFactory& gf(CoordinatesSystem::GetDefaultGeometryFactory());
-			geos::geom::CoordinateSequence *coords(gf.getCoordinateSequenceFactory()->create(0,2));
+			geos::geom::CoordinateSequence *coords(gf.getCoordinateSequenceFactory()->create((size_t)0, 2));
 
 			// Handle empty roads
 			if(_edges.empty())

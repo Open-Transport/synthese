@@ -540,7 +540,7 @@ namespace synthese
 				_fromVertex->hasGeometry() &&
 				_next->_fromVertex->hasGeometry()
 			){
-				CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+				CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create((size_t)0, 2));
 				cs->add(*_fromVertex->getGeometry()->getCoordinate(), false);
 				cs->add(*_next->_fromVertex->getGeometry()->getCoordinate(), false);
 				if(cs->size() != 2)

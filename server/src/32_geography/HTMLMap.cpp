@@ -52,7 +52,7 @@ namespace synthese
 			bool highlight,
 			bool mousePosition,
 			const string id /*= "map" */
-		):	_center(static_cast<Point*>(center.clone())),
+		):	_center(dynamic_cast<Point*>(center.clone())),
 			_horizontalDistance(horizontalDistance),
 			_id(id),
 			_editFieldName(editFieldName),
