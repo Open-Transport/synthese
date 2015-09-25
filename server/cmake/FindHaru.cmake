@@ -24,7 +24,7 @@ else(WIN32)
       find_library(HARU_LIBRARY NAMES haru PATHS $ENV{HARU_DIR}/lib /opt/rcs/haru/lib /usr/local/lib /usr/lib NO_DEFAULT_PATH)
    ELSE()
       find_path(HARU_INCLUDE_DIR NAMES hpdf.h PATHS /opt/rcs/haru/include /usr/local/include /usr/include NO_DEFAULT_PATH)
-      find_library(HARU_LIBRARY NAMES haru PATHS /opt/rcs/haru/lib /usr/local/lib /usr/lib NO_DEFAULT_PATH)
+      find_library(HARU_LIBRARY NAMES hpdf PATHS /opt/rcs/haru/lib /usr/local/lib /usr/lib NO_DEFAULT_PATH)
    ENDIF()
 
 endif(WIN32)
