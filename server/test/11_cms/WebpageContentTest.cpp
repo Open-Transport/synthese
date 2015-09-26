@@ -31,8 +31,9 @@
 #include "Website.hpp"
 #include "CMSScript.hpp"
 #include "StaticFunctionRequest.h"
+#ifdef WITH_PYTHON
 #include "PythonInterpreter.hpp"
-
+#endif
 #include <boost/test/auto_unit_test.hpp>
 
 using namespace boost;
@@ -49,8 +50,9 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 	StrLenFunction::integrate();
 	StrFillFunction::integrate();
 	VersionService::integrate();
+#ifdef WITH_PYTHON
 	PythonInterpreter::Initialize();
-
+#endif
 	StaticFunctionRequest<WebPageDisplayFunction> request;
 	ParametersMap additionalParametersMap;
 	ParametersMap variables;
@@ -1111,6 +1113,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		BOOST_CHECK_EQUAL(eval, "testtest4");
 	}
 
+#ifdef WITH_PYTHON
 	{ // Python script with simple output to stream
 		string code("#!/bin/python\r\nprint 'Hello World!'");
 		CMSScript wpc(code, true);
@@ -1137,5 +1140,6 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		BOOST_CHECK_EQUAL(variables.get<int>("b"), 2);
 		BOOST_CHECK_EQUAL(variables.get<int>("c"), 3);
 	}
+#endif
 }
 

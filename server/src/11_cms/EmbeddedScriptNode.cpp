@@ -20,8 +20,9 @@
 */
 
 #include "EmbeddedScriptNode.hpp"
+#ifdef WITH_PYTHON
 #include "PythonInterpreter.hpp"
-
+#endif
 #include <sstream>
 
 
@@ -47,7 +48,9 @@ namespace synthese {
 		{			
 			// Note : the attributes 'client_url', 'host_name', 'site' and 'p' are not contained in additionalParamatersMap so they are not passed to PythonInterpreter
 			// See VariableExpression::eval() for details
+#ifdef WITH_PYTHON
 			PythonInterpreter::Execute(_scriptCode, stream, additionalParametersMap, variables);
+#endif
 		}
 
 

@@ -69,8 +69,6 @@ PackagesService.cpp
 PackagesService.hpp
 PrecisionService.cpp
 PrecisionService.hpp
-PythonInterpreter.cpp
-PythonInterpreter.hpp
 RowsListFunction.cpp
 RowsListFunction.hpp
 ServiceExpression.cpp
@@ -160,6 +158,12 @@ WebsiteRankCleanupAction.hpp
 WebsitesService.cpp
 WebsitesService.hpp
 )
+
+if(WITH_PYTHON)
+  list(APPEND cms_SRCS
+    PythonInterpreter.cpp
+    PythonInterpreter.hpp)
+endif()
 
 set_source_files_properties(CMSModule.gen.cpp CMSModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 

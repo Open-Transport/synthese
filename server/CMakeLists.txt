@@ -220,22 +220,26 @@ configure_file(
 )
 
 # Python 2.7
-if(WIN32)
-  # TODO : FindPythonLibs does not work under windows 64 bits ; for now define
-  # manually PYTHON_INCLUDE_DIR and PYTHON_LIBRARY
-  # For instance :
-  set (PYTHON_INCLUDE_DIR "C:/Python27/include")
-  set (PYTHON_LIBRARY "C:/Python27/libs/python27.lib")
-else()
-  find_package(PythonLibs 2.7 REQUIRED)
-  if(NOT PYTHONLIBS_FOUND)
-    message(FATAL_ERROR "Unable to find PythonLibs.")
+OPTION(WITH_PYTHON "Add Python support to CMS" OFF)
+if(WITH_PYTHON)
+  add_definitions(-WITH_PYTHON)
+  if(WIN32)
+    # TODO : FindPythonLibs does not work under windows 64 bits ; for now define
+    # manually PYTHON_INCLUDE_DIR and PYTHON_LIBRARY
+    # For instance :
+    set (PYTHON_INCLUDE_DIR "C:/Python27/include")
+    set (PYTHON_LIBRARY "C:/Python27/libs/python27.lib")
+  else()
+    find_package(PythonLibs 2.7 REQUIRED)
+    if(NOT PYTHONLIBS_FOUND)
+      message(FATAL_ERROR "Unable to find PythonLibs.")
+    endif()
   endif()
-endif()
 
-include(FindPythonInterp)
-if(NOT PYTHONINTERP_FOUND)
-  message(FATAL_ERROR "No Python interpreter found. Cannot continue.")
+  include(FindPythonInterp)
+  if(NOT PYTHONINTERP_FOUND)
+    message(FATAL_ERROR "No Python interpreter found. Cannot continue.")
+  endif()
 endif()
 
 enable_testing()
