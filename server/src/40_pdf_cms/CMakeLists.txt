@@ -1,4 +1,3 @@
-option(WITH_40_PDF_CMS "Module 40_PDF_CMS " ON)
 if(WITH_40_PDF_CMS)
 
   # Haru
@@ -13,7 +12,6 @@ if(WITH_40_PDF_CMS)
     message(FATAL_ERROR "libpng not found")
   endif()
   add_definitions(-DPNG_NO_MMX_CODE)
-
 
   set_source_groups()
 

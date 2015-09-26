@@ -34,11 +34,17 @@
 #include "HousesCSVFileFormat.hpp"
 #include "IGNstreetsFileFormat.hpp"
 #include "NavstreetsFileFormat.hpp"
-#include "OSMFileFormat.hpp"
-#include "RoadShapeFileFormat.hpp"
 
+#ifdef WITH_06_OPENSTREETMAP
+#include "OSMFileFormat.hpp"
+#endif
+
+#include "RoadShapeFileFormat.hpp"
+#ifdef WITH_61_DATA_EXCHANGE_INEO_NCE
 #include "NCEStatusService.hpp"
+#endif
 #include "PhysicalStopsCSVExportFunction.h"
+#ifdef WITH_61_DATA_EXCHANGE_VDV
 #include "VDVSubscriptionService.hpp"
 #include "VDVDataReadyService.hpp"
 #include "VDVDataSupplyService.hpp"
@@ -55,9 +61,12 @@
 #include "VDVClient.hpp"
 #include "VDVServer.hpp"
 #include "VDVServerSubscription.hpp"
+#endif
 
 // Devices
+#ifdef WITH_61_DATA_EXCHANGE_VIX
 #include "VixV6000FileFormat.hpp"
+#endif
 
 #include "DataExchangeModule.inc.cpp"
 
@@ -70,19 +79,10 @@ void synthese::data_exchange::moduleRegister()
 
 	synthese::data_exchange::DataExchangeModule::integrate();
 
+#ifdef WITH_61_DATA_EXCHANGE_INEO_NCE
 	synthese::data_exchange::NCEStatusService::integrate();
+#endif
 	synthese::data_exchange::PhysicalStopsCSVExportFunction::integrate();
-	synthese::data_exchange::VDVClientsListService::integrate();
-	synthese::data_exchange::VDVServersListService::integrate();
-	synthese::data_exchange::VDVSubscriptionService::integrate();
-	synthese::data_exchange::VDVDataReadyService::integrate();
-	synthese::data_exchange::VDVDataSupplyService::integrate();
-	synthese::data_exchange::VDVStatusService::integrate();
-	
-	synthese::data_exchange::VDVClientTableSync::integrate();
-	synthese::data_exchange::VDVServerTableSync::integrate();
-	synthese::data_exchange::VDVServerSubscriptionTableSync::integrate();
-
 	synthese::data_exchange::DinoFileFormat::integrate();
 	synthese::data_exchange::GPSdFileFormat::integrate();
 	synthese::data_exchange::GPSSimuFileFormat::integrate();
@@ -109,16 +109,35 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::ServicesCSVFileFormat::integrate();
 	synthese::data_exchange::HousesCSVFileFormat::integrate();
 	synthese::data_exchange::NavstreetsFileFormat::integrate();
-	synthese::data_exchange::OSMFileFormat::integrate();
 	synthese::data_exchange::RoadShapeFileFormat::integrate();
 	synthese::data_exchange::IGNstreetsFileFormat::integrate();
 	synthese::data_exchange::CMSExport::integrate();
 	synthese::data_exchange::CMSImport::integrate();
 
-	synthese::data_exchange::VixV6000FileFormat::integrate();
+#ifdef WITH_61_DATA_EXCHANGE_VDV
+	synthese::data_exchange::VDVClientsListService::integrate();
+	synthese::data_exchange::VDVServersListService::integrate();
+	synthese::data_exchange::VDVSubscriptionService::integrate();
+	synthese::data_exchange::VDVDataReadyService::integrate();
+	synthese::data_exchange::VDVDataSupplyService::integrate();
+	synthese::data_exchange::VDVStatusService::integrate();
+	
+	synthese::data_exchange::VDVClientTableSync::integrate();
+	synthese::data_exchange::VDVServerTableSync::integrate();
+	synthese::data_exchange::VDVServerSubscriptionTableSync::integrate();
+#endif
 
+#ifdef WITH_06_OPENSTREETMAP
+	synthese::data_exchange::OSMFileFormat::integrate();
+#endif
+
+#ifdef WITH_61_DATA_EXCHANGE_VIX
+	synthese::data_exchange::VixV6000FileFormat::integrate();
+#endif
 	// Registries
+#ifdef WITH_61_DATA_EXCHANGE_VDV
 	INTEGRATE(synthese::data_exchange::VDVClient);
 	INTEGRATE(synthese::data_exchange::VDVServer);
 	INTEGRATE(synthese::data_exchange::VDVServerSubscription);
+#endif
 }

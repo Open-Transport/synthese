@@ -25,7 +25,6 @@ set(MODULES
 00_framework
 01_util
 05_html
-06_openstreetmap
 07_lexical_matcher
 #08_acapela_client
 #09_agi_client
@@ -37,11 +36,8 @@ set(MODULES
 14_admin
 15_server
 16_impex
-17_messages
 18_graph
-19_inter_synthese
 20_tree
-30_fare
 31_calendar
 32_geography
 33_algorithm
@@ -50,23 +46,72 @@ set(MODULES
 37_pt_operation
 38_vehicle
 39_map
-40_pdf_cms
 51_resa
-52_forum
 53_pt_journey_planner
-54_departure_boards
-55_timetables
 56_pt_website
 #57_accounting
-58_hiking
 59_road_journey_planner
-60_analysis
 61_data_exchange
-62_regulation
 63_settings)
 
 if(WITH_MYSQL)
   list(APPEND MODULES 10_db/102_mysql)
+endif()
+
+option(WITH_06_OPENSTREETMAP "Module 06_openstreetmap" ON)
+if(WITH_06_OPENSTREETMAP)
+  add_definitions(-WITH_06_OPENSTREETMAP)
+  list(APPEND MODULES 06_openstreetmap)
+endif()
+
+option(WITH_17_MESSAGES "Module 17_messages" ON)
+if(WITH_17_MESSAGES)
+  list(APPEND MODULES 17_messages)
+endif()
+
+option(WITH_19_INTER_SYNTHESE "Module 19_inter_synthese" ON)
+if(WITH_19_INTER_SYNTHESE)
+  list(APPEND MODULES 19_inter_synthese)
+endif()
+
+option(WITH_30_FARE "Module 30_fare" ON)
+if(WITH_30_FARE)
+  list(APPEND MODULES 30_fare)
+endif()
+
+option(WITH_40_PDF_CMS "Module 40_PDF_CMS" ON)
+if(WITH_40_PDF_CMS)
+  list(APPEND MODULES 40_pdf_cms)
+endif()
+
+option(WITH_52_FORUM "Module 52_FORUM" OFF)
+if(WITH_52_FORUM)
+  list(APPEND MODULES 52_forum)
+endif()
+
+option(WITH_54_DEPARTURE_BOARDS "Module 54_DEPARTURE_BOARDS" ON)
+if(WITH_54_DEPARTURE_BOARDS)
+  list(APPEND MODULES 54_departure_boards)
+endif()
+
+option(WITH_55_TIMETABLES "Module 55_TIMETABLES" ON)
+if(WITH_55_TIMETABLES)
+  list(APPEND MODULES 55_timetables)
+endif()
+
+option(WITH_58_HIKING "Module 58_HIKING" OFF)
+if(WITH_58_HIKING)
+  list(APPEND MODULES 58_hiking)
+endif()
+
+option(WITH_60_ANALYSIS "Module 60_ANALYSIS" OFF)
+if(WITH_60_ANALYSIS)
+  list(APPEND MODULES 60_analysis)
+endif()
+
+option(WITH_62_REGULATION "Module 62_REGULATION" ON)
+if(WITH_62_REGULATION)
+  list(APPEND MODULES 62_regulation)
 endif()
 
 if(WITH_SCOM)
@@ -74,6 +119,7 @@ if(WITH_SCOM)
   add_definitions(-DWITH_SCOM)
 endif()
 
+option(WITH_61_INEO_TERMINUS "Module 61_INEO_TERMINUS" OFF)
 if (WITH_INEO_TERMINUS)
   list(APPEND MODULES 61_ineo_terminus)
 endif()

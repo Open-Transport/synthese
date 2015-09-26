@@ -1,171 +1,174 @@
-set_source_groups()
+if(WITH_54_DEPARTURE_BOARDS)
 
-set(departure_boards_SRCS
-AddDepartureStopToDisplayScreenAction.cpp
-AddDepartureStopToDisplayScreenAction.h
-AddForbiddenPlaceToDisplayScreenAction.cpp
-AddForbiddenPlaceToDisplayScreenAction.h
-AddPreselectionPlaceToDisplayScreenAction.cpp
-AddPreselectionPlaceToDisplayScreenAction.h
-AdvancedSelectTableSync.cpp
-AdvancedSelectTableSync.h
-AlarmTestOnDisplayScreenFunction.cpp
-AlarmTestOnDisplayScreenFunction.h
-ArrivalDepartureTableGenerator.cpp
-ArrivalDepartureTableGenerator.h
-ArrivalDepartureTableLog.cpp
-ArrivalDepartureTableLog.h
-ArrivalDepartureTableRight.cpp
-ArrivalDepartureTableRight.h
-BroadcastPointsAdmin.cpp
-BroadcastPointsAdmin.h
-CentreonConfigExportFunction.cpp
-CentreonConfigExportFunction.h
-CPUGetWiredScreensFunction.cpp
-CPUGetWiredScreensFunction.h
-CreateDisplayScreenAction.cpp
-CreateDisplayScreenAction.h
-CreateDisplayTypeAction.cpp
-CreateDisplayTypeAction.h
-DeparturesTableBenchmarkAdmin.cpp
-DeparturesTableBenchmarkAdmin.h
-DeparturesTableModule.cpp
-DeparturesTableModule.gen.cpp
-DeparturesTableModuleRegister.cpp
-DeparturesTableModule.h
-DeparturesTableModule.inc.cpp
-DeparturesTableTypes.h
-DisplayAdmin.cpp
-DisplayAdmin.h
-DisplayGetNagiosStatusFunction.cpp
-DisplayGetNagiosStatusFunction.h
-DisplayMaintenanceLog.cpp
-DisplayMaintenanceLog.h
-DisplayMaintenanceRight.cpp
-DisplayMaintenanceRight.h
-DisplayMonitoringStatus.cpp
-DisplayMonitoringStatus.h
-DisplayMonitoringStatusTableSync.cpp
-DisplayMonitoringStatusTableSync.h
-DisplayScreen.cpp
-DisplayScreen.h
-DisplayScreenAddDisplayedPlaceAction.cpp
-DisplayScreenAddDisplayedPlaceAction.h
-DisplayScreenAppearanceUpdateAction.cpp
-DisplayScreenAppearanceUpdateAction.h
-DisplayScreenContentFunction.cpp
-DisplayScreenContentFunction.h
-DisplayScreenCPU.cpp
-DisplayScreenCPU.h
-DisplayScreenCPUAdmin.cpp
-DisplayScreenCPUAdmin.h
-DisplayScreenCPUCreateAction.cpp
-DisplayScreenCPUCreateAction.h
-DisplayScreenCPUMaintenanceUpdateAction.cpp
-DisplayScreenCPUMaintenanceUpdateAction.h
-DisplayScreenCPUTableSync.cpp
-DisplayScreenCPUTableSync.h
-DisplayScreenCPUUpdateAction.cpp
-DisplayScreenCPUUpdateAction.h
-DisplayScreenRemoveDisplayedPlaceAction.cpp
-DisplayScreenRemoveDisplayedPlaceAction.h
-DisplayScreenRemoveForbiddenPlaceAction.cpp
-DisplayScreenRemoveForbiddenPlaceAction.h
-DisplayScreenRemovePhysicalStopAction.cpp
-DisplayScreenRemovePhysicalStopAction.h
-DisplayScreenSupervisionFunction.cpp
-DisplayScreenSupervisionFunction.h
-DisplayScreenTableSync.cpp
-DisplayScreenTableSync.h
-DisplayScreenTransferDestinationAddAction.cpp
-DisplayScreenTransferDestinationAddAction.h
-DisplayScreenTransferDestinationRemoveAction.cpp
-DisplayScreenTransferDestinationRemoveAction.h
-DisplayScreenUpdateDisplayedStopAreaAction.cpp
-DisplayScreenUpdateDisplayedStopAreaAction.hpp
-DisplaySearchAdmin.cpp
-DisplaySearchAdmin.h
-DisplayType.cpp
-DisplayType.h
-DisplayTypeAdmin.cpp
-DisplayTypeAdmin.h
-DisplayTypesAdmin.cpp
-DisplayTypesAdmin.h
-DisplayTypesService.cpp
-DisplayTypesService.hpp
-DisplayTypeTableSync.cpp
-DisplayTypeTableSync.h
-ForcedDestinationsArrivalDepartureTableGenerator.cpp
-ForcedDestinationsArrivalDepartureTableGenerator.h
-GetDepartureBoardsService.hpp
-GetDepartureBoardsService.cpp
-PhysicalStopDepartureTableGenerator.cpp
-PhysicalStopDepartureTableGenerator.h
-PlaceWithDisplayBoards.cpp
-PlaceWithDisplayBoards.hpp
-RemovePreselectionPlaceFromDisplayScreenAction.cpp
-RemovePreselectionPlaceFromDisplayScreenAction.h
-RoutePlanningTableGenerator.cpp
-RoutePlanningTableGenerator.h
-StandardArrivalDepartureTableGenerator.cpp
-StandardArrivalDepartureTableGenerator.h
-TransferLinesService.cpp
-TransferLinesService.hpp
-UpdateAllStopsDisplayScreenAction.cpp
-UpdateAllStopsDisplayScreenAction.h
-UpdateDisplayMaintenanceAction.cpp
-UpdateDisplayMaintenanceAction.h
-UpdateDisplayPreselectionParametersAction.cpp
-UpdateDisplayPreselectionParametersAction.h
-UpdateDisplayScreenAction.cpp
-UpdateDisplayScreenAction.h
-UpdateDisplayTypeAction.cpp
-UpdateDisplayTypeAction.h
-)
+  set_source_groups()
 
-set_source_files_properties(DeparturesTableModule.gen.cpp DeparturesTableModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
+  set(departure_boards_SRCS
+    AddDepartureStopToDisplayScreenAction.cpp
+    AddDepartureStopToDisplayScreenAction.h
+    AddForbiddenPlaceToDisplayScreenAction.cpp
+    AddForbiddenPlaceToDisplayScreenAction.h
+    AddPreselectionPlaceToDisplayScreenAction.cpp
+    AddPreselectionPlaceToDisplayScreenAction.h
+    AdvancedSelectTableSync.cpp
+    AdvancedSelectTableSync.h
+    AlarmTestOnDisplayScreenFunction.cpp
+    AlarmTestOnDisplayScreenFunction.h
+    ArrivalDepartureTableGenerator.cpp
+    ArrivalDepartureTableGenerator.h
+    ArrivalDepartureTableLog.cpp
+    ArrivalDepartureTableLog.h
+    ArrivalDepartureTableRight.cpp
+    ArrivalDepartureTableRight.h
+    BroadcastPointsAdmin.cpp
+    BroadcastPointsAdmin.h
+    CentreonConfigExportFunction.cpp
+    CentreonConfigExportFunction.h
+    CPUGetWiredScreensFunction.cpp
+    CPUGetWiredScreensFunction.h
+    CreateDisplayScreenAction.cpp
+    CreateDisplayScreenAction.h
+    CreateDisplayTypeAction.cpp
+    CreateDisplayTypeAction.h
+    DeparturesTableBenchmarkAdmin.cpp
+    DeparturesTableBenchmarkAdmin.h
+    DeparturesTableModule.cpp
+    DeparturesTableModule.gen.cpp
+    DeparturesTableModuleRegister.cpp
+    DeparturesTableModule.h
+    DeparturesTableModule.inc.cpp
+    DeparturesTableTypes.h
+    DisplayAdmin.cpp
+    DisplayAdmin.h
+    DisplayGetNagiosStatusFunction.cpp
+    DisplayGetNagiosStatusFunction.h
+    DisplayMaintenanceLog.cpp
+    DisplayMaintenanceLog.h
+    DisplayMaintenanceRight.cpp
+    DisplayMaintenanceRight.h
+    DisplayMonitoringStatus.cpp
+    DisplayMonitoringStatus.h
+    DisplayMonitoringStatusTableSync.cpp
+    DisplayMonitoringStatusTableSync.h
+    DisplayScreen.cpp
+    DisplayScreen.h
+    DisplayScreenAddDisplayedPlaceAction.cpp
+    DisplayScreenAddDisplayedPlaceAction.h
+    DisplayScreenAppearanceUpdateAction.cpp
+    DisplayScreenAppearanceUpdateAction.h
+    DisplayScreenContentFunction.cpp
+    DisplayScreenContentFunction.h
+    DisplayScreenCPU.cpp
+    DisplayScreenCPU.h
+    DisplayScreenCPUAdmin.cpp
+    DisplayScreenCPUAdmin.h
+    DisplayScreenCPUCreateAction.cpp
+    DisplayScreenCPUCreateAction.h
+    DisplayScreenCPUMaintenanceUpdateAction.cpp
+    DisplayScreenCPUMaintenanceUpdateAction.h
+    DisplayScreenCPUTableSync.cpp
+    DisplayScreenCPUTableSync.h
+    DisplayScreenCPUUpdateAction.cpp
+    DisplayScreenCPUUpdateAction.h
+    DisplayScreenRemoveDisplayedPlaceAction.cpp
+    DisplayScreenRemoveDisplayedPlaceAction.h
+    DisplayScreenRemoveForbiddenPlaceAction.cpp
+    DisplayScreenRemoveForbiddenPlaceAction.h
+    DisplayScreenRemovePhysicalStopAction.cpp
+    DisplayScreenRemovePhysicalStopAction.h
+    DisplayScreenSupervisionFunction.cpp
+    DisplayScreenSupervisionFunction.h
+    DisplayScreenTableSync.cpp
+    DisplayScreenTableSync.h
+    DisplayScreenTransferDestinationAddAction.cpp
+    DisplayScreenTransferDestinationAddAction.h
+    DisplayScreenTransferDestinationRemoveAction.cpp
+    DisplayScreenTransferDestinationRemoveAction.h
+    DisplayScreenUpdateDisplayedStopAreaAction.cpp
+    DisplayScreenUpdateDisplayedStopAreaAction.hpp
+    DisplaySearchAdmin.cpp
+    DisplaySearchAdmin.h
+    DisplayType.cpp
+    DisplayType.h
+    DisplayTypeAdmin.cpp
+    DisplayTypeAdmin.h
+    DisplayTypesAdmin.cpp
+    DisplayTypesAdmin.h
+    DisplayTypesService.cpp
+    DisplayTypesService.hpp
+    DisplayTypeTableSync.cpp
+    DisplayTypeTableSync.h
+    ForcedDestinationsArrivalDepartureTableGenerator.cpp
+    ForcedDestinationsArrivalDepartureTableGenerator.h
+    GetDepartureBoardsService.hpp
+    GetDepartureBoardsService.cpp
+    PhysicalStopDepartureTableGenerator.cpp
+    PhysicalStopDepartureTableGenerator.h
+    PlaceWithDisplayBoards.cpp
+    PlaceWithDisplayBoards.hpp
+    RemovePreselectionPlaceFromDisplayScreenAction.cpp
+    RemovePreselectionPlaceFromDisplayScreenAction.h
+    RoutePlanningTableGenerator.cpp
+    RoutePlanningTableGenerator.h
+    StandardArrivalDepartureTableGenerator.cpp
+    StandardArrivalDepartureTableGenerator.h
+    TransferLinesService.cpp
+    TransferLinesService.hpp
+    UpdateAllStopsDisplayScreenAction.cpp
+    UpdateAllStopsDisplayScreenAction.h
+    UpdateDisplayMaintenanceAction.cpp
+    UpdateDisplayMaintenanceAction.h
+    UpdateDisplayPreselectionParametersAction.cpp
+    UpdateDisplayPreselectionParametersAction.h
+    UpdateDisplayScreenAction.cpp
+    UpdateDisplayScreenAction.h
+    UpdateDisplayTypeAction.cpp
+    UpdateDisplayTypeAction.h
+  )
 
-# MySQL
+  set_source_files_properties(DeparturesTableModule.gen.cpp DeparturesTableModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
-if(WITH_MYSQL)
-  add_definitions(-DWITH_MYSQL)
-  include_directories(${MYSQL_INCLUDE_DIR})
-endif(WITH_MYSQL)
+  # MySQL
+  if(WITH_MYSQL)
+    add_definitions(-DWITH_MYSQL)
+    include_directories(${MYSQL_INCLUDE_DIR})
+  endif(WITH_MYSQL)
 
-add_library(54_departure_boards ${departure_boards_SRCS})
+  add_library(54_departure_boards ${departure_boards_SRCS})
 
-if(UNIX)
-  set(PTHREAD "pthread")
-endif()
+  if(UNIX)
+    set(PTHREAD "pthread")
+  endif()
 
-if(WITH_MYSQL)
-target_link_libraries(54_departure_boards
-  07_lexical_matcher
-  10_db
-  17_messages
-  18_graph
-  32_geography
-  33_algorithm
-  35_pt
-  11_cms
-  ${MYSQL_LIBRARIES}
-  ${PTHREAD}
-)
-else(WITH_MYSQL)
-target_link_libraries(54_departure_boards
-  07_lexical_matcher
-  10_db
-  17_messages
-  18_graph
-  32_geography
-  33_algorithm
-  35_pt
-  11_cms
-)
-endif(WITH_MYSQL)
+  if(WITH_MYSQL)
+    target_link_libraries(54_departure_boards
+      07_lexical_matcher
+      10_db
+      17_messages
+      18_graph
+      32_geography
+      33_algorithm
+      35_pt
+      11_cms
+      ${MYSQL_LIBRARIES}
+      ${PTHREAD}
+    )
+  else(WITH_MYSQL)
+    target_link_libraries(54_departure_boards
+      07_lexical_matcher
+      10_db
+      17_messages
+      18_graph
+      32_geography
+      33_algorithm
+      35_pt
+      11_cms
+    )
+  endif(WITH_MYSQL)
 
-if(WITH_SCOM)
-  target_link_libraries(54_departure_boards 62_scom)
-endif(WITH_SCOM)
+  if(WITH_SCOM)
+    target_link_libraries(54_departure_boards 62_scom)
+  endif(WITH_SCOM)
 
-install(TARGETS 54_departure_boards DESTINATION lib)
+  install(TARGETS 54_departure_boards DESTINATION lib)
+
+endif(WITH_54_DEPARTURE_BOARDS)

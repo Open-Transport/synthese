@@ -72,6 +72,13 @@ if(NOT SPATIALITE_FOUND)
   message(FATAL_ERROR "Spatialite not found")
 endif()
 
+# SQlite
+
+find_package(Sqlite)
+if(NOT SQLITE_FOUND)
+  message(FATAL_ERROR "SQlite not found")
+endif()
+
 # IConv
 if(WIN32)
   find_package(Iconv)

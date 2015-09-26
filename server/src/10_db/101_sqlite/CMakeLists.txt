@@ -24,7 +24,7 @@ add_library(10_db_sqlite ${db_sqlite_SRCS})
 
 target_link_libraries(10_db_sqlite
   ${SPATIALITE_LIBRARIES}
-  ${SQLITE_LIBRARY}
+  ${SQLITE_LIBRARIES}
 )
 
 install(TARGETS 10_db_sqlite DESTINATION lib)

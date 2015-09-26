@@ -1,50 +1,52 @@
-set_source_groups()
+if(WITH_62_REGULATION)
 
-set(regulation_SRCS
-RegulationModule.cpp
-RegulationModule.gen.cpp
+  set_source_groups()
 
-RegulationModuleRegister.cpp
-RegulationModule.hpp
-RegulationModule.inc.cpp
+  set(regulation_SRCS
+    RegulationModule.cpp
+    RegulationModule.gen.cpp
 
-RegulationRight.cpp
-RegulationRight.hpp
+    RegulationModuleRegister.cpp
+    RegulationModule.hpp
+    RegulationModule.inc.cpp
 
-AlertProcessingThreadExec.hpp
-AlertProcessingThreadExec.cpp
-AlertProcessor.hpp
-CallbackRequestAlertProcessor.hpp
-CallbackRequestAlertProcessor.cpp
-Alert.hpp
-Alert.cpp
-AlertTableSync.hpp
-AlertTableSync.cpp
-AlertListService.hpp
-AlertListService.cpp
-ProcessAlertsAction.hpp
-ProcessAlertsAction.cpp
+    RegulationRight.cpp
+    RegulationRight.hpp
 
-#CheckLineCalendarFunction.cpp
-#CheckLineCalendarFunction.hpp
-#GenerateVehicleServiceUsagesAction.cpp
-#GenerateVehicleServiceUsagesAction.hpp
-#IsochronAdmin.cpp
-#IsochronAdmin.hpp
-#IsochronService.cpp
-#IsochronService.hpp
-#PTQualityControlAdmin.cpp
-#PTQualityControlAdmin.hpp
-#ServiceLengthService.cpp
-#ServiceLengthService.hpp
-#ServiceDensityService.cpp
-#ServiceDensityService.hpp
-#VehicleServiceUsage.cpp
-#VehicleServiceUsage.hpp
-#VehicleServiceUsagesListService.cpp
-#"VehicleServiceUsagesListService.hpp
-#VehicleServiceUsageTableSync.cpp
-#VehicleServiceUsageTableSync.hpp
+    AlertProcessingThreadExec.hpp
+    AlertProcessingThreadExec.cpp
+    AlertProcessor.hpp
+    CallbackRequestAlertProcessor.hpp
+    CallbackRequestAlertProcessor.cpp
+    Alert.hpp
+    Alert.cpp
+    AlertTableSync.hpp
+    AlertTableSync.cpp
+    AlertListService.hpp
+    AlertListService.cpp
+    ProcessAlertsAction.hpp
+    ProcessAlertsAction.cpp
+
+    #CheckLineCalendarFunction.cpp
+    #CheckLineCalendarFunction.hpp
+    #GenerateVehicleServiceUsagesAction.cpp
+    #GenerateVehicleServiceUsagesAction.hpp
+    #IsochronAdmin.cpp
+    #IsochronAdmin.hpp
+    #IsochronService.cpp
+    #IsochronService.hpp
+    #PTQualityControlAdmin.cpp
+    #PTQualityControlAdmin.hpp
+    #ServiceLengthService.cpp
+    #ServiceLengthService.hpp
+    #ServiceDensityService.cpp
+    #ServiceDensityService.hpp
+    #VehicleServiceUsage.cpp
+    #VehicleServiceUsage.hpp
+    #VehicleServiceUsagesListService.cpp
+    #"VehicleServiceUsagesListService.hpp
+    #VehicleServiceUsageTableSync.cpp
+    #VehicleServiceUsageTableSync.hpp
 )
 
 set_source_files_properties(RegulationModule.gen.cpp RegulationModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
@@ -57,3 +59,5 @@ target_link_libraries(62_regulation
 )
 
 install(TARGETS 62_regulation DESTINATION lib)
+
+endif(WITH_62_REGULATION)

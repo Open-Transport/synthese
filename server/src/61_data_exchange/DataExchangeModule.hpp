@@ -87,6 +87,7 @@ namespace synthese
 			public graph::GraphModuleTemplate<DataExchangeModule>
 		{
 		public:
+#ifdef WITH_61_DATA_EXCHANGE_VDV
 			typedef std::map<std::string, VDVClient*> VDVClients;
 			typedef std::map<std::string, VDVServer*> VDVServers;
 
@@ -109,7 +110,12 @@ namespace synthese
 			static void AddVDVServer(VDVServer& value);
 			static void RemoveVDVServer(const std::string& key);
 			static VDVServer& GetVDVServer(const std::string& name);
+			static bool GetVDVClientActive() { return _vdvClientActive; }
+			static bool GetVDVServerActive() { return _vdvServerActive; }
+			static boost::posix_time::ptime& GetVDVStartingTime() { return _vdvStartingTime; }
 
+#endif
+		public:
 			static void ClientsPoller();
 			static void ServersConnector();
 
@@ -117,10 +123,6 @@ namespace synthese
 				const std::string& name,
 				const std::string& value
 			);
-
-			static bool GetVDVClientActive() { return _vdvClientActive; }
-			static bool GetVDVServerActive() { return _vdvServerActive; }
-			static boost::posix_time::ptime& GetVDVStartingTime() { return _vdvStartingTime; }
 
 			static void Init();
 		};

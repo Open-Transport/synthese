@@ -264,7 +264,6 @@ target_link_libraries(35_pt
   17_messages
   18_graph
   20_tree
-  30_fare
   31_calendar
   32_geography
   33_algorithm
@@ -275,6 +274,10 @@ target_link_libraries(35_pt
   #39_map
   ${EXPAT_LIBRARIES}
 )
+
+if(WITH_30_FARE)
+  target_link_libraries(35_pt 30_fare)
+endif()
 
 # To prevent "fatal error LNK1106: invalid file or disk full: cannot seek to 0x..."
 if (WIN32)

@@ -22,13 +22,25 @@
 
 #include "DataExchangeModule.hpp"
 
-#include "IneoNCEConnection.hpp"
-#include "MGScreenConnection.hpp"
 #include "ServerModule.h"
+
+#ifdef WITH_61_DATA_EXCHANGE_INEO_NCE
+#include "IneoNCEConnection.hpp"
+#endif
+
+#ifdef WITH_61_DATA_EXCHANGE_MG_SCREEN
+#include "MGScreenConnection.hpp"
+#endif
+
+#ifdef WITH_61_DATA_EXCHANGE_STOP_BUTTON_POLLER
 #include "StopButtonFilePoller.hpp"
+#endif
+
+#ifdef WITH_61_DATA_EXCHANGE_VDV
 #include "VDVClient.hpp"
 #include "VDVClientSubscription.hpp"
 #include "VDVServer.hpp"
+#endif
 
 #include <boost/lexical_cast.hpp>
 #include <boost/thread.hpp>
@@ -56,6 +68,7 @@ namespace synthese
 
 	namespace data_exchange
 	{
+#ifdef WITH_61_DATA_EXCHANGE_VDV
 		DataExchangeModule::VDVClients DataExchangeModule::_vdvClients;
 		DataExchangeModule::VDVServers DataExchangeModule::_vdvServers;
 		bool DataExchangeModule::_vdvClientActive = true;
@@ -63,6 +76,7 @@ namespace synthese
 		ptime DataExchangeModule::_vdvStartingTime;
 		const string DataExchangeModule::MODULE_PARAM_VDV_SERVER_ACTIVE = "vdv_server_active";
 		const string DataExchangeModule::MODULE_PARAM_VDV_CLIENT_ACTIVE = "vdv_client_active";
+#endif
 	}
 
 
@@ -72,10 +86,17 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::PreInit()
 		{
+#ifdef WITH_61_DATA_EXCHANGE_VDV
 			RegisterParameter(DataExchangeModule::MODULE_PARAM_VDV_SERVER_ACTIVE, "1", &DataExchangeModule::ParameterCallback);
 			RegisterParameter(DataExchangeModule::MODULE_PARAM_VDV_CLIENT_ACTIVE, "1", &DataExchangeModule::ParameterCallback);
+#endif
+
+#ifdef WITH_61_DATA_EXCHANGE_INEO_NCE
 			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_HOST, "", &IneoNCEConnection::ParameterCallback);
 			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_PORT, "", &IneoNCEConnection::ParameterCallback);
+#endif
+
+#ifdef WITH_61_DATA_EXCHANGE_MG_SCREEN
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_HOST, "", &MGScreenConnection::ParameterCallback);
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_PORT, "", &MGScreenConnection::ParameterCallback);
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_SPEED, "5", &MGScreenConnection::ParameterCallback);
@@ -83,44 +104,68 @@ namespace synthese
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_MIN, "1", &MGScreenConnection::ParameterCallback);
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_MAX, "255", &MGScreenConnection::ParameterCallback);
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_ARCHIVE_MONITORING, "0", &MGScreenConnection::ParameterCallback);
+#endif
+
+#ifdef WITH_61_DATA_EXCHANGE_STOP_BUTTON_POLLER
 			RegisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_FILE, "", &StopButtonFilePoller::ParameterCallback);
 			RegisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_PERIOD_MS, "", &StopButtonFilePoller::ParameterCallback);
+#endif
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::Init()
 		{
 			// In the init section in order to read this parameter after the data load (DBModule::Init)
+#ifdef WITH_61_DATA_EXCHANGE_INEO_NCE
 			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_DATASOURCE_ID, "", &IneoNCEConnection::ParameterCallback);
 			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_MESSAGE_RECIPIENTS, "", &IneoNCEConnection::ParameterCallback);
+#endif
+
+#ifdef WITH_61_DATA_EXCHANGE_MG_SCREEN
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_CPU_NAME, "MG CPU", &MGScreenConnection::ParameterCallback);
+#endif
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::Start()
 		{
 			// VDV Server poller
+#ifdef WITH_61_DATA_EXCHANGE_VDV
 			ServerModule::AddThread(&DataExchangeModule::ClientsPoller, "VDVClientsPoller");
 
 			// VDV Client connector
 			ServerModule::AddThread(&DataExchangeModule::ServersConnector, "VDVServerConnector");
+#endif
 
+#ifdef WITH_61_DATA_EXCHANGE_INEO_NCE
 			// Ineo NCE connector
 			ServerModule::AddThread(&IneoNCEConnection::RunThread, "IneoNCEConnector");
+#endif
 
+#ifdef WITH_61_DATA_EXCHANGE_MG_SCREEN
 			// MG Screen connector
 			ServerModule::AddThread(&MGScreenConnection::RunThread, "MGScreenConnector");
-
+#endif
 			// Stop Button File Poller
+#ifdef WITH_61_DATA_EXCHANGE_STOP_BUTTON_POLLER
 			ServerModule::AddThread(&StopButtonFilePoller::RunThread, "StopButtonPoller");
+#endif
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::End()
 		{
+#ifdef WITH_61_DATA_EXCHANGE_VDV
 			UnregisterParameter(DataExchangeModule::MODULE_PARAM_VDV_SERVER_ACTIVE);
 			UnregisterParameter(DataExchangeModule::MODULE_PARAM_VDV_CLIENT_ACTIVE);
+#endif
+
+#ifdef WITH_61_DATA_EXCHANGE_INEO_NCE
 			UnregisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_HOST);
 			UnregisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_PORT);
+#endif
+
+#ifdef WITH_61_DATA_EXCHANGE_STOP_BUTTON_POLLER
 			UnregisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_FILE);
 			UnregisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_PERIOD_MS);
+#endif
 		}
 
 
@@ -138,6 +183,7 @@ namespace synthese
 
 	namespace data_exchange
 	{
+#ifdef WITH_61_DATA_EXCHANGE_VDV
 		void DataExchangeModule::AddVDVClient( VDVClient& value )
 		{
 			_vdvClients.insert(
@@ -195,7 +241,7 @@ namespace synthese
 			}
 			return *it->second;
 		}
-
+#endif
 
 
 		void DataExchangeModule::ClientsPoller()
@@ -203,6 +249,7 @@ namespace synthese
 			ptime now(second_clock::local_time());
 			while(true)
 			{
+#ifdef WITH_61_DATA_EXCHANGE_VDV
 				if(_vdvServerActive)
 				{
 					ServerModule::SetCurrentThreadRunningAction();
@@ -228,7 +275,7 @@ namespace synthese
 						}
 					}
 				}
-
+#endif
 				ServerModule::SetCurrentThreadWaiting();
 				this_thread::sleep(posix_time::seconds(30));
 			}
@@ -241,6 +288,7 @@ namespace synthese
 			while(true)
 			{
 				// Checks all server if the client is active
+#ifdef WITH_61_DATA_EXCHANGE_VDV
 				if(_vdvClientActive)
 				{
 					ServerModule::SetCurrentThreadRunningAction();
@@ -257,7 +305,7 @@ namespace synthese
 						server.second->connect();
 					}
 				}
-
+#endif
 				// Wait 30 s
 				ServerModule::SetCurrentThreadWaiting();
 				this_thread::sleep(seconds(30));
@@ -270,6 +318,7 @@ namespace synthese
 			const std::string& name,
 			const std::string& value
 		){
+#ifdef WITH_61_DATA_EXCHANGE_VDV
 			// VDV client activation
 			if(name == MODULE_PARAM_VDV_CLIENT_ACTIVE)
 			{
@@ -316,10 +365,13 @@ namespace synthese
 
 				}
 			}
+#endif
 		}
 
 		void DataExchangeModule::Init()
 		{
+#ifdef WITH_61_DATA_EXCHANGE_VDV
 			_vdvStartingTime = second_clock::local_time();
+#endif
 		}
 }	}

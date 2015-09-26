@@ -1,31 +1,35 @@
-set_source_groups()
+if(WITH_61_INEO_TERMINUS)
 
-set(ineo_terminus_SRCS
-  IneoNotificationChannel.cpp
-  IneoNotificationChannel.hpp
-  IneoTerminusModule.cpp
-  IneoTerminusModule.gen.cpp
-  IneoTerminusModule.hpp
-  IneoTerminusModule.inc.cpp
-  IneoTerminusModuleRegister.cpp
-  IneoTerminusConnection.cpp
-  IneoTerminusConnection.hpp
-  IneoTerminusLog.cpp
-  IneoTerminusLog.hpp
-  IneoTerminusSynchronizeAction.cpp
-  IneoTerminusSynchronizeAction.hpp
-)
+  set_source_groups()
 
-set_source_files_properties(IneoTerminusModule.gen.cpp IneoTerminusModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
+  set(ineo_terminus_SRCS
+    IneoNotificationChannel.cpp
+    IneoNotificationChannel.hpp
+    IneoTerminusModule.cpp
+    IneoTerminusModule.gen.cpp
+    IneoTerminusModule.hpp
+    IneoTerminusModule.inc.cpp
+    IneoTerminusModuleRegister.cpp
+    IneoTerminusConnection.cpp
+    IneoTerminusConnection.hpp
+    IneoTerminusLog.cpp
+    IneoTerminusLog.hpp
+    IneoTerminusSynchronizeAction.cpp
+    IneoTerminusSynchronizeAction.hpp
+    )
 
-include_directories(${EXPAT_INCLUDE_DIRS})
+  set_source_files_properties(IneoTerminusModule.gen.cpp IneoTerminusModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
-add_library(61_ineo_terminus ${ineo_terminus_SRCS})
+  include_directories(${EXPAT_INCLUDE_DIRS})
 
-target_link_libraries(61_ineo_terminus
-  01_util
-  17_messages
-  ${EXPAT_LIBRARIES}
-)
+  add_library(61_ineo_terminus ${ineo_terminus_SRCS})
 
-install(TARGETS 61_ineo_terminus DESTINATION lib)
+  target_link_libraries(61_ineo_terminus
+    01_util
+    17_messages
+    ${EXPAT_LIBRARIES}
+    )
+
+  install(TARGETS 61_ineo_terminus DESTINATION lib)
+
+endif(WITH_61_INEO_TERMINUS)
