@@ -34,7 +34,6 @@ set(DEPS
   35_pt
   37_pt_operation
   54_departure_boards
-  61_data_exchange
 )
 
 boost_test(Edge "${DEPS}")

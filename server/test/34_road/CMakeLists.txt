@@ -14,7 +14,6 @@ set(DEPS
   11_cms # from road > graph > server
   34_road
   54_departure_boards
-  61_data_exchange
   37_pt_operation
   38_vehicle
   56_pt_website
