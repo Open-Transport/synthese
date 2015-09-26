@@ -24,7 +24,6 @@ set(DEPS
   10_db
   00_framework
   54_departure_boards
-  61_data_exchange
   37_pt_operation
 )
 
