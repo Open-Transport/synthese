@@ -25,7 +25,6 @@ else(WIN32)
    ELSE()
       find_path(SPATIALITE_INCLUDE_DIR NAMES spatialite.h PATHS /opt/rcs/spatialite/include /usr/local/include /usr/include)
       find_library(SPATIALITE_LIBRARY NAMES spatialite PATHS /opt/rcs/spatialite/lib /usr/local/lib /usr/lib)
-      find_library(SQLITE_LIBRARY NAMES sqlite3 PATHS /opt/rcs/spatialite/lib /usr/local/lib /usr/lib)
    ENDIF()
 
 endif(WIN32)
