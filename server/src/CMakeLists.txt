@@ -51,7 +51,6 @@ set(MODULES
 56_pt_website
 #57_accounting
 59_road_journey_planner
-61_data_exchange
 63_settings)
 
 if(WITH_MYSQL)
@@ -117,6 +116,11 @@ endif()
 if(WITH_SCOM)
   list(APPEND MODULES 62_scom)
   add_definitions(-DWITH_SCOM)
+endif()
+
+option(WITH_61_DATA_EXCHANGE "Module 61_DATE_EXCHANGE" OFF)
+if (WITH_61_DATA_EXCHANGE)
+  list(APPEND MODULES 61_data_exchange)
 endif()
 
 option(WITH_61_INEO_TERMINUS "Module 61_INEO_TERMINUS" OFF)
