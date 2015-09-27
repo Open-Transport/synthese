@@ -59,7 +59,7 @@ endif()
 
 option(WITH_06_OPENSTREETMAP "Module 06_openstreetmap" ON)
 if(WITH_06_OPENSTREETMAP)
-  add_definitions(-WITH_06_OPENSTREETMAP)
+  add_definitions(-DWITH_06_OPENSTREETMAP)
   list(APPEND MODULES 06_openstreetmap)
 endif()
 
