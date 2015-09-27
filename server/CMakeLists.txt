@@ -216,7 +216,7 @@ configure_file(
 # Python 2.7
 OPTION(WITH_PYTHON "Add Python support to CMS" OFF)
 if(WITH_PYTHON)
-  add_definitions(-WITH_PYTHON)
+  add_definitions(-DWITH_PYTHON)
   if(WIN32)
     # TODO : FindPythonLibs does not work under windows 64 bits ; for now define
     # manually PYTHON_INCLUDE_DIR and PYTHON_LIBRARY
