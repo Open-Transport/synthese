@@ -5,7 +5,7 @@
 #  PNG_INCLUDE_DIRS - the png include directories
 #  PNG_LIBRARIES - link these to use png
 
-include(cmake/LibFindMacros.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/LibFindMacros.cmake)
 
 if(WIN32)
 

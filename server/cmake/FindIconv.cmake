@@ -5,7 +5,7 @@
 #  ICONV_INCLUDE_DIRS - the iconv include directories
 #  ICONV_LIBRARIES - link these to use iconv
 
-include(cmake/LibFindMacros.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/LibFindMacros.cmake)
 
 if(WIN32)
 

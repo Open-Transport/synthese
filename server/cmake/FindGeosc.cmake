@@ -5,7 +5,7 @@
 #  GEOSC_INCLUDE_DIRS - the geosc include directories
 #  GEOSC_LIBRARIES - link these to use geosc
 
-include(cmake/LibFindMacros.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/LibFindMacros.cmake)
 
 
 if(WIN32)

@@ -5,7 +5,7 @@
 #  SPATIALITE_INCLUDE_DIRS - the spatialite include directories
 #  SPATIALITE_LIBRARIES - link these to use spatialite
 
-include(cmake/LibFindMacros.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/LibFindMacros.cmake)
 
 if(WIN32)
 

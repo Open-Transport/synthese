@@ -5,7 +5,7 @@
 #  HARU_INCLUDE_DIRS - the haru include directories
 #  HARU_LIBRARIES - link these to use haru
 
-include(cmake/LibFindMacros.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/LibFindMacros.cmake)
 
 if(WIN32)
 

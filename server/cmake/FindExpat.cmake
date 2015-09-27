@@ -5,7 +5,7 @@
 #  EXPAT_INCLUDE_DIRS - the expat include directories
 #  EXPAT_LIBRARIES - link these to use expat
 
-include(cmake/LibFindMacros.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/LibFindMacros.cmake)
 
 if(WIN32)
 
@@ -18,15 +18,8 @@ if(WIN32)
    ENDIF()
 
 else(WIN32)
-
-   IF(DEFINED ENV{EXPAT_DIR})
-      find_path(EXPAT_INCLUDE_DIR NAMES expat.h PATHS $ENV{EXPAT_DIR}/include /opt/rcs/expat/include /usr/local/include /usr/include NO_DEFAULT_PATH)
-      find_library(EXPAT_LIBRARY NAMES expat PATHS $ENV{EXPAT_DIR}/lib /opt/rcs/expat/lib /usr/local/lib /usr/lib NO_DEFAULT_PATH)
-   ELSE()
-      find_path(EXPAT_INCLUDE_DIR NAMES expat.h PATHS /opt/rcs/expat/include /usr/local/include /usr/include)
-      find_library(EXPAT_LIBRARY NAMES expat PATHS /opt/rcs/expat/lib /usr/local/lib /usr/lib)
-   ENDIF()
-
+   include(FindEXPAT)
+   find_package(EXPAT REQUIRED)
 endif(WIN32)
 
 set(EXPAT_PROCESS_INCLUDES EXPAT_INCLUDE_DIR)
