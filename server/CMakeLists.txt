@@ -31,12 +31,6 @@ if(UNIX)
   set(BUILD_SHARED_LIBS ON)
 endif()
 
-# Zlib
-find_package(Zlib)
-if(NOT ZLIB_FOUND)
-  message(FATAL_ERROR "Zlib not found")
-endif()
-
 # Expat
 
 find_package(Expat)
