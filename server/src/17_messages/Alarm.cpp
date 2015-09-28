@@ -410,7 +410,7 @@ namespace synthese
 			
 			// Then check if specific application periods are defined for the current message
 
-			if(getCalendar())
+			if(getCalendar() && !getCalendar()->getApplicationPeriods().empty())
 			{
 				// Search for an application period including the checked date
 				BOOST_FOREACH(
@@ -422,17 +422,13 @@ namespace synthese
 						return true;
 					}
 				}
-				
-				// No period was found : the message is inactive
+				// No matching period found: the message is inactive
 				return false;
 			}
 			else
 			{
 				// Then refer to the simple start/end date of the scenario
-				return
-					(sentScenario->getPeriodStart().is_not_a_date_time() || sentScenario->getPeriodStart() <= when) &&
-					(sentScenario->getPeriodEnd().is_not_a_date_time() || sentScenario->getPeriodEnd() >= when)
-					;
+				return sentScenario->isApplicable(when);
 			}
 				
 		}
