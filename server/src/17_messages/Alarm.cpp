@@ -598,7 +598,13 @@ namespace synthese
 
 		void Alarm::activationStarted()
 		{
-			set<LastActivationStart>(posix_time::second_clock::local_time());
+			posix_time::ptime now = posix_time::second_clock::local_time();
+			if (get<LastActivationEnd>() == now)
+			{
+				// reset end so that alarm is considered activated
+				set<LastActivationEnd>(posix_time::not_a_date_time);
+			}
+			set<LastActivationStart>(now);
 		}
 
 
@@ -612,7 +618,7 @@ namespace synthese
 		{
 			posix_time::ptime now = posix_time::second_clock::local_time();
 			return !get<LastActivationStart>().is_not_a_date_time()
-					&& get<LastActivationStart>() < now
+					&& get<LastActivationStart>() <= now
 					&& (get<LastActivationEnd>().is_not_a_date_time()
 						|| get<LastActivationEnd>() < get<LastActivationStart>());
 		}

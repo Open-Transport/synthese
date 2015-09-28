@@ -277,6 +277,9 @@ namespace synthese
 			/**
 				Test if Alarm has already been activated by user action.
 
+				Specific case where LastActivationStart == LastActivationEnd
+				returns false.
+
 				@return true if current date after LastActivationStart but not after LastActivationEnd
 			*/
 			bool isActivated() const;
