@@ -422,13 +422,6 @@ namespace synthese
 			){
 				if (message->isApplicable(now)) {
 
-					// Check if the message is already in activated cache
-					if(_activatedMessages.find(message) == _activatedMessages.end())
-					{
-						// Record the message as activated
-						_activatedMessages.insert(message);
-					}
-
 					// Change message activation date
 					if (!message->isActivated())
 					{
@@ -436,12 +429,19 @@ namespace synthese
 						AlarmTableSync::Save(&(*message));
 					}
 
-					// Run the display start trigger on each broadcast point
-					BOOST_FOREACH(
-						const BroadcastPoint::BroadcastPoints::value_type& bp,
-						BroadcastPoint::GetBroadcastPoints()
-					){
-						bp->onDisplayStart(*message);
+					// Check if the message is already in activated cache
+					if(_activatedMessages.find(message) == _activatedMessages.end())
+					{
+						// Record the message as activated
+						_activatedMessages.insert(message);
+
+						// Run the display start trigger on each broadcast point
+						BOOST_FOREACH(
+							const BroadcastPoint::BroadcastPoints::value_type& bp,
+							BroadcastPoint::GetBroadcastPoints()
+						){
+							bp->onDisplayStart(*message);
+						}
 					}
 				}
 				else
@@ -457,16 +457,15 @@ namespace synthese
 					{
 						message->activationEnded();
 						AlarmTableSync::Save(&(*message));
-					}
 
-					// Run the display end trigger
-					BOOST_FOREACH(
-						const BroadcastPoint::BroadcastPoints::value_type& bp,
-						BroadcastPoint::GetBroadcastPoints()
-					){
-						bp->onDisplayEnd(*message);
+						// Run the display end trigger
+						BOOST_FOREACH(
+							const BroadcastPoint::BroadcastPoints::value_type& bp,
+							BroadcastPoint::GetBroadcastPoints()
+						){
+							bp->onDisplayEnd(*message);
+						}
 					}
-
 				}
 			}
 
