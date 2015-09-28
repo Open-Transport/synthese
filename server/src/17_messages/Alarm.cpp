@@ -443,11 +443,7 @@ namespace synthese
 			{
 				return result;
 			}
-			const SentScenario* sentScenario = dynamic_cast<const SentScenario*>(getScenario());
-			if (NULL == sentScenario) return result;
-			if (!sentScenario->getIsEnabled()) return result;
-
-			// Then check if specific application periods are defined for the current message
+			// Check if specific application periods are defined for the current message
 			if(getCalendar())
 			{
 				// Search for an application period including the checked date
@@ -463,6 +459,9 @@ namespace synthese
 			}
 			else
 			{
+				const SentScenario* sentScenario = dynamic_cast<const SentScenario*>(getScenario());
+				if (NULL == sentScenario) return result;
+
 				// Then refer to the simple start/end date of the scenario
 				if ((sentScenario->getPeriodStart().is_not_a_date_time() || sentScenario->getPeriodStart() >= when) &&
 					(sentScenario->getPeriodEnd().is_not_a_date_time() || sentScenario->getPeriodEnd() <= when))
@@ -483,11 +482,7 @@ namespace synthese
 			{
 				return result;
 			}
-			const SentScenario* sentScenario = dynamic_cast<const SentScenario*>(getScenario());
-			if (NULL == sentScenario) return result;
-			if (!sentScenario->getIsEnabled()) return result;
-
-			// Then check if specific application periods are defined for the current message
+			// Check if specific application periods are defined for the current message
 			if(getCalendar())
 			{
 				// Search for an application period including the checked date
@@ -503,6 +498,9 @@ namespace synthese
 			}
 			else
 			{
+				const SentScenario* sentScenario = dynamic_cast<const SentScenario*>(getScenario());
+				if (NULL == sentScenario) return result;
+
 				// Then refer to the simple start/end date of the scenario
 				if ((sentScenario->getPeriodStart().is_not_a_date_time() || sentScenario->getPeriodStart() >= when) &&
 					(sentScenario->getPeriodEnd().is_not_a_date_time() || sentScenario->getPeriodEnd() <= when))
