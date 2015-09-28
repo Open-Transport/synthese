@@ -73,6 +73,7 @@ target_link_libraries(12_security
   05_html
   10_db
   11_cms_model
+  13_dblog
   16_impex
   # Forward dependencies:
   #13_dblog

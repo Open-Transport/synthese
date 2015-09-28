@@ -1,12 +1,20 @@
 set_source_groups()
 
 set(cms_model_SRCS
+Webpage.cpp
+Webpage.h
 WebPageTableSync.cpp
 WebPageTableSync.h
+Website.cpp
+Website.hpp
 WebsiteTableSync.cpp
 WebsiteTableSync.hpp
+WebsiteConfig.cpp
+WebsiteConfig.hpp
 WebsiteConfigTableSync.cpp
 WebsiteConfigTableSync.hpp
+WebpageContent.cpp
+WebpageContent.hpp
 )
 
 set(cms_SRCS
@@ -112,14 +120,10 @@ VariablesDebugExpression.cpp
 VariablesDebugExpression.hpp
 VariableUpdateNode.cpp
 VariableUpdateNode.hpp
-Webpage.cpp
-Webpage.h
 WebPageAddAction.cpp
 WebPageAddAction.h
 WebPageAdmin.cpp
 WebPageAdmin.h
-WebpageContent.cpp
-WebpageContent.hpp
 WebpageContentNode.cpp
 WebpageContentNode.hpp
 WebpageContentUploadAction.cpp
@@ -150,12 +154,8 @@ WebpagePreviousFunction.cpp
 WebpagePreviousFunction.hpp
 WebPageUpdateAction.cpp
 WebPageUpdateAction.h
-Website.cpp
-Website.hpp
 WebsiteAdmin.cpp
 WebsiteAdmin.hpp
-WebsiteConfig.cpp
-WebsiteConfig.hpp
 WebsiteRankCleanupAction.cpp
 WebsiteRankCleanupAction.hpp
 WebsitesService.cpp
