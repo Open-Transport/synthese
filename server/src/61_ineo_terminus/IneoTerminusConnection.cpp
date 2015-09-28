@@ -1677,10 +1677,10 @@ namespace synthese
 				messagePM->insert("repeat_interval", lexical_cast<string>(message.repeatPeriod * 60));
 				messagePM->insert("section", "");
 				messagePM->insert("alternative", "");
-				messagePM->insert("with_ack", message.confirm);
-				messagePM->insert("multiple_stops", message.multipleStop);
-				messagePM->insert("play_tts", message.ttsBroadcasting);
-				messagePM->insert("light", message.diodFlashing);
+				messagePM->insert("with_ack", (bool) message.confirm);
+				messagePM->insert("multiple_stops", (bool) message.multipleStop);
+				messagePM->insert("play_tts", (bool) message.ttsBroadcasting);
+				messagePM->insert("light", (bool) message.diodFlashing);
 				messagePM->insert("direction_sign_code", message.codeGirouette);
 
 				if(false == message.startStopPoint.empty())

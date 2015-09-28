@@ -200,7 +200,7 @@ namespace synthese
 					boost::logic::tribool confirm;
 					std::string startStopPoint;
 					std::string endStopPoint;
-					bool diodFlashing;
+					boost::logic::tribool diodFlashing;
 					boost::logic::tribool alternance;
 					boost::logic::tribool multipleStop;
 					boost::logic::tribool terminusOrStop;
