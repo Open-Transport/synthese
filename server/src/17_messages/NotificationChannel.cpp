@@ -410,11 +410,13 @@ namespace synthese
 
 	bool NotificationChannel::checkForUpdate(const Alarm* alarm, boost::shared_ptr<NotificationEvent> beginEvent)
 	{
+		if (!alarm->isActivated())
+		{
+			return false;
+		}
+
 		boost::optional<NotificationProvider&> provider = beginEvent->get<NotificationProvider>();
-		boost::optional<MessageType&> type =
-			(END == beginEvent->get<EventType>())
-				? provider->get<MessageTypeEnd>()
-				: provider->get<MessageTypeBegin>();
+		boost::optional<MessageType&> type = provider->get<MessageTypeBegin>();
 		bool messageTypeFound = false;
 		ptime messageUpdate = _getMessageUpdate(alarm, type, messageTypeFound);
 
@@ -431,7 +433,8 @@ namespace synthese
 		}
 		else
 		{
-			result = (messageUpdate > beginEvent->get<LastAttempt>());
+			result = (messageUpdate > beginEvent->get<LastAttempt>()
+					&& beginEvent->get<Status>() >= FAILED);
 		}
 		return result;
 	}

@@ -344,7 +344,9 @@ namespace synthese
 			const Alarm& message
 		) const {
 			// If this NotificationProvider registers to message updates and it is an explicit recipient of this message
-			if(get<SubscribeUpdates>() && isRecipient(message.getLinkedObjects()))
+			if(get<SubscribeUpdates>()
+				&& message.isActivated()
+				&& isRecipient(message.getLinkedObjects()))
 			{
 				// NotificationProvider does not process Alarm, it requires a NotificationEvent
 				// Since we don't want to add another NotificationEvent into the database, we create a fake one that is only used to generate the message
@@ -362,7 +364,9 @@ namespace synthese
 			const Alarm& message
 		) const {
 			// If this NotificationProvider registers to message updates and it is an explicit recipient of this message
-			if(get<SubscribeUpdates>() && isRecipient(message.getLinkedObjects()))
+			if(get<SubscribeUpdates>()
+				&& message.isActivated()
+				&& isRecipient(message.getLinkedObjects()))
 			{
 				boost::shared_ptr<NotificationEvent> beginEvent = NotificationEvent::findLastEvent(message, this, BEGIN);
 				bool updateRequired = true;
