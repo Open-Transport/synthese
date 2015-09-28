@@ -21,7 +21,6 @@ if(WITH_40_PDF_CMS)
 
   include_directories(${HARU_INCLUDE_DIRS})
 
-
   add_library(40_pdf_cms ${pdf_cms_SRCS})
 
   target_link_libraries(40_pdf_cms

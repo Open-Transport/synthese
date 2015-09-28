@@ -1,5 +1,14 @@
 set_source_groups()
 
+set(cms_model_SRCS
+WebPageTableSync.cpp
+WebPageTableSync.h
+WebsiteTableSync.cpp
+WebsiteTableSync.hpp
+WebsiteConfigTableSync.cpp
+WebsiteConfigTableSync.hpp
+)
+
 set(cms_SRCS
 AddService.cpp
 AddService.hpp
@@ -139,20 +148,14 @@ WebPagePositionFunction.cpp
 WebPagePositionFunction.hpp
 WebpagePreviousFunction.cpp
 WebpagePreviousFunction.hpp
-WebPageTableSync.cpp
-WebPageTableSync.h
 WebPageUpdateAction.cpp
 WebPageUpdateAction.h
 Website.cpp
 Website.hpp
 WebsiteAdmin.cpp
 WebsiteAdmin.hpp
-WebsiteTableSync.cpp
-WebsiteTableSync.hpp
 WebsiteConfig.cpp
 WebsiteConfig.hpp
-WebsiteConfigTableSync.cpp
-WebsiteConfigTableSync.hpp
 WebsiteRankCleanupAction.cpp
 WebsiteRankCleanupAction.hpp
 WebsitesService.cpp
@@ -170,13 +173,15 @@ set_source_files_properties(CMSModule.gen.cpp CMSModule.inc.cpp PROPERTIES HEADE
 include_directories(${PYTHON_INCLUDE_DIR})
 
 add_library(11_cms ${cms_SRCS})
+add_library(11_cms_model ${cms_model_SRCS})
 
 target_link_libraries(
   11_cms
+  11_cms_model
   ${PYTHON_LIBRARY}
-  12_security
   15_server
   20_tree
 )
 
+install(TARGETS 11_cms_model DESTINATION lib)
 install(TARGETS 11_cms DESTINATION lib)

@@ -96,7 +96,7 @@ set_source_files_properties(ResaModule.gen.cpp ResaModule.inc.cpp PROPERTIES HEA
 add_library(51_resa ${resa_SRCS})
 
 target_link_libraries(51_resa
-  11_cms
+  11_cms_model
   38_vehicle
   # Forward dependencies:
   #53_pt_journey_planner
