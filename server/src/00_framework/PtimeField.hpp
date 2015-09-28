@@ -169,6 +169,7 @@ namespace synthese
 	FIELD_PTIME(EndTime)
 	FIELD_PTIME(StartTime)
 	FIELD_PTIME(Time)
+	FIELD_PTIME(LastUpdate)
 }
 
 #endif

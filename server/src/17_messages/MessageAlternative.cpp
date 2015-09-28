@@ -45,7 +45,8 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Alarm),
 					FIELD_DEFAULT_CONSTRUCTOR(MessageType),
-					FIELD_DEFAULT_CONSTRUCTOR(Content)
+					FIELD_DEFAULT_CONSTRUCTOR(Content),
+					FIELD_VALUE_CONSTRUCTOR(LastUpdate, boost::posix_time::second_clock::local_time())
 			)	)
 		{}
 
@@ -73,4 +74,13 @@ namespace synthese
 				get<Alarm>()->setMessageAlternatives(v);
 			}
 		}
+
+
+
+		void MessageAlternative::setContent(const std::string& content)
+		{
+			set<Content>(content);
+			set<LastUpdate>(boost::posix_time::second_clock::local_time());
+		}
+
 }	}

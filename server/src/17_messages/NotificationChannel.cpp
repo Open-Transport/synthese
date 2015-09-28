@@ -21,25 +21,25 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <Alarm.h>
-#include <AlarmObjectLink.h>
-#include <CMSScript.hpp>
-#include <CityTableSync.h>
-#include <CommercialLine.h>
-#include <CommercialLineTableSync.h>
-#include <Env.h>
-#include <MessageAlternative.hpp>
-#include <MessageType.hpp>
-#include <NamedPlace.h>
-#include <NotificationChannel.hpp>
-#include <NotificationLog.hpp>
-#include <NotificationProvider.hpp>
-#include <Object.hpp>
-#include <ParametersMap.h>
-#include <ParametersMapField.hpp>
-#include <StopArea.hpp>
-#include <StopAreaTableSync.hpp>
-#include <TransportNetworkTableSync.h>
+#include "Alarm.h"
+#include "AlarmObjectLink.h"
+#include "CMSScript.hpp"
+#include "CityTableSync.h"
+#include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
+#include "Env.h"
+#include "MessageAlternative.hpp"
+#include "MessageType.hpp"
+#include "NamedPlace.h"
+#include "NotificationChannel.hpp"
+#include "NotificationLog.hpp"
+#include "NotificationProvider.hpp"
+#include "Object.hpp"
+#include "ParametersMap.h"
+#include "ParametersMapField.hpp"
+#include "StopArea.hpp"
+#include "StopAreaTableSync.hpp"
+#include "TransportNetworkTableSync.h"
 
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -122,7 +122,7 @@ namespace synthese
 					if(alternativeType->getKey() == typeKey)
 					{
 						// Alternative message found, return its content
-						messageAlternative = alternativeText->get<Content>();
+						messageAlternative = alternativeText->getContent();
 						messageTypeFound = true;
 					}
 				}
@@ -173,7 +173,7 @@ namespace synthese
 				const string beginIso = to_iso_string(begin);
 				variables.insert(VARIABLE_APPLICATION_BEGIN, beginTime);
 				variables.insert(VARIABLE_APPLICATION_BEGIN_ISO, beginIso);
-				if (eventType == BEGIN)
+				if (eventType != END)
 				{
 					variables.insert(VARIABLE_EVENT_TIME, beginTime);
 					variables.insert(VARIABLE_EVENT_TIME_ISO, beginIso);
@@ -192,6 +192,12 @@ namespace synthese
 					variables.insert(VARIABLE_EVENT_TIME, endTime);
 					variables.insert(VARIABLE_EVENT_TIME_ISO, endIso);
 				}
+			}
+
+			if (begin.is_not_a_date_time() && end.is_not_a_date_time())
+			{
+				variables.insert(VARIABLE_EVENT_TIME, eventTime);
+				variables.insert(VARIABLE_EVENT_TIME_ISO, to_iso_string(eventTime));
 			}
 		}
 
@@ -224,15 +230,7 @@ namespace synthese
 			// Generate variables for rendering
 			ParametersMap scriptParameters;
 
-			if (eventType == BEGIN)
-			{
-				scriptParameters.insert(VARIABLE_EVENT_TYPE, string("BEGIN"));
-			}
-			else if (eventType == END)
-			{
-				scriptParameters.insert(VARIABLE_EVENT_TYPE, string("END"));
-			}
-
+			scriptParameters.insert(VARIABLE_EVENT_TYPE, string(NotificationEvent::TYPE_NAMES[eventType]));
 			scriptParameters.insert(VARIABLE_SHORT_MESSAGE, alarm->getShortMessage());
 			scriptParameters.insert(VARIABLE_URL, alarm->getDigitizedVersion());
 
@@ -376,4 +374,69 @@ namespace synthese
 			return result;
 		}
 	}
+
+
+
+	ptime NotificationChannel::_getMessageUpdate(
+		const Alarm* alarm,
+		const boost::optional<MessageType&> type,
+		bool& messageTypeFound
+	) {
+		// Initialize with alarm message update timestamp, in case we do not find the requested alternative
+		ptime result = alarm->getLastUpdate();
+		// If type is not set, set messageTypeFound to true
+		messageTypeFound = !type.is_initialized();
+
+		if(type)
+		{
+			util::RegistryKeyType typeKey = type.get().getKey();
+
+			BOOST_FOREACH(const Alarm::MessageAlternatives::value_type& alternative, alarm->getMessageAlternatives())
+			{
+				const MessageType* alternativeType = alternative.first;
+				const MessageAlternative* alternativeMessage = alternative.second;
+				if(alternativeType->getKey() == typeKey)
+				{
+					// Alternative message found, return its content
+					result = alternativeMessage->getLastUpdate();
+					messageTypeFound = true;
+				}
+			}
+		}
+		return result;
+	}
+
+
+
+	bool NotificationChannel::checkForUpdate(const Alarm* alarm, boost::shared_ptr<NotificationEvent> beginEvent)
+	{
+		if (!alarm->isActivated())
+		{
+			return false;
+		}
+
+		boost::optional<NotificationProvider&> provider = beginEvent->get<NotificationProvider>();
+		boost::optional<MessageType&> type = provider->get<MessageTypeBegin>();
+		bool messageTypeFound = false;
+		ptime messageUpdate = _getMessageUpdate(alarm, type, messageTypeFound);
+
+		if (false == messageTypeFound)
+		{
+			const std::string details = "Type de message manquant: " + (type ? type->getName() : "indéfini");
+			NotificationLog::AddNotificationProviderFailure(&(provider.get()), details, alarm);
+		}
+
+		bool result = false;
+		if (beginEvent->get<LastAttempt>().is_not_a_date_time())
+		{
+			result = (messageUpdate > beginEvent->get<Time>());
+		}
+		else
+		{
+			result = (messageUpdate > beginEvent->get<LastAttempt>()
+					&& beginEvent->get<Status>() >= FAILED);
+		}
+		return result;
+	}
+
 }

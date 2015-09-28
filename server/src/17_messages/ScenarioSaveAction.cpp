@@ -1109,7 +1109,7 @@ namespace synthese
 							{
 
 							}
-							alternative->set<Content>(alternativeNode.second.get("content", string()));
+							alternative->setContent(alternativeNode.second.get("content", string()));
 
 							// Save
 							MessageAlternativeTableSync::Save(alternative.get(), transaction);

@@ -23,6 +23,7 @@
 #include "MessagesModule.h"
 
 #include "AlarmObjectLink.h"
+#include "AlarmTableSync.h"
 #include "BroadcastPoint.hpp"
 #include "CommercialLine.h"
 #include "Env.h"
@@ -397,20 +398,8 @@ namespace synthese
 			}
 			return processedEvents;
 		}
-		
-		bool MessagesModule::_selectMessagesToActivate( const Alarm& object )
-		{
-			// Now
-			ptime now(second_clock::local_time());
 
-			// Record active message
-			if(!object.isApplicable(now))
-			{
-				return false;
-			}
 
-			return true;
-		}
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Updates the activated messages cache
@@ -419,52 +408,67 @@ namespace synthese
 			// Wait for the availability of the cache
 			mutex::scoped_lock lock(_activatedMessagesMutex);
 
-			// Duplicate the cache to run unactivation triggers
-			ActivatedMessages unactivatedMessages(_activatedMessages);
+			const ptime now(second_clock::local_time());
 
 			// Loop on all messages
-			Alarm::Registry::Vector messagesToUpdate(
-				Env::GetOfficialEnv().getRegistry<Alarm>().getVector(&_selectMessagesToActivate)
+			const Alarm::Registry::Vector messages(
+				Env::GetOfficialEnv().getRegistry<Alarm>().getVector()
 			);
 			recursive_mutex::scoped_lock registryLock(Env::GetOfficialEnv().getRegistry<Alarm>().getMutex());
 
 			BOOST_FOREACH(
 				const Alarm::Registry::Vector::value_type& message,
-				messagesToUpdate
+				messages
 			){
-				// Remove the message as unactivated one
-				unactivatedMessages.erase(message);
+				if (message->isApplicable(now)) {
 
-				// Check if the message was already activated
-				if(_activatedMessages.find(message) == _activatedMessages.end())
+					// Change message activation date
+					if (!message->isActivated())
+					{
+						message->activationStarted();
+						AlarmTableSync::Save(&(*message));
+					}
+
+					// Check if the message is already in activated cache
+					if(_activatedMessages.find(message) == _activatedMessages.end())
+					{
+						// Record the message as activated
+						_activatedMessages.insert(message);
+
+						// Run the display start trigger on each broadcast point
+						BOOST_FOREACH(
+							const BroadcastPoint::BroadcastPoints::value_type& bp,
+							BroadcastPoint::GetBroadcastPoints()
+						){
+							bp->onDisplayStart(*message);
+						}
+					}
+				}
+				else
 				{
-					// Record the message as activated
-					_activatedMessages.insert(message);
+					if(_activatedMessages.find(message) != _activatedMessages.end())
+					{
+						// Remove from cache
+						_activatedMessages.erase(message);
+					}
 
-					// Run the display start trigger on each broadcast point
-					BOOST_FOREACH(
-						const BroadcastPoint::BroadcastPoints::value_type& bp,
-						BroadcastPoint::GetBroadcastPoints()
-					){
-						bp->onDisplayStart(*message);
+					// Change message activation date
+					if (message->isActivated())
+					{
+						message->activationEnded();
+						AlarmTableSync::Save(&(*message));
+
+						// Run the display end trigger
+						BOOST_FOREACH(
+							const BroadcastPoint::BroadcastPoints::value_type& bp,
+							BroadcastPoint::GetBroadcastPoints()
+						){
+							bp->onDisplayEnd(*message);
+						}
 					}
 				}
 			}
 
-			// Erase deactivated messages
-			BOOST_FOREACH(const ActivatedMessages::value_type& sentMessage, unactivatedMessages)
-			{
-				// Remove from cache
-				_activatedMessages.erase(sentMessage);
-
-				// Run the display end trigger
-				BOOST_FOREACH(
-					const BroadcastPoint::BroadcastPoints::value_type& bp,
-					BroadcastPoint::GetBroadcastPoints()
-				){
-					bp->onDisplayEnd(*sentMessage);
-				}
-			}
 		}
 		
 		bool MessagesModule::_enableScenarioIfAutoActivation( SentScenario* sscenario )
