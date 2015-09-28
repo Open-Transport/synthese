@@ -573,7 +573,7 @@
             </label>
             <label>Depuis l'arrêt
               <select class="input-large" field="start_stop_point" onkeyup="activateForm()" onchange="activateForm()">
-                <option value="-1">Aucun</option>
+                <option value="0">Aucun</option>
 		<?StopAreasListFunction&group_by_cities=1&output_stops=1&stops_directions=3&template=
 			<{city&template=
 				<@city_name=<@name@>@>
@@ -593,7 +593,7 @@
             </label>
             <label>Jusque l'arrêt
               <select class="input-large" field="end_stop_point" onkeyup="activateForm()" onchange="activateForm()">
-                <option value="-1">Aucun</option>
+                <option value="0">Aucun</option>
 		<?StopAreasListFunction&group_by_cities=1&output_stops=1&stops_directions=3&template=
 			<{city&template=
 				<@city_name=<@name@>@>
