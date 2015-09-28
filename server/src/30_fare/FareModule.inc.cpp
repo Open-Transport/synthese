@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace fare
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

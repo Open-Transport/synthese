@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace server
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace regulation
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace pt_website
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

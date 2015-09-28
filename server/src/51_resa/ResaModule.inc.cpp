@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace resa
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

@@ -23,19 +23,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // At first to avoid the Windows bug "WinSock.h has already been included"
-#include "ServerModule.h"
+//#include "ServerModule.h"
 
 #ifdef VLD
 #include <vld.h>
 #endif
 
 #include "Exception.h"
-#include "Log.h"
-#include "Factory.h"
-#include "ModuleClass.h"
-#include "Language.hpp"
-#include "DBModule.h"
-#include "15_server/version.h"
+//#include "Log.h"
+//#include "Factory.h"
+//#include "ModuleClass.h"
+//#include "Language.hpp"
+//#include "DBModule.h"
+//#include "15_server/version.h"
 
 #include <csignal>
 #include <string>
@@ -50,15 +50,15 @@
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+//#include "includes.cpp.inc"
 
-// included auto generated code
-#include "includes.cpp.inc"
+#include <dlfcn.h>
 
 using namespace boost;
 using namespace std;
-using namespace synthese::util;
-using namespace synthese::db;
-using namespace synthese::server;
+//using namespace synthese::util;
+//using namespace synthese::db;
+//using namespace synthese::server;
 
 namespace po = boost::program_options;
 
@@ -90,7 +90,7 @@ void sig_INT_handler(int sig)
 	
 	// Catch INT signal and close server properly with exit.
 	// This allows profiling info to be dumped.
-	Log::GetInstance ().info ("Caught signal no. " + lexical_cast<string>(sig));
+	//Log::GetInstance ().info ("Caught signal no. " + lexical_cast<string>(sig));
 
 	// Ignore if we crash in the stop procedure
 	setSigHandlers(SIG_DFL);
@@ -112,19 +112,20 @@ void sig_PIPE_handler(int sig)
 {
 	// Catch SIGPIPE and ignore it. We do not want the program to
 	// die on a broken pipe error, which is well detected at socket level.
-	Log::GetInstance ().info ("Ignoring broken pipe.");
+	//Log::GetInstance ().info ("Ignoring broken pipe.");
 }
 
 
 
 pid_t daemonize ()
 {
+#if 0
 	pid_t pid;
 	if (getppid () == 1) return getpid();
 	pid = fork ();
 	if (pid < 0)
 	{
-		Log::GetInstance ().fatal ("fork() failed !");
+		//Log::GetInstance ().fatal ("fork() failed !");
 		exit (1);
 	}
 	if (pid > 0)
@@ -140,17 +141,19 @@ pid_t daemonize ()
 	umask(022);
 	if (setsid () < 0)
 	{
-		Log::GetInstance ().fatal ("setsid() failed !");
+		//Log::GetInstance ().fatal ("setsid() failed !");
 		exit (1);
 	}
 
 	if (chdir ("/") < 0)
 	{
-		Log::GetInstance ().fatal ("chdir(\"/\") failed !");
+		//Log::GetInstance ().fatal ("chdir(\"/\") failed !");
 		exit (1);
 	}
 
 	return getpid();
+#endif
+	return 0;
 }
 
 #endif
@@ -180,6 +183,7 @@ filesystem::path createCompletePath (const std::string& s)
 
 void quit(bool doExit)
 {
+#if 0
 	// End all threads
 	ServerModule::KillAllHTTPThreads(false);
 	ServerModule::End();
@@ -204,6 +208,7 @@ void quit(bool doExit)
 	{
 		exit(0);
 	}
+#endif
 }
 
 
@@ -251,7 +256,7 @@ int main( int argc, char **argv )
 			po::variables_map vm;
 			po::store(po::parse_command_line(argc, argv, desc), vm);
 			po::notify(vm);
-
+#if 0
 			if (vm.count("version"))
 			{
 				std::cout << "SYNTHESE " << SYNTHESE_VERSION << " " <<
@@ -266,7 +271,7 @@ int main( int argc, char **argv )
 
 				return 1;
 			}
-
+#endif
 			if (vm.count("help"))
 			{
 				std::cout << desc << std::endl;
@@ -275,7 +280,7 @@ int main( int argc, char **argv )
 #ifndef WIN32
 			bool daemonMode (vm.count("daemon") != 0);
 #endif
-
+#if 0
 			ModuleClass::Parameters defaultParams;
 			for (std::vector<std::string>::const_iterator it = params.begin ();
 				it != params.end (); ++it)
@@ -287,7 +292,7 @@ int main( int argc, char **argv )
 
 				defaultParams.insert (std::make_pair (paramName, paramValue));
 			}
-
+#endif
 #ifndef WIN32
 			pid_t pid = getpid ();
 			if(pidf != "-")
@@ -321,7 +326,7 @@ int main( int argc, char **argv )
 				}
 				else
 				{
-					Log::GetInstance ().setOutputStream (logStream);
+					//Log::GetInstance ().setOutputStream (logStream);
 				}
 			}
 
@@ -332,43 +337,85 @@ int main( int argc, char **argv )
 			{
 				pid = daemonize ();
 			}
-			Log::GetInstance ().info ("Process PID = " + lexical_cast<string>(pid) + (daemonMode ? " (daemon mode)" : ""));
+			//sLog::GetInstance ().info ("Process PID = " + lexical_cast<string>(pid) + (daemonMode ? " (daemon mode)" : ""));
 #endif
+//#include "generated.cpp.inc"
+			namespace fs = boost::filesystem;
+			fs::path someDir("/opt/rcs/synthese3/lib");
+			fs::directory_iterator end_iter;
+			typedef std::vector<fs::path> result_set_t;
+			result_set_t modulelib_set;
 
-			// included auto generated code
-#include "generated.cpp.inc"
+			if ( fs::exists(someDir) && fs::is_directory(someDir))
+			{
+				for( fs::directory_iterator dir_iter(someDir) ; dir_iter != end_iter ; ++dir_iter)
+				{
+					if (fs::is_regular_file(dir_iter->status()) )
+					{
+						cout << *dir_iter << endl;
+						modulelib_set.push_back(*dir_iter);
+					}
+				}
+			}
 
+
+			for( result_set_t::const_iterator dir_iter = modulelib_set.begin(); dir_iter != modulelib_set.end() ; ++dir_iter)
+			{
+				// open the library
+				cout << "Opening " << *dir_iter << "...\n";
+				void* handle = dlopen(dir_iter->c_str(), RTLD_LAZY | RTLD_GLOBAL);
+
+				if (!handle) {
+					cerr << "Cannot open library: " << dlerror() << '\n';
+					return 1;
+				}
+
+				// load the symbol
+				cout << "Loading symbol moduleRegister...\n";
+				typedef void (*moduleRegister_t)();
+				moduleRegister_t moduleRegister = (moduleRegister_t) dlsym(handle, "moduleRegister");
+				if (!moduleRegister) {
+					cerr << "Cannot load symbol 'moduleRegister': " << dlerror() << '\n';
+					dlclose(handle);
+					return 1;
+				}
+
+				cout << "Calling moduleRegister...\n";
+				moduleRegister();
+			}
 			const boost::filesystem::path& workingDir = boost::filesystem::current_path();
-			Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
+			//Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
 
+#if 0
+			// Should be done in the module register
 			synthese::Language::Populate();
 			ModuleClass::SetDefaultParameters (defaultParams);
 			DBModule::SetConnectionString(dbConnString);
-
+#endif
 			// Initialize modules
 			//		if (Factory<ModuleClass>::size() == 0)
 			//			throw std::exception("No registered module !");
 
-
+#if 0
 			vector<boost::shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
 			BOOST_FOREACH(const boost::shared_ptr<ModuleClass> module, modules)
 			{
-				Log::GetInstance ().info ("Pre-initializing module " + module->getFactoryKey() + "...");
+				//Log::GetInstance ().info ("Pre-initializing module " + module->getFactoryKey() + "...");
 				module->preInit();
 			}
 
 			BOOST_FOREACH(const boost::shared_ptr<ModuleClass> module, modules)
 			{
-				Log::GetInstance ().info ("Initializing module " + module->getFactoryKey() + "...");
+				//Log::GetInstance ().info ("Initializing module " + module->getFactoryKey() + "...");
 				module->init();
 			}
 
 			BOOST_FOREACH(const boost::shared_ptr<ModuleClass> module, modules)
 			{
-				Log::GetInstance ().info ("Starting module " + module->getFactoryKey() + "...");
+				//Log::GetInstance ().info ("Starting module " + module->getFactoryKey() + "...");
 				module->start();
 			}
-
+#endif
 
 #ifndef WIN32
 			// Create the real PID file
@@ -394,6 +441,7 @@ int main( int argc, char **argv )
 
 			// We pass the data to ServerModule to avoid having it being recompiled
 			// on each version.h change (which triggers many links behind it).
+#if 0
 			ServerModule::InitRevisionInfo(
 				SYNTHESE_VERSION,
 				SYNTHESE_REVISION,
@@ -403,7 +451,7 @@ int main( int argc, char **argv )
 			);
 			ServerModule::RunHTTPServer();
 			ServerModule::Wait();
-
+#endif
 			quit(false);
 		}
 
@@ -411,11 +459,11 @@ int main( int argc, char **argv )
 	}
 	catch (std::exception& e)
 	{
-		Log::GetInstance ().fatal (std::string ("Fatal error : ") + e.what ());
+//		Log::GetInstance ().fatal (std::string ("Fatal error : ") + e.what ());
 	}
 	catch (...)
 	{
-		Log::GetInstance ().fatal ("Unexpected exception.");
+//		Log::GetInstance ().fatal ("Unexpected exception.");
 	}
 	exit(1);
 }

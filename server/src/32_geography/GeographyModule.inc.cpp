@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace geography
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

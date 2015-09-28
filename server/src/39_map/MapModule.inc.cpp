@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace map
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

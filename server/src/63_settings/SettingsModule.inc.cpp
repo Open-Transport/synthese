@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace settings
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

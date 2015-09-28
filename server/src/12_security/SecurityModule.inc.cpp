@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace security
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

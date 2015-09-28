@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace messages
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

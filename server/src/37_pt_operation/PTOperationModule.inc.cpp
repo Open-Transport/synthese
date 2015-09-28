@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace pt_operation
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

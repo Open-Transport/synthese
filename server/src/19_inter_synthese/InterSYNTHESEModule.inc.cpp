@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace inter_synthese
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

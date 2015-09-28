@@ -2,7 +2,7 @@ namespace synthese
 {
 	namespace scom
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }
 

@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace forum
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

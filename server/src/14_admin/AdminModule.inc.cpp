@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace admin
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

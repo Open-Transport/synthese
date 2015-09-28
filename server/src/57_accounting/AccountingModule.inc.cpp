@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace accounting
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

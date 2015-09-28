@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace ineo_terminus
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace departure_boards
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

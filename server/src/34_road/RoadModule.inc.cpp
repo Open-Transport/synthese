@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace road
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

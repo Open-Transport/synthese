@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace dblog
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

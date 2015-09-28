@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace algorithm
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

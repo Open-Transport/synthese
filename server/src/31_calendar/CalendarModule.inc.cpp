@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace calendar
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

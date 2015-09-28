@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace analysis
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

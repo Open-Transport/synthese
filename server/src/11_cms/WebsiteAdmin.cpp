@@ -71,7 +71,6 @@ namespace synthese
 	using namespace cms;
 	using namespace db;
 	using namespace html;
-	using namespace impex;
 	using namespace security;
 	using namespace server;
 	using namespace util;

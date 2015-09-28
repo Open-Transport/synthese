@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace impex
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

@@ -38,14 +38,14 @@ endif()
 foreach(module ${MODULES})
   # Don't include submodules
   if(NOT ${module} MATCHES ".*/.*")
-    target_link_libraries(s3-server ${module})
+#    target_link_libraries(s3-server ${module})
   endif()
 endforeach(module)
 
 target_link_libraries(s3-server ${Boost_LIBRARIES})
 
 if(UNIX)
-  target_link_libraries(s3-server pthread)
+  target_link_libraries(s3-server pthread dl rt -rdynamic)
 endif()
 
 install(TARGETS s3-server DESTINATION bin)

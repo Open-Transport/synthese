@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace cms
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

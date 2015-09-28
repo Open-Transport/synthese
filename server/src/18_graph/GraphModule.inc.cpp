@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace graph
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }

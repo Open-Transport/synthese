@@ -2,6 +2,6 @@ namespace synthese
 {
 	namespace timetables
 	{
-		void moduleRegister();
+		extern "C" void moduleRegister();
 	}
 }
