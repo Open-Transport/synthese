@@ -107,7 +107,7 @@ namespace synthese
 	{
 		MessagesModule::ActivatedMessages MessagesModule::_activatedMessages;
 		boost::mutex MessagesModule::_activatedMessagesMutex;
-		long MessagesModule::_lastMinute(60);
+		boost::posix_time::ptime MessagesModule::_lastSecondActivation;
 		long MessagesModule::_lastMinuteScenario(60);
 		bool MessagesModule::_messagesActivationRanOnce = false;
 		bool MessagesModule::_scenariosActivationRanOnce = false;
@@ -234,7 +234,7 @@ namespace synthese
 			{
 				// Check if a new minute has begun
 				ptime now(second_clock::local_time());
-				if(now.time_of_day().minutes() != _lastMinute)
+				if(now != _lastSecondActivation)
 				{
 					// Change the thread status
 					ServerModule::SetCurrentThreadRunningAction();
@@ -242,8 +242,8 @@ namespace synthese
 					// Update the activated messages cache
 					UpdateActivatedMessages();
 
-					// Update the last seconds cache
-					_lastMinute = now.time_of_day().minutes();
+					// Update the last second
+					_lastSecondActivation = now;
 
 					_messagesActivationRanOnce = true;
 

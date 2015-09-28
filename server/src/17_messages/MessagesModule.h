@@ -89,7 +89,7 @@ namespace synthese
 		private:
 			static ActivatedMessages _activatedMessages;
 			static boost::mutex _activatedMessagesMutex;
-			static long _lastMinute;
+			static boost::posix_time::ptime _lastSecondActivation;
 			static long _lastMinuteScenario;
 			static bool _messagesActivationRanOnce;
 			static bool _scenariosActivationRanOnce;
