@@ -227,11 +227,9 @@ function print_recipient_view(recipient, event, id, cat)
           for(var j=0; j<event.calendar[i].message.length; ++j)
           {
             var current_recipient=event.calendar[i].message[j][recipient+'_recipient'];
-            // Cas ou le recipient est vide : Tous pour line et stoparea, Aucun pour displayscreen
-            if(current_recipient.length == 0 && recipient != 'displayscreen') {
+            if(current_recipient.length == 0) {
               links.push({'id': "", 'parameter': "", 'recipient_id': "0"});
-            }
-            else {
+            } else {
               for(var k=0; k<current_recipient.length; ++k)
               {
                 links.push(current_recipient[k]);
@@ -248,9 +246,6 @@ function print_recipient_view(recipient, event, id, cat)
     for(var i=0; i<links.length; ++i)
     {
       var link = links[i];
-      // Si un link correspond a "Tous" (cas des lignes et arrets, recipient_id==0 ne peut etre verifie 
-      // dans le cas de displayscreen du fait qu'il n'est pas sauve dans ce cas la), 
-      // il prend le dessus sur les autres (qui ne se retrouvent plus dans le resultat)
       if(link.recipient_id == 0)
       {
         s = "Aucun";
@@ -275,7 +270,7 @@ function print_recipient_view(recipient, event, id, cat)
   }
   else
   {
-    s = (recipient == 'displayscreen' ? "Aucun" : "Tous");
+    s = "Aucun";
   }
   $('#view_recipients_'+ recipient + '-' + id + '-' + cat).html(s);
 }
