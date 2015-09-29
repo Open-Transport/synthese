@@ -24,18 +24,18 @@ pip2 install robotframework-databaselibrary
 ```
 $ mkdir result ; cd result
 ``` 
+* execute cmake 
+```
+$ cmake ..
+``` 
+* eventually, some variables like WITH_INEO_TERMINUS might be added to command line to execute optional tests (server must have been built accordingly, ie with same cmake WITH_* variables)
+```
+$ cmake -DWITH_INEO_TERMINUS=ON ..
+``` 
 * run test !
 ```
-export SYNTHESE_ROBOT_DIR=/path/to/synthese3/robot
-```
-export PYTHONPATH=$SYNTHESE_ROBOT_DIR/resources/s3-fakeclient
-```
-pybot $SYNTHESE_ROBOT_DIR/cases/
+$ make check
 ``` 
-Default s3-server binary used is ``/opt/rcs/synthese3/bin/s3-server``. This can be customized doing something like :
-```
-pybot --variable S3_SERVER_BINARY:/path/to/my/own/s3-server ../cases/
-```
-* check results in ``log.html``, ``output.xml`` and  ``report.html``.
+* check results in ``log.html``, ``output.xml`` and  ``report.html`` in appropriate subdirs.
 * intermediate log and data files created for the purpose of each test case run will lie in the matching subfolder. Note that it is a good idea to clear completely this subfolder if you want to run the same test again !
-* note that some tests require s3-server to be generated with specific flags (e.g. Ineo-Terminus tests require -DWITH_INEO_TERMINUS=ON)
+

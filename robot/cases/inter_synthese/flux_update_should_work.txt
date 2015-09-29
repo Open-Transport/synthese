@@ -8,9 +8,9 @@ Test Teardown     Run Keywords    Stop Synthese On Node 1     Stop Synthese On N
 
 First Update Of An InterSynthese Slave Should Work
     On Node 0
-    ${http_response}=    Create Synthese Object    table_id=${ALERTS_TABLE_ID}
+    ${http_response}=    Create Synthese Object    table_id=${ALARMS_TABLE_ID}
     ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
-    ${config_id}=    Config "config1" Containing Object ${ALERTS_TABLE_ID} Is Created
+    ${config_id}=    Config "config1" Containing Object ${ALARMS_TABLE_ID} Is Created
     ${slave_id}=    Slave "slave1" Is Created On Config "${config_id}"
     On Node 1
     ${tmp_node}=  Set Variable  ${NODES[0]}

@@ -63,7 +63,6 @@ set(MODULES
 59_road_journey_planner
 60_analysis
 61_data_exchange
-62_regulation
 63_settings)
 
 if(WITH_MYSQL)
@@ -77,6 +76,10 @@ endif()
 
 if (WITH_INEO_TERMINUS)
   list(APPEND MODULES 61_ineo_terminus)
+endif()
+
+if(WITH_REGULATION)
+  list(APPEND MODULES 62_regulation)
 endif()
 
 include_directories(${PROJ_INCLUDE_DIRS})
