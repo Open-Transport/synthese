@@ -124,7 +124,7 @@ if (WITH_61_DATA_EXCHANGE)
 endif()
 
 option(WITH_61_INEO_TERMINUS "Module 61_INEO_TERMINUS" OFF)
-if (WITH_INEO_TERMINUS)
+if (WITH_61_INEO_TERMINUS)
   list(APPEND MODULES 61_ineo_terminus)
 endif()
 
