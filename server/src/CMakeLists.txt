@@ -118,11 +118,6 @@ if(WITH_SCOM)
   add_definitions(-DWITH_SCOM)
 endif()
 
-option(WITH_61_DATA_EXCHANGE "Module 61_DATE_EXCHANGE" OFF)
-if (WITH_61_DATA_EXCHANGE)
-  list(APPEND MODULES 61_data_exchange)
-endif()
-
 option(WITH_61_INEO_TERMINUS "Module 61_INEO_TERMINUS" OFF)
 if (WITH_61_INEO_TERMINUS)
   list(APPEND MODULES 61_ineo_terminus)
@@ -153,5 +148,13 @@ foreach(module ${MODULES})
     add_subdirectory(${module})
   endif()
 endforeach(module)
+
+# This module is dynamicaly loaded
+option(WITH_61_DATA_EXCHANGE "Module 61_DATE_EXCHANGE" OFF)
+if (WITH_61_DATA_EXCHANGE)
+  # Do not put is in MODULES to not have it being linked with s3-server
+  include_directories("${PROJECT_SOURCE_DIR}/src/61_data_exchange")
+  add_subdirectory("61_data_exchange")
+endif()
 
 add_subdirectory(bin)

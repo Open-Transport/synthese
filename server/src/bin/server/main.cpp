@@ -54,6 +54,8 @@
 // included auto generated code
 #include "includes.cpp.inc"
 
+#include <dlfcn.h> //dlopen
+
 using namespace boost;
 using namespace std;
 using namespace synthese::util;
@@ -246,7 +248,8 @@ int main( int argc, char **argv )
 #ifndef WIN32
 				("pidfile", po::value<std::string>(&pidf)->default_value (std::string ("s3_server.pid")), "PID file ( - = no pid file )")
 #endif
-				("param", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)");
+				("param", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)")
+				("with_data_exchange", "with data exchange module");
 
 			po::variables_map vm;
 			po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -350,6 +353,35 @@ int main( int argc, char **argv )
 			//			throw std::exception("No registered module !");
 
 
+			// dlopen optional libraries
+
+			// open the library
+			if (vm.count("with_data_exchange"))
+			{
+//				std::string dllib("../../61_data_exchange/lib61_data_exchange.so");
+				std::string dllib("/opt/rcs/synthese3/lib/lib61_data_exchange.so");
+				cout << "Opening " << dllib << "...\n";
+				void* handle = dlopen(dllib.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+
+				if (!handle) {
+					cerr << "Cannot open library: " << dlerror() << '\n';
+					return 1;
+				}
+
+				// load the symbol
+				cout << "Loading symbol moduleRegister for " << dllib << "\n";
+				typedef void (*moduleRegister_t)();
+				moduleRegister_t moduleRegister = (moduleRegister_t) dlsym(handle, "moduleRegister");
+				if (!moduleRegister) {
+					cerr << "Cannot load symbol 'moduleRegister' for " << dllib << ": " << dlerror() << '\n';
+					dlclose(handle);
+					return 1;
+				}
+
+				cout << "Calling moduleRegister for " << dllib << "\n";
+				moduleRegister();
+			}
+			// Normal load load
 			vector<boost::shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
 			BOOST_FOREACH(const boost::shared_ptr<ModuleClass> module, modules)
 			{

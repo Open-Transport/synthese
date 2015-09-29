@@ -35,6 +35,7 @@ if(WIN32)
   set_target_properties(s3-server PROPERTIES LINK_FLAGS "/INCREMENTAL:NO")
 endif()
 
+set (CMAKE_EXE_LINKER_FLAGS "-Wl,--no-as-needed")
 foreach(module ${MODULES})
   # Don't include submodules
   if(NOT ${module} MATCHES ".*/.*")
@@ -45,7 +46,7 @@ endforeach(module)
 target_link_libraries(s3-server ${Boost_LIBRARIES})
 
 if(UNIX)
-  target_link_libraries(s3-server pthread)
+  target_link_libraries(s3-server pthread dl)
 endif()
 
 install(TARGETS s3-server DESTINATION bin)

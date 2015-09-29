@@ -176,6 +176,7 @@ if(WITH_61_DATA_EXCHANGE)
   target_link_libraries(61_data_exchange
     00_framework
     01_util
+    06_openstreetmap
     10_db
     12_security
     16_impex
