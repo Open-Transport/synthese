@@ -112,7 +112,7 @@ namespace synthese
 		){
 			ReplaceQuery<UserFavoriteJourneyTableSync> query(*object);
 			query.addField(object->getUser() ? object->getUser()->getKey() : RegistryKeyType(0));
-			query.addField(object->getRank().value_or(0));
+			query.addField(object->getRank().get_value_or(0));
 			query.addField(object->getOriginCityName());
 			query.addField(object->getOriginPlaceName());
 			query.addField(object->getDestinationCityName());

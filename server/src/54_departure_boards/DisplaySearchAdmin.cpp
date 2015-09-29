@@ -131,19 +131,19 @@ namespace synthese
 				m.insert(PARAMETER_SEARCH_CITY, _searchCity);
 				m.insert(PARAMETER_SEARCH_STOP, _searchStop);
 				m.insert(PARAMETER_SEARCH_NAME, _searchName);
-				m.insert(PARAMETER_SEARCH_LINE_ID, _searchLineId.value_or(0));
+				m.insert(PARAMETER_SEARCH_LINE_ID, _searchLineId.get_value_or(0));
 			}
 			if(_searchTypeId)
 			{
-				m.insert(PARAMETER_SEARCH_TYPE_ID, _searchTypeId.value_or(0));
+				m.insert(PARAMETER_SEARCH_TYPE_ID, _searchTypeId.get_value_or(0));
 			}
 			if(_searchState)
 			{
-				m.insert(PARAMETER_SEARCH_STATE, _searchState.value_or(0));
+				m.insert(PARAMETER_SEARCH_STATE, _searchState.get_value_or(0));
 			}
 			if(_searchMessage)
 			{
-				m.insert(PARAMETER_SEARCH_MESSAGE, _searchMessage.value_or(0));
+				m.insert(PARAMETER_SEARCH_MESSAGE, _searchMessage.get_value_or(0));
 			}
 			return m;
 		}

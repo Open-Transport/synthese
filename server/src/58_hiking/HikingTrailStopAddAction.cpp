@@ -73,7 +73,7 @@ namespace synthese
 					map.insert(PARAMETER_CITY, _stop->getCity()->getName());
 					map.insert(PARAMETER_NAME, _stop->getName());
 				}
-				map.insert(PARAMETER_RANK, _rank.value_or(0));
+				map.insert(PARAMETER_RANK, _rank.get_value_or(0));
 			}
 			return map;
 		}

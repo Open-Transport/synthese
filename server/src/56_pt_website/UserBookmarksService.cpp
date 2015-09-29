@@ -112,7 +112,7 @@ namespace synthese
 				ParametersMap pm(getTemplateParameters());
 
 				pm.insert(Request::PARAMETER_OBJECT_ID, fav->getKey());
-				pm.insert(DATA_RANK, fav->getRank().value_or(0));
+				pm.insert(DATA_RANK, fav->getRank().get_value_or(0));
 				pm.insert(DATA_ORIGIN_CITY_NAME, fav->getOriginCityName());
 				pm.insert(DATA_DESTINATION_PLACE_NAME, fav->getOriginPlaceName());
 				pm.insert(DATA_DESTINATION_CITY_NAME, fav->getDestinationCityName());

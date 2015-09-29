@@ -66,7 +66,7 @@ namespace synthese
 				map.insert(PARAMETER_DISPLAY_PAGE_ID, _displayPage->getKey());
 			}
 			map.insert(PARAMETER_MIN_DEPTH, _minDepth);
-			map.insert(PARAMETER_MAX_DEPTH, _maxDepth.value_or(0));
+			map.insert(PARAMETER_MAX_DEPTH, _maxDepth.get_value_or(0));
 			return map;
 		}
 

@@ -95,7 +95,7 @@ namespace synthese
 			}
 			if(_max_stops_number)
 			{
-				map.insert(PARAMETER_MAX_STOPS_NUMBER, *_max_stops_number.value_or(0));
+				map.insert(PARAMETER_MAX_STOPS_NUMBER, (*_max_stops_number).get_value_or(0));
 			}
 			if(_displayMainPage)
 			{

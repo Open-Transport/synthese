@@ -83,7 +83,7 @@ endif()
 
 # Boost
 
-set(Boost_ADDITIONAL_VERSIONS "1.57")
+set(Boost_ADDITIONAL_VERSIONS "1.55")
 # Uncomment to enable debugging output when finding Boost.
 # set(Boost_DEBUG ON)
 
@@ -104,7 +104,7 @@ add_definitions(-DFUSION_MAX_VECTOR_SIZE=40)
 add_definitions(-DFUSION_MAX_MAP_SIZE=40)
 
 if(NOT DEFINED BOOST_VERSION)
-  set(BOOST_VERSION 1.57)
+  set(BOOST_VERSION 1.55)
 endif()
 
 set(BOOST_LIBS program_options filesystem system random regex thread date_time iostreams unit_test_framework)
@@ -117,7 +117,7 @@ endif()
 if(NOT $ENV{BOOST_ROOT} STREQUAL "")
   set(Boost_NO_SYSTEM_PATHS ON)
 endif()
-find_package(Boost ${BOOST_VERSION} EXACT COMPONENTS ${BOOST_LIBS})
+find_package(Boost ${BOOST_VERSION} COMPONENTS ${BOOST_LIBS})
 if(NOT Boost_FOUND)
   message(FATAL_ERROR "Boost not found")
 endif()

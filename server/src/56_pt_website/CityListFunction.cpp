@@ -68,7 +68,7 @@ namespace synthese
 		{
 			ParametersMap pm(FunctionWithSiteBase::_getParametersMap());
 			pm.insert(PARAMETER_INPUT, _input);
-			pm.insert(PARAMETER_NUMBER, _n.value_or(0));
+			pm.insert(PARAMETER_NUMBER, _n.get_value_or(0));
 			if(_page.get())
 			{
 				pm.insert(PARAMETER_PAGE, _page->getKey());
