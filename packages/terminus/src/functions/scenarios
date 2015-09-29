@@ -192,6 +192,11 @@ template=<{scenario&template=
   </table>
 </div>
 
+</div>
+
+
+</div>
+
 <div class="tab-content">
   <div class="nav hide" id="scenarios_filt">
   </div>
