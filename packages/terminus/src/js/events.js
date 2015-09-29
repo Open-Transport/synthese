@@ -112,50 +112,42 @@ function match_filter(scenario_id, recipient)
           for(var j=0; j<event.calendar[i].message.length; ++j)
           {
             var current_recipient=event.calendar[i].message[j][recipient];
-            // Si la liste des destinataires (line ou stoparea) d'un message est vide, alors considere que le message
-            // est diffuse sur TOUS (ce n'est pas le cas du displayscreen ou le message est diffuse sur AUCUN)
-            if(current_recipient.length == 0 && recipient != 'displayscreen_recipient') {
-              theevent[scenario_id].filtered = 1;
-              break;
-            }
-            else {
-              for(var k=0; k<current_recipient.length; ++k)
+            for(var k=0; k<current_recipient.length; ++k)
+            {
+              for(var z = 0; z < filters[recipient].length; z++)
               {
-                for(var z = 0; z < filters[recipient].length; z++)
+                // Si l'id du destinataire dans le filtre est egal a celui du destinataire dans le msg
+                if(filters[recipient][z].recipient_id == current_recipient[k].recipient_id)
                 {
-                  // Si l'id du destinataire dans le filtre est egal a celui du destinataire dans le msg
-                  if(filters[recipient][z].recipient_id == current_recipient[k].recipient_id)
+                  if(filters[recipient][z].parameter != undefined)
                   {
-                    if(filters[recipient][z].parameter != undefined)
-                    {
-                      if(filters[recipient][z].parameter == current_recipient[k].parameter) {
-                        theevent[scenario_id].filtered = 1;
-                        break;
-                      }
-                    }
-                    else if (current_recipient[k].parameter == "") {
+                    if(filters[recipient][z].parameter == current_recipient[k].parameter) {
                       theevent[scenario_id].filtered = 1;
                       break;
                     }
                   }
+                  else if (current_recipient[k].parameter == "") {
+                    theevent[scenario_id].filtered = 1;
+                    break;
+                  }
                 }
-                for(var z = 0; z < hiddenfilters[recipient].length; z++)
+              }
+              for(var z = 0; z < hiddenfilters[recipient].length; z++)
+              {
+                if(hiddenfilters[recipient][z].recipient_id == current_recipient[k].recipient_id) 
                 {
-                  if(hiddenfilters[recipient][z].recipient_id == current_recipient[k].recipient_id) 
+                  if(hiddenfilters[recipient][z].parameter != undefined)
                   {
-                    if(hiddenfilters[recipient][z].parameter != undefined)
-                    {
-                      if(hiddenfilters[recipient][z].parameter == current_recipient[k].parameter)
-                      {
-                        theevent[scenario_id].filtered = 1;
-                        break;
-                      }
-                    }
-                    else if (current_recipient[k].parameter == "")
+                    if(hiddenfilters[recipient][z].parameter == current_recipient[k].parameter)
                     {
                       theevent[scenario_id].filtered = 1;
                       break;
                     }
+                  }
+                  else if (current_recipient[k].parameter == "")
+                  {
+                    theevent[scenario_id].filtered = 1;
+                    break;
                   }
                 }
               }
@@ -228,7 +220,7 @@ function activate_filter(isOnAllSections)
   for(var i in theevent)
   {
     var matchedAndFilter = true;
-    var matchedOrFilter = true;
+    var matchedOrFilter = false;
     theevent[i].filtered = 0;
     if (filters['displayscreen_recipient'].length > 0)
     {
