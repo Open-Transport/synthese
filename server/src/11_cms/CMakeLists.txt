@@ -1,6 +1,6 @@
 set_source_groups()
 
-set(cms_model_SRCS
+set(cms_SRCS
 Webpage.cpp
 Webpage.h
 WebPageTableSync.cpp
@@ -15,9 +15,6 @@ WebsiteConfigTableSync.cpp
 WebsiteConfigTableSync.hpp
 WebpageContent.cpp
 WebpageContent.hpp
-)
-
-set(cms_SRCS
 AddService.cpp
 AddService.hpp
 AndFunction.cpp
@@ -173,15 +170,13 @@ set_source_files_properties(CMSModule.gen.cpp CMSModule.inc.cpp PROPERTIES HEADE
 include_directories(${PYTHON_INCLUDE_DIR})
 
 add_library(11_cms ${cms_SRCS})
-add_library(11_cms_model ${cms_model_SRCS})
 
 target_link_libraries(
   11_cms
-  11_cms_model
   ${PYTHON_LIBRARY}
   15_server
+  12_security
   20_tree
 )
 
-install(TARGETS 11_cms_model DESTINATION lib)
 install(TARGETS 11_cms DESTINATION lib)

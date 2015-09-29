@@ -60,7 +60,7 @@ set_source_files_properties(TransportWebsiteModule.gen.cpp TransportWebsiteModul
 add_library(56_pt_website ${pt_website_SRCS})
 
 target_link_libraries(56_pt_website
-  11_cms_model
+  11_cms
   53_pt_journey_planner
   # Forward dependencies:
   #59_road_journey_planner

@@ -23,19 +23,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // At first to avoid the Windows bug "WinSock.h has already been included"
-//#include "ServerModule.h"
+#include "ServerModule.h"
 
 #ifdef VLD
 #include <vld.h>
 #endif
 
 #include "Exception.h"
-//#include "Log.h"
-//#include "Factory.h"
-//#include "ModuleClass.h"
-//#include "Language.hpp"
-//#include "DBModule.h"
-//#include "15_server/version.h"
+#include "Log.h"
+#include "Factory.h"
+#include "ModuleClass.h"
+#include "Language.hpp"
+#include "DBModule.h"
+#include "15_server/version.h"
 
 #include <csignal>
 #include <string>
@@ -50,15 +50,15 @@
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-//#include "includes.cpp.inc"
+#include "includes.cpp.inc"
 
 #include <dlfcn.h>
 
 using namespace boost;
 using namespace std;
-//using namespace synthese::util;
-//using namespace synthese::db;
-//using namespace synthese::server;
+using namespace synthese::util;
+using namespace synthese::db;
+using namespace synthese::server;
 
 namespace po = boost::program_options;
 
@@ -280,7 +280,7 @@ int main( int argc, char **argv )
 #ifndef WIN32
 			bool daemonMode (vm.count("daemon") != 0);
 #endif
-#if 0
+//#if 0
 			ModuleClass::Parameters defaultParams;
 			for (std::vector<std::string>::const_iterator it = params.begin ();
 				it != params.end (); ++it)
@@ -292,7 +292,7 @@ int main( int argc, char **argv )
 
 				defaultParams.insert (std::make_pair (paramName, paramValue));
 			}
-#endif
+//#endif
 #ifndef WIN32
 			pid_t pid = getpid ();
 			if(pidf != "-")
@@ -339,7 +339,7 @@ int main( int argc, char **argv )
 			}
 			//sLog::GetInstance ().info ("Process PID = " + lexical_cast<string>(pid) + (daemonMode ? " (daemon mode)" : ""));
 #endif
-//#include "generated.cpp.inc"
+#include "generated.cpp.inc"
 			namespace fs = boost::filesystem;
 			fs::path someDir("/opt/rcs/synthese3/lib");
 			fs::directory_iterator end_iter;
@@ -352,8 +352,11 @@ int main( int argc, char **argv )
 				{
 					if (fs::is_regular_file(dir_iter->status()) )
 					{
-						cout << *dir_iter << endl;
-						modulelib_set.push_back(*dir_iter);
+						if(*dir_iter == "/opt/rcs/synthese3/lib/lib62_ineo_terminus.so")
+						{
+							cout << *dir_iter << endl;
+							modulelib_set.push_back(*dir_iter);
+						}
 					}
 				}
 			}
@@ -386,17 +389,17 @@ int main( int argc, char **argv )
 			const boost::filesystem::path& workingDir = boost::filesystem::current_path();
 			//Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
 
-#if 0
+//#if 0
 			// Should be done in the module register
 			synthese::Language::Populate();
 			ModuleClass::SetDefaultParameters (defaultParams);
 			DBModule::SetConnectionString(dbConnString);
-#endif
+//#endif
 			// Initialize modules
 			//		if (Factory<ModuleClass>::size() == 0)
 			//			throw std::exception("No registered module !");
 
-#if 0
+//#if 0
 			vector<boost::shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
 			BOOST_FOREACH(const boost::shared_ptr<ModuleClass> module, modules)
 			{
@@ -415,7 +418,7 @@ int main( int argc, char **argv )
 				//Log::GetInstance ().info ("Starting module " + module->getFactoryKey() + "...");
 				module->start();
 			}
-#endif
+//#endif
 
 #ifndef WIN32
 			// Create the real PID file
@@ -441,7 +444,7 @@ int main( int argc, char **argv )
 
 			// We pass the data to ServerModule to avoid having it being recompiled
 			// on each version.h change (which triggers many links behind it).
-#if 0
+//#if 0
 			ServerModule::InitRevisionInfo(
 				SYNTHESE_VERSION,
 				SYNTHESE_REVISION,
@@ -451,7 +454,7 @@ int main( int argc, char **argv )
 			);
 			ServerModule::RunHTTPServer();
 			ServerModule::Wait();
-#endif
+//#endif
 			quit(false);
 		}
 
