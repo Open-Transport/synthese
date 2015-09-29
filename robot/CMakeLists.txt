@@ -1,6 +1,11 @@
 
 enable_testing ()
 
+if(NOT S3_SERVER_BINARY)
+  set(S3_SERVER_BINARY "${PROJECT_SOURCE_DIR}/../server/build/src/bin/server/s3-server")
+endif()
+message("Using ${S3_SERVER_BINARY}")
+
 add_subdirectory("cases/inter_synthese")
 add_subdirectory("cases/object_services")
 add_subdirectory("cases/topical_messaging")

@@ -8,7 +8,7 @@ Test Teardown     Run Keywords    Stop Synthese On Node 1     Stop Synthese On N
 
 First Update Of An InterSynthese Package Should Work
     On Node 0
-    ${http_response}=    Create Synthese Object    ${ALARMS_TABLE_ID}   field_kind\=1 
+    ${http_response}=    Create Synthese Object    ${ALARMS_TABLE_ID}   field_level\=1 
     ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
     Package "package2" Containing Object ${created_object_id} Is Created
     On Node 1
@@ -17,17 +17,17 @@ First Update Of An InterSynthese Package Should Work
 
 Second Update Of An InterSynthese Package Should Work
     On Node 0
-    ${http_response}=  Create Synthese Object  ${ALARMS_TABLE_ID}  field_kind\=1
+    ${http_response}=  Create Synthese Object  ${ALARMS_TABLE_ID}  field_level\=1
     ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
     Package "package4" Containing Object ${created_object_id} Is Created
     On Node 1
     Package "package4" Is Updated From Node 0
-    Check Synthese Object Field Equals  object_id=${created_object_id}  field_name=kind  value=1
+    Check Synthese Object Field Equals  object_id=${created_object_id}  field_name=level  value=1
     On Node 0
-    ${http_response}=  Update Synthese Object  ${created_object_id}  actionParam_field_kind\=2
+    ${http_response}=  Update Synthese Object  ${created_object_id}  actionParam_field_level\=2
     On Node 1
     Package "package4" Is Updated From Node 0
-    Check Synthese Object Field Equals  object_id=${created_object_id}  field_name=kind  value=2
+    Check Synthese Object Field Equals  object_id=${created_object_id}  field_name=level  value=2
     
 First Update Of An InterSynthese Package With Only One Default Object Should Work
     On Node 0
