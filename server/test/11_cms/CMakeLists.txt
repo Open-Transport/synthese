@@ -23,7 +23,6 @@ set(DEPS
   11_cms # from pt
   19_inter_synthese
   54_departure_boards
-  61_data_exchange
   37_pt_operation
 )
 

@@ -19,7 +19,6 @@ set(DEPS
   54_departure_boards
   56_pt_website
   59_road_journey_planner
-  61_data_exchange
 )
 
 boost_test(MessageApplicationPeriod "${DEPS}")

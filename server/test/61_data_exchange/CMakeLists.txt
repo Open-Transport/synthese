@@ -1,3 +1,4 @@
+if(61_DATA_EXCHANGE)
 include_directories(${SPATIALITE_INCLUDE_DIRS})
 include_directories(${PROJ_INCLUDE_DIRS})
 include_directories(${GEOS_INCLUDE_DIRS})
@@ -44,3 +45,4 @@ add_definitions(-DPEGASE_TEST_SQL="${CMAKE_CURRENT_SOURCE_DIR}/test_data/pegase_
 boost_test(PegaseFileFormat "${DEPS}")
 add_definitions(-DINEO_FILE_PATTERN="${CMAKE_CURRENT_SOURCE_DIR}/test_data/ineo")
 boost_test(IneoFileFormat "${DEPS}")
+endif(61_DATA_EXCHANGE)

@@ -26,7 +26,6 @@ set(DEPS
   59_road_journey_planner # from 56_pt_website
   56_pt_website # from 54_departure_boards > 36_cms
   54_departure_boards
-  61_data_exchange
   37_pt_operation
 )
 

@@ -1,3 +1,5 @@
+if(WITH_61_DATA_EXCHANGE)
+
 set_source_groups()
 
 set(data_exchange_SRCS
@@ -158,3 +160,4 @@ install(TARGETS 61_data_exchange DESTINATION lib)
 
 #add_subdirectory(testapps/ValidateurTestApp)
 
+endif(WITH_61_DATA_EXCHANGE)

@@ -62,7 +62,6 @@ set(MODULES
 58_hiking
 59_road_journey_planner
 60_analysis
-61_data_exchange
 63_settings)
 
 if(WITH_MYSQL)
@@ -107,5 +106,14 @@ foreach(module ${MODULES})
     add_subdirectory(${module})
   endif()
 endforeach(module)
+
+# This module is dynamicaly loaded and can be not compiled at all
+option(WITH_61_DATA_EXCHANGE "Module 61_DATA_EXCHANGE" ON)
+if (WITH_61_DATA_EXCHANGE)
+  # Do not put is in MODULES to not have it being linked with s3-server
+  add_definitions(-DWITH_61_DATA_EXCHANGE)
+  include_directories("${PROJECT_SOURCE_DIR}/src/61_data_exchange")
+  add_subdirectory("61_data_exchange")
+endif()
 
 add_subdirectory(bin)

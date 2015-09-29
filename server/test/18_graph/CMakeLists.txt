@@ -14,7 +14,6 @@ set(DEPS
   30_fare
   #14_admin # from server
   54_departure_boards
-  61_data_exchange
   37_pt_operation
 )
 

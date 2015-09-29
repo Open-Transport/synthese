@@ -59,7 +59,9 @@
 #include "DataSource.h"
 #include "DataSourceAdmin.h"
 #include "RemoveObjectAction.hpp"
+#ifdef WITH_61_DATA_EXCHANGE
 #include "TridentFileFormat.h"
+#endif
 #include "ExportFunction.hpp"
 #include "ImportableAdmin.hpp"
 #include "DRTArea.hpp"
@@ -74,7 +76,9 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
+#ifdef WITH_61_DATA_EXCHANGE
 	using namespace data_exchange;
+#endif
 	using namespace server;
 	using namespace util;
 	using namespace pt;
@@ -543,6 +547,7 @@ namespace synthese
 
 			////////////////////////////////////////////////////////////////////
 			// TAB EXPORT
+#ifdef WITH_61_DATA_EXCHANGE
 			if (openTabContent(stream, TAB_EXPORT))
 			{
 				StaticFunctionRequest<ExportFunction> tridentExportFunction(_request, true);
@@ -561,7 +566,7 @@ namespace synthese
 				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident Tisséo", string(), "/admin/img/page_white_go.png");
 				stream << "</p>";
 			}
-
+#endif
 			////////////////////////////////////////////////////////////////////
 			// END TABS
 			closeTabContent(stream);
