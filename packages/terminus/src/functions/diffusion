@@ -576,15 +576,15 @@
                 <option value="0">Aucun</option>
 		<?StopAreasListFunction&group_by_cities=1&output_stops=1&stops_directions=3&template=
 			<{city&template=
-				<@city_name=<@name@>@>
+				<@_city_name=<@name@>@>
 				<{stopArea&template=
-					<@stop_area_name=<@name@>@>
+					<@_stop_area_name=<@name@>@>
 					<{stop&template=
-						<@direction=@>
-						<@direction=<{direction&template=<@direction@>}>@>
-						<@option_label=<@city_name@> <@stop_area_name@> <@direction?("dir " + direction):operatorCode@>@>
-						<@option_value=<@id@>@>
-                <option value="<@option_value@>"><@option_label@></option>
+						<@_direction=@>
+						<@_direction=<{direction&template=<@direction@>}>@>
+						<@_option_label=<@_city_name@> <@_stop_area_name@> <@_direction?("dir " + _direction):operatorCode@>@>
+						<@_option_value=<@id@>@>
+                <option value="<@_option_value@>"><@_option_label@></option>
 					}>
 				}>
 			}>
@@ -596,15 +596,15 @@
                 <option value="0">Aucun</option>
 		<?StopAreasListFunction&group_by_cities=1&output_stops=1&stops_directions=3&template=
 			<{city&template=
-				<@city_name=<@name@>@>
+				<@_city_name=<@name@>@>
 				<{stopArea&template=
-					<@stop_area_name=<@name@>@>
+					<@_stop_area_name=<@name@>@>
 					<{stop&template=
-						<@direction=@>
-						<@direction=<{direction&template=<@direction@>}>@>
-						<@option_label=<@city_name@> <@stop_area_name@> <@direction?("dir " + direction):operatorCode@>@>
-						<@option_value=<@id@>@>
-                <option value="<@option_value@>"><@option_label@></option>
+						<@_direction=@>
+						<@_direction=<{direction&template=<@direction@>}>@>
+						<@_option_label=<@_city_name@> <@_stop_area_name@> <@_direction?("dir " + _direction):operatorCode@>@>
+						<@_option_value=<@id@>@>
+                <option value="<@_option_value@>"><@_option_label@></option>
 					}>
 				}>
 			}>
