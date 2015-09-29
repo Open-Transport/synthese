@@ -253,7 +253,7 @@ function print_recipient_view(recipient, event, id, cat)
       // il prend le dessus sur les autres (qui ne se retrouvent plus dans le resultat)
       if(link.recipient_id == 0)
       {
-        s = "Tous";
+        s = "Aucun";
         break;
       }
       else
@@ -304,10 +304,6 @@ function update_filters_preview(recipient, filters)
       }
     }
   }
-//  else
-//  {
-//    s = (recipient == 'displayscreen' ? "Aucun" : "Tous");
-//  }
   $('#recipients_filter_'+ recipient).html(s);
 }
 
