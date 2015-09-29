@@ -349,12 +349,33 @@ namespace synthese
 
 			// Execute the script
 			PyRun_String(script.c_str(), Py_file_input, globals, locals);
-			PyObject* exception = PyErr_Occurred();
 
-			if(NULL != exception)
+			if(NULL != PyErr_Occurred())
 			{
-				// TODO : log properly into SYNTHESE logs (requires another wrapper for Python stderr that points to SYNTHESE logger)
-				PyErr_Print();
+				// The script raised an exception, log it properly
+				std::string pythonError =
+					"Python exception raised in page " + parameters.getDefault<std::string>("id", "") +
+					" (" + parameters.getDefault<std::string>("title", "") + ") : ";
+				PyObject* exceptionType  = NULL;
+				PyObject* exceptionValue = NULL;
+				PyObject* exceptionPyStr = NULL;
+				PyObject* traceback = NULL;
+
+				PyErr_Fetch(&exceptionType, &exceptionValue, &traceback);
+
+				if((NULL != exceptionType) && (NULL != exceptionValue))
+				{
+					exceptionPyStr = PyObject_Str(exceptionValue);
+				}
+
+				pythonError = pythonError + ((NULL != exceptionPyStr) ? PyString_AsString(exceptionPyStr) : "unknown");
+
+				util::Log::GetInstance().error(pythonError);
+
+				Py_XDECREF(exceptionType);
+				Py_XDECREF(exceptionValue);
+				Py_XDECREF(exceptionPyStr);
+				Py_XDECREF(traceback);
 			}
 
 			// Write return values into the map 'variables'

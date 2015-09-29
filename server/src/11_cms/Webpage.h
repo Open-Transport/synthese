@@ -216,7 +216,7 @@ namespace synthese
 				/// @date 2013
 				void display(
 					std::ostream& stream,
-					const util::ParametersMap& additionalParametersMap
+					util::ParametersMap& additionalParametersMap
 				) const;
 
 

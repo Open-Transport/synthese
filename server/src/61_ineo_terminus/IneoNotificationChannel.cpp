@@ -118,16 +118,20 @@ namespace synthese
 			fields.insert("period", periodPM);
 
 			string requestName = provider->getName();
-			if (event->get<EventType>() == BEGIN)
+			string requestType = "";
+			if ((event->get<EventType>() == BEGIN) || (event->get<EventType>() == UPDATE))
 			{
-				fields.insert("type", string("Create"));
-				requestName += "Create";
+				requestType = "Create";
 			}
-			else if (event->get<EventType>() == END)
+			else if ((event->get<EventType>() == END) || (event->get<EventType>() == BEFORE_UPDATE))
 			{
-				fields.insert("type", string("Delete"));
-				requestName += "Delete";
+				requestType = "Delete";
 			}
+
+			fields.insert("type", requestType);
+			requestName += requestType;
+
+
 			fields.insert("messagerie", provider->getName());
 			string requestID = lexical_cast<string>(IneoTerminusConnection::GetTheConnection()->getNextRequestID());
 			fields.insert("ID", requestID);
@@ -136,11 +140,23 @@ namespace synthese
 			fields.insert("xsd_location", IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_XSD_LOCATION));
 			fields.insert("ineo_stop_point_prefix", synthese::data_exchange::IneoFileFormat::Importer_::MNLP_PREFIX);
 
-			if (provider->get<Parameters>().getDefault<RegistryKeyType>(PARAMETER_CMS_INTERPRETER, 0))
+			RegistryKeyType scriptId = provider->get<Parameters>().getDefault<RegistryKeyType>(PARAMETER_CMS_INTERPRETER, 0);
+			const cms::Webpage* scriptPage = NULL;
+
+			try
 			{
-				const cms::Webpage* interpreter = Env::GetOfficialEnv().get<Webpage>(provider->get<Parameters>().get<RegistryKeyType>(PARAMETER_CMS_INTERPRETER)).get();
+				scriptPage = Env::GetOfficialEnv().get<cms::Webpage>(scriptId).get();
+			}
+
+			catch(ObjectNotFoundInRegistryException<cms::Webpage>& onfire)
+			{
+				util::Log::GetInstance().error("Ineo Terminus : provider " + provider->getName() + " has wrong script identifier " + boost::lexical_cast<string>(scriptId));
+			}
+
+			if(NULL != scriptPage)
+			{
 				stringstream message;
-				interpreter->display(message, fields);
+				scriptPage->display(message, fields);
 
 				IneoTerminusConnection::GetTheConnection()->addMessage(message.str());
 				// Log the message in db_log
@@ -148,12 +164,8 @@ namespace synthese
 
 				return true;
 			}
-			else
-			{
-				// Il faut un interpreter
-				util::Log::GetInstance().warn("Interpreter n'existe pas pour cette messagerie (" + provider->getName() + ")");
-				return false;
-			}
+
+			return false;
 		}
 
 	}

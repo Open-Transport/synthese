@@ -145,9 +145,20 @@ namespace synthese
 
 		void Webpage::display(
 			std::ostream& stream,
-			const util::ParametersMap& additionalParametersMap
+			util::ParametersMap& additionalParametersMap
 		) const	{
 			StaticFunctionRequest<WebPageDisplayFunction> fakeRequest;
+
+			// This version of 'display' is invoked with a parameters map that does not contain webpage properties
+			if(false == additionalParametersMap.isDefined("id"))
+			{
+				additionalParametersMap.insert("id", get<Key>());
+			}
+			if(false == additionalParametersMap.isDefined("title"))
+			{
+				additionalParametersMap.insert("title", get<Title>());
+			}
+
 			display(stream, fakeRequest, additionalParametersMap);
 		}
 

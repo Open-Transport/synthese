@@ -1326,25 +1326,33 @@ namespace synthese
 
 			transaction.run();
 
+			// The operation may have activated or deactivated the scenario or change its calendars, so force an update of the cache of activated messages
+			MessagesModule::UpdateActivatedMessages();
+
 			// Notify broadcast points of message modifications
 			if(true == notifyBroadcastPoints)
 			{
-				BOOST_FOREACH(const Alarm* message, _sscenario->getMessages())
+				// Note : The scenario and its messages must be reread from the registry, because during the update the recipients are added to the registry object
+				// and not to the instance we are processing (this is highly counter-intuitive)
+				boost::shared_ptr<SentScenario> registryScenarioSptr = Env::GetOfficialEnv().getEditableRegistry<SentScenario>().getEditable(_sscenario->getKey());
+
+				// Do not notify an update if the scenario is not enabled : if its status changed, it has been already notified by UpdateActivatedMessages()
+				if(true == registryScenarioSptr->getIsEnabled())
 				{
-					// Note : The message must be reread from the registry, because during the update the recipients are added to the registry object
-					// and not to the instance we are processing (this is highly counter-intuitive)
-					boost::shared_ptr<Alarm> registryMessagePtr = Env::GetOfficialEnv().getEditableRegistry<Alarm>().getEditable(message->getKey());
-					Alarm* registryMessage = registryMessagePtr.get();
-
-					if(true == registryMessage->isApplicable(now))
+					BOOST_FOREACH(const Alarm* message, registryScenarioSptr->getMessages())
 					{
+						boost::shared_ptr<Alarm> registryMessageSptr = Env::GetOfficialEnv().getEditableRegistry<Alarm>().getEditable(message->getKey());
+						Alarm* registryMessage = registryMessageSptr.get();
 
-						// Run the display start trigger on each broadcast point
-						BOOST_FOREACH(
-							const BroadcastPoint::BroadcastPoints::value_type& bp,
-							BroadcastPoint::GetBroadcastPoints()
-						){
-							bp->afterMessageUpdate(*registryMessage);
+						if(true == registryMessage->isApplicable(now))
+						{
+							// Run the display start trigger on each broadcast point
+							BOOST_FOREACH(
+								const BroadcastPoint::BroadcastPoints::value_type& bp,
+								BroadcastPoint::GetBroadcastPoints()
+							){
+								bp->afterMessageUpdate(*registryMessage);
+							}
 						}
 					}
 				}
