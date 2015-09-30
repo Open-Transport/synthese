@@ -74,7 +74,8 @@ if(WITH_SCOM)
   add_definitions(-DWITH_SCOM)
 endif()
 
-if (WITH_INEO_TERMINUS)
+OPTION(WITH_61_INEO_TERMINUS "With module 61_INEO_TERMINUS" ON)
+if (WITH_61_INEO_TERMINUS)
   list(APPEND MODULES 61_ineo_terminus)
 endif()
 
