@@ -120,14 +120,20 @@ theevent["<@roid@>"] = {
       </td>
       <td class="min-date">
         <script>
+function parse_date(dateIsoString) {
+  var date = new Date(dateIsoString);  
+  date = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
+  return date;
+}
+        
 var dates = [];
 	<{calendar&template=
 		<{application_period&template=
 if("<@start_time@>"){
-  dates.push(Date.parse("<@start_time@>".replace(" ","T")));
+  dates.push(parse_date("<@start_time@>".replace(" ","T")));
 }
 if("<@end_time@>"){
-  dates.push(Date.parse("<@end_time@>".replace(" ","T")));
+  dates.push(parse_date("<@end_time@>".replace(" ","T")));
 }
 		}>
 	}>
