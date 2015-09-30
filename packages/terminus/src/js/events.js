@@ -292,10 +292,10 @@ function activate_filter(isOnAllSections)
             for(var k=0; k<theevent[i].calendar[j].application_period.length; ++k)
             {
               if (theevent[i].calendar[j].application_period[k].start_date != undefined && theevent[i].calendar[j].application_period[k].start_date != "") {
-                dates.push(Date.parse(theevent[i].calendar[j].application_period[k].start_date.replace(" ","T")));
+                dates.push(parse_date(theevent[i].calendar[j].application_period[k].start_date.replace(" ","T")));
               }
               if (theevent[i].calendar[j].application_period[k].end_date != undefined && theevent[i].calendar[j].application_period[k].end_date != "") {
-                dates.push(Date.parse(theevent[i].calendar[j].application_period[k].end_date.replace(" ","T")));
+                dates.push(parse_date(theevent[i].calendar[j].application_period[k].end_date.replace(" ","T")));
               }
               if (dates.length > 0) {
                 min = new Date(Math.min.apply(null, dates));
@@ -462,6 +462,14 @@ function activate_filter(isOnAllSections)
     $.bootstrapSortable(true);
 }
 // FIN AJOUT TERMINUS 2.2
+
+
+function parse_date(dateIsoString) {
+  var date = new Date(dateIsoString);  
+  date = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
+  return date;
+}
+
 
 
 $(function(){
