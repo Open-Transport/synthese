@@ -79,7 +79,8 @@ if (WITH_61_INEO_TERMINUS)
   list(APPEND MODULES 61_ineo_terminus)
 endif()
 
-if(WITH_REGULATION)
+OPTION(WITH_62_REGULATION "With module 62_REGULATION" ON)
+if(WITH_62_REGULATION)
   list(APPEND MODULES 62_regulation)
 endif()
 
