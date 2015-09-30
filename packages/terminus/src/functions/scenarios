@@ -372,25 +372,67 @@ template=<{network&template=
 group_by_cities=1&
 output_stops=1&
 stops_directions=3&
+output_lines_in_stops=1&
 template=<{city&template=
+	<@displayCity=0@>
+	<?if&cond=<@~global("terminus_networks")@>&then=
+		<{stopArea&template=
+			<{stop&template=
+				<{line&template=
+					<?if&cond=<?StrStr&text=<@~global("terminus_networks")@>&match=<@line_network_id@>?>&then=
+						<@displayCity=1@>
+					?>
+				}>
+			}>
+		}>
+	&else=
+		<@displayCity=1@>
+	?>
+	<?if&cond=<@displayCity@>&then=
     <div>
       <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@city_id@>" name="0"> Commune <@city_name@></label>
       <div style="padding-left:30px;" class="hide">
-	<{stopArea&template=
+		<{stopArea&template=
+			<@displayStopArea=0@>
+			<?if&cond=<@~global("terminus_networks")@>&then=
+				<{stop&template=
+					<{line&template=
+						<?if&cond=<?StrStr&text=<@~global("terminus_networks")@>&match=<@line_network_id@>?>&then=
+							<@displayStopArea=1@>
+						?>
+					}>
+				}>
+			&else=
+				<@displayStopArea=1@>
+			?>
+			<?if&cond=<@displayStopArea@>&then=
         <div>
           <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>" name="1"> Arrêt commercial <@name@></label>
-		<@stop_area_name=<@name@>@>
+				<@stop_area_name=<@name@>@>
           <div style="padding-left:30px;" class="hide">
-		<{stop&template=
+				<{stop&template=
+					<@displayStop=0@>
+					<?if&cond=<@~global("terminus_networks")@>&then=
+						<{line&template=
+							<?if&cond=<?StrStr&text=<@~global("terminus_networks")@>&match=<@line_network_id@>?>&then=
+								<@displayStop=1@>
+							?>
+						}>
+					&else=
+						<@displayStop=1@>
+					?>
+					<?if&cond=<@displayStop@>&then=
             <div>
-			<@direction=@>
-			<@direction=<{direction&template=<@direction@> }>@>
+						<@direction=@>
+						<@direction=<{direction&template=<@direction@> }>@>
               <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>" name="2"> Arrêt <@stop_area_name@> <@direction?("direction "+direction):operatorCode@></label>
             </div>
-		}>
+					?>
+				}>
           </div>
         </div>
-	}>
+			?>
+		}>
       </div>
     </div>
 }>?>
