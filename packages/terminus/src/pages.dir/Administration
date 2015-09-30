@@ -880,6 +880,22 @@ then=
           </form>
         </div>
       </div>
+      <div class="control-group">
+        <label class="control-label" for="terminus_networks">Réseaux de transport concernés par Terminus</label>
+        <div class="controls">
+          <?form&
+          target=<@p@>&
+          tab=system&
+          a=global_variable_update&
+          actionParam_variable=terminus_networks&
+          actionParam_persistent=1&
+          class=form-inline&
+          ?>
+            <input type="text" name="actionParam_value" value="<@~global("terminus_networks")@>" />
+            <button type="submit" class="btn btn-danger">Modifier</button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
   <#tab_div&id=ineo#>
