@@ -27,6 +27,8 @@ $ mkdir result ; cd result
 * execute cmake 
 ```
 $ cmake ..
+To specify the location of you s3-server binary, invoke cmake with S3_SERVER_BINARY :
+$ cmake -DS3_SERVER_BINARY=/absolute/path/to/your/s3-server ..
 ``` 
 * eventually, some variables like WITH_INEO_TERMINUS might be added to command line to execute optional tests (server must have been built accordingly, ie with same cmake WITH_* variables)
 ```

@@ -627,8 +627,8 @@ namespace synthese
 			const SentScenario* leftScenario = dynamic_cast<const SentScenario*>(leftGenericScenario);
 			const SentScenario* rightScenario = dynamic_cast<const SentScenario*>(rightGenericScenario);
 
-			if (!leftScenario) return 0;
-			if (!rightScenario) return 0;
+			if (!leftScenario) return false;
+			if (!rightScenario) return true;
 			
 			if(!leftScenario->getPeriodStart().is_not_a_date_time())
 			{

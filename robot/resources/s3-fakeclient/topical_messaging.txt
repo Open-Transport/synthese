@@ -18,7 +18,7 @@ Topical Message ${message_id} Is Bounded To Broadcast Point Type ${broadcast_poi
 
         
 Broadcast Of ${message_id} Is Enabled
-    ${http_response}=  Call Synthese Action   scenario_save   actionParamt\=0   actionParam_created_message_title\=${message.title}   actionParamme\=${message.content}   actionParamsid\=${message.id}   actionParamis\=16607027920896004   actionParamena\=1   actionParam_recipients_displayscreen\=${broadcast_point_type_id}   actionParamdv\=%20  actionParamnam\=00  
+    ${http_response}=  Call Synthese Action   scenario_save   actionParamt\=0   actionParam_created_message_title\=${message.title}   actionParamme\=${message.content}   actionParamsid\=${message.id}   actionParamis\=16607027920896004   actionParamena\=1   actionParam_recipients_displayscreen\=${broadcast_point_type_id}   actionParamdv\=%20  actionParamnam\=00     actionParamle=10
     Should Be Equal As Strings    ${http_response.status_code}    200
 
 
