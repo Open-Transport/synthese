@@ -69,19 +69,16 @@ if(WITH_MYSQL)
   list(APPEND MODULES 10_db/102_mysql)
 endif()
 
-OPTION(WITH_62_SCOM "With module 62_SCOM" OFF)
-if(WITH_62_SCOM)
+if(WITH_SCOM)
   list(APPEND MODULES 62_scom)
   add_definitions(-DWITH_SCOM)
 endif()
 
-OPTION(WITH_61_INEO_TERMINUS "With module 61_INEO_TERMINUS" ON)
-if (WITH_61_INEO_TERMINUS)
+if (WITH_INEO_TERMINUS)
   list(APPEND MODULES 61_ineo_terminus)
 endif()
 
-OPTION(WITH_62_REGULATION "With module 62_REGULATION" ON)
-if(WITH_62_REGULATION)
+if(WITH_REGULATION)
   list(APPEND MODULES 62_regulation)
 endif()
 
