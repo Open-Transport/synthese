@@ -86,65 +86,75 @@ hiddenfilters = {
     <input type="text" class="input-medium search-query pull-right" action="search">
 <?PTNetworksListFunction&
 template=<{network&template=
+	<@displayNetwork=0@>
+	<?if&cond=<@~global("terminus_networks")@>&then=
+		<?if&cond=<?StrStr&text=<@~global("terminus_networks")@>&match=<@id@>?>&then=
+			<@displayNetwork=1@>
+		?>
+	&else=
+		<@displayNetwork=1@>
+	?>
+	<?if&cond=<@displayNetwork@>&then=
     <div>
       <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" name="0"> Réseau <@name@></label>
       <div style="padding-left:30px;" class="hide">
-	<?tree_folders&
-	recursive=1&
-	roid=<@id@>&
-	template=<{folder&template=
+		<?tree_folders&
+		recursive=1&
+		roid=<@id@>&
+		template=<{folder&template=
         <div>
-		<@lines_menu=<?LinesListFunction2&
-		ni=<@id@>&
-		with_directions=1&
-		template=<{line&template=
+			<@lines_menu=<?LinesListFunction2&
+			ni=<@id@>&
+			with_directions=1&
+			template=<{line&template=
           <div>
             <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" name="1"> <@line_short_name@> <@name@></label>
             <div style="padding-left:30px;" class="hide">
               <div>
-			<@direction=<{forward_direction&template=<@direction@> }>@>
+				<@direction=<{forward_direction&template=<@direction@> }>@>
                 <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="0" name="2"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"aller"@></label>
-			<@direction=@>
+				<@direction=@>
               </div>
               <div>
-			<@direction=<{backward_direction&template=<@direction@> }>@>
+				<@direction=<{backward_direction&template=<@direction@> }>@>
                 <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="1" name="2"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"retour"@></label>
               </div>
             </div>
           </div>
-		}>?>@>
-		<?if&
-		cond=<@recursive_content@><@lines_menu@>&then=
+			}>?>@>
+			<?if&
+			cond=<@recursive_content@><@lines_menu@>&then=
           <i class="icon-chevron-right openclose"></i>
-		?>
+			?>
           <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" name="2"> <@name@></label>
           <div style="padding-left:30px;" class="hide">
-			<@recursive_content@>
-			<@lines_menu@>
+				<@recursive_content@>
+				<@lines_menu@>
           </div>
         </div>
-	}>?>
-	<?LinesListFunction2&
-	ni=<@id@>,0&
-	with_directions=1&
-	template=<{line&template=
+		}>?>
+		<?LinesListFunction2&
+		ni=<@id@>,0&
+		with_directions=1&
+		template=<{line&template=
         <div>
           <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" name="1"> <@line_short_name@> <@name@></label>
           <div style="padding-left:30px;" class="hide">
             <div>
-		<@direction=<{forward_direction&template=<@direction@> }>@>
+			<@direction=<{forward_direction&template=<@direction@> }>@>
               <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="0" name="2"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"aller"@></label>
-		<@direction=@>
+			<@direction=@>
             </div>
             <div>
-		<@direction=<{backward_direction&template=<@direction@> }>@>
+			<@direction=<{backward_direction&template=<@direction@> }>@>
               <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="1" name="2"> <@line_short_name@> <@name@> <@direction?("direction "+direction):"retour"@></label>
             </div>
           </div>
         </div>
-	}>?>
+		}>?>
       </div>
     </div>
+	?>
 }>?>
   </div>
   <div class="modal-footer">
@@ -163,6 +173,7 @@ template=<{network&template=
 group_by_cities=1&
 output_stops=1&
 stops_directions=3&
+output_lines_in_stops=1&
 template=<{city&template=
 	<@displayCity=0@>
 	<?if&cond=<@~global("terminus_networks")@>&then=
@@ -225,6 +236,7 @@ template=<{city&template=
 		}>
       </div>
     </div>
+	?>
 }>?>
   </div>
   <div class="modal-footer">
