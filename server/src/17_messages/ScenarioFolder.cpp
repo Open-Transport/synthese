@@ -52,9 +52,11 @@ namespace synthese
 		std::string ScenarioFolder::getFullName() const
 		{
 			string result;
-			for(const ScenarioFolder* folder(this); folder != NULL; folder = &folder->get<Parent>().get())
-			{
-				result = "/" + folder->getName() + result;
+			const ScenarioFolder* folder(this);
+			while (true) {
+				result = "/" + folder->get<Name>() + result;	
+				if (!folder->get<Parent>()) break;
+				folder = &folder->get<Parent>().get();
 			}
 			return result;
 		}
