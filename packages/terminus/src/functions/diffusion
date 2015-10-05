@@ -38,28 +38,13 @@
     target=/lib&
     ?> <span class=\"divider\">/</span>
   </li>
-			<?ScenarioFoldersService&
-			root_id=0&
-			template=<{folder&recursive=1&template=
-				<@recursive_content?"
-  <li>
-    <?link&
-    target=/lib&
-    roid=<@id@>&
-    text=<@name@>
-    ?> <span class=\"divider\">/</span></li>
-				":""@>
-				<@(id==scenario_folder_id)?"
-  <li>
-    <?link&
-    target=/lib&
-    roid=<@id@>&
-    text=<@name@>
-    ?> <span class=\"divider\">/</span>
-  </li>"
-				:""@>
-				<@recursive_content@>
-			}>?>
+  <?ScenarioFoldersService&
+         root_id=0&
+         template=<{folder&recursive=1&template=
+               <@recursive_content?("<li>"+<?link&target=/lib&roid=<@id@>&text=<@name@>?>+" <span class=\"divider\">/</span></li>"):""@>
+  <@(id==scenario_folder_id)?("<li>"+<?link&target=/lib&roid=<@id@>&text=<@name@>?>+" <span class=\"divider\">/</span></li>"):""@>
+  <@recursive_content@>
+  }>?>
   <li class="active"><@name@> <span class=\"divider\">/</span></li>
   <li class="active"><@section_name@></li>&
 		else=
