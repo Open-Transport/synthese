@@ -129,7 +129,14 @@ theevent["<@roid@>"] = {
 
 function parse_date(dateIsoString) {
   var date = new Date(dateIsoString);  
-  date = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
+  var tzoffset = date.getTimezoneOffset();
+  var tzoIso8601 = (tzoffset <= 0) ? "+" : "-";
+  var hoursString = "00" + Math.floor(Math.abs(tzoffset / 60));
+  tzoIso8601 += hoursString.substr(hoursString.length - 2);
+  tzoIso8601 += ":";
+  var minutesString = "00" + Math.floor(Math.abs(tzoffset % 60));
+  tzoIso8601 += minutesString.substr(minutesString.length - 2);
+  date = new Date(dateIsoString + tzoIso8601);
   return date;
 }
         
