@@ -27,8 +27,6 @@ set(MODULES
 05_html
 06_openstreetmap
 07_lexical_matcher
-#08_acapela_client
-#09_agi_client
 10_db
 10_db/101_sqlite
 10_db/103_svn
