@@ -60,8 +60,6 @@ namespace synthese
 		const string UserUpdateAction::PARAMETER_EMAIL = Action_PARAMETER_PREFIX + "email";
 		const string UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN(Action_PARAMETER_PREFIX + "a");
 		const string UserUpdateAction::PARAMETER_PROFILE_ID = Action_PARAMETER_PREFIX + "prof";
-		const string UserUpdateAction::PARAMETER_SVN_USERNAME = Action_PARAMETER_PREFIX + "svn_username";
-		const string UserUpdateAction::PARAMETER_SVN_PASSWORD = Action_PARAMETER_PREFIX + "svn_password";
 
 
 		ParametersMap UserUpdateAction::getParametersMap() const
@@ -126,8 +124,6 @@ namespace synthese
 					_profile = ProfileTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PROFILE_ID), *_env);
 				}
 
-				_svnUsername = map.getDefault<string>(PARAMETER_SVN_USERNAME);
-				_svnPassword = map.getDefault<string>(PARAMETER_SVN_PASSWORD);
 			}
 			catch (ObjectNotFoundException<Profile>&)
 			{
@@ -175,8 +171,6 @@ namespace synthese
 			}
 			_user->setName(_name);
 			_user->setSurname(_surname);
-			_user->setSVNUsername(_svnUsername);
-			_user->setSVNPassword(_svnPassword);
 
 			UserTableSync::Save(_user.get());
 

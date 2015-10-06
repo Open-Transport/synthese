@@ -399,7 +399,7 @@ int main( int argc, char **argv )
 				SYNTHESE_REVISION,
 				SYNTHESE_BRANCH,
 				SYNTHESE_BUILD_DATE,
-				SYNTHESE_SVN_URL
+				SYNTHESE_GIT_URL
 			);
 			ServerModule::RunHTTPServer();
 			ServerModule::Wait();
