@@ -59,7 +59,6 @@ set(MODULES
 55_timetables
 56_pt_website
 #57_accounting
-58_hiking
 59_road_journey_planner
 60_analysis
 61_data_exchange
