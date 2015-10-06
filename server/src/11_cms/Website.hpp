@@ -26,7 +26,6 @@
 #include "Object.hpp"
 #include "TreeRoot.hpp"
 #include "TreeRankOrderingPolicy.hpp"
-#include "SVNWorkingCopy.hpp"
 
 #include "DateField.hpp"
 #include "NumericField.hpp"
@@ -55,8 +54,7 @@ namespace synthese
 			FIELD(EndDate),
 			FIELD(HostName),
 			FIELD(ClientURL),
-			FIELD(DefaultTemplate),
-			FIELD(db::svn::SVNWorkingCopy)
+			FIELD(DefaultTemplate)
 		> WebsiteRecord;
 
 		//////////////////////////////////////////////////////////////////////////

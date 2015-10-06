@@ -40,7 +40,6 @@ namespace synthese
 {
 	using namespace util;
 	using namespace cms;
-	using namespace db::svn;
 	
 	CLASS_DEFINITION(Website, "t025_sites", 25)
 	FIELD_DEFINITION_OF_OBJECT(Website, "website_id", "websites")
@@ -62,12 +61,10 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(EndDate, posix_time::not_a_date_time),
 					FIELD_DEFAULT_CONSTRUCTOR(HostName),
 					FIELD_DEFAULT_CONSTRUCTOR(ClientURL),
-					FIELD_DEFAULT_CONSTRUCTOR(DefaultTemplate),
-					FIELD_DEFAULT_CONSTRUCTOR(SVNWorkingCopy)
+					FIELD_DEFAULT_CONSTRUCTOR(DefaultTemplate)
 			)	),
 			_config(NULL)
 		{
-			get<SVNWorkingCopy>().setObject(this);
 		}
 
 

@@ -35,6 +35,7 @@
 #include "101_sqlite/SQLiteDB.h"
 #include "UtilTypes.h"
 
+#include <boost/filesystem.hpp>
 #include <boost/test/auto_unit_test.hpp>
 
 using namespace synthese::admin;

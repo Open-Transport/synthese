@@ -33,7 +33,6 @@
 #include "PropertiesHTMLTable.h"
 #include "RemoveObjectAction.hpp"
 #include "Request.h"
-#include "SVNCheckoutAction.hpp"
 #include "WebsiteAdmin.hpp"
 #include "WebsiteTableSync.hpp"
 #include "Webpage.h"
@@ -52,7 +51,6 @@ namespace synthese
 	using namespace cms;
 	using namespace html;
 	using namespace db;
-	using namespace db::svn;
 	using namespace server;
 	using namespace util;
 
@@ -350,17 +348,5 @@ namespace synthese
 			stream << t.col() << f.getSubmitButton("Ajouter");
 			stream << t.close() << f.close();
 
-			// SVN Checkout
-			stream << "<h1>SVN Checkout</h1>";
-			AdminActionFunctionRequest<SVNCheckoutAction, WebsiteAdmin> svnRequest(request);
-			svnRequest.setActionFailedPage<ModuleAdmin>();
-			static_cast<ModuleAdmin*>(svnRequest.getActionFailedPage().get())->setModuleClass(boost::shared_ptr<ModuleClass>(new CMSModule));
-			svnRequest.setActionWillCreateObject();
-			PropertiesHTMLTable pf(svnRequest.getHTMLForm("svn"));
-			stream << pf.open();
-			stream << pf.cell("URL", pf.getForm().getTextInput(SVNCheckoutAction::PARAMETER_REPO_URL, string()));
-			stream << pf.cell("Utilisateur", pf.getForm().getTextInput(SVNCheckoutAction::PARAMETER_USER, string()));
-			stream << pf.cell("Mot de passe", pf.getForm().getPasswordInput(SVNCheckoutAction::PARAMETER_PASSWORD, string()));
-			stream << pf.close();
 		}
 }	}
