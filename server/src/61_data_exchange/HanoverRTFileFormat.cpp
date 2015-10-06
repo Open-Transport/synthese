@@ -1,8 +1,8 @@
 ﻿
 //////////////////////////////////////////////////////////////////////////
-/// HanoverTheoricalFileFormat class implementation.
-/// @file HanoverTheoricalFileFormat.cpp
-/// @author Thomas Puigt
+/// HanoverRTFileFormat class implementation.
+/// @file HanoverRTFileFormat.cpp
+/// @author Camille Hue
 /// @date 2015
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -22,7 +22,7 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "HanoverTheoricalFileFormat.hpp"
+#include "HanoverRTFileFormat.hpp"
 
 #include "CityTableSync.h"
 #include "TransportNetworkTableSync.h"
@@ -66,18 +66,16 @@ namespace synthese
 	using namespace util;
 
 	template<>
-	const string FactorableTemplate<FileFormat, data_exchange::HanoverTheoricalFileFormat>::FACTORY_KEY = "HanoverTheorical";
+	const string FactorableTemplate<FileFormat, data_exchange::HanoverRTFileFormat>::FACTORY_KEY = "HanoverRealTime";
 
 	namespace data_exchange
 	{
-		const string HanoverTheoricalFileFormat::Importer_::PARAMETER_DB_CONN_STRING("conn_string");
-		const string HanoverTheoricalFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY = "default_city";
-		const string HanoverTheoricalFileFormat::Importer_::PARAMETER_NETWORK_ID = "ni";
-		const string HanoverTheoricalFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION = "sa_td";
+		const string HanoverRTFileFormat::Importer_::PARAMETER_DB_CONN_STRING("conn_string");
+		const string HanoverRTFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
 
 
 
-		HanoverTheoricalFileFormat::Importer_::Importer_(
+		HanoverRTFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::Import& import,
 			impex::ImportLogLevel minLogLevel,
@@ -85,7 +83,7 @@ namespace synthese
 			boost::optional<std::ostream&> outputStream,
 			util::ParametersMap& pm
 		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
-			DatabaseReadImporter<HanoverTheoricalFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			DatabaseReadImporter<HanoverRTFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
 			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			HanoverFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_stopAreas(*import.get<DataSource>(), env),
@@ -95,55 +93,28 @@ namespace synthese
 
 
 
-		ParametersMap HanoverTheoricalFileFormat::Importer_::getParametersMap() const
+		ParametersMap HanoverRTFileFormat::Importer_::getParametersMap() const
 		{
 			ParametersMap map;
-			if (_network.get() != NULL)
-			{
-				map.insert(PARAMETER_NETWORK_ID, _network->getKey());
-			}
-			if(_defaultCity.get())
-			{
-				map.insert(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity->getKey());
-			}
-			if(!_stopAreaDefaultTransferDuration.is_not_a_date_time())
-			{
-				map.insert(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, _stopAreaDefaultTransferDuration.total_seconds() / 60);
-			}
 			return map;
 		}
 
 
 
-		void HanoverTheoricalFileFormat::Importer_::_setFromParametersMap(const ParametersMap& map)
+		void HanoverRTFileFormat::Importer_::_setFromParametersMap(const ParametersMap& map)
 		{
 			_dbConnString = map.getOptional<string>(PARAMETER_DB_CONN_STRING);
 
-			try
-			{
-				_network = TransportNetworkTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
-			}
-			catch (ObjectNotFoundException<TransportNetwork>&)
-			{
-			}
-
-			// Default City
-			if(map.getDefault<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY, 0))
-			{
-				_defaultCity = CityTableSync::Get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY), _env);
-			}
-
-			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
+			// Hysteresis
+			_hysteresis = seconds(
+				map.getDefault<long>(PARAMETER_HYSTERESIS, 0)
+			);
 		}
 
 
 
 
-
-
-
-
-		bool HanoverTheoricalFileFormat::Importer_::_read(
+		bool HanoverRTFileFormat::Importer_::_read(
 		) const {
 			DataSource& dataSource(*_import.get<DataSource>());
 			boost::shared_ptr<DB> db;
@@ -158,7 +129,7 @@ namespace synthese
 
 
 			//////////////////////////////////////////////////////////////////////////
-			// Pre-loading objects from HanoverTheorical
+			// Pre-loading objects from Hanover
 			LinksMap _links;
 
 			// Stop areas
@@ -173,15 +144,13 @@ namespace synthese
 					string name(result->get<string>("sgr_name"));
 					string ref(result->get<string>("sgr_short_name"));
 
-					_createOrUpdateStopAreas(
-						_stopAreas,
-						ref,
-						name,
-						_defaultCity.get(),
-						false,
-						_stopAreaDefaultTransferDuration,
-						dataSource
-					);
+					if (!_stopAreas.contains(ref))
+					{
+						stringstream content;
+						content << "Unrecognized stop area " << ref << "(" << name << ")";
+						_logError(content.str());
+						return false;
+					}
 				}
 			}
 
@@ -198,44 +167,13 @@ namespace synthese
 					string name(result->get<string>("sto_name"));
 					string ref(result->get<string>("sto_graph_key"));
 
-					const StopArea* stopArea(NULL);
-					if(_stopAreas.contains(areaRef))
+					if(!_stopPoints.contains(ref))
 					{
-						stopArea = *_stopAreas.get(areaRef).begin();
+						stringstream content;
+						content << "Unrecognized stop point " << ref << "(" << name << "), should be in stop area " << areaRef;
+						_logError(content.str());
+						return false;
 					}
-					else if(_stopPoints.contains(ref))
-					{
-						stopArea = (*_stopPoints.get(ref).begin())->getConnectionPlace();
-					}
-					else
-					{
-						_logWarning(
-							"inconsistent STOP GROUP reference "+ areaRef +" in stop "+ ref
-						);
-						continue;
-					}
-
-
-					// Point
-					boost::shared_ptr<geos::geom::Point> geometry;
-					geometry = dataSource.getActualCoordinateSystem().createPoint(
-						lexical_cast<double>(result->get<string>("pnt_longitude")) / static_cast<double>(3600000),
-						lexical_cast<double>(result->get<string>("pnt_latitude")) / static_cast<double>(3600000)
-					);
-					if(geometry->isEmpty())
-					{
-						geometry.reset();
-					}
-
-					_createOrUpdateStop(
-						_stopPoints,
-						ref,
-						name,
-						optional<const RuleUser::Rules&>(),
-						stopArea,
-						geometry.get(),
-						dataSource
-					);
 				}
 			}
 
@@ -250,20 +188,14 @@ namespace synthese
 					// Fields load
 					string name(result->get<string>("lin_linename"));
 					string shortName(result->get<string>("lin_number"));
-					int colorR(result->get<int>("in_color_r"));
-					int colorG(result->get<int>("lin_color_g"));
-					int colorB(result->get<int>("lin_color_b"));
-					const RGBColor color(colorR,colorG, colorB);
 
-					_createOrUpdateLine(
-						_lines,
-						shortName,
-						name,
-						shortName,
-						optional<RGBColor>(color),
-						*_network,
-						dataSource
-					);
+					if(!_lines.contains(shortName))
+					{
+						stringstream content;
+						content << "Unrecognized commercial line " << shortName << "(" << name << ")";
+						_logError(content.str());
+						return false;
+					}
 				}
 			}
 
@@ -481,6 +413,7 @@ namespace synthese
 			{
 				string query(
 					string("SELECT * FROM ") + _database +".v_rcs_passing_time " + "WHERE run_number_ext NOT LIKE 'HLP%' " + 
+						"AND pti_real_estimated IS NOT NULL " +
 						"ORDER BY rou_id ASC, run_id ASC, pti_rank ASC"
 				);
 				DBResultSPtr result(db->execQuery(query));
@@ -543,6 +476,7 @@ namespace synthese
 							HanoverSchedule()
 					)	);
 					schedule.dept = duration_from_string(result->get<string>("pti_scheduled"));
+					schedule.deptRT = duration_from_string(result->get<string>("pti_real_estimated"));
 
 					// Getting calendar
 					htyId = result->get<int>("hty_id");
@@ -570,7 +504,7 @@ namespace synthese
 				}
 			}
 
-			// Registering data in ENV
+			// Update RT schedules
 			{
 				BOOST_FOREACH(const RunsMap::value_type& run, _runs)
 				{
@@ -633,28 +567,35 @@ namespace synthese
 							true,
 							true
 					)	);
-
-					// Service
+					
+					// Theorical Service (find or create it)
 					ScheduledService::Schedules departures;
 					ScheduledService::Schedules arrivals;
+					ScheduledService::Schedules RTdepartures;
+					ScheduledService::Schedules RTarrivals;
 					time_duration nextArrivalTime = run.second.schedules.front().dept;
 					BOOST_FOREACH(const HanoverSchedule& schedule, run.second.schedules)
 					{
+						time_duration delta(schedule.dept - schedule.deptRT);
 						if(nextArrivalTime.seconds())
 						{
 							arrivals.push_back(nextArrivalTime + seconds(60 - nextArrivalTime.seconds()));
+							RTarrivals.push_back(nextArrivalTime + seconds(60 - nextArrivalTime.seconds()) - delta);
 						}
 						else
 						{
 							arrivals.push_back(nextArrivalTime);
+							RTarrivals.push_back(nextArrivalTime - delta);
 						}
 						if(schedule.dept.seconds())
 						{
 							departures.push_back(schedule.dept - seconds(schedule.dept.seconds()));
+							RTdepartures.push_back(schedule.dept - seconds(schedule.dept.seconds()) - delta);
 						}
 						else
 						{
 							departures.push_back(schedule.dept);
+							RTdepartures.push_back(schedule.dept - delta);
 						}
 						nextArrivalTime = schedule.dept;
 					}
@@ -675,13 +616,76 @@ namespace synthese
 					{
 						*service |= run.second.calendar;
 					}
+					
+					// Update it with Real Time info
+					bool updated(false);
+					time_duration maxDelta(seconds(0));
+					time_duration minDelta(seconds(0));
+					for(size_t i(0); i<departures.size(); ++i)
+					{
+						time_duration delta(departures[i] - RTdepartures[i]);
+						if(delta<minDelta)
+						{
+							minDelta = delta;
+						}
+						if(delta>maxDelta)
+						{
+							maxDelta = delta;
+						}
+						if(delta < -_hysteresis || delta > _hysteresis)
+						{
+							updated = true;
+							break;
+						}
+						delta = arrivals[i] - RTarrivals[i];
+						if(delta<minDelta)
+						{
+							minDelta = delta;
+						}
+						if(delta>maxDelta)
+						{
+							maxDelta = delta;
+						}
+						if(delta < -_hysteresis || delta > _hysteresis)
+						{
+							updated = true;
+							break;
+						}
+					}
+					if(!updated && !service->hasRealTimeData())
+					{
+						// No update is needed but we do it anyway so that RT schedule will be set
+						service->setRealTimeSchedules(departures, arrivals);
+					}
+					else if(updated)
+					{
+						// if course is ended, don't update it because it may have been cleaned by RTDataCleaner
+						// and we do not want update the course for tomorrow
+						boost::posix_time::ptime now(boost::posix_time::second_clock::local_time());
+						if(!(now.time_of_day() > service->GetTimeOfDay(RTdepartures[RTdepartures.size()-1]) + minutes(1)))
+						{
+							service->setRealTimeSchedules(RTdepartures, RTarrivals);
+							_logDebugDetail(
+								"REAL-TIME SCHEDULES UPDATE",
+								run.second.service_number,
+								run.second.route->line->getShortName()+"/"+routeId,
+								service->getKey(),
+								service->getServiceNumber(),
+								string(),
+								lexical_cast<string>(minDelta)+"s/"+lexical_cast<string>(maxDelta)+"s",
+								string()
+							);
+						}
+					}
 				}
 			} // end of registering data in ENV
 
 			return true;
 		}
 
-		DBTransaction HanoverTheoricalFileFormat::Importer_::_save() const
+
+
+		DBTransaction HanoverRTFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
 

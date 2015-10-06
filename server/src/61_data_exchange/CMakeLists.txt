@@ -24,6 +24,10 @@ set(data_exchange_SRCS
   GPSSimuFileFormat.hpp
   HafasFileFormat.cpp
   HafasFileFormat.hpp
+  HanoverFileFormat.cpp
+  HanoverFileFormat.hpp
+  HanoverRTFileFormat.cpp
+  HanoverRTFileFormat.hpp
   HanoverTheoricalFileFormat.cpp
   HanoverTheoricalFileFormat.hpp
   HastusCSVFileFormat.cpp

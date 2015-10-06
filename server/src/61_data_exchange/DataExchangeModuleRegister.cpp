@@ -12,6 +12,7 @@
 #include "GPSSimuFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
 #include "HafasFileFormat.hpp"
+#include "HanoverRTFileFormat.hpp"
 #include "HanoverTheoricalFileFormat.hpp"
 #include "HastusCSVFileFormat.hpp"
 #include "RTMFileFormat.hpp"
@@ -88,6 +89,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::GPSSimuFileFormat::integrate();
 	synthese::data_exchange::GTFSFileFormat::integrate();
 	synthese::data_exchange::HafasFileFormat::integrate();
+	synthese::data_exchange::HanoverRTFileFormat::integrate();
 	synthese::data_exchange::HanoverTheoricalFileFormat::integrate();
 	synthese::data_exchange::HastusCSVFileFormat::integrate();
 	synthese::data_exchange::RTMFileFormat::integrate();

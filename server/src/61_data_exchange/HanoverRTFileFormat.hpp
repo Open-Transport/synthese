@@ -1,8 +1,8 @@
 ﻿
 //////////////////////////////////////////////////////////////////////////
-/// HanoverTheorical file format class header.
-///	@file HanoverTheoricalFileFormat.hpp
-///	@author Thomas Puigt
+/// HanoverRT file format class header.
+///	@file HanoverRTFileFormat.hpp
+///	@author Camille Hue
 ///	@date 2015
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -22,8 +22,8 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_HanoverTheoricalFileFormat_H__
-#define SYNTHESE_HanoverTheoricalFileFormat_H__
+#ifndef SYNTHESE_HanoverRTFileFormat_H__
+#define SYNTHESE_HanoverRTFileFormat_H__
 
 #include "DatabaseReadImporter.hpp"
 #include "FactorableTemplate.h"
@@ -72,32 +72,28 @@ namespace synthese
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// HanoverTheorical file format.
+		/// HanoverRT file format.
 		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m61File refFile
-		class HanoverTheoricalFileFormat:
-			public impex::FileFormatTemplate<HanoverTheoricalFileFormat>
+		class HanoverRTFileFormat:
+			public impex::FileFormatTemplate<HanoverRTFileFormat>
 		{
 		public:
 
 			class Importer_:
-				public impex::DatabaseReadImporter<HanoverTheoricalFileFormat>,
+				public impex::DatabaseReadImporter<HanoverRTFileFormat>,
 				public PTFileFormat,
 				public HanoverFileFormat
 			{
 			public:
 				static const std::string PARAMETER_DB_CONN_STRING;
-				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
-				static const std::string PARAMETER_NETWORK_ID;
-				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
+				static const std::string PARAMETER_HYSTERESIS;
 
 			private:
 				boost::optional<std::string> _dbConnString;
-				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
-				boost::shared_ptr<const geography::City> _defaultCity;
-				boost::shared_ptr<pt::TransportNetwork> _network;
+				boost::posix_time::time_duration _hysteresis;
 
 				mutable std::set<pt::ScheduledService*> _servicesToSave;
 				mutable impex::ImportableTableSync::ObjectBySource<pt::StopAreaTableSync> _stopAreas;
@@ -106,7 +102,6 @@ namespace synthese
 
 				mutable RoutesMap _routes;
 				mutable HanoverSchedulesMap _hanoverTheoricalSchedules;
-
 				mutable Calendars _calendars;
 				mutable RunsMap _runs;
 
@@ -146,9 +141,9 @@ namespace synthese
 			};
 
 
-			typedef impex::NoExportPolicy<HanoverTheoricalFileFormat> Exporter_;
+			typedef impex::NoExportPolicy<HanoverRTFileFormat> Exporter_;
 		};
 }	}
 
-#endif // SYNTHESE_HanoverTheoricalFileFormat_H__
+#endif // SYNTHESE_HanoverRTFileFormat_H__
 
