@@ -53,7 +53,6 @@ set(MODULES
 39_map
 40_pdf_cms
 51_resa
-52_forum
 53_pt_journey_planner
 54_departure_boards
 55_timetables
