@@ -23,6 +23,7 @@
 #include "Log.h"
 
 #include <iomanip>
+#include <string.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
@@ -30,6 +31,12 @@
 using namespace boost;
 using namespace std;
 using namespace boost::posix_time;
+
+#ifdef __gnu_linux__
+#include <pthread.h>  // For pthread_getname_np
+#include <features.h> // For __GNU_LIBRARY__, __GLIBC__ and __GLIBC_MINOR__
+#endif
+
 
 namespace synthese
 {
@@ -234,6 +241,13 @@ namespace synthese
 			// Append date time
 			ptime now(microsec_clock::local_time());
 
+			// Linux only : print thread name instead of thread id
+			char threadName[16];
+			memset(threadName, 0, sizeof(threadName));
+#if defined __gnu_linux__ && __GNU_LIBRARY__ >= 6 && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 13
+			pthread_getname_np(pthread_self(), threadName, sizeof(threadName));
+#endif
+
 			(*_outputStream) << " # " << std::setfill ('0')
 				<< std::setw (4) << now.date().year() << "/"
 				<< std::setw (2) << static_cast<int>(now.date().month()) << "/"
@@ -241,9 +255,18 @@ namespace synthese
 				<< std::setw (2) << now.time_of_day().hours() << ":"
 				<< std::setw (2) << now.time_of_day().minutes() << ":"
 				<< std::setw (2) << now.time_of_day().seconds() << "."
-				<< std::setw (3) << now.time_of_day().fractional_seconds()
-				<< setw (6) << " # " << this_thread::get_id()
-				<< " # " << message;
+				<< std::setw (3) << now.time_of_day().fractional_seconds();
+
+			if(0 < strlen(threadName))
+			{
+				(*_outputStream) << setw (6) << " # " << std::string(threadName);
+			}
+			else
+			{
+				(*_outputStream) << setw (6) << " # " << this_thread::get_id();
+			}
+
+			(*_outputStream) << " # " << message;
 
 			if (exception != 0)
 			{

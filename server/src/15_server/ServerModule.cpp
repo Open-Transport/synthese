@@ -556,11 +556,13 @@ namespace synthese
 		boost::thread::id ServerModule::AddHTTPThread()
 		{
 			recursive_mutex::scoped_lock lock(_threadManagementMutex);
+			static unsigned int httpThreadCounter = 0;
+			httpThreadCounter += 1;
 
 			boost::shared_ptr<thread> theThread(
 				AddThread(
 					boost::bind(&asio::io_service::run, &ServerModule::_io_service),
-					"HTTP",
+					"HTTP_" + boost::lexical_cast<std::string>(httpThreadCounter),
 					true
 			)	);
 			return theThread->get_id();
