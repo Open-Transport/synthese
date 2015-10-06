@@ -99,8 +99,6 @@
 
 #include "TransportNetworkRight.h"
 
-#include "StopPointWFSType.hpp"
-
 #include "DeactivationPTDataInterSYNTHESE.hpp"
 #include "RealTimePTDataInterSYNTHESE.hpp"
 
@@ -232,8 +230,6 @@ void synthese::pt::moduleRegister()
 	synthese::pt::TransportNetworkRight::integrate();
 
 	synthese::pt::StopArea::integrate();
-
-	synthese::pt::StopPointWFSType::integrate();
 
 	synthese::pt::LineAlarmRecipient::integrate();
 	synthese::pt::StopAreaAlarmRecipient::integrate();
