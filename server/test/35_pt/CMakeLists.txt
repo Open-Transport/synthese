@@ -22,7 +22,6 @@ include_directories("${PROJECT_SOURCE_DIR}/src/33_algorithm")
 include_directories("${PROJECT_SOURCE_DIR}/src/34_road")
 include_directories("${PROJECT_SOURCE_DIR}/src/35_pt")
 include_directories("${PROJECT_SOURCE_DIR}/src/37_pt_operation")
-include_directories("${PROJECT_SOURCE_DIR}/src/39_map")
 include_directories("${PROJECT_SOURCE_DIR}/src/56_pt_website")
 
 set(DEPS
