@@ -41,8 +41,6 @@
 #include "Session.h"
 #include "StaticActionFunctionRequest.h"
 #include "StaticFunctionRequest.h"
-#include "SVNCheckoutAction.hpp"
-#include "SVNUpdateAction.hpp"
 #include "URI.hpp"
 #include "User.h"
 #include "Webpage.h"
@@ -64,7 +62,6 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace db::svn;
 
 	template<>
 	const string FactorableTemplate<Function,cms::PackagesService>::FACTORY_KEY = "packages";
@@ -82,7 +79,7 @@ namespace synthese
 		ParametersMap PackagesService::_getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_REPO_URL, (_repoType == SVN_REPO) ? _svnRepo.getURL() : _interSYNTHESERepoURL);
+			map.insert(PARAMETER_REPO_URL, _interSYNTHESERepoURL);
 			map.insert(PARAMETER_REPO_TYPE, static_cast<size_t>(_repoType));
 			map.insert(PARAMETER_USER, _user);
 			map.insert(PARAMETER_PASSWORD, _password);
@@ -103,21 +100,10 @@ namespace synthese
 					PARAMETER_REPO_TYPE,
 					static_cast<size_t>(INTER_SYNTHESE_REPO)
 			)	);
-			if(_repoType == SVN_REPO)
-			{
-				_svnRepo = SVNRepository(
-					map.getDefault<string>(
-						PARAMETER_REPO_URL,
-						"https://extranet.rcsmobility.com/svn/synthese3/trunk/sites"
-				)	);
-			}
-			else
-			{
-				_interSYNTHESERepoURL = map.getDefault<string>(
-					PARAMETER_REPO_URL,
-					"www.rcsmobility.com:8088"
-				);
-			}
+			_interSYNTHESERepoURL = map.getDefault<string>(
+				PARAMETER_REPO_URL,
+				"www.rcsmobility.com:8088"
+			);
 			_user = map.getDefault<string>(PARAMETER_USER);
 			_password = map.getDefault<string>(PARAMETER_PASSWORD);
 
@@ -209,43 +195,55 @@ namespace synthese
 					}
 				}
 
-				// SVN URL change form
 				vector<pair<optional<RepositoryType>, string> > repoTypes;
 				repoTypes.push_back(make_pair(INTER_SYNTHESE_REPO, "Inter-SYNTHESE"));
-				repoTypes.push_back(make_pair(SVN_REPO, "Subversion"));
-				StaticFunctionRequest<PackagesService> svnRequest(request, true);
+				StaticFunctionRequest<PackagesService> packagesRequest(request, true);
 				optional<string> undefinedPackage;
-				svnRequest.getFunction()->setPackageToInstall(undefinedPackage);
-				HTMLForm f(svnRequest.getHTMLForm());
+				packagesRequest.getFunction()->setPackageToInstall(undefinedPackage);
+				HTMLForm f(packagesRequest.getHTMLForm());
 				p << f.open();
 				p << "Type : " << f.getSelectInput(PARAMETER_REPO_TYPE, repoTypes, optional<RepositoryType>(_repoType));
-				p << "URL : " << f.getTextInput(PARAMETER_REPO_URL, (_repoType == SVN_REPO) ? _svnRepo.getURL() : _interSYNTHESERepoURL);
+				p << "URL : " << f.getTextInput(PARAMETER_REPO_URL, _interSYNTHESERepoURL);
 				p << " Utilisateur : " << f.getTextInput(PARAMETER_USER, _user);
 				p << " Mot de passe : " << f.getPasswordInput(PARAMETER_PASSWORD, _password);
 				p << " " << f.getSubmitButton("Changer");
 				p << f.close();
 
 				// Get installable packages
-				if(_repoType == SVN_REPO)
+				// Getting the packages list
+				string port("80");
+				string host(_interSYNTHESERepoURL);
+				vector<string> parts;
+				split(parts, _interSYNTHESERepoURL, is_any_of(":"));
+				if(parts.size() > 1)
 				{
-					SVNCommands::LsResult packages(_svnRepo.ls(_user, _password));
-					if(packages.empty())
+					host = parts[0];
+					port = parts[1];
+				}
+				StaticFunctionRequest<InterSYNTHESEPackagesService> r;
+				r.getFunction()->setOutputFormat(MimeTypes::JSON);
+				BasicClient c(
+					host,
+					port
+				);
+				string contentStr(
+					c.post(
+						"/",
+						r.getURI(),
+						"application/x-www-form-urlencoded"
+				)	);
+				if(contentStr.empty())
+				{
+					p << "<p>Pas de package à installer à cette URL.</p>";
+				}
+				else
+				{
+					ptree packages;
+					istringstream ss(contentStr);
+					read_json(ss, packages);
+				
+					if(packages.count(InterSYNTHESEPackagesService::TAG_PACKAGE))
 					{
-						p << "<p>Pas de package à installer à cette URL.</p>";
-					}
-					else
-					{
-						// Installation request
-						StaticActionFunctionRequest<SVNCheckoutAction, PackagesService> checkoutRequest(request, true);
-						checkoutRequest.getAction()->setUser(_user);
-						checkoutRequest.getAction()->setPassword(_password);
-
-						// Update request
-						StaticActionFunctionRequest<SVNUpdateAction, PackagesService> updateRequest(request, true);
-						updateRequest.getAction()->setUser(_user);
-						updateRequest.getAction()->setPassword(_password);
-
-						// Draw the table
 						HTMLTable::ColsVector c;
 						c.push_back("Package");
 						c.push_back("Installé");
@@ -255,174 +253,45 @@ namespace synthese
 						}
 						HTMLTable t(c);
 						p << t.open();
-						BOOST_FOREACH(const string& package, packages)
+
+						StaticFunctionRequest<PackagesService> installRequest(request, true);
+
+						BOOST_FOREACH(const ptree::value_type& packageNode, packages.get_child(InterSYNTHESEPackagesService::TAG_PACKAGE))
 						{
-							// Jump over empty strings
-							if(trim_copy(package).empty())
-							{
-								continue;
-							}
-
-							// Check of the id of the site
-							SVNCommands::LsResult files(
-								_svnRepo.ls("/"+ package, _user, _password)
+							RegistryKeyType packageId(
+								packageNode.second.get(Key::FIELD.name, RegistryKeyType(0))
 							);
-							RegistryKeyType siteId(0);
-							BOOST_FOREACH(const string& file, files)
-							{
-								if(	file.size() > 5 &&
-									file.substr(file.size() - 5, 5) == ".dump"
-								){
-									try
-									{
-										siteId = lexical_cast<RegistryKeyType>(
-											file.substr(0, file.size() - 5)
-										);
-									}
-									catch(bad_lexical_cast&)
-									{
-									}
-								}
-							}
-
-							// No id was found : corrupted package
-							if(!siteId)
-							{
-								continue;
-							}
-
-							// Is the package currently installed ?
-							bool isInstalled(
-								Env::GetOfficialEnv().getRegistry<Website>().contains(siteId)
+							string packageName(
+								packageNode.second.get(Name::FIELD.name, string())
 							);
 
-							// HTML output
+
 							p << t.row();
 
-							// Package name
-							p << t.col() << package;
+							p << t.col() << packageName;
 
-							// Package is installed =
-							p << t.col() <<
-								(isInstalled ? "OUI" : "NON");
+							// Installed
+							bool installed(
+								Env::GetOfficialEnv().getRegistry<InterSYNTHESEPackage>().contains(
+									packageId
+							)	);
+							p << t.col() << (installed ? "OUI" : "NON");
 
-							// Action cell
-							if(installRight)
-							{
-								p << t.col();
-								if(isInstalled)
-								{
-									boost::shared_ptr<ObjectBase> site(
-										Env::GetOfficialEnv().getCastEditable<ObjectBase, Website>(siteId)
-									);
-									updateRequest.getAction()->setObject(site);
-									p << HTMLModule::getLinkButton(
-										updateRequest.getURL(),
-										"Mettre à jour",
-										"Etes-vous sûr de vouloir mettre à jour le package "+ package +" ?"
-									);
-								}
-								else
-								{
-									SVNRepository packageRepo(_svnRepo.getURL() +"/"+ package);
-									checkoutRequest.getAction()->setRepo(packageRepo);
-									p << HTMLModule::getLinkButton(
-										checkoutRequest.getURL(),
-										"Installer",
-										"Etes-vous sûr de vouloir installer le package "+ package +" ?"
-									);
-								}
-							}
+							// Action
+							optional<string> packageURL("http://" + host +":" + port + "/"+ packageNode.second.get(Code::FIELD.name, string()));
+							installRequest.getFunction()->setPackageToInstall(packageURL);
+							p << t.col() << HTMLModule::getHTMLLink(
+								installRequest.getURL(),
+								installed ? "Mettre à jour" : "Installer",
+								"Êtes-vous sûr de vouloir " + string(installed ? "mettre à jour" : "installer") + " le paquet " + packageName
+							);
 						}
-						p << t.close();
-					}
-				}
-				else
-				{ // Inter-SYNTHESE packages
 
-					// Getting the packages list
-					string port("80");
-					string host(_interSYNTHESERepoURL);
-					vector<string> parts;
-					split(parts, _interSYNTHESERepoURL, is_any_of(":"));
-					if(parts.size() > 1)
-					{
-						host = parts[0];
-						port = parts[1];
-					}
-					StaticFunctionRequest<InterSYNTHESEPackagesService> r;
-					r.getFunction()->setOutputFormat(MimeTypes::JSON);
-					BasicClient c(
-						host,
-						port
-					);
-					string contentStr(
-						c.post(
-							"/",
-							r.getURI(),
-							"application/x-www-form-urlencoded"
-					)	);
-					if(contentStr.empty())
-					{
-						p << "<p>Pas de package à installer à cette URL.</p>";
+						p << t.close();
 					}
 					else
 					{
-						ptree packages;
-						istringstream ss(contentStr);
-						read_json(ss, packages);
-					
-						if(packages.count(InterSYNTHESEPackagesService::TAG_PACKAGE))
-						{
-							HTMLTable::ColsVector c;
-							c.push_back("Package");
-							c.push_back("Installé");
-							if(installRight)
-							{
-								c.push_back("Actions");
-							}
-							HTMLTable t(c);
-							p << t.open();
-
-							StaticFunctionRequest<PackagesService> installRequest(request, true);
-
-							BOOST_FOREACH(const ptree::value_type& packageNode, packages.get_child(InterSYNTHESEPackagesService::TAG_PACKAGE))
-							{
-								RegistryKeyType packageId(
-									packageNode.second.get(Key::FIELD.name, RegistryKeyType(0))
-								);
-								string packageName(
-									packageNode.second.get(Name::FIELD.name, string())
-								);
-
-
-								p << t.row();
-
-								p << t.col() << packageName;
-
-								// Installed
-								bool installed(
-									Env::GetOfficialEnv().getRegistry<InterSYNTHESEPackage>().contains(
-										packageId
-								)	);
-								p << t.col() << (installed ? "OUI" : "NON");
-
-								// Action
-								optional<string> packageURL("http://" + host +":" + port + "/"+ packageNode.second.get(Code::FIELD.name, string()));
-								installRequest.getFunction()->setPackageToInstall(packageURL);
-								p << t.col() << HTMLModule::getHTMLLink(
-									installRequest.getURL(),
-									installed ? "Mettre à jour" : "Installer",
-									"Êtes-vous sûr de vouloir " + string(installed ? "mettre à jour" : "installer") + " le paquet " + packageName
-								);
-							}
-
-							p << t.close();
-						}
-						else
-						{
-							p << "<p>Pas de package à installer à cette URL.</p>";
-						}
+						p << "<p>Pas de package à installer à cette URL.</p>";
 					}
 				}
 			}

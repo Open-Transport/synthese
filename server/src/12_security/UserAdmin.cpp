@@ -155,9 +155,6 @@ namespace synthese
 								optional<RegistryKeyType>()
 					)	);
 				}
-				stream << t.title("SVN");
-				stream << t.cell("Utilisateur SVN", t.getForm().getTextInput(UserUpdateAction::PARAMETER_SVN_USERNAME, _user->getSVNUsername()));
-				stream << t.cell("Mot de passe SVN", t.getForm().getPasswordInput(UserUpdateAction::PARAMETER_SVN_PASSWORD, _user->getSVNPassword()));
 				stream << t.close();
 			}
 

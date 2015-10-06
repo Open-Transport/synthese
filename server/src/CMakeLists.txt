@@ -27,8 +27,6 @@ set(MODULES
 05_html
 06_openstreetmap
 07_lexical_matcher
-#08_acapela_client
-#09_agi_client
 10_db
 10_db/101_sqlite
 10_db/103_svn
@@ -50,16 +48,12 @@ set(MODULES
 35_pt
 37_pt_operation
 38_vehicle
-39_map
 40_pdf_cms
 51_resa
-52_forum
 53_pt_journey_planner
 54_departure_boards
 55_timetables
 56_pt_website
-#57_accounting
-58_hiking
 59_road_journey_planner
 60_analysis
 61_data_exchange

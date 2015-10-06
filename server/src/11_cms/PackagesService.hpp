@@ -28,8 +28,6 @@
 #include "FactorableTemplate.h"
 #include "Function.h"
 
-#include "SVNRepository.hpp"
-
 namespace synthese
 {
 	namespace cms
@@ -55,15 +53,13 @@ namespace synthese
 
 			typedef enum 
 			{
-				INTER_SYNTHESE_REPO,
-				SVN_REPO
+				INTER_SYNTHESE_REPO
 			} RepositoryType;
 			
 		protected:
 			//! \name Page parameters
 			//@{
 				RepositoryType _repoType;
-				db::svn::SVNRepository _svnRepo;
 				std::string _interSYNTHESERepoURL;
 				std::string _user;
 				std::string _password;

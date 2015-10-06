@@ -170,7 +170,6 @@ add_library(11_cms ${cms_SRCS})
 target_link_libraries(
   11_cms
   ${PYTHON_LIBRARY}
-  103_db_svn
   12_security
   15_server
   20_tree

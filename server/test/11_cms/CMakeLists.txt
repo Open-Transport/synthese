@@ -7,7 +7,6 @@ include_directories("${PROJECT_SOURCE_DIR}/src/01_util")
 include_directories("${PROJECT_SOURCE_DIR}/src/05_html")
 include_directories("${PROJECT_SOURCE_DIR}/src/07_lexical_matcher")
 include_directories("${PROJECT_SOURCE_DIR}/src/10_db")
-include_directories("${PROJECT_SOURCE_DIR}/src/10_db/103_svn")
 include_directories("${PROJECT_SOURCE_DIR}/src/12_security")
 include_directories("${PROJECT_SOURCE_DIR}/src/14_admin")
 include_directories("${PROJECT_SOURCE_DIR}/src/15_server")
@@ -16,7 +15,6 @@ include_directories("${PROJECT_SOURCE_DIR}/src/20_tree")
 include_directories("${PROJECT_SOURCE_DIR}/src/11_cms")
 
 set(DEPS
-  103_db_svn
   20_tree
   59_road_journey_planner # from 56_pt_website
   56_pt_website # from cms

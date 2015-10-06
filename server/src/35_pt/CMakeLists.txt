@@ -233,8 +233,6 @@ StopPointTableSync.cpp
 StopPointTableSync.hpp
 StopPointUpdateAction.cpp
 StopPointUpdateAction.hpp
-StopPointWFSType.cpp
-StopPointWFSType.hpp
 TransportNetwork.cpp
 TransportNetwork.h
 TransportNetworkAdmin.cpp
@@ -272,7 +270,6 @@ target_link_libraries(35_pt
   38_vehicle
   # Forward dependencies:
   #11_cms
-  #39_map
   ${EXPAT_LIBRARIES}
 )
 

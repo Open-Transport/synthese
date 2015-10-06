@@ -54,8 +54,6 @@ namespace synthese
 			static const std::string PARAMETER_EMAIL;
 			static const std::string PARAMETER_AUTHORIZED_LOGIN;
 			static const std::string PARAMETER_PROFILE_ID;
-			static const std::string PARAMETER_SVN_USERNAME;
-			static const std::string PARAMETER_SVN_PASSWORD;
 
 		private:
 			boost::shared_ptr<User>	_user;
@@ -69,8 +67,6 @@ namespace synthese
 			std::string				_email;
 			boost::optional<bool>								_authorizedLogin;
 			boost::optional<boost::shared_ptr<const Profile> >	_profile;
-			std::string				_svnUsername;
-			std::string				_svnPassword;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
