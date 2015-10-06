@@ -22,13 +22,17 @@
 
 #include "SentScenario.h"
 
-#include "MessagesSection.hpp"
-#include "ScenarioCalendar.hpp"
-#include "ScenarioTemplate.h"
 #include "Alarm.h"
+#include "MessagesRight.h"
+#include "MessagesSection.hpp"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "Registry.h"
 #include "Request.h"
+#include "ScenarioCalendar.hpp"
+#include "ScenarioTemplate.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace boost;
 using namespace std;
@@ -348,6 +352,22 @@ namespace synthese
 				}
 			}
 			return true;
+		}
+
+
+		bool SentScenario::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool SentScenario::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool SentScenario::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::DELETE_RIGHT);
 		}
 		
 }	}

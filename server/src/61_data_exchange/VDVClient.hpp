@@ -25,8 +25,8 @@
 
 #include "Object.hpp"
 
-#include "NumericField.hpp"
 #include "DataSource.h"
+#include "NumericField.hpp"
 #include "PointerField.hpp"
 #include "SchemaMacros.hpp"
 #include "StringField.hpp"
@@ -135,6 +135,10 @@ namespace synthese
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

@@ -23,6 +23,9 @@
 #include "Vehicle.hpp"
 
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "VehicleModule.hpp"
 
 using namespace std;
@@ -95,5 +98,21 @@ namespace synthese
 				seatPM->insert(TAG_SEAT, seat);
 				pm.insert(prefix + TAG_SEAT, seatPM);
 			}
+		}
+
+
+		bool Vehicle::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool Vehicle::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool Vehicle::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}

@@ -62,6 +62,10 @@ namespace synthese
 			bool isAcceptable(
 				const std::string& message
 			) const;
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

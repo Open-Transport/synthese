@@ -22,13 +22,16 @@
 
 #include "Webpage.h"
 
-#include "ParametersMap.h"
-#include "DynamicRequest.h"
-#include "StaticFunctionRequest.h"
-#include "FunctionWithSite.h"
-#include "ServerModule.h"
-#include "WebPageDisplayFunction.h"
 #include "CMSModule.hpp"
+#include "CMSRight.hpp"
+#include "DynamicRequest.h"
+#include "FunctionWithSite.h"
+#include "ParametersMap.h"
+#include "Profile.h"
+#include "ServerModule.h"
+#include "StaticFunctionRequest.h"
+#include "User.h"
+#include "WebPageDisplayFunction.h"
 #include "Website.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -308,5 +311,21 @@ namespace synthese
 				result.push_back(make_pair(page.getKey(), prefix + page.getName()));
 				page.getPagesList(result, prefix + "   ");
 			}
+		}
+
+
+		bool Webpage::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<cms::CMSRight>(security::WRITE);
+		}
+
+		bool Webpage::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<cms::CMSRight>(security::WRITE);
+		}
+
+		bool Webpage::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<cms::CMSRight>(security::DELETE_RIGHT);
 		}
 }	}

@@ -299,6 +299,10 @@ namespace synthese
 					const std::string prefix
 				) const;
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

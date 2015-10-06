@@ -22,10 +22,13 @@
 
 #include "TimetableRowGroup.hpp"
 
+#include "Profile.h"
 #include "RankUpdateQuery.hpp"
 #include "SchemaMacros.hpp"
+#include "TimetableRight.h"
 #include "TimetableRowGroupTableSync.hpp"
 #include "TimetableRowGroupItem.hpp"
+#include "User.h"
 
 namespace synthese
 {
@@ -157,5 +160,21 @@ namespace synthese
 			}
 			
 			return it1 < it2;
+		}
+
+
+		bool TimetableRowGroup::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(security::WRITE);
+		}
+
+		bool TimetableRowGroup::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(security::WRITE);
+		}
+
+		bool TimetableRowGroup::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(security::DELETE_RIGHT);
 		}
 }	}

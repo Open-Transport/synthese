@@ -30,7 +30,9 @@
 #include "InterSYNTHESESlaveTableSync.hpp"
 #include "InterSYNTHESEPacket.hpp"
 #include "InterSYNTHESESyncTypeFactory.hpp"
+#include "Profile.h"
 #include "ServerModule.h"
+#include "User.h"
 
 using namespace boost;
 using namespace std;
@@ -586,6 +588,22 @@ namespace synthese
 			}
 
 			setLastSentRange(range);
+		}
+
+
+		bool InterSYNTHESESlave::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool InterSYNTHESESlave::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool InterSYNTHESESlave::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}
 

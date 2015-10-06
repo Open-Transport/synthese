@@ -22,6 +22,10 @@
 
 #include "VDVServerSubscription.hpp"
 
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
+
 using namespace std;
 using namespace boost::posix_time;
 
@@ -95,6 +99,22 @@ namespace synthese
 			{
 				map.insert(ATTR_EXPIRATION, to_iso_extended_string(_expiration));
 			}
+		}
+
+
+		bool VDVServerSubscription::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool VDVServerSubscription::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool VDVServerSubscription::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}
 

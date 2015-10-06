@@ -26,8 +26,11 @@
 #include "DataSource.h"
 
 #include "Exception.h"
+#include "GlobalRight.h"
 #include "Importer.hpp"
 #include "Importable.h"
+#include "Profile.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;
@@ -61,5 +64,21 @@ namespace synthese
 		const CoordinatesSystem& DataSource::getActualCoordinateSystem() const
 		{
 			return get<CoordinatesSystem>() ? *get<CoordinatesSystem>() : CoordinatesSystem::GetInstanceCoordinatesSystem();
+		}
+
+
+		bool DataSource::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool DataSource::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool DataSource::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}

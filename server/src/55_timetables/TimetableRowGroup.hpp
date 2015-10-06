@@ -113,6 +113,10 @@ namespace synthese
 				virtual void beforeCreate(boost::optional<db::DBTransaction&> transaction) const;
 				virtual void afterDelete(boost::optional<db::DBTransaction&> transaction) const;
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

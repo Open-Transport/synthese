@@ -23,10 +23,13 @@
 #include "City.h"
 
 #include "CityTableSync.h"
-#include "GeographyModule.h"
-#include "Registry.h"
 #include "Factory.h"
+#include "GeographyModule.h"
+#include "GlobalRight.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "Registry.h"
+#include "User.h"
 
 #include <assert.h>
 #include <geos/geom/Point.h>
@@ -286,5 +289,21 @@ namespace synthese
 					break;
 				}
 			}
+		}
+
+
+		bool City::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool City::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool City::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}

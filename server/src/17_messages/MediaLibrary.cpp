@@ -21,10 +21,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <Field.hpp>
-#include <MediaLibrary.hpp>
-#include <Registry.h>
-#include <SimpleObjectFieldDefinition.hpp>
+#include "MediaLibrary.hpp"
+
+#include "Field.hpp"
+#include "MessagesRight.h"
+#include "Profile.h"
+#include "Registry.h"
+#include "Session.h"
+#include "SimpleObjectFieldDefinition.hpp"
+#include "User.h"
 
 #include <boost/fusion/container/map.hpp>
 
@@ -81,5 +86,20 @@ namespace synthese
 			}
 		}
 
+
+		bool MediaLibrary::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool MediaLibrary::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool MediaLibrary::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::DELETE_RIGHT);
+		}
 	}
 }

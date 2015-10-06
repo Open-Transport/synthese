@@ -22,6 +22,10 @@
 
 #include "ObjectSiteLink.h"
 
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
+
 using namespace std;
 
 namespace synthese
@@ -46,5 +50,21 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ObjectId),
 					FIELD_DEFAULT_CONSTRUCTOR(Site)
 		)	) {}
+
+
+		bool ObjectSiteLink::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool ObjectSiteLink::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool ObjectSiteLink::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
+		}
 	}
 }

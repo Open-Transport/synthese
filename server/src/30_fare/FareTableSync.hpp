@@ -90,6 +90,8 @@ namespace synthese
 			static NamedList GetList(
 				util::Env& env
 			);
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

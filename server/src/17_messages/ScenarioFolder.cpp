@@ -22,7 +22,11 @@
 
 #include "ScenarioFolder.h"
 
+#include "MessagesRight.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace std;
 
@@ -57,6 +61,22 @@ namespace synthese
 				result = "/" + folder->getName() + result;
 			}
 			return result;
+		}
+
+
+		bool ScenarioFolder::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool ScenarioFolder::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool ScenarioFolder::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::DELETE_RIGHT);
 		}
 
 }	}

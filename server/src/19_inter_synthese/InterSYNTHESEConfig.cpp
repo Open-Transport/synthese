@@ -25,6 +25,9 @@
 #include "InterSYNTHESEConfigItem.hpp"
 #include "InterSYNTHESEContent.hpp"
 #include "InterSYNTHESESyncTypeFactory.hpp"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace boost;
 using namespace boost::posix_time;
@@ -155,6 +158,22 @@ namespace synthese
 					);
 				}
 			}
+		}
+
+
+		bool InterSYNTHESEConfig::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool InterSYNTHESEConfig::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool InterSYNTHESEConfig::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}
 

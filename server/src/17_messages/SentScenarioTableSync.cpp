@@ -218,6 +218,11 @@ namespace synthese
 			SentScenarioTableSync::Save(sentScenario.get());
 		}
 
+		bool SentScenarioTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::READ);
+		}
+
 
 	}
 }

@@ -102,7 +102,7 @@ namespace synthese
 		bool ObjectListService::isAuthorized(
 			const Session* session
 		) const {
-			return true;
+			return _tableSync->allowList(session);
 		}
 
 

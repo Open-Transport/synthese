@@ -24,7 +24,9 @@
 
 #include "Conversion.h"
 #include "GeographyModule.h"
+#include "Profile.h"
 #include "ReplaceQuery.h"
+#include "User.h"
 
 #include <assert.h>
 
@@ -161,6 +163,11 @@ namespace synthese
 			if(cities.empty()) return boost::shared_ptr<City>();
 			boost::shared_ptr<const City> result(cities.front());
 			return GetEditable(result->getKey(), environment, linkLevel);
+		}
+
+		bool CityTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::READ);
 		}
 	}
 }

@@ -23,7 +23,11 @@
 #include "Website.hpp"
 
 #include "CMSModule.hpp"
+#include "CMSRight.hpp"
 #include "Env.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "Webpage.h"
 
 #include <boost/lexical_cast.hpp>
@@ -193,5 +197,21 @@ namespace synthese
 				page.getPagesList(result, "      ");
 			}
 			return result;
+		}
+
+
+		bool Website::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<cms::CMSRight>(security::WRITE);
+		}
+
+		bool Website::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<cms::CMSRight>(security::WRITE);
+		}
+
+		bool Website::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<cms::CMSRight>(security::DELETE_RIGHT);
 		}
 }	}

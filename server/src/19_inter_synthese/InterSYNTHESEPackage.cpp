@@ -26,6 +26,7 @@
 #include "InterSYNTHESEModule.hpp"
 #include "Import.hpp"
 #include "MD5Wrapper.h"
+#include "Profile.h"
 #include "User.h"
 
 using namespace boost;
@@ -461,5 +462,21 @@ namespace synthese
 					smartURL = url.substr(pos2+1);
 				}
 			}
+		}
+
+
+		bool InterSYNTHESEPackage::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool InterSYNTHESEPackage::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool InterSYNTHESEPackage::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}

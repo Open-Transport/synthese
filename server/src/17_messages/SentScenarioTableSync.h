@@ -108,6 +108,8 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
+			virtual bool allowList( const server::Session* session ) const;
+
 		};
 
 		template<class OutputIterator>

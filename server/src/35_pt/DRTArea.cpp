@@ -22,8 +22,12 @@
 
 #include "DRTArea.hpp"
 
+#include "Profile.h"
 #include "PTModule.h"
+#include "Session.h"
 #include "StopArea.hpp"
+#include "TransportNetworkRight.h"
+#include "User.h"
 
 using namespace std;
 
@@ -145,5 +149,21 @@ namespace synthese
 
 				++stopIter;
 			}
+		}
+
+
+		bool DRTArea::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<pt::TransportNetworkRight>(security::WRITE);
+		}
+
+		bool DRTArea::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<pt::TransportNetworkRight>(security::WRITE);
+		}
+
+		bool DRTArea::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<pt::TransportNetworkRight>(security::DELETE_RIGHT);
 		}
 }	}

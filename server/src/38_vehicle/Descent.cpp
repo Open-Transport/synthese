@@ -23,6 +23,7 @@
 #include "Descent.hpp"
 
 #include "ImportableTableSync.hpp"
+#include "Profile.h"
 
 using namespace boost;
 using namespace std;
@@ -99,5 +100,21 @@ namespace synthese
 		Descent::~Descent()
 		{
 		unlink();
+		}
+
+
+		bool Descent::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool Descent::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool Descent::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}

@@ -96,6 +96,10 @@ namespace synthese
 				void setOnline(bool value){ _online = value; }
 				void setExpiration(const boost::posix_time::ptime& value){ _expiration = value; }
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

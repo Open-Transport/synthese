@@ -143,5 +143,10 @@ namespace synthese
 
 			return LoadFromQuery(query, env, linkLevel);
 		}
+
+		bool ObjectSiteLinkTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::READ);
+		}
 	}
 }

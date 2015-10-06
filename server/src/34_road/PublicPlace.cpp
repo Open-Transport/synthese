@@ -24,9 +24,13 @@
 
 #include "City.h"
 #include "Crossing.h"
+#include "GlobalRight.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PublicPlaceEntrance.hpp"
 #include "RoadModule.h"
+#include "Session.h"
+#include "User.h"
 #include "VertexAccessMap.h"
 
 #include <geos/geom/Point.h>
@@ -293,5 +297,21 @@ namespace synthese
 					getFullName()
 				);
 			}
+		}
+
+
+		bool PublicPlace::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool PublicPlace::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool PublicPlace::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}

@@ -26,11 +26,11 @@
 #include "Object.hpp"
 
 #include "CoordinatesSystem.hpp"
+#include "IncludingPlace.h"
+#include "LexicalMatcher.h"
+#include "NamedPlace.h"
 #include "Registry.h"
 #include "StringField.hpp"
-#include "LexicalMatcher.h"
-#include "IncludingPlace.h"
-#include "NamedPlace.h"
 
 #include <string>
 #include <iostream>
@@ -199,6 +199,10 @@ namespace synthese
 					util::Env& env
 				);
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 	}
 }

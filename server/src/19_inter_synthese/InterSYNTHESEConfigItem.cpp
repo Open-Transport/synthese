@@ -24,6 +24,9 @@
 
 #include "Factory.h"
 #include "InterSYNTHESESyncTypeFactory.hpp"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace std;
 
@@ -101,6 +104,22 @@ namespace synthese
 					contentPerimeter
 				)
 			;
+		}
+
+
+		bool InterSYNTHESEConfigItem::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool InterSYNTHESEConfigItem::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool InterSYNTHESEConfigItem::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}
 

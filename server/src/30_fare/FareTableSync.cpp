@@ -148,5 +148,10 @@ namespace synthese
 
 			return result;
 		}
+
+		bool FareTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::READ);
+		}
 	}
 }
