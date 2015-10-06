@@ -26,9 +26,11 @@
 #include "ImportableTableSync.hpp"
 #include "NumericField.hpp"
 #include "OperationUnitTableSync.hpp"
+#include "Profile.h"
 #include "ScheduledService.h"
 #include "SchemaMacros.hpp"
 #include "StringField.hpp"
+#include "User.h"
 #include "VehicleServiceTableSync.hpp"
 
 using namespace boost;
@@ -264,5 +266,21 @@ namespace synthese
 			}
 
 			return ds1 < ds2;
+		}
+
+
+		bool VehicleService::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool VehicleService::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool VehicleService::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}

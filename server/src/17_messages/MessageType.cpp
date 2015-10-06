@@ -22,6 +22,11 @@
 
 #include "MessageType.hpp"
 
+#include "MessagesRight.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
+
 namespace synthese
 {
 	using namespace messages;
@@ -59,5 +64,21 @@ namespace synthese
 			}
 
 			return true;
+		}
+
+
+		bool MessageType::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool MessageType::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool MessageType::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::DELETE_RIGHT);
 		}
 }	}

@@ -26,9 +26,12 @@
 #include "CommercialLine.h"
 #include "DataExchangeModule.hpp"
 #include "JourneyPattern.hpp"
+#include "Profile.h"
+#include "Session.h"
 #include "ServerModule.h"
 #include "Service.h"
 #include "ServicePointer.h"
+#include "User.h"
 #include "VDVClientSubscription.hpp"
 #include "XmlToolkit.h"
 
@@ -316,5 +319,21 @@ namespace synthese
 				logFile << content;
 				logFile.close();
 			}
+		}
+
+
+		bool VDVClient::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool VDVClient::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool VDVClient::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}

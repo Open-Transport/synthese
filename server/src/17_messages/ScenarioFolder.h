@@ -67,6 +67,11 @@ namespace synthese
 					@date 2009
 				*/
 				std::string getFullName() const;
+			//}@
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 
 		};
 	}

@@ -26,6 +26,7 @@
 #include "DBTypes.h"
 #include "DBResult.hpp"
 #include "Registrable.h"
+#include "Session.h"
 
 namespace synthese
 {
@@ -125,6 +126,10 @@ namespace synthese
 			
 			virtual std::string whereClauseDefault(
 			) const { return std::string(); }
+
+
+			virtual bool allowList( const server::Session* session
+			) const { return false; }
 
 
 

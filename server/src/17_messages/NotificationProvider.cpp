@@ -21,19 +21,22 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <Alarm.h>
-#include <AlarmObjectLink.h>
-#include <BroadcastPointAlarmRecipient.hpp>
-#include <Factory.h>
-#include <Field.hpp>
-#include <NotificationChannel.hpp>
-#include <NotificationEvent.hpp>
-#include <NotificationLog.hpp>
-#include <ParametersMap.h>
-#include <Registry.h>
-#include <Alarm.h>
-#include <SimpleObjectFieldDefinition.hpp>
-#include <UtilTypes.h>
+#include "Alarm.h"
+#include "AlarmObjectLink.h"
+#include "BroadcastPointAlarmRecipient.hpp"
+#include "Factory.h"
+#include "Field.hpp"
+#include "MessagesRight.h"
+#include "NotificationChannel.hpp"
+#include "NotificationEvent.hpp"
+#include "NotificationLog.hpp"
+#include "ParametersMap.h"
+#include "Profile.h"
+#include "Registry.h"
+#include "Session.h"
+#include "SimpleObjectFieldDefinition.hpp"
+#include "User.h"
+#include "UtilTypes.h"
 
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/foreach.hpp>
@@ -382,6 +385,21 @@ namespace synthese
 			}
 		}
 
+
+		bool NotificationProvider::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool NotificationProvider::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool NotificationProvider::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::DELETE_RIGHT);
+		}
 	}
 }
 

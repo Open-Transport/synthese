@@ -22,6 +22,11 @@
 
 #include "WebsiteConfig.hpp"
 
+#include "CMSRight.hpp"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
+
 namespace synthese
 {
 	CLASS_DEFINITION(cms::WebsiteConfig, "t103_website_configs", 103)
@@ -61,6 +66,22 @@ namespace synthese
 			{
 				get<Website>()->setConfig(NULL);
 			}
+		}
+
+
+		bool WebsiteConfig::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CMSRight>(security::WRITE);
+		}
+
+		bool WebsiteConfig::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CMSRight>(security::WRITE);
+		}
+
+		bool WebsiteConfig::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CMSRight>(security::DELETE_RIGHT);
 		}
 }	}
 

@@ -340,6 +340,10 @@ namespace synthese
 					return _linkedObjects;
 				}
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 
 		typedef std::vector<boost::shared_ptr<Alarm> > Alarms;

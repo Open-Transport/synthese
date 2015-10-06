@@ -23,24 +23,27 @@
 #include "VDVServer.hpp"
 
 #include "BasicClient.h"
-#include "DataExchangeModule.hpp"
-#include "Env.h"
-#include "VDVServerSubscription.hpp"
-#include "XmlToolkit.h"
-#include "ServerModule.h"
-#include "ImportableTableSync.hpp"
-#include "TransportNetworkTableSync.h"
-#include "ScheduledServiceTableSync.h"
 #include "City.h"
 #include "CityTableSync.h"
-#include "StopAreaTableSync.hpp"
-#include "StopPointTableSync.hpp"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
-#include "JourneyPatternTableSync.hpp"
-#include "DesignatedLinePhysicalStop.hpp"
-#include "LineStopTableSync.h"
+#include "DataExchangeModule.hpp"
 #include "DBModule.h"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "Env.h"
+#include "ImportableTableSync.hpp"
+#include "JourneyPatternTableSync.hpp"
+#include "LineStopTableSync.h"
+#include "Profile.h"
+#include "ScheduledServiceTableSync.h"
+#include "Session.h"
+#include "ServerModule.h"
+#include "StopAreaTableSync.hpp"
+#include "StopPointTableSync.hpp"
+#include "TransportNetworkTableSync.h"
+#include "User.h"
+#include "VDVServerSubscription.hpp"
+#include "XmlToolkit.h"
 
 #include <boost/date_time/local_time_adjustor.hpp>
 #include <boost/date_time/c_local_time_adjustor.hpp>
@@ -916,4 +919,19 @@ namespace synthese
 			ScheduledServiceTableSync::Save(service);
 		}
 
+
+		bool VDVServer::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool VDVServer::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool VDVServer::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
+		}
 }	}

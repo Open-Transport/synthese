@@ -115,6 +115,10 @@ namespace synthese
 			static std::string SerializeSlices(
 				const FareType::Slices& object
 			);
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 	}
 }

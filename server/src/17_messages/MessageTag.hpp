@@ -49,6 +49,10 @@ namespace synthese
 			MessageTag(
 				util::RegistryKeyType id = 0
 			);
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

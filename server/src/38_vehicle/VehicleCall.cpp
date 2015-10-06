@@ -23,6 +23,8 @@
 #include "VehicleCall.hpp"
 
 #include "ImportableTableSync.hpp"
+#include "Profile.h"
+#include "User.h"
 
 using namespace boost;
 using namespace std;
@@ -81,5 +83,21 @@ namespace synthese
 		VehicleCall::~VehicleCall()
 		{
 			unlink();
+		}
+
+
+		bool VehicleCall::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool VehicleCall::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool VehicleCall::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}

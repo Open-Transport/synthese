@@ -26,15 +26,17 @@
 #include <boost/optional/optional_io.hpp>
 
 #include "ScenarioFolderTableSync.h"
-#include "ScenarioFolder.h"
+
 #include "Conversion.h"
+#include "DBException.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
-#include "DBException.hpp"
+#include "MessagesLibraryRight.h"
+#include "MessagesRight.h"
 #include "Profile.h"
 #include "ReplaceQuery.h"
+#include "ScenarioFolder.h"
 #include "ScenarioTemplateTableSync.h"
-#include "MessagesLibraryRight.h"
 #include "Session.h"
 #include "User.h"
 
@@ -155,6 +157,11 @@ namespace synthese
 				query << " OFFSET " << first;
 
 			return LoadFromQuery(query.str(), env, linkLevel);
+		}
+		
+		bool ScenarioFolderTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::READ);
 		}
 	}
 }

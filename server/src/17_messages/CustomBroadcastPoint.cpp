@@ -25,6 +25,10 @@
 #include "Alarm.h"
 #include "BroadcastPointAlarmRecipient.hpp"
 #include "MessagesModule.h"
+#include "MessagesRight.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace boost;
 using namespace std;
@@ -172,6 +176,22 @@ namespace synthese
 		void CustomBroadcastPoint::unlink()
 		{
 			MessagesModule::ClearAllBroadcastCaches();
+		}
+
+
+		bool CustomBroadcastPoint::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool CustomBroadcastPoint::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool CustomBroadcastPoint::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::DELETE_RIGHT);
 		}
 }	}
 

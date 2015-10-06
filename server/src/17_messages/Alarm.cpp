@@ -24,18 +24,22 @@
 
 #include "AlarmObjectLink.h"
 #include "AlarmRecipient.h"
+#include "BroadcastPoint.hpp"
 #include "DBConstants.h"
 #include "Factory.h"
 #include "MessageAlternative.hpp"
 #include "MessageApplicationPeriod.hpp"
-#include "MessagesSection.hpp"
 #include "MessagesModule.h"
-#include "BroadcastPoint.hpp"
+#include "MessagesRight.h"
+#include "MessagesSection.hpp"
+#include "ParametersMap.h"
+#include "Profile.h"
 #include "Scenario.h"
-#include "SentScenario.h"
 #include "ScenarioCalendar.hpp"
 #include "ScenarioTemplate.h"
-#include "ParametersMap.h"
+#include "SentScenario.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace boost;
 using namespace std;
@@ -617,5 +621,20 @@ namespace synthese
 						|| get<LastActivationEnd>() < get<LastActivationStart>());
 		}
 
+
+		bool Alarm::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool Alarm::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool Alarm::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::DELETE_RIGHT);
+		}
 }	}
 

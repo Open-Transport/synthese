@@ -22,6 +22,10 @@
 
 #include "ReservationContact.h"
 
+#include "Profile.h"
+#include "TransportNetworkRight.h"
+#include "User.h"
+
 using namespace std;
 using namespace boost;
 
@@ -59,5 +63,21 @@ namespace synthese
 		bool ReservationContact::getOnline() const
 		{
 			return false;
+		}
+
+
+		bool ReservationContact::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<pt::TransportNetworkRight>(security::WRITE);
+		}
+
+		bool ReservationContact::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<pt::TransportNetworkRight>(security::WRITE);
+		}
+
+		bool ReservationContact::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<pt::TransportNetworkRight>(security::DELETE_RIGHT);
 		}
 }	}

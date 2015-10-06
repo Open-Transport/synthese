@@ -22,8 +22,11 @@
 
 #include "MessagesSection.hpp"
 
+#include "MessagesRight.h"
 #include "MessagesSectionTableSync.hpp"
+#include "Profile.h"
 #include "RankUpdateQuery.hpp"
+#include "User.h"
 
 namespace synthese
 {
@@ -107,6 +110,22 @@ namespace synthese
 				get<Rank>()
 			);
 			query.execute(transaction);
+		}
+
+
+		bool MessagesSection::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool MessagesSection::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool MessagesSection::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::DELETE_RIGHT);
 		}
 }	}
 

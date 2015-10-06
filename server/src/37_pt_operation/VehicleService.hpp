@@ -128,6 +128,10 @@ namespace synthese
 					std::string prefix = std::string()
 				) const;
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

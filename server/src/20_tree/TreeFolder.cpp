@@ -22,6 +22,10 @@
 
 #include "TreeFolder.hpp"
 
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
+
 using namespace std;
 
 namespace synthese
@@ -61,6 +65,22 @@ namespace synthese
 			{
 				setNullParent();
 			}
+		}
+
+
+		bool TreeFolder::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool TreeFolder::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool TreeFolder::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}
 

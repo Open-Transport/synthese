@@ -22,6 +22,11 @@
 
 #include "MessageTag.hpp"
 
+#include "MessagesRight.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
+
 namespace synthese
 {
 	using namespace messages;
@@ -40,5 +45,21 @@ namespace synthese
 			FIELD_DEFAULT_CONSTRUCTOR(Name)
 		)	)
 		{
+		}
+
+
+		bool MessageTag::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool MessageTag::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::WRITE);
+		}
+
+		bool MessageTag::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::DELETE_RIGHT);
 		}
 }	}

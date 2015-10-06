@@ -1,142 +1,166 @@
+<@session_id=<?session&template=<{session&template=<@id@>}>?>@>
 <@site_name=<?object&roid=<@s@>&template=<@name@>?>@>
 <html>
-<head>
-<link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-<link href="/cms/css/main.css" rel="stylesheet" media="screen">
-<title><?if&cond=<@s@>&then=<@site_name@> - ?>SYNTHESE CMS</title>
-</head>
-<body>
-<div class="navbar navbar-inverse">
- <div class="navbar-inner">
-  <a class="brand" href="#" class="active"><?if&cond=<@s@>&then=<@site_name@> - ?>SYNTHESE CMS</a>
-  <?if&cond=<@s@>&then=
-	  <ul class="nav">
-	   <li><a href="#">Configuration locale</a></li>
-	   <li><a href="#properties_modal" data-toggle="modal">Propriétés</a></li>
-	  </ul>
-  ?>
-   <ul class="nav pull-right">
-    <li class="dropdown">
-     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-      Ouvrir un site
-      <b class="caret"></b>
-     </a>
-     <ul class="dropdown-menu">
-      <?websites&
-        template=<{website&template=
+  <head>
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/cms/css/main.css" rel="stylesheet" media="screen">
+    <title><?if&cond=<@s@>&then=<@site_name@> - ?>SYNTHESE CMS</title>
+  </head>
+  <body>
+    <div class="navbar navbar-inverse">
+      <div class="navbar-inner">
+        <a class="brand" href="#" class="active"><?if&cond=<@s@>&then=<@site_name@> - ?>SYNTHESE CMS</a>
+<?if&cond=<@session_id@>&then=
+	<?if&cond=<@s@>&then=
+        <ul class="nav">
+          <li><a href="#">Configuration locale</a></li>
+          <li><a href="#properties_modal" data-toggle="modal">Propriétés</a></li>
+        </ul>
+	?>
+        <ul class="nav pull-right">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              Ouvrir un site
+              <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+	<?websites&
+	template=<{website&template=
+              <li>
+                <?link&target=<@p@>&s=<@id@>&text=<@name@>&?>
+              </li>
+	}>?>
+            </ul>
+          </li>
+        </ul>
+        <ul class="pull-right nav">
           <li>
-           <?link&
-             target=<@p@>&
-             s=<@id@>&
-             text=<@name@>&
-           ?>
-         </li>
-      }>?>
-     </ul>
-    </li>
-   </ul>
- </div>
-</div>
-<?if&
-  cond=<@s@>&
-  else=<div class="well" style="margin:40px;"><h1>Bienvenue sur le CMS SYNTHESE.</h1><p>Sélectionnez le site à éditer sur le menu en haut à droite.</p></div>&
-  then=
-<div id="menu">
- <div id="menu_title">
-  <ul class="nav nav-pills">
-   <li class="active" files="1">
-    <a href="#">Fichiers</a>
-   </li>
-   <li file_type="js" class="hide"><a href="#">Javascript</a></li>
-  </ul>
- </div>
- <div id="menu_content">
-  <div id="menu_files">
-   <ul class="nav nav-list">
-    <?menu&
-      root=<@s@>&
-      raw_data=1&
-      min_depth=0&
-      max_depth=9999&
-      template=
-     	<{page&
-    	  recursive=1&
-    	  template=
-	    	<li class="tree_<@depth@>" file_id="<@id@>" file_type="<@mime_type@>"><a href="#"><@title@></a></li>
-	    	<@recursive_content@>
-	}>
-    ?>
-   </ul>
-  </div><div id="menu_js" class="hide">
-   <ul class="nav nav-list">
-   </ul>
-  </div>
- </div>
-</div><div id="main">
- <textarea id="editor"></textarea>
-</div>
-<div id="properties_modal" class="hide modal fade">
- <?form&
-   name=properties&
-   a=ObjectUpdate&
-   target=<@p@>&
-   s=<@s@>&
-   actionParam_object_id=<@s@>&
-   class=form form-horizontal&
- ?>
- <div class="modal-header">
-  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
-  <h3>Propriétés du site</h3>
- </div>
- <div class="modal-body">
-  <?object&
-    roid=<@s@>&
-    template=
-	  <div class="control-group">
-	   <label class="control-label">Nom</label>
-	   <div class="controls">
-	    <input type="text" name="actionParam_field_name" value="<@name@>" />
-	   </div>
-	  </div>
-	  <div class="control-group">
-	   <label class="control-label">URL</label>
-	   <div class="controls">
-	    <input type="text" name="actionParam_field_cient_url" value="<@cient_url@>" />
-	   </div>
-	  </div>
-	  <div class="control-group">
-	   <label class="control-label">Modèle par défaut</label>
-	   <div class="controls">
-	    <select name="default_page_template_id">
-	    <option value="0">(pas de modèle)</option>
-	    <?menu&
-	      root=<@s@>&
-	      raw_data=1&
-	      min_depth=0&
-	      max_depth=9999&
-	      template=
-	     	<{page&
-	    	  recursive=1&
-	    	  template=
-		    	<option value="<@id@>" <@(id==default_page_template_id)?" selected=\"true\"":""@>><#str_repeat&t=\&nbsp;\&nbsp;&n=<@depth@>#><@title@></option>
-		    	<@recursive_content@>
-		}>
-	    ?>
-	    </select>
-	   </div>
-	  </div>
-  ?>
- </div>
- <div class="modal-footer">
-  <a href="#" class="btn btn-primary" data-dismiss="modal">Fermer</a>
-  <button type="submit" class="btn btn-warning">Enregistrer</button>
- </div>
- </form>
-</div>
+            <?link&target=17733086741528628&a=logout&text=<i class="icon-off icon-white"></i>?>
+          </li>
+        </ul>
 ?>
-<script src="/lib/jquery/jquery-1.7.1.min.js"></script>
-<script src="/lib/bootstrap/js/bootstrap.min.js"></script>
-<script src="/lib/edit_area/edit_area_full.js"></script>
-<script src="/cms/js/main.js"></script>
-</body>
+      </div>
+    </div>
+<?if&
+cond=<@session_id@>&
+else=
+    <div class="hero-unit">
+      <h2>Bienvenue sur CMS</h2>
+      <?form&
+      name=login&
+      page_id=<@p@>&
+      a=login&
+      class=form-horizontal well
+      ?>
+        <label>Veuillez remplir le formulaire suivant pour vous connecter :</label>
+        <input name="actionParamlogin" type="text" class="span3" placeholder="Login">
+        <label></label>
+        <input name="actionParampwd" type="password" class="span3" placeholder="Mot de passe">
+        <label></label>
+        <button type="submit" class="btn btn-primary">Connexion</button>
+      </form>
+    </div>
+&then=
+	<?if&
+	cond=<@s@>&
+	else=
+    <div class="well" style="margin:40px;"><h1>Bienvenue sur le CMS SYNTHESE.</h1><p>Sélectionnez le site à éditer sur le menu en haut à droite.</p></div>&
+	then=
+    <div id="menu">
+      <div id="menu_title">
+        <ul class="nav nav-pills">
+          <li class="active" files="1">
+            <a href="#">Fichiers</a>
+          </li>
+          <li file_type="js" class="hide"><a href="#">Javascript</a></li>
+        </ul>
+      </div>
+      <div id="menu_content">
+        <div id="menu_files">
+          <ul class="nav nav-list">
+		<?menu&
+		root=<@s@>&
+		raw_data=1&
+		min_depth=0&
+		max_depth=9999&
+		template=<{page&
+			recursive=1&
+			template=
+            <li class="tree_<@depth@>" file_id="<@id@>" file_type="<@mime_type@>"><a href="#"><@title@></a></li>
+				<@recursive_content@>
+		}>?>
+          </ul>
+        </div>
+        <div id="menu_js" class="hide">
+          <ul class="nav nav-list">
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div id="main">
+      <textarea id="editor"></textarea>
+    </div>
+    <div id="properties_modal" class="hide modal fade">
+      <?form&
+      name=properties&
+      a=ObjectUpdate&
+      target=<@p@>&
+      s=<@s@>&
+      actionParam_object_id=<@s@>&
+      class=form form-horizontal&
+      ?>
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
+          <h3>Propriétés du site</h3>
+        </div>
+        <div class="modal-body">
+		<?object&
+		roid=<@s@>&
+		template=
+          <div class="control-group">
+            <label class="control-label">Nom</label>
+            <div class="controls">
+              <input type="text" name="actionParam_field_name" value="<@name@>" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">URL</label>
+            <div class="controls">
+              <input type="text" name="actionParam_field_cient_url" value="<@cient_url@>" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Modèle par défaut</label>
+            <div class="controls">
+              <select name="default_page_template_id">
+                <option value="0">(pas de modèle)</option>
+			<?menu&
+			root=<@s@>&
+			raw_data=1&
+			min_depth=0&
+			max_depth=9999&
+			template=<{page&
+				recursive=1&
+				template=
+                <option value="<@id@>" <@(id==default_page_template_id)?" selected=\"true\"":""@>><#str_repeat&t=\&nbsp;\&nbsp;&n=<@depth@>#><@title@></option>
+					<@recursive_content@>
+			}>?>
+              </select>
+            </div>
+          </div>
+		?>
+        </div>
+        <div class="modal-footer">
+          <a href="#" class="btn btn-primary" data-dismiss="modal">Fermer</a>
+          <button type="submit" class="btn btn-warning">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+	?>
+?>
+    <script src="/lib/jquery/jquery-1.7.1.min.js"></script>
+    <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/lib/edit_area/edit_area_full.js"></script>
+    <script src="/cms/js/main.js"></script>
+  </body>
 </html>

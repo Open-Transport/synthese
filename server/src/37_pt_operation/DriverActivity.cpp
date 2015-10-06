@@ -22,6 +22,8 @@
 
 #include "DriverActivity.hpp"
 
+#include "Profile.h"
+#include "Session.h"
 #include "User.h"
 
 using namespace boost::gregorian;
@@ -48,5 +50,21 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks)
 			)	)
 		{}
+
+
+		bool DriverActivity::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool DriverActivity::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool DriverActivity::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
+		}
 }	}
 

@@ -164,6 +164,11 @@ namespace synthese
 			Search(env, std::back_inserter(result), scenarioId, first, number, orderByLevel, linkLevel);
 			return result;
 		}
+
+		bool AlarmTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::READ);
+		}
 }	}
 
 

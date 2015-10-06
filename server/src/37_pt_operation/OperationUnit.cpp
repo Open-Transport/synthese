@@ -22,6 +22,10 @@
 
 #include "OperationUnit.hpp"
 
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
+
 using namespace std;
 
 namespace synthese
@@ -78,5 +82,21 @@ namespace synthese
 				map.insert(TAG_ALLOWED_LINE, linePM);
 			}
 
+		}
+
+
+		bool OperationUnit::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool OperationUnit::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool OperationUnit::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}
