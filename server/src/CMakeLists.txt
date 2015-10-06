@@ -57,7 +57,6 @@ set(MODULES
 54_departure_boards
 55_timetables
 56_pt_website
-#57_accounting
 59_road_journey_planner
 60_analysis
 61_data_exchange
