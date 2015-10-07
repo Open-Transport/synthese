@@ -268,10 +268,6 @@ namespace synthese
 					);
 					if(stop)
 					{
-						stop = *_stopPoints.get(stopref).begin();
-					}
-					if(stop)
-					{
 						HanoverLineStop& vs(*linkStops.insert(linkStops.end(),HanoverLineStop()));
 						vs.id = pntId;
 						vs.syntheseStop = const_cast<StopPoint*>(stop);
