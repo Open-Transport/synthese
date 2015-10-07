@@ -219,15 +219,6 @@ namespace synthese
 						_logError(content.str());
 						return false;
 					}
-
-					CommercialLine* commercialLine = *_lines.get(shortName).begin();
-					JourneyPatternTableSync::Search(_env, commercialLine->getKey());
-					ScheduledServiceTableSync::Search(_env, optional<RegistryKeyType>(), commercialLine->getKey());
-					ContinuousServiceTableSync::Search(_env, optional<RegistryKeyType>(), commercialLine->getKey());
-					BOOST_FOREACH(const Path* route, commercialLine->getPaths())
-					{
-						LineStopTableSync::Search(_env, route->getKey());
-					}
 				}
 			}
 
