@@ -351,7 +351,6 @@ namespace synthese
 							);
 							continue;
 						}
-						commercialLine = *_lines.get(commercialLineRef).begin();
 
 						// Beginning load of the next ref
 						lastRouteId = id;
