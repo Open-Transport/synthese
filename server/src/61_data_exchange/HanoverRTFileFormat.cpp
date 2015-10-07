@@ -486,7 +486,14 @@ namespace synthese
 							HanoverSchedule()
 					)	);
 					schedule.dept = duration_from_string(result->get<string>("pti_scheduled"));
-					schedule.deptRT = duration_from_string(result->get<string>("pti_real_estimated"));
+					if (result->get<string>("pti_real_estimated").empty())
+					{
+						schedule.deptRT = schedule.dept;
+					}
+					else
+					{
+						schedule.deptRT = duration_from_string(result->get<string>("pti_real_estimated"));
+					}
 
 					// Getting calendar
 					htyId = result->get<int>("hty_id");
