@@ -96,9 +96,6 @@ namespace synthese
 				boost::posix_time::time_duration _hysteresis;
 
 				mutable std::set<pt::ScheduledService*> _servicesToSave;
-				mutable impex::ImportableTableSync::ObjectBySource<pt::StopAreaTableSync> _stopAreas;
-				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stopPoints;
-				mutable impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync> _lines;
 
 				mutable RoutesMap _routes;
 				mutable HanoverSchedulesMap _hanoverTheoricalSchedules;

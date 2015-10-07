@@ -90,7 +90,6 @@ namespace synthese
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
-				static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
 
 			private:
 				boost::optional<std::string> _dbConnString;

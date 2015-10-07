@@ -73,6 +73,7 @@ namespace synthese
 	{
 		const string HanoverRTFileFormat::Importer_::PARAMETER_DB_CONN_STRING("conn_string");
 		const string HanoverRTFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
+		const string HanoverRTFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID = "th_ds";
 
 
 
@@ -86,10 +87,7 @@ namespace synthese
 		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
 			DatabaseReadImporter<HanoverRTFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
 			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
-			HanoverFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
-			_stopAreas(*import.get<DataSource>(), env),
-			_stopPoints(*import.get<DataSource>(), env),
-			_lines(*import.get<DataSource>(), env)
+			HanoverFileFormat(env, import, minLogLevel, logPath, outputStream, pm)
 		{}
 
 
@@ -105,6 +103,18 @@ namespace synthese
 		void HanoverRTFileFormat::Importer_::_setFromParametersMap(const ParametersMap& map)
 		{
 			_dbConnString = map.getOptional<string>(PARAMETER_DB_CONN_STRING);
+
+			// Planned datasource
+			try
+			{
+				_plannedDataSource = Env::GetOfficialEnv().get<DataSource>(
+					map.get<RegistryKeyType>(PARAMETER_PLANNED_DATASOURCE_ID)
+				);
+			}
+			catch(ObjectNotFoundException<DataSource>&)
+			{
+				throw RequestException("No such planned data source");
+			}
 
 			// Hysteresis
 			_hysteresis = seconds(
@@ -145,7 +155,11 @@ namespace synthese
 					string name(result->get<string>("sgr_name"));
 					string ref(result->get<string>("sgr_short_name"));
 
-					if (!_stopAreas.contains(ref))
+					StopArea* stopArea(
+						_plannedDataSource->getObjectByCode<StopArea>(ref)
+					);
+
+					if (!stopArea)
 					{
 						stringstream content;
 						content << "Unrecognized stop area " << ref << "(" << name << ")";
@@ -168,7 +182,11 @@ namespace synthese
 					string name(result->get<string>("sto_name"));
 					string ref(result->get<string>("sto_graph_key"));
 
-					if(!_stopPoints.contains(ref))
+					StopPoint* stopPoint(
+						_plannedDataSource->getObjectByCode<StopPoint>(ref)
+					);
+
+					if(!stopPoint)
 					{
 						stringstream content;
 						content << "Unrecognized stop point " << ref << "(" << name << "), should be in stop area " << areaRef;
@@ -190,7 +208,11 @@ namespace synthese
 					string name(result->get<string>("lin_linename"));
 					string shortName(result->get<string>("lin_number"));
 
-					if(!_lines.contains(shortName))
+					CommercialLine* cline(
+						_plannedDataSource->getObjectByCode<CommercialLine>(shortName)
+					);
+
+					if(!cline)
 					{
 						stringstream content;
 						content << "Unrecognized commercial line " << shortName << "(" << name << ")";
@@ -250,8 +272,10 @@ namespace synthese
 					);
 					offsetSum += lg;
 
-					const StopPoint* stop(NULL);
-					if(_stopPoints.contains(stopref))
+					StopPoint* stop(
+						_plannedDataSource->getObjectByCode<StopPoint>(stopref)
+					);
+					if(stop)
 					{
 						stop = *_stopPoints.get(stopref).begin();
 					}
@@ -323,8 +347,17 @@ namespace synthese
 					{
 						string commercialLineRef(result->get<string>("lin_number"));
 
+						commercialLine = _plannedDataSource->getObjectByCode<CommercialLine>(commercialLineRef);
+						JourneyPatternTableSync::Search(Env::GetOfficialEnv(), commercialLine->getKey());
+						ScheduledServiceTableSync::Search(Env::GetOfficialEnv(), optional<RegistryKeyType>(), commercialLine->getKey());
+						ContinuousServiceTableSync::Search(Env::GetOfficialEnv(), optional<RegistryKeyType>(), commercialLine->getKey());
+						BOOST_FOREACH(const Path* route, commercialLine->getPaths())
+						{
+							LineStopTableSync::Search(Env::GetOfficialEnv(), route->getKey());
+						}
+
 						// Check of the commercial line
-						if(!_lines.contains(commercialLineRef))
+						if(!commercialLine)
 						{
 							_logWarning(
 								"Inconsistent line id "+ lexical_cast<string>(commercialLineRef) +" in ROUTE "+ lexical_cast<string>(id)
@@ -578,7 +611,7 @@ namespace synthese
 							run.second.route->direction,
 							NULL,
 							stops,
-							dataSource,
+							*_plannedDataSource,
 							true,
 							true,
 							true,
@@ -623,7 +656,7 @@ namespace synthese
 							departures,
 							arrivals,
 							run.second.service_number,
-							dataSource,
+							*_plannedDataSource,
 							optional<const string&>(),
 							optional<const RuleUser::Rules&>(),
 							optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(stops),
@@ -705,20 +738,6 @@ namespace synthese
 		DBTransaction HanoverRTFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
-
-			BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
-			{
-				StopAreaTableSync::Save(cstop.second.get(), transaction);
-			}
-			BOOST_FOREACH(Registry<StopPoint>::value_type stop, _env.getRegistry<StopPoint>())
-			{
-				StopPointTableSync::Save(stop.second.get(), transaction);
-			}
-
-			BOOST_FOREACH(Registry<CommercialLine>::value_type cline, _env.getRegistry<CommercialLine>())
-			{
-				CommercialLineTableSync::Save(cline.second.get(), transaction);
-			}
 
 			// Created journey patterns
 			BOOST_FOREACH(const JourneyPattern::Registry::value_type& journeyPattern, _env.getRegistry<JourneyPattern>())
