@@ -24,6 +24,7 @@
 
 #include "HanoverRTFileFormat.hpp"
 
+#include "ContinuousServiceTableSync.h"
 #include "CityTableSync.h"
 #include "TransportNetworkTableSync.h"
 #include "CommercialLine.h"
@@ -195,6 +196,15 @@ namespace synthese
 						content << "Unrecognized commercial line " << shortName << "(" << name << ")";
 						_logError(content.str());
 						return false;
+					}
+
+					CommercialLine* commercialLine = *_lines.get(shortName).begin();
+					JourneyPatternTableSync::Search(_env, commercialLine->getKey());
+					ScheduledServiceTableSync::Search(_env, optional<RegistryKeyType>(), commercialLine->getKey());
+					ContinuousServiceTableSync::Search(_env, optional<RegistryKeyType>(), commercialLine->getKey());
+					BOOST_FOREACH(const Path* route, commercialLine->getPaths())
+					{
+						LineStopTableSync::Search(_env, route->getKey());
 					}
 				}
 			}
@@ -413,7 +423,7 @@ namespace synthese
 			{
 				string query(
 					string("SELECT * FROM ") + _database +".v_rcs_passing_time " + "WHERE run_number_ext NOT LIKE 'HLP%' " + 
-						"AND pti_real_estimated IS NOT NULL " +
+						"AND run_id in (SELECT DISTINCT run_id FROM " + _database + "v_rcs_passing_time WHERE pti_real_estimated IS NOT NULL) " +
 						"ORDER BY rou_id ASC, run_id ASC, pti_rank ASC"
 				);
 				DBResultSPtr result(db->execQuery(query));
