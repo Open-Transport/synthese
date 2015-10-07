@@ -24,10 +24,12 @@
 
 #include "AlgorithmLogger.hpp"
 #include "RoutePlanner.h"
+#include "Log.h"
 
 #include <boost/foreach.hpp>
 #include <sstream>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <boost/date_time/posix_time/time_formatters.hpp>
 
 using namespace boost;
 using namespace std;
@@ -254,14 +256,14 @@ namespace synthese
 				{
 					if(_planningOrder == DEPARTURE_FIRST)
 					{
-						// Verifiy that the journey is not the same continuous service than the last one.
+						// Verify that the journey is not the same continuous service than the last one.
 						// If yes, enlarge the time slot of the existing continuous service
 						result.push_back(journey);
 						_journeyTemplates.addResult(journey);
 					}
 					else
 					{
-						// Verifiy that the journey is not the same continuous service than the first one.
+						// Verify that the journey is not the same continuous service than the first one.
 						// If yes, enlarge the time slot of the existing continuous service and shift it
 						result.push_front(journey);
 						_journeyTemplates.addResult(journey);
@@ -297,12 +299,36 @@ namespace synthese
 						if(_planningOrder == DEPARTURE_FIRST)
 						{
 							const Journey& last(result.back());
-							originDateTime = last.getLastDepartureTime();
+							boost::posix_time::ptime newOriginDateTime = last.getLastDepartureTime();
+
+							if(newOriginDateTime < originDateTime)
+							{
+								// There is a time inconsistency, log an error and clear the result set
+								util::Log::GetInstance().error("Route planning found a journey breaking time consistency : "
+															   + boost::posix_time::to_simple_string(newOriginDateTime) + " < "
+															   + boost::posix_time::to_simple_string(originDateTime));
+								result.clear();
+								break;
+							}
+
+							originDateTime = newOriginDateTime;
 						}
 						else
 						{
 							const Journey& first(result.front());
-							originDateTime = first.getFirstArrivalTime();
+							boost::posix_time::ptime newOriginDateTime = first.getFirstArrivalTime();
+
+							if(newOriginDateTime > originDateTime)
+							{
+								// There is a time inconsistency, log an error and clear the result set
+								util::Log::GetInstance().error("Route planning found a journey breaking time consistency : "
+															   + boost::posix_time::to_simple_string(newOriginDateTime) + " > "
+															   + boost::posix_time::to_simple_string(originDateTime));
+								result.clear();
+								break;
+							}
+
+							originDateTime = newOriginDateTime;
 						}
 
 						result = tempResult;
@@ -331,19 +357,42 @@ namespace synthese
 					if(_planningOrder == DEPARTURE_FIRST)
 					{
 						const Journey& last(result.back());
-						originDateTime = last.getLastDepartureTime();
+						boost::posix_time::ptime newOriginDateTime = last.getLastDepartureTime();
+
+						if(newOriginDateTime < originDateTime)
+						{
+							// There is a time inconsistency, log an error and clear the result set
+							util::Log::GetInstance().error("Route planning found a journey breaking time consistency : "
+														   + boost::posix_time::to_simple_string(newOriginDateTime) + " < "
+														   + boost::posix_time::to_simple_string(originDateTime));
+							result.clear();
+							break;
+						}
+
+						originDateTime = newOriginDateTime;
 					}
 					else
 					{
 						const Journey& first(result.front());
-						originDateTime = first.getFirstArrivalTime();
+						boost::posix_time::ptime newOriginDateTime = first.getFirstArrivalTime();
+
+						if(newOriginDateTime > originDateTime)
+						{
+							// There is a time inconsistency, log an error and clear the result set
+							util::Log::GetInstance().error("Route planning found a journey breaking time consistency : "
+														   + boost::posix_time::to_simple_string(newOriginDateTime) + " > "
+														   + boost::posix_time::to_simple_string(originDateTime));
+							result.clear();
+							break;
+						}
+
+						originDateTime = newOriginDateTime;
 					}
 				}
 			}
 
 			return result;
 		}
-
 
 
 		TimeSlotRoutePlanner::Result TimeSlotRoutePlanner::_MergeSubResultAndParentContinuousService(

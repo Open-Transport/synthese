@@ -36,6 +36,7 @@
 #include <limits>
 #include <set>
 #include <sstream>
+#include <boost/date_time/posix_time/time_formatters.hpp>
 
 #undef max
 #undef min
@@ -132,17 +133,17 @@ namespace synthese
 			ptime beginBound(result2.getBeginTime());
 			ptime endBound(result2.getEndTime());
 			
-			// Solution should not start after _maxBeginTime even if better than a solution
-			// which starts before _maxBeginTime
-			if (_planningOrder == DEPARTURE_FIRST &&
-				beginBound > _maxBeginTime)
-			{
-				beginBound = _maxBeginTime;
-			}
-			else if (_planningOrder != DEPARTURE_FIRST &&
-				endBound < _maxBeginTime)
+			// Solution should not start after _maxBeginTime even if better than a solution which starts before _maxBeginTime
+			// Note that result2 is reversed : its planning order is the opposite of _planningOrder, and its bounds are also reversed
+			// (result.beginBound == result2.endBound ; result.endBound == result2.beginBound)
+			if ((DEPARTURE_FIRST == _planningOrder) && (endBound > _maxBeginTime))
 			{
 				endBound = _maxBeginTime;
+			}
+
+			else if ((ARRIVAL_FIRST == _planningOrder) && (beginBound > _maxBeginTime))
+			{
+				beginBound = _maxBeginTime;
 			}
 
 			// Check if the found result is compliant with the duration filters
@@ -221,6 +222,7 @@ namespace synthese
 						finalResult.append(goalApproachJourney);
 					}
 				}
+
 				return finalResult;
 			}// If no result with no duration filter at first run then try with duration filter at first run
 			else if(ignoreDurationFilterFirstRun && (_maxDuration || _maxTransferDuration))
@@ -390,7 +392,6 @@ namespace synthese
 
 			_logger.closeJourneyPlannerLog();
 		}
-
 
 
 		RoutePlanner::SamePlacesException::SamePlacesException()
