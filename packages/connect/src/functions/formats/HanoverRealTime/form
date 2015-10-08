@@ -1,0 +1,14 @@
+<#forms/text_input&
+  label=Connecteur de base de données&
+  name=conn_string&
+#>
+
+<#forms/text_input&
+  label=Nom de base de données&
+  name=db&
+#>
+
+<#forms/datasource_selector&
+  label=Source de données des données théoriques&
+  name=th_ds&
+#>
