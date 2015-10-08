@@ -734,7 +734,7 @@ namespace synthese
 								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getFullName()
 							);
 						}
-						r->setArrivalTime(su.getArrivalDateTime());
+						r->set<ArrivalTime>(su.getArrivalDateTime());
 
 						const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
 						if (line)

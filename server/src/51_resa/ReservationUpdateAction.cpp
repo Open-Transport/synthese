@@ -285,7 +285,7 @@ namespace synthese
 			// Acknowledge time
 			if(_acknowledgeTime)
 			{
-				_reservation->setAcknowledgeTime(*_acknowledgeTime);
+				r->set<ArrivalTime>(su.getArrivalDateTime());
 			}
 			else if(_cancelAcknowledgement)
 			{
