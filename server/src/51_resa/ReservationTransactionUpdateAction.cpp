@@ -130,11 +130,11 @@ namespace synthese
 		){
 			if(_seats)
 			{
-				_reservationTransaction->setSeats(*_seats);
+				_reservationTransaction->set<Seats>(*_seats);
 			}
 			if(_name)
 			{
-				_reservationTransaction->setCustomerName(*_name);
+				_reservationTransaction->set<CustomerName>(*_name);
 			}
 			ReservationTransactionTableSync::Save(_reservationTransaction.get());
 
@@ -151,12 +151,12 @@ namespace synthese
 					break;
 				}
 				
-				reservation->setDeparturePlaceId(_departurePlace->getKey());
-				reservation->setDepartureCityName(_departurePlace->getCity()->getName());
-				reservation->setDeparturePlaceNameNoCity(_departurePlace->getName());
-				reservation->setDeparturePlaceName(_departurePlace->getFullName());
+				reservation->set<DeparturePlaceId>(_departurePlace->getKey());
+				reservation->set<DepartureCityName>(_departurePlace->getCity()->getName());
+				reservation->set<DeparturePlaceNameNoCity>(_departurePlace->getName());
+				reservation->set<DeparturePlaceName>(_departurePlace->getFullName());
 				if (!_departureTime.is_not_a_date_time())
-					reservation->setDepartureTime(_departureTime);
+					reservation->set<DepartureTime>(_departureTime);
 				ReservationTableSync::Save(reservation);
 			}
 			
@@ -171,12 +171,12 @@ namespace synthese
 				{
 					reservation = resa.get();
 				}
-				reservation->setArrivalPlaceId(_arrivalPlace->getKey());
-				reservation->setArrivalCityName(_arrivalPlace->getCity()->getName());
-				reservation->setArrivalPlaceNameNoCity(_arrivalPlace->getName());
-				reservation->setArrivalPlaceName(_arrivalPlace->getFullName());
+				reservation->set<ArrivalPlaceId>(_arrivalPlace->getKey());
+				reservation->set<ArrivalCityName>(_arrivalPlace->getCity()->getName());
+				reservation->set<ArrivalPlaceNameNoCity>(_arrivalPlace->getName());
+				reservation->set<ArrivalPlaceName>(_arrivalPlace->getFullName());
 				if (!_arrivalTime.is_not_a_date_time())
-					reservation->setArrivalTime(_arrivalTime);
+					reservation->set<ArrivalTime>(_arrivalTime);
 				ReservationTableSync::Save(reservation);
 			}
 		}

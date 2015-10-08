@@ -23,10 +23,11 @@
 #ifndef SYNTHESE_resa_ReservationTransaction_h__
 #define SYNTHESE_resa_ReservationTransaction_h__
 
-#include "ResaTypes.h"
+#include "Object.hpp"
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "PtimeField.hpp"
+#include "ResaTypes.h"
+#include "StringField.hpp"
 
 #include <set>
 #include <boost/shared_ptr.hpp>
@@ -43,11 +44,38 @@ namespace synthese
 	{
 		class Reservation;
 
+		FIELD_ID(LastReservationId)
+		FIELD_SIZE_T(Seats)
+		FIELD_PTIME(BookingTime)
+		FIELD_PTIME(CancellationTime)
+		FIELD_POINTER(Customer, security::User)
+		FIELD_STRING(CustomerName)
+		FIELD_STRING(CustomerPhone)
+		FIELD_STRING(CustomerEmail)
+		FIELD_ID(BookingUserId)
+		FIELD_ID(CancelUserId)
+		FIELD_STRING(Comment)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(LastReservationId),
+			FIELD(Seats),
+			FIELD(BookingTime),
+			FIELD(CancellationTime),
+			FIELD(Customer),
+			FIELD(CustomerName),
+			FIELD(CustomerPhone),
+			FIELD(CustomerEmail),
+			FIELD(BookingUserId),
+			FIELD(CancelUserId),
+			FIELD(Comment)
+		> ReservationTransactionSchema;
+
 		/** ReservationTransaction class.
 			@ingroup m51
 		*/
 		class ReservationTransaction
-		:	public virtual util::Registrable
+		:	public virtual Object<ReservationTransaction, ReservationTransactionSchema>
 		{
 		public:
 
@@ -56,9 +84,6 @@ namespace synthese
 				bool operator()(Reservation* op1, Reservation* op2);
 			};
 
-			/// Chosen registry class.
-			typedef util::Registry<ReservationTransaction>	Registry;
-
 			typedef std::set<Reservation*, ReservationComparator> Reservations;
 
 		private:
@@ -66,22 +91,6 @@ namespace synthese
 			//!	\name Reservation attributes
 			//@{
 				Reservations		_reservations;
-				util::RegistryKeyType		_lastReservation;		//!< Code de la réservation annulée en cas de modification
-				size_t					_seats;			//!< Nombre de places
-				boost::posix_time::ptime		_bookingTime;		//!< Date de la réservation
-				boost::posix_time::ptime	_cancellationTime;		//!< Date de l'annulation (unknown = not cancelled)
-				std::string _comment;
-			//@}
-
-			//!	\name Customer
-			//@{
-				util::RegistryKeyType	_customerUserId;
-				security::User*			_customer;
-				std::string			_customerName;
-				std::string			_customerPhone;
-				std::string			_customerEMail;
-				util::RegistryKeyType		_bookingUserId;
-				util::RegistryKeyType	_cancelUserId;
 			//@}
 
 			//! \name Journey
@@ -99,33 +108,9 @@ namespace synthese
 
 		public:
 			ReservationTransaction(util::RegistryKeyType key = 0);
+			~ReservationTransaction();
 
-			void setLastReservation	(util::RegistryKeyType id) { _lastReservation = id; }
-			void setSeats			(size_t value){ _seats = value; }
-			void setBookingTime		(const boost::posix_time::ptime& time);
-			void setCancellationTime(const boost::posix_time::ptime& time);
-			void setCustomerUserId	(util::RegistryKeyType id){ _customerUserId = id; }
-			void setCustomer		(security::User* value){ _customer = value; }
-			void setCustomerName	(const std::string& name);
-			void setCustomerPhone	(const std::string& phone);
-			void setBookingUserId	(util::RegistryKeyType id) { _bookingUserId = id; }
-			void setCancelUserId	(util::RegistryKeyType id) { _cancelUserId = id; }
-			void setCustomerEMail	(const std::string& email);
-			void setComment(const std::string& value){ _comment = value; }
-
-			util::RegistryKeyType					getLastReservation()	const { return _lastReservation; }
-			size_t						getSeats()				const { return _seats; }
-			const boost::posix_time::ptime&	getBookingTime()		const;
-			const boost::posix_time::ptime&	getCancellationTime()	const;
-			util::RegistryKeyType	getCustomerUserId()		const { return _customerUserId; }
-			security::User*			getCustomer()			const { return _customer; }
-			const std::string&		getCustomerName()		const;
-			const std::string&		getCustomerPhone()		const;
-			util::RegistryKeyType	getBookingUserId()		const { return _bookingUserId; }
-			util::RegistryKeyType	getCancelUserId()		const { return _cancelUserId; }
-			const std::string&		getCustomerEMail()		const;
 			const Reservations&		getReservations()		const;
-			const std::string& getComment() const { return _comment; }
 
 
 
@@ -169,6 +154,10 @@ namespace synthese
 				*/
 				boost::posix_time::ptime getReservationDeadLine() const;
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

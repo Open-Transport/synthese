@@ -22,10 +22,9 @@
 
 #include "BookReservationAction.h"
 
-#include "RequestException.h"
-#include "ClientException.h"
 #include "AlgorithmLogger.hpp"
 #include "City.h"
+#include "ClientException.h"
 #include "CommercialLine.h"
 #include "FreeDRTArea.hpp"
 #include "FreeDRTTimeSlot.hpp"
@@ -46,6 +45,7 @@
 #include "PTServiceConfig.hpp"
 #include "PTUseRule.h"
 #include "Request.h"
+#include "RequestException.h"
 #include "ResaDBLog.h"
 #include "ResaModule.h"
 #include "ResaRight.h"
@@ -65,6 +65,8 @@
 #include "UseRule.h"
 #include "User.h"
 #include "UserTableSync.h"
+#include "Vehicle.hpp"
+#include "VehiclePosition.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -559,15 +561,16 @@ namespace synthese
 
 							BOOST_FOREACH(ReservationTableSync::SearchResult::value_type& reservation, reservations)
 							{
-								if (reservation->getReservationPossible())
+								if (reservation->get<IsReservationPossible>())
 								{
-									User* customer = UserTableSync::GetEditable(reservation->getTransaction()->getCustomerUserId(),
+									User* customer = UserTableSync::GetEditable(
+										reservation->get<Transaction>()->get<Customer>() ? reservation->get<Transaction>()->get<Customer>()->getKey() : util::RegistryKeyType(0),
 										Env::GetOfficialEnv()).get();
 
-									if ((reservation->getServiceId() == su.getService()->getKey()) &&
+									if ((reservation->get<ServiceId>() == su.getService()->getKey()) &&
 										(customer->getKey() == _customer->getKey()) &&
-										(reservation->getDepartureTime() == su.getDepartureDateTime() &&
-										reservation->getArrivalTime() == su.getArrivalDateTime())
+										(reservation->get<DepartureTime>() == su.getDepartureDateTime() &&
+										reservation->get<ArrivalTime>() == su.getArrivalDateTime())
 									){
 										const ReservationStatus& status(reservation->getStatus());
 
@@ -591,17 +594,15 @@ namespace synthese
 				// New ReservationTransaction
 				ReservationTransaction rt;
 				rt.setKey(ReservationTransactionTableSync::getId());
-				rt.setBookingTime(second_clock::local_time());
-				rt.setBookingUserId(request.getUser()->getKey());
-				rt.setCustomerName(_customer->getName() + " " + _customer->getSurname());
-				rt.setCustomerPhone(_customer->getPhone());
-				rt.setCustomerEMail(_customer->getEMail());
-				rt.setCustomerUserId(_customer->getKey());
-				rt.setSeats(_seatsNumber);
-				rt.setComment(_comment);
-				rt.setCustomer(
-					UserTableSync::GetEditable(_customer->getKey(), *_env, UP_LINKS_LOAD_LEVEL).get()
-				);
+				rt.set<BookingTime>(second_clock::local_time());
+				rt.set<BookingUserId>(request.getUser()->getKey());
+				rt.set<CustomerName>(_customer->getName() + " " + _customer->getSurname());
+				rt.set<CustomerPhone>(_customer->getPhone());
+				rt.set<CustomerEmail>(_customer->getEMail());
+				rt.set<Seats>(_seatsNumber);
+				rt.set<Comment>(_comment);
+				boost::shared_ptr<User> customer = UserTableSync::GetEditable(_customer->getKey(), *_env, UP_LINKS_LOAD_LEVEL);
+				rt.set<Customer>(*customer);
 				ReservationTransactionTableSync::Save(&rt);
 				transactions.push_back(rt);
 			}
@@ -634,7 +635,7 @@ namespace synthese
 
 						if(dynamic_cast<const Registrable*>(su.getDepartureEdge()->getHub()))
 						{
-							r->setDeparturePlaceId(
+							r->set<DeparturePlaceId>(
 								dynamic_cast<const Registrable*>(su.getDepartureEdge()->getHub())->getKey()
 							);
 						}
@@ -643,13 +644,13 @@ namespace synthese
 						){
 							if(dynamic_cast<const Registrable*>(_departurePlace.get()))
 							{
-								r->setDeparturePlaceId(
+								r->set<DeparturePlaceId>(
 									dynamic_cast<const Registrable*>(_departurePlace.get())->getKey()
 								);
 							}
 							else if(dynamic_cast<const House*>(_departurePlace.get()))
 							{
-								r->setDeparturePlaceId(
+								r->set<DeparturePlaceId>(
 									dynamic_cast<const House*>(_departurePlace.get())->getRoadChunk()->getRoad()->get<RoadPlace>()->getKey()
 								);
 							}
@@ -657,33 +658,33 @@ namespace synthese
 						}
 						if(dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub()))
 						{
-							r->setDepartureCityName(
+							r->set<DepartureCityName>(
 								dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub())->getCity()->getName()
 							);
-							r->setDeparturePlaceNameNoCity(
+							r->set<DeparturePlaceNameNoCity>(
 								dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub())->getName()
 							);
-							r->setDeparturePlaceName(
+							r->set<DeparturePlaceName>(
 								dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub())->getFullName()
 							);
 						}
 						else if (dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup()))
 						{
-							r->setDepartureCityName(
+							r->set<DepartureCityName>(
 								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getCity()->getName()
 							);
-							r->setDeparturePlaceNameNoCity(
+							r->set<DeparturePlaceNameNoCity>(
 								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getName()
 							);
-							r->setDeparturePlaceName(
+							r->set<DeparturePlaceName>(
 								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getFullName()
 							);
 						}
-						r->setDepartureTime(su.getDepartureDateTime());
-						r->setOriginDateTime(su.getOriginDateTime());
+						r->set<DepartureTime>(su.getDepartureDateTime());
+						r->set<OriginDateTime>(su.getOriginDateTime());
 						if(dynamic_cast<const Registrable*>(su.getArrivalEdge()->getHub()))
 						{
-							r->setArrivalPlaceId(
+							r->set<ArrivalPlaceId>(
 								dynamic_cast<const Registrable*>(su.getArrivalEdge()->getHub())->getKey()
 							);
 						}
@@ -692,30 +693,30 @@ namespace synthese
 						){
 							if(dynamic_cast<const Registrable*>(_arrivalPlace.get()))
 							{
-								r->setDeparturePlaceId(
+								r->set<DeparturePlaceId>(
 									dynamic_cast<const Registrable*>(_arrivalPlace.get())->getKey()
 								);
 							}
 							else if(dynamic_cast<const House*>(_arrivalPlace.get()))
 							{
-								r->setDeparturePlaceId(
+								r->set<DeparturePlaceId>(
 									dynamic_cast<const House*>(_arrivalPlace.get())->getRoadChunk()->getRoad()->get<RoadPlace>()->getKey()
 								);
 							}
 						}
 						if(dynamic_cast<const NamedPlace*>(su.getArrivalEdge()->getHub()))
 						{
-							r->setArrivalCityName(
+							r->set<ArrivalCityName>(
 								dynamic_cast<const NamedPlace*>(
 									su.getArrivalEdge()->getHub()
 								)->getCity()->getName()
 							);
-							r->setArrivalPlaceNameNoCity(
+							r->set<ArrivalPlaceNameNoCity>(
 								dynamic_cast<const NamedPlace*>(
 									su.getArrivalEdge()->getHub()
 								)->getName()
 							);
-							r->setArrivalPlaceName(
+							r->set<ArrivalPlaceName>(
 								dynamic_cast<const NamedPlace*>(
 									su.getArrivalEdge()->getHub()
 								)->getFullName()
@@ -723,13 +724,13 @@ namespace synthese
 						}
 						else if (dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup()))
 						{
-							r->setArrivalCityName(
+							r->set<ArrivalCityName>(
 								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getCity()->getName()
 							);
-							r->setArrivalPlaceNameNoCity(
+							r->set<ArrivalPlaceNameNoCity>(
 								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getName()
 							);
-							r->setArrivalPlaceName(
+							r->set<ArrivalPlaceName>(
 								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getFullName()
 							);
 						}
@@ -740,17 +741,17 @@ namespace synthese
 						{
 							assert(line->getCommercialLine() != NULL);
 
-							r->setLineCode(line->getCommercialLine()->getShortName());
-							r->setLineId(line->getCommercialLine()->getKey());
+							r->set<LineCode>(line->getCommercialLine()->getShortName());
+							r->set<LineId>(line->getCommercialLine()->getKey());
 						}
 						const RoadPath* road(dynamic_cast<const RoadPath*>(su.getService()->getPath()));
 						if (road)
 						{
-							r->setLineCode(road->getRoad()->get<RoadPlace>()->getName());
-							r->setLineId(road->getRoad()->getKey());
+							r->set<LineCode>(road->getRoad()->get<RoadPlace>()->getName());
+							r->set<LineId>(road->getRoad()->getKey());
 						}
 
-						r->setReservationPossible(false);
+						r->set<IsReservationPossible>(false);
 						if(	UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, _ignoreReservation, _reservationRulesDelayType))
 						){
 							if(	dynamic_cast<const JourneyPattern*>(su.getService()->getPath()) &&
@@ -766,18 +767,18 @@ namespace synthese
 							}
 							if(dynamic_cast<const PTUseRule*>(&su.getUseRule()))
 							{
-								r->setReservationRuleId(static_cast<const PTUseRule&>(su.getUseRule()).getKey());
+								r->set<ReservationRuleId>(static_cast<const PTUseRule&>(su.getUseRule()).getKey());
 							}
-							r->setReservationDeadLine(
+							r->set<ReservationDeadLine>(
 								su.getUseRule().getReservationDeadLine(
 									su.getOriginDateTime(),
 									su.getDepartureDateTime(),
 									_reservationRulesDelayType
 							)	);
-							r->setReservationPossible(true);
+							r->set<IsReservationPossible>(true);
 						}
-						r->setServiceId(su.getService()->getKey());
-						r->setServiceCode(lexical_cast<string>(su.getService()->getServiceNumber()));
+						r->set<ServiceId>(su.getService()->getKey());
+						r->set<ServiceCode>(lexical_cast<string>(su.getService()->getServiceNumber()));
 
 						r->setTransaction(&(transactions[transaction_number]));
 
@@ -799,37 +800,37 @@ namespace synthese
 				r->setKey(ReservationTableSync::getId());
 				_env->getEditableRegistry<Reservation>().add(r);
 
-				r->setDeparturePlaceId(
+				r->set<DeparturePlaceId>(
 					dynamic_cast<const NamedPlace*>(_departurePlace.get())->getKey()
 				);
-				r->setDepartureCityName(
+				r->set<DepartureCityName>(
 					dynamic_cast<const NamedPlace*>(_departurePlace.get())->getCity()->getName()
 				);
-				r->setDeparturePlaceNameNoCity(
+				r->set<DeparturePlaceNameNoCity>(
 					dynamic_cast<const NamedPlace*>(_departurePlace.get())->getName()
 				);
-				r->setDeparturePlaceName(
+				r->set<DeparturePlaceName>(
 					dynamic_cast<const NamedPlace*>(_departurePlace.get())->getFullName()
 				);
-				r->setDepartureTime(_departureDateTime);
-				r->setOriginDateTime(_departureDateTime);
-				r->setArrivalPlaceId(
+				r->set<DepartureTime>(_departureDateTime);
+				r->set<OriginDateTime>(_departureDateTime);
+				r->set<ArrivalPlaceId>(
 					dynamic_cast<const NamedPlace*>(_arrivalPlace.get())->getKey()
 				);
-				r->setArrivalCityName(
+				r->set<ArrivalCityName>(
 					dynamic_cast<const NamedPlace*>(_arrivalPlace.get())->getCity()->getName()
 				);
-				r->setArrivalPlaceNameNoCity(
+				r->set<ArrivalPlaceNameNoCity>(
 					dynamic_cast<const NamedPlace*>(_arrivalPlace.get())->getName()
 				);
-				r->setArrivalPlaceName(
+				r->set<ArrivalPlaceName>(
 					dynamic_cast<const NamedPlace*>(_arrivalPlace.get())->getFullName()
 				);
-				r->setArrivalTime(_arrivalDateTime);
+				r->set<ArrivalTime>(_arrivalDateTime);
 
-				r->setLineCode(_freeDRTTimeSlot->getArea()->getLine()->getShortName());
-				r->setLineId(_freeDRTTimeSlot->getArea()->getLine()->getKey());
-				r->setReservationPossible(false);
+				r->set<LineCode>(_freeDRTTimeSlot->getArea()->getLine()->getShortName());
+				r->set<LineId>(_freeDRTTimeSlot->getArea()->getLine()->getKey());
+				r->set<IsReservationPossible>(false);
 
 				reservationContact = OnlineReservationRule::GetOnlineReservationRule(
 					_freeDRTTimeSlot->getArea()->getLine()->getReservationContact()
@@ -837,20 +838,20 @@ namespace synthese
 
 				if(dynamic_cast<const PTUseRule*>(&_freeDRTTimeSlot->getUseRule(_userClassCode)))
 				{
-					r->setReservationRuleId(
+					r->set<ReservationRuleId>(
 						static_cast<const PTUseRule&>(
 							_freeDRTTimeSlot->getUseRule(_userClassCode)
 						).getKey()
 					);
 				}
-				r->setReservationDeadLine(
+				r->set<ReservationDeadLine>(
 					_freeDRTTimeSlot->getUseRule(_userClassCode).getReservationDeadLine(
 						_departureDateTime,
 						_departureDateTime,
 						_reservationRulesDelayType
 				)	);
-				r->setServiceId(_freeDRTTimeSlot->getKey());
-				r->setServiceCode(_freeDRTTimeSlot->getServiceNumber());
+				r->set<ServiceId>(_freeDRTTimeSlot->getKey());
+				r->set<ServiceCode>(_freeDRTTimeSlot->getServiceNumber());
 				r->setTransaction(&(transactions[0]));
 
 				ReservationTableSync::Save(r.get());

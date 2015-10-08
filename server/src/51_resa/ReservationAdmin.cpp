@@ -83,7 +83,7 @@ namespace synthese
 			try
 			{
 				_resa = ReservationTableSync::Get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID), *_env);
-				ReservationTableSync::Search(*_env, _resa->getTransaction()->getKey());
+				ReservationTableSync::Search(*_env, _resa->get<Transaction>()->getKey());
 			}
 			catch(ObjectNotFoundException<Reservation>&)
 			{
@@ -114,7 +114,7 @@ namespace synthese
 				return false;
 			}
 
-			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_resa->getLineId()));
+			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_resa->get<LineId>()));
 		}
 
 
@@ -130,7 +130,7 @@ namespace synthese
 			AdminFunctionRequest<ReservationAdmin> openRequest(request, *this);
 
 			AdminFunctionRequest<ResaCustomerAdmin> openCustomer(request);
-			boost::shared_ptr<const User> user(UserTableSync::Get(_resa->getTransaction()->getCustomerUserId(), *_env));
+			boost::shared_ptr<const User> user(UserTableSync::Get(_resa->get<Transaction>()->get<Customer>()->getKey(), *_env));
 			openCustomer.getPage()->setUser(user);
 
 			PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
@@ -138,20 +138,20 @@ namespace synthese
 			stream << t.title("Client");
 
 			stream << t.cell("Nom", HTMLModule::getHTMLLink(openCustomer.getURL(), user->getFullName()));
-			stream << t.cell("Seats", lexical_cast<string>(_resa->getTransaction()->getSeats()));
+			stream << t.cell("Seats", lexical_cast<string>(_resa->get<Transaction>()->get<Seats>()));
 
 			stream << t.title("Evénements");
 
-			stream << t.cell("Réservation", lexical_cast<string>(_resa->getTransaction()->getBookingTime()));
+			stream << t.cell("Réservation", lexical_cast<string>(_resa->get<Transaction>()->get<BookingTime>()));
 			stream << t.cell("Annulation",
-				_resa->getTransaction()->getCancellationTime().is_not_a_date_time() ?
+				_resa->get<Transaction>()->get<CancellationTime>().is_not_a_date_time() ?
 				"Annuler" :
-				lexical_cast<string>(_resa->getTransaction()->getCancellationTime())
+				lexical_cast<string>(_resa->get<Transaction>()->get<CancellationTime>())
 			);
 
 			stream << t.title("Trajet");
 			size_t rank(0);
-			BOOST_FOREACH(Reservation* resa, _resa->getTransaction()->getReservations())
+			BOOST_FOREACH(Reservation* resa, _resa->get<Transaction>()->getReservations())
 			{
 				openRequest.getPage()->setReservation(_env->getSPtr(resa));
 
@@ -159,10 +159,10 @@ namespace synthese
 					resa == _resa.get() ?
 					"<b>" + lexical_cast<string>(rank++) + "</b>" :
 					HTMLModule::getHTMLLink(openRequest.getURL(), lexical_cast<string>(rank++)),
-					lexical_cast<string>(resa->getDepartureTime()) + " " +
-					resa->getDeparturePlaceName() + "-&gt;" +
-					resa->getArrivalPlaceName() + " " +
-					lexical_cast<string>(resa->getArrivalTime()) + " "
+					lexical_cast<string>(resa->get<DepartureTime>()) + " " +
+					resa->get<DeparturePlaceName>() + "-&gt;" +
+					resa->get<ArrivalPlaceName>() + " " +
+					lexical_cast<string>(resa->get<ArrivalTime>()) + " "
 				);
 			}
 			stream << t.title("Affectation");
@@ -172,42 +172,42 @@ namespace synthese
 				t.getForm().getSelectInput(
 					ReservationUpdateAction::PARAMETER_VEHICLE_ID,
 					VehicleTableSync::GetVehiclesList(*_env, string("(non affectée)")),
-					optional<RegistryKeyType>(_resa->getVehicle() ? _resa->getVehicle()->getKey() : RegistryKeyType(0))
+					optional<RegistryKeyType>(_resa->get<Vehicle>() ? _resa->get<Vehicle>()->getKey() : RegistryKeyType(0))
 			)	);
-			stream << t.cell("Numéro siège", t.getForm().getTextInput(ReservationUpdateAction::PARAMETER_SEAT_NUMBER, _resa->getSeatNumber()));
+			stream << t.cell("Numéro siège", t.getForm().getTextInput(ReservationUpdateAction::PARAMETER_SEAT_NUMBER, _resa->get<SeatNumber>()));
 			stream << t.cell(
 				"PM départ",
 				t.getForm().getTextInput(
 					ReservationUpdateAction::PARAMETER_DEPARTURE_METER_OFFSET,
-					_resa->getVehiclePositionAtDeparture() ?
-					lexical_cast<string>(_resa->getVehiclePositionAtDeparture()->getMeterOffset()) :
+					_resa->get<VehiclePositionAtDeparture>() ?
+					lexical_cast<string>(_resa->get<VehiclePositionAtDeparture>()->getMeterOffset()) :
 					string()
 			)	);
 			stream << t.cell(
 				"PM arrivée",
 				t.getForm().getTextInput(
 					ReservationUpdateAction::PARAMETER_ARRIVAL_METER_OFFSET,
-					_resa->getVehiclePositionAtArrival() ?
-					lexical_cast<string>(_resa->getVehiclePositionAtArrival()->getMeterOffset()) :
+					_resa->get<VehiclePositionAtArrival>() ?
+					lexical_cast<string>(_resa->get<VehiclePositionAtArrival>()->getMeterOffset()) :
 					string()
 			)	);
 
 			stream << t.title("Ponctualité");
-			stream << t.cell("Non opéré", t.getForm().getOuiNonRadioInput(ReservationUpdateAction::PARAMETER_CANCELLED_BY_OPERATOR, _resa->getCancelledByOperator()));
+			stream << t.cell("Non opéré", t.getForm().getOuiNonRadioInput(ReservationUpdateAction::PARAMETER_CANCELLED_BY_OPERATOR, _resa->get<CancelledByOperator>()));
 			stream << t.cell(
 				"Départ réel",
 				t.getForm().getCalendarInput(
 					ReservationUpdateAction::PARAMETER_REAL_DEPARTURE_TIME,
-					_resa->getVehiclePositionAtDeparture() ?
-					_resa->getVehiclePositionAtDeparture()->getTime() :
+					_resa->get<VehiclePositionAtDeparture>() ?
+					_resa->get<VehiclePositionAtDeparture>()->getTime() :
 					ptime(not_a_date_time)
 			)	);
 			stream << t.cell(
 				"Arrivée réelle",
 					t.getForm().getCalendarInput(
 						ReservationUpdateAction::PARAMETER_REAL_ARRIVAL_TIME,
-						_resa->getVehiclePositionAtArrival() ?
-						_resa->getVehiclePositionAtArrival()->getTime() :
+						_resa->get<VehiclePositionAtArrival>() ?
+						_resa->get<VehiclePositionAtArrival>()->getTime() :
 					ptime(not_a_date_time)
 			)	);
 

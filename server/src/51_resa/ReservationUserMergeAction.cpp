@@ -182,8 +182,8 @@ namespace synthese
                 ));
                 BOOST_FOREACH(const ReservationTransactionTableSync::SearchResult::value_type& transaction, transactions)
                 {
-                    transaction->setCustomerName(_userToMerge->getSurname()+" "+_userToMerge->getName());
-                    transaction->setCustomerEMail(_userToMerge->getEMail());
+                    transaction->set<CustomerName>(_userToMerge->getSurname()+" "+_userToMerge->getName());
+					transaction->set<CustomerEmail>(_userToMerge->getEMail());
                     ReservationTransactionTableSync::Save(transaction.get());
                 }
             }
@@ -206,24 +206,23 @@ namespace synthese
 			BOOST_FOREACH(const ReservationTransactionTableSync::SearchResult::value_type& transaction, transactions)
 			{
 				// Attach reseervation transaction to merged user
-				transaction->setCustomerUserId(_userToMerge->getKey());
-				transaction->setCustomer(_userToMerge.get());
+				transaction->set<Customer>(*_userToMerge);
 
 				if (!_userToMerge->getName().empty() && !_userToMerge->getSurname().empty())
 				{
-					transaction->setCustomerName(_userToMerge->getSurname()+" "+_userToMerge->getName());
+					transaction->set<CustomerName>(_userToMerge->getSurname()+" "+_userToMerge->getName());
 				}
 				if (!_userToMerge->getEMail().empty())
 				{
-					transaction->setCustomerEMail(_userToMerge->getEMail());
+					transaction->set<CustomerEmail>(_userToMerge->getEMail());
 				}
-				if (transaction->getBookingUserId() == _userToDelete->getKey())
+				if (transaction->get<BookingUserId>() == _userToDelete->getKey())
 				{
-					transaction->setBookingUserId(_userToMerge->getKey());
+					transaction->set<BookingUserId>(_userToMerge->getKey());
 				}
-				if (transaction->getCancelUserId() == _userToDelete->getKey())
+				if (transaction->get<CancelUserId>() == _userToDelete->getKey())
 				{
-					transaction->setCancelUserId(_userToDelete->getKey());
+					transaction->set<CancelUserId>(_userToDelete->getKey());
 				}
 
 				ReservationTransactionTableSync::Save(transaction.get());

@@ -126,13 +126,13 @@ namespace synthese
 
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(RESERVATION_ENTRY));
-			content.push_back(to_iso_extended_string(r1->getDepartureTime().date()) +" "+to_simple_string(r1->getDepartureTime().time_of_day()));
+			content.push_back(to_iso_extended_string(r1->get<DepartureTime>().date()) +" "+to_simple_string(r1->get<DepartureTime>().time_of_day()));
 			content.push_back("Réservation");
 			content.push_back(lexical_cast<string>(transaction.getKey()));
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session->getUser().get(), transaction.getCustomerUserId(), callId);
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session->getUser().get(), transaction.get<Customer>()->getKey(), callId);
 
-			UpdateCallEntryCustomer(callId, transaction.getCustomerUserId());
+			UpdateCallEntryCustomer(callId, transaction.get<Customer>()->getKey());
 		}
 
 
@@ -218,13 +218,13 @@ namespace synthese
 			}
 
 			content.push_back(lexical_cast<string>(type));
-			content.push_back(to_iso_extended_string(r1->getDepartureTime().date())+" "+to_simple_string(r1->getDepartureTime().time_of_day()));
+			content.push_back(to_iso_extended_string(r1->get<DepartureTime>().date())+" "+to_simple_string(r1->get<DepartureTime>().time_of_day()));
 			content.push_back(description);
 			content.push_back(lexical_cast<string>(transaction.getKey()));
 
-			_addEntry(FACTORY_KEY, level, content, session->getUser().get(), transaction.getCustomerUserId(), callId);
+			_addEntry(FACTORY_KEY, level, content, session->getUser().get(), transaction.get<Customer>()->getKey(), callId);
 
-			UpdateCallEntryCustomer(callId, transaction.getCustomerUserId());
+			UpdateCallEntryCustomer(callId, transaction.get<Customer>()->getKey());
 		}
 
 
@@ -683,7 +683,7 @@ namespace synthese
 			content.push_back(lexical_cast<string>(RESERVATION_UPDATE));
 			content.push_back(string());
 			content.push_back(detail);
-			content.push_back(lexical_cast<string>(reservation.getTransaction()->getKey()));
+			content.push_back(lexical_cast<string>(reservation.get<Transaction>()->getKey()));
 
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), reservation.getKey(), callId);
 		}

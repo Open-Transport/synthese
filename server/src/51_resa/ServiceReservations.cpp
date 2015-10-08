@@ -36,23 +36,23 @@ namespace synthese
 			const Reservation* right
 		) const	{
 			return
-				left->getDepartureTime() < right->getDepartureTime() ||
-				(	left->getDepartureTime() == right->getDepartureTime() &&
-					left->getDeparturePlaceName() < right->getDeparturePlaceName()
+				left->get<DepartureTime>() < right->get<DepartureTime>() ||
+				(	left->get<DepartureTime>() == right->get<DepartureTime>() &&
+					left->get<DeparturePlaceName>() < right->get<DeparturePlaceName>()
 				) || (
-					left->getDepartureTime() == right->getDepartureTime() &&
-					left->getDeparturePlaceName() == right->getDeparturePlaceName() &&
-					left->getArrivalPlaceName() < right->getArrivalPlaceName()
+					left->get<DepartureTime>() == right->get<DepartureTime>() &&
+					left->get<DeparturePlaceName>() == right->get<DeparturePlaceName>() &&
+					left->get<ArrivalPlaceName>() < right->get<ArrivalPlaceName>()
 				) || (
-					left->getDepartureTime() == right->getDepartureTime() &&
-					left->getDeparturePlaceName() == right->getDeparturePlaceName() &&
-					left->getArrivalPlaceName() == right->getArrivalPlaceName() &&
-					left->getTransaction()->getBookingTime() < right->getTransaction()->getBookingTime()
+					left->get<DepartureTime>() == right->get<DepartureTime>() &&
+					left->get<DeparturePlaceName>() == right->get<DeparturePlaceName>() &&
+					left->get<ArrivalPlaceName>() == right->get<ArrivalPlaceName>() &&
+					left->get<Transaction>()->get<BookingTime>() < right->get<Transaction>()->get<BookingTime>()
 				) || (
-					left->getDepartureTime() == right->getDepartureTime() &&
-					left->getDeparturePlaceName() == right->getDeparturePlaceName() &&
-					left->getArrivalPlaceName() == right->getArrivalPlaceName() &&
-					left->getTransaction()->getBookingTime() == right->getTransaction()->getBookingTime() &&
+					left->get<DepartureTime>() == right->get<DepartureTime>() &&
+					left->get<DeparturePlaceName>() == right->get<DeparturePlaceName>() &&
+					left->get<ArrivalPlaceName>() == right->get<ArrivalPlaceName>() &&
+					left->get<Transaction>()->get<BookingTime>() == right->get<Transaction>()->get<BookingTime>() &&
 					left < right
 				)
 			;
@@ -80,9 +80,9 @@ namespace synthese
 			int result(0);
 			BOOST_FOREACH(const Reservation* resa, _reservations)
 			{
-				if (resa->getTransaction()->getCancellationTime().is_not_a_date_time())
+				if (resa->get<Transaction>()->get<CancellationTime>().is_not_a_date_time())
 				{
-					result += resa->getTransaction()->getSeats();
+					result += resa->get<Transaction>()->get<Seats>();
 				}
 			}
 			return result;

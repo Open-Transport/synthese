@@ -21,9 +21,14 @@
 */
 
 #include "ReservationTransaction.h"
+
+#include "Profile.h"
 #include "Registry.h"
+#include "ResaRight.h"
 #include "Reservation.h"
 #include "ResaModule.h"
+#include "Session.h"
+#include "User.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -33,84 +38,56 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace resa;
 	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<resa::ReservationTransaction>::KEY("ReservationTransaction");
-	}
+	CLASS_DEFINITION(ReservationTransaction, "t046_reservation_transactions", 46)
+	FIELD_DEFINITION_OF_OBJECT(ReservationTransaction, "transaction_id", "transaction_ids")
+
+	FIELD_DEFINITION_OF_TYPE(LastReservationId, "last_reservation_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Seats, "seats", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(BookingTime, "booking_time", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(CancellationTime, "cancellation_time", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(Customer, "customer_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(CustomerName, "customer_name", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(CustomerPhone, "customer_phone", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(CustomerEmail, "customer_email", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(BookingUserId, "booking_user_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(CancelUserId, "cancel_user_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Comment, "comment", SQL_TEXT)
 
 	namespace resa
 	{
 		ReservationTransaction::ReservationTransaction(
 			RegistryKeyType key
 		):	Registrable(key),
-			_lastReservation(0),
-			_bookingTime(second_clock::local_time()),
-			_cancellationTime(not_a_date_time),
-			_customerUserId(0),
-			_customer(NULL),
-			_bookingUserId(0),
-			_cancelUserId(0),
+			Object<ReservationTransaction, ReservationTransactionSchema> (
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_VALUE_CONSTRUCTOR(LastReservationId, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(Seats),
+					FIELD_VALUE_CONSTRUCTOR(BookingTime, second_clock::local_time()),
+					FIELD_VALUE_CONSTRUCTOR(CancellationTime, not_a_date_time),
+					FIELD_DEFAULT_CONSTRUCTOR(Customer),
+					FIELD_DEFAULT_CONSTRUCTOR(CustomerName),
+					FIELD_DEFAULT_CONSTRUCTOR(CustomerPhone),
+					FIELD_DEFAULT_CONSTRUCTOR(CustomerEmail),
+					FIELD_VALUE_CONSTRUCTOR(BookingUserId, 0),
+					FIELD_VALUE_CONSTRUCTOR(CancelUserId, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(Comment)
+			)	),
 			_originDateTime(not_a_date_time),
 			_destinationDateTime(not_a_date_time)
 		{}
 
 
 
-		void ReservationTransaction::setBookingTime( const ptime& time )
+		ReservationTransaction::~ReservationTransaction()
 		{
-			_bookingTime = time;
-		}
-
-		void ReservationTransaction::setCancellationTime( const ptime& time )
-		{
-			_cancellationTime = time;
-		}
-
-
-		void ReservationTransaction::setCustomerName( const std::string& name )
-		{
-			_customerName = name;
-		}
-
-		void ReservationTransaction::setCustomerPhone( const std::string& phone )
-		{
-			_customerPhone = phone;
-		}
-
-
-
-		const ptime& ReservationTransaction::getBookingTime() const
-		{
-			return _bookingTime;
-		}
-
-		const ptime& ReservationTransaction::getCancellationTime() const
-		{
-			return _cancellationTime;
-		}
-
-
-		const std::string& ReservationTransaction::getCustomerName() const
-		{
-			return _customerName;
-		}
-
-		const std::string& ReservationTransaction::getCustomerPhone() const
-		{
-			return _customerPhone;
-		}
-
-
-		void ReservationTransaction::setCustomerEMail( const std::string& email )
-		{
-			_customerEMail = email;
-		}
-
-		const std::string& ReservationTransaction::getCustomerEMail() const
-		{
-			return _customerEMail;
+			for(Reservations::const_iterator it(_reservations.begin()); it != _reservations.end(); ++it)
+			{
+				(*it)->set<Transaction>(boost::none);
+			}
 		}
 
 
@@ -157,14 +134,14 @@ namespace synthese
 			
 			case CANCELLED:
 			case CANCELLATION_TO_ACK:
-				return statusText + " le " + to_simple_string(_cancellationTime);
+				return statusText + " le " + to_simple_string(get<CancellationTime>());
 
 			case CANCELLED_AFTER_DELAY:
 			case ACKNOWLEDGED_CANCELLED_AFTER_DELAY:
-				return statusText + " le " + to_simple_string(_cancellationTime);
+				return statusText + " le " + to_simple_string(get<CancellationTime>());
 
 			case NO_SHOW:
-				return statusText + " constatée le " + to_simple_string(_cancellationTime);
+				return statusText + " constatée le " + to_simple_string(get<CancellationTime>());
 				
 			default:
 				break;
@@ -180,8 +157,8 @@ namespace synthese
 			ptime result(not_a_date_time);
 			for (Reservations::const_iterator it(_reservations.begin()); it != _reservations.end(); ++it)
 			{
-				if (!(*it)->getReservationDeadLine().is_not_a_date_time() && (result.is_not_a_date_time() || (*it)->getReservationDeadLine() < result))
-					result = (*it)->getReservationDeadLine();
+				if (!(*it)->get<ReservationDeadLine>().is_not_a_date_time() && (result.is_not_a_date_time() || (*it)->get<ReservationDeadLine>() < result))
+					result = (*it)->get<ReservationDeadLine>();
 			}
 			return result;
 		}
@@ -192,7 +169,7 @@ namespace synthese
 			Reservation& resa
 		){
 			// Check of the precondition
-			assert(resa.getTransaction() == this);
+			assert((resa.get<Transaction>()).get_ptr() == this);
 
 			// Adds the reservation to the transaction
 			_reservations.insert(&resa);
@@ -230,26 +207,41 @@ namespace synthese
 			}
 
 			// Identical departure time objects : sort by address
-			if(op1->getDepartureTime() == op2->getDepartureTime())
+			if(op1->get<DepartureTime>() == op2->get<DepartureTime>())
 			{
 				return op1 < op2;
 			}
 
 			// Undefined departure time after all
-			if(op1->getDepartureTime().is_not_a_date_time())
+			if(op1->get<DepartureTime>().is_not_a_date_time())
 			{
 				assert(false); // This should not happen
 				return false;
 			}
 
 			// All before undefined departure time
-			if(op2->getDepartureTime().is_not_a_date_time())
+			if(op2->get<DepartureTime>().is_not_a_date_time())
 			{
 				assert(false); // This should not happen
 				return true;
 			}
 
 			// Comparison on valid departure times
-			return op1->getDepartureTime() < op2->getDepartureTime();
+			return op1->get<DepartureTime>() < op2->get<DepartureTime>();
+		}
+
+		bool ReservationTransaction::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(security::WRITE);
+		}
+
+		bool ReservationTransaction::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(security::WRITE);
+		}
+
+		bool ReservationTransaction::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(security::DELETE_RIGHT);
 		}
 }	}

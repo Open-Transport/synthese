@@ -164,7 +164,7 @@ namespace synthese
 						{
 							const StopArea* stopArea(
 								Env::GetOfficialEnv().get<StopArea>(
-									resa->getDeparturePlaceId()
+									resa->get<DeparturePlaceId>()
 								).get()
 							);
 							if(	(isArea && dynamic_cast<DRTArea*>(edge->getFromVertex())->contains(*stopArea)) ||
@@ -177,7 +177,7 @@ namespace synthese
 						{
 							const StopArea* stopArea(
 								Env::GetOfficialEnv().get<StopArea>(
-									resa->getArrivalPlaceId()
+									resa->get<ArrivalPlaceId>()
 								).get()
 							);
 							if(	(isArea && dynamic_cast<DRTArea*>(edge->getFromVertex())->contains(*stopArea)) ||
@@ -280,8 +280,8 @@ namespace synthese
 			const StopArea* stopArea(
 				Env::GetOfficialEnv().get<StopArea>(
 					departure ?
-					resa.getDeparturePlaceId() :
-					resa.getArrivalPlaceId()
+					resa.get<DeparturePlaceId>() :
+					resa.get<ArrivalPlaceId>()
 				).get()
 			);
 
@@ -319,7 +319,7 @@ namespace synthese
 			{
 				if(resa.second == departure)
 				{
-					result += resa.first->getTransaction()->getSeats();
+					result += resa.first->get<Transaction>()->get<Seats>();
 				}
 			}
 			return result;

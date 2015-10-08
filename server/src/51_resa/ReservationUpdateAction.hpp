@@ -78,7 +78,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<Reservation> _reservation;
-			boost::optional<boost::shared_ptr<const vehicle::Vehicle> > _vehicle;
+			boost::optional<boost::shared_ptr<vehicle::Vehicle> > _vehicle;
 			boost::optional<std::string> _seatNumber;
 			boost::optional<boost::posix_time::ptime> _realDepartureTime;
 			boost::optional<boost::posix_time::ptime> _realArrivalTime;
