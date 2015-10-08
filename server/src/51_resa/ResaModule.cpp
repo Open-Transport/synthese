@@ -196,7 +196,7 @@ namespace synthese
 			const ReservationTransaction& tr,
 			const Language& language
 		){
-			stream << tr.getSeats() << " place" << ((tr.getSeats() > 1) ? "s" : "") << " au nom de " << tr.getCustomerName() << " (" << tr.getCustomerPhone() << ") sur :";
+			stream << tr.get<Seats>() << " place" << ((tr.get<Seats>() > 1) ? "s" : "") << " au nom de " << tr.get<CustomerName>() << " (" << tr.get<CustomerPhone>() << ") sur :";
 			stream << "<ul>";
 			ReservationTransaction::Reservations rs(tr.getReservations());
 			for (ReservationTransaction::Reservations::const_iterator itrs(rs.begin()); itrs != rs.end(); ++itrs)
@@ -206,7 +206,7 @@ namespace synthese
 				try
 				{
 					boost::shared_ptr<const ScheduledService> service(
-						Env::GetOfficialEnv().get<ScheduledService>(resa.getServiceId())
+						Env::GetOfficialEnv().get<ScheduledService>(resa.get<ServiceId>())
 					);
 					if(!dynamic_cast<const JourneyPattern*>(service->getPath()))
 					{
@@ -221,18 +221,18 @@ namespace synthese
 				}
 				catch (...)
 				{
-					stream << "Ligne " << (*itrs)->getLineCode();
+					stream << "Ligne " << (*itrs)->get<LineCode>();
 				}
-				if ((*itrs)->getReservationRuleId() != 0)
+				if ((*itrs)->get<ReservationRuleId>() != 0)
 				{
 					stream << HTMLModule::getHTMLImage("/admin/img/resa_compulsory.png", "Place réservée sur ce tronçon");
 				}
-				stream << " de " << (*itrs)->getDeparturePlaceName();
-				stream << " le " << language.getWeekDayName((*itrs)->getDepartureTime().date().day_of_week()) << " " << (*itrs)->getDepartureTime();
-				stream << " jusqu'à " << (*itrs)->getArrivalPlaceName();
-				if(!(*itrs)->getArrivalTime().is_not_a_date_time())
+				stream << " de " << (*itrs)->get<DeparturePlaceName>();
+				stream << " le " << language.getWeekDayName((*itrs)->get<DepartureTime>().date().day_of_week()) << " " << (*itrs)->get<DepartureTime>();
+				stream << " jusqu'à " << (*itrs)->get<ArrivalPlaceName>();
+				if(!(*itrs)->get<ArrivalTime>().is_not_a_date_time())
 				{
-					stream << " le " << language.getWeekDayName((*itrs)->getArrivalTime().date().day_of_week()) << " " << (*itrs)->getArrivalTime();
+					stream << " le " << language.getWeekDayName((*itrs)->get<ArrivalTime>().date().day_of_week()) << " " << (*itrs)->get<ArrivalTime>();
 				}
 				stream << "</li>";
 			}
@@ -469,14 +469,14 @@ namespace synthese
 
 			try
 			{
-				RegistryTableType tableId(decodeTableId(reservation.getServiceId()));
+				RegistryTableType tableId(decodeTableId(reservation.get<ServiceId>()));
 				if(tableId == ScheduledServiceTableSync::TABLE.ID)
 				{
-					_reservationsByService[Env::GetOfficialEnv().get<ScheduledService>(reservation.getServiceId()).get()].insert(&reservation);
+					_reservationsByService[Env::GetOfficialEnv().get<ScheduledService>(reservation.get<ServiceId>()).get()].insert(&reservation);
 				}
 				else if(tableId == FreeDRTTimeSlotTableSync::TABLE.ID)
 				{
-					_reservationsByService[Env::GetOfficialEnv().get<FreeDRTTimeSlot>(reservation.getServiceId()).get()].insert(&reservation);
+					_reservationsByService[Env::GetOfficialEnv().get<FreeDRTTimeSlot>(reservation.get<ServiceId>()).get()].insert(&reservation);
 				}
 			}
 			catch(ObjectNotFoundException<ScheduledService>&)
@@ -493,16 +493,16 @@ namespace synthese
 		{
 			recursive_mutex::scoped_lock lock(_reservationsByServiceMutex);
 
-			RegistryTableType tableId(decodeTableId(reservation.getServiceId()));
+			RegistryTableType tableId(decodeTableId(reservation.get<ServiceId>()));
 			try
 			{
 				if(tableId == ScheduledServiceTableSync::TABLE.ID)
 				{
-					_reservationsByService[Env::GetOfficialEnv().get<ScheduledService>(reservation.getServiceId()).get()].erase(&reservation);
+					_reservationsByService[Env::GetOfficialEnv().get<ScheduledService>(reservation.get<ServiceId>()).get()].erase(&reservation);
 				}
 				else if(tableId == FreeDRTTimeSlotTableSync::TABLE.ID)
 				{
-					_reservationsByService[Env::GetOfficialEnv().get<FreeDRTTimeSlot>(reservation.getServiceId()).get()].erase(&reservation);
+					_reservationsByService[Env::GetOfficialEnv().get<FreeDRTTimeSlot>(reservation.get<ServiceId>()).get()].erase(&reservation);
 				}
 			}
 			catch(ObjectNotFoundException<ScheduledService>&)

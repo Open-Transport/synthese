@@ -414,7 +414,7 @@ namespace synthese
 				// Sort reservations
 				BOOST_FOREACH(const boost::shared_ptr<const Reservation>& resa, sqlreservations)
 				{
-					reservations[resa->getServiceCode()].addReservation(resa.get());
+					reservations[resa->get<ServiceCode>()].addReservation(resa.get());
 				}
 
 
@@ -522,14 +522,14 @@ namespace synthese
 				{
 					// Departure rank check
 					if(	(_minDepartureRank || _maxDepartureRank) &&
-						decodeTableId(reservation->getServiceId()) == ScheduledServiceTableSync::TABLE.ID
+						decodeTableId(reservation->get<ServiceId>()) == ScheduledServiceTableSync::TABLE.ID
 					){
 						bool result(true);
 						boost::shared_ptr<const ScheduledService> service(
-							Env::GetOfficialEnv().get<ScheduledService>(reservation->getServiceId())
+							Env::GetOfficialEnv().get<ScheduledService>(reservation->get<ServiceId>())
 						);
 						boost::shared_ptr<const StopArea> stopArea(
-							Env::GetOfficialEnv().get<StopArea>(reservation->getDeparturePlaceId())
+							Env::GetOfficialEnv().get<StopArea>(reservation->get<DeparturePlaceId>())
 						);
 						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stopArea->getPhysicalStops())
 						{
@@ -559,14 +559,14 @@ namespace synthese
 
 					// Arrival rank check
 					if(	(_minArrivalRank || _maxArrivalRank) &&
-						decodeTableId(reservation->getServiceId()) == ScheduledServiceTableSync::TABLE.ID
+						decodeTableId(reservation->get<ServiceId>()) == ScheduledServiceTableSync::TABLE.ID
 					){
 						bool result(true);
 						boost::shared_ptr<const ScheduledService> service(
-							Env::GetOfficialEnv().get<ScheduledService>(reservation->getServiceId())
+							Env::GetOfficialEnv().get<ScheduledService>(reservation->get<ServiceId>())
 						);
 						boost::shared_ptr<const StopArea> stopArea(
-							Env::GetOfficialEnv().get<StopArea>(reservation->getArrivalPlaceId())
+							Env::GetOfficialEnv().get<StopArea>(reservation->get<ArrivalPlaceId>())
 						);
 
 						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stopArea->getPhysicalStops())
@@ -594,7 +594,7 @@ namespace synthese
 					}
 
 					// Check of link with vehicle
-					if(_linkedWithVehicleOnly && !reservation->getVehicle())
+					if(_linkedWithVehicleOnly && !reservation->get<Vehicle>())
 					{
 						continue;
 					}

@@ -23,23 +23,23 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "ActionException.h"
+#include "DBLogModule.h"
 #include "ParametersMap.h"
 #include "ReservationUpdateAction.hpp"
 #include "Request.h"
-#include "Reservation.h"
-#include "ReservationTableSync.h"
-#include "Vehicle.hpp"
-#include "VehicleTableSync.hpp"
 #include "ResaDBLog.h"
 #include "ResaModule.h"
-#include "DBLogModule.h"
+#include "Reservation.h"
+#include "ReservationTableSync.h"
+#include "ReservationTransaction.h"
+#include "ScheduledServiceTableSync.h"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
-#include "ScheduledServiceTableSync.h"
 #include "UserTableSync.h"
+#include "Vehicle.hpp"
 #include "VehiclePosition.hpp"
 #include "VehiclePositionTableSync.hpp"
-#include "ReservationTransaction.h"
+#include "VehicleTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -136,11 +136,7 @@ namespace synthese
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_VEHICLE_ID));
 				if(id > 0)
 				{
-					_vehicle = VehicleTableSync::Get(id, *_env);
-				}
-				else
-				{
-					_vehicle = boost::shared_ptr<Vehicle>();
+					_vehicle = VehicleTableSync::GetEditable(id, *_env);
 				}
 			}
 			catch(ObjectNotFoundException<Vehicle>&)
@@ -242,19 +238,19 @@ namespace synthese
 
 			if(	_realDepartureTime || _realArrivalTime || _departureMeterOffset || _arrivalMeterOffset)
 			{
-				if(!_reservation->getVehicle() && (!_vehicle || !_vehicle->get()))
+				if(!_reservation->get<Vehicle>() && (!_vehicle || !_vehicle->get()))
 				{
 					throw ActionException("A vehicle must be associated to the reservation");
 				}
 
 				if(!_realDepartureTime || _realDepartureTime->is_not_a_date_time())
 				{
-					_realDepartureTime = _reservation->getDepartureTime();
+					_realDepartureTime = _reservation->get<DepartureTime>();
 				}
 
 				if(!_realArrivalTime || _realArrivalTime->is_not_a_date_time())
 				{
-					_realArrivalTime = _reservation->getArrivalTime();
+					_realArrivalTime = _reservation->get<ArrivalTime>();
 				}
 
 				if(_cancelledByOperator && *_cancelledByOperator)
@@ -269,25 +265,21 @@ namespace synthese
 			Request& request
 		){
 			stringstream text;
-			if(_vehicle && _reservation->getVehicle() != _vehicle->get())
+			if(_vehicle && _reservation->get<Vehicle>().get_ptr() != _vehicle->get())
 			{
 				DBLogModule::appendToLogIfChange(
 					text,
 					"Affectation véhicule",
-					_reservation->getVehicle() ? _reservation->getVehicle()->getName() : "(undefined)",
+					_reservation->get<Vehicle>() ? _reservation->get<Vehicle>()->getName() : "(undefined)",
 					_vehicle->get() ? (*_vehicle)->getName() : "(undefined)"
 				);
-				_reservation->setVehicle(_vehicle->get());
+				_reservation->set<Vehicle>(*(_vehicle.get()));
 			}
 
 			// Acknowledge user
 			if(_acknowledgeUser)
 			{
-				_reservation->setAcknowledgeUser(_acknowledgeUser->get());
-			}
-			else if(_cancelAcknowledgement)
-			{
-				_reservation->setAcknowledgeUser(NULL);
+				_reservation->set<AcknowledgeUser>(*(_acknowledgeUser->get()));
 			}
 
 			// Acknowledge time
@@ -297,82 +289,82 @@ namespace synthese
 			}
 			else if(_cancelAcknowledgement)
 			{
-				_reservation->setAcknowledgeTime(not_a_date_time);
+				_reservation->set<AcknowledgeTime>(*_acknowledgeTime);
 			}
 			if(_acknowledgeUser && !_acknowledgeTime)
 			{
 				ptime now(second_clock::local_time());
-				_reservation->setAcknowledgeTime(now);
+				_reservation->set<AcknowledgeTime>(now);
 			}
 
 			// Cancellation acknowledge user
 			if(_cancellationAcknowledgeUser)
 			{
-				_reservation->setCancellationAcknowledgeUser(
-					_cancellationAcknowledgeUser->get()
+				_reservation->set<CancellationAcknowledgeUser>(
+					*(_cancellationAcknowledgeUser->get())
 				);
 			}
 
 			// Cancellation acknowledge time
 			if(_cancellationAcknowledgeTime)
 			{
-				_reservation->setCancellationAcknowledgeTime(
+				_reservation->set<CancellationAcknowledgeTime>(
 					*_cancellationAcknowledgeTime
 				);
 			}
 			if(_cancellationAcknowledgeUser && !_cancellationAcknowledgeTime)
 			{
 				ptime now(second_clock::local_time());
-				_reservation->setCancellationAcknowledgeTime(now);
+				_reservation->set<CancellationAcknowledgeTime>(now);
 			}
 
-			if(_seatNumber && _reservation->getSeatNumber() != *_seatNumber)
+			if(_seatNumber && _reservation->get<SeatNumber>() != *_seatNumber)
 			{
 				DBLogModule::appendToLogIfChange(
 					text,
 					"Numéro de siège",
-					_reservation->getSeatNumber(),
+					_reservation->get<SeatNumber>(),
 					*_seatNumber
 				);
-				_reservation->setSeatNumber(*_seatNumber);
+				_reservation->set<SeatNumber>(*_seatNumber);
 			}
 
-			if(_cancelledByOperator && _reservation->getCancelledByOperator() != *_cancelledByOperator)
+			if(_cancelledByOperator && _reservation->get<CancelledByOperator>() != *_cancelledByOperator)
 			{
 				DBLogModule::appendToLogIfChange(
 					text,
 					"Annulation par le transporteur",
-					_reservation->getCancelledByOperator(),
+					_reservation->get<CancelledByOperator>(),
 					*_cancelledByOperator
 				);
-				_reservation->setCancelledByOperator(*_cancelledByOperator);
+				_reservation->set<CancelledByOperator>(*_cancelledByOperator);
 			}
 
 			if(_realDepartureTime)
 			{
 				// Removes passengers from existing positions
-				if(_reservation->getVehiclePositionAtDeparture() && _reservation->getVehiclePositionAtArrival())
+				if(_reservation->get<VehiclePositionAtDeparture>() && _reservation->get<VehiclePositionAtArrival>())
 				{
 					VehiclePositionTableSync::ChangePassengers(
-						*_reservation->getVehiclePositionAtDeparture(),
-						*_reservation->getVehiclePositionAtArrival(),
+						*_reservation->get<VehiclePositionAtDeparture>(),
+						*_reservation->get<VehiclePositionAtArrival>(),
 						0,
-						_reservation->getTransaction()->getSeats()
+						_reservation->get<Transaction>()->get<Seats>()
 					);
 				}
 
 				{
 					boost::shared_ptr<VehiclePosition> position;
-					if(_reservation->getVehiclePositionAtDeparture())
+					if(_reservation->get<VehiclePositionAtDeparture>())
 					{
-						position = _env->getEditableSPtr(const_cast<VehiclePosition*>(_reservation->getVehiclePositionAtDeparture()));
+						position = _env->getEditableSPtr(const_cast<VehiclePosition*>(_reservation->get<VehiclePositionAtDeparture>().get_ptr()));
 					}
 					else
 					{
 						VehiclePositionTableSync::SearchResult existingPositions(
 							VehiclePositionTableSync::Search(
 								*_env,
-								_reservation->getVehicle()->getKey(),
+								_reservation->get<Vehicle>()->getKey(),
 								_realDepartureTime,
 								_realDepartureTime
 						)	);
@@ -381,7 +373,7 @@ namespace synthese
 							position.reset(new VehiclePosition);
 							position->setKey(VehiclePositionTableSync::getId());
 							position->setTime(*_realDepartureTime);
-							position->setVehicle(const_cast<Vehicle*>(_reservation->getVehicle()));
+							position->setVehicle(_reservation->get<Vehicle>().get_ptr());
 							_env->getEditableRegistry<VehiclePosition>().add(position);
 						}
 						else
@@ -390,14 +382,14 @@ namespace synthese
 						}
 					}
 
-					boost::shared_ptr<const StopArea> stopArea(StopAreaTableSync::Get(_reservation->getDeparturePlaceId(), *_env));
+					boost::shared_ptr<const StopArea> stopArea(StopAreaTableSync::Get(_reservation->get<DeparturePlaceId>(), *_env));
 					StopPointTableSync::Search(*_env, stopArea->getKey());
 					const StopPoint* stopPoint(stopArea->getPhysicalStops().begin()->second);
-					boost::shared_ptr<ScheduledService> service(ScheduledServiceTableSync::GetEditable(_reservation->getServiceId(), *_env));
+					boost::shared_ptr<ScheduledService> service(ScheduledServiceTableSync::GetEditable(_reservation->get<ServiceId>(), *_env));
 					Edge* edge(
 						service->getEdgeFromStopAndTime(
 							*stopPoint,
-							_reservation->getDepartureTime() - _reservation->getOriginDateTime(),
+							_reservation->get<DepartureTime>() - _reservation->get<OriginDateTime>(),
 							true
 					)	);
 
@@ -406,7 +398,7 @@ namespace synthese
 					VehiclePositionTableSync::SearchResult oldPositions(
 						VehiclePositionTableSync::Search(
 							*_env,
-							_reservation->getVehicle()->getKey(),
+							_reservation->get<Vehicle>()->getKey(),
 							beforeDepartureTime,
 							_realDepartureTime
 					)	);
@@ -430,7 +422,7 @@ namespace synthese
 					{
 						position->setRankInPath(edge->getRankInPath());
 					}
-					_reservation->setVehiclePositionAtDeparture(position.get());
+					_reservation->set<VehiclePositionAtDeparture>(*position.get());
 
 					if(_departureMeterOffset)
 					{
@@ -441,16 +433,16 @@ namespace synthese
 
 				{
 					boost::shared_ptr<VehiclePosition> position;
-					if(_reservation->getVehiclePositionAtArrival())
+					if(_reservation->get<VehiclePositionAtArrival>())
 					{
-						position = _env->getEditableSPtr(const_cast<VehiclePosition*>(_reservation->getVehiclePositionAtArrival()));
+						position = _env->getEditableSPtr(const_cast<VehiclePosition*>(_reservation->get<VehiclePositionAtArrival>().get_ptr()));
 					}
 					else
 					{
 						VehiclePositionTableSync::SearchResult existingPositions(
 							VehiclePositionTableSync::Search(
 								*_env,
-								_reservation->getVehicle()->getKey(),
+								_reservation->get<Vehicle>()->getKey(),
 								_realArrivalTime,
 								_realArrivalTime
 						)	);
@@ -459,7 +451,7 @@ namespace synthese
 							position.reset(new VehiclePosition);
 							position->setKey(VehiclePositionTableSync::getId());
 							position->setTime(*_realArrivalTime);
-							position->setVehicle(const_cast<Vehicle*>(_reservation->getVehicle()));
+							position->setVehicle(_reservation->get<Vehicle>().get_ptr());
 							_env->getEditableRegistry<VehiclePosition>().add(position);
 						}
 						else
@@ -468,14 +460,14 @@ namespace synthese
 						}
 					}
 
-					boost::shared_ptr<const StopArea> stopArea(StopAreaTableSync::Get(_reservation->getArrivalPlaceId(), *_env));
+					boost::shared_ptr<const StopArea> stopArea(StopAreaTableSync::Get(_reservation->get<ArrivalPlaceId>(), *_env));
 					StopPointTableSync::Search(*_env, stopArea->getKey());
 					const StopPoint* stopPoint(stopArea->getPhysicalStops().begin()->second);
-					boost::shared_ptr<ScheduledService> service(ScheduledServiceTableSync::GetEditable(_reservation->getServiceId(), *_env));
+					boost::shared_ptr<ScheduledService> service(ScheduledServiceTableSync::GetEditable(_reservation->get<ServiceId>(), *_env));
 					Edge* edge(
 						service->getEdgeFromStopAndTime(
 							*stopPoint,
-							_reservation->getArrivalTime() - _reservation->getOriginDateTime(),
+							_reservation->get<ArrivalTime>() - _reservation->get<OriginDateTime>(),
 							false
 					)	);
 
@@ -484,7 +476,7 @@ namespace synthese
 					VehiclePositionTableSync::SearchResult oldPositions(
 						VehiclePositionTableSync::Search(
 							*_env,
-							_reservation->getVehicle()->getKey(),
+							_reservation->get<Vehicle>()->getKey(),
 							beforeArrivalTime,
 							_realArrivalTime
 					)	);
@@ -508,7 +500,7 @@ namespace synthese
 					{
 						position->setRankInPath(edge->getRankInPath());
 					}
-					_reservation->setVehiclePositionAtArrival(position.get());
+					_reservation->set<VehiclePositionAtArrival>(*position.get());
 
 					if(_arrivalMeterOffset)
 					{
@@ -517,12 +509,12 @@ namespace synthese
 					VehiclePositionTableSync::Save(position.get());
 				}
 
-				if(_reservation->getVehiclePositionAtDeparture() && _reservation->getVehiclePositionAtArrival())
+				if(_reservation->get<VehiclePositionAtDeparture>() && _reservation->get<VehiclePositionAtArrival>())
 				{
 					VehiclePositionTableSync::ChangePassengers(
-						*_reservation->getVehiclePositionAtDeparture(),
-						*_reservation->getVehiclePositionAtArrival(),
-						_reservation->getTransaction()->getSeats(),
+						*_reservation->get<VehiclePositionAtDeparture>(),
+						*_reservation->get<VehiclePositionAtArrival>(),
+						_reservation->get<Transaction>()->get<Seats>(),
 						0
 					);
 				}

@@ -30,7 +30,6 @@
 
 #include "DBDirectTableSyncTemplate.hpp"
 #include "ConditionalSynchronizationPolicy.hpp"
-#include "OldLoadSavePolicy.hpp"
 #include "Reservation.h"
 
 namespace synthese
@@ -46,42 +45,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				ReservationTableSync,
 				Reservation,
-				db::ConditionalSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::ConditionalSynchronizationPolicy
 			>
 		{
 		public:
-			static const std::string COL_TRANSACTION_ID;
-			static const std::string COL_LINE_ID;
-			static const std::string COL_LINE_CODE;
-            static const std::string COL_IS_RESERVATION_POSSIBLE;
-			static const std::string COL_SERVICE_ID;
-			static const std::string COL_SERVICE_CODE;
-			static const std::string COL_ORIGIN_DATE_TIME;
-			static const std::string COL_DEPARTURE_PLACE_ID;
-			static const std::string COL_DEPARTURE_CITY_NAME;
-			static const std::string COL_DEPARTURE_PLACE_NAME_NO_CITY;
-			static const std::string COL_DEPARTURE_PLACE_NAME;
-			static const std::string COL_DEPARTURE_TIME;
-			static const std::string COL_ARRIVAL_PLACE_ID;
-			static const std::string COL_ARRIVAL_CITY_NAME;
-			static const std::string COL_ARRIVAL_PLACE_NAME_NO_CITY;
-			static const std::string COL_ARRIVAL_PLACE_NAME;
-			static const std::string COL_ARRIVAL_TIME;
-			static const std::string COL_RESERVATION_RULE_ID;
-			static const std::string COL_RESERVATION_DEAD_LINE;
-			static const std::string COL_VEHICLE_ID;
-			static const std::string COL_SEAT_NUMBER;
-			static const std::string COL_VEHICLE_POSITION_ID_AT_DEPARTURE;
-			static const std::string COL_VEHICLE_POSITION_ID_AT_ARRIVAL;
-			static const std::string COL_CANCELLED_BY_OPERATOR;
-			static const std::string COL_ACKNOWLEDGE_TIME;
-			static const std::string COL_ACKNOWLEDGE_USER_ID;
-			static const std::string COL_CANCELLATION_ACKNOWLEDGE_TIME;
-			static const std::string COL_CANCELLATION_ACKNOWLEDGE_USER_ID;
-
-
-
 			/** Reservation search.
 				The returned reservations includes their corresponding transaction as shared pointer.
 				@param transaction Transaction
@@ -157,6 +124,8 @@ namespace synthese
 			
 			virtual std::string whereClauseDefault(
 			) const;
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

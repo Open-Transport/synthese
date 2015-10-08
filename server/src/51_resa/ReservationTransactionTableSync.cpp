@@ -25,9 +25,11 @@
 #include "DBException.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
+#include "Profile.h"
 #include "PtimeField.hpp"
 #include "ReplaceQuery.h"
 #include "ResaModule.h"
+#include "ResaRight.h"
 #include "ReservationTableSync.h"
 #include "Service.h"
 #include "SQLSingleOperatorExpression.hpp"
@@ -59,18 +61,6 @@ namespace synthese
 	{
 		const time_duration ReservationTransactionTableSync::BEFORE_RESERVATION_INDEXATION_DURATION = hours(1);
 		const time_duration ReservationTransactionTableSync::AFTER_RESERVATION_INDEXATION_DURATION = hours(6);
-
-		const string ReservationTransactionTableSync::COL_LAST_RESERVATION_ID = "last_reservation_id";
-		const string ReservationTransactionTableSync::COL_SEATS = "seats";
-		const string ReservationTransactionTableSync::COL_BOOKING_TIME = "booking_time";
-		const string ReservationTransactionTableSync::COL_CANCELLATION_TIME = "cancellation_time";
-		const string ReservationTransactionTableSync::COL_CUSTOMER_ID = "customer_id";
-		const string ReservationTransactionTableSync::COL_CUSTOMER_NAME = "customer_name";
-		const string ReservationTransactionTableSync::COL_CUSTOMER_PHONE = "customer_phone";
-		const string ReservationTransactionTableSync::COL_CUSTOMER_EMAIL = "customer_email";
-		const string ReservationTransactionTableSync::COL_BOOKING_USER_ID = "booking_user_id";
-		const string ReservationTransactionTableSync::COL_CANCEL_USER_ID = "cancel_user_id";
-		const string ReservationTransactionTableSync::COL_COMMENT = "comment";
 	}
 
 	namespace db
@@ -81,18 +71,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<ReservationTransactionTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(ReservationTransactionTableSync::COL_LAST_RESERVATION_ID, SQL_INTEGER),
-			Field(ReservationTransactionTableSync::COL_SEATS, SQL_INTEGER),
-			Field(ReservationTransactionTableSync::COL_BOOKING_TIME, SQL_DATETIME),
-			Field(ReservationTransactionTableSync::COL_CANCELLATION_TIME, SQL_DATETIME),
-			Field(ReservationTransactionTableSync::COL_CUSTOMER_ID, SQL_INTEGER),
-			Field(ReservationTransactionTableSync::COL_CUSTOMER_NAME, SQL_TEXT),
-			Field(ReservationTransactionTableSync::COL_CUSTOMER_PHONE, SQL_TEXT),
-			Field(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL, SQL_TEXT),
-			Field(ReservationTransactionTableSync::COL_BOOKING_USER_ID, SQL_INTEGER),
-			Field(ReservationTransactionTableSync::COL_CANCEL_USER_ID, SQL_INTEGER),
-			Field(ReservationTransactionTableSync::COL_COMMENT, SQL_TEXT),
 			Field()
 		};
 
@@ -102,79 +80,6 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<ReservationTransactionTableSync>::GetIndexes()
 		{
 			return DBTableSync::Indexes();
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<ReservationTransactionTableSync,ReservationTransaction>::Load(
-			ReservationTransaction* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			object->setLastReservation(rows->getLongLong ( ReservationTransactionTableSync::COL_LAST_RESERVATION_ID));
-			object->setSeats(rows->getInt( ReservationTransactionTableSync::COL_SEATS));
-			object->setBookingTime(rows->getDateTime( ReservationTransactionTableSync::COL_BOOKING_TIME));
-			object->setCancellationTime(rows->getDateTime( ReservationTransactionTableSync::COL_CANCELLATION_TIME));
-			object->setComment(rows->getText(ReservationTransactionTableSync::COL_COMMENT));
-
-			// Customer user
-			object->setCustomerUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_CUSTOMER_ID));
-			object->setCustomer(NULL);
-			if(	linkLevel > FIELDS_ONLY_LOAD_LEVEL &&
-				object->getCustomerUserId()
-			) try {
-				object->setCustomer(
-					UserTableSync::GetEditable(object->getCustomerUserId(), env, linkLevel).get()
-				);
-			}
-			catch(ObjectNotFoundException<User>&)
-			{
-				// Not bad if the user does not exist anymore
-			}
-
-			object->setCustomerName(rows->getText ( ReservationTransactionTableSync::COL_CUSTOMER_NAME));
-			object->setCustomerPhone(rows->getText ( ReservationTransactionTableSync::COL_CUSTOMER_PHONE));
-			object->setBookingUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_BOOKING_USER_ID));
-			object->setCancelUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_CANCEL_USER_ID));
-			object->setCustomerEMail(rows->getText(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL));
-
-			// Indexation
-			if( linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
-			{
-				ReservationTableSync::Search(env, object->getKey());
-			}
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<ReservationTransactionTableSync,ReservationTransaction>::Save(
-			ReservationTransaction* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<ReservationTransactionTableSync> query(*object);
-			query.addField(object->getLastReservation());
-			query.addField(object->getSeats());
-			query.addFrameworkField<PtimeField>(object->getBookingTime());
-			query.addFrameworkField<PtimeField>(object->getCancellationTime());
-			query.addField(object->getCustomerUserId());
-			query.addField(object->getCustomerName());
-			query.addField(object->getCustomerPhone());
-			query.addField(object->getCustomerEMail());
-			query.addField(object->getBookingUserId());
-			query.addField(object->getCancelUserId());
-			query.addField(object->getComment());
-			query.execute(transaction);
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<ReservationTransactionTableSync,ReservationTransaction>::Unlink(
-			ReservationTransaction* obj
-		){
 		}
 
 
@@ -239,13 +144,13 @@ namespace synthese
 			}
 
 			// Checking if all reservations are too old to be cached
-			if((*resas.rbegin())->getArrivalTime() < (now - ReservationTransactionTableSync::BEFORE_RESERVATION_INDEXATION_DURATION))
+			if((*resas.rbegin())->get<ArrivalTime>() < (now - ReservationTransactionTableSync::BEFORE_RESERVATION_INDEXATION_DURATION))
 			{
 				return false;
 			}
 
 			// Checking if all reservations are too late to be cached
-			return (*resas.begin())->getDepartureTime() < (now + ReservationTransactionTableSync::AFTER_RESERVATION_INDEXATION_DURATION);
+			return (*resas.begin())->get<DepartureTime>() < (now + ReservationTransactionTableSync::AFTER_RESERVATION_INDEXATION_DURATION);
 		}
 
 
@@ -286,15 +191,15 @@ namespace synthese
 				<< " SELECT " << TABLE.NAME << ".*"
 				<< " FROM " << TABLE.NAME
 				<< " INNER JOIN " << ReservationTableSync::TABLE.NAME << " AS r ON "
-				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE.NAME << "." << TABLE_COL_ID
+				<< " r." << Transaction::FIELD.name << "=" << TABLE.NAME << "." << TABLE_COL_ID
 				<< " WHERE "
-				<< " r." << ReservationTableSync::COL_SERVICE_ID << "=" << serviceId
-				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << ">='" << to_iso_extended_string(originDate) << " 00:00'"
-				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << "<='" << to_iso_extended_string(originDate) << " 23:59'";
+				<< " r." << ServiceId::FIELD.name << "=" << serviceId
+				<< " AND r." << OriginDateTime::FIELD.name << ">='" << to_iso_extended_string(originDate) << " 00:00'"
+				<< " AND r." << OriginDateTime::FIELD.name << "<='" << to_iso_extended_string(originDate) << " 23:59'";
 			if (!withCancelled)
-				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
+				query << " AND " << CancellationTime::FIELD.name << " IS NULL";
 			query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
-			query << " ORDER BY " << ReservationTableSync::COL_DEPARTURE_TIME;
+			query << " ORDER BY " << DepartureTime::FIELD.name;
 			if (number)
 			{
 				query << " LIMIT " << (*number + 1);
@@ -322,16 +227,16 @@ namespace synthese
 				<< " SELECT " << TABLE.NAME << ".*"
 				<< " FROM " << TABLE.NAME
 				<< " INNER JOIN " << ReservationTableSync::TABLE.NAME << " AS r ON "
-				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE.NAME << "." << TABLE_COL_ID
-				<< " WHERE " << COL_CANCEL_USER_ID << "=" << *userId;
+				<< " r." << Transaction::FIELD.name << "=" << TABLE.NAME << "." << TABLE_COL_ID
+				<< " WHERE " << CancelUserId::FIELD.name << "=" << *userId;
 			if (!minDate.is_not_a_date_time())
-				query << " AND r." << ReservationTableSync::COL_DEPARTURE_TIME << ">='" << to_iso_extended_string(minDate.date()) << " " << to_simple_string(minDate.time_of_day()) << "'";
+				query << " AND r." << DepartureTime::FIELD.name << ">='" << to_iso_extended_string(minDate.date()) << " " << to_simple_string(minDate.time_of_day()) << "'";
 			if (!maxDate.is_not_a_date_time())
-				query << " AND r." << ReservationTableSync::COL_DEPARTURE_TIME << "<='" << to_iso_extended_string(maxDate.date()) << " " << to_simple_string(maxDate.time_of_day()) << "'";
+				query << " AND r." << DepartureTime::FIELD.name << "<='" << to_iso_extended_string(maxDate.date()) << " " << to_simple_string(maxDate.time_of_day()) << "'";
 			if (!withCancelled)
-				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
+				query << " AND " << CancellationTime::FIELD.name << " IS NULL";
 			query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
-			query << " ORDER BY " << ReservationTableSync::COL_DEPARTURE_TIME << " DESC";
+			query << " ORDER BY " << DepartureTime::FIELD.name << " DESC";
 			if (number)
 			{
 				query << " LIMIT " << (*number + 1);
@@ -357,16 +262,16 @@ namespace synthese
 				<< " SELECT " << TABLE.NAME << ".*"
 				<< " FROM " << TABLE.NAME
 				<< " INNER JOIN " << ReservationTableSync::TABLE.NAME << " AS r ON "
-				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE.NAME << "." << TABLE_COL_ID
-				<< " WHERE " << COL_CUSTOMER_ID << "=" << *userId;
+				<< " r." << Transaction::FIELD.name << "=" << TABLE.NAME << "." << TABLE_COL_ID
+				<< " WHERE " << Customer::FIELD.name << "=" << *userId;
 			if (!minDate.is_not_a_date_time())
-				query << " AND " << TABLE.NAME << "." << COL_BOOKING_TIME << ">='" << to_iso_extended_string(minDate.date()) << " " << to_simple_string(minDate.time_of_day()) << "'";
+				query << " AND " << TABLE.NAME << "." << BookingTime::FIELD.name << ">='" << to_iso_extended_string(minDate.date()) << " " << to_simple_string(minDate.time_of_day()) << "'";
 			if (!maxDate.is_not_a_date_time())
-				query << " AND " << TABLE.NAME << "." << COL_BOOKING_TIME << "<='" << to_iso_extended_string(maxDate.date()) << " " << to_simple_string(maxDate.time_of_day()) << "'";
+				query << " AND " << TABLE.NAME << "." << BookingTime::FIELD.name << "<='" << to_iso_extended_string(maxDate.date()) << " " << to_simple_string(maxDate.time_of_day()) << "'";
 			if (!withCancelled)
-				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
+				query << " AND " << CancellationTime::FIELD.name << " IS NULL";
 			query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
-			query << " ORDER BY " << ReservationTableSync::COL_DEPARTURE_TIME << " DESC";
+			query << " ORDER BY " << DepartureTime::FIELD.name << " DESC";
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
@@ -375,11 +280,16 @@ namespace synthese
 		{
 			stringstream where;
 			ptime now(second_clock::local_time());
-			where << TABLE_COL_ID << " in (SELECT " << ReservationTableSync::COL_TRANSACTION_ID <<
+			where << TABLE_COL_ID << " in (SELECT " << Transaction::FIELD.name <<
 				" FROM " << ReservationTableSync::TABLE.NAME <<
-				" WHERE " << ReservationTableSync::COL_DEPARTURE_TIME << " >= '" << boost::gregorian::to_iso_extended_string(now.date()) <<
+				" WHERE " << DepartureTime::FIELD.name << " >= '" << boost::gregorian::to_iso_extended_string(now.date()) <<
 				"'')";
 			return where.str();
+		}
+
+		bool ReservationTransactionTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(security::READ);
 		}
 	}
 }

@@ -317,7 +317,7 @@ namespace synthese
 				map<string, ServiceReservations> reservations;
 				BOOST_FOREACH(const boost::shared_ptr<const Reservation>& resa, sqlreservations)
 				{
-					reservations[resa->getServiceCode()].addReservation(resa.get());
+					reservations[resa->get<ServiceCode>()].addReservation(resa.get());
 				}
 
 				// Search form
@@ -581,37 +581,37 @@ namespace synthese
 
 							customerRequest.getPage()->setUser(
 								UserTableSync::Get(
-									reservation->getTransaction()->getCustomerUserId(),
+									reservation->get<Transaction>()->get<Customer>() ? reservation->get<Transaction>()->get<Customer>()->getKey() : util::RegistryKeyType(0),
 									_getEnv()
 							)	);
 
 							cancelRequest.getAction()->setTransaction(
 								ReservationTransactionTableSync::GetEditable(
-									reservation->getTransaction()->getKey(),
+									reservation->get<Transaction>()->getKey(),
 									_getEnv()
 							)	);
 
 							stream << t.row();
 							stream <<
-								t.col(1, string(), false, string(), reservation->getTransaction()->getComment().empty() ? 1 : 2) <<
+								t.col(1, string(), false, string(), reservation->get<Transaction>()->get<Comment>().empty() ? 1 : 2) <<
 								HTMLModule::getHTMLImage("/admin/img/" + ResaModule::GetStatusIcon(status), reservation->getFullStatusText());
 							stream <<
 								t.col() <<
-								(	reservation->getDepartureTime().date() != _date ?
-									to_simple_string(reservation->getDepartureTime()) :
-									to_simple_string(reservation->getDepartureTime().time_of_day())
+								(	reservation->get<DepartureTime>().date() != _date ?
+									to_simple_string(reservation->get<DepartureTime>()) :
+									to_simple_string(reservation->get<DepartureTime>().time_of_day())
 								)
 							;
-							stream << t.col() << reservation->getDeparturePlaceName();
-							stream << t.col() << reservation->getArrivalPlaceName();
+							stream << t.col() << reservation->get<DeparturePlaceName>();
+							stream << t.col() << reservation->get<ArrivalPlaceName>();
 							stream <<
 								t.col() <<
-								(	reservation->getArrivalTime().date() != _date ?
-									to_simple_string(reservation->getArrivalTime())	:
-									to_simple_string(reservation->getArrivalTime().time_of_day())
+								(	reservation->get<ArrivalTime>().date() != _date ?
+									to_simple_string(reservation->get<ArrivalTime>())	:
+									to_simple_string(reservation->get<ArrivalTime>().time_of_day())
 								)
 							;
-							stream << t.col() << reservation->getTransaction()->getSeats();
+							stream << t.col() << reservation->get<Transaction>()->get<Seats>();
 
 							// Customer name
 							stream << t.col();
@@ -619,12 +619,12 @@ namespace synthese
 							{
 								stream  << HTMLModule::getHTMLLink(
 									customerRequest.getURL(),
-									reservation->getTransaction()->getCustomerName()
+									reservation->get<Transaction>()->get<CustomerName>()
 								);
 							}
 							else
 							{
-								stream << reservation->getTransaction()->getCustomerName();
+								stream << reservation->get<Transaction>()->get<CustomerName>();
 							}
 
 							if(!_serviceNumber)
@@ -632,7 +632,7 @@ namespace synthese
 								// Cancel link
 								if (globalDeleteRight)
 								{
-									stream << t.col(1, string(), false, string(), reservation->getTransaction()->getComment().empty() ? 1 : 2);
+									stream << t.col(1, string(), false, string(), reservation->get<Transaction>()->get<Comment>().empty() ? 1 : 2);
 									switch(status)
 									{
 									case OPTION:
@@ -674,17 +674,17 @@ namespace synthese
 								stream << uv.getSelectInput(
 									ReservationUpdateAction::PARAMETER_VEHICLE_ID,
 									VehicleTableSync::GetVehiclesList(*_env, string("(non affecté)")),
-									optional<RegistryKeyType>(reservation->getVehicle() ? reservation->getVehicle()->getKey() : RegistryKeyType(0))
+									optional<RegistryKeyType>(reservation->get<Vehicle>() ? reservation->get<Vehicle>()->getKey() : RegistryKeyType(0))
 								);
 								stream << uv.getSubmitButton("Enregistrer");
 								stream << uv.close();
 							}
 
 							// Comment
-							if(!reservation->getTransaction()->getComment().empty())
+							if(!reservation->get<Transaction>()->get<Comment>().empty())
 							{
 								stream << t.row();
-								stream << t.col(6) << reservation->getTransaction()->getComment();
+								stream << t.col(6) << reservation->get<Transaction>()->get<Comment>();
 							}
 						}
 					}

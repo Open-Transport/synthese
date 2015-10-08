@@ -105,7 +105,7 @@ namespace synthese
 			}
 
 			// Tests if the reservation is already cancelled
-			if(!_transaction->getCancellationTime().is_not_a_date_time())
+			if(!_transaction->get<CancellationTime>().is_not_a_date_time())
 			{
 				throw ActionException("Cette réservation est déjà annulée.");
 			}
@@ -122,29 +122,29 @@ namespace synthese
 			);
 			BOOST_FOREACH(const boost::shared_ptr<Reservation>& resa, reservations)
 			{
-				if (resa->getReservationRuleId() != 0)
+				if (resa->get<ReservationRuleId>() != 0)
 				{
 					// If the resa should be done, we should throw an exception
 					// but if the user has CANCEL right (but no more), he should be a driver
 					// and may want to log an absence by cancelling the resa too late
 					// (back at the deposit for example), we let him 24h to do that
-					if (now > resa->getArrivalTime() &&
+					if (now > resa->get<ArrivalTime>() &&
 						(!request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(CANCEL) ||
 						request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE))
 					)
 					{
 						// Search for specific right
-						util::RegistryKeyType lineId = resa->getLineId();
+						util::RegistryKeyType lineId = resa->get<LineId>();
 						if (request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(security::CANCEL, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(lineId)))
 						{
 							// User has specific cancel right
-							if (!(now > resa->getArrivalTime() + hours(24)))
+							if (!(now > resa->get<ArrivalTime>() + hours(24)))
 								break;
 						}
 						throw ActionException("Le statut de la réservation ne permet pas de l'annuler");
 					}
 					else if (request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(CANCEL) &&
-						now > resa->getArrivalTime() + hours(24)
+						now > resa->get<ArrivalTime>() + hours(24)
 					)
 						throw ActionException("Le statut de la réservation ne permet pas de l'annuler");
 					break;
@@ -155,21 +155,21 @@ namespace synthese
 			ReservationStatus oldStatus(_transaction->getStatus());
 
 			// Write the cancellation
-			_transaction->setCancellationTime(now);
-			_transaction->setCancelUserId(request.getUser()->getKey());
+			_transaction->set<CancellationTime>(now);
+			_transaction->set<CancelUserId>(request.getUser()->getKey());
 			ReservationTransactionTableSync::Save(_transaction.get());
 
 			// Write the log
 			ResaDBLog::AddCancelReservationEntry(request.getSession().get(), *_transaction, oldStatus);
 
 			// Mail
-            boost::shared_ptr<const User> customer(UserTableSync::Get(_transaction->getCustomerUserId(), *_env));
+            boost::shared_ptr<const User> customer(UserTableSync::Get(_transaction->get<Customer>() ? _transaction->get<Customer>()->getKey() : util::RegistryKeyType(0), *_env));
 			const OnlineReservationRule* reservationContact(NULL);
 			BOOST_FOREACH(const Reservation* resa, _transaction->getReservations())
 			{
 				try
 				{
-					boost::shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get(resa->getLineId(), *_env));
+					boost::shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get(resa->get<LineId>(), *_env));
 					const OnlineReservationRule* onlineContact(OnlineReservationRule::GetOnlineReservationRule(
 							line->getReservationContact()
 					)	);
@@ -184,7 +184,6 @@ namespace synthese
 					continue;
 				}
 			}
-            _transaction->setCustomer(UserTableSync::GetEditable(_transaction->getCustomerUserId(), *_env, UP_LINKS_LOAD_LEVEL).get());
 			if(	customer.get() && !customer->getEMail().empty() && reservationContact)
 			{
 				reservationContact->sendCustomerCancellationEMail(*_transaction, _absence);
@@ -211,10 +210,10 @@ namespace synthese
 			}
 
 			if(session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE) ||
-				(_transaction->getCustomerUserId() == session->getUser()->getKey() &&
+				(_transaction->get<Customer>() && _transaction->get<Customer>()->getKey() == session->getUser()->getKey() &&
 				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE)) ||
 				session->getUser()->getProfile()->isAuthorized<ResaRight>(CANCEL) ||
-				(_transaction->getCustomerUserId() == session->getUser()->getKey() &&
+				(_transaction->get<Customer>() && _transaction->get<Customer>()->getKey() == session->getUser()->getKey() &&
 				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, CANCEL)))
 			{
 				return true;
@@ -223,7 +222,7 @@ namespace synthese
 			// User has no global right to cancel reservation, maybe he has specific right for the line
 			BOOST_FOREACH(const Reservation* resa, _transaction->getReservations())
 			{
-				util::RegistryKeyType lineId = resa->getLineId();
+				util::RegistryKeyType lineId = resa->get<LineId>();
 				bool hasRight = false;
 				if (session->getUser()->getProfile()->isAuthorized<ResaRight>(security::WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(lineId)))
 				{

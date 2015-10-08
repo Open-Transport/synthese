@@ -516,14 +516,14 @@ namespace synthese
 			);
 			BOOST_FOREACH(Resas::value_type& resa, resas)
 			{
-				if(	resa.first->getDeparturePlaceId() == stopArea.getKey() &&
-					resa.first->getDepartureTime() == departureTime
+				if(	resa.first->get<DeparturePlaceId>() == stopArea.getKey() &&
+					resa.first->get<DepartureTime>() == departureTime
 				){
 					result.get<0>().insert(resa.first);
 					resa.second = true;
 				}
-				if(	resa.first->getArrivalPlaceId() == stopArea.getKey() &&
-					resa.first->getArrivalTime() == arrivalTime
+				if(	resa.first->get<ArrivalPlaceId>() == stopArea.getKey() &&
+					resa.first->get<ArrivalTime>() == arrivalTime
 				){
 					result.get<1>().insert(resa.first);
 					if(!resa.second)

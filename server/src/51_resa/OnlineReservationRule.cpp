@@ -247,17 +247,17 @@ namespace synthese
 				ParametersMap subjectMap;
 
 				subjectMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_SUBJECT);
-				subjectMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
-				subjectMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->getDepartureCityName());
-				subjectMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceNameNoCity());
-				subjectMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
-				subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
+				subjectMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->get<DepartureTime>().date()));
+				subjectMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->get<DepartureCityName>());
+				subjectMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->get<DeparturePlaceNameNoCity>());
+				subjectMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->get<ArrivalCityName>());
+				subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->get<ArrivalPlaceNameNoCity>());
 
 				_cmsConfirmationEMail.get()->display(subject, subjectMap);
 
 				email.setSubject(subject.str());
 
-				email.addRecipient(resa.getCustomerEMail(), resa.getCustomerName());
+				email.addRecipient(resa.get<CustomerEmail>(), resa.get<CustomerName>());
 
 				stringstream content;
 				ParametersMap contentMap;
@@ -267,51 +267,49 @@ namespace synthese
 				BOOST_FOREACH(const Reservation* r, resa.getReservations())
 				{
 					boost::shared_ptr<ParametersMap> resaMap(new ParametersMap);
-					resaMap->insert(DATA_DEPARTURE_TIME, to_simple_string(r->getDepartureTime().time_of_day()));
-					resaMap->insert(DATA_DEPARTURE_CITY_NAME, r->getDepartureCityName());
-					resaMap->insert(DATA_DEPARTURE_PLACE_NAME, r->getDeparturePlaceNameNoCity());
-					resaMap->insert(DATA_ARRIVAL_TIME, to_simple_string(r->getArrivalTime().time_of_day()));
-					resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->getArrivalCityName());
-					resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->getArrivalPlaceNameNoCity());
-					resaMap->insert(DATA_LINE_CODE, r->getLineCode());
-					resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
+					resaMap->insert(DATA_DEPARTURE_TIME, to_simple_string(r->get<DepartureTime>().time_of_day()));
+					resaMap->insert(DATA_DEPARTURE_CITY_NAME, r->get<DepartureCityName>());
+					resaMap->insert(DATA_DEPARTURE_PLACE_NAME, r->get<DeparturePlaceNameNoCity>());
+					resaMap->insert(DATA_ARRIVAL_TIME, to_simple_string(r->get<ArrivalTime>().time_of_day()));
+					resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->get<ArrivalCityName>());
+					resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->get<ArrivalPlaceNameNoCity>());
+					resaMap->insert(DATA_LINE_CODE, r->get<LineCode>());
+					resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->get<IsReservationPossible>());
 					roadResaMap->insert(DATA_ROAD_RESA, resaMap);
 				}
 
 				contentMap.insert(DATA_ROAD_RESAS, roadResaMap);
 				contentMap.insert(DATA_KEY_RESA, lexical_cast<string>(resa.getKey()));
-				contentMap.insert(DATA_CUSTOMER_ID, lexical_cast<string>(resa.getCustomerUserId()));
+				contentMap.insert(DATA_CUSTOMER_ID, lexical_cast<string>(resa.get<Customer>() ? resa.get<Customer>()->getKey() : util::RegistryKeyType(0)));
 				contentMap.insert(DATA_RESERVATION_DEAD_LINE_DATE, to_simple_string(resa.getReservationDeadLine().date()));
 				contentMap.insert(DATA_RESERVATION_DEAD_LINE_TIME, to_simple_string(resa.getReservationDeadLine().time_of_day()));
-				contentMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->getDepartureCityName());
-				contentMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceNameNoCity());
-				contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
-				contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
-				contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
-				contentMap.insert(DATA_CUSTOMER_PHONE, resa.getCustomerPhone());
-				contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
+				contentMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->get<DepartureCityName>());
+				contentMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->get<DeparturePlaceNameNoCity>());
+				contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->get<ArrivalCityName>());
+				contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->get<ArrivalPlaceNameNoCity>());
+				contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->get<DepartureTime>().date()));
+				contentMap.insert(DATA_CUSTOMER_PHONE, resa.get<CustomerPhone>());
+				contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.get<Seats>()));
 
-				if (resa.getCustomer())
+				if (resa.get<Customer>())
 				{
-					security::User* customer = resa.getCustomer();
+					contentMap.insert(DATA_USER_NAME, resa.get<Customer>()->getName());
+					contentMap.insert(DATA_USER_SURNAME, resa.get<Customer>()->getSurname());
+					contentMap.insert(DATA_USER_KEY, lexical_cast<string>(resa.get<Customer>()->getKey()));
+					contentMap.insert(DATA_USER_PHONE, resa.get<Customer>()->getPhone());
+					contentMap.insert(DATA_USER_EMAIL, resa.get<Customer>()->getEMail());
+					contentMap.insert(DATA_USER_LOGIN, resa.get<Customer>()->getLogin());
 
-					contentMap.insert(DATA_USER_NAME, customer->getName());
-					contentMap.insert(DATA_USER_SURNAME, customer->getSurname());
-					contentMap.insert(DATA_USER_KEY, lexical_cast<string>(customer->getKey()));
-					contentMap.insert(DATA_USER_PHONE, customer->getPhone());
-					contentMap.insert(DATA_USER_EMAIL, customer->getEMail());
-					contentMap.insert(DATA_USER_LOGIN, customer->getLogin());
-
-					if(!customer->getPassword().empty())
+					if(!resa.get<Customer>()->getPassword().empty())
 					{
-						contentMap.insert(DATA_USER_PASSWORD, customer->getPassword());
+						contentMap.insert(DATA_USER_PASSWORD, resa.get<Customer>()->getPassword());
 					}
 					else
 					{
 						contentMap.insert(DATA_USER_PASSWORD, TYPE_UNCHANGED_PASSWORD);
 					}
 
-					LoginToken token(LoginToken(customer->getLogin(), customer->getPasswordHash(), resa.getKey()));
+					LoginToken token(LoginToken(resa.get<Customer>()->getLogin(), resa.get<Customer>()->getPasswordHash(), resa.getKey()));
 					contentMap.insert(DATA_TOKEN_CANCELLATION, token.toString());
 				}
 
@@ -359,20 +357,18 @@ namespace synthese
 				ParametersMap subjectMap;
 
 				subjectMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_SUBJECT);
-				subjectMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resas.front().getReservations().begin())->getDepartureTime().date()));
-				subjectMap.insert(DATA_DEPARTURE_CITY_NAME, (*resas.front().getReservations().begin())->getDepartureCityName());
-				subjectMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resas.front().getReservations().begin())->getDeparturePlaceNameNoCity());
-				subjectMap.insert(DATA_ARRIVAL_CITY_NAME, (*resas.front().getReservations().rbegin())->getArrivalCityName());
-				subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resas.front().getReservations().rbegin())->getArrivalPlaceNameNoCity());
+				subjectMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resas.front().getReservations().begin())->get<DepartureTime>().date()));
+				subjectMap.insert(DATA_DEPARTURE_CITY_NAME, (*resas.front().getReservations().begin())->get<DepartureCityName>());
+				subjectMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resas.front().getReservations().begin())->get<DeparturePlaceNameNoCity>());
+				subjectMap.insert(DATA_ARRIVAL_CITY_NAME, (*resas.front().getReservations().rbegin())->get<ArrivalCityName>());
+				subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resas.front().getReservations().rbegin())->get<ArrivalPlaceNameNoCity>());
 				subjectMap.insert(DATA_RESERVATIONS_NUMBER, resas.size());
 
 				_cmsMultiReservationsEMail.get()->display(subject, subjectMap);
 
 				email.setSubject(subject.str());
 
-				email.addRecipient(resas.front().getCustomerEMail(), resas.front().getCustomerName());
-
-				boost::shared_ptr<const User> customer = UserTableSync::getUserFromLogin(resas.front().getCustomer()->getLogin());
+				email.addRecipient(resas.front().get<CustomerEmail>(), resas.front().get<CustomerName>());
 
 				stringstream content;
 				ParametersMap contentMap;
@@ -390,26 +386,26 @@ namespace synthese
 					BOOST_FOREACH(const Reservation* r, resa.getReservations())
 					{
 						boost::shared_ptr<ParametersMap> resaMap(new ParametersMap);
-						resaMap->insert(DATA_DEPARTURE_TIME, to_simple_string(r->getDepartureTime().time_of_day()));
-						resaMap->insert(DATA_DEPARTURE_CITY_NAME, r->getDepartureCityName());
-						resaMap->insert(DATA_DEPARTURE_PLACE_NAME, r->getDeparturePlaceNameNoCity());
-						resaMap->insert(DATA_ARRIVAL_TIME, to_simple_string(r->getArrivalTime().time_of_day()));
-						resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->getArrivalCityName());
-						resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->getArrivalPlaceNameNoCity());
-						resaMap->insert(DATA_LINE_CODE, r->getLineCode());
-                   		resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
+						resaMap->insert(DATA_DEPARTURE_TIME, to_simple_string(r->get<DepartureTime>().time_of_day()));
+						resaMap->insert(DATA_DEPARTURE_CITY_NAME, r->get<DepartureCityName>());
+						resaMap->insert(DATA_DEPARTURE_PLACE_NAME, r->get<DeparturePlaceNameNoCity>());
+						resaMap->insert(DATA_ARRIVAL_TIME, to_simple_string(r->get<ArrivalTime>().time_of_day()));
+						resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->get<ArrivalCityName>());
+						resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->get<ArrivalPlaceNameNoCity>());
+						resaMap->insert(DATA_LINE_CODE, r->get<LineCode>());
+						resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->get<IsReservationPossible>());
 						resaRoadMap->insert(DATA_ROAD_RESA, resaMap);
 
-						if (r->getReservationPossible())
+						if (r->get<IsReservationPossible>())
 							servicesNumber++;
 					}
 
-					LoginToken token(LoginToken(customer->getLogin(),customer->getPasswordHash(),resa.getKey()));
+					LoginToken token(LoginToken(resas.front().get<Customer>()->getLogin(),resas.front().get<Customer>()->getPasswordHash(),resa.getKey()));
 
-					resaTransactionMap->insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
+					resaTransactionMap->insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->get<DepartureTime>().date()));
 					resaTransactionMap->insert(DATA_KEY_RESA, lexical_cast<string>(resa.getKey()));
 					resaTransactionMap->insert(DATA_TOKEN_CANCELLATION, token.toString());
-					resaTransactionMap->insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
+					resaTransactionMap->insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.get<Seats>()));
 					resaTransactionMap->insert(DATA_SERVICES_NUMBER, servicesNumber);
 					resaTransactionMap->insert(DATA_ROAD_RESAS, resaRoadMap);
 
@@ -418,29 +414,27 @@ namespace synthese
 			
 				contentMap.insert(DATA_RESERVATIONS, resasMap);
 				contentMap.insert(DATA_RESERVATIONS_NUMBER, resas.size());
-				contentMap.insert(DATA_CUSTOMER_ID, lexical_cast<string>(resas.front().getCustomerUserId()));
+				contentMap.insert(DATA_CUSTOMER_ID, lexical_cast<string>(resas.front().get<Customer>()->getKey()));
 				contentMap.insert(DATA_RESERVATION_DEAD_LINE_DATE, to_simple_string(resas.front().getReservationDeadLine().date()));
 				contentMap.insert(DATA_RESERVATION_DEAD_LINE_TIME, to_simple_string(resas.front().getReservationDeadLine().time_of_day()));
-				contentMap.insert(DATA_DEPARTURE_CITY_NAME, (*resas.front().getReservations().begin())->getDepartureCityName());
-				contentMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resas.front().getReservations().begin())->getDeparturePlaceNameNoCity());
-				contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resas.front().getReservations().rbegin())->getArrivalCityName());
-				contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resas.front().getReservations().rbegin())->getArrivalPlaceNameNoCity());
-				contentMap.insert(DATA_CUSTOMER_PHONE, resas.front().getCustomerPhone());
+				contentMap.insert(DATA_DEPARTURE_CITY_NAME, (*resas.front().getReservations().begin())->get<DepartureCityName>());
+				contentMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resas.front().getReservations().begin())->get<DeparturePlaceNameNoCity>());
+				contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resas.front().getReservations().rbegin())->get<ArrivalCityName>());
+				contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resas.front().getReservations().rbegin())->get<ArrivalPlaceNameNoCity>());
+				contentMap.insert(DATA_CUSTOMER_PHONE, resas.front().get<CustomerPhone>());
 				
-				if (resas.front().getCustomer())
+				if (resas.front().get<Customer>())
 				{
-					security::User* customer = resas.front().getCustomer();
+					contentMap.insert(DATA_USER_NAME, resas.front().get<Customer>()->getName());
+					contentMap.insert(DATA_USER_SURNAME, resas.front().get<Customer>()->getSurname());
+					contentMap.insert(DATA_USER_KEY, lexical_cast<string>(resas.front().get<Customer>()->getKey()));
+					contentMap.insert(DATA_USER_PHONE, resas.front().get<Customer>()->getPhone());
+					contentMap.insert(DATA_USER_EMAIL, resas.front().get<Customer>()->getEMail());
+					contentMap.insert(DATA_USER_LOGIN, resas.front().get<Customer>()->getLogin());
 
-					contentMap.insert(DATA_USER_NAME, customer->getName());
-					contentMap.insert(DATA_USER_SURNAME, customer->getSurname());
-					contentMap.insert(DATA_USER_KEY, lexical_cast<string>(customer->getKey()));
-					contentMap.insert(DATA_USER_PHONE, customer->getPhone());
-					contentMap.insert(DATA_USER_EMAIL, customer->getEMail());
-					contentMap.insert(DATA_USER_LOGIN, customer->getLogin());
-
-					if(!customer->getPassword().empty())
+					if(!resas.front().get<Customer>()->getPassword().empty())
 					{
-						contentMap.insert(DATA_USER_PASSWORD, customer->getPassword());
+						contentMap.insert(DATA_USER_PASSWORD, resas.front().get<Customer>()->getPassword());
 					}
 					else
 					{
@@ -609,17 +603,17 @@ namespace synthese
 				ParametersMap subjectMap;
 
 				subjectMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_SUBJECT);
-				subjectMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
-				subjectMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->getDepartureCityName());
-				subjectMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceNameNoCity());
-				subjectMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
-				subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
+				subjectMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->get<DepartureTime>().date()));
+				subjectMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->get<DepartureCityName>());
+				subjectMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->get<DeparturePlaceNameNoCity>());
+				subjectMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->get<ArrivalCityName>());
+				subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->get<ArrivalPlaceNameNoCity>());
 				subjectMap.insert(DATA_CANCELLATION_BECAUSE_OF_ABSENCE, isBecauseOfAbsence);
 
 				_cmsCancellationEMail.get()->display(subject, subjectMap);
 					
 				email.setSubject(subject.str());
-				email.addRecipient(resa.getCustomerEMail(), resa.getCustomerName());
+				email.addRecipient(resa.get<CustomerEmail>(), resa.get<CustomerName>());
 
 				stringstream content;
 				ParametersMap contentMap;
@@ -629,42 +623,40 @@ namespace synthese
 				BOOST_FOREACH(const Reservation* r, resa.getReservations())
 				{
 					boost::shared_ptr<ParametersMap> resaMap(new ParametersMap);
-					resaMap->insert(DATA_DEPARTURE_TIME, to_simple_string(r->getDepartureTime().time_of_day()));
-					resaMap->insert(DATA_DEPARTURE_CITY_NAME, r->getDepartureCityName());
-					resaMap->insert(DATA_DEPARTURE_PLACE_NAME, r->getDeparturePlaceNameNoCity());
-					resaMap->insert(DATA_ARRIVAL_TIME, to_simple_string(r->getArrivalTime().time_of_day()));
-					resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->getArrivalCityName());
-					resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->getArrivalPlaceNameNoCity());
-					resaMap->insert(DATA_LINE_CODE, r->getLineCode());
-					resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
+					resaMap->insert(DATA_DEPARTURE_TIME, to_simple_string(r->get<DepartureTime>().time_of_day()));
+					resaMap->insert(DATA_DEPARTURE_CITY_NAME, r->get<DepartureCityName>());
+					resaMap->insert(DATA_DEPARTURE_PLACE_NAME, r->get<DeparturePlaceNameNoCity>());
+					resaMap->insert(DATA_ARRIVAL_TIME, to_simple_string(r->get<ArrivalTime>().time_of_day()));
+					resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->get<ArrivalCityName>());
+					resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->get<ArrivalPlaceNameNoCity>());
+					resaMap->insert(DATA_LINE_CODE, r->get<LineCode>());
+					resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->get<IsReservationPossible>());
 					roadResaMap->insert(DATA_ROAD_RESA, resaMap);
 				}
 				contentMap.insert(DATA_ROAD_RESAS, roadResaMap);
 				contentMap.insert(DATA_KEY_RESA, lexical_cast<string>(resa.getKey()));
-				contentMap.insert(DATA_CUSTOMER_ID, lexical_cast<string>(resa.getCustomerUserId()));
+				contentMap.insert(DATA_CUSTOMER_ID, lexical_cast<string>(resa.get<Customer>()->getKey()));
 				contentMap.insert(DATA_RESERVATION_DEAD_LINE_DATE, to_simple_string(resa.getReservationDeadLine().date()));
 				contentMap.insert(DATA_RESERVATION_DEAD_LINE_TIME, to_simple_string(resa.getReservationDeadLine().time_of_day()));
-				contentMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->getDepartureCityName());
-				contentMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceNameNoCity());
-				contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
-				contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
-				contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
-				contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
+				contentMap.insert(DATA_DEPARTURE_CITY_NAME, (*resa.getReservations().begin())->get<DepartureCityName>());
+				contentMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->get<DeparturePlaceNameNoCity>());
+				contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->get<ArrivalCityName>());
+				contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->get<ArrivalPlaceNameNoCity>());
+				contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->get<DepartureTime>().date()));
+				contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.get<Seats>()));
 
-				if (resa.getCustomer())
+				if (resa.get<Customer>())
 				{
-					security::User* customer = resa.getCustomer();
+					contentMap.insert(DATA_USER_NAME, resa.get<Customer>()->getName());
+					contentMap.insert(DATA_USER_SURNAME, resa.get<Customer>()->getSurname());
+					contentMap.insert(DATA_USER_KEY, lexical_cast<string>(resa.get<Customer>()->getKey()));
+					contentMap.insert(DATA_USER_PHONE, resa.get<Customer>()->getPhone());
+					contentMap.insert(DATA_USER_EMAIL, resa.get<Customer>()->getEMail());
+					contentMap.insert(DATA_USER_LOGIN, resa.get<Customer>()->getLogin());
 
-					contentMap.insert(DATA_USER_NAME, customer->getName());
-					contentMap.insert(DATA_USER_SURNAME, customer->getSurname());
-					contentMap.insert(DATA_USER_KEY, lexical_cast<string>(customer->getKey()));
-					contentMap.insert(DATA_USER_PHONE, customer->getPhone());
-					contentMap.insert(DATA_USER_EMAIL, customer->getEMail());
-					contentMap.insert(DATA_USER_LOGIN, customer->getLogin());
-
-					if(!customer->getPassword().empty())
+					if(!resa.get<Customer>()->getPassword().empty())
 					{
-						contentMap.insert(DATA_USER_PASSWORD, customer->getPassword());
+						contentMap.insert(DATA_USER_PASSWORD, resa.get<Customer>()->getPassword());
 					}
 					else
 					{

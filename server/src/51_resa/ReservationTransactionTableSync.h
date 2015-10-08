@@ -27,7 +27,6 @@
 
 #include "DBDirectTableSyncTemplate.hpp"
 #include "ConditionalSynchronizationPolicy.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 #include "ReservationTransaction.h"
 
@@ -53,25 +52,12 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				ReservationTransactionTableSync,
 				ReservationTransaction,
-				db::ConditionalSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::ConditionalSynchronizationPolicy
 			>
 		{
 		public:
 			static const boost::posix_time::time_duration BEFORE_RESERVATION_INDEXATION_DURATION;
 			static const boost::posix_time::time_duration AFTER_RESERVATION_INDEXATION_DURATION;
-
-			static const std::string COL_LAST_RESERVATION_ID;
-			static const std::string COL_SEATS;
-			static const std::string COL_BOOKING_TIME;
-			static const std::string COL_CANCELLATION_TIME;
-			static const std::string COL_CUSTOMER_ID;
-			static const std::string COL_CUSTOMER_NAME;
-			static const std::string COL_CUSTOMER_PHONE;
-			static const std::string COL_BOOKING_USER_ID;
-			static const std::string COL_CANCEL_USER_ID;
-			static const std::string COL_CUSTOMER_EMAIL;
-			static const std::string COL_COMMENT;
 
 
 
@@ -132,6 +118,8 @@ namespace synthese
 			
 			virtual std::string whereClauseDefault(
 			) const;
+
+			virtual bool allowList( const server::Session* session ) const;
 
 		};
 }	}

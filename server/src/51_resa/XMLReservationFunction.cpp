@@ -95,28 +95,28 @@ namespace synthese
 			posix_time::ptime travelDate;
 			if(resa.get() && !resa->getReservations().empty())
 			{
-				departurePlaceName = (*resa->getReservations().begin())->getDeparturePlaceName();
-				travelDate = (*resa->getReservations().begin())->getDepartureTime();
-				arrivalPlaceName = (*resa->getReservations().rbegin())->getArrivalPlaceName();
+				departurePlaceName = (*resa->getReservations().begin())->get<DeparturePlaceName>();
+				travelDate = (*resa->getReservations().begin())->get<DepartureTime>();
+				arrivalPlaceName = (*resa->getReservations().rbegin())->get<ArrivalPlaceName>();
 			}
 
 			stream <<
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 				"<reservation xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/xml_reservation_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" <<
 				" id=\"" << (resa.get() ? lexical_cast<string>(resa->getKey()) : string()) << "\"" <<
-				" customerId=\"" << (resa.get() ? lexical_cast<string>(resa->getCustomerUserId()) : string()) << "\"" <<
+				" customerId=\"" << (resa.get() ? lexical_cast<string>(resa->get<Customer>()->getKey()) : string()) << "\"" <<
 				" cancellationDeadLine=\"" << (resa.get() ? posix_time::to_iso_extended_string(resa->getReservationDeadLine()) : string()) << "\"" <<
 				" departureStop=\"" << departurePlaceName << "\"" <<
 				" arrivalStop=\"" << arrivalPlaceName << "\"" <<
 				" travelDate=\"" << (travelDate.is_not_a_date_time() ? string()  : posix_time::to_iso_extended_string(travelDate)) << "\"" <<
-				" customerName=\"" << (resa.get() ? resa->getCustomerName() : string()) << "\"" <<
-				" customerPhone=\"" << (resa.get() ? resa->getCustomerPhone() : string()) << "\"" <<
+				" customerName=\"" << (resa.get() ? resa->get<CustomerName>() : string()) << "\"" <<
+				" customerPhone=\"" << (resa.get() ? resa->get<CustomerPhone>() : string()) << "\"" <<
 				" status=\"" << (resa.get() ? ResaModule::GetStatusText(resa->getStatus()) : "N.A.") << "\"" <<
-				" canBeCancelled=\"" << (resa.get() ? lexical_cast<string>(second_clock::local_time() < resa->getReservationDeadLine() && resa->getCancellationTime().is_not_a_date_time()) : "0") << "\"" <<
-				" seats=\"" << (resa.get() ? lexical_cast<string>(resa->getSeats()) : "0") << "\"";
-			if(resa.get() && !resa->getCancellationTime().is_not_a_date_time())
+				" canBeCancelled=\"" << (resa.get() ? lexical_cast<string>(second_clock::local_time() < resa->getReservationDeadLine() && resa->get<CancellationTime>().is_not_a_date_time()) : "0") << "\"" <<
+				" seats=\"" << (resa.get() ? lexical_cast<string>(resa->get<Seats>()) : "0") << "\"";
+			if(resa.get() && !resa->get<CancellationTime>().is_not_a_date_time())
 			{
-				stream << " cancellationDateTime=\"" << posix_time::to_iso_extended_string(resa->getCancellationTime()) << "\"";
+				stream << " cancellationDateTime=\"" << posix_time::to_iso_extended_string(resa->get<CancellationTime>()) << "\"";
 			}
 			stream << ">";
 
@@ -126,11 +126,11 @@ namespace synthese
 				{
 					stream <<
 						"<chunk" <<
-						" departurePlaceName=\"" << r->getDeparturePlaceName() << "\"" <<
-						" departureDateTime=\"" << posix_time::to_iso_extended_string(r->getDepartureTime()) << "\"" <<
-						" arrivalPlaceName=\"" << r->getArrivalPlaceName() << "\"" <<
-						" arrivalDateTime=\"" << posix_time::to_iso_extended_string(r->getArrivalTime()) << "\"" <<
-						" lineNumber=\"" << r->getLineCode() << "\"" <<
+						" departurePlaceName=\"" << r->get<DeparturePlaceName>() << "\"" <<
+						" departureDateTime=\"" << posix_time::to_iso_extended_string(r->get<DepartureTime>()) << "\"" <<
+						" arrivalPlaceName=\"" << r->get<ArrivalPlaceName>() << "\"" <<
+						" arrivalDateTime=\"" << posix_time::to_iso_extended_string(r->get<ArrivalTime>()) << "\"" <<
+						" lineNumber=\"" << r->get<LineCode>() << "\"" <<
 						" />";
 				}
 			}
