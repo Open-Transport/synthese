@@ -104,6 +104,23 @@ required).
 
 ### Security
 
+## [3.9.5] - 2015-10-08
+### Added
 
+### Changed
+
+- tc-335 : Display thread names in logs instead of thread ids
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+- Distance calculation for approach from addresses and public places
+- tc-308 : Crash when processing alerts with missing data (unknown scheduled service, commercial line,...)
+- #60403 : Infinite loop in route planning algorithm due to wrong boundary check
+
+### Security
 
 
