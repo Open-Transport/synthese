@@ -149,12 +149,10 @@ namespace synthese
 			const std::string& getVehicleNumber() const { return _vehicleNumber; }
 			const boost::posix_time::ptime& getNextStopFoundTime() const { return _nextStopFoundTime; }
 
-			virtual void toParametersMap(
-				util::ParametersMap& pm,
+			virtual void toParametersMap(util::ParametersMap& pm,
 				bool withAdditionalParameters,
 				boost::logic::tribool withFiles = boost::logic::indeterminate,
-				std::string prefix = std::string()
-			) const;
+				std::string prefix = std::string()) const;
 		};
 }	}
 

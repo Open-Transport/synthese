@@ -27,6 +27,7 @@
 
 #include "FactorableTemplate.h"
 #include "Function.h"
+#include "CoordinatesSystem.hpp"
 
 namespace synthese
 {
@@ -54,6 +55,8 @@ namespace synthese
 			static const std::string TAG_SCREEN;
 			static const std::string TAG_SCREENS;
 			static const std::string TAG_EXTRA_PARAMETERS;
+
+			CoordinatesSystem::SRID _srid;
 
 		public:
 			

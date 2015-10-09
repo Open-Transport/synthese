@@ -62,6 +62,7 @@ namespace synthese
 				"The information is returned as a parameters map."
 			);
 			api.addParams(Request::PARAMETER_OBJECT_ID, "The 'roid' of a Vehicle", false);
+			api.addParams(Vehicle::PARAMETER_SRID, "The 'srid' of the coordinates system so use", false);
 			return api;
 		}
 
@@ -89,6 +90,9 @@ namespace synthese
 					throw RequestException("No such vehicle");
 				}
 			}
+
+			// SRID or 0 if none
+			_srid = map.getDefault<CoordinatesSystem::SRID>(Vehicle::PARAMETER_SRID,0);
 			
 			Function::setOutputFormatFromMap(map,string());
 		}
@@ -101,6 +105,8 @@ namespace synthese
 		) const {
 
 			ParametersMap map;
+
+			map.insert(Vehicle::PARAMETER_SRID, static_cast<int>(_srid));
 			
 			// Informations about the vehicle
 			if(_vehicle.get())
