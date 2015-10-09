@@ -24,6 +24,8 @@
 #include "ParametersMap.h"
 #include "ScheduledService.h"
 #include "StopPoint.hpp"
+#include "CoordinatesSystem.hpp"
+#include "Vehicle.hpp"
 
 #include <geos/geom/Point.h>
 
@@ -111,11 +113,26 @@ namespace synthese
 			boost::logic::tribool withFiles,
 			std::string prefix
 		) const	{
+
 			if(hasGeometry())
 			{
-				pm.insert(ATTR_X, getGeometry()->getX());
-				pm.insert(ATTR_Y, getGeometry()->getY());
+				// Fetch the srid if any
+				CoordinatesSystem::SRID srid = pm.getDefault<CoordinatesSystem::SRID>(Vehicle::PARAMETER_SRID,0);
+
+				// Convert the geometry into the given coordinate system, if specified
+				if (srid)
+				{
+					boost::shared_ptr<geos::geom::Geometry> geom = CoordinatesSystem::GetCoordinatesSystem(srid).convertGeometry(static_cast<geos::geom::Geometry&>(*getGeometry()));
+					pm.insert(ATTR_X, geom->getCoordinate()->x);
+					pm.insert(ATTR_Y, geom->getCoordinate()->y);
+				}
+				else
+				{
+					pm.insert(ATTR_X, getGeometry()->getX());
+					pm.insert(ATTR_Y, getGeometry()->getY());
+				}
 			}
+
 			pm.insert(ATTR_METER_OFFSET, _meterOffset);
 			pm.insert(ATTR_STATUS, _status);
 			pm.insert(ATTR_IN_STOP_AREA, _inStopArea);

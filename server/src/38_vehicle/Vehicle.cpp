@@ -44,6 +44,7 @@ namespace synthese
 
 	namespace vehicle
 	{
+		const string Vehicle::PARAMETER_SRID = "srid";
 		const string Vehicle::TAG_SEAT = "seat";
 
 

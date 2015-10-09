@@ -75,6 +75,7 @@ namespace synthese
 			public impex::ImportableTemplate<Vehicle>
 		{
 		public:
+			static const std::string PARAMETER_SRID;
 			static const std::string TAG_SEAT;
 
 		private:
