@@ -23,8 +23,12 @@
 #ifndef SYNTHESE_CMODALITERESERVATIONENLIGNE_H
 #define SYNTHESE_CMODALITERESERVATIONENLIGNE_H
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
+
+#include "ReservationContact.h"
+#include "TriboolField.hpp"
+#include "User.h"
+#include "Webpage.h"
 
 #include <map>
 #include <set>
@@ -33,24 +37,46 @@
 
 namespace synthese
 {
-	namespace pt
-	{
-		class ReservationContact;
-	}
-
-	namespace security
-	{
-		class User;
-	}
-
-	namespace cms
-	{
-		class Webpage;
-	}
-
 	namespace resa
 	{
 		class ReservationTransaction;
+
+		FIELD_POINTER(Contact, pt::ReservationContact)
+		FIELD_STRING(Email)
+		FIELD_STRING(CopyEmail)
+		FIELD_TRIBOOL(NeedsSurname)
+		FIELD_TRIBOOL(NeedsAddress)
+		FIELD_TRIBOOL(NeedsPhone)
+		FIELD_TRIBOOL(NeedsEmail)
+		FIELD_TRIBOOL(NeedsCustomerNumber)
+		FIELD_SIZE_T(MaxSeat)
+		FIELD_STRING(Thresholds)
+		FIELD_STRING(SenderEmail)
+		FIELD_STRING(SenderName)
+		FIELD_POINTER(ConfirmationEmailCMS, cms::Webpage)
+		FIELD_POINTER(CancellationEmailCMS, cms::Webpage)
+		FIELD_POINTER(PasswordEmailCMS, cms::Webpage)
+		FIELD_POINTER(MultiReservationsEmailCMS, cms::Webpage)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Contact),
+			FIELD(Email),										//!< Adresse e-mail du destinataire des mails d'états de réservations (ex: le transporteur)
+			FIELD(CopyEmail),									//!< Adresse e-mail de copie des mails d'états de réservations (ex: l'organisme autoritaire)
+			FIELD(NeedsSurname),								//!< Prénom du client (Indifferent = champ affiché, remplissage facultatif)
+			FIELD(NeedsAddress),								//!< Adresse du client (Indifferent = champ affiché, remplissage facultatif)
+			FIELD(NeedsPhone),									//!< Numéro de téléphone du client (Indifferent = champ affiché, remplissage facultatif)
+			FIELD(NeedsEmail),									//!< Numéro d'abonné du client (Indifferent = champ affiché, remplissage facultatif)
+			FIELD(NeedsCustomerNumber),							//!< Adresse e-mail du client (Indifferent = champ affiché, remplissage facultatif)
+			FIELD(MaxSeat),
+			FIELD(Thresholds),									//!< Paliers de nombre de réservations générant un envoi de mail d'alerte /!\ Not used
+			FIELD(SenderEmail),
+			FIELD(SenderName),
+			FIELD(ConfirmationEmailCMS),
+			FIELD(CancellationEmailCMS),
+			FIELD(PasswordEmailCMS),
+			FIELD(MultiReservationsEmailCMS)
+		> OnlineReservationRuleSchema;
 
 		/**	Online reservation rule class.
 			@author Hugues Romain
@@ -58,12 +84,9 @@ namespace synthese
 			@ingroup m51
 		*/
 		class OnlineReservationRule
-		:	public virtual util::Registrable
+		:	public virtual Object<OnlineReservationRule, OnlineReservationRuleSchema>
 		{
 		public:
-
-			/// Chosen registry class.
-			typedef util::Registry<OnlineReservationRule>	Registry;
 
 			typedef std::set<size_t> CapacityThresholds;
 			typedef std::map<util::RegistryKeyType, const OnlineReservationRule*> OnlineReservationRuleMap;
@@ -110,38 +133,11 @@ namespace synthese
 		private:
 			//! \name Link with env reservation rules
 			//@{
-				const pt::ReservationContact* _reservationRule;
 				static OnlineReservationRuleMap _onlineReservationRuleMap;
-			//@}
-
-			//! \name Addresses for reports sending
-			//@{
-				std::string _eMail;		//!< Adresse e-mail du destinataire des mails d'états de réservations (ex: le transporteur)
-				std::string	_copyEMail;	//!< Adresse e-mail de copie des mails d'états de réservations (ex: l'organisme autoritaire)
-			//@}
-
-			//! \name Customer e-mail sending options
-			//@{
-				std::string _senderEMail;
-				std::string _senderName;
-				boost::shared_ptr<const cms::Webpage> _cmsConfirmationEMail;
-				boost::shared_ptr<const cms::Webpage> _cmsMultiReservationsEMail;
-				boost::shared_ptr<const cms::Webpage> _cmsCancellationEMail;
-				boost::shared_ptr<const cms::Webpage> _cmsPasswordEMail;
-			//@}
-
-			//! \name Optional form fields
-			//@{
-				boost::logic::tribool	_needsSurname;			//!< Prénom du client (Indifferent = champ affiché, remplissage facultatif)
-				boost::logic::tribool	_needsAddress;			//!< Adresse du client (Indifferent = champ affiché, remplissage facultatif)
-				boost::logic::tribool	_needsPhone;			//!< Numéro de téléphone du client (Indifferent = champ affiché, remplissage facultatif)
-				boost::logic::tribool	_needsCustomerNumber;	//!< Numéro d'abonné du client (Indifferent = champ affiché, remplissage facultatif)
-				boost::logic::tribool	_needsEMail;			//!< Adresse e-mail du client (Indifferent = champ affiché, remplissage facultatif)
 			//@}
 
 			//! \name Capacity
 			//@{
-				boost::optional<size_t>	_maxSeats;				//!< Nombre maximal de réservations par service (undefined = unlimited capacity)
 				CapacityThresholds		_thresholds;			//!< Paliers de nombre de réservations générant un envoi de mail d'alerte
 			//@}
 
@@ -151,7 +147,7 @@ namespace synthese
 
 			//! \name Getters
 			//@{
-				const pt::ReservationContact*	getReservationContact()		const { return _reservationRule; }
+				const pt::ReservationContact*	getReservationContact()		const { return get<Contact>() ? get<Contact>().get_ptr() : NULL; }
 				const std::string&				getEMail()					const;
 				const std::string&				getCopyEMail()				const;
 				boost::logic::tribool			getNeedsSurname()			const;
@@ -159,14 +155,10 @@ namespace synthese
 				boost::logic::tribool			getNeedsPhone()				const;
 				boost::logic::tribool			getNeedsCustomerNumber()	const;
 				boost::logic::tribool			getNeedsEMail()				const;
-				const boost::optional<size_t>&	getMaxSeats()				const { return _maxSeats; }
+				size_t							getMaxSeats()				const { return get<MaxSeat>(); }
 				const CapacityThresholds&		getThresholds()				const;
 				const std::string&				getSenderEMail()			const;
 				const std::string&				getSenderName()				const;
-				boost::shared_ptr<const cms::Webpage> getConfirmationEMailCMS() const { return _cmsConfirmationEMail; }
-				boost::shared_ptr<const cms::Webpage> getMultiReservationsEMailCMS() const{ return _cmsMultiReservationsEMail; }
-				boost::shared_ptr<const cms::Webpage> getCancellationEMailCMS() const { return _cmsCancellationEMail; }
-				boost::shared_ptr<const cms::Webpage> getPasswordEMailCMS() const{ return _cmsPasswordEMail; }
 
 			//@}
 
@@ -180,14 +172,10 @@ namespace synthese
 				void	setNeedsPhone(boost::logic::tribool value);
 				void	setNeedsCustomerNumber(boost::logic::tribool value);
 				void	setNeedsEMail(boost::logic::tribool value);
-				void	setMaxSeats(const boost::optional<size_t>& value){ _maxSeats = value; }
+				void	setMaxSeats(const size_t value){ set<MaxSeat>(value); }
 				void	setThresholds(const CapacityThresholds& thresholds);
 				void	setSenderEMail(const std::string& value);
 				void	setSenderName(const std::string& value);
-				void	setConfirmationEMailCMS(boost::shared_ptr<const cms::Webpage> value);
-				void	setMultiReservationsEMailCMS(boost::shared_ptr<const cms::Webpage> value);
-				void	setCancellationEMailCMS(boost::shared_ptr<const cms::Webpage> value);
-				void	setPasswordEMailCMS(boost::shared_ptr<const cms::Webpage> value);
 			//@}
 
 			//! \name Queries
@@ -236,6 +224,10 @@ namespace synthese
 				OnlineReservationRule(util::RegistryKeyType key = 0);
 				~OnlineReservationRule();
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 
 		};
 	}

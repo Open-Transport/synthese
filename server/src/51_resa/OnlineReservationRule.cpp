@@ -20,19 +20,22 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ServerModule.h"
-#include "EMail.h"
-#include "ReservationTransaction.h"
 #include "OnlineReservationRule.h"
+
+#include "EMail.h"
+#include "LoginToken.hpp"
+#include "PTModule.h"
+#include "Profile.h"
 #include "Registry.h"
 #include "ResaModule.h"
-#include "PTModule.h"
+#include "ResaRight.h"
+#include "Reservation.h"
+#include "ReservationContact.h"
+#include "ReservationTransaction.h"
+#include "ServerModule.h"
 #include "User.h"
 #include "UserTableSync.h"
-#include "LoginToken.hpp"
-#include "ReservationContact.h"
 #include "Webpage.h"
-#include "Reservation.h"
 
 #include "UtilConstants.h"
 
@@ -41,17 +44,32 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace pt;
-	using namespace util;
-	using namespace server;
-	using namespace security;
-	using namespace pt;
 	using namespace cms;
+	using namespace pt;
+	using namespace resa;
+	using namespace security;
+	using namespace server;
+	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<resa::OnlineReservationRule>::KEY("OnlineReservationRule");
-	}
+	CLASS_DEFINITION(OnlineReservationRule, "t047_online_reservation_rules", 47)
+	FIELD_DEFINITION_OF_OBJECT(OnlineReservationRule, "online_reservation_rule_id", "online_reservation_rule_ids")
+
+	FIELD_DEFINITION_OF_TYPE(resa::Contact, "reservation_rule_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Email, "email", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(CopyEmail, "copy_email", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(NeedsSurname, "needs_surname", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(NeedsAddress, "needs_address", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(NeedsPhone, "needs_phone", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(NeedsEmail, "needs_email", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(NeedsCustomerNumber, "needs_customer_number", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MaxSeat, "max_seat", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Thresholds, "thresholds", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(SenderEmail, "sender_email", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(SenderName, "sender_name", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(ConfirmationEmailCMS, "confirmation_email_cms_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(CancellationEmailCMS, "cancellation_email_cms_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(PasswordEmailCMS, "password_email_cms_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MultiReservationsEmailCMS, "multi_reservations_email_cms_id", SQL_INTEGER)
 
 	namespace resa
 	{
@@ -97,43 +115,62 @@ namespace synthese
 		OnlineReservationRule::OnlineReservationRule(
 			RegistryKeyType key
 		):	Registrable(key),
-			_reservationRule(NULL)
+			Object<OnlineReservationRule, OnlineReservationRuleSchema> (
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_DEFAULT_CONSTRUCTOR(resa::Contact),
+					FIELD_DEFAULT_CONSTRUCTOR(Email),
+					FIELD_DEFAULT_CONSTRUCTOR(CopyEmail),
+					FIELD_DEFAULT_CONSTRUCTOR(NeedsSurname),
+					FIELD_DEFAULT_CONSTRUCTOR(NeedsAddress),
+					FIELD_DEFAULT_CONSTRUCTOR(NeedsPhone),
+					FIELD_DEFAULT_CONSTRUCTOR(NeedsEmail),
+					FIELD_DEFAULT_CONSTRUCTOR(NeedsCustomerNumber),
+					FIELD_DEFAULT_CONSTRUCTOR(MaxSeat),
+					FIELD_DEFAULT_CONSTRUCTOR(Thresholds),
+					FIELD_DEFAULT_CONSTRUCTOR(SenderEmail),
+					FIELD_DEFAULT_CONSTRUCTOR(SenderName),
+					FIELD_DEFAULT_CONSTRUCTOR(ConfirmationEmailCMS),
+					FIELD_DEFAULT_CONSTRUCTOR(CancellationEmailCMS),
+					FIELD_DEFAULT_CONSTRUCTOR(PasswordEmailCMS),
+					FIELD_DEFAULT_CONSTRUCTOR(MultiReservationsEmailCMS)
+			)	)
 		{
 		}
 
 		const std::string& OnlineReservationRule::getEMail() const
 		{
-			return _eMail;
+			return get<Email>();
 		}
 
 		const std::string& OnlineReservationRule::getCopyEMail() const
 		{
-			return _copyEMail;
+			return get<CopyEmail>();
 		}
 
 		boost::logic::tribool OnlineReservationRule::getNeedsSurname() const
 		{
-			return _needsSurname;
+			return get<NeedsSurname>();
 		}
 
 		boost::logic::tribool OnlineReservationRule::getNeedsAddress() const
 		{
-			return _needsAddress;
+			return get<NeedsAddress>();
 		}
 
 		boost::logic::tribool OnlineReservationRule::getNeedsPhone() const
 		{
-			return _needsPhone;
+			return get<NeedsPhone>();
 		}
 
 		boost::logic::tribool OnlineReservationRule::getNeedsCustomerNumber() const
 		{
-			return _needsCustomerNumber;
+			return get<NeedsCustomerNumber>();
 		}
 
 		boost::logic::tribool OnlineReservationRule::getNeedsEMail() const
 		{
-			return _needsEMail;
+			return get<NeedsEmail>();
 		}
 
 
@@ -145,49 +182,51 @@ namespace synthese
 
 		void OnlineReservationRule::setReservationContact(const ReservationContact* rule)
 		{
-			if (_reservationRule != NULL)
+			if (get<resa::Contact>())
 			{
-				OnlineReservationRuleMap::iterator it(_onlineReservationRuleMap.find(_reservationRule->getKey()));
+				OnlineReservationRuleMap::iterator it(_onlineReservationRuleMap.find(get<resa::Contact>()->getKey()));
 				assert(it != _onlineReservationRuleMap.end());
 				_onlineReservationRuleMap.erase(it);
 			}
-			_reservationRule = rule;
+			set<resa::Contact>(rule
+				? boost::optional<ReservationContact&>(*const_cast<ReservationContact*>(rule))
+				: boost::none);
 			_onlineReservationRuleMap.insert(make_pair(rule->getKey(), this));
 		}
 
 		void OnlineReservationRule::setEMail( const std::string& email )
 		{
-			_eMail = email;
+			set<Email>(email);
 		}
 
 		void OnlineReservationRule::setCopyEMail( const std::string& email )
 		{
-			_copyEMail = email;
+			set<CopyEmail>(email);
 		}
 
 		void OnlineReservationRule::setNeedsSurname( boost::logic::tribool value )
 		{
-			_needsSurname = value;
+			set<NeedsSurname>(value);
 		}
 
 		void OnlineReservationRule::setNeedsAddress( boost::logic::tribool value )
 		{
-			_needsAddress = value;
+			set<NeedsAddress>(value);
 		}
 
 		void OnlineReservationRule::setNeedsPhone( boost::logic::tribool value )
 		{
-			_needsPhone = value;
+			set<NeedsPhone>(value);
 		}
 
 		void OnlineReservationRule::setNeedsCustomerNumber( boost::logic::tribool value )
 		{
-			_needsCustomerNumber = value;
+			set<NeedsCustomerNumber>(value);
 		}
 
 		void OnlineReservationRule::setNeedsEMail( boost::logic::tribool value )
 		{
-			_needsEMail = value;
+			set<NeedsEmail>(value);
 		}
 
 
@@ -221,7 +260,7 @@ namespace synthese
 			const ReservationTransaction& resa
 		) const {
 
-			if(	!_cmsConfirmationEMail.get()
+			if(	!get<ConfirmationEmailCMS>()
 			){
 				return false;
 			}
@@ -232,7 +271,7 @@ namespace synthese
 				EMail email(ServerModule::GetEMailSender());
 
 				// MIME type
-				string mimeType = _cmsConfirmationEMail.get()->getMimeType();
+				string mimeType = get<ConfirmationEmailCMS>()->getMimeType();
 				if (mimeType == "text/html") {
 					email.setFormat(EMail::EMAIL_HTML);
 				}
@@ -240,8 +279,8 @@ namespace synthese
 				{
 					email.setFormat(EMail::EMAIL_TEXT);
 				}
-				email.setSender(_senderEMail);
-				email.setSenderName(_senderName);
+				email.setSender(get<SenderEmail>());
+				email.setSenderName(get<SenderName>());
 
 				stringstream subject;
 				ParametersMap subjectMap;
@@ -253,7 +292,7 @@ namespace synthese
 				subjectMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->get<ArrivalCityName>());
 				subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->get<ArrivalPlaceNameNoCity>());
 
-				_cmsConfirmationEMail.get()->display(subject, subjectMap);
+				get<ConfirmationEmailCMS>()->display(subject, subjectMap);
 
 				email.setSubject(subject.str());
 
@@ -313,7 +352,7 @@ namespace synthese
 					contentMap.insert(DATA_TOKEN_CANCELLATION, token.toString());
 				}
 
-				_cmsConfirmationEMail.get()->display(content, contentMap);
+				get<ConfirmationEmailCMS>()->display(content, contentMap);
 
 				email.setContent(content.str());
 
@@ -332,7 +371,7 @@ namespace synthese
 			const std::vector<ReservationTransaction>& resas
 		) const {
 
-			if( !_cmsMultiReservationsEMail.get()
+			if( !get<MultiReservationsEmailCMS>()
 			){
 				return false;
 			}
@@ -342,7 +381,7 @@ namespace synthese
 				EMail email(ServerModule::GetEMailSender());
 
 				// MIME type
-				string mimeType = _cmsMultiReservationsEMail.get()->getMimeType();
+				string mimeType = get<MultiReservationsEmailCMS>()->getMimeType();
 				if (mimeType == "text/html") {
 					email.setFormat(EMail::EMAIL_HTML);
 				}
@@ -350,8 +389,8 @@ namespace synthese
 				{
 					email.setFormat(EMail::EMAIL_TEXT);
 				}
-				email.setSender(_senderEMail);
-				email.setSenderName(_senderName);
+				email.setSender(get<SenderEmail>());
+				email.setSenderName(get<SenderName>());
 
 				stringstream subject;
 				ParametersMap subjectMap;
@@ -364,7 +403,7 @@ namespace synthese
 				subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resas.front().getReservations().rbegin())->get<ArrivalPlaceNameNoCity>());
 				subjectMap.insert(DATA_RESERVATIONS_NUMBER, resas.size());
 
-				_cmsMultiReservationsEMail.get()->display(subject, subjectMap);
+				get<MultiReservationsEmailCMS>()->display(subject, subjectMap);
 
 				email.setSubject(subject.str());
 
@@ -442,7 +481,7 @@ namespace synthese
 					}
 				}
 
-				_cmsMultiReservationsEMail.get()->display(content, contentMap);
+				get<MultiReservationsEmailCMS>()->display(content, contentMap);
 
 				email.setContent(content.str());
 
@@ -459,7 +498,7 @@ namespace synthese
 
 		bool OnlineReservationRule::sendCustomerEMail( const security::User& customer ) const
 		{
-			if(	!_cmsPasswordEMail.get() ||
+			if(	!get<PasswordEmailCMS>() ||
 				customer.getEMail().empty()
 			){
 				return false;
@@ -469,7 +508,7 @@ namespace synthese
 			try
 			{
 				EMail email(ServerModule::GetEMailSender());
-				string mimeType = _cmsPasswordEMail.get()->getMimeType();
+				string mimeType = get<PasswordEmailCMS>()->getMimeType();
 				if (mimeType == "text/html") {
 					email.setFormat(EMail::EMAIL_HTML);
 				}
@@ -477,8 +516,8 @@ namespace synthese
 				{
 					email.setFormat(EMail::EMAIL_TEXT);
 				}
-				email.setSender(_senderEMail);
-				email.setSenderName(_senderName);
+				email.setSender(get<SenderEmail>());
+				email.setSenderName(get<SenderName>());
 
 				stringstream subject;
 				ParametersMap subjectMap;
@@ -486,7 +525,7 @@ namespace synthese
 				subjectMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_SUBJECT);
 				subjectMap.insert(DATA_USER_LOGIN, customer.getLogin());
 
-				_cmsPasswordEMail.get()->display(subject, subjectMap);
+				get<PasswordEmailCMS>()->display(subject, subjectMap);
 
 				email.setSubject(subject.str());
 				email.addRecipient(customer.getEMail(), customer.getFullName());
@@ -510,7 +549,7 @@ namespace synthese
 					contentMap.insert(DATA_USER_PASSWORD, TYPE_UNCHANGED_PASSWORD);
 				}
 
-				_cmsPasswordEMail.get()->display(content, contentMap);
+				get<PasswordEmailCMS>()->display(content, contentMap);
 
 				email.setContent(content.str());
 
@@ -527,50 +566,28 @@ namespace synthese
 
 		void OnlineReservationRule::setSenderEMail( const std::string& value )
 		{
-			_senderEMail = value;
+			set<SenderEmail>(value);
 		}
 
 
 
 		void OnlineReservationRule::setSenderName( const std::string& value )
 		{
-			_senderName = value;
+			set<SenderName>(value);
 		}
 
 
 
 		const std::string& OnlineReservationRule::getSenderEMail() const
 		{
-			return _senderEMail;
+			return get<SenderEmail>();
 		}
 
 
 
 		const std::string& OnlineReservationRule::getSenderName() const
 		{
-			return _senderName;
-		}
-
-
-
-		void OnlineReservationRule::setConfirmationEMailCMS( boost::shared_ptr<const cms::Webpage> value )
-		{
-			_cmsConfirmationEMail = value;
-		}
-
-		void OnlineReservationRule::setMultiReservationsEMailCMS( boost::shared_ptr<const cms::Webpage> value )
-		{
-			_cmsMultiReservationsEMail = value;
-		}
-
-		void OnlineReservationRule::setCancellationEMailCMS( boost::shared_ptr<const cms::Webpage> value )
-		{
-			_cmsCancellationEMail = value;
-		}
-
-		void OnlineReservationRule::setPasswordEMailCMS( boost::shared_ptr<const cms::Webpage> value )
-		{
-			_cmsPasswordEMail = value;
+			return get<SenderName>();
 		}
 
 
@@ -579,7 +596,7 @@ namespace synthese
 			const ReservationTransaction& resa,
 			bool isBecauseOfAbsence
 		) const	{
-			if(	!_cmsCancellationEMail.get()
+			if(	!get<CancellationEmailCMS>()
 			){
 				return false;
 			}
@@ -588,7 +605,7 @@ namespace synthese
 			try
 			{
 				EMail email(ServerModule::GetEMailSender());
-				string mimeType = _cmsCancellationEMail.get()->getMimeType();
+				string mimeType = get<CancellationEmailCMS>()->getMimeType();
 				if (mimeType == "text/html") {
 					email.setFormat(EMail::EMAIL_HTML);
 				}
@@ -596,8 +613,8 @@ namespace synthese
 				{
 					email.setFormat(EMail::EMAIL_TEXT);
 				}
-				email.setSender(_senderEMail);
-				email.setSenderName(_senderName);
+				email.setSender(get<SenderEmail>());
+				email.setSenderName(get<SenderName>());
 
 				stringstream subject;
 				ParametersMap subjectMap;
@@ -610,7 +627,7 @@ namespace synthese
 				subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->get<ArrivalPlaceNameNoCity>());
 				subjectMap.insert(DATA_CANCELLATION_BECAUSE_OF_ABSENCE, isBecauseOfAbsence);
 
-				_cmsCancellationEMail.get()->display(subject, subjectMap);
+				get<CancellationEmailCMS>()->display(subject, subjectMap);
 					
 				email.setSubject(subject.str());
 				email.addRecipient(resa.get<CustomerEmail>(), resa.get<CustomerName>());
@@ -666,7 +683,7 @@ namespace synthese
 
 				contentMap.insert(DATA_CANCELLATION_BECAUSE_OF_ABSENCE, isBecauseOfAbsence);
 
-				_cmsCancellationEMail.get()->display(content, contentMap);
+				get<CancellationEmailCMS>()->display(content, contentMap);
 				email.setContent(content.str());
 
 				email.send();
@@ -676,6 +693,21 @@ namespace synthese
 			{
 				return false;
 			}
+		}
+
+		bool OnlineReservationRule::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(security::WRITE);
+		}
+
+		bool OnlineReservationRule::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(security::WRITE);
+		}
+
+		bool OnlineReservationRule::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(security::DELETE_RIGHT);
 		}
 	}
 }

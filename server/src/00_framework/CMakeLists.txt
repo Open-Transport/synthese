@@ -50,6 +50,7 @@ StringField.hpp
 StringVectorField.hpp
 TimeField.cpp
 TimeField.hpp
+TriboolField.hpp
 WithGeometry.hpp
 )
 

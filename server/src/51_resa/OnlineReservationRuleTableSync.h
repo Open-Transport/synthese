@@ -31,7 +31,6 @@
 #include "OnlineReservationRule.h"
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -44,27 +43,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				OnlineReservationRuleTableSync,
 				OnlineReservationRule,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>
 		{
 		public:
-			static const std::string COL_RESERVATION_CONTACT_ID;
-			static const std::string COL_EMAIL;
-			static const std::string COL_COPY_EMAIL;
-			static const std::string COL_NEEDS_SURNAME;
-			static const std::string COL_NEEDS_ADDRESS;
-			static const std::string COL_NEEDS_PHONE;
-			static const std::string COL_NEEDS_EMAIL;
-			static const std::string COL_NEEDS_CUSTOMER_NUMBER;
-			static const std::string COL_MAX_SEATS;
-			static const std::string COL_THRESHOLDS;
-			static const std::string COL_SENDER_EMAIL;
-			static const std::string COL_SENDER_NAME;
-			static const std::string COL_CONFIRMATION_EMAIL_CMS_ID;
-			static const std::string COL_CANCELLATION_EMAIL_CMS_ID;
-			static const std::string COL_PASSWORD_EMAIL_CMS_ID;
-			static const std::string COL_MULTI_RESERVATIONS_EMAIL_CMS_ID;
 
 
 
@@ -82,6 +64,8 @@ namespace synthese
 				int number = 0,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }
