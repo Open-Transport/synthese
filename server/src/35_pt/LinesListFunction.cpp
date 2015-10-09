@@ -706,6 +706,7 @@ namespace synthese
 			// displayDurationBeforeFirstDepartureFilter
 			if(	_displayDurationBeforeFirstDepartureFilter &&
 				!line.getDisplayDurationBeforeFirstDeparture().is_not_a_date_time() &&
+				line.getDisplayDurationBeforeFirstDeparture() != boost::posix_time::time_duration(0,-1,0) &&
 				!line.runsSoon(line.getDisplayDurationBeforeFirstDeparture())
 			){
 				return false;
