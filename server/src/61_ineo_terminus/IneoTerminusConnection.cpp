@@ -1113,7 +1113,7 @@ namespace synthese
 
 			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
 			boost::shared_ptr<NotificationProvider> provider;
-			MessagesModule::ActivatedMessages activatedMessages;
+			MessagesModule::SortedActivatedMessages activatedMessages;
 			typedef std::map< std::string, boost::shared_ptr<Alarm> > MessageMap;
 			MessageMap mapActivatedMessages;
 			MessageMap mapMessagesUnknownFromIneo;

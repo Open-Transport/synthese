@@ -135,6 +135,9 @@ namespace synthese
 				DBTransaction transaction;
 				SentScenarioTableSync::Remove(NULL, _scenario->getKey(), transaction, false);
 				transaction.run();
+
+				// Log
+				MessagesLog::addUpdateEntry(_scenario, "Diffusion supprimée le " + to_simple_string(_stopDateTime), request.getUser().get());
 			}
 			else
 			{
@@ -142,7 +145,7 @@ namespace synthese
 				_scenario->setPeriodEnd(_stopDateTime);
 				_scenario->setIsEnabled(false);
 
-				if (_archive)
+				if(_archive)
 				{
 					_scenario->setArchived(true);
 				}
@@ -152,6 +155,9 @@ namespace synthese
 				// Log
 				MessagesLog::addUpdateEntry(_scenario, "Diffusion arrêtée le " + to_simple_string(_stopDateTime), request.getUser().get());
 			}
+
+			// The operation may have activated or deactivated the scenario or change its calendars, so force an update of the cache of activated messages
+			MessagesModule::UpdateActivatedMessages();
 		}
 
 

@@ -188,7 +188,7 @@ namespace synthese
 			ParametersMap pm;
 
 			// Getting messages
-			MessagesModule::ActivatedMessages messages;
+			MessagesModule::SortedActivatedMessages messages;
 			if (_broadcastPoint)
 			{
 				// If the date is now (more or less 60 seconds), use the cached function

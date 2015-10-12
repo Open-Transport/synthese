@@ -6,6 +6,6 @@ Resource          common.txt
 *** Keywords ***
 List Display Screen Messages 
     [Arguments]    ${display_screen_id}
-    ${messages_list}=   Call Synthese Service    messages   r\=${display_screen_id}   of\=xml
+    ${messages_list}=   Call Synthese Service    messages   r\=${display_screen_id}   b\=0   of\=xml
     [Return]    ${messages_list}
 

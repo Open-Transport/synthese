@@ -13,6 +13,7 @@ ${SCENARIO2}          10977528386682882
 
 ${SCENARIO_TEMPLATE_NAME}  Template scénario
 ${SCENARIO_NAME1}          Scénario 1
+${SCENARIO_NAME2}          Scénario 2
 ${MESSAGE_TITLE1}          Titre 1
 ${MESSAGE_CONTENT1}        Contenu 1
 ${MESSAGE_TITLE2}          Titre 2
