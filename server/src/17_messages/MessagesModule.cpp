@@ -416,21 +416,28 @@ namespace synthese
 			);
 			recursive_mutex::scoped_lock registryLock(Env::GetOfficialEnv().getRegistry<Alarm>().getMutex());
 
+			// Store a copy of the cache into messagesDeletedFromRegistry, and remove each message of the registry from this set
+			// Once all registry messages have been processed, the remaining messages are the ones that were deleted since last cycle
+			ActivatedMessages messagesDeletedFromRegistry = _activatedMessages;
+
 			BOOST_FOREACH(
 				const Alarm::Registry::Vector::value_type& message,
 				messages
 			){
-				if (message->isApplicable(now)) {
+				ActivatedMessages::iterator itMessage = _activatedMessages.find(message);
+				messagesDeletedFromRegistry.erase(message);
 
+				if(true == message->isApplicable(now))
+				{
 					// Change message activation date
-					if (!message->isActivated())
+					if(false == message->isActivated())
 					{
 						message->activationStarted();
 						AlarmTableSync::Save(&(*message));
 					}
 
 					// Check if the message is already in activated cache
-					if(_activatedMessages.find(message) == _activatedMessages.end())
+					if(_activatedMessages.end() == itMessage)
 					{
 						// Record the message as activated
 						_activatedMessages.insert(message);
@@ -446,14 +453,14 @@ namespace synthese
 				}
 				else
 				{
-					if(_activatedMessages.find(message) != _activatedMessages.end())
+					if(_activatedMessages.end() != itMessage)
 					{
 						// Remove from cache
-						_activatedMessages.erase(message);
+						_activatedMessages.erase(itMessage);
 					}
 
-					// Change message activation date
-					if (message->isActivated())
+					// Change message last activation date
+					if(true == message->isActivated())
 					{
 						message->activationEnded();
 						AlarmTableSync::Save(&(*message));
@@ -469,6 +476,11 @@ namespace synthese
 				}
 			}
 
+			BOOST_FOREACH(const ActivatedMessages::value_type& deletedMessage, messagesDeletedFromRegistry)
+			{
+				// Purge the cache from messages that were deleted from the registry
+				_activatedMessages.erase(deletedMessage);
+			}
 		}
 		
 		bool MessagesModule::_enableScenarioIfAutoActivation( SentScenario* sscenario )
@@ -522,13 +534,13 @@ namespace synthese
 		/// @param broadcastPoint the broadcast point to check
 		/// @param parameters the broadcast parameters
 		/// @return the list of the messages to display
-		MessagesModule::ActivatedMessages MessagesModule::GetActivatedMessagesAt(
+		MessagesModule::SortedActivatedMessages MessagesModule::GetActivatedMessagesAt(
 			const BroadcastPoint& broadcastPoint,
 			const util::ParametersMap& parameters,
 			const boost::posix_time::ptime& date
 		){
-			// Initialisation of the result
-			ActivatedMessages result;
+			// Initialisation of the result : use a set of messages sorted by priority
+			SortedActivatedMessages result;
 
 			// Fetch all messages on the broadcast point and activated at the requested start date
 			BOOST_FOREACH(const Alarm::Registry::value_type& message, Env::GetOfficialEnv().getRegistry<Alarm>())
@@ -554,15 +566,15 @@ namespace synthese
 		/// @param broadcastPoint the broadcast point to check
 		/// @param parameters the broadcast parameters
 		/// @return the list of the messages to display
-		MessagesModule::ActivatedMessages MessagesModule::GetActivatedMessages(
+		MessagesModule::SortedActivatedMessages MessagesModule::GetActivatedMessages(
 			const BroadcastPoint& broadcastPoint,
 			const util::ParametersMap& parameters
 		){
 			// Wait for the availability of the cache
 			mutex::scoped_lock lock(_activatedMessagesMutex);
 
-			// Initialisation of the result
-			ActivatedMessages result;
+			// Initialisation of the result : use a set of messages sorted by priority
+			SortedActivatedMessages result;
 
 			// Check each message
 			BOOST_FOREACH(boost::shared_ptr<Alarm> message, _activatedMessages)
@@ -610,13 +622,33 @@ namespace synthese
 		}
 
 
-
-		bool MessagesModule::AlarmLess::operator()(
+		bool MessagesModule::UnicityAlarmLess::operator()(
 			boost::shared_ptr<Alarm> left,
 			boost::shared_ptr<Alarm> right
 		) const {
 			assert(left.get() && right.get());
 
+			// Order by object id, then by pointer address
+			if(left->getKey() != right->getKey())
+			{
+				return left->getKey() < right->getKey();
+			}
+
+			return left.get() < right.get();
+		}
+
+
+		bool MessagesModule::ImportanceAlarmLess::operator()(
+			boost::shared_ptr<Alarm> left,
+			boost::shared_ptr<Alarm> right
+		) const {
+			assert(left.get() && right.get());
+
+			// Note : this operator is supposed to return true if left < right, false otherwise
+			// however the set of messages is sorted so that it starts with the most important messages
+			// therefore left < right <=> left has a higher importance than right
+
+			// Order by descending alarm level first
 			if(left->getLevel() != right->getLevel())
 			{
 				return left->getLevel() > right->getLevel();
@@ -627,9 +659,14 @@ namespace synthese
 			const SentScenario* leftScenario = dynamic_cast<const SentScenario*>(leftGenericScenario);
 			const SentScenario* rightScenario = dynamic_cast<const SentScenario*>(rightGenericScenario);
 
-			if (!leftScenario) return 0;
-			if (!rightScenario) return 0;
+			// Messages without scenario or attached to scenario template are not inserted into the cache
+			// but they can searched for, so the operator must handle this case
+			if (!leftScenario)  return false;
+			if (!rightScenario) return true;
 			
+			// Order by period start :
+			// - infinite period start is more important than fixed period start
+			// - left.period > right.period => left is more important than right
 			if(!leftScenario->getPeriodStart().is_not_a_date_time())
 			{
 				if(rightScenario->getPeriodStart().is_not_a_date_time())
@@ -649,46 +686,13 @@ namespace synthese
 				}
 			}
 
-			// Sort by commercial line if both alarm are linked to
+			// Order by object id
+			if(left->getKey() != right->getKey())
 			{
-				boost::shared_ptr<const pt::CommercialLine> firstLineLeft, firstLineRight;
-				BOOST_FOREACH(Alarm::LinkedObjects::value_type& leftId, left->getLinkedObjects())
-				{
-					if(leftId.first != "line")continue;
-					BOOST_FOREACH(const AlarmObjectLink* link, leftId.second)
-					{
-						if(Env::GetOfficialEnv().contains<pt::CommercialLine>(link->getObjectId()))
-						{
-							firstLineLeft = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
-							break;
-						}
-					}
-					break;
-				}
-				BOOST_FOREACH(Alarm::LinkedObjects::value_type& rightId, right->getLinkedObjects())
-				{
-					if(rightId.first != "line")continue;
-					BOOST_FOREACH(const AlarmObjectLink* link, rightId.second)
-					{
-						if(Env::GetOfficialEnv().contains<pt::CommercialLine>(link->getObjectId()))
-						{
-							firstLineRight = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
-							break;
-						}
-					}
-					break;
-				}
-				if(firstLineLeft.get() && firstLineRight.get())
-				{
-					return *firstLineLeft.get() < *firstLineRight.get();
-				}
-				else
-				{
-					if(firstLineLeft.get())return true; // Only left is associated to a line
-					if(firstLineRight.get())return false; // Only right is associated to a line
-				}
+				return left->getKey() < right->getKey();
 			}
 
+			// Order by pointer address
 			return left.get() < right.get();
 		}
 	}

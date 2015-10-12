@@ -78,13 +78,23 @@ namespace synthese
 			public server::ModuleClassTemplate<MessagesModule>
 		{
 		public:
-			struct AlarmLess : public std::binary_function<boost::shared_ptr<Alarm>, boost::shared_ptr<Alarm>, bool>
+
+			struct UnicityAlarmLess : public std::binary_function<boost::shared_ptr<Alarm>, boost::shared_ptr<Alarm>, bool>
 			{
 				//////////////////////////////////////////////////////////////////////////
-				/// Order by decreasing priority level, then by line number, then by start date, then by address
+				/// Order by object id, then by pointer address
 				bool operator()(boost::shared_ptr<Alarm> left, boost::shared_ptr<Alarm> right) const;
 			};
-			typedef std::set<boost::shared_ptr<Alarm>, AlarmLess> ActivatedMessages;
+
+			struct ImportanceAlarmLess : public std::binary_function<boost::shared_ptr<Alarm>, boost::shared_ptr<Alarm>, bool>
+			{
+				//////////////////////////////////////////////////////////////////////////
+				/// Order by decreasing priority level, then by start date, then by pointer address
+				bool operator()(boost::shared_ptr<Alarm> left, boost::shared_ptr<Alarm> right) const;
+			};
+
+			typedef std::set<boost::shared_ptr<Alarm>, UnicityAlarmLess> ActivatedMessages;
+			typedef std::set<boost::shared_ptr<Alarm>, ImportanceAlarmLess> SortedActivatedMessages;
 
 		private:
 			static ActivatedMessages _activatedMessages;
@@ -102,12 +112,12 @@ namespace synthese
 			static void UpdateAutomaticallyManagedScenarii();
 			static int HandleNotificationEvents();
 
-			static ActivatedMessages GetActivatedMessages(
+			static SortedActivatedMessages GetActivatedMessages(
 				const BroadcastPoint& broadcastPoint,
 				const util::ParametersMap& parameters
 			);
 
-			static ActivatedMessages GetActivatedMessagesAt(
+			static SortedActivatedMessages GetActivatedMessagesAt(
 				const BroadcastPoint& broadcastPoint,
 				const util::ParametersMap& parameters,
 				const boost::posix_time::ptime& date

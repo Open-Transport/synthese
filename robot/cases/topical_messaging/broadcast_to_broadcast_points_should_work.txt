@@ -3,16 +3,119 @@ Resource          ../../resources/s3-fakeclient/topical_messaging.txt
 Resource          ../../resources/data/topical_messaging_data.txt
 Test Setup        Run Keywords  On Node 0  AND  With Test Data  ${DB}  AND  Start Synthese On Node 0
 Test Teardown     Stop Synthese On Node 0
-*** Test Cases ***
 
+
+*** Keywords ***
+
+
+*** Test Cases ***
     
 Broadcasting A Message To Certain Type Of Broadcast Point Should Work
-    Topical Message ${MESSAGE1} Is Created With Title "${MESSAGE_TITLE1}" And Content "${MESSAGE_CONTENT1}"
-    Topical Message ${MESSAGE1} Is Bounded To Broadcast Point Type ${TYPE_BORNE1}
-    Broadcast Of ${MESSAGE1} Is Enabled
-    A Topical Message Is Broadcasted On Broadcast Point ${BORNE1} 
-    Content Of This Topical Message Is "${MESSAGE_CONTENT1}"
-    Title Of This Topical Message Is "${MESSAGE_TITLE1}"
-   
+    ${scenario_id}=   Scenario Is Created With Name "${SCENARIO_NAME1}" Containing One Message With Title "${MESSAGE_TITLE1}" And Content "${MESSAGE_CONTENT1}" On Broadcast Point ${TYPE_BORNE1}
+    Broadcast Of Scenario ${scenario_id} Is Enabled
+    ${messages_xml}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml} Contains 1 Elements
+    Content Of Message 1 Of Message List ${messages_xml} Is ${MESSAGE_CONTENT1}
+    Title Of Message 1 Of Message List ${messages_xml} Is ${MESSAGE_TITLE1}
 
+
+Disabling A Broadcasted Message Should Work
+    ${scenario_id}=   Scenario Is Created With Name "${SCENARIO_NAME1}" Containing One Message With Title "${MESSAGE_TITLE1}" And Content "${MESSAGE_CONTENT1}" On Broadcast Point ${TYPE_BORNE1}
+    Broadcast Of Scenario ${scenario_id} Is Enabled
+    ${messages_xml}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml} Contains 1 Elements
+    Broadcast Of Scenario ${scenario_id} Is Disabled
+    ${messages_xml2}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml2} Contains 0 Elements
+
+
+Deleting A Broadcasted Message Should Work
+    ${scenario_id}=   Scenario Is Created With Name "${SCENARIO_NAME1}" Containing One Message With Title "${MESSAGE_TITLE1}" And Content "${MESSAGE_CONTENT1}" On Broadcast Point ${TYPE_BORNE1}
+    Broadcast Of Scenario ${scenario_id} Is Enabled
+    ${messages_xml}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml} Contains 1 Elements
+    Scenario ${scenario_id} Is Deleted
+    ${messages_xml2}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml2} Contains 0 Elements
+
+
+Broadcasting Two Messages Of Same Priority Should Work
+    ${scenario_id}=   Scenario Is Created With Name "${SCENARIO_NAME1}" Containing One Message With Title "${MESSAGE_TITLE1}" And Content "${MESSAGE_CONTENT1}" On Broadcast Point ${TYPE_BORNE1}
+    Broadcast Of Scenario ${scenario_id} Is Enabled
+    Sleep   1s
+    ${scenario_id2}=   Scenario Is Created With Name "${SCENARIO_NAME2}" Containing One Message With Title "${MESSAGE_TITLE2}" And Content "${MESSAGE_CONTENT2}" On Broadcast Point ${TYPE_BORNE1}
+    Broadcast Of Scenario ${scenario_id2} Is Enabled
+    ${messages_xml}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml} Contains 2 Elements
+    Content Of Message 1 Of Message List ${messages_xml} Is ${MESSAGE_CONTENT2}
+    Title Of Message 1 Of Message List ${messages_xml} Is ${MESSAGE_TITLE2}
+    Content Of Message 2 Of Message List ${messages_xml} Is ${MESSAGE_CONTENT1}
+    Title Of Message 2 Of Message List ${messages_xml} Is ${MESSAGE_TITLE1}
+
+
+Broadcasting Two Messages Of Different Priority Should Work
+    ${scenario_id}=   Scenario Is Created With Name "${SCENARIO_NAME1}" Containing One Message With Title "${MESSAGE_TITLE1}" And Content "${MESSAGE_CONTENT1}" And Level 50 On Broadcast Point ${TYPE_BORNE1}
+    Broadcast Of Scenario ${scenario_id} Is Enabled
+    ${scenario_id2}=   Scenario Is Created With Name "${SCENARIO_NAME2}" Containing One Message With Title "${MESSAGE_TITLE2}" And Content "${MESSAGE_CONTENT2}" On Broadcast Point ${TYPE_BORNE1}
+    Broadcast Of Scenario ${scenario_id2} Is Enabled
+    ${messages_xml}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml} Contains 2 Elements
+    Content Of Message 1 Of Message List ${messages_xml} Is ${MESSAGE_CONTENT1}
+    Title Of Message 1 Of Message List ${messages_xml} Is ${MESSAGE_TITLE1}
+    Content Of Message 2 Of Message List ${messages_xml} Is ${MESSAGE_CONTENT2}
+    Title Of Message 2 Of Message List ${messages_xml} Is ${MESSAGE_TITLE2}
+
+
+Disabling Messages During Broadcasting Should Work
+    ${scenario_id}=   Scenario Is Created With Name "${SCENARIO_NAME1}" Containing One Message With Title "${MESSAGE_TITLE1}" And Content "${MESSAGE_CONTENT1}" On Broadcast Point ${TYPE_BORNE1}
+    Broadcast Of Scenario ${scenario_id} Is Enabled
+    Sleep   1s
+    ${scenario_id2}=   Scenario Is Created With Name "${SCENARIO_NAME2}" Containing One Message With Title "${MESSAGE_TITLE2}" And Content "${MESSAGE_CONTENT2}" On Broadcast Point ${TYPE_BORNE1}
+    Broadcast Of Scenario ${scenario_id2} Is Enabled
+    ${messages_xml}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml} Contains 2 Elements
+    Broadcast Of Scenario ${scenario_id} Is Disabled
+    ${messages_xml2}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml2} Contains 1 Elements
+    Content Of Message 1 Of Message List ${messages_xml2} Is ${MESSAGE_CONTENT2}
+    Title Of Message 1 Of Message List ${messages_xml2} Is ${MESSAGE_TITLE2}
+    Broadcast Of Scenario ${scenario_id2} Is Disabled
+    ${messages_xml3}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml3} Contains 0 Elements
+
+
+Deleting Messages During Broadcasting Should Work
+    ${scenario_id}=   Scenario Is Created With Name "${SCENARIO_NAME1}" Containing One Message With Title "${MESSAGE_TITLE1}" And Content "${MESSAGE_CONTENT1}" On Broadcast Point ${TYPE_BORNE1}
+    Broadcast Of Scenario ${scenario_id} Is Enabled
+    Sleep   1s
+    ${scenario_id2}=   Scenario Is Created With Name "${SCENARIO_NAME2}" Containing One Message With Title "${MESSAGE_TITLE2}" And Content "${MESSAGE_CONTENT2}" On Broadcast Point ${TYPE_BORNE1}
+    Broadcast Of Scenario ${scenario_id2} Is Enabled
+    ${messages_xml}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml} Contains 2 Elements
+    Scenario ${scenario_id} Is Deleted
+    ${messages_xml2}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml2} Contains 1 Elements
+    Content Of Message 1 Of Message List ${messages_xml2} Is ${MESSAGE_CONTENT2}
+    Title Of Message 1 Of Message List ${messages_xml2} Is ${MESSAGE_TITLE2}
+    Scenario ${scenario_id2} Is Deleted
+    ${messages_xml3}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml3} Contains 0 Elements
+
+
+# TODO : this test case requires keywords to update an existing message without breaking its recipients
+# Modifying A Message While Broadcasting Two Messages Should Work
+
+
+Creating A Scenario Template During The Broadcast Of A Message Should Work
+    ${scenario_id}=   Scenario Is Created With Name "${SCENARIO_NAME1}" Containing One Message With Title "${MESSAGE_TITLE1}" And Content "${MESSAGE_CONTENT1}" On Broadcast Point ${TYPE_BORNE1}
+    Broadcast Of Scenario ${scenario_id} Is Enabled
+    ${messages_xml}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml} Contains 1 Elements
+    Content Of Message 1 Of Message List ${messages_xml} Is ${MESSAGE_CONTENT1}
+    Title Of Message 1 Of Message List ${messages_xml} Is ${MESSAGE_TITLE1}
+    ${scenario_template_id}=  Scenario Template Is Created With Name "${SCENARIO_TEMPLATE_NAME}" Containing One Message With Title "${MESSAGE_TITLE2}" And Content "${MESSAGE_CONTENT2}"
+    ${messages_xml2}=   List Of Messages Broadcasted On Broadcast Point ${BORNE1} Is Requested
+    Message List ${messages_xml2} Contains 1 Elements
+    Content Of Message 1 Of Message List ${messages_xml2} Is ${MESSAGE_CONTENT1}
+    Title Of Message 1 Of Message List ${messages_xml2} Is ${MESSAGE_TITLE1}
 
