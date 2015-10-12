@@ -9,6 +9,7 @@ BasicClientWin.cpp
 BasicClientWin.h
 BasicClient.cpp
 BasicClient.h
+CallableByThread.hpp
 CleanerThreadExec.cpp
 CleanerThreadExec.h
 ClientException.cpp
