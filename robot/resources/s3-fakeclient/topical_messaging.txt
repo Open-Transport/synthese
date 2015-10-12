@@ -7,72 +7,134 @@ Library           XML
 
 *** Keywords ***
 
-Topical Message ${message_id} Is Created With Title "${message_title}" And Content "${message_content}"
+Topical Message ${message_id:\d+} Is Created With Title "${message_title}" And Content "${message_content}"
     Set Test Variable   ${message.id}   ${message_id}
     Set Test Variable   ${message.title}   ${message_title}
     Set Test Variable   ${message.content}   ${message_content}
 
     
-Topical Message ${message_id} Is Bounded To Broadcast Point Type ${broadcast_point_type_id}
+Topical Message ${message_id:\d+} Is Bounded To Broadcast Point Type ${broadcast_point_type_id:\d+}
     Set Test Variable   ${broadcast_point_type_id}   ${broadcast_point_type_id}
 
         
-Broadcast Of ${message_id} Is Enabled
+Broadcast Of ${message_id:\d+} Is Enabled
     ${http_response}=  Call Synthese Action   scenario_save   actionParamt\=0   actionParam_created_message_title\=${message.title}   actionParamme\=${message.content}   actionParamsid\=${message.id}   actionParamis\=16607027920896004   actionParamena\=1   actionParam_recipients_displayscreen\=${broadcast_point_type_id}   actionParamdv\=%20  actionParamnam\=00     actionParamle=10
     Should Be Equal As Strings    ${http_response.status_code}    200
 
 
+#################################################
+###   Checkers for a list of Message as XML   ###
+#################################################
 
-A Topical Message Is Broadcasted On Broadcast Point ${broadcast_point_id} 
-    ${response}=   List Display Screen Messages     ${broadcast_point_id} 
-    ${utf8_content}   Decode Bytes To String   ${response.content}   UTF-8    strict
-    ${messages_root}=   Parse XML   ${utf8_content}
-    Set Test Variable   ${messages}   ${messages_root}
-    Element Should Exist	${messages}	  xpath=message
-
-
-Content Of This Topical Message Is "${message_content}"
-    Element Attribute Should Be	 ${messages}  content  ${message_content}  xpath=message[1]
+Message List ${messages_xml} Contains ${messages_count} Elements
+    ${real_messages_count}=  Get Element Count  ${messages_xml}  xpath=message
+    Should Be Equal As Integers  ${real_messages_count}  ${messages_count}
 
 
-Title Of This Topical Message Is "${message_title}"
-    Element Attribute Should Be  ${messages}  title  ${message_title}  xpath=message[1]
+Content Of Message ${message_index:\d+} Of Message List ${messages_xml} Is ${message_content}
+    Element Attribute Should Be	 ${messages_xml}  content  ${message_content}  xpath=message[${message_index}]
 
 
-Scenario ${scenario_id:\d+} Is Requested
-    ${response}=   Call Synthese Service   scenario   roid\=${scenario_id}   of\=xml
-    ${utf8_content}   Decode Bytes To String   ${response.content}   UTF-8    strict
-    ${scenario_root}=   Parse XML   ${utf8_content}
-    Set Test Variable   ${scenario.xml}   ${scenario_root}
-    Log   ${utf8_content}
-    Element Should Exist	${scenario_root}	  xpath=calendar/message
+Title Of Message ${message_index:\d+} Of Message List ${messages_xml} Is ${message_title}
+    Element Attribute Should Be	 ${messages_xml}  title  ${message_title}  xpath=message[${message_index}]
 
 
-Name Of This Scenario Is "${scenario_name}"
-    Element Attribute Should Be	 ${scenario.xml}  name  ${scenario_name}
+Level Of Message ${message_index:\d+} Of Message List ${messages_xml} Is ${message_content}
+    Element Attribute Should Be	 ${messages_xml}  level  ${message_level}  xpath=message[${message_index}]
 
 
-Title Of The Topical Message Of This Scenario Is "${message_title}"
-    Element Attribute Should Be  ${scenario.xml}  title  ${message_title}  xpath=calendar[1].message[1]
+#################################################
+### Checkers for a Scenario XML representation###
+#################################################
+
+Name Of Scenario ${scenario_xml} Is ${scenario_name}
+    Element Attribute Should Be	 ${scenario_xml}  name  ${scenario_name}
 
 
-Content Of The Topical Message Of This Scenario Is "${message_content}"
-    Element Attribute Should Be  ${scenario.xml}  content  ${message_content}  xpath=calendar[1].message[1]
+Title Of The Message Of Scenario ${scenario_xml} Is ${message_title}
+    Element Attribute Should Be  ${scenario_xml}  title  ${message_title}  xpath=calendar[1].message[1]
 
 
-Name Of This Scenario Template Is "${scenario_name}"
-    Element Attribute Should Be	 ${scenario.xml}  name  ${scenario_name}  xpath=template_scenario[1]
+Content Of The Message Of Scenario ${scenario_xml} Is ${message_content}
+    Element Attribute Should Be  ${scenario_xml}  content  ${message_content}  xpath=calendar[1].message[1]
 
 
-Title Of The Topical Message Of This Scenario Template Is "${message_title}"
-    Element Attribute Should Be  ${scenario.xml}  title  ${message_title}  xpath=template_scenario[1].calendar[1].message[1]
+Level Of The Message Of Scenario ${scenario_xml} Is ${message_level}
+    Element Attribute Should Be  ${scenario_xml}  level  ${message_level}  xpath=calendar[1].message[1]
 
 
-Content Of The Topical Message Of This Scenario Template Is "${message_content}"
-    Element Attribute Should Be  ${scenario.xml}  content  ${message_content}  xpath=template_scenario[1].calendar[1].message[1]
+Name Of The Template Of Scenario ${scenario_xml} Is ${scenario_name}
+    Element Attribute Should Be	 ${scenario_xml}  name  ${scenario_name}  xpath=template_scenario[1]
 
 
-Scenario Template "${scenario_name}" Is Created Containing One Message With Title "${message_title}" And Content "${message_content}"
+Title Of The Message Of The Template Of Scenario ${scenario_xml} Is ${message_title}
+    Element Attribute Should Be  ${scenario_xml}  title  ${message_title}  xpath=template_scenario[1].calendar[1].message[1]
+
+
+Content Of The Message Of The Template Of Scenario ${scenario_xml} Is ${message_content}
+    Element Attribute Should Be  ${scenario_xml}  content  ${message_content}  xpath=template_scenario[1].calendar[1].message[1]
+
+
+Level Of The Message Of The Template Of Scenario ${scenario_xml} Template Is ${message_level}
+    Element Attribute Should Be  ${scenario_xml}  level  ${message_level}  xpath=template_scenario[1].calendar[1].message[1]
+
+
+#################################################
+### Setters for a Scenario XML representation ###
+#################################################
+
+Set Name Of Scenario "${scenario_xml}" To "${scenario_name}"
+    ${updated_scenario_xml}=   Set Element Attribute   ${scenario_xml}   name     ${scenario_name}
+    [Return]    ${updated_scenario_xml}
+
+
+Set Title Of The Message Of Scenario "${scenario_xml}" To "${message_title}"
+    ${updated_scenario_xml}=   Set Element Attribute   ${scenario_xml}   title     ${message_title}     calendar[1]/message[1]
+    [Return]    ${updated_scenario_xml}
+
+
+Set Content Of The Message Of Scenario "${scenario_xml}" To "${message_content}"
+    ${updated_scenario_xml}=   Set Element Attribute   ${scenario_xml}   content     ${message_content}     calendar[1]/message[1]
+    [Return]    ${updated_scenario_xml}
+
+
+Set Level Of The Message Of Scenario "${scenario_xml}" To ${message_level:\d+}
+    ${updated_scenario_xml}=   Set Element Attribute   ${scenario_xml}   level     ${message_level}     calendar[1]/message[1]
+    [Return]    ${updated_scenario_xml}
+
+
+#################################################
+###    Various modes of scenario creations    ###
+#################################################
+
+Scenario Is Created With Name "${scenario_name}" Containing One Message With Title "${message_title}" And Content "${message_content}"
+    ${response}=   Call Synthese Action   scenario_save   actionParamt\=0   actionParamnam\=${scenario_name}   actionParam_json\={"calendar":[{"id":"","name":"","period":[],"message":[{"id":"","calendar_rank":"1","title":"${message_title}","content":"${message_content}","level":"10","displayDuration":"","digitized_version":"","alternative":[],"section":[{"id":""}],"line_recipient":[],"stoparea_recipient":[],"displayscreen_recipient":[],"rank":0}],"rank":1}]}
+    Should Be Equal As Strings    ${response.status_code}    200
+    ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
+    ${xml_response}=   Parse XML   ${utf8_content}
+	${scenario_id}=   Get Element Attribute   source=${xml_response}   name=generated_id
+    [Return]    ${scenario_id}
+
+
+Scenario Is Created With Name "${scenario_name}" Containing One Message With Title "${message_title}" And Content "${message_content}" On Broadcast Point ${broadcast_point_id:\d+}
+    ${response}=   Call Synthese Action   scenario_save   actionParamt\=0   actionParamnam\=${scenario_name}   actionParam_json\={"calendar":[{"id":"","name":"","period":[],"message":[{"id":"","calendar_rank":"1","title":"${message_title}","content":"${message_content}","level":"10","displayDuration":"","digitized_version":"","alternative":[],"section":[{"id":""}],"line_recipient":[],"stoparea_recipient":[],"displayscreen_recipient":[{"id":"","recipient_id":${broadcast_point_id},"parameter":""}],"rank":0}],"rank":1}]}
+    Should Be Equal As Strings    ${response.status_code}    200
+    ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
+    ${xml_response}=   Parse XML   ${utf8_content}
+	${scenario_id}=   Get Element Attribute   source=${xml_response}   name=generated_id
+    [Return]    ${scenario_id}
+
+
+Scenario Is Created With Name "${scenario_name}" Containing One Message With Title "${message_title}" And Content "${message_content}" And Level ${message_level:\d+} On Broadcast Point ${broadcast_point_id:\d+}
+    ${response}=   Call Synthese Action   scenario_save   actionParamt\=0   actionParamnam\=${scenario_name}   actionParam_json\={"calendar":[{"id":"","name":"","period":[],"message":[{"id":"","calendar_rank":"1","title":"${message_title}","content":"${message_content}","level":"${message_level}","displayDuration":"","digitized_version":"","alternative":[],"section":[{"id":""}],"line_recipient":[],"stoparea_recipient":[],"displayscreen_recipient":[{"id":"","recipient_id":${broadcast_point_id},"parameter":""}],"rank":0}],"rank":1}]}
+    Should Be Equal As Strings    ${response.status_code}    200
+    ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
+    ${xml_response}=   Parse XML   ${utf8_content}
+	${scenario_id}=   Get Element Attribute   source=${xml_response}   name=generated_id
+    [Return]    ${scenario_id}
+
+
+Scenario Template Is Created With Name "${scenario_name}" Containing One Message With Title "${message_title}" And Content "${message_content}"
     ${response}=   Call Synthese Action   scenario_save   actionParamt\=1   actionParamnam\=${scenario_name}   actionParam_json\={"calendar":[{"id":"","name":"","period":[],"message":[{"id":"","calendar_rank":"1","title":"${message_title}","content":"${message_content}","level":"10","displayDuration":"","digitized_version":"","alternative":[],"section":[{"id":""}],"line_recipient":[],"stoparea_recipient":[],"displayscreen_recipient":[],"rank":0}],"rank":1}]}
     Should Be Equal As Strings    ${response.status_code}    200
     ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
@@ -81,7 +143,7 @@ Scenario Template "${scenario_name}" Is Created Containing One Message With Titl
     [Return]    ${scenario_id}
 
 
-Scenario "${scenario_name}" Is Instanciated From ${scenario_template_id}
+Scenario "${scenario_name}" Is Instanciated From ${scenario_template_id:\d+}
     ${response}=   Call Synthese Action   scenario_save   actionParamt\=0   actionParamtpl\=${scenario_template_id}   actionParamnam\=${scenario_name}
     Should Be Equal As Strings    ${response.status_code}    200
     ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
@@ -90,22 +152,77 @@ Scenario "${scenario_name}" Is Instanciated From ${scenario_template_id}
     [Return]    ${scenario_id}
 
 
-Single Message Of Scenario ${scenario_id} Is Updated With Title "${message_title}" And Content "${message_content}"
-    Scenario ${scenario_id} Is Requested
-    ${scenario.xml}=    Set Element Attribute   ${scenario.xml}   title     ${message_title}     calendar[1]/message[1]
-    ${scenario.xml}=    Set Element Attribute   ${scenario.xml}   content   ${message_content}   calendar[1]/message[1]
-    ${scenario_json}=   Convert Scenario From XML To Json ${scenario.xml}
+#################################################
+###         Enable/disable a scenario         ###
+#################################################
+
+Broadcast Of Scenario ${scenario_id:\d+} Is Enabled
+    ${http_response}=  Call Synthese Action   scenario_save   actionParamsid\=${scenario_id}   actionParamena\=1
+    Should Be Equal As Strings    ${http_response.status_code}    200
+
+
+Broadcast Of Scenario ${scenario_id:\d+} Is Disabled
+    ${http_response}=  Call Synthese Action   scenario_save   actionParamsid\=${scenario_id}   actionParamena\=0
+    Should Be Equal As Strings    ${http_response.status_code}    200
+
+
+#################################################
+###            Delete a scenario             ###
+#################################################
+
+Scenario ${scenario_id:\d+} Is Deleted
+    ${http_response}=  Call Synthese Action   scenariostop   actionParams\=${scenario_id}   actionParam_remove\=1
+    Should Be Equal As Strings    ${http_response.status_code}    200
+
+
+#################################################
+###   Query currently broadcasted messages    ###
+#################################################
+
+List Of Messages Broadcasted On Broadcast Point ${broadcast_point_id} Is Requested
+    ${response}=   List Display Screen Messages     ${broadcast_point_id}
+    ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
+    Log   ${utf8_content}
+    ${messages_xml}=   Parse XML   ${utf8_content}
+    [Return]   ${messages_xml}
+
+
+#################################################
+###   Query a scenario from its identifier    ###
+#################################################
+
+Scenario ${scenario_id:\d+} Is Requested
+    ${response}=   Call Synthese Service   scenario   roid\=${scenario_id}   of\=xml
+    ${utf8_content}   Decode Bytes To String   ${response.content}   UTF-8    strict
+    ${scenario_xml}=   Parse XML   ${utf8_content}
+    Log   ${utf8_content}
+    Element Should Exist	${scenario_xml}	  xpath=calendar/message
+    [Return]   ${scenario_xml}
+
+
+#################################################
+###      Update an existing scenario          ###
+#################################################
+
+# TODO : Support for message recipients ?
+# When we will need better control over the content of a scenario (e.g. manipulation of multi-calendars, multi-messages scenarios), 
+# we should consider the development of an extension library providing proper SYNTHESE message objects
+
+Single Message Of Scenario ${scenario_id:\d+} Is Updated With Title "${message_title}" And Content "${message_content}"
+    ${scenario_xml}=    Scenario ${scenario_id} Is Requested
+    ${scenario_xml}=    Set Title Of The Message Of Scenario "${scenario_xml}" To "${message_title}"
+    ${scenario_xml}=    Set Content Of The Message Of Scenario "${scenario_xml}" To "${message_content}"
+    ${scenario_json}=   Convert Scenario From XML To Json ${scenario_xml}
     ${response}=   Call Synthese Action   scenario_save   actionParamsid\=${scenario_id}   actionParam_json\=${scenario_json}
     Should Be Equal As Strings    ${response.status_code}    200
 
 
-This Scenario Is Named "${scenario_name}" 
-    Element Attribute Should Be	 ${scenario.xml}  name  ${scenario_name}
-
-
-This Scenario Contains One Message With Title "${message_title}" And Content "${message_content}"
-    Element Attribute Should Be  ${scenario.xml}  title    ${message_title}    xpath=calendar[1]/message[1]
-    Element Attribute Should Be  ${scenario.xml}  content  ${message_content}  xpath=calendar[1]/message[1]
+Single Message Of Scenario ${scenario_id:\d+} Is Updated With Level ${message_level:\d+}
+    ${scenario_xml}=    Scenario ${scenario_id} Is Requested
+    ${scenario_xml}=    Set Level Of The Message Of Scenario "${scenario_xml}" To ${message_level}
+    ${scenario_json}=   Convert Scenario From XML To Json ${scenario_xml}
+    ${response}=   Call Synthese Action   scenario_save   actionParamsid\=${scenario_id}   actionParam_json\=${scenario_json}
+    Should Be Equal As Strings    ${response.status_code}    200
 
 
 Convert Scenario From XML To Json ${scenario_xml}
@@ -114,7 +231,8 @@ Convert Scenario From XML To Json ${scenario_xml}
     ${message_id}=       Get Element Attribute   ${scenario_xml}   message_id   calendar[1]/message[1]
     ${message_title}=    Get Element Attribute   ${scenario_xml}   title        calendar[1]/message[1]
     ${message_content}=  Get Element Attribute   ${scenario_xml}   content      calendar[1]/message[1]
-    ${scenario_json}=    Set Variable   {\"calendar\":[{\"id\":\"${calendar_id}\",\"name\":\"${calendar_name}\",\"period\":[],\"message\":[{\"id\":\"${message_id}\",\"calendar_rank\":\"\",\"title\":\"${message_title}\",\"content\":\"${message_content}\",\"level\":\"10\",\"displayDuration\":\"\",\"digitized_version\":\"\",\"alternative\":[],\"section\":[{\"id\":\"\"}],\"line_recipient\":[],\"stoparea_recipient\":[],\"displayscreen_recipient\":[],\"rank\":0}],\"rank\":1}]}
+    ${message_level}=    Get Element Attribute   ${scenario_xml}   level        calendar[1]/message[1]
+    ${scenario_json}=    Set Variable   {\"calendar\":[{\"id\":\"${calendar_id}\",\"name\":\"${calendar_name}\",\"period\":[],\"message\":[{\"id\":\"${message_id}\",\"calendar_rank\":\"\",\"title\":\"${message_title}\",\"content\":\"${message_content}\",\"level\":\"${message_level}\",\"displayDuration\":\"\",\"digitized_version\":\"\",\"alternative\":[],\"section\":[{\"id\":\"\"}],\"line_recipient\":[],\"stoparea_recipient\":[],\"displayscreen_recipient\":[],\"rank\":0}],\"rank\":1}]}
     Log   ${scenario_json}
     [Return]  ${scenario_json}
 
