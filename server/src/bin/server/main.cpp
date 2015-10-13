@@ -51,6 +51,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+#include "LegacySecurityPolicy.h"
+
 // included auto generated code
 #include "includes.cpp.inc"
 
@@ -401,6 +403,9 @@ int main( int argc, char **argv )
 				SYNTHESE_BUILD_DATE,
 				SYNTHESE_GIT_URL
 			);
+			LegacySecurityPolicy legacySecurityPolicy;
+			SecurityPolicy::SetInstance(legacySecurityPolicy);
+
 			ServerModule::RunHTTPServer();
 			ServerModule::Wait();
 

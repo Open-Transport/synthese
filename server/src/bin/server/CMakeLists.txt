@@ -27,8 +27,13 @@ include_directories(${SPATIALITE_INCLUDE_DIRS})
 include_directories(${PROJ_INCLUDE_DIRS})
 include_directories(${EXPAT_INCLUDE_DIRS})
 
+set(s3_server_SRCS
+LegacySecurityPolicy.h
+LegacySecurityPolicy.cpp
+main.cpp
+)
 
-add_executable(s3-server main.cpp)
+add_executable(s3-server ${s3_server_SRCS})
 
 if(WIN32)
   # To prevent "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"

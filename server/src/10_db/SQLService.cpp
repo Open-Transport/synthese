@@ -26,12 +26,9 @@
 
 #include "DBModule.h"
 #include "DBResult.hpp"
-#include "GlobalRight.h"
-#include "Profile.h"
 #include "RequestException.h"
 #include "Request.h"
 #include "Session.h"
-#include "User.h"
 
 using namespace boost;
 using namespace std;
@@ -96,15 +93,6 @@ namespace synthese
 		}
 		
 		
-		
-		bool SQLService::isAuthorized(
-			const Session* session
-		) const {
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<GlobalRight>(DELETE_RIGHT);
-		}
-
-
-
 		std::string SQLService::getOutputMimeType() const
 		{
 			return "text/html";

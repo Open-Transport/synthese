@@ -24,6 +24,7 @@
 
 #include "Request.h"
 #include "MimeTypes.hpp"
+#include "SecurityPolicy.h"
 
 #include <sstream>
 
@@ -163,5 +164,15 @@ namespace synthese
 		{
 			return FunctionAPI();
 		}
+
+
+		bool
+		Function::isAuthorized(const Session* session) const
+		{
+			return SecurityPolicy::GetInstance().isAuthorized(getFactoryKey(), session);
+		}
+
+
+
 
 }	}
