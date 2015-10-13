@@ -56,13 +56,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,RoadPlaceTableSync>::FACTORY_KEY("34.01 RoadPlace");
 	}
 
-	namespace road
-	{
-		const string RoadPlaceTableSync::COL_NAME = "name";
-		const string RoadPlaceTableSync::COL_CITYID = "city_id";
-		const string RoadPlaceTableSync::COL_DATASOURCE_LINKS = "datasource_links";
-		const string RoadPlaceTableSync::COL_ISCITYMAINROAD = "is_city_main_road";
-	}
 
 	namespace db
 	{
@@ -71,144 +64,17 @@ namespace synthese
 		);
 
 		template<> const Field DBTableSyncTemplate<RoadPlaceTableSync>::_FIELDS[]=
-		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(RoadPlaceTableSync::COL_NAME, SQL_TEXT),
-			Field(RoadPlaceTableSync::COL_CITYID, SQL_INTEGER),
-			Field(RoadPlaceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			Field(RoadPlaceTableSync::COL_ISCITYMAINROAD, SQL_BOOLEAN),
-			Field()
+		{	Field()
 		};
+
 
 		template<>
 		DBTableSync::Indexes DBTableSyncTemplate<RoadPlaceTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(
-				DBTableSync::Index(
-					RoadPlaceTableSync::COL_CITYID.c_str()
-			, "")	);
-			return r;
+			r.push_back(DBTableSync::Index(ComplexObjectFieldDefinition<NamedPlaceField>::FIELDS[1].name.c_str(), ""));
+			return DBTableSync::Indexes();
 		}
-
-
-
-		template<> void OldLoadSavePolicy<RoadPlaceTableSync,RoadPlace>::Load(
-			RoadPlace* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			// Name
-			object->setName(
-				trim_copy(
-					rows->getText(RoadPlaceTableSync::COL_NAME)
-			)	);
-
-			// City
-			object->setCity(NULL);
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				RegistryKeyType cityId(rows->getLongLong(RoadPlaceTableSync::COL_CITYID));
-
-				// City
-				object->setCity(CityTableSync::GetEditable(cityId, env, linkLevel).get());
-				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
-
-				// Registration to city matcher
-				if(!object->getName().empty())
-				{
-					city->addPlaceToMatcher(env.getEditableSPtr(object));
-				}
-
-				bool isCityMainRoad(rows->getBool(RoadPlaceTableSync::COL_ISCITYMAINROAD));
-				if(isCityMainRoad)
-				{
-					city->addIncludedPlace(*object);
-				}
-				else
-				{
-					city->removeIncludedPlace(*object);
-				}
-			}
-
-			// Datasource links
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				object->setDataSourceLinksWithoutRegistration(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(RoadPlaceTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
-			}
-
-			// Registration to all places matcher
-			if(	&env == &Env::GetOfficialEnv() &&
-				linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL &&
-				!object->getName().empty()
-			){
-				GeographyModule::GetGeneralAllPlacesMatcher().add(
-					object->getFullName(),
-					env.getEditableSPtr(object)
-				);
-			}
-
-			// Registration to road places matcher
-			if(&env == &Env::GetOfficialEnv() &&
-				linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL &&
-				!object->getName().empty()
-			){
-				RoadModule::GetGeneralRoadsMatcher().add(
-					object->getFullName(),
-					env.getEditableSPtr(object)
-				);
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<RoadPlaceTableSync,RoadPlace>::Save(
-			RoadPlace* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<RoadPlaceTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-			query.addField(object->getCity() ? object->getCity()->includes(*object) : false);
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<RoadPlaceTableSync,RoadPlace>::Unlink(
-			RoadPlace* obj
-		){
-			// City matcher
-			City* city = const_cast<City*>(obj->getCity());
-			if (city != NULL)
-			{
-				city->removePlaceFromMatcher(*obj);
-				city->removeIncludedPlace(*obj);
-			}
-
-			if(Env::GetOfficialEnv().contains(*obj))
-			{
-				// General all places
-				GeographyModule::GetGeneralAllPlacesMatcher().remove(
-					obj->getFullName()
-				);
-
-				// General public places
-				RoadModule::GetGeneralRoadsMatcher().remove(
-					obj->getFullName()
-				);
-			}
-		}
-
 
 
 		template<> bool DBTableSyncTemplate<RoadPlaceTableSync>::CanDelete(
@@ -218,8 +84,6 @@ namespace synthese
 			//TODO Check user rights
 			return true;
 		}
-
-
 
 		template<> void DBTableSyncTemplate<RoadPlaceTableSync>::BeforeDelete(
 			util::RegistryKeyType id,
@@ -268,15 +132,15 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (exactName)
-				query << " AND " << COL_NAME << (isDifferentFromExactName ? "!=" : "=") << Conversion::ToDBString(*exactName);
+				query << " AND " << geography::NamedPlaceField::FIELDS[0].name << (isDifferentFromExactName ? "!=" : "=") << Conversion::ToDBString(*exactName);
 			if (likeName)
-				query << " AND " << COL_NAME << " LIKE " << Conversion::ToDBString(*likeName);
+				query << " AND " << geography::NamedPlaceField::FIELDS[0].name << " LIKE " << Conversion::ToDBString(*likeName);
 			if (cityId)
-				query << " AND " << COL_CITYID << "=" <<*cityId;
+				query << " AND " << geography::NamedPlaceField::FIELDS[1].name << "=" <<*cityId;
 			if (!logic::indeterminate(mainRoad))
-				query << " AND " << COL_ISCITYMAINROAD << "=" << (mainRoad ? "1" : "0");
+				query << " AND " << IsCityMainRoad::FIELD.name << "=" << (mainRoad ? "1" : "0");
 			if (orderByName)
-				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY " << geography::NamedPlaceField::FIELDS[0].name << (raisingOrder ? " ASC" : " DESC");
 			if (number)
 			{
 				query << " LIMIT " << (*number + 1);
@@ -302,4 +166,11 @@ namespace synthese
 			}
 			return roadPlaces.front();
 		}
+
+
+		bool RoadPlaceTableSync::allowList(const server::Session* session) const
+		{
+			return true;
+		}
+
 }	}

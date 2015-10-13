@@ -29,10 +29,13 @@
 #include "Place.h"
 #include "RoadTypes.hpp"
 #include "NamedPlaceTemplate.h"
+#include "NamedPlaceField.hpp"
+#include "DataSourceLinksField.hpp"
 #include "PathGroup.h"
 #include "Registrable.h"
 #include "Registry.h"
 #include "ImportableTemplate.hpp"
+#include "Object.hpp"
 #include "PointerField.hpp"
 
 namespace synthese
@@ -48,16 +51,25 @@ namespace synthese
 		class RoadPath;
 		class House;
 
+		FIELD_BOOL(IsCityMainRoad)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(geography::NamedPlaceField),
+			FIELD(impex::DataSourceLinks),
+			FIELD(IsCityMainRoad)
+		> RoadPlaceSchema;
+
 		////////////////////////////////////////////////////////////////////////
 		/// Road place class.
 		/// @ingroup m34
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
 		class RoadPlace:
+			public Object<RoadPlace, RoadPlaceSchema>,
 			public graph::PathGroup,
 			public geography::NamedPlaceTemplate<RoadPlace>,
-			public impex::ImportableTemplate<RoadPlace>,
-			public PointerField<RoadPlace, RoadPlace>
+			public impex::ImportableTemplate<RoadPlace>
 		{
 		public:
 			static const std::string DATA_ID;
@@ -101,6 +113,9 @@ namespace synthese
 				void removeRoad(RoadPath& road);
 				void addRoad(Road& road) const;
 				void removeRoad(Road& road) const;
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 			//@}
 
 			//! @name Services
@@ -117,11 +132,10 @@ namespace synthese
 					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
 				) const;
-				
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
+
+				virtual bool allowUpdate(const server::Session* session) const;
+				virtual bool allowCreate(const server::Session* session) const;
+				virtual bool allowDelete(const server::Session* session) const;
 
 				virtual std::string getRuleUserName() const;
 
@@ -159,6 +173,10 @@ namespace synthese
 			//! @name Static algorithms
 			//@{
 			//@}
+
+		private:
+			bool getIsCityMainRoad() const { return get<IsCityMainRoad>(); }
+
 		};
 }	}
 
