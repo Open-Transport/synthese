@@ -81,9 +81,9 @@ namespace synthese
 			// Language
 			if(map.getOptional<string>(PARAMETER_LANGUAGE)) try
 			{
-				_language = &Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_LANGUAGE));
+				_language = &synthese::Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_LANGUAGE));
 			}
-			catch (Language::LanguageNotFoundException& e)
+			catch (synthese::Language::LanguageNotFoundException& e)
 			{
 				throw RequestException("Inconsistent display language "+ e.getMessage());
 			}
@@ -94,9 +94,9 @@ namespace synthese
 			// Value
 			if(map.getOptional<string>(PARAMETER_VALUE)) try
 			{
-				_value = &Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_VALUE));
+				_value = &synthese::Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_VALUE));
 			}
-			catch (Language::LanguageNotFoundException& e)
+			catch (synthese::Language::LanguageNotFoundException& e)
 			{
 				throw RequestException("Inconsistent default value "+ e.getMessage());
 			}
@@ -110,7 +110,7 @@ namespace synthese
 		) const {
 
 			// Language
-			const Language* language(_language);
+			const synthese::Language* language(_language);
 			if(!language)
 			{
 				if(request.getUser() && request.getUser()->getLanguage())
@@ -119,7 +119,7 @@ namespace synthese
 				}
 				else
 				{
-					language = &Language::GetLanguageFromIso639_1Code("en");
+					language = &synthese::Language::GetLanguageFromIso639_1Code("en");
 				}
 			}
 
@@ -131,7 +131,7 @@ namespace synthese
 			stream <<
 				f.getSelectInput(
 					_name,
-					Language::GetIso639_2LanguagesVector(*language),
+					synthese::Language::GetIso639_2LanguagesVector(*language),
 					_value ? optional<string>(_value->getIso639_2Code()) : optional<string>()
 				);
 

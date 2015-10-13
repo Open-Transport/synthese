@@ -28,18 +28,29 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
 
+#include "GlobalRight.h"
 #include "SecurityConstants.hpp"
 #include "SecurityTypes.hpp"
-#include "GlobalRight.h"
+#include "StringField.hpp"
 
 namespace synthese
 {
 	namespace security
 	{
+		class Profile;
 		class Right;
+
+		FIELD_POINTER(ParentProfile, Profile)
+		FIELD_STRING(Rights)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(ParentProfile),
+			FIELD(Rights)
+		> ProfileSchema;
 
 		/** Profil utilisateur.
 			@ingroup m12
@@ -59,19 +70,15 @@ namespace synthese
 
 		*/
 		class Profile
-		:	public virtual util::Registrable
+		:	public virtual Object<Profile, ProfileSchema>
 		{
-		public:
-
-			/// Chosen registry class.
-			typedef util::Registry<Profile>	Registry;
-
 		private:
-			std::string		_name;
 			RightsVector	_rights;
-			const Profile*	_parent;
 
 		public:
+			static const std::string RIGHT_SEPARATOR;
+			static const std::string RIGHT_VALUE_SEPARATOR;
+
 			/** Comparison operator between profiles.
 				@param profile Profile to compare with
 				@return true if the compared profile permits at least one thing that the current profile can not do.
@@ -163,6 +170,14 @@ namespace synthese
 				template<class T>
 				RightLevel	getGlobalPublicRight()	const;
 			//@}
+
+			//! @name Modifiers
+			//@{
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+			//@}
+
+			std::string getRightsString();
+			void setRightsFromString(const std::string& text);
 		};
 
 		template<class R>

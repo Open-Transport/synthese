@@ -39,11 +39,6 @@
 
 namespace synthese
 {
-	namespace security
-	{
-		class Profile;
-	}
-
 	namespace server
 	{
 		class Session;

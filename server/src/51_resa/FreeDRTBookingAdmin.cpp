@@ -238,10 +238,10 @@ namespace synthese
 					): string()
 			)	);
 			stream << t.row();
-			const Language& language(
+			const synthese::Language& language(
 				request.getUser()->getLanguage() ?
 					*request.getUser()->getLanguage() :
-					Language::GetLanguageFromIso639_1Code("fr")
+					synthese::Language::GetLanguageFromIso639_1Code("fr")
 			);
 			vector<pair<optional<string>, string> > dates;
 			vector<pair<optional<string>, string> > times;

@@ -22,9 +22,11 @@
 
 #include "User.h"
 
+#include "Language.hpp"
 #include "MD5Wrapper.h"
 #include "Profile.h"
 #include "Registry.h"
+#include "Session.h"
 #include "StringUtils.hpp"
 #include "UserException.h"
 
@@ -41,12 +43,29 @@ using namespace boost::gregorian;
 
 namespace synthese
 {
+	using namespace security;
 	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<security::User>::KEY("User");
-	}
+	CLASS_DEFINITION(User, "t026_users", 26)
+	FIELD_DEFINITION_OF_OBJECT(User, "user_id", "user_ids")
+
+	FIELD_DEFINITION_OF_TYPE(SurName, "surname", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Login, "login", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Password, "password", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(UserProfile, "profile_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Address, "address", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(PostCode, "post_code", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(CityText, "city_text", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(CityId, "city_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Country, "country", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Email, "email", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Phone, "phone", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(CreationDate, "creation_date", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(CreatorId, "creator_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Auth, "auth", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(BirthDate, "birth_date", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(security::Language, "language", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DataSourceLinksWithoutUnderscore, "data_source_links", SQL_TEXT)
 
 
 	namespace {
@@ -65,12 +84,28 @@ namespace synthese
 		User::User(
 			util::RegistryKeyType id
 		):	Registrable(id),
-			_profile(NULL),
-			_cityId(0),
-			_creatorId(0),
-			_isConnectionAllowed(true),
-			_birthDate(not_a_date_time),
-			_language(NULL)
+			Object<User, UserSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(SurName),
+					FIELD_DEFAULT_CONSTRUCTOR(Login),
+					FIELD_DEFAULT_CONSTRUCTOR(Password),
+					FIELD_DEFAULT_CONSTRUCTOR(UserProfile),
+					FIELD_DEFAULT_CONSTRUCTOR(Address),
+					FIELD_DEFAULT_CONSTRUCTOR(PostCode),
+					FIELD_DEFAULT_CONSTRUCTOR(CityText),
+					FIELD_VALUE_CONSTRUCTOR(CityId, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(Country),
+					FIELD_DEFAULT_CONSTRUCTOR(Email),
+					FIELD_DEFAULT_CONSTRUCTOR(Phone),
+					FIELD_DEFAULT_CONSTRUCTOR(CreationDate),
+					FIELD_VALUE_CONSTRUCTOR(CreatorId, 0),
+					FIELD_VALUE_CONSTRUCTOR(Auth, true),
+					FIELD_VALUE_CONSTRUCTOR(BirthDate, not_a_date_time),
+					FIELD_DEFAULT_CONSTRUCTOR(security::Language),
+					FIELD_DEFAULT_CONSTRUCTOR(DataSourceLinksWithoutUnderscore)
+			)	)
 		{
 		}
 
@@ -78,12 +113,14 @@ namespace synthese
 
 		void User::setProfile(const Profile* profile )
 		{
-			_profile = profile;
+			set<UserProfile>(profile
+				? boost::optional<Profile&>(*const_cast<Profile*>(profile))
+				: boost::none);
 		}
 
 		void User::setLogin( const std::string& login )
 		{
-			_login = login;
+			set<Login>(login);
 		}
 
 		void User::setPassword( const std::string& password )
@@ -107,27 +144,31 @@ namespace synthese
 
 		void User::setPasswordHash( const std::string& passwordHash )
 		{
-			_passwordHash = passwordHash;
+			set<Password>(passwordHash);
 		}
 
 		void User::setName( const std::string& name )
 		{
-			_name = name;
+			set<Name>(name);
 		}
 
 		void User::setSurname( const std::string& surname )
 		{
-			_surname = surname;
+			set<SurName>(surname);
 		}
 
 		const Profile* User::getProfile() const
 		{
-			return _profile;
+			if (get<UserProfile>())
+			{
+				return get<UserProfile>().get_ptr();
+			}
+			return NULL;
 		}
 
 		const std::string& User::getLogin() const
 		{
-			return _login;
+			return get<Login>();
 		}
 
 		const std::string& User::getPassword() const
@@ -137,33 +178,34 @@ namespace synthese
 
 		const std::string& User::getPasswordHash() const
 		{
-			return _passwordHash;
+			return get<Password>();
 		}
 
 		std::string User::getName() const
 		{
-			return _name;
+			return get<Name>();
 		}
 
 		const std::string& User::getSurname() const
 		{
-			return _surname;
+			return get<SurName>();
 		}
 
 		void User::verifyPassword( const std::string& password ) const
 		{
 			// Backward compatibility: password used to be stored unhashed.
-			if(_passwordHash == password)
+			if(get<Password>() == password)
 				return;
 
 			const int MD5_LENGTH = 32;
-			if(_passwordHash.length() != SALT_LENGTH + MD5_LENGTH)
+			string passwordHash = get<Password>();
+			if(passwordHash.length() != SALT_LENGTH + MD5_LENGTH)
 				throw UserException("Bad password");
-			string salt = _passwordHash.substr(0, SALT_LENGTH);
+			string salt = passwordHash.substr(0, SALT_LENGTH);
 
 			MD5Wrapper md5;
 			string expectedMd5Hash = md5.getHashFromString(salt + password);
-			string md5Hash(_passwordHash.substr(SALT_LENGTH, MD5_LENGTH));
+			string md5Hash(passwordHash.substr(SALT_LENGTH, MD5_LENGTH));
 
 			if (md5Hash != expectedMd5Hash)
 				throw UserException("Bad password");
@@ -171,93 +213,93 @@ namespace synthese
 
 		void User::setAddress( const std::string& address )
 		{
-			_address = address;
+			set<Address>(address);
 		}
 
 
 		void User::setPostCode( const std::string& code )
 		{
-			_postCode = code;
+			set<PostCode>(code);
 		}
 
 		void User::setCityText( const std::string& city )
 		{
-			_cityText = city;
+			set<CityText>(city);
 		}
 
 		void User::setCountry( const std::string& country )
 		{
-			_country = country;
+			set<Country>(country);
 		}
 
 		void User::setEMail( const std::string& email )
 		{
-			_email = email;
+			set<Email>(email);
 		}
 
 		void User::setPhone( const std::string& phone )
 		{
-			_phone = phone;
+			set<Phone>(phone);
 		}
 
 		void User::setCreationDate( const boost::gregorian::date& creationDate )
 		{
-			_creationDate = creationDate;
+			set<CreationDate>(creationDate);
 		}
 
 		const std::string& User::getAddress() const
 		{
-			return _address;
+			return get<Address>();
 		}
 
 		const std::string& User::getPostCode() const
 		{
-			return _postCode;
+			return get<PostCode>();
 		}
 
 		const std::string& User::getCityText() const
 		{
-			return _cityText;
+			return get<CityText>();
 		}
 
 		const std::string& User::getCountry() const
 		{
-			return _country;
+			return get<Country>();
 		}
 
 		const std::string& User::getEMail() const
 		{
-			return _email;
+			return get<Email>();
 		}
 
 		const std::string& User::getPhone() const
 		{
-			return _phone;
+			return get<Phone>();
 		}
 
 		const boost::gregorian::date& User::getCreationDate() const
 		{
-			return _creationDate;
+			return get<CreationDate>();
 		}
 
 		void User::setConnectionAllowed( bool value )
 		{
-			_isConnectionAllowed = value;
+			set<Auth>(value);
 		}
 
 		bool User::getConnectionAllowed() const
 		{
-			return _isConnectionAllowed;
+			return get<Auth>();
 		}
 
 		const date& User::getBirthDate() const
 		{
-			return _birthDate;
+			return get<BirthDate>();
 		}
 
 		void User::setBirthDate( const date& date )
 		{
-			_birthDate = date;
+			set<BirthDate>(date);
 		}
 
 		std::string User::getFullName() const
@@ -285,25 +327,59 @@ namespace synthese
 			std::string prefix
 		) const	{
 			pm.insert("id", getKey());
-			pm.insert(DATA_NAME, _name);
-			pm.insert(DATA_SURNAME, _surname);
-			pm.insert(DATA_LOGIN, _login);
-			pm.insert("phone", _phone);
-			pm.insert("email", _email);
-			pm.insert("address", _address);
-			pm.insert("postcode", _postCode);
-			pm.insert("cityText", _cityText);
-			pm.insert("country", _country);
-			pm.insert("is_connection_allowed", _isConnectionAllowed);
-			if(_profile)
+			pm.insert(DATA_NAME, get<Name>());
+			pm.insert(DATA_SURNAME, get<SurName>());
+			pm.insert(DATA_LOGIN, get<Login>());
+			pm.insert("phone", get<Phone>());
+			pm.insert("email", get<Email>());
+			pm.insert("address", get<Address>());
+			pm.insert("postcode", get<PostCode>());
+			pm.insert("cityText", get<CityText>());
+			pm.insert("country", get<Country>());
+			pm.insert("is_connection_allowed", get<Auth>());
+			if(get<UserProfile>())
 			{
-				pm.insert("profile_id", _profile->getKey());
+				pm.insert("profile_id", get<UserProfile>()->getKey());
 			}
-			pm.insert("creation_date", _creationDate);
-			if(_creatorId)
+			pm.insert("creation_date", get<CreationDate>());
+			if(get<CreatorId>())
 			{
-				pm.insert("creator_id", _creatorId);
+				pm.insert("creator_id", get<CreatorId>());
 			}
+		}
+
+		void User::setLanguage(const synthese::Language* value)
+		{
+			_language = value;
+		}
+
+		void User::link(util::Env& env, bool withAlgorithmOptimizations)
+		{
+			// Language
+			string langStr(get<security::Language>());
+			if(!langStr.empty()) try
+			{
+				setLanguage(&synthese::Language::GetLanguageFromIso639_2Code(langStr));
+			}
+			catch(synthese::Language::LanguageNotFoundException& e)
+			{
+				Log::GetInstance().warn("Language error in user "+ lexical_cast<string>(getKey()), e);
+			}
+		}
+
+		bool User::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool User::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool User::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 	}
 }

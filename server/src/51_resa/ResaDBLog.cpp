@@ -308,7 +308,7 @@ namespace synthese
 						ResaModule::DisplayReservations(
 							stream,
 							*tr,
-							searchRequest.getUser()->getLanguage() ? *searchRequest.getUser()->getLanguage() : Language::GetLanguageFromIso639_1Code("fr")
+							searchRequest.getUser()->getLanguage() ? *searchRequest.getUser()->getLanguage() : synthese::Language::GetLanguageFromIso639_1Code("fr")
 						);
 						stream << "<br />Statut actuel de la réservation : " << HTMLModule::getHTMLImage("/admin/img/" + ResaModule::GetStatusIcon(status), tr->getFullStatusText()) << " " << tr->getFullStatusText();
 					}
@@ -323,7 +323,7 @@ namespace synthese
 						ResaModule::DisplayReservations(
 							stream,
 							*tr,
-							searchRequest.getUser()->getLanguage() ? *searchRequest.getUser()->getLanguage() : Language::GetLanguageFromIso639_1Code("fr")
+							searchRequest.getUser()->getLanguage() ? *searchRequest.getUser()->getLanguage() : synthese::Language::GetLanguageFromIso639_1Code("fr")
 						);
 					}
 					break;

@@ -27,6 +27,7 @@
 #include "DBLog.h"
 #include "DBLogEntryTableSync.h"
 #include "DBLogModule.h"
+#include "Profile.h"
 #include "RequestException.h"
 #include "Request.h"
 #include "UserTableSync.h"

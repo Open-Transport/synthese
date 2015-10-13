@@ -190,10 +190,10 @@ namespace synthese
 			const server::Request& _request
 		) const {
 
-			const Language& language(
+			const synthese::Language& language(
 				_request.getUser()->getLanguage() ?
 				*_request.getUser()->getLanguage() :
-				Language::GetLanguageFromIso639_1Code("fr")
+				synthese::Language::GetLanguageFromIso639_1Code("fr")
 			);
 
 			vector<pair<optional<string>, string> > dates;

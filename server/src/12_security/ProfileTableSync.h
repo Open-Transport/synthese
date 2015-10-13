@@ -27,7 +27,6 @@
 #include <iostream>
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -48,24 +47,11 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				ProfileTableSync,
 				Profile,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>
 		{
 
 		public:
-			static const std::string TABLE_COL_NAME;
-			static const std::string TABLE_COL_PARENT_ID;
-			static const std::string TABLE_COL_RIGHTS_STRING;
-
-			static const std::string RIGHT_SEPARATOR;
-			static const std::string RIGHT_VALUE_SEPARATOR;
-
-			static std::string getRightsString(const Profile*);
-			static void setRightsFromString(Profile*, const std::string& text);
-
-
-
 			/** Profile search.
 				@param name name to search (LIKE format)
 				@param right right to search

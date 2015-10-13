@@ -31,9 +31,11 @@
 #include "ImportableTableSync.hpp"
 #include "JourneyPattern.hpp"
 #include "MimeTypes.hpp"
+#include "Profile.h"
 #include "RequestException.h"
 #include "Request.h"
 #include "ScheduledService.h"
+#include "User.h"
 #include "UserTableSync.h"
 #include "Webpage.h"
 

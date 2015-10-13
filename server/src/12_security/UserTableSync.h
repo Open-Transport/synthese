@@ -29,7 +29,6 @@
 #include "User.h"
 #include "DBDirectTableSyncTemplate.hpp"
 #include "NoSynchronizationPolicy.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -44,31 +43,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				UserTableSync,
 				User,
-				db::NoSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::NoSynchronizationPolicy
 			>
 		{
 		public:
-			static const std::string TABLE_COL_LOGIN;
-			static const std::string TABLE_COL_NAME;
-			static const std::string TABLE_COL_SURNAME;
-			static const std::string TABLE_COL_PASSWORD_HASH;
-			static const std::string TABLE_COL_PROFILE_ID;
-			static const std::string TABLE_COL_ADDRESS;
-			static const std::string TABLE_COL_POST_CODE;
-			static const std::string TABLE_COL_CITY_TEXT;
-			static const std::string TABLE_COL_CITY_ID;
-			static const std::string TABLE_COL_COUNTRY;
-			static const std::string TABLE_COL_EMAIL;
-			static const std::string TABLE_COL_PHONE;
-			static const std::string TABLE_COL_CREATION_DATE;
-			static const std::string TABLE_COL_CREATOR_ID;
-			static const std::string COL_LOGIN_AUTHORIZED;
-			static const std::string COL_BIRTH_DATE;
-			static const std::string COL_LANGUAGE;
-			static const std::string COL_DATA_SOURCE_LINKS;
-
-
 			/** Gets a user in the database, founded by his login.
 				@param login login to search
 				@return boost::shared_ptr<User> Shared pointer to a new user linked-object.

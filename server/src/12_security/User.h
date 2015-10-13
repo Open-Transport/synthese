@@ -26,10 +26,14 @@
 #include <string>
 #include <boost/date_time/gregorian/gregorian.hpp>
 
+#include "Object.hpp"
+
+#include "DataSourceLinksField.hpp"
+#include "DateField.hpp"
 #include "ImportableTemplate.hpp"
-#include "Registrable.h"
 
 #include "Registry.h"
+#include "StringField.hpp"
 
 namespace synthese
 {
@@ -38,6 +42,46 @@ namespace synthese
 	namespace security
 	{
 		class Profile;
+
+		FIELD_STRING(SurName)
+		FIELD_STRING(Login)
+		FIELD_STRING(Password)
+		FIELD_POINTER(UserProfile, Profile)
+		FIELD_STRING(Address)
+		FIELD_STRING(PostCode)
+		FIELD_STRING(CityText)
+		FIELD_ID(CityId)
+		FIELD_STRING(Country)
+		FIELD_STRING(Email)
+		FIELD_STRING(Phone)
+		FIELD_DATE(CreationDate)
+		FIELD_ID(CreatorId)
+		FIELD_BOOL(Auth)
+		FIELD_DATE(BirthDate)
+		FIELD_STRING(Language)
+		FIELD_DATASOURCE_LINKS(DataSourceLinksWithoutUnderscore)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(SurName),
+			FIELD(Login),
+			FIELD(Password),
+			FIELD(UserProfile),
+			FIELD(Address),
+			FIELD(PostCode),
+			FIELD(CityText),
+			FIELD(CityId),
+			FIELD(Country),
+			FIELD(Email),
+			FIELD(Phone),
+			FIELD(CreationDate),
+			FIELD(CreatorId),
+			FIELD(Auth),
+			FIELD(BirthDate),
+			FIELD(security::Language),
+			FIELD(DataSourceLinksWithoutUnderscore)
+		> UserSchema;
 
 		/** Utilisateur.
 			@ingroup m12
@@ -52,37 +96,17 @@ namespace synthese
 
 		*/
 		class User:
-			public virtual util::Registrable,
-			public impex::ImportableTemplate<User>
+			public impex::ImportableTemplate<User>,
+			public virtual Object<User,UserSchema>
 		{
 		public:
-
-			/// Chosen registry class.
-			typedef util::Registry<User>	Registry;
-
 			static const std::string DATA_NAME;
 			static const std::string DATA_SURNAME;
 			static const std::string DATA_LOGIN;
 
 		private:
-			const Profile*	_profile;
-			std::string		_login;
+			const synthese::Language*	_language;
 			std::string		_password;
-			std::string		_passwordHash;
-			std::string		_name;
-			std::string		_surname;
-			std::string		_address;
-			std::string		_postCode;
-			std::string		_cityText;
-			util::RegistryKeyType		_cityId;
-			std::string		_country;
-			std::string		_email;
-			std::string		_phone;
-			boost::gregorian::date		_creationDate;
-			util::RegistryKeyType		_creatorId;
-			bool			_isConnectionAllowed;
-			boost::gregorian::date	_birthDate;
-			const Language*	_language;
 
 		public:
 			User(util::RegistryKeyType id = 0);
@@ -99,16 +123,16 @@ namespace synthese
 				void setAddress(const std::string& address);
 				void setPostCode(const std::string& code);
 				void setCityText(const std::string& city);
-				void setCityId(util::RegistryKeyType cityId) { _cityId = cityId; }
+				void setCityId(util::RegistryKeyType cityId) { set<CityId>(cityId); }
 				void setCountry(const std::string& country);
 				void setEMail(const std::string& email);
 				void setPhone(const std::string& phone);
 				void setCreationDate(const boost::gregorian::date& date);
-				void setCreatorId(util::RegistryKeyType creatorId) { _creatorId = creatorId; }
+				void setCreatorId(util::RegistryKeyType creatorId) { set<CreatorId>(creatorId); }
 				void setConnectionAllowed(bool value);
 				void setBirthDate(const boost::gregorian::date& date);
 				void setRandomPassword();
-				void setLanguage(const Language* value){ _language = value; }
+				void setLanguage(const synthese::Language* value);
 			//@}
 
 			//! \name Getters
@@ -127,15 +151,15 @@ namespace synthese
 				const std::string&	getAddress()			const;
 				const std::string&	getPostCode()			const;
 				const std::string&	getCityText()			const;
-				util::RegistryKeyType	getCityId()				const { return _cityId; }
+				util::RegistryKeyType	getCityId()			const { return get<CityId>(); }
 				const std::string&	getCountry()			const;
 				const std::string&	getEMail()				const;
 				const std::string&	getPhone()				const;
 				const boost::gregorian::date&	getCreationDate()		const;
-				util::RegistryKeyType	getCreatorId()		const { return _creatorId; }
+				util::RegistryKeyType	getCreatorId()		const { return get<CreatorId>(); }
 				bool				getConnectionAllowed()	const;
 				const boost::gregorian::date&	getBirthDate()			const;
-				const Language*		getLanguage() const { return _language; }
+				const synthese::Language*		getLanguage() const { return _language; }
 			//@}
 
 			//! \name Services
@@ -154,6 +178,15 @@ namespace synthese
 				 * setPassword(). */
 				void resetTempPassword();
 			//@}
+
+			//! @name Modifiers
+			//@{
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 	}
 }
