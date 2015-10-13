@@ -55,7 +55,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_OBJECT(OnlineReservationRule, "online_reservation_rule_id", "online_reservation_rule_ids")
 
 	FIELD_DEFINITION_OF_TYPE(resa::Contact, "reservation_rule_id", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(Email, "email", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(resa::Email, "email", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(CopyEmail, "copy_email", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(NeedsSurname, "needs_surname", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(NeedsAddress, "needs_address", SQL_INTEGER)
@@ -119,7 +119,7 @@ namespace synthese
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, key),
 					FIELD_DEFAULT_CONSTRUCTOR(resa::Contact),
-					FIELD_DEFAULT_CONSTRUCTOR(Email),
+					FIELD_DEFAULT_CONSTRUCTOR(resa::Email),
 					FIELD_DEFAULT_CONSTRUCTOR(CopyEmail),
 					FIELD_DEFAULT_CONSTRUCTOR(NeedsSurname),
 					FIELD_DEFAULT_CONSTRUCTOR(NeedsAddress),
@@ -140,7 +140,7 @@ namespace synthese
 
 		const std::string& OnlineReservationRule::getEMail() const
 		{
-			return get<Email>();
+			return get<resa::Email>();
 		}
 
 		const std::string& OnlineReservationRule::getCopyEMail() const
@@ -196,7 +196,7 @@ namespace synthese
 
 		void OnlineReservationRule::setEMail( const std::string& email )
 		{
-			set<Email>(email);
+			set<resa::Email>(email);
 		}
 
 		void OnlineReservationRule::setCopyEMail( const std::string& email )
