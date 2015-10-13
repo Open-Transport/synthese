@@ -18,4 +18,20 @@ There Is One Object In Table
     ${object_count}=  Get Element Count	 ${response.content}  xpath=object
     Should Be Equal As Numbers  1  ${object_count}
 
-    
+There Is Two Objects In Table 
+    [Arguments]  ${table_id}
+    ${response}=  List Synthese Objects  table_id=${table_id}
+    ${object_count}=  Get Element Count	 ${response.content}  xpath=object
+    Should Be Equal As Numbers  2  ${object_count}
+
+There Is Three Objects In Table 
+    [Arguments]  ${table_id}
+    ${response}=  List Synthese Objects  table_id=${table_id}
+    ${object_count}=  Get Element Count	 ${response.content}  xpath=object
+    Should Be Equal As Numbers  3  ${object_count}
+
+There Is Four Objects In Table 
+    [Arguments]  ${table_id}
+    ${response}=  List Synthese Objects  table_id=${table_id}
+    ${object_count}=  Get Element Count	 ${response.content}  xpath=object
+    Should Be Equal As Numbers  4  ${object_count}
