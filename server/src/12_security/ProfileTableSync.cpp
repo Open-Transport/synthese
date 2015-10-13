@@ -193,5 +193,10 @@ namespace synthese
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
+
+		bool ProfileTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(security::READ);
+		}
 	}
 }

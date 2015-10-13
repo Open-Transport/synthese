@@ -26,6 +26,7 @@
 #include "MD5Wrapper.h"
 #include "Profile.h"
 #include "Registry.h"
+#include "SecurityRight.h"
 #include "Session.h"
 #include "StringUtils.hpp"
 #include "UserException.h"
@@ -369,17 +370,17 @@ namespace synthese
 
 		bool User::allowUpdate(const server::Session* session) const
 		{
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(security::WRITE);
 		}
 
 		bool User::allowCreate(const server::Session* session) const
 		{
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(security::WRITE);
 		}
 
 		bool User::allowDelete(const server::Session* session) const
 		{
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(security::DELETE_RIGHT);
 		}
 	}
 }

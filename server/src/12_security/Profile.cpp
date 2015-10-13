@@ -25,8 +25,12 @@
 #include "Exception.h"
 #include "Registry.h"
 
+#include "ParametersMap.h"
 #include "Profile.h"
 #include "Right.h"
+#include "SecurityRight.h"
+#include "Session.h"
+#include "User.h"
 
 #include <boost/foreach.hpp>
 
@@ -244,6 +248,21 @@ namespace synthese
 					continue;
 				}
 			}
+		}
+
+		bool Profile::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(security::WRITE);
+		}
+
+		bool Profile::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(security::WRITE);
+		}
+
+		bool Profile::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(security::DELETE_RIGHT);
 		}
 
 	}
