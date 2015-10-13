@@ -14,6 +14,8 @@ Singleton Object List Should Work For Any Table
     ${OBJECT_SITE_LINKS_TABLE_ID}
     ${FARES_TABLE_ID}
     ${ONLINE_RESERVATION_RULES_TABLE_ID}
+    ${USERS_TABLE_ID}
+    ${PROFILES_TABLE_ID}
     
 
 Empty Object List Should Work For Any Table
@@ -25,6 +27,8 @@ Empty Object List Should Work For Any Table
     ${OBJECT_SITE_LINKS_TABLE_ID}
     ${FARES_TABLE_ID}
     ${ONLINE_RESERVATION_RULES_TABLE_ID}
+    ${USERS_TABLE_ID}
+    ${PROFILES_TABLE_ID}
     
 
 *** Keywords ***

@@ -25,6 +25,7 @@
 #include "AdminParametersException.h"
 #include "BookReservationAction.h"
 #include "HTMLTable.h"
+#include "Profile.h"
 #include "ResaCustomerHtmlOptionListFunction.h"
 #include "ReservationTransaction.h"
 #include "ReservationTransactionTableSync.h"

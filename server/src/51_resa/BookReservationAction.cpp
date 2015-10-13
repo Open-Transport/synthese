@@ -257,9 +257,10 @@ namespace synthese
 					{
 						try
 						{
-							_customer->setLanguage(&Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_CUSTOMER_LANGUAGE)));
+							_customer->setLanguage(&synthese::Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_CUSTOMER_LANGUAGE)));
+							_customer->set<security::Language>(map.get<string>(PARAMETER_CUSTOMER_LANGUAGE));
 						}
-						catch(Language::LanguageNotFoundException&)
+						catch(synthese::Language::LanguageNotFoundException&)
 						{
 							throw RequestException("Langue incorrecte");
 						}

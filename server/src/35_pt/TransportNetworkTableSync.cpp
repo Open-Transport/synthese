@@ -74,7 +74,7 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<TransportNetworkTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(DataSourceLinksWithoutUnderscore::FIELD.name.c_str(), ""));
+			r.push_back(DBTableSync::Index(pt::DataSourceLinksWithoutUnderscore::FIELD.name.c_str(), ""));
 			r.push_back(DBTableSync::Index(SimpleObjectFieldDefinition<Name>::FIELD.name.c_str(), ""));
 			return r;
 		};
@@ -139,7 +139,7 @@ namespace synthese
 			}
 			if (!creatorId.empty())
 			{
-				query.addWhereField(DataSourceLinksWithoutUnderscore::FIELD.name, creatorId, ComposedExpression::OP_LIKE);
+				query.addWhereField(pt::DataSourceLinksWithoutUnderscore::FIELD.name, creatorId, ComposedExpression::OP_LIKE);
 			}
 			if(orderByName)
 			{

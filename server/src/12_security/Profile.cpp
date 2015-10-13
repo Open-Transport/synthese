@@ -35,27 +35,37 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace security;
 	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<security::Profile>::KEY("Profile");
-	}
+	CLASS_DEFINITION(Profile, "t027_profiles", 27)
+	FIELD_DEFINITION_OF_OBJECT(Profile, "profile_id", "profile_ids")
+
+	FIELD_DEFINITION_OF_TYPE(ParentProfile, "parent", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Rights, "rights", SQL_TEXT)
 
 	namespace security
 	{
+		const string Profile::RIGHT_SEPARATOR = "|";
+		const string Profile::RIGHT_VALUE_SEPARATOR = ",";
 
 
 		Profile::Profile(
 			RegistryKeyType id
 		):	Registrable(id),
-			_parent(NULL)
+			Object<Profile, ProfileSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(ParentProfile),
+					FIELD_DEFAULT_CONSTRUCTOR(Rights)
+			)	)
 		{
 		}
 
 		void Profile::setName( const std::string& name )
 		{
-			_name = name;
+			set<Name>(name);
 		}
 
 
@@ -72,17 +82,23 @@ namespace synthese
 
 		void Profile::setParent(const Profile* value)
 		{
-			_parent = value;
+			set<ParentProfile>(value
+				? boost::optional<Profile&>(*const_cast<Profile*>(value))
+				: boost::none);
 		}
 
 		std::string Profile::getName() const
 		{
-			return _name;
+			return get<Name>();
 		}
 
 		const Profile* Profile::getParent() const
 		{
-			return _parent;
+			if (get<ParentProfile>())
+			{
+				return get<ParentProfile>().get_ptr();
+			}
+			return NULL;
 		}
 
 		void Profile::removeRight( const std::string& key, const std::string& parameter)
@@ -91,6 +107,8 @@ namespace synthese
 			if (it == _rights.end())
 				throw Exception("Right not found");
 			_rights.erase(it);
+
+			set<Rights>(getRightsString());
 		}
 
 		boost::shared_ptr<Right> Profile::getRight( const std::string key, const std::string parameter)
@@ -113,6 +131,7 @@ namespace synthese
 		void Profile::addRight(boost::shared_ptr<Right> right )
 		{
 			_rights.insert(make_pair(make_pair(right->getFactoryKey(), right->getParameter()), right));
+			set<Rights>(getRightsString());
 		}
 
 		bool Profile::isAuthorized(
@@ -163,6 +182,68 @@ namespace synthese
 					m.insert(make_pair(it.first.second, it.second));
 			}
 			return m;
+		}
+
+		void Profile::link(util::Env& env, bool withAlgorithmOptimizations)
+		{
+			string rights(get<Rights>()); // string copy because Rights will be cleaned during setRightsFromString
+			setRightsFromString(rights);
+		}
+
+		string Profile::getRightsString()
+		{
+			stringstream s;
+
+			for (RightsVector::const_iterator it = getRights().begin(); it != getRights().end(); ++it)
+			{
+				boost::shared_ptr<const Right> right = it->second;
+				if (it != getRights().begin())
+					s	<< RIGHT_SEPARATOR;
+				s	<< right->getFactoryKey()
+					<< RIGHT_VALUE_SEPARATOR << right->getParameter()
+					<< RIGHT_VALUE_SEPARATOR << (static_cast<int>(right->getPrivateRightLevel()))
+					<< RIGHT_VALUE_SEPARATOR << (static_cast<int>(right->getPublicRightLevel()))
+				;
+			}
+			return s.str();
+		}
+
+		void Profile::setRightsFromString(const string& text )
+		{
+			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+			boost::char_separator<char> sep(RIGHT_SEPARATOR.c_str ());
+
+			// CLeaning the profile
+			cleanRights();
+
+			// Parsing
+			tokenizer parametersTokens (text, sep);
+			for (tokenizer::iterator parameterToken = parametersTokens.begin();
+				parameterToken != parametersTokens.end (); ++ parameterToken)
+			{
+				tokenizer valuesToken(*parameterToken, boost::char_separator<char>(RIGHT_VALUE_SEPARATOR.c_str()));
+				tokenizer::iterator it = valuesToken.begin();
+
+				try
+				{
+					boost::shared_ptr<Right> right(Factory<Right>::create(*it));
+
+					++it;
+					right->setParameter(*it);
+
+					++it;
+					right->setPrivateLevel(static_cast<RightLevel>(lexical_cast<int>(*it)));
+
+					++it;
+					right->setPublicLevel(static_cast<RightLevel>(lexical_cast<int>(*it)));
+
+					addRight(right);
+				}
+				catch (FactoryException<Right> e)
+				{
+					continue;
+				}
+			}
 		}
 
 	}

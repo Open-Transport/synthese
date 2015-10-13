@@ -194,7 +194,7 @@ namespace synthese
 		void ResaModule::DisplayReservations(
 			std::ostream& stream,
 			const ReservationTransaction& tr,
-			const Language& language
+			const synthese::Language& language
 		){
 			stream << tr.get<Seats>() << " place" << ((tr.get<Seats>() > 1) ? "s" : "") << " au nom de " << tr.get<CustomerName>() << " (" << tr.get<CustomerPhone>() << ") sur :";
 			stream << "<ul>";

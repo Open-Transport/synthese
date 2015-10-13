@@ -30,6 +30,7 @@
 #include "ImpExModule.h"
 #include "Import.hpp"
 #include "Importer.hpp"
+#include "Profile.h"
 #include "PTModule.h"
 #include "UserTableSync.h"
 #include "VehicleServiceTableSync.hpp"

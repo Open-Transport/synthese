@@ -313,7 +313,7 @@ namespace synthese
 
 		void Reservation::toParametersMap(
 			util::ParametersMap& pm,
-			boost::optional<Language> language,
+			boost::optional<synthese::Language> language,
 			std::string prefix /*= std::string() */
 		) const	{
 
@@ -419,7 +419,7 @@ namespace synthese
 
 		void Reservation::toParametersMap( util::ParametersMap& pm, bool withAdditionalParameters, boost::logic::tribool withFiles /*= boost::logic::indeterminate*/, std::string prefix /*= std::string() */ ) const
 		{
-			toParametersMap(pm, optional<Language>(), prefix);
+			toParametersMap(pm, optional<synthese::Language>(), prefix);
 		}
 
 		void Reservation::link(util::Env& env, bool withAlgorithmOptimizations)

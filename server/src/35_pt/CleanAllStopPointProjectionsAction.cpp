@@ -95,7 +95,7 @@ namespace synthese
 					continue;
 				}
 
-				Address emptyAddress;
+				road::Address emptyAddress;
 				stopPoint->setProjectedPoint(emptyAddress);
 				StopPointTableSync::Save(stopPoint.get(), transaction);
 			}

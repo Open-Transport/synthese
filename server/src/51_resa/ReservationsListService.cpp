@@ -301,7 +301,7 @@ namespace synthese
 
 			if(map.isDefined(PARAMETER_LANGUAGE))
 			{
-				_language = Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_LANGUAGE));
+				_language = synthese::Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_LANGUAGE));
 			}
 
 			_minDepartureRank = map.getOptional<size_t>(PARAMETER_MINIMAL_DEPARTURE_RANK);
