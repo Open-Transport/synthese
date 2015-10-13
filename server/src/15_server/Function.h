@@ -161,7 +161,7 @@ namespace synthese
 			*/
 			virtual bool isAuthorized(
 				const Session* session
-			) const = 0;
+			) const;
 
 
 

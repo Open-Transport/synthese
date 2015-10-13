@@ -59,6 +59,8 @@ Request.cpp
 Request.h
 RequestException.cpp
 RequestException.h
+SecurityPolicy.h
+SecurityPolicy.cpp
 ServerAdminRight.cpp
 ServerAdminRight.h
 ServerConstants.h
