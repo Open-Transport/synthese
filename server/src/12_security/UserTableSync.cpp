@@ -271,5 +271,10 @@ namespace synthese
 				throw Exception(e.getMessage());
 			}
 		}
+
+		bool UserTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(security::READ);
+		}
 	}
 }
