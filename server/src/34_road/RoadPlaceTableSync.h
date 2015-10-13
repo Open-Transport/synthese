@@ -32,7 +32,6 @@
 #include "RoadPlace.h"
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 #include <boost/optional.hpp>
 
@@ -46,18 +45,10 @@ namespace synthese
 		class RoadPlaceTableSync:
 			public db::DBDirectTableSyncTemplate<
 				RoadPlaceTableSync,
-				RoadPlace,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				RoadPlace
 			>
 		{
 		public:
-			static const std::string COL_NAME;
-			static const std::string COL_CITYID;
-			static const std::string COL_DATASOURCE_LINKS;
-			static const std::string COL_ISCITYMAINROAD;
-
-
 			/** RoadPlace search.
 				@param env Environment to read and populate
 				@param name Part of the name of the server
@@ -93,6 +84,9 @@ namespace synthese
 				util::Env& environment,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+			virtual bool allowList( const server::Session* session ) const;
+
 		};
 	}
 }

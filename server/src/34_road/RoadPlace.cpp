@@ -49,14 +49,16 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace geography;
-
-	template<> const Field SimpleObjectFieldDefinition<road::RoadPlace>::FIELD = Field("road_place_id", SQL_INTEGER);
+	using namespace road;
 
 	namespace util
 	{
-		template<> const string Registry<road::RoadPlace>::KEY("RoadPlace");
 		template<> const string FactorableTemplate<NamedPlace,road::RoadPlace>::FACTORY_KEY("RoadPlace");
 	}
+
+	CLASS_DEFINITION(RoadPlace, "t060_road_places", 60)
+	FIELD_DEFINITION_OF_OBJECT(RoadPlace, "road_place_id", "road_place_ids")
+	FIELD_DEFINITION_OF_TYPE(IsCityMainRoad, "is_city_main_road", SQL_BOOLEAN)
 
 	namespace road
 	{
@@ -65,11 +67,16 @@ namespace synthese
 		const string RoadPlace::DATA_X = "x";
 		const string RoadPlace::DATA_Y = "y";
 
-
-
 		RoadPlace::RoadPlace(
-			RegistryKeyType key
-		):	Registrable(key),
+			RegistryKeyType id
+		):	Registrable(id),
+			Object<RoadPlace, RoadPlaceSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(NamedPlaceField),
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
+					FIELD_DEFAULT_CONSTRUCTOR(IsCityMainRoad)
+			)	),
 			NamedPlaceTemplate<RoadPlace>()
 		{
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
@@ -407,87 +414,91 @@ namespace synthese
 				prefix
 			);
 		}
-		
-		bool RoadPlace::loadFromRecord( const Record& record, util::Env& env )
-		{
-			bool result(false);
-			
-			// Name
-			if(record.isDefined(RoadPlaceTableSync::COL_NAME))
-			{
-				string value(
-					record.get<string>(RoadPlaceTableSync::COL_NAME)
+
+		void RoadPlace::link(
+			util::Env& env,
+			bool withAlgorithmOptimizations /*= false*/
+		){
+
+			City* city(const_cast<City*>(getCity()));
+			if (city) {
+				if(!getName().empty())
+				{
+					city->addPlaceToMatcher(env.getEditableSPtr(this));
+				}
+
+				if(getIsCityMainRoad())
+				{
+					city->addIncludedPlace(*this);
+				}
+				else
+				{
+					city->removeIncludedPlace(*this);
+				}
+			}
+
+			// Registration to all places matcher
+			if(	&env == &Env::GetOfficialEnv() &&
+				withAlgorithmOptimizations
+			){
+				GeographyModule::GetGeneralAllPlacesMatcher().add(
+					getFullName(),
+					env.getEditableSPtr(this)
 				);
-				if(value != getName())
-				{
-					setName(value);
-					result = true;
-				}
 			}
-			
-			// City
-			if(record.isDefined(RoadPlaceTableSync::COL_CITYID))
-			{
-				City* value(NULL);
-				RegistryKeyType cityId(
-					record.getDefault<RegistryKeyType>(RoadPlaceTableSync::COL_CITYID, 0)
+
+			// Registration to road places matcher
+			if(	&env == &Env::GetOfficialEnv() &&
+				withAlgorithmOptimizations
+			){
+				RoadModule::GetGeneralRoadsMatcher().add(
+					getFullName(),
+					env.getEditableSPtr(this)
 				);
-				if(cityId > 0) try
-				{
-					value = CityTableSync::GetEditable(cityId, env).get();
-				}
-				catch(ObjectNotFoundException<City>&)
-				{
-					Log::GetInstance().warn("Bad value " + lexical_cast<string>(cityId) + " for city in road place " + lexical_cast<string>(getKey()));
-				}
-				if(value != getCity())
-				{
-					setCity(value);
-					// Registration to city matcher
-					if(!getName().empty())
-					{
-						value->addPlaceToMatcher(env.getEditableSPtr(this));
-					}
-					result = true;
-				}
 			}
-			
-			// City main road
-			if(record.isDefined(RoadPlaceTableSync::COL_ISCITYMAINROAD))
-			{
-				bool value(record.getDefault<bool>(RoadPlaceTableSync::COL_ISCITYMAINROAD, false));
-				if(value && getCity())
-				{
-					getCity()->addIncludedPlace(*this);
-				}
-				if (!value && getCity())
-				{
-					getCity()->removeIncludedPlace(*this);
-				}
-			}
-			
-			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
-			if(record.isDefined(RoadPlaceTableSync::COL_DATASOURCE_LINKS))
-			{
-				Importable::DataSourceLinks value(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						record.get<string>(RoadPlaceTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
-				if(value != getDataSourceLinks())
-				{
-					if(&env == &Env::GetOfficialEnv())
-					{
-						setDataSourceLinksWithRegistration(value);
-					}
-					else
-					{
-						setDataSourceLinksWithoutRegistration(value);
-					}
-					result = true;
-				}
-			}
-			
-			return result;
 		}
+
+
+
+		void RoadPlace::unlink()
+		{
+			// City matcher
+			City* city(const_cast<City*>(getCity()));
+			if (city)
+			{
+				city->removePlaceFromMatcher(*this);
+			}
+
+			if(Env::GetOfficialEnv().contains(*this))
+			{
+				// General all places
+				GeographyModule::GetGeneralAllPlacesMatcher().remove(
+					getFullName()
+				);
+			}
+
+			if(Env::GetOfficialEnv().contains(*this))
+			{
+				// General public places
+				RoadModule::GetGeneralRoadsMatcher().remove(
+					getFullName()
+				);
+			}
+		}
+
+		bool RoadPlace::allowUpdate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool RoadPlace::allowCreate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool RoadPlace::allowDelete(const server::Session* session) const
+		{
+			return true;
+		}
+
 }	}
