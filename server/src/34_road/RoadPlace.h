@@ -54,7 +54,6 @@ namespace synthese
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
 		class RoadPlace:
-			public virtual geography::Place,
 			public graph::PathGroup,
 			public geography::NamedPlaceTemplate<RoadPlace>,
 			public impex::ImportableTemplate<RoadPlace>,
