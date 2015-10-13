@@ -70,5 +70,5 @@ void synthese::road::moduleRegister()
 	INTEGRATE(synthese::road::Road);
 	INTEGRATE(synthese::road::PublicPlace);
 	INTEGRATE(synthese::road::PublicPlaceEntrance);
-	synthese::util::Env::Integrate<synthese::road::RoadPlace>();
+	INTEGRATE(synthese::road::RoadPlace);
 }
