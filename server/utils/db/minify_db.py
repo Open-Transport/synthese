@@ -5,6 +5,8 @@ import sys
 import argparse
 import pyspatialite.dbapi2 as sqlite3
 
+# TODO hackish there might be a cycle
+sys.setrecursionlimit(10000)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("db_file", help="SQLite db file to minify")
@@ -18,10 +20,15 @@ parser.add_argument("-o", "--obfuscate",
 args = parser.parse_args()
 
 all_uids = {}
+
 db_file = args.db_file
 uids = args.uid
 
 conn = sqlite3.connect(db_file)
+
+# to ignore encoding problems
+conn.text_factory = lambda x: unicode(x, "utf-8", "ignore")
+
 conn.row_factory = sqlite3.Row
 
 
@@ -59,14 +66,16 @@ def decode_table_id(uid):
         
 def collect_uid(uid):
     table_id = decode_table_id(uid)
+    if table_id not in table_infos.keys(): return
     uids = collected_table_uids(table_id)
     if uid in uids:
         return
-    print("Collected UID %s from table %s" % (uid, table_infos[table_id].table_name))
+    # TODO log with level !! print("Collected UID %s from table %s" % (uid, table_infos[table_id].table_name))
     uids.append(uid)    
     collect_foreign_uids(uid)
-    if table_id == 9:
-        collect_line_stops_for_line(uid)
+    collect_reverse_foreign_uids(uid)
+    #if table_id == 9:
+    #    collect_line_stops_for_line(uid)
 
 def collect_all_table_uids(table_id):
     cursor.execute("SELECT id FROM %s" % table_infos[table_id].table_name)
@@ -79,22 +88,37 @@ def collect_foreign_uids(uid):
         raise Exception("Unhandled table %s" % table_id)
     table_info = table_infos[table_id]
     row = cursor.execute("select * from %s where id = %s" % (table_info.table_name, uid)).fetchone()
+    # TODO : log something ?
+    if row == None: return
     for single_foreign_key_column in table_info.single_foreign_key_columns:
         collect_single_foreign_uid_from_row(row, single_foreign_key_column)
     for multiple_foreign_keys_column in table_info.multiple_foreign_keys_columns:
         collect_multiple_foreign_uids_from_row(row, multiple_foreign_keys_column)
 
+
+current_reverse_foreign_path = []
+
+def collect_reverse_foreign_uids(uid):
+    if uid not in all_reverse_foreign_uids.keys(): return
+    # prevent cycles!
+    if uid in current_reverse_foreign_path: return
+    current_reverse_foreign_path.append(uid)
+    for reverse_foreign_uid in all_reverse_foreign_uids[uid]:
+        collect_uid(reverse_foreign_uid) 
+    current_reverse_foreign_path.pop()
+
     
-def collect_single_foreign_uid_from_row(row, column_name):
+def collect_single_foreign_uid_from_row(row, column_name):  
     column_value = row[column_name]
     if not column_value:
         return
     collect_uid(column_value)
     
 def collect_multiple_foreign_uids_from_row(row, column_name):
-    column_value = row[column_name].strip()
+    column_value = row[column_name]
     if not column_value:
         return
+    column_value = column_value.strip()
     foreign_uids = column_value.split(",")
     for foreign_uid in foreign_uids:
         collect_uid(foreign_uid)
@@ -170,9 +194,39 @@ def drop_table(table_name):
     print(sql)
     cursor.execute(sql)
 
+
+def append_reverse_foreign_uids(target_uid, source_uid):
+    if target_uid not in all_reverse_foreign_uids.keys():
+        all_reverse_foreign_uids[target_uid] = []
+    all_reverse_foreign_uids[target_uid].append(source_uid)
+
+
+def prepare_reverse_foreign_uids():
+    for key, table_info in table_infos.iteritems():
+        if table_info.table_name not in table_names: continue
+        print("Preparing reverse foreign uids cache for %s" % table_info.table_name)
+        if (len(table_info.single_foreign_key_columns) == 0) and (len(table_info.multiple_foreign_keys_columns) == 0): continue
+        for row in cursor.execute("SELECT * FROM %s" % table_info.table_name):
+            if row['id'] not in all_reverse_foreign_uids.keys():
+                all_reverse_foreign_uids[row['id']] = []
+            for single_foreign_key_column in table_info.single_foreign_key_columns:
+                column_value = row[single_foreign_key_column]            
+                if not column_value: continue
+                append_reverse_foreign_uids(column_value, row['id'])
+            for multiple_foreign_keys_column in table_info.multiple_foreign_keys_columns:
+                column_value = row[multiple_foreign_keys_column]
+                if not column_value: continue
+                column_value = column_value.strip()
+                foreign_uids = column_value.split(",")
+                for foreign_uid in foreign_uids:
+                    append_reverse_foreign_uids(foreign_uid, row['id'])
+
+
 def minify_db(db_file, uids):
     if args.discard_geometry:
         remove_geometry()
+    prepare_reverse_foreign_uids()
+    print "DONE!!"
     for uid in uids:
         if len(uid) <= 3:
             collect_all_table_uids(int(uid))
@@ -186,6 +240,7 @@ def minify_db(db_file, uids):
     conn.commit()
 
 table_infos = {}
+all_reverse_foreign_uids = {}
 
 # ===========================================================
 table_name = "t001_object_site_links"
@@ -287,7 +342,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 
 # ===========================================================
 table_name = "t021_reservation_contacts"
-table_single_foreign_key_columns = ["path_id"]
+table_single_foreign_key_columns = []
 table_multiple_foreign_keys_columns = []
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
@@ -539,14 +594,14 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 
 # ===========================================================
 table_name = "t073_depots"
-table_single_foreign_key_columns = ["vehicle_id", "service_id"]
+table_single_foreign_key_columns = []
 table_multiple_foreign_keys_columns = []
 table_obfuscation_map = { 'name': 'depot_' }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
 # ===========================================================
 table_name = "t074_destinations"
-table_single_foreign_key_columns = ["vehicle_id", "service_id"]
+table_single_foreign_key_columns = []
 table_multiple_foreign_keys_columns = []
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
@@ -839,11 +894,11 @@ table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
     
 # ===========================================================
-table_name = "t999_config"
-table_single_foreign_key_columns = []
-table_multiple_foreign_keys_columns = []
-table_obfuscation_map = { }
-append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
+#table_name = "t999_config"
+#table_single_foreign_key_columns = []
+#table_multiple_foreign_keys_columns = []
+#table_obfuscation_map = { }
+#append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
     
 minify_db(db_file, uids)
 
