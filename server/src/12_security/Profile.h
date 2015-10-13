@@ -178,6 +178,10 @@ namespace synthese
 
 			std::string getRightsString();
 			void setRightsFromString(const std::string& text);
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 
 		template<class R>
