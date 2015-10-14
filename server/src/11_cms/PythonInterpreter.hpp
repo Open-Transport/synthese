@@ -67,7 +67,11 @@ namespace synthese
 
 		private:
 
+			// Declaration of bindings to SYNTHESE APIs
 			static PyMethodDef PYTHON_BINDINGS[];
+
+			// Thread state during Python initialization, preserved for cleanup
+			static PyThreadState* _initialThreadState;
 
 			PythonInterpreter();
 
@@ -80,6 +84,25 @@ namespace synthese
 			static boost::shared_ptr<synthese::util::ParametersMap> BuildParametersMapFromDictionary(PyObject* dictionary);
 
 			static void _BuildParametersMapFromDictionary(boost::shared_ptr<synthese::util::ParametersMap> map, PyObject* dictionary);
+
+
+			// This struct stores the variables required for each thread-specific instance of the Python interpreter
+			struct ThreadSpecificInterpreter
+			{
+
+				PyThreadState* _threadState;
+
+				PyObject* _mainModule;
+
+				PyObject* _sysModule;
+
+				PyObject* _globals;
+
+				ThreadSpecificInterpreter();
+
+				~ThreadSpecificInterpreter();
+
+			};
 
 		};
 

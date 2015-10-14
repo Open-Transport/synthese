@@ -25,8 +25,9 @@
 #include "Action.h"
 #include "Request.h"
 
-#include <structmember.h>
 #include <iostream>
+#include <structmember.h>
+#include <boost/thread/tss.hpp>
 
 
 namespace synthese
@@ -41,7 +42,8 @@ namespace synthese
 
 		const std::string PythonInterpreter::MODULE_NAME = "synthese";
 
-		// Declaration of bindings to SYNTHESE APIs
+		PyThreadState* PythonInterpreter::_initialThreadState = NULL;
+
 		PyMethodDef PythonInterpreter::PYTHON_BINDINGS[] = {
 			{
 				"service",
@@ -183,9 +185,69 @@ namespace synthese
 		};
 
 
+		PythonInterpreter::ThreadSpecificInterpreter::ThreadSpecificInterpreter()
+		{
+			// Creating a new Python interpreter requires to lock the global interpreter lock (GIL)
+			PyEval_AcquireLock();
+			_threadState = Py_NewInterpreter();
+			assert(NULL != _threadState);
+
+			// Register a 'synthese' module exposing the bindings to SYNTHESE API
+			PyObject* syntheseModule = Py_InitModule(PythonInterpreter::MODULE_NAME.c_str(), PythonInterpreter::PYTHON_BINDINGS);
+
+			if(NULL == syntheseModule)
+			{
+				Log::GetInstance().error("Failed to initialize PythonInterpreter");
+			}
+
+			else
+			{
+				// Register the class 'OutputStreamWrapper' as a Python object
+				if(PyType_Ready(&OutputStreamWrapperType) == 0)
+				{
+					Py_INCREF(&OutputStreamWrapperType);
+					PyModule_AddObject(syntheseModule, "OutputStreamWrapper", (PyObject*) &OutputStreamWrapperType);
+					Log::GetInstance().info("PythonInterpreter successfully initialized");
+				}
+
+				else
+				{
+					Log::GetInstance().error("Failed to register output stream wrapper of PythonInterpreter");
+				}
+			}
+
+			// 'globals' is the dictionary containing the main functions of Python
+			// Use PyImport_AddModule instead of PyImport_ImportModule because Py_NewInterpreter already loads the __main__ module
+			_mainModule = PyImport_AddModule("__main__");
+			_globals    = PyModule_GetDict(_mainModule);
+
+			// Load the sys module for I/O redirection
+			_sysModule = PyImport_ImportModule("sys");
+
+			// Release the GIL
+			PyEval_ReleaseThread(_threadState);
+		}
+
+		PythonInterpreter::ThreadSpecificInterpreter::~ThreadSpecificInterpreter()
+		{
+			// Releasing the Python interpreter also requires to lock the GIL
+			PyEval_AcquireThread(_threadState);
+
+			// PyImport_AddModule and PyModule_GetDict return borrowed references, no need to free _mainModule and _globals
+
+			// PyImport_ImportModule returns a new reference, it must be freed
+			Py_XDECREF(_sysModule);
+
+			Py_EndInterpreter(_threadState);
+			// Release the GIL
+			PyEval_ReleaseLock();
+		}
+
+
 		void PythonInterpreter::Initialize()
 		{
 			Py_Initialize();
+			PyEval_InitThreads();
 
 			// Register a 'synthese' module exposing the bindings to SYNTHESE API
 			PyObject* syntheseModule = Py_InitModule(MODULE_NAME.c_str(), PYTHON_BINDINGS);
@@ -207,14 +269,19 @@ namespace synthese
 
 				else
 				{
-					Log::GetInstance().error("Failed to initialize PythonInterpreter");
+					Log::GetInstance().error("Failed to register output stream wrapper of PythonInterpreter");
 				}
 			}
+
+			// Save current thread state for cleanup
+			_initialThreadState = PyEval_SaveThread();
 		}
 
 
 		void PythonInterpreter::End()
 		{
+			// Saved thread state must be restored prior finalization (note that this locks the GIL)
+			PyEval_RestoreThread(_initialThreadState);
 			Py_Finalize();
 		}
 
@@ -252,11 +319,18 @@ namespace synthese
 				//Py_DECREF(parametersDictionary);
 			}
 
+			// CPython does not support true multithreading : it has a global mutex (the GIL) preventing concurrent executions of Python API
+			// Before executing the SYNTHESE service we release the GIL so that another thread can take it and execute its Python script
+			// Once the SYNTHESE service is completed we lock it again to perform the necessary Python calls
+			PyThreadState* state = PyEval_SaveThread();
 			parametersMap->insert(Request::PARAMETER_SERVICE, serviceName);
 			function->_setFromParametersMap(*parametersMap);
 
 			// TODO : run function with ostringstream output and push output string into result map/dict
 			ParametersMap resultMap = function->run(std::cout, request);
+
+			// Restore Python thread state and lock the GIL
+			PyEval_RestoreThread(state);
 
 			// Convert the result map into a Python dictionary and return it
 			PyObject* resultDict = BuildDictionaryFromParametersMap(resultMap);
@@ -297,9 +371,17 @@ namespace synthese
 				//Py_DECREF(parametersDictionary);
 			}
 
+			// CPython does not support true multithreading : it has a global mutex (the GIL) preventing concurrent executions of Python API
+			// Before executing the SYNTHESE service we release the GIL so that another thread can take it and execute its Python script
+			// Once the SYNTHESE service is completed we lock it again to perform the necessary Python calls
+			PyThreadState* state = PyEval_SaveThread();
+
 			parametersMap->insert(Request::PARAMETER_ACTION, actionName);
 			action->_setFromParametersMap(*parametersMap);
 			action->run(request);
+
+			// Restore Python thread state and lock the GIL
+			PyEval_RestoreThread(state);
 
 			// Actions do not return parameters maps, but they may store attributes in the parameters map of the request
 			PyObject* resultDict = BuildDictionaryFromParametersMap(request.getParametersMap());
@@ -329,26 +411,29 @@ namespace synthese
 			util::ParametersMap& variables
 		)
 		{
-			// TODO : see what kind of error management is implemented into CMS and try to provide same level
+			// Initialization of a thread-specific Python interpreter
+			static boost::thread_specific_ptr<ThreadSpecificInterpreter> interpreterPtr;
+			if(! interpreterPtr.get())
+			{
+				interpreterPtr.reset(new ThreadSpecificInterpreter());
+			}
 
-			// 'globals' is the dictionary containing the main functions of Python
-			PyObject* mainModule = PyImport_AddModule("__main__");
-			PyObject* globals    = PyModule_GetDict(mainModule);
-
-			// 'locals' is the dictionary containing the input parameters of the script
-			// It will store the return values of the script
-			PyObject* locals  = BuildDictionaryFromParametersMap(parameters);
+			// Switch to the interpreter of this thread
+			PyEval_AcquireThread(interpreterPtr->_threadState);
 
 			// Redirect Python stdout to stream using an OutputStreamWrapper
-			PyObject* sys = PyImport_ImportModule("sys");
 			PyObject* wrapper = PyObject_CallObject((PyObject*) &OutputStreamWrapperType, NULL);
 			((OutputStreamWrapper*) wrapper)->output = &stream;
-			if (-1 == PyObject_SetAttrString(sys, "stdout", wrapper)) {
+			if (-1 == PyObject_SetAttrString(interpreterPtr->_sysModule, "stdout", wrapper)) {
 				Log::GetInstance().warn("Failed to redirect Python stdout to stream");
 			}
 
+			// 'locals' is the dictionary containing the input parameters of the script
+			// It will also store the return values of the script
+			PyObject* locals  = BuildDictionaryFromParametersMap(parameters);
+
 			// Execute the script
-			PyRun_String(script.c_str(), Py_file_input, globals, locals);
+			PyRun_String(script.c_str(), Py_file_input, interpreterPtr->_globals, locals);
 
 			if(NULL != PyErr_Occurred())
 			{
@@ -372,6 +457,7 @@ namespace synthese
 
 				util::Log::GetInstance().error(pythonError);
 
+				// PyErr_Fetch and PyObject_Str return new references, so they must be freed
 				Py_XDECREF(exceptionType);
 				Py_XDECREF(exceptionValue);
 				Py_XDECREF(exceptionPyStr);
@@ -379,14 +465,18 @@ namespace synthese
 			}
 
 			// Write return values into the map 'variables'
+			// Note that script 'locals' overwrites the content of the input parameters map, so changing a parameter value or deleting
+			// a parameter into a script will affect the final state of the parameters map
 			boost::shared_ptr<util::ParametersMap> returnMap = BuildParametersMapFromDictionary(locals);
 			variables.clear();
 			variables.merge(*returnMap, "", true);
 
-			// Memory management : decrement reference to 'locals'
-			Py_DECREF(locals);
-			Py_XDECREF(sys);
+			// Free locals and wrapper
+			Py_XDECREF(locals);
 			Py_XDECREF(wrapper);
+
+			// Switch out the interpreter of this thread
+			PyEval_ReleaseThread(interpreterPtr->_threadState);
 		}
 
 
