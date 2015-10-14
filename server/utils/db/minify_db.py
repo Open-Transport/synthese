@@ -65,7 +65,11 @@ def decode_table_id(uid):
     return table_id
         
 def collect_uid(uid):
-    table_id = decode_table_id(uid)
+    table_id = -1
+    try:
+        table_id = decode_table_id(uid)
+    except ValueError:
+        return
     if table_id not in table_infos.keys(): return
     uids = collected_table_uids(table_id)
     if uid in uids:
@@ -252,7 +256,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t003_alarms"
 table_single_foreign_key_columns = ["scenario_id", "template_id", "messages_section_id", "calendar_id"]
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["datasource_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -280,7 +284,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t009_lines"
 table_single_foreign_key_columns = ["commercial_line_id"]
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["data_source"]
 table_obfuscation_map = {}
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -308,7 +312,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t013_public_places"
 table_single_foreign_key_columns = ["city_id"]
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["data_source_links"]
 table_obfuscation_map = { 'name': 'public_place_' }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -329,7 +333,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t016_scheduled_services"
 table_single_foreign_key_columns = ["path_id"]
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["datasource_links"]
 table_obfuscation_map = {}
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -364,7 +368,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t026_users"
 table_single_foreign_key_columns = ["city_id", "profile_id", "creator_id"]
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["data_source_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -385,7 +389,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t039_scenarios"
 table_single_foreign_key_columns = ["folder_id", "template_id"]
-table_multiple_foreign_keys_columns = ["messages_section_ids"]
+table_multiple_foreign_keys_columns = ["datasource_links", "messages_section_ids"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -399,7 +403,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t041_display_screens"
 table_single_foreign_key_columns = ["broadcast_point_id", "type_id"]
-table_multiple_foreign_keys_columns = ["displayed_places_ids"]
+table_multiple_foreign_keys_columns = ["displayed_places_ids", "data_source_links"]
 table_obfuscation_map = { 'broadcast_point_comment': 'comment' }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -413,7 +417,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t043_crossings"
 table_single_foreign_key_columns = []
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["data_source_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -455,7 +459,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t049_rolling_stock"
 table_single_foreign_key_columns = []
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["data_source_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -483,7 +487,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t054_calendar_templates"
 table_single_foreign_key_columns = ["parent_id"]
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["datasource_links"]
 table_obfuscation_map = { 'name': 'calendar_template_' }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -525,7 +529,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t060_road_places"
 table_single_foreign_key_columns = ["city_id"]
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["datasource_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -567,7 +571,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t069_vehicles"
 table_single_foreign_key_columns = []
-table_multiple_foreign_keys_columns = ["allowed_lines"]
+table_multiple_foreign_keys_columns = ["allowed_lines", "data_source_links"]
 table_obfuscation_map = { 'name': 'vehicle_' }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -595,14 +599,14 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t073_depots"
 table_single_foreign_key_columns = []
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["datasource_links"]
 table_obfuscation_map = { 'name': 'depot_' }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
 # ===========================================================
 table_name = "t074_destinations"
 table_single_foreign_key_columns = []
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["data_source_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -616,28 +620,28 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t077_vehicle_services"
 table_single_foreign_key_columns = []
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["datasource_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
 # ===========================================================
 table_name = "t078_houses"
 table_single_foreign_key_columns = ["road_place_id"]
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["data_source_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
 # ===========================================================
 table_name = "t080_dead_runs"
 table_single_foreign_key_columns = ["network_id", "depot_id", "stop_id"]
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["datasource_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
 # ===========================================================
 table_name = "t081_driver_services"
 table_single_foreign_key_columns = []
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["datasource_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -658,14 +662,14 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t084_public_place_entrances"
 table_single_foreign_key_columns = ["public_place_id", "road_chunk_id"]
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["data_source_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
 # ===========================================================
 table_name = "t085_driver_allocations"
 table_single_foreign_key_columns = ["driver_allocation_template_id", "driver_id", "driver_activity_id"]
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["data_source_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -679,14 +683,14 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 # ===========================================================
 table_name = "t087_driver_activites"
 table_single_foreign_key_columns = []
-table_multiple_foreign_keys_columns = []
+table_multiple_foreign_keys_columns = ["data_source_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
 # ===========================================================
 table_name = "t088_driver_allocation_templates"
 table_single_foreign_key_columns = []
-table_multiple_foreign_keys_columns = ["driver_service_ids"]
+table_multiple_foreign_keys_columns = ["driver_service_ids", "data_source_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -734,8 +738,8 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 
 # ===========================================================
 table_name = "t097_vdv_servers"
-table_single_foreign_key_columns = []
-table_multiple_foreign_keys_columns = []
+table_single_foreign_key_columns = ["data_source_id", "planned_data_source_id"]
+table_multiple_foreign_keys_columns = ["datasource_links"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
 
@@ -748,7 +752,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 
 # ===========================================================
 table_name = "t099_vdv_clients"
-table_single_foreign_key_columns = []
+table_single_foreign_key_columns = ["data_source_id"]
 table_multiple_foreign_keys_columns = ["transport_network_ids"]
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
@@ -783,7 +787,7 @@ append_table_info(table_name, table_single_foreign_key_columns, table_multiple_f
 
 # ===========================================================
 table_name = "t105_imports"
-table_single_foreign_key_columns = []
+table_single_foreign_key_columns = ["data_source_id"]
 table_multiple_foreign_keys_columns = []
 table_obfuscation_map = { }
 append_table_info(table_name, table_single_foreign_key_columns, table_multiple_foreign_keys_columns, table_obfuscation_map)
