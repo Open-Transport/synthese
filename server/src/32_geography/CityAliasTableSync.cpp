@@ -45,32 +45,15 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,CityAliasTableSync>::FACTORY_KEY("32.40 City aliases");
 	}
 
-	namespace geography
-	{
-		const string CityAliasTableSync::COL_ALIASED_CITY_ID("aliased_city_id");
-		const string CityAliasTableSync::COL_NAME ("name");
-		const string CityAliasTableSync::COL_CODE ("code");
-		const string CityAliasTableSync::COL_VISIBLE ("visible");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<CityAliasTableSync>::TABLE(
 			"t065_city_aliases"
 		);
 
-
-
 		template<> const Field DBTableSyncTemplate<CityAliasTableSync>::_FIELDS[]=
-		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(CityAliasTableSync::COL_ALIASED_CITY_ID, SQL_INTEGER),
-			Field(CityAliasTableSync::COL_NAME, SQL_TEXT),
-			Field(CityAliasTableSync::COL_CODE, SQL_TEXT),
-			Field(CityAliasTableSync::COL_VISIBLE, SQL_INTEGER),
-			Field()
+		{	Field()
 		};
-
 
 
 		template<>
@@ -79,64 +62,14 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					CityAliasTableSync::COL_CODE.c_str(),
+					Code::FIELD.name.c_str(),
 			"")	);
 			r.push_back(
 				DBTableSync::Index(
-					CityAliasTableSync::COL_ALIASED_CITY_ID.c_str(),
-					CityAliasTableSync::COL_NAME.c_str(),
+					AliasedCity::FIELD.name.c_str(),
+					Name::FIELD.name.c_str(),
 			"")	);
 			return r;
-		}
-
-
-
-		template<> void OldLoadSavePolicy<CityAliasTableSync,CityAlias>::Load(
-			CityAlias* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			object->setName(rows->getText(CityAliasTableSync::COL_NAME));
-			object->setCode(rows->getText(CityAliasTableSync::COL_CODE));
-			object->setVisible(rows->getBool(CityAliasTableSync::COL_VISIBLE));
-
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				RegistryKeyType pid(rows->getLongLong(CityAliasTableSync::COL_ALIASED_CITY_ID));
-				if(pid > 0)
-				{
-					try
-					{
-						object->setCity(CityTableSync::GetEditable(pid, env, linkLevel).get());
-					}
-					catch(ObjectNotFoundException<City>&)
-					{
-						Log::GetInstance().warn("No such city "+ lexical_cast<string>(pid) +" in CityAlias "+ lexical_cast<string>(object->getKey()));
-					}
-				}
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<CityAliasTableSync,CityAlias>::Save(
-			CityAlias* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<CityAliasTableSync> query(*object);
-			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
-			query.addField(object->getName());
-			query.addField(object->getCode());
-			query.addField(object->getVisible());
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<CityAliasTableSync,CityAlias>::Unlink(
-			CityAlias* obj
-		){
 		}
 
 
@@ -197,15 +130,15 @@ namespace synthese
 				;
 			if(aliasedCityFilter)
 			{
-			 	query << " AND " << COL_ALIASED_CITY_ID << "=" << *aliasedCityFilter;
+				query << " AND " << AliasedCity::FIELD.name << "=" << *aliasedCityFilter;
 			}
 			if(codeFilter)
 			{
-				query << " AND " << COL_CODE << "=" << *codeFilter;
+				query << " AND " << Code::FIELD.name << "=" << *codeFilter;
 			}
 			if(orderByName)
 			{
-			 	query << " ORDER BY " << COL_NAME << " " << (raisingOrder ? "ASC" : "DESC");
+				query << " ORDER BY " << Name::FIELD.name << " " << (raisingOrder ? "ASC" : "DESC");
 			}
 			if (number)
 			{
@@ -217,5 +150,12 @@ namespace synthese
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
+
+
+		bool CityAliasTableSync::allowList(const server::Session* session) const
+		{
+			return true;
+		}
+
 	}
 }

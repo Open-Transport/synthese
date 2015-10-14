@@ -23,15 +23,27 @@
 #ifndef SYNTHESE_geography_CityAlias_hpp__
 #define SYNTHESE_geography_CityAlias_hpp__
 
+#include "Object.hpp"
 #include "IncludingPlace.h"
-#include "Registrable.h"
-#include "Registry.h"
+#include "PointerField.hpp"
+#include "StringField.hpp"
 
 namespace synthese
 {
 	namespace geography
 	{
 		class City;
+
+		FIELD_BOOL(Visible)
+		FIELD_POINTER(AliasedCity, City)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(AliasedCity),
+			FIELD(Name),
+			FIELD(Code),
+			FIELD(Visible)
+		> CityAliasSchema;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Alias to a city.
@@ -46,40 +58,15 @@ namespace synthese
 		/// @date 2010
 		/// @since 3.1.16
 		class CityAlias:
-			public IncludingPlace<City>,
-			public util::Registrable
+			public Object<CityAlias, CityAliasSchema>,
+			public IncludingPlace<City>
 		{
 		public:
 
-			/// Chosen registry class.
-			typedef util::Registry<CityAlias>	Registry;
-
-		private:
-
-			bool _visible;  //!< Visibility of the alias in city list lexical matcher (see class description for more informations)
-			std::string _name; //!< The name of the alias
-			std::string _code; //!< Unique code identifier for city within its country (france => INSEE code)
-
-		public:
 			CityAlias(util::RegistryKeyType id = 0);
 
+
 			//! @name Getters
-			//@{
-				bool getVisible() const;
-				virtual std::string getName() const;
-				const std::string& getCode() const;
-			//@}
-
-
-			//! @name Setters
-			//@{
-				void setVisible(bool value);
-				void setName(const std::string& value);
-				void setCode(const std::string& value);
-			//@}
-
-
-			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
 				/// Gets the aliased city.
@@ -91,21 +78,27 @@ namespace synthese
 				/// The aliased city is read in the IncludingPlace::_includedPlaces attribute which is
 				/// supposed to contain only one city.
 				const City* getCity() const;
+
+			//@}
+
+
+			//! @name Setters
+			//@{
+			//@}
+
+
+			//! @name Services
+			//@{
 			//@}
 
 			//! @name Modifiers
 			//@{
-				//////////////////////////////////////////////////////////////////////////
-				/// Sets the aliased city
-				/// @param value the aliased city
-				/// @author Hugues Romain
-				/// @date 2010
-				/// @since 3.1.16
-				///
-				/// The aliased city is stored in the IncludingPlace::_includedPlaces attribute.
-				/// If non empty, it is cleaned before.
-				void setCity(const City* value);
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
+
 		};
 	}
 }

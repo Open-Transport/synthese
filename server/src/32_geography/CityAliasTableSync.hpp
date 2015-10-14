@@ -27,7 +27,6 @@
 
 #include "CityAlias.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -42,21 +41,10 @@ namespace synthese
 		class CityAliasTableSync:
 			public db::DBDirectTableSyncTemplate<
 				CityAliasTableSync,
-				CityAlias,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				CityAlias
 			>
 		{
 		public:
-			//! @name Field names
-			//@{
-				static const std::string COL_NAME;
-				static const std::string COL_CODE;
-				static const std::string COL_ALIASED_CITY_ID;
-				static const std::string COL_VISIBLE;
-			//@}
-
-
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
@@ -84,6 +72,8 @@ namespace synthese
 					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 				);
 			//@}
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

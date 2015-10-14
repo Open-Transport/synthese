@@ -30,78 +30,46 @@ namespace synthese
 	using namespace geography;
 	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<geography::CityAlias>::KEY("CityAlias");
-	}
+	CLASS_DEFINITION(CityAlias, "t065_city_aliases", 65)
+	FIELD_DEFINITION_OF_OBJECT(CityAlias, "city_alias_id", "city_aliases_ids")
 
-
+	FIELD_DEFINITION_OF_TYPE(AliasedCity, "aliased_city_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Visible, "visible", SQL_BOOLEAN)
 
 	namespace geography
 	{
 		CityAlias::CityAlias( util::RegistryKeyType id)
-			: Registrable(id)
-		{}
-
-
-
-		bool CityAlias::getVisible() const
+			: Registrable(id),
+			  Object<CityAlias, CityAliasSchema>(
+				  Schema(
+					  FIELD_VALUE_CONSTRUCTOR(Key, id),
+					  FIELD_DEFAULT_CONSTRUCTOR(AliasedCity),
+					  FIELD_DEFAULT_CONSTRUCTOR(Name),
+					  FIELD_DEFAULT_CONSTRUCTOR(Code),
+					  FIELD_DEFAULT_CONSTRUCTOR(Visible)
+			  )	)
 		{
-			return _visible;
 		}
 
-
-
-		std::string CityAlias::getName() const
+		const City*
+		CityAlias::getCity() const
 		{
-			return _name;
+			return (get<AliasedCity>() ? get<AliasedCity>().get_ptr() : NULL);
 		}
 
-
-
-		const std::string& CityAlias::getCode() const
+		bool CityAlias::allowUpdate(const server::Session* session) const
 		{
-			return _code;
+			return true;
 		}
 
-
-
-		void CityAlias::setVisible( bool value )
+		bool CityAlias::allowCreate(const server::Session* session) const
 		{
-			_visible = value;
+			return true;
 		}
 
-
-
-		void CityAlias::setName( const std::string& value )
+		bool CityAlias::allowDelete(const server::Session* session) const
 		{
-			_name = value;
+			return true;
 		}
 
-
-
-		void CityAlias::setCode( const std::string& value )
-		{
-			_code = value;
-		}
-
-
-
-		const City* CityAlias::getCity() const
-		{
-			assert(getIncludedPlaces().size() == 1);
-			assert(dynamic_cast<const City*>(*getIncludedPlaces().begin()));
-
-			return dynamic_cast<const City*>(*getIncludedPlaces().begin());
-		}
-
-
-
-		void CityAlias::setCity( const City* value )
-		{
-			assert(value);
-
-			clearIncludedPlaces();
-			addIncludedPlace(*value);
-		}
 }	}
