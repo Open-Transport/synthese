@@ -32,7 +32,6 @@
 #include "House.hpp"
 #include "FetcherTemplate.h"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -49,20 +48,16 @@ namespace synthese
 			</dl>
 		*/
 		class HouseTableSync:
-			public db::DBDirectTableSyncTemplate<
-				HouseTableSync,
-				House,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
-			>
+				public db::DBDirectTableSyncTemplate<
+					HouseTableSync,
+					House
+				>
 		{
 		public:
-			static const std::string COL_DATA_SOURCE_LINKS;
-			static const std::string COL_ROAD_PLACE_ID;
-			static const std::string COL_NUMBER;
-
 			HouseTableSync() {}
 			~HouseTableSync() {}
+
+			virtual bool allowList( const server::Session* session ) const;
 
 		};
 	}

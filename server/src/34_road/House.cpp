@@ -26,6 +26,7 @@
 #include "RoadPath.hpp"
 #include "RoadPlace.h"
 #include "RoadChunkEdge.hpp"
+#include "RoadPlaceTableSync.h"
 
 #include <boost/lexical_cast.hpp>
 #include "EdgeProjector.hpp"
@@ -38,12 +39,19 @@ namespace synthese
 	using namespace geography;
 	using namespace graph;
 	using namespace algorithm;
+	using namespace road;
+	using namespace util;
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<NamedPlace,road::House>::FACTORY_KEY("House");
-		template<> const string Registry<road::House>::KEY("House");
 	}
+
+
+	CLASS_DEFINITION(House, "t078_houses", 78)
+	FIELD_DEFINITION_OF_OBJECT(House, "house_id", "house_ids")
+
+	FIELD_DEFINITION_OF_TYPE(Number, "number", SQL_INTEGER)
 
 	namespace road
 	{
@@ -60,6 +68,14 @@ namespace synthese
 			bool numberAtBeginning,
 			std::string separator
 		):	Registrable(0),
+			Object<House, HouseSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
+					FIELD_VALUE_CONSTRUCTOR(RoadPlace, chunk.getRoad()->get<RoadPlace>()),
+					FIELD_VALUE_CONSTRUCTOR(Number, houseNumber),
+					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
+			)),
 			Address(
 				chunk,
 				chunk.getHouseNumberMetricOffset(houseNumber),
@@ -84,6 +100,14 @@ namespace synthese
 			bool numberAtBeginning,
 			std::string separator
 		):	Registrable(0),
+			Object<House, HouseSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
+					FIELD_VALUE_CONSTRUCTOR(RoadPlace, chunk.getRoad()->get<RoadPlace>()),
+					FIELD_VALUE_CONSTRUCTOR(Number, chunk.getHouseNumberFromOffset(metricOffset)),
+					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
+			)),
 			Address(
 				chunk,
 				metricOffset,
@@ -105,6 +129,14 @@ namespace synthese
 		House::House(
 			util::RegistryKeyType key
 		):	Registrable(key),
+			Object<House, HouseSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
+					FIELD_DEFAULT_CONSTRUCTOR(RoadPlace),
+					FIELD_DEFAULT_CONSTRUCTOR(Number),
+					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
+			)),
 			_numberAtBeginning(true)
 		{
 		}
@@ -115,7 +147,6 @@ namespace synthese
 		{
 			return this->getGeometry();
 		}
-
 
 
 		void House::setRoadChunkFromRoadPlace(
@@ -175,7 +206,10 @@ namespace synthese
 		) const	{
 
 			// Road place informations
-			getRoadChunk()->getRoad()->get<RoadPlace>()->toParametersMap(pm, coordinatesSystem, DATA_ROAD_PREFIX);
+			if (getRoadChunk() != 0)
+			{
+				getRoadChunk()->getRoad()->get<RoadPlace>()->toParametersMap(pm, coordinatesSystem, DATA_ROAD_PREFIX);
+			}
 
 			// Number
 			if(getHouseNumber())
@@ -215,4 +249,48 @@ namespace synthese
 		{
 			return !_numberAtBeginning;
 		}
+
+
+		void House::link(
+			util::Env& env,
+			bool withAlgorithmOptimizations /*= false*/
+		){
+
+			boost::shared_ptr<RoadPlace> roadPlace(get<RoadPlace>() ? get<RoadPlace>().get_ptr() : NULL);
+			if (!roadPlace) return;
+			try
+			{
+				setRoadChunkFromRoadPlace(roadPlace);
+			}
+			catch(ObjectNotFoundException<RoadPlace>&)
+			{
+				Log::GetInstance().warn("No such road place "+ lexical_cast<string>(roadPlace->getKey()) +" in house "+ lexical_cast<string>(getKey()));
+				throw;
+			}
+			catch(EdgeProjector<RoadChunk*>::NotFoundException&)
+			{
+				Log::GetInstance().warn("No chunk was found near the house "+ lexical_cast<string>(getKey()) +" in the road place "+ lexical_cast<string>(roadPlace->getKey()));
+				throw;
+			}
+		}
+
+		void House::unlink() {
+
+		}
+
+		bool House::allowUpdate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool House::allowCreate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool House::allowDelete(const server::Session* session) const
+		{
+			return true;
+		}
+
 }	}

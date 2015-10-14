@@ -20,7 +20,7 @@ Singleton Object List Should Work For Any Table
     ${CITY_ALIASES_TABLE_ID}
     ${JUNCTIONS_TABLE_ID}
     ${FREE_DRT_AREAS_TABLE_ID}
-    
+    ${HOUSES_TABLE_ID}
 
 Empty Object List Should Work For Any Table
     [Template]    Empty Object List Should Work
@@ -37,6 +37,7 @@ Empty Object List Should Work For Any Table
     ${CITY_ALIASES_TABLE_ID}
     ${JUNCTIONS_TABLE_ID}
     ${FREE_DRT_AREAS_TABLE_ID}
+    ${HOUSES_TABLE_ID}
 
 Object List Should Work For Some Tables
     On node 0

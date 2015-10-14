@@ -23,15 +23,28 @@
 #ifndef SYNTHESE_road_House_hpp__
 #define SYNTHESE_road_House_hpp__
 
+#include "Object.hpp"
 #include "Address.h"
 #include "NamedPlaceTemplate.h"
 #include "RoadPlace.h"
 #include "ImportableTemplate.hpp"
+#include "GeometryField.hpp"
 
 namespace synthese
 {
 	namespace road
 	{
+
+		FIELD_INT(Number)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(impex::DataSourceLinks),
+			FIELD(RoadPlace),
+			FIELD(Number),
+			FIELD(PointGeometry)
+		> HouseSchema;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// House.
 		/// A house is a place representing a single address, designed to be
@@ -45,8 +58,8 @@ namespace synthese
 		/// @date 2010
 		class House:
 			public Address,
+			public Object<House, HouseSchema>,
 			public geography::NamedPlaceTemplate<House>,
-			public virtual util::Registrable,
 			public impex::ImportableTemplate<House>
 		{
 		public:
@@ -157,6 +170,12 @@ namespace synthese
 				) const;
 
 
+				virtual bool allowUpdate(const server::Session* session) const;
+				virtual bool allowCreate(const server::Session* session) const;
+				virtual bool allowDelete(const server::Session* session) const;
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 
 				virtual bool _getCityNameBeforePlaceName() const;
 			//@}

@@ -58,13 +58,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync, HouseTableSync>::FACTORY_KEY("34.40.01 House");
 	}
 
-	namespace road
-	{
-		const std::string HouseTableSync::COL_ROAD_PLACE_ID ("road_place_id");
-		const std::string HouseTableSync::COL_DATA_SOURCE_LINKS ("data_source_links");
-		const std::string HouseTableSync::COL_NUMBER ("number");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<HouseTableSync>::TABLE(
@@ -73,12 +66,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<HouseTableSync>::_FIELDS[] =
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(HouseTableSync::COL_DATA_SOURCE_LINKS, SQL_TEXT),
-			Field(HouseTableSync::COL_ROAD_PLACE_ID, SQL_INTEGER),
-			Field(HouseTableSync::COL_NUMBER, SQL_INTEGER),
-			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
-			Field()
 		};
 
 		template<>
@@ -86,80 +73,6 @@ namespace synthese
 		{
 			return DBTableSync::Indexes();
 		}
-
-		template<> void OldLoadSavePolicy<HouseTableSync, House>::Load(
-			House* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			// Geometry
-			boost::shared_ptr<Point> point(
-				static_pointer_cast<Point, Geometry>(
-					rows->getGeometryFromWKT(TABLE_COL_GEOMETRY)
-			)	);
-			if(point.get())
-			{
-				object->setGeometry(point);
-			}
-
-			// Code by source
-			object->setDataSourceLinksWithoutRegistration(
-				ImportableTableSync::GetDataSourceLinksFromSerializedString(
-					rows->getText(HouseTableSync::COL_DATA_SOURCE_LINKS),
-					env
-			)	);
-
-			// House number
-			HouseNumber houseNumber = rows->getInt(HouseTableSync::COL_NUMBER);
-			object->setHouseNumber(houseNumber);
-
-			// Road Place
-			RegistryKeyType roadId(
-				rows->getLongLong(HouseTableSync::COL_ROAD_PLACE_ID)
-			);
-			try
-			{
-				boost::shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditable(roadId, env));
-				object->setRoadChunkFromRoadPlace(roadPlace);
-			}
-			catch(ObjectNotFoundException<RoadPlace>&)
-			{
-				Log::GetInstance().warn("No such road place "+ lexical_cast<string>(roadId) +" in house "+ lexical_cast<string>(object->getKey()));
-				throw;
-			}
-			catch(EdgeProjector<RoadChunk*>::NotFoundException&)
-			{
-				Log::GetInstance().warn("No chunk was found near the house "+ lexical_cast<string>(object->getKey()) +" in the road place "+ lexical_cast<string>(roadId));
-				throw;
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<HouseTableSync, House>::Unlink(
-			House* obj
-		){
-		}
-
-
-
-		template<> void OldLoadSavePolicy<HouseTableSync, House>::Save(
-			House* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<HouseTableSync> query(*object);
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-			query.addField(object->getRoadChunk() ? object->getRoadChunk()->getRoad()->get<RoadPlace>()->getKey() : RegistryKeyType(0));
-			query.addField(object->getHouseNumber() ? static_cast<int>(*(object->getHouseNumber())) : 0);
-			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
-			query.execute(transaction);
-		}
-
-
 
 		template<> bool DBTableSyncTemplate<HouseTableSync>::CanDelete(
 			const server::Session* session,
@@ -193,5 +106,16 @@ namespace synthese
 		){
 			//TODO Log the removal
 		}
+
+	}
+
+	namespace road
+	{
+
+		bool HouseTableSync::allowList(const server::Session* session) const
+		{
+			return true;
+		}
+
 	}
 }

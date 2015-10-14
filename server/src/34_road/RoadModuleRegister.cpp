@@ -65,7 +65,7 @@ void synthese::road::moduleRegister()
 
 	// Registries
 	INTEGRATE(synthese::road::Crossing);
-	synthese::util::Env::Integrate<synthese::road::House>();
+	INTEGRATE(synthese::road::House);
 	synthese::util::Env::Integrate<synthese::road::RoadChunk>();
 	INTEGRATE(synthese::road::Road);
 	INTEGRATE(synthese::road::PublicPlace);

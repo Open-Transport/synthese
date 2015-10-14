@@ -100,7 +100,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-			const Roads& getRoads() const { return _roads; }				
+			const Roads& getRoads() const { return _roads; }
 			//@}
 
 			//! @name Setters
