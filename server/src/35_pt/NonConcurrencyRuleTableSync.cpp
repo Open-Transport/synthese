@@ -165,7 +165,7 @@ namespace synthese
 			if(orderByPriorityLine || orderByHiddenLine)
 			{
 				query <<
-					" ORDER BY c." << CommercialLineTableSync::COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC")
+					" ORDER BY c." << ShortName::FIELD.name << (raisingOrder ? " ASC" : " DESC")
 				;
 			}
 			else if(orderByDelay)

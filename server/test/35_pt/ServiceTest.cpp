@@ -33,6 +33,7 @@
 #include "LineStop.h"
 #include "PermanentService.h"
 #include "ServicePointer.h"
+#include "TestUtils.hpp"
 
 #include <iostream>
 
@@ -1259,6 +1260,7 @@ BOOST_AUTO_TEST_CASE (testPermanentService)
 
 BOOST_AUTO_TEST_CASE (testServcesIndices)
 {
+	ScopedRegistrable<CommercialLine> scopedCommercialLine;
 	Env env;
 	GeographyModule::PreInit();
 

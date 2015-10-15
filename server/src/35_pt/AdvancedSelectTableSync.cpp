@@ -77,7 +77,7 @@ namespace synthese
 				<< " INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID
 				<< " WHERE "
 				<< "p." << StopPointTableSync::COL_PLACEID << "=" << placeId
-				<< " AND c." << CommercialLineTableSync::COL_NETWORK_ID << "=" << networkId
+				<< " AND c." << Network::FIELD.name << "=" << networkId
 				<< " LIMIT 1";
 			DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
 			return rows->next();

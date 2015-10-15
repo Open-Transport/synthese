@@ -33,7 +33,6 @@
 
 // Db
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 // Security
 #include "SecurityTypes.hpp"
@@ -51,34 +50,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				CommercialLineTableSync,
 				CommercialLine,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>
 		{
 		public:
-			static const std::string COL_NETWORK_ID;
-			static const std::string COL_NAME;
-			static const std::string COL_SHORT_NAME;
-			static const std::string COL_LONG_NAME;
-			static const std::string COL_COLOR;
-			static const std::string COL_FOREGROUND_COLOR;
-			static const std::string COL_STYLE;
-			static const std::string COL_IMAGE;
-			static const std::string COL_OPTIONAL_RESERVATION_PLACES;
-			static const std::string COL_CREATOR_ID;
-			static const std::string COL_PEDESTRIAN_USE_RULE;
-			static const std::string COL_HANDICAPPED_USE_RULE;
-			static const std::string COL_BIKE_USE_RULE;
-			static const std::string COL_RESERVATION_CONTACT_ID;
-			static const std::string COL_CALENDAR_TEMPLATE_ID;
-			static const std::string COL_MAP_URL;
-			static const std::string COL_DOC_URL;
-			static const std::string COL_TIMETABLE_ID;
-			static const std::string COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE;
-			static const std::string COL_WEIGHT_FOR_SORTING;
-
-
-
 			/** CommercialLine search.
 				@param networkId Id of the network which the lines must belong (default = undefined = all networks)
 				@param name SQL LIKE mask that line names must respect (default = "%" = all names). Use % and ? to specify jokers.

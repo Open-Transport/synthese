@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE (testIneoFileFormat)
 	ModuleClassTemplate<synthese::db::DBModule>::PreInit();
 	ModuleClassTemplate<synthese::db::DBModule>::Init();
 	
-	Env& env(Env::GetOfficialEnv());
+	Env env;
 
     boost::shared_ptr<TransportNetwork> transportNetwork(new TransportNetwork(6192449487677434ULL,
                                                                               "transportNetwork"));

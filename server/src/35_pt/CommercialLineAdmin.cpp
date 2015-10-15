@@ -484,14 +484,17 @@ namespace synthese
 				// Main properties update form
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();
-				stream << t.cell("Réseau", _cline->getNetwork()->getName());
-				stream << t.cell(
-					"Parent",
-					t.getForm().getSelectInput(
-						CommercialLineUpdateAction::PARAMETER_NETWORK_ID,
-						_cline->getNetwork()->getSubFoldersLabels(),
-						boost::optional<util::RegistryKeyType>(_cline->_getParent()->getKey())
-				)	);
+				if (_cline->getNetwork())
+				{
+					stream << t.cell("Réseau", _cline->getNetwork()->getName());
+					stream << t.cell(
+						"Parent",
+						t.getForm().getSelectInput(
+							CommercialLineUpdateAction::PARAMETER_NETWORK_ID,
+							_cline->getNetwork()->getSubFoldersLabels(),
+							boost::optional<util::RegistryKeyType>(_cline->_getParent()->getKey())
+					)	);
+				}
 				stream << t.cell("Poids (tri)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_WEIGHT_FOR_SORTING, boost::lexical_cast<string>(_cline->getWeightForSorting())));
 				stream << t.title("Nom");
 				stream << t.cell("Nom (menu)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NAME, _cline->getName()));

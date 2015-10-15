@@ -84,29 +84,6 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<DBTableSync,CommercialLineTableSync>::FACTORY_KEY("35.25.01 Commercial lines");
 	}
-	namespace pt
-	{
-		const string CommercialLineTableSync::COL_NETWORK_ID ("network_id");
-		const string CommercialLineTableSync::COL_NAME ("name");
-		const string CommercialLineTableSync::COL_SHORT_NAME ("short_name");
-		const string CommercialLineTableSync::COL_LONG_NAME ("long_name");
-		const string CommercialLineTableSync::COL_COLOR ("color");
-		const string CommercialLineTableSync::COL_FOREGROUND_COLOR ("foreground_color");
-		const string CommercialLineTableSync::COL_STYLE ("style");
-		const string CommercialLineTableSync::COL_IMAGE ("image");
-		const string CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES("optional_reservation_places");
-		const string CommercialLineTableSync::COL_CREATOR_ID("creator_id");
-		const string CommercialLineTableSync::COL_BIKE_USE_RULE("bike_compliance_id");
-		const string CommercialLineTableSync::COL_HANDICAPPED_USE_RULE ("handicapped_compliance_id");
-		const string CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE("pedestrian_compliance_id");
-		const string CommercialLineTableSync::COL_RESERVATION_CONTACT_ID("reservation_contact_id");
-		const string CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID("calendar_template_id");
-		const string CommercialLineTableSync::COL_MAP_URL("map_url");
-		const string CommercialLineTableSync::COL_DOC_URL("doc_url");
-		const string CommercialLineTableSync::COL_TIMETABLE_ID("timetable_id");
-		const string CommercialLineTableSync::COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE = "display_duration_before_first_departure";
-		const string CommercialLineTableSync::COL_WEIGHT_FOR_SORTING = "weight_for_sorting";
-	}
 
 	namespace db
 	{
@@ -117,27 +94,6 @@ namespace synthese
 		template<>
 		const Field DBTableSyncTemplate<CommercialLineTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(CommercialLineTableSync::COL_NETWORK_ID, SQL_INTEGER),
-			Field(CommercialLineTableSync::COL_NAME, SQL_TEXT),
-			Field(CommercialLineTableSync::COL_SHORT_NAME, SQL_TEXT),
-			Field(CommercialLineTableSync::COL_LONG_NAME, SQL_TEXT),
-			Field(CommercialLineTableSync::COL_COLOR, SQL_TEXT),
-			Field(CommercialLineTableSync::COL_FOREGROUND_COLOR, SQL_TEXT),
-			Field(CommercialLineTableSync::COL_STYLE, SQL_TEXT),
-			Field(CommercialLineTableSync::COL_IMAGE, SQL_TEXT),
-			Field(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES, SQL_TEXT),
-			Field(CommercialLineTableSync::COL_CREATOR_ID, SQL_TEXT),
-			Field(CommercialLineTableSync::COL_BIKE_USE_RULE, SQL_INTEGER),
-			Field(CommercialLineTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
-			Field(CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
-			Field(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID, SQL_INTEGER),
-			Field(CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
-			Field(CommercialLineTableSync::COL_MAP_URL, SQL_TEXT),
-			Field(CommercialLineTableSync::COL_DOC_URL, SQL_TEXT),
-			Field(CommercialLineTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
-			Field(CommercialLineTableSync::COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE, SQL_INTEGER),
-			Field(CommercialLineTableSync::COL_WEIGHT_FOR_SORTING, SQL_INTEGER),
 			Field()
 		};
 
@@ -149,118 +105,16 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					CommercialLineTableSync::COL_NETWORK_ID.c_str(),
-					CommercialLineTableSync::COL_CREATOR_ID.c_str(),
+					Network::FIELD.name.c_str(),
+					pt::CreatorId::FIELD.name.c_str(),
 					""
 			)	);
 			r.push_back(
 				DBTableSync::Index(
-					CommercialLineTableSync::COL_RESERVATION_CONTACT_ID.c_str(),
+					LineReservationContact::FIELD.name.c_str(),
 					""
 			)	);
 			return r;
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<CommercialLineTableSync, CommercialLine>::Load(
-			CommercialLine* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
-			object->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<CommercialLineTableSync,CommercialLine>::Unlink(
-			CommercialLine* obj
-		){
-			obj->removeParentLink();
-
-			if(Env::GetOfficialEnv().contains(*obj))
-			{
-				obj->cleanDataSourceLinks(true);
-			}
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<CommercialLineTableSync,CommercialLine>::Save(
-			CommercialLine* object,
-			optional<DBTransaction&> transaction
-		){
-			// Preparation of places with optional reservation
-			stringstream optionalReservationPlaces;
-			bool first(true);
-			BOOST_FOREACH(const StopArea* place, object->getOptionalReservationPlaces())
-			{
-				if (first)
-				{
-					first = false;
-				}
-				else
-				{
-					optionalReservationPlaces << ",";
-				}
-				optionalReservationPlaces << place->getKey();
-			}
-
-			// The query
-			ReplaceQuery<CommercialLineTableSync> query(*object);
-			query.addField(object->_getParent() ? object->_getParent()->getKey() : RegistryKeyType(0));
-			query.addField(object->getName());
-			query.addField(object->getShortName());
-			query.addField(object->getLongName());
-			query.addField(object->getColor() ? object->getColor()->toXMLColor() : string());
-			query.addField(object->getFgColor() ? object->getFgColor()->toXMLColor() : string());
-			query.addField(object->getStyle());
-			query.addField(object->getImage());
-			query.addField(optionalReservationPlaces.str());
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-			query.addField(
-				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :
-				RegistryKeyType(0)
-			);
-			query.addField(
-				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() :
-				RegistryKeyType(0)
-			);
-			query.addField(
-				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() :
-				RegistryKeyType(0)
-			);
-			query.addField(
-				object->getReservationContact() ? object->getReservationContact()->getKey() : RegistryKeyType(0)
-			);
-			query.addField(
-				object->getCalendarTemplate() ? object->getCalendarTemplate()->getKey() : RegistryKeyType(0)
-			);
-			query.addField(object->getMapURL());
-			query.addField(object->getDocURL());
-			query.addField(object->getTimetableId());
-			query.addField(
-				object->getDisplayDurationBeforeFirstDeparture().is_not_a_date_time() ?
-				string() :
-				lexical_cast<string>(object->getDisplayDurationBeforeFirstDeparture().total_seconds() / 60)
-			);
-			query.addField(object->getWeightForSorting());
-			query.execute(transaction);
 		}
 
 
@@ -350,34 +204,34 @@ namespace synthese
 			if(creatorId && *creatorId != "%%" && *creatorId != "%")
 			{
 				if (creatorId->empty())
-					query << " AND (l." << COL_CREATOR_ID << " IS NULL OR l." << COL_CREATOR_ID << "='')";
+					query << " AND (l." << pt::CreatorId::FIELD.name << " IS NULL OR l." << pt::CreatorId::FIELD.name << "='')";
 				else
-					query << " AND l." << COL_CREATOR_ID << " LIKE " << Conversion::ToDBString(*creatorId);
+					query << " AND l." << pt::CreatorId::FIELD.name << " LIKE " << Conversion::ToDBString(*creatorId);
 			}
 			if(name && *name != "%%" && *name != "%")
 			{
 				if (name->empty())
-					query << " AND (l." << COL_NAME << " IS NULL OR l." << COL_NAME << "='')";
+					query << " AND (l." << SimpleObjectFieldDefinition<Name>::FIELD.name << " IS NULL OR l." << SimpleObjectFieldDefinition<Name>::FIELD.name << "='')";
 				else
-					query << " AND l." << COL_NAME << " LIKE " << Conversion::ToDBString(*name);
+					query << " AND l." << SimpleObjectFieldDefinition<Name>::FIELD.name << " LIKE " << Conversion::ToDBString(*name);
 			}
 			if (parentId)
 			{
-				query << " AND l." << COL_NETWORK_ID << "=" << *parentId;
+				query << " AND l." << Network::FIELD.name << "=" << *parentId;
 			}
 
 			// Contact center filter
 			if(contactCenterId)
 			{
-				query << " AND l." << COL_RESERVATION_CONTACT_ID << "=" << *contactCenterId;
+				query << " AND l." << LineReservationContact::FIELD.name << "=" << *contactCenterId;
 			}
 
 			if (orderByNetwork)
 				query << " ORDER BY "
-					<< "(SELECT n." << SimpleObjectFieldDefinition<Name>::FIELD.name << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=l." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
-					<< ",l." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
+					<< "(SELECT n." << SimpleObjectFieldDefinition<Name>::FIELD.name << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=l." << Network::FIELD.name << ")" << (raisingOrder ? " ASC" : " DESC")
+					<< ",l." << ShortName::FIELD.name << (raisingOrder ? " ASC" : " DESC");
 			else if (orderByName)
-				query << " ORDER BY l." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY l." << ShortName::FIELD.name << (raisingOrder ? " ASC" : " DESC");
 			if(number)
 			{
 				query << " LIMIT " << (*number + 1);
@@ -408,10 +262,10 @@ namespace synthese
 				<< getSQLLinesList(rights, totalControl, neededLevel, mustBeBookable, "*");
 			if (orderByNetwork)
 				query << " ORDER BY "
-				<< "(SELECT n." << SimpleObjectFieldDefinition<Name>::FIELD.name << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
-				<< "," << TABLE.NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
+				<< "(SELECT n." << SimpleObjectFieldDefinition<Name>::FIELD.name << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=" << TABLE.NAME << "." << Network::FIELD.name << ")" << (raisingOrder ? " ASC" : " DESC")
+				<< "," << TABLE.NAME << "." << ShortName::FIELD.name << (raisingOrder ? " ASC" : " DESC");
 			if (orderByName)
-				query << " ORDER BY " << TABLE.NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY " << TABLE.NAME << "." << ShortName::FIELD.name << (raisingOrder ? " ASC" : " DESC");
 			if (number)
 				query << " LIMIT " << (*number + 1);
 			if (first > 0)
@@ -481,7 +335,7 @@ namespace synthese
 				{
 					if (it != forbiddenNetworks.begin())
 						query << " AND ";
-					query << CommercialLineTableSync::COL_NETWORK_ID << "!=" << *it;
+					query << Network::FIELD.name << "!=" << *it;
 				}
 				query << ")";
 
@@ -504,7 +358,7 @@ namespace synthese
 				if (!allowedNetworks.empty())
 				{
 					for (set<util::RegistryKeyType>::const_iterator it(allowedNetworks.begin()); it != allowedNetworks.end(); ++it)
-						query << " OR " << COL_NETWORK_ID << "=" << *it;
+						query << " OR " << Network::FIELD.name << "=" << *it;
 				}
 				if (!allowedLines.empty())
 				{
@@ -520,7 +374,7 @@ namespace synthese
 			}
 			if (mustBeBookable)
 			{
-				query << " AND " << COL_RESERVATION_CONTACT_ID << ">0";
+				query << " AND " << LineReservationContact::FIELD.name << ">0";
 			}
 
 			return query.str();

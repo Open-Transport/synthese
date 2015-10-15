@@ -122,7 +122,7 @@ namespace synthese
 			if(pedestrian)
 			{
 				stream << t.col() << f.getSelectInput(
-					graph::RuleUserUpdateAction::PARAMETER_VALUE_PREFIX + CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE,
+					graph::RuleUserUpdateAction::PARAMETER_VALUE_PREFIX + PedestrianComplianceId::FIELD.name,
 					PTModule::GetPTUseRuleLabels(),
 					boost::optional<util::RegistryKeyType>(dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_PEDESTRIAN)) ? dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_PEDESTRIAN))->getKey() : 0)
 				);
@@ -130,7 +130,7 @@ namespace synthese
 			if(handicapped)
 			{
 				stream << t.col() << f.getSelectInput(
-					graph::RuleUserUpdateAction::PARAMETER_VALUE_PREFIX + CommercialLineTableSync::COL_HANDICAPPED_USE_RULE,
+					graph::RuleUserUpdateAction::PARAMETER_VALUE_PREFIX + HandicappedComplianceId::FIELD.name,
 					PTModule::GetPTUseRuleLabels(),
 					boost::optional<util::RegistryKeyType>(dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_HANDICAPPED)) ? dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_HANDICAPPED))->getKey() : 0)
 				);
@@ -138,7 +138,7 @@ namespace synthese
 			if(bikes)
 			{
 				stream << t.col() << f.getSelectInput(
-					graph::RuleUserUpdateAction::PARAMETER_VALUE_PREFIX + CommercialLineTableSync::COL_BIKE_USE_RULE,
+					graph::RuleUserUpdateAction::PARAMETER_VALUE_PREFIX + BikeComplianceId::FIELD.name,
 					PTModule::GetPTUseRuleLabels(),
 					boost::optional<util::RegistryKeyType>(dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_BIKE)) ? dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_BIKE))->getKey() : 0)
 				);

@@ -242,7 +242,7 @@ void checkJourneyEquals(size_t i, PTRoutePlannerResult::Journeys& journeys,
  */
 BOOST_AUTO_TEST_CASE (scheduledVSscheduled)
 {
-	ScopedRegistrable<FreeDRTArea> scopedFreeDRTAreaRegistrable;
+	ScopedRegistrable<CommercialLine> scopedCommercialLine;
 
 	TestAreaMap testAreaMap(NB_STOP);
 	
@@ -328,7 +328,7 @@ BOOST_AUTO_TEST_CASE (scheduledVSscheduled)
  */
 BOOST_AUTO_TEST_CASE (scheduledVScontinuous)
 {
-	ScopedRegistrable<FreeDRTArea> scopedFreeDRTAreaRegistrable;
+	ScopedRegistrable<CommercialLine> scopedCommercialLine;
 
 	TestAreaMap testAreaMap(NB_STOP);
 	
@@ -423,7 +423,7 @@ BOOST_AUTO_TEST_CASE (scheduledVScontinuous)
  */
 BOOST_AUTO_TEST_CASE (continuousVSscheduled)
 {
-	ScopedRegistrable<FreeDRTArea> scopedFreeDRTAreaRegistrable;
+	ScopedRegistrable<CommercialLine> scopedCommercialLine;
 
 	TestAreaMap testAreaMap(NB_STOP);
 	
@@ -508,7 +508,7 @@ BOOST_AUTO_TEST_CASE (continuousVSscheduled)
  */
 BOOST_AUTO_TEST_CASE (continuousVScontinuous)
 {
-	ScopedRegistrable<FreeDRTArea> scopedFreeDRTAreaRegistrable;
+	ScopedRegistrable<CommercialLine> scopedCommercialLine;
 
 	TestAreaMap testAreaMap(NB_STOP);
 	

@@ -38,6 +38,7 @@ using namespace synthese::vehicle;
 
 BOOST_AUTO_TEST_CASE (RoutePlanner)
 {
+	ScopedRegistrable<CommercialLine> scopedCommercialLine;
 	ScopedCoordinatesSystemUser scopedCoordinatesSystemUser;
 
 	#include "RoutePlannerTestData.hpp"

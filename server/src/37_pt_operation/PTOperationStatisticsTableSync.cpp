@@ -104,7 +104,7 @@ namespace synthese
 			if(column)
 			{
 				if(step == LINE_STEP)
-					return "(SELECT c."+ CommercialLineTableSync::COL_SHORT_NAME +
+					return "(SELECT c."+ ShortName::FIELD.name +
 						" FROM "+ CommercialLineTableSync::TABLE.NAME +" AS c " +
 						"INNER JOIN "+ JourneyPatternTableSync::TABLE.NAME +" AS jp ON "+
 							"jp."+ JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID +"=c."+ TABLE_COL_ID +

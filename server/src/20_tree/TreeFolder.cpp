@@ -50,6 +50,11 @@ namespace synthese
 			)	)
 		{}
 
+		TreeFolder::~TreeFolder()
+		{
+			unlink();
+		}
+
 
 
 		void TreeFolder::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
@@ -64,6 +69,11 @@ namespace synthese
 			if(_getParent())
 			{
 				setNullParent();
+			}
+
+			BOOST_FOREACH(TreeFolderDownNodeInterface* treeFolderDownNode, getChildren<TreeFolderDownNodeInterface>())
+			{
+				treeFolderDownNode->setNullParent();
 			}
 		}
 

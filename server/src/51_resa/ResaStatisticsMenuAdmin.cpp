@@ -24,18 +24,20 @@
 
 #include "ResaStatisticsMenuAdmin.h"
 
+#include "AdminFunctionRequest.hpp"
 #include "AdminParametersException.h"
+#include "CallStatisticsAdmin.h"
+#include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
+#include "HTMLModule.h"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "ResaModule.h"
 #include "ResaRight.h"
 #include "ResaStatisticsAdmin.h"
+#include "ReservationContactTableSync.h"
+#include "TreeFolderTableSync.hpp"
 #include "User.h"
-#include "CallStatisticsAdmin.h"
-#include "AdminFunctionRequest.hpp"
-#include "CommercialLineTableSync.h"
-#include "CommercialLine.h"
-#include "HTMLModule.h"
 
 using namespace std;
 using namespace boost;
@@ -187,6 +189,10 @@ namespace synthese
 				links.push_back(p);
 			}
 
+			// Load all networks and folders to avoid warning in load of lines
+			TransportNetworkTableSync::Search(*_env);
+			tree::TreeFolderTableSync::Search(*_env);
+			ReservationContactTableSync::Search(*_env);
 			CommercialLineTableSync::SearchResult lines(
 				CommercialLineTableSync::Search(
 					*_env,

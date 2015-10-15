@@ -307,8 +307,8 @@ namespace synthese
 			{
 				boost::shared_ptr<ParametersMap> linePm(new ParametersMap);
 				linePm->insert(prefix + "line_id", item.second.get<0>());
-				linePm->insert(prefix + CommercialLineTableSync::COL_SHORT_NAME,item.first);
-				linePm->insert(prefix + CommercialLineTableSync::COL_NETWORK_ID,item.second.get<1>());
+				linePm->insert(prefix + ShortName::FIELD.name,item.first);
+				linePm->insert(prefix + Network::FIELD.name,item.second.get<1>());
 				linesPm->insert(prefix + "line",linePm);
 			}
 			pm.insert(prefix + "lines", linesPm);

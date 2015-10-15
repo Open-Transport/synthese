@@ -86,7 +86,12 @@ namespace synthese
 
 
 		TransportNetwork::~TransportNetwork()
-		{}
+		{
+			BOOST_FOREACH(pt::CommercialLine* line, getChildren<pt::CommercialLine>())
+			{
+				line->setNullParent();
+			}
+		}
 
 
 

@@ -29,6 +29,7 @@
 #include "JourneyPattern.hpp"
 #include "ScheduledService.h"
 #include "DeparturesTableTypes.h"
+#include "TestUtils.hpp"
 
 #include <boost/test/auto_unit_test.hpp>
 
@@ -44,6 +45,7 @@ using namespace synthese;
 
 BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 {
+	ScopedRegistrable<CommercialLine> scopedCommercialLine;
 	Env env;
 
 	// Stops

@@ -254,7 +254,7 @@ namespace synthese
 				{
 					try
 					{
-						_reservationContact = ReservationContactTableSync::Get(rid, *_env);
+						_reservationContact = ReservationContactTableSync::GetEditable(rid, *_env);
 					}
 					catch (ObjectNotFoundException<ReservationContact>&)
 					{
@@ -263,7 +263,7 @@ namespace synthese
 				}
 				else
 				{
-					_reservationContact = boost::shared_ptr<const ReservationContact>();
+					_reservationContact = boost::shared_ptr<ReservationContact>();
 				}
 			}
 
@@ -329,10 +329,12 @@ namespace synthese
 			if(_network && _network->get())
 			{
 				_line->setParent(**_network);
+				_line->set<Network>(*_network.get());
 			}
 			if(_folder && _folder->get())
 			{
 				_line->setParent(**_folder);
+				_line->set<Network>(*_folder.get());
 			}
 			if(_reservationContact)
 			{
