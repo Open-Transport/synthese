@@ -19,22 +19,25 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#include "AdvancedSelectTableSync.h"
 
 #include "DBModule.h"
-#include "StopAreaTableSync.hpp"
+#include "CalendarTemplate.h"
 #include "CityTableSync.h"
-#include "StopPointTableSync.hpp"
-#include "CommercialLineTableSync.h"
-#include "LineStopTableSync.h"
-#include "JourneyPatternTableSync.hpp"
-#include "StopArea.hpp"
 #include "CommercialLine.h"
-#include "AdvancedSelectTableSync.h"
-#include "DisplayScreenTableSync.h"
-#include "Env.h"
+#include "CommercialLineTableSync.h"
 #include "Conversion.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
+#include "DisplayScreenTableSync.h"
+#include "Env.h"
+#include "JourneyPatternTableSync.hpp"
+#include "LineStopTableSync.h"
+#include "ReservationContact.h"
+#include "StopArea.hpp"
+#include "StopAreaTableSync.hpp"
+#include "StopPointTableSync.hpp"
+#include "TreeFolderUpNode.hpp"
 
 #include <sstream>
 #include <boost/optional/optional_io.hpp>
@@ -184,7 +187,7 @@ namespace synthese
 				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=s." << LineNode::FIELD.name
 				<< " INNER JOIN " << DisplayScreenTableSync::TABLE.NAME << " AS b ON b." << BroadCastPoint::FIELD.name << "=p." << StopPointTableSync::COL_PLACEID
 				<< " GROUP BY c." << TABLE_COL_ID
-				<< " ORDER BY c." << CommercialLineTableSync::COL_SHORT_NAME;
+				<< " ORDER BY c." << ShortName::FIELD.name;
 			if (number)
 				query << " LIMIT " << (*number + 1);
 			if (first > 0)

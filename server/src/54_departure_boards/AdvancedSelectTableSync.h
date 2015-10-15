@@ -32,6 +32,7 @@
 
 #include "SecurityTypes.hpp"
 #include "UtilConstants.h"
+#include "UtilTypes.h"
 
 namespace synthese
 {

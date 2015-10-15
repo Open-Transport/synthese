@@ -740,6 +740,7 @@ namespace synthese
 				_logCreation(logStream.str());
 
 				line->setParent(defaultNetwork);
+				line->set<Network>(defaultNetwork);
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
 				line->setDataSourceLinksWithoutRegistration(links);

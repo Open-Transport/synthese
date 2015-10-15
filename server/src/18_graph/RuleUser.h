@@ -80,7 +80,7 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @date 2010
 				/// @since 3.1.18
-				void setRules(const Rules& value){ _rules = value; }
+				virtual void setRules(const Rules& value){ _rules = value; }
 			//@}
 
 			//! @name Queries

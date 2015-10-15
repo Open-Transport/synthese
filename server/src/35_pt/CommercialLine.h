@@ -26,13 +26,18 @@
 #include <string>
 #include <set>
 
+#include "Object.hpp"
+
 #include "TreeFolderDownNode.hpp"
 
+#include "Calendar.h"
+#include "DataSourceLinksField.hpp"
+#include "GraphTypes.h"
+#include "ImportableTemplate.hpp"
 #include "PathGroup.h"
 #include "RGBColor.h"
-#include "GraphTypes.h"
-#include "Calendar.h"
-#include "ImportableTemplate.hpp"
+#include "StringField.hpp"
+#include "TimeField.hpp"
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/optional.hpp>
@@ -59,6 +64,11 @@ namespace synthese
 		class Service;
 	}
 
+	namespace tree
+	{
+		class TreeFolderUpNode;
+	}
+
 	namespace vehicle
 	{
 		class RollingStock;
@@ -70,7 +80,51 @@ namespace synthese
 		class NonConcurrencyRule;
 		class ReservationContact;
 		class StopArea;
-		
+
+		FIELD_POINTER(Network, tree::TreeFolderUpNode)
+		FIELD_STRING(ShortName)
+		FIELD_STRING(LongName)
+		FIELD_STRING(Color)
+		FIELD_STRING(ForegroundColor)
+		FIELD_STRING(Style)
+		FIELD_STRING(LineImage)
+		FIELD_STRING(OptionalReservationPlaces)
+		FIELD_DATASOURCE_LINKS(CreatorId)
+		FIELD_ID(BikeComplianceId)
+		FIELD_ID(HandicappedComplianceId)
+		FIELD_ID(PedestrianComplianceId)
+		FIELD_POINTER(LineReservationContact, ReservationContact)
+		FIELD_POINTER(LineCalendarTemplate, calendar::CalendarTemplate) //!< List of days when the line is supposed to run
+		FIELD_STRING(MapUrl)
+		FIELD_STRING(DocUrl)
+		FIELD_ID(TimetableId)
+		FIELD_TIME(DisplayDurationBeforeFirstDeparture)
+		FIELD_INT(WeightForSorting)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Network),
+			FIELD(Name),
+			FIELD(ShortName),
+			FIELD(LongName),
+			FIELD(Color),
+			FIELD(ForegroundColor),
+			FIELD(Style),
+			FIELD(LineImage),
+			FIELD(OptionalReservationPlaces),
+			FIELD(CreatorId),
+			FIELD(BikeComplianceId),
+			FIELD(HandicappedComplianceId),
+			FIELD(PedestrianComplianceId),
+			FIELD(LineReservationContact),
+			FIELD(LineCalendarTemplate),
+			FIELD(MapUrl),
+			FIELD(DocUrl),
+			FIELD(TimetableId),
+			FIELD(DisplayDurationBeforeFirstDeparture),
+			FIELD(WeightForSorting)
+		> CommercialLineSchema;
+
 		/** Commercial line.
 			@ingroup m35
 
@@ -83,7 +137,8 @@ namespace synthese
 		class CommercialLine:
 			public graph::PathGroup,
 			public impex::ImportableTemplate<CommercialLine>,
-			public tree::TreeFolderDownNode<TransportNetwork>
+			public tree::TreeFolderDownNode<TransportNetwork>,
+			public virtual Object<CommercialLine, CommercialLineSchema>
 		{
 		public:
 			static const std::string DATA_LINE_SHORT_NAME;
@@ -112,27 +167,12 @@ namespace synthese
 		private:
 			/// @name data
 			//@{
-				std::string			_shortName;	//!< Name (cartouche)
-				std::string			_longName;	//!< Name for schedule card
-				std::string _name;
-
 				boost::optional<util::RGBColor>		_color;		//!< CommercialLine color
 				boost::optional<util::RGBColor>		_fgColor;		//!< CommercialLine foreground color
-				std::string			_style;		//!< CSS style (cartouche)
-				std::string			_image;		//!< Display image (cartouche)
 
-				const pt::ReservationContact*	_reservationContact;	//!< Reservation contact
 				PlacesSet	_optionalReservationPlaces;
 
 				NonConcurrencyRules _nonConcurrencyRules;
-
-				calendar::CalendarTemplate* _calendarTemplate;	//!< List of days when the line is supposed to run
-
-				std::string _mapURL;
-				std::string _docURL;
-				util::RegistryKeyType _timetableId;
-				boost::posix_time::time_duration _displayDurationBeforeFirstDeparture;
-				int _weightForSorting;
 			//@}
 
 			/// @name Mutexes
@@ -152,47 +192,49 @@ namespace synthese
 			/// Initializes the following default use rules :
 			///  - USER_PEDESTRIAN : allowed
 			CommercialLine(util::RegistryKeyType key = 0);
+			~CommercialLine();
 
 			//! @name Getters
 			//@{
-				const std::string& getStyle () const { return _style; }
+				const std::string& getStyle () const { return get<Style>(); }
 				TransportNetwork* getNetwork () const;
-				const std::string& getShortName () const { return _shortName; }
-				const std::string& getLongName () const { return _longName; }
-				const std::string& getImage () const { return _image; }
+				const std::string& getShortName () const { return get<ShortName>(); }
+				const std::string& getLongName () const { return get<LongName>(); }
+				const std::string& getImage () const { return get<LineImage>(); }
 				const boost::optional<util::RGBColor>& getColor () const { return _color; }
 				const boost::optional<util::RGBColor>& getFgColor () const { return _fgColor; }
-				const pt::ReservationContact* getReservationContact() const { return _reservationContact; }
+				const pt::ReservationContact* getReservationContact() const;
 				const PlacesSet& getOptionalReservationPlaces() const { return _optionalReservationPlaces; }
 				const NonConcurrencyRules& getNonConcurrencyRules() const { return _nonConcurrencyRules; }
-				calendar::CalendarTemplate* getCalendarTemplate() const { return _calendarTemplate; }
+				calendar::CalendarTemplate* getCalendarTemplate() const;
 				boost::recursive_mutex& getNonConcurrencyRulesMutex() const { return _nonConcurrencyRulesMutex; }
-				const std::string& getMapURL() const { return _mapURL; }
-				const std::string& getDocURL() const { return _docURL; }
-				util::RegistryKeyType getTimetableId() const { return _timetableId; }
-				const boost::posix_time::time_duration& getDisplayDurationBeforeFirstDeparture() const { return _displayDurationBeforeFirstDeparture; }
-				int getWeightForSorting() const { return _weightForSorting; }
-				virtual std::string getName() const { return _name; }
+				const std::string& getMapURL() const { return get<MapUrl>(); }
+				const std::string& getDocURL() const { return get<DocUrl>(); }
+				util::RegistryKeyType getTimetableId() const { return get<TimetableId>(); }
+				const boost::posix_time::time_duration& getDisplayDurationBeforeFirstDeparture() const { return get<DisplayDurationBeforeFirstDeparture>(); }
+				int getWeightForSorting() const { return get<WeightForSorting>(); }
+				virtual std::string getName() const { return get<Name>(); }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setStyle (const std::string& value) { _style = value; }
-				void setShortName (const std::string& shortName) { _shortName = shortName; }
-				void setLongName (const std::string& longName) { _longName = longName; }
-				void setImage (const std::string& image) { _image = image; }
-				void setColor (const boost::optional<util::RGBColor>& color) { _color = color; }
-				void setFgColor (const boost::optional<util::RGBColor>& color) { _fgColor = color; }
-				void setReservationContact(const pt::ReservationContact* value) { _reservationContact = value; }
-				void setCalendarTemplate(calendar::CalendarTemplate* value) { _calendarTemplate = value;}
+				void setStyle (const std::string& value) { set<Style>(value); }
+				void setShortName (const std::string& shortName) { set<ShortName>(shortName); }
+				void setLongName (const std::string& longName) { set<LongName>(longName); }
+				void setImage (const std::string& image) { set<LineImage>(image); }
+				void setColor (const boost::optional<util::RGBColor>& color);
+				void setFgColor (const boost::optional<util::RGBColor>& color);
+				void setReservationContact(pt::ReservationContact* value);
+				void setCalendarTemplate(calendar::CalendarTemplate* value);
 				void setNonConcurrencyRules(const NonConcurrencyRules& value) { _nonConcurrencyRules = value; }
-				void setOptionalReservationPlaces(const PlacesSet& value) { _optionalReservationPlaces = value; }
-				void setMapURL(const std::string& value){ _mapURL = value; }
-				void setDocURL(const std::string& value){ _docURL = value; }
-				void setTimetableId(util::RegistryKeyType value){ _timetableId = value; }
-				void setDisplayDurationBeforeFirstDeparture(const boost::posix_time::time_duration& value){ _displayDurationBeforeFirstDeparture = value; }
-				void setWeightForSorting(int weightForSorting) { _weightForSorting = weightForSorting; }
-				void setName(const std::string& value){ _name = value; }
+				void setOptionalReservationPlaces(const PlacesSet& value);
+				void setMapURL(const std::string& value){ set<MapUrl>(value); }
+				void setDocURL(const std::string& value){ set<DocUrl>(value); }
+				void setTimetableId(util::RegistryKeyType value){ set<TimetableId>(value); }
+				void setDisplayDurationBeforeFirstDeparture(const boost::posix_time::time_duration& value){ set<DisplayDurationBeforeFirstDeparture>(value); }
+				void setWeightForSorting(int weightForSorting) { set<WeightForSorting>(weightForSorting); }
+				void setName(const std::string& value){ set<Name>(value); }
+				virtual void setRules(const Rules& value);
 			//@}
 
 			/// @name Indices maintenance
@@ -335,13 +377,6 @@ namespace synthese
 					}
 				};
 
-
-
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
-
 				virtual SubObjects getSubObjects() const;
 
 				virtual LinkedObjectsIds getLinkedObjectsIds(
@@ -349,7 +384,12 @@ namespace synthese
 				) const;
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

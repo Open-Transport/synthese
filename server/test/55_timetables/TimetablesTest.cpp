@@ -55,6 +55,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 {
 	ScopedCoordinatesSystemUser scopedCoordinatesSystemUser;
 	ScopedRegistrable<JourneyPattern> scopedJourneyPattern;
+	ScopedRegistrable<CommercialLine> scopedCommercialLine;
 	Env env;
 
 

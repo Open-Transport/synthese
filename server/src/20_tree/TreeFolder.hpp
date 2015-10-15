@@ -57,6 +57,7 @@ namespace synthese
 			TreeFolder(
 				util::RegistryKeyType id = 0
 			);
+			~TreeFolder();
 
 			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 			virtual void unlink();

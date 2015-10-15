@@ -245,10 +245,10 @@ void synthese::pt::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt::JourneyPattern>();
 	INTEGRATE(synthese::pt::LineStop);
 	synthese::util::Env::Integrate<synthese::pt::StopArea>();
-	synthese::util::Env::Integrate<synthese::pt::CommercialLine>();
+	INTEGRATE(synthese::pt::CommercialLine);
 	synthese::util::Env::Integrate<synthese::pt::StopPoint>();
 	synthese::util::Env::Integrate<synthese::pt::Junction>();
-	synthese::util::Env::Integrate<synthese::pt::TransportNetwork>();
+	INTEGRATE(synthese::pt::TransportNetwork);
 	synthese::util::Env::Integrate<synthese::pt::PTUseRule>();
 	synthese::util::Env::Integrate<synthese::pt::ContinuousService>();
 	synthese::util::Env::Integrate<synthese::pt::ScheduledService>();

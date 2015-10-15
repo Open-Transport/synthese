@@ -95,7 +95,7 @@ namespace synthese
 			boost::optional<std::string>			_image;		//!< Display image (cartouche)
 			boost::optional<boost::shared_ptr<TransportNetwork> >	_network;	//!< Network
 			boost::optional<boost::shared_ptr<tree::TreeFolder> >	_folder;	//!< Folder
-			boost::optional<boost::shared_ptr<const pt::ReservationContact> >	_reservationContact;	//!< Reservation contact
+			boost::optional<boost::shared_ptr<pt::ReservationContact> >	_reservationContact;	//!< Reservation contact
 			boost::optional<std::string> _mapURL;
 			boost::optional<std::string> _docURL;
 			boost::optional<util::RegistryKeyType> _timetableId;
