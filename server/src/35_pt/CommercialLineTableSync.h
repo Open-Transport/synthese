@@ -153,6 +153,8 @@ neededLevel = READ
 				, bool mustBeBookable
 				, std::string selectedColumns = db::TABLE_COL_ID
 			);
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

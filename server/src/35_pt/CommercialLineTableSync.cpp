@@ -379,5 +379,10 @@ namespace synthese
 
 			return query.str();
 		}
+
+		bool CommercialLineTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::READ);
+		}
 	}
 }
