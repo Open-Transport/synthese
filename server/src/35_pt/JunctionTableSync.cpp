@@ -55,15 +55,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,JunctionTableSync>::FACTORY_KEY("35.60 Junctions");
 	}
 
-	namespace pt
-	{
-		const std::string JunctionTableSync::COL_START_PHYSICAL_STOP_ID("start_physical_stop");
-		const std::string JunctionTableSync::COL_END_PHYSICAL_STOP_ID("end_physical_stop");
-		const std::string JunctionTableSync::COL_LENGTH("length");
-		const std::string JunctionTableSync::COL_DURATION("duration");
-		const std::string JunctionTableSync::COL_BIDIRECTIONAL("bidirectional");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<JunctionTableSync>::TABLE(
@@ -74,12 +65,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<JunctionTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(JunctionTableSync::COL_START_PHYSICAL_STOP_ID, SQL_INTEGER),
-			Field(JunctionTableSync::COL_END_PHYSICAL_STOP_ID, SQL_INTEGER),
-			Field(JunctionTableSync::COL_LENGTH, SQL_INTEGER),
-			Field(JunctionTableSync::COL_DURATION, SQL_INTEGER),
-			Field(JunctionTableSync::COL_BIDIRECTIONAL, SQL_INTEGER),
 			Field()
 		};
 
@@ -91,53 +76,15 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					JunctionTableSync::COL_START_PHYSICAL_STOP_ID.c_str(),
-					JunctionTableSync::COL_END_PHYSICAL_STOP_ID.c_str(),
+					StartPhysicalStop::FIELD.name.c_str(),
+					EndPhysicalStop::FIELD.name.c_str(),
 			"")	);
 			r.push_back(
 				DBTableSync::Index(
-					JunctionTableSync::COL_END_PHYSICAL_STOP_ID.c_str(),
-					JunctionTableSync::COL_START_PHYSICAL_STOP_ID.c_str(),
+					EndPhysicalStop::FIELD.name.c_str(),
+					StartPhysicalStop::FIELD.name.c_str(),
 			"")	);
 			return r;
-		}
-
-
-
-		template<> void OldLoadSavePolicy<JunctionTableSync,Junction>::Load(
-			Junction* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
-			object->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<JunctionTableSync,Junction>::Save(
-			Junction* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<JunctionTableSync> query(*object);
-			query.addField(object->isValid() ? object->getStart()->getKey() : RegistryKeyType(0));
-			query.addField(object->isValid() ? object->getEnd()->getKey() : RegistryKeyType(0));
-			query.addField(object->isValid() ? object->getLength() : double(0));
-			query.addField(object->isValid() ? object->getDuration().total_seconds() / 60 : 0);
-			query.addField(object->getBack() != NULL);
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<JunctionTableSync,Junction>::Unlink(
-			Junction* obj
-		){
 		}
 
 
@@ -206,7 +153,7 @@ namespace synthese
 								expr,
 								ComposedExpression::OP_OR,
 								ComposedExpression::Get(
-									FieldExpression::Get(TABLE.NAME, COL_START_PHYSICAL_STOP_ID),
+									FieldExpression::Get(TABLE.NAME, StartPhysicalStop::FIELD.name),
 									ComposedExpression::OP_EQ,
 									ValueExpression<RegistryKeyType>::Get(stop->getKey())
 							)	);
@@ -215,7 +162,7 @@ namespace synthese
 				}	}
 				else
 				{
-					query.addWhereField(COL_START_PHYSICAL_STOP_ID, *startStopFilter);
+					query.addWhereField(StartPhysicalStop::FIELD.name, *startStopFilter);
 				}
 			}
 			if(endStopFilter)
@@ -234,7 +181,7 @@ namespace synthese
 								expr,
 								ComposedExpression::OP_OR,
 								ComposedExpression::Get(
-									FieldExpression::Get(TABLE.NAME, COL_END_PHYSICAL_STOP_ID),
+									FieldExpression::Get(TABLE.NAME, EndPhysicalStop::FIELD.name),
 									ComposedExpression::OP_EQ,
 									ValueExpression<RegistryKeyType>::Get(stop->getKey())
 							)	);
@@ -243,13 +190,13 @@ namespace synthese
 				}	}
 				else
 				{
-					query.addWhereField(COL_END_PHYSICAL_STOP_ID, *endStopFilter);
+					query.addWhereField(EndPhysicalStop::FIELD.name, *endStopFilter);
 				}
 			}
 			if(orderByStop)
 			{
-				query.addOrderField(COL_START_PHYSICAL_STOP_ID, raisingOrder);
-				query.addOrderField(COL_END_PHYSICAL_STOP_ID, raisingOrder);
+				query.addOrderField(StartPhysicalStop::FIELD.name, raisingOrder);
+				query.addOrderField(EndPhysicalStop::FIELD.name, raisingOrder);
 			}
 			if(number)
 			{
@@ -260,6 +207,11 @@ namespace synthese
 			}	}
 
 			return LoadFromQuery(query, env, linkLevel);
+		}
+
+		bool JunctionTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::READ);
 		}
 	}
 }

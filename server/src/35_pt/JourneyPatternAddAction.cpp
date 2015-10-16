@@ -25,16 +25,18 @@
 #include "JourneyPatternAddAction.hpp"
 
 #include "ActionException.h"
+#include "CommercialLineTableSync.h"
+#include "DBTransaction.hpp"
+#include "Destination.hpp"
+#include "JourneyPatternTableSync.hpp"
+#include "LineStopTableSync.h"
 #include "ParametersMap.h"
 #include "Profile.h"
+#include "Request.h"
+#include "RollingStock.hpp"
 #include "Session.h"
 #include "TransportNetworkRight.h"
 #include "User.h"
-#include "Request.h"
-#include "CommercialLineTableSync.h"
-#include "JourneyPatternTableSync.hpp"
-#include "LineStopTableSync.h"
-#include "DBTransaction.hpp"
 
 #include <geos/geom/LineString.h>
 

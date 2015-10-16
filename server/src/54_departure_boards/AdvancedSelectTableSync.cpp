@@ -84,13 +84,13 @@ namespace synthese
 					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << StopAreaTableSync::TABLE_COL_CITYID
 					<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS ps ON " 	<< " ps." << StopPointTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
 					<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineNode::FIELD.name
-					<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " as l ON l." << TABLE_COL_ID << "=ls." << Line::FIELD.name;
+					<< " INNER JOIN " << JourneyPatternCommercialLine::FIELD.name << " as l ON l." << TABLE_COL_ID << "=ls." << Line::FIELD.name;
 			// Where
 			query << " WHERE 1 ";
 			if (neededLevel > FORBIDDEN)
-				query << " AND l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel, false) << ")";
+				query << " AND l." << JourneyPatternCommercialLine::FIELD.name << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel, false) << ")";
 			if (lineId)
-				query << " AND l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=" << *lineId;
+				query << " AND l." << JourneyPatternCommercialLine::FIELD.name << "=" << *lineId;
 			if (!cityName.empty())
 				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(cityName, false) << "%'";
 			if (!placeName.empty())
@@ -182,7 +182,7 @@ namespace synthese
 			query << " SELECT "
 				<< "c." << TABLE_COL_ID << " AS " << TABLE_COL_ID
 				<< " FROM " << CommercialLineTableSync::TABLE.NAME << " AS c "
-				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=c." << TABLE_COL_ID
+				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << JourneyPatternCommercialLine::FIELD.name << "=c." << TABLE_COL_ID
 				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS s ON s." << Line::FIELD.name << "=l." << TABLE_COL_ID
 				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=s." << LineNode::FIELD.name
 				<< " INNER JOIN " << DisplayScreenTableSync::TABLE.NAME << " AS b ON b." << BroadCastPoint::FIELD.name << "=p." << StopPointTableSync::COL_PLACEID

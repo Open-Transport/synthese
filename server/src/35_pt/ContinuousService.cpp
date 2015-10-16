@@ -29,10 +29,12 @@
 #include "CommercialLine.h"
 #include "ContinuousServiceTableSync.h"
 #include "DBConstants.h"
+#include "Destination.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "PTUseRuleTableSync.h"
 #include "Registry.h"
+#include "RollingStock.hpp"
 
 using namespace std;
 using namespace boost;

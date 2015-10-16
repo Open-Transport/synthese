@@ -25,14 +25,15 @@
 #include "FreeDRTAreaUpdateAction.hpp"
 
 #include "ActionException.h"
+#include "CommercialLineTableSync.h"
+#include "FreeDRTAreaTableSync.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
+#include "Request.h"
+#include "RollingStock.hpp"
 #include "Session.h"
 #include "TransportNetworkRight.h"
 #include "User.h"
-#include "Request.h"
-#include "FreeDRTAreaTableSync.hpp"
-#include "CommercialLineTableSync.h"
 
 using namespace std;
 
@@ -68,11 +69,11 @@ namespace synthese
 			}
 			if(_cities)
 			{
-				map.insert(PARAMETER_CITIES, FreeDRTAreaTableSync::SerializeCities(*_cities));
+				map.insert(PARAMETER_CITIES, FreeDRTArea::SerializeCities(*_cities));
 			}
 			if(_stopAreas)
 			{
-				map.insert(PARAMETER_STOP_AREAS, FreeDRTAreaTableSync::SerializeStopAreas(*_stopAreas));
+				map.insert(PARAMETER_STOP_AREAS, FreeDRTArea::SerializeStopAreas(*_stopAreas));
 			}
 			if(_line && _line->get())
 			{
@@ -105,12 +106,12 @@ namespace synthese
 
 			if(map.isDefined(PARAMETER_CITIES))
 			{
-				_cities = FreeDRTAreaTableSync::UnserializeCities(map.get<string>(PARAMETER_CITIES), *_env);
+				_cities = FreeDRTArea::UnserializeCities(map.get<string>(PARAMETER_CITIES), *_env);
 			}
 
 			if(map.isDefined(PARAMETER_STOP_AREAS))
 			{
-				_stopAreas = FreeDRTAreaTableSync::UnserializeStopAreas(map.get<string>(PARAMETER_STOP_AREAS), *_env);
+				_stopAreas = FreeDRTArea::UnserializeStopAreas(map.get<string>(PARAMETER_STOP_AREAS), *_env);
 			}
 
 			if(map.getDefault<RegistryKeyType>(PARAMETER_COMMERCIAL_LINE_ID, 0))

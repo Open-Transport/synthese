@@ -62,24 +62,6 @@ namespace synthese
 		"35.30.01 Journey patterns"
 	);
 
-	namespace pt
-	{
-		const string JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID = "commercial_line_id";
-		const string JourneyPatternTableSync::COL_NAME ("name");
-		const string JourneyPatternTableSync::COL_TIMETABLENAME ("timetable_name");
-		const string JourneyPatternTableSync::COL_DIRECTION ("direction");
-		const string JourneyPatternTableSync::COL_DIRECTION_ID("direction_id");
-		const string JourneyPatternTableSync::COL_ISWALKINGLINE ("is_walking_line");
-		const string JourneyPatternTableSync::COL_ROLLINGSTOCKID ("rolling_stock_id");
-		const string JourneyPatternTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
-		const string JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
-		const string JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-		const string JourneyPatternTableSync::COL_WAYBACK("wayback");
-		const string JourneyPatternTableSync::COL_DATASOURCE_ID("data_source");
-		const string JourneyPatternTableSync::COL_MAIN("main");
-		const string JourneyPatternTableSync::COL_PLANNED_LENGTH = "planned_length";
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<JourneyPatternTableSync>::TABLE(
@@ -87,21 +69,6 @@ namespace synthese
 		);
 		template<> const Field DBTableSyncTemplate<JourneyPatternTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID, SQL_INTEGER),
-			Field(JourneyPatternTableSync::COL_NAME, SQL_TEXT),
-			Field(JourneyPatternTableSync::COL_TIMETABLENAME, SQL_TEXT),
-			Field(JourneyPatternTableSync::COL_DIRECTION, SQL_TEXT),
-			Field(JourneyPatternTableSync::COL_DIRECTION_ID, SQL_INTEGER),
-			Field(JourneyPatternTableSync::COL_ISWALKINGLINE, SQL_BOOLEAN),
-			Field(JourneyPatternTableSync::COL_ROLLINGSTOCKID, SQL_INTEGER),
-			Field(JourneyPatternTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
-			Field(JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
-			Field(JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			Field(JourneyPatternTableSync::COL_WAYBACK, SQL_INTEGER),
-			Field(JourneyPatternTableSync::COL_DATASOURCE_ID, SQL_TEXT),
-			Field(JourneyPatternTableSync::COL_MAIN, SQL_BOOLEAN),
-			Field(JourneyPatternTableSync::COL_PLANNED_LENGTH, SQL_DOUBLE),
 			Field()
 		};
 
@@ -109,74 +76,9 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<JourneyPatternTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID.c_str(), ""));
-			r.push_back(DBTableSync::Index(JourneyPatternTableSync::COL_DATASOURCE_ID.c_str(), ""));
+			r.push_back(DBTableSync::Index(JourneyPatternCommercialLine::FIELD.name.c_str(), ""));
+			r.push_back(DBTableSync::Index(LineDataSource::FIELD.name.c_str(), ""));
 			return r;
-		}
-
-
-		template<>
-		void OldLoadSavePolicy<JourneyPatternTableSync,JourneyPattern>::Load(
-			JourneyPattern* line,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			DBModule::LoadObjects(line->getLinkedObjectsIds(*rows), env, linkLevel);
-			line->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				line->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<JourneyPatternTableSync,JourneyPattern>::Save(
-			JourneyPattern* object,
-			optional<DBTransaction&> transaction
-		){
-			if(!object->getCommercialLine()) throw Exception("JourneyPattern save error. Missing commercial line");
-			ReplaceQuery<JourneyPatternTableSync> query(*object);
-			query.addField(object->getCommercialLine()->getKey());
-			query.addField(object->getName());
-			query.addField(object->getTimetableName());
-			query.addField(object->getDirection());
-			query.addField(object->getDirectionObj() ? object->getDirectionObj()->getKey() : RegistryKeyType(0));
-			query.addField(object->getWalkingLine());
-			query.addField(object->getRollingStock() ? object->getRollingStock()->getKey() : RegistryKeyType(0));
-			query.addField(
-				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() : RegistryKeyType(0)
-			);
-			query.addField(
-				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() : RegistryKeyType(0)
-			);
-			query.addField(
-				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() : RegistryKeyType(0)
-			);
-			query.addField(object->getWayBack());
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-			query.addField(object->getMain());
-			query.addField(object->getPlannedLength());
-			query.execute(transaction);
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<JourneyPatternTableSync,JourneyPattern>::Unlink(JourneyPattern* obj)
-		{
-			if(obj->getCommercialLine())
-			{
-				const_cast<CommercialLine*>(obj->getCommercialLine())->removePath(obj);
-			}
 		}
 
 
@@ -250,15 +152,15 @@ namespace synthese
 			SelectQuery<JourneyPatternTableSync> query;
 			if (commercialLineId)
 			{
-				query.addWhereField(COL_COMMERCIAL_LINE_ID, *commercialLineId);
+				query.addWhereField(JourneyPatternCommercialLine::FIELD.name, *commercialLineId);
 			}
 			if(wayback)
 			{
-				query.addWhereField(COL_WAYBACK, *wayback);
+				query.addWhereField(WayBack::FIELD.name, *wayback);
 			}
 			if (orderByName)
 			{
-				query.addOrderField(COL_NAME, raisingOrder);
+				query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 			}
 			if (number)
 			{

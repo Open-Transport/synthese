@@ -23,9 +23,10 @@
 #ifndef SYNTHESE_pt_Junction_hpp__
 #define SYNTHESE_pt_Junction_hpp__
 
-#include "Path.h"
+#include "Object.hpp"
 
 #include "FrameworkTypes.hpp"
+#include "Path.h"
 
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
@@ -34,6 +35,21 @@ namespace synthese
 	namespace pt
 	{
 		class StopPoint;
+
+		FIELD_POINTER(StartPhysicalStop, StopPoint)
+		FIELD_POINTER(EndPhysicalStop, StopPoint)
+		FIELD_INT(Length)
+		FIELD_INT(DurationMinutes)
+		FIELD_BOOL(Bidirectional)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(StartPhysicalStop),
+			FIELD(EndPhysicalStop),
+			FIELD(Length),
+			FIELD(DurationMinutes),
+			FIELD(Bidirectional)
+		> JunctionSchema;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Link between two stops allowing pedestrians to do a transfer outside of a StopArea.
@@ -44,6 +60,7 @@ namespace synthese
 		///
 		/// A junction corresponds to a fake public transportation line, supporting a PermanentService.
 		class Junction:
+			public Object<Junction, JunctionSchema>,
 			public graph::Path
 		{
 		public:
@@ -97,7 +114,8 @@ namespace synthese
 					StopPoint* end,
 					double length,
 					boost::posix_time::time_duration duration,
-					bool doBack
+					bool doBack,
+					bool setDBValues = true
 				);
 			//@}
 
@@ -109,11 +127,6 @@ namespace synthese
 				boost::logic::tribool withFiles = boost::logic::indeterminate,
 				std::string prefix = std::string()
 			) const;
-				
-			virtual bool loadFromRecord(
-				const Record& record,
-				util::Env& env
-			);
 
 			virtual SubObjects getSubObjects() const;
 
@@ -122,6 +135,10 @@ namespace synthese
 			) const;
 
 			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 
 		};
 	}

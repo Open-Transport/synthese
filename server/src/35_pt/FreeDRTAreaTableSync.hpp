@@ -27,7 +27,6 @@
 
 #include "FreeDRTArea.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -43,22 +42,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				FreeDRTAreaTableSync,
 				FreeDRTArea,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>
 		{
 		public:
-			//! @name Field names
-			//@{
-				static const std::string COL_COMMERCIAL_LINE_ID;
-				static const std::string COL_TRANSPORT_MODE_ID;
-				static const std::string COL_NAME;
-				static const std::string COL_CITIES;
-				static const std::string COL_STOP_AREAS;
-				static const std::string COL_USE_RULES;
-			//@}
-
-
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
@@ -83,26 +70,9 @@ namespace synthese
 					bool raisingOrder = true,
 					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 				);
-
-
-				static FreeDRTArea::Cities UnserializeCities(
-					const std::string& value,
-					util::Env& env,
-					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
-				);
-				static std::string SerializeCities(
-					const FreeDRTArea::Cities& value
-				);
-
-				static FreeDRTArea::StopAreas UnserializeStopAreas(
-					const std::string& value,
-					util::Env& env,
-					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
-				);
-				static std::string SerializeStopAreas(
-					const FreeDRTArea::StopAreas& value
-				);
 			//@}
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

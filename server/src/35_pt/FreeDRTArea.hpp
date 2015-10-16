@@ -23,14 +23,16 @@
 #ifndef SYNTHESE_pt_FreeDRTArea_hpp__
 #define SYNTHESE_pt_FreeDRTArea_hpp__
 
-#include "Registrable.h"
-#include "Registry.h"
-#include "Journey.h"
-#include "Exception.h"
-#include "Path.h"
+#include "Object.hpp"
+
 #include "Edge.h"
-#include "Vertex.h"
+#include "Exception.h"
 #include "Hub.h"
+#include "Journey.h"
+#include "Path.h"
+#include "Registry.h"
+#include "StringField.hpp"
+#include "Vertex.h"
 
 #include <set>
 #include <boost/thread/recursive_mutex.hpp>
@@ -55,6 +57,22 @@ namespace synthese
 		class StopArea;
 		class TransportNetwork;
 
+		FIELD_POINTER(FreeDRTAreaCommercialLine, CommercialLine)
+		FIELD_POINTER(FreeDRTAreaRollingStock, vehicle::RollingStock)
+		FIELD_STRING(FreeDRTAreaCities)
+		FIELD_STRING(FreeDRTAreaStopAreas)
+		FIELD_STRING(UseRules)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(FreeDRTAreaCommercialLine),
+			FIELD(FreeDRTAreaRollingStock),
+			FIELD(Name),
+			FIELD(FreeDRTAreaCities),
+			FIELD(FreeDRTAreaStopAreas),
+			FIELD(UseRules)
+		> FreeDRTAreaSchema;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Free DRT area.
 		/// Contracts :
@@ -64,12 +82,10 @@ namespace synthese
 		/// @author Hugues Romain
 		/// @date 2011
 		class FreeDRTArea:
+			public Object<FreeDRTArea, FreeDRTAreaSchema>,
 			public graph::Path
 		{
 		public:
-			/// Chosen registry class.
-			typedef util::Registry<FreeDRTArea>	Registry;
-
 			typedef std::set<geography::City*> Cities;
 			typedef std::set<StopArea*> StopAreas;
 
@@ -99,7 +115,6 @@ namespace synthese
 			//@{
 				Cities _cities;
 				StopAreas _stopAreas;
-				std::string _name;
 			//@}
 
 			/// @name Links
@@ -110,19 +125,21 @@ namespace synthese
 			FreeDRTArea(
 				util::RegistryKeyType key = 0
 			);
+			~FreeDRTArea();
 
 			//! @name Getters
 			//@{
-				virtual std::string getName() const { return _name; }
+				virtual std::string getName() const { return get<Name>(); }
 				const Cities& getCities() const { return _cities; }
 				const StopAreas& getStopAreas() const { return _stopAreas; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setCities(const Cities& value){ _cities = value; }
-				void setStopAreas(const StopAreas& value){ _stopAreas = value; }
-				void setName(const std::string& value){ _name = value; }
+				void setCities(const Cities& value);
+				void setStopAreas(const StopAreas& value);
+				void setName(const std::string& value){ set<Name>(value); }
+				virtual void setRules(const Rules& value);
 			//@}
 
 			/// @name Modifiers
@@ -195,6 +212,29 @@ namespace synthese
 					const geography::Place& to
 				) const;
 			//@}
+
+			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+			virtual void unlink();
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
+
+			static Cities UnserializeCities(
+				const std::string& value,
+				util::Env& env
+			);
+			static std::string SerializeCities(
+				const FreeDRTArea::Cities& value
+			);
+
+			static StopAreas UnserializeStopAreas(
+				const std::string& value,
+				util::Env& env
+			);
+			static std::string SerializeStopAreas(
+				const FreeDRTArea::StopAreas& value
+			);
 		};
 }	}
 

@@ -25,16 +25,17 @@
 #include "FreeDRTTimeSlotUpdateAction.hpp"
 
 #include "ActionException.h"
+#include "CommercialLineTableSync.h"
+#include "FreeDRTAreaTableSync.hpp"
+#include "FreeDRTTimeSlotTableSync.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
+#include "PTUseRuleTableSync.h"
+#include "Request.h"
+#include "RollingStock.hpp"
 #include "Session.h"
 #include "TransportNetworkRight.h"
 #include "User.h"
-#include "Request.h"
-#include "FreeDRTTimeSlotTableSync.hpp"
-#include "CommercialLineTableSync.h"
-#include "PTUseRuleTableSync.h"
-#include "FreeDRTAreaTableSync.hpp"
 
 using namespace std;
 using namespace boost::posix_time;

@@ -94,7 +94,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(AllPhysicalDisplayed, "all_physicals", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(ForbiddenArrivalPlaces, "forbidden_arrival_places_ids", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(AllowedLines, "allowed_lines_ids", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(Direction, "direction", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(departure_boards::Direction, "direction", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(OriginsOnly, "origins_only", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(DisplayedPlaces, "displayed_places_ids", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(MaxDelay, "max_delay", SQL_INTEGER)
@@ -160,7 +160,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(AllPhysicalDisplayed, true),
 					FIELD_DEFAULT_CONSTRUCTOR(ForbiddenArrivalPlaces),
 					FIELD_DEFAULT_CONSTRUCTOR(AllowedLines),
-					FIELD_DEFAULT_CONSTRUCTOR(Direction),
+					FIELD_DEFAULT_CONSTRUCTOR(departure_boards::Direction),
 					FIELD_DEFAULT_CONSTRUCTOR(OriginsOnly),
 					FIELD_DEFAULT_CONSTRUCTOR(DisplayedPlaces),
 					FIELD_VALUE_CONSTRUCTOR(MaxDelay, 12 * 60),// default = 24 hours
@@ -1162,7 +1162,7 @@ namespace synthese
 		
 		void DisplayScreen::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
-			setDirection(static_cast<DeparturesTableDirection>(get<Direction>()));
+			setDirection(static_cast<DeparturesTableDirection>(get<departure_boards::Direction>()));
 			setOriginsOnly(static_cast<EndFilter>(get<OriginsOnly>()));
 			setGenerationMethod(static_cast<GenerationMethod>(get<GenerationMethodCode>()));
 			setSubScreenType(static_cast<SubScreenType>(get<SubScreenTypeCode>()));

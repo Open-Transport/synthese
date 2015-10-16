@@ -59,16 +59,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,FreeDRTAreaTableSync>::FACTORY_KEY("35.80 Free DRT Areas");
 	}
 
-	namespace pt
-	{
-		const string FreeDRTAreaTableSync::COL_COMMERCIAL_LINE_ID = "commercial_line_id";
-		const string FreeDRTAreaTableSync::COL_TRANSPORT_MODE_ID = "transport_mode_id";
-		const string FreeDRTAreaTableSync::COL_NAME = "name";
-		const string FreeDRTAreaTableSync::COL_CITIES = "cities";
-		const string FreeDRTAreaTableSync::COL_STOP_AREAS = "stop_areas";
-		const string FreeDRTAreaTableSync::COL_USE_RULES = "use_rules";
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<FreeDRTAreaTableSync>::TABLE(
@@ -79,13 +69,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<FreeDRTAreaTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(FreeDRTAreaTableSync::COL_COMMERCIAL_LINE_ID, SQL_INTEGER),
-			Field(FreeDRTAreaTableSync::COL_TRANSPORT_MODE_ID, SQL_INTEGER),
-			Field(FreeDRTAreaTableSync::COL_NAME, SQL_TEXT),
-			Field(FreeDRTAreaTableSync::COL_CITIES, SQL_TEXT),
-			Field(FreeDRTAreaTableSync::COL_STOP_AREAS, SQL_TEXT),
-			Field(FreeDRTAreaTableSync::COL_USE_RULES, SQL_TEXT),
 			Field()
 		};
 
@@ -97,115 +80,9 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					FreeDRTAreaTableSync::COL_COMMERCIAL_LINE_ID.c_str(),
+					FreeDRTAreaCommercialLine::FIELD.name.c_str(),
 			"")	);
 			return r;
-		};
-
-
-
-		template<> void OldLoadSavePolicy<FreeDRTAreaTableSync,FreeDRTArea>::Load(
-			FreeDRTArea* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			// Commercial lines
-			object->setLine(NULL);
-			object->setNetwork(NULL);
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				RegistryKeyType commercialLineId(rows->getLongLong (FreeDRTAreaTableSync::COL_COMMERCIAL_LINE_ID));
-				if(commercialLineId) try
-				{
-					CommercialLine* cline(CommercialLineTableSync::GetEditable(commercialLineId, env, linkLevel).get());
-					object->setNetwork(cline->getNetwork());
-					object->setLine(cline);
-				}
-				catch(ObjectNotFoundException<CommercialLine>)
-				{
-					Log::GetInstance().warn("Bad value " + lexical_cast<string>(commercialLineId) + " for line in free DRT area " + lexical_cast<string>(object->getKey()));
-				}
-			}
-
-			// Transport mode id
-			object->setRollingStock(NULL);
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				RegistryKeyType transportModeId(rows->getLongLong (FreeDRTAreaTableSync::COL_TRANSPORT_MODE_ID));
-				if(transportModeId)	try
-				{
-					RollingStock* transportMode(RollingStockTableSync::GetEditable(transportModeId, env, linkLevel).get());
-					object->setRollingStock(transportMode);
-				}
-				catch(ObjectNotFoundException<RollingStock>)
-				{
-					Log::GetInstance().warn("Bad value " + lexical_cast<string>(transportModeId) + " for transport mode in free DRT area " + lexical_cast<string>(object->getKey()));
-				}
-			}
-
-			// Name
-			object->setName(rows->getText(FreeDRTAreaTableSync::COL_NAME));
-
-			// Cities
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				object->setCities(
-					FreeDRTAreaTableSync::UnserializeCities(
-						rows->getText(FreeDRTAreaTableSync::COL_CITIES),
-						env,
-						linkLevel
-				)	);
-			}
-
-			// Stop areas
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				object->setStopAreas(
-					FreeDRTAreaTableSync::UnserializeStopAreas(
-						rows->getText(FreeDRTAreaTableSync::COL_STOP_AREAS),
-						env,
-						linkLevel
-				)	);
-			}
-
-			// Use rules
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				object->setRules(
-					PTUseRuleTableSync::UnserializeUseRules(
-						rows->getText(FreeDRTAreaTableSync::COL_USE_RULES),
-						env,
-						linkLevel
-				)	);
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<FreeDRTAreaTableSync,FreeDRTArea>::Save(
-			FreeDRTArea* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<FreeDRTAreaTableSync> query(*object);
-			query.addField(object->getLine() ? object->getLine()->getKey() : RegistryKeyType(0));
-			query.addField(object->getRollingStock() ? object->getRollingStock()->getKey() : RegistryKeyType(0));
-			query.addField(object->getName());
-			query.addField(FreeDRTAreaTableSync::SerializeCities(object->getCities()));
-			query.addField(FreeDRTAreaTableSync::SerializeStopAreas(object->getStopAreas()));
-			query.addField(PTUseRuleTableSync::SerializeUseRules(object->getRules()));
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<FreeDRTAreaTableSync,FreeDRTArea>::Unlink(
-			FreeDRTArea* obj
-		){
-			if(obj->getLine())
-			{
-				const_cast<CommercialLine*>(obj->getLine())->removePath(obj);
-			}
 		}
 
 
@@ -266,11 +143,11 @@ namespace synthese
 			SelectQuery<FreeDRTAreaTableSync> query;
 			if(lineId)
 			{
-			 	query.addWhereField(COL_COMMERCIAL_LINE_ID, *lineId);
+			 	query.addWhereField(FreeDRTAreaCommercialLine::FIELD.name, *lineId);
 			}
 			if(orderByName)
 			{
-			 	query.addOrderField(COL_NAME, raisingOrder);
+			 	query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 			}
 			if (number)
 			{
@@ -286,102 +163,8 @@ namespace synthese
 
 
 
-		FreeDRTArea::Cities FreeDRTAreaTableSync::UnserializeCities(
-			const std::string& value,
-			util::Env& env,
-			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
-		){
-			FreeDRTArea::Cities result;
-			if(!value.empty())
-			{
-				vector<string> cities;
-				split(cities, value, is_any_of(","));
-				BOOST_FOREACH(const string& city, cities)
-				{
-					try
-					{
-						RegistryKeyType cityId(lexical_cast<RegistryKeyType>(city));
-						result.insert(
-							CityTableSync::GetEditable(cityId, env, linkLevel).get()
-						);
-					}
-					catch(ObjectNotFoundException<City>&)
-					{
-					}
-				}
-			}
-			return result;
-		}
-
-
-
-		std::string FreeDRTAreaTableSync::SerializeCities( const FreeDRTArea::Cities& value )
+		bool FreeDRTAreaTableSync::allowList(const server::Session* session) const
 		{
-			stringstream s;
-			bool first(true);
-			BOOST_FOREACH(const FreeDRTArea::Cities::value_type& city, value)
-			{
-				if(first)
-				{
-					first = false;
-				}
-				else
-				{
-					s << ",";
-				}
-				s << city->getKey();
-			}
-			return s.str();
-		}
-
-
-
-		FreeDRTArea::StopAreas FreeDRTAreaTableSync::UnserializeStopAreas(
-			const std::string& value,
-			util::Env& env,
-			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
-		){
-			FreeDRTArea::StopAreas result;
-			if(!value.empty())
-			{
-				vector<string> stopAreas;
-				split(stopAreas, value, is_any_of(","));
-				BOOST_FOREACH(const string& stopArea, stopAreas)
-				{
-					try
-					{
-						RegistryKeyType stopAreaId(lexical_cast<RegistryKeyType>(stopArea));
-						result.insert(
-							StopAreaTableSync::GetEditable(stopAreaId, env, linkLevel).get()
-						);
-					}
-					catch(ObjectNotFoundException<City>&)
-					{
-					}
-				}
-			}
-			return result;
-
-		}
-
-
-
-		std::string FreeDRTAreaTableSync::SerializeStopAreas( const FreeDRTArea::StopAreas& value )
-		{
-			stringstream s;
-			bool first(true);
-			BOOST_FOREACH(const FreeDRTArea::StopAreas::value_type& stopArea, value)
-			{
-				if(first)
-				{
-					first = false;
-				}
-				else
-				{
-					s << ",";
-				}
-				s << stopArea->getKey();
-			}
-			return s.str();
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::READ);
 		}
 }	}

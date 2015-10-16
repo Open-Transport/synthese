@@ -25,14 +25,16 @@
 #include <sstream>
 
 #include "FreeDRTTimeSlotTableSync.hpp"
-#include "ReplaceQuery.h"
-#include "SelectQuery.hpp"
-#include "CommercialLineTableSync.h"
+
+#include "CalendarLink.hpp"
+#include "CalendarLinkTableSync.hpp"
 #include "CityTableSync.h"
+#include "CommercialLineTableSync.h"
 #include "FreeDRTAreaTableSync.hpp"
 #include "PTUseRuleTableSync.h"
-#include "CalendarLinkTableSync.hpp"
-#include "CalendarLink.hpp"
+#include "ReplaceQuery.h"
+#include "RollingStock.hpp"
+#include "SelectQuery.hpp"
 
 #include <boost/algorithm/string/split.hpp>
 

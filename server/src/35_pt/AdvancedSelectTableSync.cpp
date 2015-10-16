@@ -57,7 +57,7 @@ namespace synthese
 				<< "SELECT ls." << TABLE_COL_ID << " FROM "
 				<< LineStopTableSync::TABLE.NAME << " AS ls "
 				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineNode::FIELD.name
-				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=ls." << Line::FIELD.name
+				<< " AND l." << JourneyPatternCommercialLine::FIELD.name << "=" << lineId
 				<< " WHERE "
 				<< "p." << StopPointTableSync::COL_PLACEID << "=" << placeId
 				<< " AND l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineId
@@ -74,7 +74,7 @@ namespace synthese
 				<< LineStopTableSync::TABLE.NAME << " AS ls "
 				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineNode::FIELD.name
 				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=ls." << Line::FIELD.name
-				<< " INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID
+				<< " INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=l." << JourneyPatternCommercialLine::FIELD.name
 				<< " WHERE "
 				<< "p." << StopPointTableSync::COL_PLACEID << "=" << placeId
 				<< " AND c." << Network::FIELD.name << "=" << networkId

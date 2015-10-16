@@ -27,7 +27,6 @@
 
 #include "Junction.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -42,21 +41,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				JunctionTableSync,
 				Junction,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>
 		{
 		public:
-			//! @name Field names
-			//@{
-				static const std::string COL_START_PHYSICAL_STOP_ID;
-				static const std::string COL_END_PHYSICAL_STOP_ID;
-				static const std::string COL_LENGTH;
-				static const std::string COL_DURATION;
-				static const std::string COL_BIDIRECTIONAL;
-			//@}
-
-
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
@@ -83,6 +71,8 @@ namespace synthese
 					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 				);
 			//@}
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

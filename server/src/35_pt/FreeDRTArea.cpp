@@ -21,14 +21,22 @@
 */
 
 #include "FreeDRTArea.hpp"
+
+#include "City.h"
+#include "CityTableSync.h"
+#include "CommercialLine.h"
 #include "FreeDRTTimeSlot.hpp"
 #include "NamedPlace.h"
-#include "CommercialLine.h"
-#include "RollingStock.hpp"
-#include "TransportNetwork.h"
+#include "Profile.h"
 #include "PTModule.h"
-#include "City.h"
+#include "PTUseRule.h"
+#include "PTUseRuleTableSync.h"
+#include "RollingStock.hpp"
 #include "StopArea.hpp"
+#include "StopAreaTableSync.hpp"
+#include "TransportNetwork.h"
+#include "TransportNetworkRight.h"
+#include "User.h"
 
 #include <boost/foreach.hpp>
 
@@ -39,22 +47,42 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace util;
-	using namespace graph;
 	using namespace geography;
+	using namespace graph;
+	using namespace pt;
+	using namespace util;
 	using namespace vehicle;
 
-	namespace util
-	{
-		template<> const string Registry<pt::FreeDRTArea>::KEY("FreeDRTArea");
-	}
+	CLASS_DEFINITION(FreeDRTArea, "t082_free_drt_areas", 82)
+	FIELD_DEFINITION_OF_OBJECT(FreeDRTArea, "free_drt_area_id", "free_drt_area_ids")
+
+	FIELD_DEFINITION_OF_TYPE(FreeDRTAreaCommercialLine, "commercial_line_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(FreeDRTAreaRollingStock, "transport_mode_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(FreeDRTAreaCities, "cities", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(FreeDRTAreaStopAreas, "stop_areas", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(UseRules, "use_rules", SQL_TEXT)
 
 	namespace pt
 	{
 		FreeDRTArea::FreeDRTArea(
 			util::RegistryKeyType key /*= 0 */
-		):	Registrable(key)
+		):	Registrable(key),
+			Object<FreeDRTArea, FreeDRTAreaSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_DEFAULT_CONSTRUCTOR(FreeDRTAreaCommercialLine),
+					FIELD_DEFAULT_CONSTRUCTOR(FreeDRTAreaRollingStock),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(FreeDRTAreaCities),
+					FIELD_DEFAULT_CONSTRUCTOR(FreeDRTAreaStopAreas),
+					FIELD_DEFAULT_CONSTRUCTOR(UseRules)
+			)	)
 		{}
+
+		FreeDRTArea::~FreeDRTArea()
+		{
+			unlink();
+		}
 
 
 
@@ -206,6 +234,9 @@ namespace synthese
 		void FreeDRTArea::setLine( CommercialLine* value )
 		{
 			_pathGroup = value;
+			set<FreeDRTAreaCommercialLine>(value
+				? boost::optional<CommercialLine&>(*value)
+				: boost::none);
 		}
 
 
@@ -213,6 +244,9 @@ namespace synthese
 		void FreeDRTArea::setRollingStock( RollingStock* value)
 		{
 			_pathClass = static_cast<PathClass*>(value);
+			set<FreeDRTAreaRollingStock>(value
+				? boost::optional<RollingStock&>(*value)
+				: boost::none);
 		}
 		void FreeDRTArea::setNetwork( TransportNetwork* value)
 		{
@@ -242,7 +276,7 @@ namespace synthese
 
 			// Declarations
 			ReachableStopAreas result;
-			set<StopArea*> attemptedStopAreas;
+			std::set<StopArea*> attemptedStopAreas;
 
 			// Loop on cities
 			BOOST_FOREACH(City* city, _cities)
@@ -363,4 +397,167 @@ namespace synthese
 				") cannot use it."
 			)
 		{}
+
+		void FreeDRTArea::link(util::Env& env, bool withAlgorithmOptimizations)
+		{
+			if(get<FreeDRTAreaCommercialLine>())
+			{
+				_pathGroup = get<FreeDRTAreaCommercialLine>().get_ptr();
+			}
+			else
+			{
+				_pathGroup = NULL;
+			}
+			if(get<FreeDRTAreaCommercialLine>())
+			{
+				setNetwork(get<FreeDRTAreaCommercialLine>()->getNetwork());
+			}
+			else
+			{
+				setNetwork(NULL);
+			}
+
+			_cities = UnserializeCities(get<FreeDRTAreaCities>(), env);
+			_stopAreas = UnserializeStopAreas(get<FreeDRTAreaStopAreas>(), env);
+
+			RuleUser::setRules(
+				PTUseRuleTableSync::UnserializeUseRules(
+					get<UseRules>(),
+					env
+			)	);
+		}
+
+		void FreeDRTArea::unlink()
+		{
+			if(getLine())
+			{
+				const_cast<CommercialLine*>(getLine())->removePath(this);
+			}
+		}
+
+		void FreeDRTArea::setCities(const Cities& value)
+		{
+			_cities = value;
+			string strCities = SerializeCities(_cities);
+			set<FreeDRTAreaCities>(strCities);
+		}
+
+		void FreeDRTArea::setStopAreas(const StopAreas& value)
+		{
+			_stopAreas = value;
+			string strStopAreas = SerializeStopAreas(_stopAreas);
+			set<FreeDRTAreaStopAreas>(strStopAreas);
+		}
+
+		void FreeDRTArea::setRules(const Rules& value)
+		{
+			RuleUser::setRules(value);
+			string strUseRules = PTUseRuleTableSync::SerializeUseRules(value);
+			set<UseRules>(strUseRules);
+		}
+
+		bool FreeDRTArea::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::WRITE);
+		}
+
+		bool FreeDRTArea::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::WRITE);
+		}
+
+		bool FreeDRTArea::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::DELETE_RIGHT);
+		}
+
+		FreeDRTArea::Cities FreeDRTArea::UnserializeCities(
+			const std::string& value,
+			util::Env& env
+		){
+			FreeDRTArea::Cities result;
+			if(!value.empty())
+			{
+				vector<string> cities;
+				split(cities, value, is_any_of(","));
+				BOOST_FOREACH(const string& city, cities)
+				{
+					try
+					{
+						RegistryKeyType cityId(lexical_cast<RegistryKeyType>(city));
+						result.insert(
+							CityTableSync::GetEditable(cityId, env).get()
+						);
+					}
+					catch(ObjectNotFoundException<City>&)
+					{
+					}
+				}
+			}
+			return result;
+		}
+
+		std::string FreeDRTArea::SerializeCities( const FreeDRTArea::Cities& value )
+		{
+			stringstream s;
+			bool first(true);
+			BOOST_FOREACH(const FreeDRTArea::Cities::value_type& city, value)
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					s << ",";
+				}
+				s << city->getKey();
+			}
+			return s.str();
+		}
+
+		FreeDRTArea::StopAreas FreeDRTArea::UnserializeStopAreas(
+			const std::string& value,
+			util::Env& env
+		){
+			FreeDRTArea::StopAreas result;
+			if(!value.empty())
+			{
+				vector<string> stopAreas;
+				split(stopAreas, value, is_any_of(","));
+				BOOST_FOREACH(const string& stopArea, stopAreas)
+				{
+					try
+					{
+						RegistryKeyType stopAreaId(lexical_cast<RegistryKeyType>(stopArea));
+						result.insert(
+							StopAreaTableSync::GetEditable(stopAreaId, env).get()
+						);
+					}
+					catch(ObjectNotFoundException<City>&)
+					{
+					}
+				}
+			}
+			return result;
+		}
+
+		std::string FreeDRTArea::SerializeStopAreas( const FreeDRTArea::StopAreas& value )
+		{
+			stringstream s;
+			bool first(true);
+			BOOST_FOREACH(const FreeDRTArea::StopAreas::value_type& stopArea, value)
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					s << ",";
+				}
+				s << stopArea->getKey();
+			}
+			return s.str();
+		}
 }	}

@@ -107,7 +107,7 @@ namespace synthese
 					return "(SELECT c."+ ShortName::FIELD.name +
 						" FROM "+ CommercialLineTableSync::TABLE.NAME +" AS c " +
 						"INNER JOIN "+ JourneyPatternTableSync::TABLE.NAME +" AS jp ON "+
-							"jp."+ JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID +"=c."+ TABLE_COL_ID +
+							"jp."+ JourneyPatternCommercialLine::FIELD.name +"=c."+ TABLE_COL_ID +
 						" INNER JOIN "+ ScheduledServiceTableSync::TABLE.NAME +" AS s ON "
 							"s."+ ScheduledServiceTableSync::COL_PATHID +"=jp."+ TABLE_COL_ID +
 						" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_SERVICE_ID +")";
@@ -118,7 +118,7 @@ namespace synthese
 			else
 			{
 				if(step == LINE_STEP)
-					return "(SELECT jp."+ JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID +
+					return "(SELECT jp."+ JourneyPatternCommercialLine::FIELD.name +
 						" FROM "+ JourneyPatternTableSync::TABLE.NAME +" AS jp "+
 						"INNER JOIN "+ ScheduledServiceTableSync::TABLE.NAME +" AS s ON "+
 							"s."+ ScheduledServiceTableSync::COL_PATHID +"=jp."+ TABLE_COL_ID +

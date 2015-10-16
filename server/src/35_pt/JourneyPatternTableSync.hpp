@@ -31,7 +31,6 @@
 #include "JourneyPattern.hpp"
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -51,27 +50,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				JourneyPatternTableSync,
 				JourneyPattern,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>
 		{
 		public:
-			static const std::string COL_COMMERCIAL_LINE_ID;
-			static const std::string COL_NAME;
-			static const std::string COL_TIMETABLENAME;
-			static const std::string COL_DIRECTION;
-			static const std::string COL_DIRECTION_ID;
-			static const std::string COL_ISWALKINGLINE;
-			static const std::string COL_ROLLINGSTOCKID;
-			static const std::string COL_BIKECOMPLIANCEID;
-			static const std::string COL_HANDICAPPEDCOMPLIANCEID;
-			static const std::string COL_PEDESTRIANCOMPLIANCEID;
-			static const std::string COL_WAYBACK;
-			static const std::string COL_DATASOURCE_ID;
-			static const std::string COL_MAIN;
-			static const std::string COL_PLANNED_LENGTH;
-
-
 			/** JourneyPattern search.
 				@param commercialLineId Id of commercial line which must belong the results (undefined = all lines)
 				@param first First JourneyPattern object to answer

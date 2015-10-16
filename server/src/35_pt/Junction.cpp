@@ -22,12 +22,15 @@
 
 #include "Junction.hpp"
 
+#include "AllowedUseRule.h"
 #include "JunctionStop.hpp"
 #include "JunctionTableSync.hpp"
 #include "PermanentService.h"
+#include "Profile.h"
 #include "StopPointTableSync.hpp"
 #include "StopArea.hpp"
-#include "AllowedUseRule.h"
+#include "TransportNetworkRight.h"
+#include "User.h"
 
 using namespace boost;
 using namespace boost::posix_time;
@@ -40,16 +43,29 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 
-	namespace util
-	{
-		template<> const string Registry<pt::Junction>::KEY("Junction");
-	}
+	CLASS_DEFINITION(Junction, "t066_junctions", 66)
+	FIELD_DEFINITION_OF_OBJECT(Junction, "junction_id", "junctions_ids")
+
+	FIELD_DEFINITION_OF_TYPE(StartPhysicalStop, "start_physical_stop", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(EndPhysicalStop, "end_physical_stop", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Length, "length", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(DurationMinutes, "duration", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Bidirectional, "bidirectional", SQL_BOOLEAN)
 
 	namespace pt
 	{
 		Junction::Junction(
 			util::RegistryKeyType id
-		):	Registrable(id)
+		):	Registrable(id),
+			Object<Junction, JunctionSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(StartPhysicalStop),
+					FIELD_DEFAULT_CONSTRUCTOR(EndPhysicalStop),
+					FIELD_DEFAULT_CONSTRUCTOR(Length),
+					FIELD_DEFAULT_CONSTRUCTOR(DurationMinutes),
+					FIELD_DEFAULT_CONSTRUCTOR(Bidirectional)
+			)	)
 		{
 			// Default use rules
 			RuleUser::Rules rules(getRules());
@@ -73,7 +89,8 @@ namespace synthese
 			StopPoint* end,
 			double length,
 			boost::posix_time::time_duration duration,
-			bool doBack
+			bool doBack,
+			bool setDBValues
 		){
 			// Cleaning existing data
 			if(!_edges.empty())
@@ -113,6 +130,19 @@ namespace synthese
 			{
 				_back.reset(new Junction);
 				_back->setStops(end, start, length, duration, false);
+			}
+
+			if (setDBValues)
+			{
+				set<StartPhysicalStop>(start
+					? boost::optional<StopPoint&>(*start)
+					: boost::none);
+				set<EndPhysicalStop>(end
+					? boost::optional<StopPoint&>(*end)
+					: boost::none);
+				set<Length>(length);
+				set<DurationMinutes>(duration.minutes());
+				set<Bidirectional>(doBack);
 			}
 		}
 
@@ -228,107 +258,25 @@ namespace synthese
 		{
 			pm.insert(TABLE_COL_ID, getKey());
 			pm.insert(
-				JunctionTableSync::COL_START_PHYSICAL_STOP_ID,
+				StartPhysicalStop::FIELD.name,
 				isValid() ? getStart()->getKey() : RegistryKeyType(0)
 			);
 			pm.insert(
-				JunctionTableSync::COL_END_PHYSICAL_STOP_ID,
+				EndPhysicalStop::FIELD.name,
 				isValid() ? getEnd()->getKey() : RegistryKeyType(0)
 			);
 			pm.insert(
-				JunctionTableSync::COL_LENGTH,
+				Length::FIELD.name,
 				isValid() ? getLength() : double(0)
 			);
 			pm.insert(
-				JunctionTableSync::COL_DURATION,
+				DurationMinutes::FIELD.name,
 				isValid() ? getDuration().total_seconds() / 60 : 0
 			);
 			pm.insert(
-				JunctionTableSync::COL_BIDIRECTIONAL,
+				Bidirectional::FIELD.name,
 				getBack() != NULL
 			);
-		}
-
-
-
-		bool Junction::loadFromRecord( const Record& record, util::Env& env )
-		{
-			bool result(false);
-
-			RegistryKeyType sid(isValid() ? getStart()->getKey() : RegistryKeyType(0));
-			if(record.isDefined(JunctionTableSync::COL_START_PHYSICAL_STOP_ID))
-			{
-				RegistryKeyType value(record.getDefault<RegistryKeyType>(JunctionTableSync::COL_START_PHYSICAL_STOP_ID, 0));
-				if(sid != value)
-				{
-					result = true;
-					sid = value;
-				}
-			}
-
-			RegistryKeyType eid(isValid() ? getEnd()->getKey() : RegistryKeyType(0));
-			if(record.isDefined(JunctionTableSync::COL_END_PHYSICAL_STOP_ID))
-			{
-				RegistryKeyType value(record.getDefault<RegistryKeyType>(JunctionTableSync::COL_END_PHYSICAL_STOP_ID, 0));
-				if(eid != value)
-				{
-					eid = value;
-					result = true;
-				}
-			}
-
-			double length(isValid() ? getLength() : double(0));
-			if(record.isDefined(JunctionTableSync::COL_LENGTH))
-			{
-				double value(record.getDefault<double>(JunctionTableSync::COL_LENGTH, 0.0));
-				if(value != length)
-				{
-					length = value;
-					result = true;
-				}
-			}
-
-			time_duration duration(minutes(isValid() ? getDuration().total_seconds() / 60 : 0));
-			if(record.isDefined(JunctionTableSync::COL_DURATION))
-			{
-				time_duration value(minutes(record.getDefault<long>(JunctionTableSync::COL_DURATION, 0)));
-				if(value != duration)
-				{
-					duration = value;
-					result = true;
-				}
-			}
-
-			bool bidir(getBack() != NULL);
-			if(record.isDefined(JunctionTableSync::COL_BIDIRECTIONAL))
-			{
-				bool value(record.getDefault<bool>(JunctionTableSync::COL_BIDIRECTIONAL, true));
-				if(value != bidir)
-				{
-					bidir = value;
-					result = true;
-				}
-			}
-
-			if(result && sid > 0 && eid > 0)
-			{
-				try
-				{
-					setStops(
-						StopPointTableSync::GetEditable(sid, env).get(),
-						StopPointTableSync::GetEditable(eid, env).get(),
-						length,
-						duration,
-						bidir
-					);
-				}
-				catch(ObjectNotFoundException<StopPoint>&)
-				{
-					Log::GetInstance().warn("No such stop in Junction "+ lexical_cast<string>(getKey()));
-				}
-			}
-
-			return result;
 		}
 
 
@@ -344,12 +292,12 @@ namespace synthese
 		synthese::LinkedObjectsIds Junction::getLinkedObjectsIds( const Record& record ) const
 		{
 			LinkedObjectsIds result;
-			RegistryKeyType sid(record.getDefault<RegistryKeyType>(JunctionTableSync::COL_START_PHYSICAL_STOP_ID, 0));
+			RegistryKeyType sid(get<StartPhysicalStop>() ? get<StartPhysicalStop>()->getKey() : RegistryKeyType(0));
 			if(sid)
 			{
 				result.push_back(sid);
 			}
-			RegistryKeyType eid(record.getDefault<RegistryKeyType>(JunctionTableSync::COL_END_PHYSICAL_STOP_ID, 0));
+			RegistryKeyType eid(get<EndPhysicalStop>() ? get<EndPhysicalStop>()->getKey() : RegistryKeyType(0));
 			if(eid)
 			{
 				result.push_back(eid);
@@ -361,7 +309,40 @@ namespace synthese
 
 		void Junction::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
+			time_duration duration(minutes(get<DurationMinutes>()));
+			try
+			{
+				if (get<StartPhysicalStop>() && get<EndPhysicalStop>())
+				{
+					setStops(
+						get<StartPhysicalStop>().get_ptr(),
+						get<EndPhysicalStop>().get_ptr(),
+						get<Length>(),
+						duration,
+						get<Bidirectional>(),
+						false
+					);
+				}
+			}
+			catch(ObjectNotFoundException<StopPoint>&)
+			{
+				Log::GetInstance().warn("No such stop in Junction "+ lexical_cast<string>(getKey()));
+			}
+		}
 
+		bool Junction::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::WRITE);
+		}
+
+		bool Junction::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::WRITE);
+		}
+
+		bool Junction::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::DELETE_RIGHT);
 		}
 
 }	}

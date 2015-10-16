@@ -220,7 +220,7 @@ namespace synthese
 					query.addWhere(
 						ComposedExpression::Get(
 							FieldExpression::Get(
-								JourneyPatternTableSync::TABLE.NAME, JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID
+								JourneyPatternTableSync::TABLE.NAME, JourneyPatternCommercialLine::FIELD.name
 							),
 							ComposedExpression::OP_IN,
 							SubQueryExpression::Get(
@@ -237,7 +237,7 @@ namespace synthese
 				}
 				if (lineid)
 				{
-					query.addWhereFieldOther<JourneyPatternTableSync>(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID, *lineid);
+					query.addWhereFieldOther<JourneyPatternTableSync>(JourneyPatternCommercialLine::FIELD.name, *lineid);
 				}
 			}
 			if(state)

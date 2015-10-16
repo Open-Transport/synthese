@@ -243,7 +243,7 @@ namespace synthese
 			}
 			if (commercialLineId)
 			{
-				query << " AND l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=" << *commercialLineId;
+				query << " AND l." << JourneyPatternCommercialLine::FIELD.name << "=" << *commercialLineId;
 			}
 			if (orderByDepartureTime)
 			{

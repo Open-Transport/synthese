@@ -25,15 +25,17 @@
 #include "JourneyPatternRankContinuityRestoreAction.hpp"
 
 #include "ActionException.h"
+#include "Destination.hpp"
+#include "JourneyPatternTableSync.hpp"
+#include "LineStopTableSync.h"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "Request.h"
+#include "RollingStock.hpp"
 #include "Session.h"
-#include "User.h"
-#include "JourneyPatternTableSync.hpp"
-#include "LineStopTableSync.h"
 #include "TransportNetworkRight.h"
 #include "UpdateQuery.hpp"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

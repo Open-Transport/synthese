@@ -291,7 +291,7 @@ namespace synthese
 				query.addWhere(
 					ComposedExpression::Get(
 						SubQueryExpression::Get(
-							string("SELECT b."+ JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID +" FROM "+ JourneyPatternTableSync::TABLE.NAME +" AS b WHERE b."+ TABLE_COL_ID +"="+ TABLE.NAME +"."+ COL_PATHID)
+							string("SELECT b."+ JourneyPatternCommercialLine::FIELD.name +" FROM "+ JourneyPatternTableSync::TABLE.NAME +" AS b WHERE b."+ TABLE_COL_ID +"="+ TABLE.NAME +"."+ COL_PATHID)
 						), ComposedExpression::OP_EQ,
 						ValueExpression<RegistryKeyType>::Get(*commercialLineId)
 					)

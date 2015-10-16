@@ -28,11 +28,15 @@
 
 #include <boost/logic/tribool.hpp>
 
-#include "Path.h"
-#include "ImportableTemplate.hpp"
-#include "Registry.h"
+#include "Object.hpp"
+
 #include "Calendar.h"
+#include "CommercialLine.h"
+#include "DataSourceLinksField.hpp"
 #include "Edge.h"
+#include "ImportableTemplate.hpp"
+#include "Path.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -65,6 +69,35 @@ namespace synthese
 		class LineAlarmBroadcast;
 		class CommercialLine;
 
+		FIELD_POINTER(JourneyPatternCommercialLine, CommercialLine)
+		FIELD_STRING(TimetableName)
+		FIELD_STRING(Direction)
+		FIELD_POINTER(LineDestination, Destination)
+		FIELD_BOOL(IsWalkingLine)
+		FIELD_POINTER(LineRollingStock, vehicle::RollingStock)
+		FIELD_BOOL(WayBack)
+		FIELD_DATASOURCE_LINKS(LineDataSource)
+		FIELD_BOOL(Main)
+		FIELD_DOUBLE(PlannedLength)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(JourneyPatternCommercialLine),
+			FIELD(TimetableName),					//!< Name for timetable
+			FIELD(Direction),						//!< Direction (shown on vehicles)
+			FIELD(LineDestination),
+			FIELD(IsWalkingLine),
+			FIELD(LineRollingStock),
+			FIELD(BikeComplianceId),
+			FIELD(HandicappedComplianceId),
+			FIELD(PedestrianComplianceId),
+			FIELD(WayBack),							//!< true if back route, false else (forward route or unknown)
+			FIELD(LineDataSource),
+			FIELD(Main),
+			FIELD(PlannedLength)					//!< For DRT
+		> JourneyPatternSchema;
+
 		struct cmpLineStop
 		{
 		    bool operator() (const LineStop* s1, const LineStop* s2) const;
@@ -88,31 +121,18 @@ namespace synthese
 			NB : la correspondance entre deux services d'une même ligne est interdite, sauf dans les axes libres.
 		*/
 		class JourneyPattern:
+			public Object<JourneyPattern, JourneyPatternSchema>,
 			public graph::Path,
 			public impex::ImportableTemplate<JourneyPattern>
 		{
 		public:
 			static const std::string ATTR_DIRECTION_TEXT;
 
-			/// Chosen registry class.
-			typedef util::Registry<JourneyPattern>	Registry;
-
 			typedef std::set<LineStop*, cmpLineStop> LineStops;
 
 		private:
-			std::string _timetableName; //!< Name for timetable
-			std::string _direction;		//!< Direction (shown on vehicles)
-			Destination* _directionObj;
-			std::string _name;
-			bool _isWalkingLine;
 			mutable boost::optional<calendar::Calendar> _calendar;
 			bool _main;
-
-			bool _wayBack;	//!< true if back route, false else (forward route or unknown)
-
-			graph::MetricOffset _plannedLength; //!< For DRT
-
-			mutable boost::mutex _calendarCacheMutex;
 
 			mutable LineStops _lineStops;
 
@@ -135,12 +155,12 @@ namespace synthese
                 TransportNetwork*	getNetwork()				const;
 				bool				getWalkingLine ()			const;
 				CommercialLine*		getCommercialLine()			const;
-				bool				getWayBack()				const { return _wayBack; }
-				Destination*		getDirectionObj()			const { return _directionObj; }
-				graph::MetricOffset	getPlannedLength()			const { return _plannedLength; }
-				virtual std::string getName() const { return _name; }
+				bool				getWayBack()				const { return get<WayBack>(); }
+				Destination*		getDirectionObj()			const { return get<LineDestination>() ? get<LineDestination>().get_ptr() : NULL; }
+				graph::MetricOffset	getPlannedLength()			const { return get<PlannedLength>(); }
+				virtual std::string getName() const { return get<Name>(); }
 				calendar::Calendar& getCalendarCache() const;
-				bool getMain() const { return _main; }
+				bool getMain() const { return get<Main>(); }
 				const LineStops& getLineStops() const { return _lineStops; }
 			//@}
 
@@ -153,23 +173,18 @@ namespace synthese
 				void setTimetableName (const std::string& timetableName);
 				void setDirection (const std::string& direction);
 				void setCommercialLine(CommercialLine* value);
-				void setWayBack(bool value) { _wayBack = value; }
-				void setDirectionObj(Destination* value){ _directionObj = value; }
-				void setPlannedLength(graph::MetricOffset value){ _plannedLength = value; }
-				void setName(const std::string& value){ _name = value; }
-				void setMain(bool value){ _main = value; }
+				void setWayBack(bool value) { set<WayBack>(value); }
+				void setDirectionObj(Destination* value){ set<LineDestination>(value ? boost::optional<Destination&>(*value) : boost::none); }
+				void setPlannedLength(graph::MetricOffset value){ set<PlannedLength>(value); }
+				void setName(const std::string& value){ set<Name>(value); }
+				void setMain(bool value){ set<Main>(value); }
+				virtual void setRules(const Rules& value);
 			//@}
 
 
 
 			//! @name Update methods
 			//@{
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
-
-
 				void addLineStop(const LineStop& lineStop) const;
 				void removeLineStop(const LineStop& lineStop) const;
 			//@}
@@ -269,6 +284,10 @@ namespace synthese
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

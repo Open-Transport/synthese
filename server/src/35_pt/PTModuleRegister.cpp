@@ -122,6 +122,8 @@
 #include "DRTArea.hpp"
 #include "ServiceQuota.hpp"
 
+#include "RollingStock.hpp"
+
 #include "PTModule.inc.cpp"
 
 void synthese::pt::moduleRegister()
@@ -240,14 +242,14 @@ void synthese::pt::moduleRegister()
 	// Registries
 	INTEGRATE(synthese::pt::Destination);
 	INTEGRATE(synthese::pt::DRTArea);
-	synthese::util::Env::Integrate<synthese::pt::FreeDRTArea>();
+	INTEGRATE(synthese::pt::FreeDRTArea);
 	synthese::util::Env::Integrate<synthese::pt::FreeDRTTimeSlot>();
-	synthese::util::Env::Integrate<synthese::pt::JourneyPattern>();
+	INTEGRATE(synthese::pt::JourneyPattern);
 	INTEGRATE(synthese::pt::LineStop);
 	synthese::util::Env::Integrate<synthese::pt::StopArea>();
 	INTEGRATE(synthese::pt::CommercialLine);
 	synthese::util::Env::Integrate<synthese::pt::StopPoint>();
-	synthese::util::Env::Integrate<synthese::pt::Junction>();
+	INTEGRATE(synthese::pt::Junction);
 	INTEGRATE(synthese::pt::TransportNetwork);
 	synthese::util::Env::Integrate<synthese::pt::PTUseRule>();
 	synthese::util::Env::Integrate<synthese::pt::ContinuousService>();
