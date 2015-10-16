@@ -132,7 +132,8 @@ namespace synthese
 
 		private:
 			mutable boost::optional<calendar::Calendar> _calendar;
-			bool _main;
+
+			mutable boost::mutex _calendarCacheMutex;
 
 			mutable LineStops _lineStops;
 
