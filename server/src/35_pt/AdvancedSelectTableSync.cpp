@@ -57,10 +57,10 @@ namespace synthese
 				<< "SELECT ls." << TABLE_COL_ID << " FROM "
 				<< LineStopTableSync::TABLE.NAME << " AS ls "
 				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineNode::FIELD.name
-				<< " AND l." << JourneyPatternCommercialLine::FIELD.name << "=" << lineId
+				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=ls." << Line::FIELD.name
 				<< " WHERE "
 				<< "p." << StopPointTableSync::COL_PLACEID << "=" << placeId
-				<< " AND l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineId
+				<< " AND l." << JourneyPatternCommercialLine::FIELD.name << "=" << lineId
 				<< " LIMIT 1";
 			DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
 			return rows->next();
