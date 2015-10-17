@@ -72,6 +72,8 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				boost::optional<bool> wayback = boost::optional<bool>()
 			);
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 }	}
 

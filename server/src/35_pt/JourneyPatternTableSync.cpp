@@ -22,25 +22,25 @@
 
 #include "JourneyPatternTableSync.hpp"
 
+#include "CommercialLineTableSync.h"
+#include "ContinuousServiceTableSync.h"
 #include "DataSourceLinksField.hpp"
+#include "DataSourceTableSync.h"
+#include "DestinationTableSync.hpp"
+#include "FareTableSync.hpp"
+#include "GraphConstants.h"
+#include "ImportableTableSync.hpp"
+#include "LineStopTableSync.h"
 #include "Profile.h"
+#include "PTUseRule.h"
+#include "PTUseRuleTableSync.h"
 #include "ReplaceQuery.h"
+#include "RollingStockTableSync.hpp"
+#include "ScheduledServiceTableSync.h"
 #include "SelectQuery.hpp"
 #include "Session.h"
-#include "User.h"
-#include "GraphConstants.h"
-#include "CommercialLineTableSync.h"
-#include "FareTableSync.hpp"
-#include "RollingStockTableSync.hpp"
-#include "DataSourceTableSync.h"
-#include "PTUseRuleTableSync.h"
-#include "PTUseRule.h"
-#include "ImportableTableSync.hpp"
-#include "ScheduledServiceTableSync.h"
-#include "ContinuousServiceTableSync.h"
-#include "LineStopTableSync.h"
 #include "TransportNetworkRight.h"
-#include "DestinationTableSync.hpp"
+#include "User.h"
 
 #include <sstream>
 
@@ -171,5 +171,10 @@ namespace synthese
 				query.setFirst(first);
 			}
 			return LoadFromQuery(query, env, linkLevel);
+		}
+
+		bool JourneyPatternTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::READ);
 		}
 }	}
