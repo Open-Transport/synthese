@@ -87,24 +87,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<RoadChunkTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(RoadChunkTableSync::COL_CROSSING_ID, SQL_INTEGER),
-			Field(RoadChunkTableSync::COL_RANKINPATH, SQL_INTEGER),
-			Field(RoadChunkTableSync::COL_ROADID, SQL_INTEGER),
-			Field(RoadChunkTableSync::COL_METRICOFFSET, SQL_DOUBLE),
-			Field(RoadChunkTableSync::COL_LEFT_START_HOUSE_NUMBER, SQL_INTEGER),
-			Field(RoadChunkTableSync::COL_LEFT_END_HOUSE_NUMBER, SQL_INTEGER),
-			Field(RoadChunkTableSync::COL_RIGHT_START_HOUSE_NUMBER, SQL_INTEGER),
-			Field(RoadChunkTableSync::COL_RIGHT_END_HOUSE_NUMBER, SQL_INTEGER),
-			Field(RoadChunkTableSync::COL_LEFT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
-			Field(RoadChunkTableSync::COL_RIGHT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
-			Field(RoadChunkTableSync::COL_ONE_WAY, SQL_INTEGER),
-			Field(RoadChunkTableSync::COL_CAR_SPEED, SQL_DOUBLE),
-			Field(RoadChunkTableSync::COL_NON_WALKABLE, SQL_BOOLEAN),
-			Field(RoadChunkTableSync::COL_NON_DRIVABLE, SQL_BOOLEAN),
-			Field(RoadChunkTableSync::COL_NON_BIKABLE, SQL_BOOLEAN),
-			Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
-			Field()
 		};
 
 		template<>
@@ -118,56 +100,7 @@ namespace synthese
 					""
 			)	);
 			return r;
-		};
-
-		template<> void OldLoadSavePolicy<RoadChunkTableSync,RoadChunk>::Load(
-			RoadChunk* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
-			object->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
 		}
-
-
-
-		template<> void OldLoadSavePolicy<RoadChunkTableSync,RoadChunk>::Unlink(
-			RoadChunk* obj
-		){
-			obj->unlink();
-		}
-
-
-
-		template<> void OldLoadSavePolicy<RoadChunkTableSync,RoadChunk>::Save(
-			RoadChunk* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<RoadChunkTableSync> query(*object);
-			query.addField(object->getFromCrossing() ? object->getFromCrossing()->getKey() : RegistryKeyType(0));
-			query.addField(object->getRankInPath());
-			query.addField(object->getRoad() ? object->getRoad()->getKey() : RegistryKeyType(0));
-			query.addField(object->getMetricOffset());
-			query.addField(object->getLeftHouseNumberBounds() ? lexical_cast<string>(object->getLeftHouseNumberBounds()->first) : string());
-			query.addField(object->getLeftHouseNumberBounds() ? lexical_cast<string>(object->getLeftHouseNumberBounds()->second) : string());
-			query.addField(object->getRightHouseNumberBounds() ? lexical_cast<string>(object->getRightHouseNumberBounds()->first) : string());
-			query.addField(object->getRightHouseNumberBounds() ? lexical_cast<string>(object->getRightHouseNumberBounds()->second) : string());
-			query.addField(static_cast<int>(object->getLeftHouseNumberBounds() ? object->getLeftHouseNumberingPolicy() : road::ALL_NUMBERS));
-			query.addField(static_cast<int>(object->getRightHouseNumberBounds() ? object->getRightHouseNumberingPolicy() : road::ALL_NUMBERS));
-			query.addField(object->getCarOneWay());
-			query.addField(object->getCarSpeed(true));
-			query.addField(object->getNonWalkable());
-			query.addField(object->getNonDrivable());
-			query.addField(object->getNonBikable());
-			query.addField(static_pointer_cast<Geometry,LineString>(object->getGeometry()));
-			query.execute(transaction);
-		}
-
 
 
 		template<> bool DBTableSyncTemplate<RoadChunkTableSync>::CanDelete(
@@ -208,6 +141,12 @@ namespace synthese
 
 	namespace road
 	{
+
+		bool RoadChunkTableSync::allowList(const server::Session* session) const
+		{
+			return true;
+		}
+
 	    RoadChunkTableSync::SearchResult RoadChunkTableSync::Search(
 			Env& env,
 			optional<RegistryKeyType> roadId,

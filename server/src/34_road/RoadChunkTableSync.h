@@ -25,8 +25,8 @@
 
 #include "RoadChunk.h"
 
+#include "Object.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 #include "EdgeProjector.hpp"
 
 #include <vector>
@@ -79,12 +79,10 @@ namespace synthese
 		///		<dt>road_id</dt><dd>id of the @ref road::RoadTableSync "road" which the chunk belongs to</dd>
 		///	</dl>
 		class RoadChunkTableSync:
-			public db::DBDirectTableSyncTemplate<
-				RoadChunkTableSync,
-				RoadChunk,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
-			>
+				public db::DBDirectTableSyncTemplate<
+					RoadChunkTableSync,
+					RoadChunk
+				>
 		{
 		public:
 			/** Road chunks table :
@@ -108,7 +106,7 @@ namespace synthese
 			static const std::string COL_NON_DRIVABLE;
 			static const std::string COL_NON_BIKABLE;
 
-
+			virtual bool allowList( const server::Session* session ) const;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Road chunks search.
