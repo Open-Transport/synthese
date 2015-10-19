@@ -127,6 +127,11 @@ namespace synthese
 					_variable.push_back(item);
 					++it2;
 				}
+				else
+				{
+					Log::GetInstance().error("Syntax error in script '" + arrayCode + "'");
+					return;
+				}
 			}
 
 			// parameters
