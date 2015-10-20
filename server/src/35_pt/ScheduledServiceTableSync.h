@@ -32,7 +32,6 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 #include "FetcherTemplate.h"
 #include "Service.h"
 
@@ -48,29 +47,12 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				ScheduledServiceTableSync,
 				ScheduledService,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>,
 			public db::FetcherTemplate<SchedulesBasedService, ScheduledServiceTableSync>,
 			public db::FetcherTemplate<calendar::Calendar, ScheduledServiceTableSync>
 		{
 		public:
-			static const std::string COL_SERVICENUMBER;
-			static const std::string COL_SCHEDULES;
-			static const std::string COL_PATHID;
-			static const std::string COL_RANKINPATH;
-			static const std::string COL_BIKECOMPLIANCEID;
-			static const std::string COL_HANDICAPPEDCOMPLIANCEID;
-			static const std::string COL_PEDESTRIANCOMPLIANCEID;
-			static const std::string COL_TEAM;
-			static const std::string COL_DATES;
-			static const std::string COL_STOPS;
-			static const std::string COL_DATASOURCE_LINKS;
-			static const std::string COL_DATES_TO_FORCE;
-			static const std::string COL_DATES_TO_BYPASS;
-
-
-
 			/** ScheduledService search.
 				@param line JourneyPattern which the service must belong to
 				@param commercialLine Commercial line which the service must belong to
@@ -96,6 +78,8 @@ namespace synthese
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 }	}
 

@@ -84,6 +84,7 @@ namespace synthese
 
 		LineStop::~LineStop()
 		{
+			unlink();
 		}
 
 

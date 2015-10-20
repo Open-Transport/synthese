@@ -109,7 +109,7 @@ namespace synthese
 						"INNER JOIN "+ JourneyPatternTableSync::TABLE.NAME +" AS jp ON "+
 							"jp."+ JourneyPatternCommercialLine::FIELD.name +"=c."+ TABLE_COL_ID +
 						" INNER JOIN "+ ScheduledServiceTableSync::TABLE.NAME +" AS s ON "
-							"s."+ ScheduledServiceTableSync::COL_PATHID +"=jp."+ TABLE_COL_ID +
+							"s."+ ServicePath::FIELD.name +"=jp."+ TABLE_COL_ID +
 						" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_SERVICE_ID +")";
 				if(step == VEHICLE_STEP)
 					return "(SELECT v."+ Name::FIELD.name +" FROM "+ VehicleTableSync::TABLE.NAME +" AS v "+
@@ -121,7 +121,7 @@ namespace synthese
 					return "(SELECT jp."+ JourneyPatternCommercialLine::FIELD.name +
 						" FROM "+ JourneyPatternTableSync::TABLE.NAME +" AS jp "+
 						"INNER JOIN "+ ScheduledServiceTableSync::TABLE.NAME +" AS s ON "+
-							"s."+ ScheduledServiceTableSync::COL_PATHID +"=jp."+ TABLE_COL_ID +
+							"s."+ ServicePath::FIELD.name +"=jp."+ TABLE_COL_ID +
 						" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_SERVICE_ID +")";
 				if(step == VEHICLE_STEP)
 					return "r."+ VehiclePositionTableSync::COL_VEHICLE_ID;

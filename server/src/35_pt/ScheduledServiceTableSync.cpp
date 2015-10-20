@@ -65,23 +65,6 @@ namespace synthese
 	template<> const string FactorableTemplate<Fetcher<SchedulesBasedService>, ScheduledServiceTableSync>::FACTORY_KEY("16");
 	template<> const string FactorableTemplate<Fetcher<Calendar>, ScheduledServiceTableSync>::FACTORY_KEY("16");
 
-	namespace pt
-	{
-		const string ScheduledServiceTableSync::COL_SERVICENUMBER ("service_number");
-		const string ScheduledServiceTableSync::COL_SCHEDULES ("schedules");
-		const string ScheduledServiceTableSync::COL_PATHID ("path_id");
-		const string ScheduledServiceTableSync::COL_RANKINPATH ("rank_in_path");
-		const string ScheduledServiceTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
-		const string ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
-		const string ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-		const string ScheduledServiceTableSync::COL_TEAM("team");
-		const string ScheduledServiceTableSync::COL_DATES("dates");
-		const string ScheduledServiceTableSync::COL_STOPS("stops");
-		const string ScheduledServiceTableSync::COL_DATASOURCE_LINKS("datasource_links");
-		const string ScheduledServiceTableSync::COL_DATES_TO_FORCE = "dates_to_force";
-		const string ScheduledServiceTableSync::COL_DATES_TO_BYPASS = "dates_to_bypass";
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<ScheduledServiceTableSync>::TABLE(
@@ -90,19 +73,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<ScheduledServiceTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(ScheduledServiceTableSync::COL_SERVICENUMBER, SQL_TEXT),
-			Field(ScheduledServiceTableSync::COL_SCHEDULES, SQL_TEXT),
-			Field(ScheduledServiceTableSync::COL_PATHID, SQL_INTEGER),
-			Field(ScheduledServiceTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
-			Field(ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
-			Field(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			Field(ScheduledServiceTableSync::COL_TEAM, SQL_TEXT),
-			Field(ScheduledServiceTableSync::COL_DATES, SQL_TEXT),
-			Field(ScheduledServiceTableSync::COL_STOPS, SQL_TEXT),
-			Field(ScheduledServiceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			Field(ScheduledServiceTableSync::COL_DATES_TO_FORCE, SQL_TEXT),
-			Field(ScheduledServiceTableSync::COL_DATES_TO_BYPASS, SQL_TEXT),
 			Field()
 		};
 
@@ -110,117 +80,8 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<ScheduledServiceTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(ScheduledServiceTableSync::COL_PATHID.c_str(), ScheduledServiceTableSync::COL_SCHEDULES.c_str(), ""));
+			r.push_back(DBTableSync::Index(ServicePath::FIELD.name.c_str(), ServiceSchedules::FIELD.name.c_str(), ""));
 			return r;
-		}
-
-		template<>
-		void OldLoadSavePolicy<ScheduledServiceTableSync,ScheduledService>::Load(
-			ScheduledService* ss,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			DBModule::LoadObjects(ss->getLinkedObjectsIds(*rows), env, linkLevel);
-			ss->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				ss->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<ScheduledServiceTableSync,ScheduledService>::Unlink(
-			ScheduledService* ss
-		){
-			ss->unlink();
-		}
-
-
-
-		template<> void OldLoadSavePolicy<ScheduledServiceTableSync,ScheduledService>::Save(
-			ScheduledService* object,
-			optional<DBTransaction&> transaction
-		){
-			// Dates preparation
-			stringstream datesStr;
-			if(object->getCalendarLinks().empty())
-			{
-				object->serialize(datesStr);
-			}
-
-			ReplaceQuery<ScheduledServiceTableSync> query(*object);
-			query.addField(object->getServiceNumber());
-			query.addField(object->encodeSchedules());
-			query.addField(object->getPath() ? object->getPath()->getKey() : 0);
-			query.addField(
-				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :
-				RegistryKeyType(0)
-			);
-
-			if (object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)))
-			{
-				query.addField(static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey());
-			}
-			else
-			{
-				query.addField(RegistryKeyType(0));
-			}
-
-			query.addField(
-				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() :
-				RegistryKeyType(0)
-			);
-			query.addField(object->getTeam());
-			query.addField(datesStr.str());
-			query.addField(object->encodeStops());
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-
-			// Dates to force
-			{
-				stringstream s;
-				bool first(true);
-				BOOST_FOREACH(const date& d, object->getDatesToForce())
-				{
-					if(first)
-					{
-						first = false;
-					}
-					else
-					{
-						s << ",";
-					}
-					s << to_iso_extended_string(d);
-				}
-				query.addField(s.str());
-			}
-
-			// Dates to bypass
-			{
-				stringstream s;
-				bool first(true);
-				BOOST_FOREACH(const date& d, object->getDatesToBypass())
-				{
-					if(first)
-					{
-						first = false;
-					}
-					else
-					{
-						s << ",";
-					}
-					s << to_iso_extended_string(d);
-				}
-				query.addField(s.str());
-			}
-
-			query.execute(transaction);
 		}
 
 
@@ -284,14 +145,14 @@ namespace synthese
 			SelectQuery<ScheduledServiceTableSync> query;
 			if (lineId)
 			{
-				query.addWhereField(ScheduledServiceTableSync::COL_PATHID, *lineId);
+				query.addWhereField(ServicePath::FIELD.name, *lineId);
 			}
 			if (commercialLineId)
 			{
 				query.addWhere(
 					ComposedExpression::Get(
 						SubQueryExpression::Get(
-							string("SELECT b."+ JourneyPatternCommercialLine::FIELD.name +" FROM "+ JourneyPatternTableSync::TABLE.NAME +" AS b WHERE b."+ TABLE_COL_ID +"="+ TABLE.NAME +"."+ COL_PATHID)
+							string("SELECT b."+ JourneyPatternCommercialLine::FIELD.name +" FROM "+ JourneyPatternTableSync::TABLE.NAME +" AS b WHERE b."+ TABLE_COL_ID +"="+ TABLE.NAME +"."+ ServicePath::FIELD.name)
 						), ComposedExpression::OP_EQ,
 						ValueExpression<RegistryKeyType>::Get(*commercialLineId)
 					)
@@ -303,7 +164,7 @@ namespace synthese
 		//	}
 			if(serviceNumber)
 			{
-				query.addWhereField(COL_SERVICENUMBER, *serviceNumber);
+				query.addWhereField(ServiceNumber::FIELD.name, *serviceNumber);
 			}
 			if(hideOldServices)
 			{
@@ -318,20 +179,20 @@ namespace synthese
 				query.addWhere(
 					ComposedExpression::Get(
 						ComposedExpression::Get(
-							FieldExpression::Get(TABLE.NAME, COL_SCHEDULES),
+							FieldExpression::Get(TABLE.NAME, ServiceSchedules::FIELD.name),
 							ComposedExpression::OP_SUPEQ,
 							ValueExpression<string>::Get(SchedulesBasedService::EncodeSchedule(snow))
 						),
 						ComposedExpression::OP_OR,
 						ComposedExpression::Get(
 							ComposedExpression::Get(
-								FieldExpression::Get(TABLE.NAME, COL_SCHEDULES),
+								FieldExpression::Get(TABLE.NAME, ServiceSchedules::FIELD.name),
 								ComposedExpression::OP_LIKE,
 								ValueExpression<string>::Get("00:00:00#%")
 							),
 							ComposedExpression::OP_AND,
 							ComposedExpression::Get(
-								FieldExpression::Get(TABLE.NAME, COL_SCHEDULES),
+								FieldExpression::Get(TABLE.NAME, ServiceSchedules::FIELD.name),
 								ComposedExpression::OP_SUPEQ,
 								ValueExpression<string>::Get("00:00:00#"+ SchedulesBasedService::EncodeSchedule(snow))
 							)
@@ -341,7 +202,7 @@ namespace synthese
 			}
 			if (orderByOriginTime)
 			{
-				query.addOrderField(COL_SCHEDULES, raisingOrder);
+				query.addOrderField(ServiceSchedules::FIELD.name, raisingOrder);
 			}
 
 			if (number)
@@ -352,5 +213,10 @@ namespace synthese
 			}
 
 			return LoadFromQuery(query, env, linkLevel);
+		}
+
+		bool ScheduledServiceTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::READ);
 		}
 }	}

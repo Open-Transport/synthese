@@ -38,6 +38,11 @@ namespace synthese
 
 	namespace pt
 	{
+		FIELD_STRING(ServiceNumber)
+		FIELD_STRING(ServiceSchedules)
+		FIELD_POINTER(ServicePath, pt::JourneyPattern)
+		FIELD_STRING(ServiceDates)
+
 		/** SchedulesBasedService class.
 			@ingroup m35
 		*/
@@ -149,7 +154,7 @@ namespace synthese
 					@param onlyScheduledEdges Only schedules at scheduled edges are present in the data to load. The missing schedules will be interpolated.
 					@author Hugues Romain
 				*/
-				void setDataSchedules(
+				virtual void setDataSchedules(
 					const Schedules& departureSchedules,
 					const Schedules& arrivalSchedules
 				);
@@ -312,7 +317,7 @@ namespace synthese
 
 
 
-				void setVertices(
+				virtual void setVertices(
 					const ServedVertices& vertices
 				);
 

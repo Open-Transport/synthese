@@ -66,19 +66,6 @@ namespace synthese
 	template<> const string FactorableTemplate<Fetcher<SchedulesBasedService>, ContinuousServiceTableSync>::FACTORY_KEY("17");
 	template<> const string FactorableTemplate<Fetcher<Calendar>, ContinuousServiceTableSync>::FACTORY_KEY("17");
 
-	namespace pt
-	{
-		const std::string ContinuousServiceTableSync::COL_SERVICENUMBER ("service_number");
-		const std::string ContinuousServiceTableSync::COL_SCHEDULES ("schedules");
-		const std::string ContinuousServiceTableSync::COL_PATHID ("path_id");
-		const std::string ContinuousServiceTableSync::COL_RANGE ("range");
-		const std::string ContinuousServiceTableSync::COL_MAXWAITINGTIME ("max_waiting_time");
-		const std::string ContinuousServiceTableSync::COL_BIKE_USE_RULE("bike_compliance_id");
-		const std::string ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE ("handicapped_compliance_id");
-		const std::string ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE("pedestrian_compliance_id");
-		const std::string ContinuousServiceTableSync::COL_DATES("dates");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<ContinuousServiceTableSync>::TABLE(
@@ -87,16 +74,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<ContinuousServiceTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(ContinuousServiceTableSync::COL_SERVICENUMBER, SQL_TEXT),
-			Field(ContinuousServiceTableSync::COL_SCHEDULES, SQL_TEXT),
-			Field(ContinuousServiceTableSync::COL_PATHID, SQL_INTEGER),
-			Field(ContinuousServiceTableSync::COL_RANGE, SQL_INTEGER),
-			Field(ContinuousServiceTableSync::COL_MAXWAITINGTIME, SQL_INTEGER),
-			Field(ContinuousServiceTableSync::COL_BIKE_USE_RULE, SQL_INTEGER),
-			Field(ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
-			Field(ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
-			Field(ContinuousServiceTableSync::COL_DATES, SQL_TEXT),
 			Field()
 		};
 
@@ -106,73 +83,11 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					ContinuousServiceTableSync::COL_PATHID.c_str(),
-					ContinuousServiceTableSync::COL_SCHEDULES.c_str(),
+					ServicePath::FIELD.name.c_str(),
+					ServiceSchedules::FIELD.name.c_str(),
 			"")	);
 			return r;
 		};
-
-		template<> void OldLoadSavePolicy<ContinuousServiceTableSync,ContinuousService>::Load(
-			ContinuousService* cs,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			DBModule::LoadObjects(cs->getLinkedObjectsIds(*rows), env, linkLevel);
-			cs->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				cs->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<ContinuousServiceTableSync,ContinuousService>::Unlink(
-			ContinuousService* obj
-		){
-			obj->unlink();
-		}
-
-
-
-		template<> void OldLoadSavePolicy<ContinuousServiceTableSync,ContinuousService>::Save(
-			ContinuousService* object,
-			optional<DBTransaction&> transaction
-		){
-			// Dates preparation
-			stringstream datesStr;
-			if(object->getCalendarLinks().empty())
-			{
-				object->serialize(datesStr);
-			}
-
-			ReplaceQuery<ContinuousServiceTableSync> query(*object);
-			query.addField(object->getServiceNumber());
-			query.addField(object->encodeSchedules(-object->getMaxWaitingTime()));
-			query.addField(object->getPath() ? object->getPath()->getKey() : 0);
-			query.addField(object->getRange().total_seconds() / 60);
-			query.addField(object->getMaxWaitingTime().total_seconds() / 60);
-			query.addField(
-				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :
-				RegistryKeyType(0)
-			);
-			query.addField(
-				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() :
-				RegistryKeyType(0)
-			);
-			query.addField(
-				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() :
-				RegistryKeyType(0)
-			);
-			query.addField(
-				datesStr.str()
-			);
-			query.execute(transaction);
-		}
 
 
 
@@ -234,12 +149,12 @@ namespace synthese
 				<< " FROM " << TABLE.NAME;
 			if (commercialLineId)
 			{
-				query << " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=" << COL_PATHID;
+				query << " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=" << ServicePath::FIELD.name;
 			}
 			query << " WHERE 1 ";
 			if (lineId)
 			{
-				query << " AND " << COL_PATHID << "=" << *lineId;
+				query << " AND " << ServicePath::FIELD.name << "=" << *lineId;
 			}
 			if (commercialLineId)
 			{
@@ -247,7 +162,7 @@ namespace synthese
 			}
 			if (orderByDepartureTime)
 			{
-				query << " ORDER BY " << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY " << ServiceSchedules::FIELD.name << (raisingOrder ? " ASC" : " DESC");
 			}
 			if (number)
 			{
@@ -259,6 +174,11 @@ namespace synthese
 			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+		bool ContinuousServiceTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::READ);
 		}
 	}
 }

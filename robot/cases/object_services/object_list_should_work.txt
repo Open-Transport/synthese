@@ -13,6 +13,8 @@ Singleton Object List Should Work For Any Table
     ${SCENARIO_FOLDER_TABLE_ID}
     ${OBJECT_SITE_LINKS_TABLE_ID}
     ${LINES_TABLE_ID}
+    ${SCHEDULED_SERVICES_TABLE_ID}
+    ${CONTINUOUS_SERVICES_TABLE_ID}
     ${FARES_TABLE_ID}
     ${COMMERCIAL_LINES_TABLE_ID}
     ${ONLINE_RESERVATION_RULES_TABLE_ID}
@@ -20,6 +22,7 @@ Singleton Object List Should Work For Any Table
     ${CITY_ALIASES_TABLE_ID}
     ${JUNCTIONS_TABLE_ID}
     ${FREE_DRT_AREAS_TABLE_ID}
+    ${FREE_DRT_TIME_SLOTS_TABLE_ID}
     
 
 Empty Object List Should Work For Any Table
@@ -30,6 +33,8 @@ Empty Object List Should Work For Any Table
     ${SCENARIO_FOLDER_TABLE_ID}
     ${OBJECT_SITE_LINKS_TABLE_ID}
     ${LINES_TABLE_ID}
+    ${SCHEDULED_SERVICES_TABLE_ID}
+    ${CONTINUOUS_SERVICES_TABLE_ID}
     ${FARES_TABLE_ID}
     ${COMMERCIAL_LINES_TABLE_ID}
     ${ONLINE_RESERVATION_RULES_TABLE_ID}
@@ -37,6 +42,7 @@ Empty Object List Should Work For Any Table
     ${CITY_ALIASES_TABLE_ID}
     ${JUNCTIONS_TABLE_ID}
     ${FREE_DRT_AREAS_TABLE_ID}
+    ${FREE_DRT_TIME_SLOTS_TABLE_ID}
 
 Object List Should Work For Some Tables
     On node 0

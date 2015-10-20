@@ -23,12 +23,15 @@
 #ifndef SYNTHESE_pt_FreeDRTTimeSlot_hpp__
 #define SYNTHESE_pt_FreeDRTTimeSlot_hpp__
 
+#include "Object.hpp"
+
 #include "ReservableService.hpp"
 
-#include "Registrable.h"
-#include "Registry.h"
-#include "NonPermanentService.h"
+#include "FreeDRTArea.hpp"
 #include "Journey.h"
+#include "NonPermanentService.h"
+#include "Registry.h"
+#include "PointerField.hpp"
 
 namespace synthese
 {
@@ -40,6 +43,29 @@ namespace synthese
 	namespace pt
 	{
 		class FreeDRTArea;
+
+		FIELD_POINTER(Area, pt::FreeDRTArea)
+		FIELD_STRING(FreeDRTServiceNumber)
+		FIELD_TIME(FirstDeparture)
+		FIELD_TIME(LastArrival)
+		FIELD_SIZE_T(MaxCapacity)
+		FIELD_DOUBLE(CommercialSpeed)
+		FIELD_DOUBLE(MaxSpeed)
+		FIELD_STRING(FreeDRTTimeSlotUseRules)
+		FIELD_STRING(FreeDRTTimeSlotDates)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Area),
+			FIELD(FreeDRTServiceNumber),
+			FIELD(FirstDeparture),
+			FIELD(LastArrival),
+			FIELD(MaxCapacity),
+			FIELD(CommercialSpeed),
+			FIELD(MaxSpeed),
+			FIELD(FreeDRTTimeSlotUseRules),
+			FIELD(FreeDRTTimeSlotDates)
+		> FreeDRTTimeSlotSchema;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Free DRT time slot.
@@ -53,48 +79,35 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m35
 		class FreeDRTTimeSlot:
-			public virtual util::Registrable,
+			public Object<FreeDRTTimeSlot, FreeDRTTimeSlotSchema>,
 			public NonPermanentService,
 			public ReservableService
 		{
 		public:
-			/// Chosen registry class.
-			typedef util::Registry<FreeDRTTimeSlot>	Registry;
-
 			typedef std::size_t Capacity;
 			typedef double KMHSpeed;
 
-		private:
-			/// @name Data
-			//@{
-				boost::posix_time::time_duration _firstDeparture;
-				boost::posix_time::time_duration _lastArrival;
-				boost::optional<Capacity> _maxCapacity;
-				KMHSpeed _commercialSpeed;
-				KMHSpeed _maxSpeed;
-			//@}
-
-		public:
 			FreeDRTTimeSlot(
 				util::RegistryKeyType id = 0
 			);
 
 			/// @name Getters
 			//@{
-				const boost::posix_time::time_duration& getFirstDeparture() const { return _firstDeparture; }
-				const boost::posix_time::time_duration& getLastArrival() const { return _lastArrival; }
-				boost::optional<Capacity> getMaxCapacity() const { return _maxCapacity; }
-				KMHSpeed getCommercialSpeed() const { return _commercialSpeed; }
-				KMHSpeed getMaxSpeed() const { return _maxSpeed; }
+				const boost::posix_time::time_duration& getFirstDeparture() const { return get<FirstDeparture>(); }
+				const boost::posix_time::time_duration& getLastArrival() const { return get<LastArrival>(); }
+				boost::optional<Capacity> getMaxCapacity() const { return get<MaxCapacity>(); }
+				KMHSpeed getCommercialSpeed() const { return get<CommercialSpeed>(); }
+				KMHSpeed getMaxSpeed() const { return get<MaxSpeed>(); }
 			//@}
 
 			/// @name Setters
 			//@{
-				void setFirstDeparture(const boost::posix_time::time_duration& value){ _firstDeparture = value; }
-				void setLastArrival(const boost::posix_time::time_duration& value){ _lastArrival = value; }
-				void setMaxCapacity(boost::optional<Capacity> value){ _maxCapacity = value; }
-				void setCommercialSpeed(KMHSpeed value){ _commercialSpeed = value; }
-				void setMaxSpeed(KMHSpeed value){ _maxSpeed = value; }
+				void setFirstDeparture(const boost::posix_time::time_duration& value){ set<FirstDeparture>(value); }
+				void setLastArrival(const boost::posix_time::time_duration& value){ set<LastArrival>(value); }
+				void setMaxCapacity(boost::optional<Capacity> value){ set<MaxCapacity>(value ? *value : 0); }
+				void setCommercialSpeed(KMHSpeed value){ set<CommercialSpeed>(value); }
+				void setMaxSpeed(KMHSpeed value){ set<MaxSpeed>(value); }
+				virtual void setRules(const Rules& value);
 			//@}
 
 			/// @name Modifiers
@@ -198,7 +211,21 @@ namespace synthese
 					const boost::gregorian::date& date,
 					std::size_t userClassRank
 				) const;
+
+				virtual void toParametersMap(
+					util::ParametersMap& map,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
+				) const;
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

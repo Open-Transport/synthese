@@ -27,7 +27,6 @@
 
 #include "FreeDRTTimeSlot.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 #include "FetcherTemplate.h"
 
 namespace synthese
@@ -44,26 +43,11 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				FreeDRTTimeSlotTableSync,
 				FreeDRTTimeSlot,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>,
 			public db::FetcherTemplate<calendar::Calendar, FreeDRTTimeSlotTableSync>
 		{
 		public:
-			//! @name Field names
-			//@{
-				static const std::string COL_AREA_ID;
-				static const std::string COL_SERVICE_NUMBER;
-				static const std::string COL_FIRST_DEPARTURE;
-				static const std::string COL_LAST_ARRIVAL;
-				static const std::string COL_MAX_CAPACITY;
-				static const std::string COL_COMMERCIAL_SPEED;
-				static const std::string COL_MAX_SPEED;
-				static const std::string COL_USE_RULES;
-				static const std::string COL_DATES;
-			//@}
-
-
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
@@ -89,6 +73,8 @@ namespace synthese
 					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 				);
 			//@}
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

@@ -52,7 +52,13 @@ namespace synthese
 {
 	using namespace graph;
 	using namespace inter_synthese;
+	using namespace pt;
 	using namespace util;
+
+	FIELD_DEFINITION_OF_TYPE(ServiceNumber, "service_number", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(ServiceSchedules, "schedules", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(ServicePath, "path_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(ServiceDates, "dates", SQL_TEXT)
 
 
 	namespace pt
@@ -965,7 +971,10 @@ namespace synthese
 			{
 				for(size_t i(0); i<_path->getEdges().size(); ++i)
 				{
-					setVertex(i, vertices[i]);
+					if (vertices[i])
+					{
+						setVertex(i, vertices[i]);
+					}
 				}
 			}
 		}

@@ -46,6 +46,8 @@
 
 #define TEST_SERVICE_DATASOURCE 16607027920896001
 #define TEST_STOP_AREA_ID 1970329131942220
+#define TEST_STOP_POINT_ID 3377704015495171
+#define TEST_LINE_STOP_ID 2814754062076747
 
 using namespace synthese::util;
 using namespace synthese::pt;
@@ -170,7 +172,8 @@ public:
 			boost::shared_ptr<StopArea> stopArea(new StopArea(TEST_STOP_AREA_ID + i, true));
 			_stopAreas.push_back(stopArea);
 			Env::GetOfficialEnv().getEditableRegistry<StopArea>().add(stopArea);
-			_stopPoints.push_back(boost::shared_ptr<StopPoint>(new StopPoint(0, "", &*_stopAreas[i])));
+			_stopPoints.push_back(boost::shared_ptr<StopPoint>(new StopPoint(TEST_STOP_POINT_ID + i, "", &*_stopAreas[i])));
+			Env::GetOfficialEnv().getEditableRegistry<StopPoint>().add(_stopPoints[i]);
 			_stopAreas[i]->addPhysicalStop(*_stopPoints[i]);
 		}
 	}
@@ -192,7 +195,7 @@ private:
 	vector<boost::shared_ptr<StopPoint> > _stopPoints;
 	size_t _numberOfStops;
 public:
-	TestJourney(JourneyPattern &jp, TestAreaMap &testAreaMap):
+	TestJourney(JourneyPattern &jp, TestAreaMap &testAreaMap, int numjp):
 		_stopPoints(testAreaMap.getStopPoints()),
 		_numberOfStops(testAreaMap.getNumberOfStops())
 	{
@@ -201,7 +204,7 @@ public:
 			_designatedLinePhysicalStops.push_back(
 				boost::shared_ptr<LineStop>(
 					new LineStop(
-						0,
+						TEST_LINE_STOP_ID + i + numjp,
 						&jp,
 						i,
 						(i < _numberOfStops - 1 ? true : false), // Departure
@@ -210,7 +213,8 @@ public:
 						*_stopPoints[i]
 				)	)
 			);
-			_designatedLinePhysicalStops[i]->link(_env);
+			Env::GetOfficialEnv().getEditableRegistry<LineStop>().add(_designatedLinePhysicalStops[i]);
+			_designatedLinePhysicalStops[i]->link(Env::GetOfficialEnv());
 		}
 	}
 
@@ -241,21 +245,23 @@ BOOST_AUTO_TEST_CASE (test1)
 
 	TestAreaMap testAreaMap(8);
 	
-	JourneyPattern jp;
-	CommercialLine cl;
-	jp.setCommercialLine(&cl);
-	TestJourney tj1(jp, testAreaMap);
+	JourneyPattern* jp = new JourneyPattern(2533279085363335);
+	CommercialLine* cl = new CommercialLine(11821953316814849);
+	jp->setCommercialLine(cl);
+	Env::GetOfficialEnv().getEditableRegistry<JourneyPattern>().add(boost::shared_ptr<JourneyPattern>(jp));
+	TestJourney tj1(*jp, testAreaMap, 0);
 
-	JourneyPattern jp2;
-	CommercialLine cl2;
-	jp2.setCommercialLine(&cl2);
-	TestJourney tj2(jp2, testAreaMap);
+	JourneyPattern* jp2 = new JourneyPattern(2533279085363336);
+	CommercialLine* cl2 = new CommercialLine(11821953316814850);
+	jp2->setCommercialLine(cl2);
+	Env::GetOfficialEnv().getEditableRegistry<JourneyPattern>().add(boost::shared_ptr<JourneyPattern>(jp2));
+	TestJourney tj2(*jp2, testAreaMap, 10);
 
-	TestScheduledService tss1(4503599627370501ULL, "1", jp, ds,  time_duration(1,0,0));
-	TestScheduledService tss2(4503599627370502ULL, "2", jp2, ds, time_duration(2,0,0));
-	TestScheduledService tss3(4503599627370503ULL, "3", jp, ds,  time_duration(3,0,0));
-	TestScheduledService tss4(4503599627370504ULL, "4", jp2, ds, time_duration(4,0,0));
-	TestScheduledService tss5(4503599627370505ULL, "5", jp, ds,  time_duration(5,0,0));
+	TestScheduledService tss1(4503599627370501ULL, "1", *jp, ds,  time_duration(1,0,0));
+	TestScheduledService tss2(4503599627370502ULL, "2", *jp2, ds, time_duration(2,0,0));
+	TestScheduledService tss3(4503599627370503ULL, "3", *jp, ds,  time_duration(3,0,0));
+	TestScheduledService tss4(4503599627370504ULL, "4", *jp2, ds, time_duration(4,0,0));
+	TestScheduledService tss5(4503599627370505ULL, "5", *jp, ds,  time_duration(5,0,0));
 
 	runScheduleRealTimeUpdateService("1970329131942223", "16607027920896001", "1", "03:20:00", "03:20:01");
 
@@ -322,6 +328,8 @@ BOOST_AUTO_TEST_CASE (test1)
 
 	tss5.checkRealArrivalSchedule  (1, time_duration(5,04,0));
 	tss5.checkRealDepartureSchedule(0, time_duration(5,00,0));
+
+	Env::GetOfficialEnv().clear();
 
 	cout << "END" << endl;	
 }
