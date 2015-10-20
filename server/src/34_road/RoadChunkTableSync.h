@@ -25,8 +25,8 @@
 
 #include "RoadChunk.h"
 
+#include "Object.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 #include "EdgeProjector.hpp"
 
 #include <vector>
@@ -79,36 +79,14 @@ namespace synthese
 		///		<dt>road_id</dt><dd>id of the @ref road::RoadTableSync "road" which the chunk belongs to</dd>
 		///	</dl>
 		class RoadChunkTableSync:
-			public db::DBDirectTableSyncTemplate<
-				RoadChunkTableSync,
-				RoadChunk,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
-			>
+				public db::DBDirectTableSyncTemplate<
+					RoadChunkTableSync,
+					RoadChunk
+				>
 		{
 		public:
-			/** Road chunks table :
-			- on insert :
-			- on update :
-			- on delete : X
-			*/
-			static const std::string COL_CROSSING_ID;
-			static const std::string COL_RANKINPATH;
-			static const std::string COL_ROADID ;  // NU
-			static const std::string COL_METRICOFFSET;  // U ??
-			static const std::string COL_LEFT_START_HOUSE_NUMBER;
-			static const std::string COL_LEFT_END_HOUSE_NUMBER;
-			static const std::string COL_RIGHT_START_HOUSE_NUMBER;
-			static const std::string COL_RIGHT_END_HOUSE_NUMBER;
-			static const std::string COL_LEFT_HOUSE_NUMBERING_POLICY;
-			static const std::string COL_RIGHT_HOUSE_NUMBERING_POLICY;
-			static const std::string COL_ONE_WAY;
-			static const std::string COL_CAR_SPEED;
-			static const std::string COL_NON_WALKABLE;
-			static const std::string COL_NON_DRIVABLE;
-			static const std::string COL_NON_BIKABLE;
 
-
+			virtual bool allowList( const server::Session* session ) const;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Road chunks search.

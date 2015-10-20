@@ -23,11 +23,15 @@
 #ifndef SYNTHESE_ENV_ROADCHUNK_H
 #define SYNTHESE_ENV_ROADCHUNK_H
 
-#include "Registrable.h"
+#include "Object.hpp"
 #include "WithGeometry.hpp"
 
 #include "GraphTypes.h"
 #include "RoadTypes.hpp"
+#include "PointerField.hpp"
+#include "Road.h"
+#include "GeometryField.hpp"
+#include "EnumObjectField.hpp"
 
 #include <utility>
 
@@ -45,8 +49,42 @@ namespace synthese
 	{
 		class Crossing;
 		class House;
-		class Road;
 		class RoadChunkEdge;
+
+		FIELD_POINTER(FromCrossing, Crossing)
+		FIELD_INT(RankInPathField)
+		FIELD_DOUBLE(MetricOffsetField)
+		FIELD_INT(LeftStartHouseNumber)
+		FIELD_INT(LeftEndHouseNumber)
+		FIELD_INT(RightStartHouseNumber)
+		FIELD_INT(RightEndHouseNumber)
+		FIELD_ENUM(LeftHouseNumberingPolicy, HouseNumberingPolicy)
+		FIELD_ENUM(RightHouseNumberingPolicy, HouseNumberingPolicy)
+		FIELD_BOOL(OneWay)
+		FIELD_DOUBLE(CarSpeed)
+		FIELD_BOOL(NonWalkable)
+		FIELD_BOOL(NonDrivable)
+		FIELD_BOOL(NonBikable)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(FromCrossing),
+			FIELD(RankInPathField),
+			FIELD(Road),
+			FIELD(MetricOffsetField),
+			FIELD(LeftStartHouseNumber),
+			FIELD(LeftEndHouseNumber),
+			FIELD(RightStartHouseNumber),
+			FIELD(RightEndHouseNumber),
+			FIELD(LeftHouseNumberingPolicy),
+			FIELD(RightHouseNumberingPolicy),
+			FIELD(OneWay),
+			FIELD(CarSpeed),
+			FIELD(NonWalkable),
+			FIELD(NonDrivable),
+			FIELD(NonBikable),
+			FIELD(LineStringGeometry)
+		> RoadChunkSchema;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Association class between road and crossings.
@@ -60,7 +98,7 @@ namespace synthese
 		///		- a physical stop address
 		///		- a public place address
 		class RoadChunk:
-			public util::Registrable,
+			public Object<RoadChunk, RoadChunkSchema>,
 			public WithGeometry<geos::geom::LineString>
 		{
 		public :
@@ -71,23 +109,7 @@ namespace synthese
 			typedef std::map<HouseNumber, House*> Houses;
 
 		private:
-			HouseNumberBounds _leftHouseNumberBounds;
-			HouseNumberBounds _rightHouseNumberBounds;
-			HouseNumberingPolicy _leftHouseNumberingPolicy;
-			HouseNumberingPolicy _rightHouseNumberingPolicy;
-
 			Houses _houses;
-			int _carOneWay;
-			double _carSpeed;
-
-			Road* _road;
-			Crossing* _crossing;
-			size_t _rankInPath;
-			graph::MetricOffset _metricOffset;
-			bool _nonWalkable;
-			bool _nonDrivable;
-			bool _nonBikable;
-
 			boost::shared_ptr<RoadChunkEdge> _forwardEdge;
 			boost::shared_ptr<RoadChunkEdge> _reverseEdge;
 
@@ -118,53 +140,61 @@ namespace synthese
 			/// @param road road which the chunk belongs to (default NULL)
 			/// @param metricOffset distance between the the chunk beginning and the road beginning (default unknown)
 			RoadChunk(
-				util::RegistryKeyType id = 0,
-				Crossing* fromCrossing = NULL,
+				util::RegistryKeyType id,
+				Crossing* fromCrossing,
 				size_t rankInRoad = 0,
 				Road* road = NULL,
 				double metricOffset = UNKNOWN_VALUE,
 				double carSpeed = 50 / 3.6
 			);
 
+			RoadChunk(util::RegistryKeyType id = 0);
+
 			virtual ~RoadChunk ();
 
 			//! @name Setters
 			//@{
-				void setLeftHouseNumberBounds(const HouseNumberBounds& value){ _leftHouseNumberBounds = value; }
-				void setRightHouseNumberBounds(const HouseNumberBounds& value){ _rightHouseNumberBounds = value; }
-				void setLeftHouseNumberingPolicy(const HouseNumberingPolicy& value){ _leftHouseNumberingPolicy = value; }
-				void setRightHouseNumberingPolicy(const HouseNumberingPolicy& value){ _rightHouseNumberingPolicy = value; }
+
 				void addHouse(House& house);
 				void removeHouse(House& house);
-				void setCarOneWay(int value){ _carOneWay = value; }
-				void setFromCrossing(Crossing* value){ _crossing = value; }
-				void setRoad(Road* road){ _road = road; }
-				void setCarSpeed(double carSpeed){ _carSpeed = carSpeed; }
-				void setRankInPath(size_t value){ _rankInPath = value; }
-				void setMetricOffset(graph::MetricOffset value){ _metricOffset = value; }
-				void setNonDrivable(bool value){ _nonDrivable = value; }
-				void setNonWalkable(bool value){ _nonWalkable = value; }
-				void setNonBikable(bool value){ _nonBikable = value; }
+
+				void setCarOneWay(int value);
+				void setCarSpeed(double carSpeed);
+				void setNonWalkable(bool value);
+				void setNonDrivable(bool value);
+				void setNonBikable(bool value);
+				void setLeftHouseNumberBounds(const HouseNumberBounds& value);
+				void setRightHouseNumberBounds(const HouseNumberBounds& value);
+				void setLeftHouseNumberingPolicy(const HouseNumberingPolicy& value);
+				void setRightHouseNumberingPolicy(const HouseNumberingPolicy& value);
+
 			//@}
+
 
 			//! @name Getters
 			//@{
-				const HouseNumberBounds& getLeftHouseNumberBounds() const { return _leftHouseNumberBounds; }
-				const HouseNumberBounds& getRightHouseNumberBounds() const { return _rightHouseNumberBounds; }
-				const HouseNumberingPolicy& getLeftHouseNumberingPolicy() const { return _leftHouseNumberingPolicy; }
-				const HouseNumberingPolicy& getRightHouseNumberingPolicy() const { return _rightHouseNumberingPolicy; }
 				const Houses& getHouses() const { return _houses; }
-				int getCarOneWay() const { return _carOneWay; }
-				Crossing* getFromCrossing() const { return _crossing; }
-				double getCarSpeed(bool nominalSpeed = false) const;
-				Road* getRoad() const { return _road; }
-				size_t getRankInPath() const { return _rankInPath; }
-				graph::MetricOffset getMetricOffset() const { return _metricOffset; }
-				bool getNonDrivable() const { return _nonDrivable; }
-				bool getNonWalkable() const { return _nonWalkable; }
-				bool getNonBikable() const { return _nonBikable; }
 				RoadChunkEdge& getForwardEdge() const { return *_forwardEdge; }
 				RoadChunkEdge& getReverseEdge() const { return *_reverseEdge; }
+
+				double getCarSpeed(bool nominalSpeed = false) const;
+
+				Road* getRoad() const;
+				void setRoad(Road* road);
+
+				Crossing* getFromCrossing() const;
+				void setFromCrossing(Crossing* value);
+
+				graph::MetricOffset getMetricOffset() const;
+				void setMetricOffset(graph::MetricOffset value);
+
+				size_t getRankInPath() const;
+				void setRankInPath(size_t value);
+
+				const HouseNumberingPolicy& getLeftHouseNumberingPolicy() const;
+				const HouseNumberingPolicy& getRightHouseNumberingPolicy() const;
+				HouseNumberBounds getLeftHouseNumberBounds() const;
+				HouseNumberBounds getRightHouseNumberBounds() const;
 			//@}
 
 				
@@ -213,11 +243,6 @@ namespace synthese
 					double metricOffset
 				) const;
 
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
-
 				virtual void toParametersMap(
 					util::ParametersMap& pm,
 					bool withAdditionalParameters,
@@ -230,6 +255,10 @@ namespace synthese
 				virtual LinkedObjectsIds getLinkedObjectsIds(
 					const Record& record
 				) const;
+
+				virtual bool allowUpdate(const server::Session* session) const;
+				virtual bool allowCreate(const server::Session* session) const;
+				virtual bool allowDelete(const server::Session* session) const;
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
