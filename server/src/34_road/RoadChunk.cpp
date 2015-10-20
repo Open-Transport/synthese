@@ -51,7 +51,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_OBJECT(RoadChunk, "road_chunk_id", "road_chunk_ids")
 
 	FIELD_DEFINITION_OF_TYPE(FromCrossing, "address_id", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(RankInPath, "rank_in_path", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(RankInPathField, "rank_in_path", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(MetricOffsetField, "metric_offset", SQL_DOUBLE)
 
 	FIELD_DEFINITION_OF_TYPE(LeftStartHouseNumber, "left_start_house_number", SQL_INTEGER)
@@ -83,7 +83,7 @@ namespace synthese
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_VALUE_CONSTRUCTOR(FromCrossing, boost::optional<Crossing&>(*fromCrossing)),
-					FIELD_VALUE_CONSTRUCTOR(RankInPath, rankInRoad),
+					FIELD_VALUE_CONSTRUCTOR(RankInPathField, rankInRoad),
 					FIELD_VALUE_CONSTRUCTOR(Road, boost::optional<Road&>(*street)),
 					FIELD_VALUE_CONSTRUCTOR(MetricOffsetField, metricOffset),
 					FIELD_DEFAULT_CONSTRUCTOR(LeftStartHouseNumber),
@@ -98,7 +98,9 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(NonDrivable, false),
 					FIELD_VALUE_CONSTRUCTOR(NonBikable, false),
 					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
-			))
+			)),
+			_forwardEdge(new RoadChunkEdge(*this, false)),
+			_reverseEdge(new RoadChunkEdge(*this, true))
 		{
 			_updateEdges();
 		}
@@ -110,7 +112,7 @@ namespace synthese
 				  Schema(
 					  FIELD_VALUE_CONSTRUCTOR(Key, id),
 					  FIELD_DEFAULT_CONSTRUCTOR(FromCrossing),
-					  FIELD_DEFAULT_CONSTRUCTOR(RankInPath),
+					  FIELD_DEFAULT_CONSTRUCTOR(RankInPathField),
 					  FIELD_DEFAULT_CONSTRUCTOR(Road),
 					  FIELD_DEFAULT_CONSTRUCTOR(MetricOffsetField),
 					  FIELD_DEFAULT_CONSTRUCTOR(LeftStartHouseNumber),
@@ -125,7 +127,9 @@ namespace synthese
 					  FIELD_VALUE_CONSTRUCTOR(NonDrivable, false),
 					  FIELD_VALUE_CONSTRUCTOR(NonBikable, false),
 					  FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
-			  ))
+			  )),
+			  _forwardEdge(new RoadChunkEdge(*this, false)),
+			  _reverseEdge(new RoadChunkEdge(*this, true))
 		{
 			_updateEdges();
 		}
@@ -155,8 +159,8 @@ namespace synthese
 			_reverseEdge->setMetricOffset(get<MetricOffsetField>());
 
 			// Rank
-			_forwardEdge->setRankInPath(get<RankInPath>());
-			_reverseEdge->setRankInPath(numeric_limits<size_t>::max() - get<RankInPath>());
+			_forwardEdge->setRankInPath(get<RankInPathField>());
+			_reverseEdge->setRankInPath(numeric_limits<size_t>::max() - get<RankInPathField>());
 
 			// Use rules
 			bool noMotorVehicles(false);
@@ -432,7 +436,7 @@ namespace synthese
 			
 			pm.insert(prefix + TABLE_COL_ID, getKey());
 			pm.insert(prefix + RoadChunkTableSync::COL_CROSSING_ID, getFromCrossing() ? getFromCrossing()->getKey() : RegistryKeyType(0));
-			pm.insert(prefix + RoadChunkTableSync::COL_RANKINPATH, get<RankInPath>());
+			pm.insert(prefix + RoadChunkTableSync::COL_RANKINPATH, get<RankInPathField>());
 			pm.insert(prefix + RoadChunkTableSync::COL_ROADID, getRoad() ? getRoad()->getKey() : RegistryKeyType(0));
 			pm.insert(prefix + RoadChunkTableSync::COL_METRICOFFSET, get<MetricOffsetField>());
 			pm.insert(prefix + RoadChunkTableSync::COL_LEFT_START_HOUSE_NUMBER, getLeftHouseNumberBounds() ? lexical_cast<string>(getLeftHouseNumberBounds()->first) : string());
@@ -514,6 +518,20 @@ namespace synthese
 		}
 
 
+		bool RoadChunk::allowUpdate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool RoadChunk::allowCreate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool RoadChunk::allowDelete(const server::Session* session) const
+		{
+			return true;
+		}
 
 		boost::shared_ptr<geos::geom::LineString> RoadChunk::getRealGeometry() const
 		{
@@ -763,6 +781,90 @@ namespace synthese
 		{
 			return std::make_pair((HouseNumber) get<RightStartHouseNumber>(),
 								  (HouseNumber) get<RightEndHouseNumber>());
+		}
+
+		size_t
+		RoadChunk::getRankInPath() const
+		{
+			return get<RankInPathField>();
+		}
+
+		void
+		RoadChunk::setRankInPath(size_t value)
+		{
+			set<RankInPathField>(value);
+		}
+
+		void
+		RoadChunk::setRoad(Road* road)
+		{
+			set<Road>(road
+						? boost::optional<Road&>(*const_cast<Road*>(road))
+						: boost::none);
+		}
+
+
+		void
+		RoadChunk::setFromCrossing(Crossing* crossing)
+		{
+			set<FromCrossing>(crossing
+						? boost::optional<Crossing&>(*const_cast<Crossing*>(crossing))
+						: boost::none);
+		}
+
+
+		void
+		RoadChunk::setMetricOffset(graph::MetricOffset value)
+		{
+			set<MetricOffsetField>(value);
+		}
+
+		void
+		RoadChunk::setCarOneWay(int value)
+		{
+			set<OneWay>(value);
+		}
+
+		void RoadChunk::setCarSpeed(double carSpeed)
+		{
+			set<CarSpeed>(carSpeed);
+		}
+
+		void RoadChunk::setNonWalkable(bool value)
+		{
+			set<NonWalkable>(value);
+		}
+
+		void RoadChunk::setNonDrivable(bool value)
+		{
+			set<NonDrivable>(value);
+		}
+
+		void RoadChunk::setNonBikable(bool value)
+		{
+			set<NonBikable>(value);
+		}
+
+		void RoadChunk::setLeftHouseNumberBounds(const HouseNumberBounds& value)
+		{
+			set<LeftStartHouseNumber>(value.get().first);
+			set<LeftEndHouseNumber>(value.get().second);
+		}
+
+		void RoadChunk::setRightHouseNumberBounds(const HouseNumberBounds& value)
+		{
+			set<RightStartHouseNumber>(value.get().first);
+			set<RightEndHouseNumber>(value.get().second);
+		}
+
+		void RoadChunk::setLeftHouseNumberingPolicy(const HouseNumberingPolicy& value)
+		{
+			set<LeftHouseNumberingPolicy>(value);
+		}
+
+		void RoadChunk::setRightHouseNumberingPolicy(const HouseNumberingPolicy& value)
+		{
+			set<RightHouseNumberingPolicy>(value);
 		}
 
 

@@ -40,6 +40,7 @@
 #include "PTServiceConfigTableSync.hpp"
 #include "Webpage.h"
 #include "RoadChunkTableSync.h"
+#include "Crossing.h"
 #include <geos/geom/LineString.h>
 #include <geos/linearref/LengthIndexedLine.h>
 
