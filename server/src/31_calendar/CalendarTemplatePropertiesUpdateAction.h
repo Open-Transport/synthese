@@ -50,7 +50,7 @@ namespace synthese
 		private:
 			boost::shared_ptr<CalendarTemplate> _calendar;
 			boost::optional<std::string> _name;
-			boost::optional<CalendarTemplate::Category> _category;
+			boost::optional<CalendarTemplateCategory> _category;
 			boost::optional<boost::shared_ptr<CalendarTemplate> > _parent;
 
 		protected:

@@ -151,7 +151,7 @@ namespace synthese
 			// Category
 			if(map.isDefined(PARAMETER_CATEGORY))
 			{
-				_category = static_cast<CalendarTemplate::Category>(map.get<int>(PARAMETER_CATEGORY));
+				_category = static_cast<CalendarTemplateCategory>(map.get<int>(PARAMETER_CATEGORY));
 			}
 
 			// Importable

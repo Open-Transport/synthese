@@ -151,7 +151,7 @@ namespace synthese
 					pt.getForm().getSelectInput(
 						CalendarTemplatePropertiesUpdateAction::PARAMETER_CATEGORY,
 						CalendarTemplate::GetCategoriesList(),
-						optional<CalendarTemplate::Category>(_calendar->getCategory())
+						optional<CalendarTemplateCategory>(_calendar->getCategory())
 				)	);
 				stream << pt.cell(
 					"Parent",
