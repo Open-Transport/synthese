@@ -23,15 +23,17 @@
 #ifndef SYNTHESE_timetables_CalendarTemplate_h__
 #define SYNTHESE_timetables_CalendarTemplate_h__
 
+#include "Object.hpp"
 #include "Calendar.h"
 #include "CalendarTemplateElement.h"
 #include "Exception.h"
 #include "ImportableTemplate.hpp"
-#include "Registrable.h"
-#include "Registry.h"
 #include "TreeAlphabeticalOrderingPolicy.hpp"
 #include "TreeNode.hpp"
 #include "TreeUniqueRootPolicy.hpp"
+#include "CalendarTypes.h"
+#include "EnumObjectField.hpp"
+#include "DataSourceLinksField.hpp"
 
 #include <map>
 #include <boost/date_time/gregorian/greg_date.hpp>
@@ -40,16 +42,27 @@ namespace synthese
 {
 	namespace calendar
 	{
+
+		class CalendarTemplate;
+
+		FIELD_ENUM(Category, CalendarTemplateCategory)
+		FIELD_POINTER(ParentCalendarTemplate, CalendarTemplate)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(Category),
+			FIELD(impex::DataSourceLinks),
+			FIELD(ParentCalendarTemplate)
+		> CalendarTemplateSchema;
+
+
 		/** CalendarTemplate class.
 			@ingroup m31
 
-			<h3>Calendar template category</h3>
-
-			@see CalendarTemplate::Category
-
 		*/
 		class CalendarTemplate:
-			public virtual util::Registrable,
+			public Object<CalendarTemplate, CalendarTemplateSchema>,
 			public impex::ImportableTemplate<CalendarTemplate>,
 			public tree::TreeNode<
 				CalendarTemplate,
@@ -72,68 +85,18 @@ namespace synthese
 				InfiniteCalendarException();
 			};
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Category of calendar template.
-			/// Pour choisir le calendrier le plus simple d'affichage, pour l'édition des renvois d'indicateur par exemple, les calendriers sont rangés par categorie, selon le format binaire suivant&nbsp;:</p>
-			///
-			///	<table class="tableau">
-			///	<tr><td colspan="2">Plage de dates</td><td></td><td></td><td>Influence periode scolaire</td><td></td><td></td><td>Tout/partiel</td></tr>
-			///	<tr><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-			///	<tr><td>7</td><td colspan="6"></td><td>0</td></tr>
-			///	</table>
-			///
-			///	On obtient la classification de catégories suivante :
-			/// <table class="tableau">
-			///	<tr><th>Plage de dates</th><th>Influence periode scolaire</th><th>Tout/partiel</th><th>Code binaire</th><th>Code décimal</th></tr>
-			///	<tr><td rowspan="4">Service complet</td><td rowspan="2">Non</td><td>Totalite de la periode</td><td>00000000</td><td>0</td></tr>
-			///	<tr><td>Restriction</td><td>00000001</td><td>1</td></tr>
-			///	<tr><td rowspan="2">Oui</td><td>Totalite de la periode</td><td>00001000</td><td>0</td></tr>
-			///	<tr><td>Restriction</td><td>00001001</td><td>1</td></tr>
-			///	<tr><td rowspan="4">Service de transporteur (ete, hiver, SNCF, etc.)</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>01000000</td><td>0</td></tr>
-			///	<tr><td>Restriction</td><td>01000001</td><td>1</td></tr>
-			///	<tr><td rowspan="2">Oui</td><td>Totalite de la periode</td><td>01001000</td><td>0</td></tr>
-			///	<tr><td>Restriction</td><td>01001001</td><td>1</td></tr>
-			///	<tr><td rowspan="4">Plage restreinte (ski...)</td><td rowspan="2">Non</td><td>Totalite de la periode</td><td>10000000</td><td>0</td></tr>
-			///	<tr><td>Restriction</td><td>10000001</td><td>1</td></tr>
-			///	<tr><td rowspan="2">Oui</td><td>Totalite de la periode</td><td>10001000</td><td>0</td></tr>
-			///	<tr><td>Restriction</td><td>10001001</td><td>1</td></tr>
-			///	<tr><td colspan="3">Autres calendriers (defaut)</td><td>11111111</td><td>255</td></tr>
-			///	</table>
-			enum Category
-			{
-				ALL_DAYS = 0,
-				ALL_DAYS_RESTRICTION = 1,
-				ALL_DAYS_SCHOOL = 8,
-				ALL_DAYS_SCHOOL_RESTRICTION = 9,
-				TIMESTAMP = 64,
-				TIMESTAMP_RESTRICTION = 65,
-				TIMESTAMP_SCHOOL = 72,
-				TIMESTAMP_SCHOOL_RESTRICTION = 73,
-				RESTRICTED = 128,
-				RESTRICTED_RESTRICTION = 129,
-				RESTRICTED_SCHOOL = 136,
-				RESTRICTED_SCHOOL_RESTRICTION = 137,
-				OTHER_CALENDAR = 255
-			};
-
-			static std::string GetCategoryName(Category value);
-
-			typedef std::vector<std::pair<boost::optional<Category>, std::string> > CategoryList;
-
-			static CategoryList GetCategoriesList();
+			static std::string GetCategoryName(CalendarTemplateCategory value);
+			static CalendarTemplateCategoryList GetCategoriesList();
 
 			typedef std::map<std::size_t, CalendarTemplateElement> Elements;
 
 		private:
+
 			mutable Elements	_elements;
-			std::string _name;
-			Category								_category;
 
 		public:
-			CalendarTemplate();
-
 			CalendarTemplate(
-				util::RegistryKeyType id
+				util::RegistryKeyType id = 0
 			);
 
 			CalendarTemplate(
@@ -180,15 +143,15 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				Category getCategory() const;
+				CalendarTemplateCategory getCategory() const;
 				const Elements& getElements() const { return _elements; }
-				virtual std::string getName() const { return _name; }
+				virtual std::string getName() const;
 			//@}
 
 			//! @name Setters
 			//@{
-				void	setCategory(Category value);
-				void setName(const std::string& value){ _name = value; }
+				void	setCategory(CalendarTemplateCategory value);
+				void	setName(const std::string& value);
 			//@}
 
 			//! @name Modifiers
@@ -197,10 +160,9 @@ namespace synthese
 				void	addElement(const CalendarTemplateElement& element);
 				void	removeElement(const CalendarTemplateElement& element);
 
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
+				virtual bool allowUpdate(const server::Session* session) const;
+				virtual bool allowCreate(const server::Session* session) const;
+				virtual bool allowDelete(const server::Session* session) const;
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 

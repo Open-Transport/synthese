@@ -105,7 +105,7 @@ namespace synthese
 				from_string(map.get<string>(PARAMETER_MAX_DATE))
 			;
 			_interval = days(map.getDefault<int>(PARAMETER_INTERVAL, 1));
-			_positive = static_cast<CalendarTemplateElement::Operation>(map.get<int>(PARAMETER_POSITIVE));
+			_positive = static_cast<CalendarTemplateElementOperation>(map.get<int>(PARAMETER_POSITIVE));
 
 			// Rank
 			optional<size_t> existingMaxRank(
@@ -159,7 +159,7 @@ namespace synthese
 		{
 			_minDate = value;
 			_maxDate = value;
-			_positive = CalendarTemplateElement::ADD;
+			_positive = ADD;
 		}
 	}
 }

@@ -81,7 +81,7 @@ namespace synthese
 			boost::gregorian::date_duration	_interval;
 			size_t			_rank;
 			boost::shared_ptr<const CalendarTemplate>	_include;
-			CalendarTemplateElement::Operation	_positive;
+			CalendarTemplateElementOperation	_positive;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

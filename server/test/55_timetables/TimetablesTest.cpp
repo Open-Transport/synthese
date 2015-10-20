@@ -287,7 +287,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 	element.setMinDate(day_clock::local_day());
 	element.setMaxDate(day_clock::local_day() + days(2));
 	element.setRank(0);
-	element.setOperation(CalendarTemplateElement::ADD);
+	element.setOperation(ADD);
 	element.setCalendar(&baseCalendarAllDays);
 	baseCalendarAllDays.addElement(element);
 

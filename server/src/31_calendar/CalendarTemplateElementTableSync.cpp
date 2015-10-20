@@ -81,14 +81,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<CalendarTemplateElementTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(CalendarTemplateElementTableSync::COL_CALENDAR_ID, SQL_INTEGER),
-			Field(CalendarTemplateElementTableSync::COL_RANK, SQL_INTEGER),
-			Field(CalendarTemplateElementTableSync::COL_MIN_DATE, SQL_DATE),
-			Field(CalendarTemplateElementTableSync::COL_MAX_DATE, SQL_DATE),
-			Field(CalendarTemplateElementTableSync::COL_INTERVAL, SQL_INTEGER),
-			Field(CalendarTemplateElementTableSync::COL_POSITIVE, SQL_INTEGER),
-			Field(CalendarTemplateElementTableSync::COL_INCLUDE_ID, SQL_INTEGER),
 			Field()
 		};
 
@@ -101,50 +93,6 @@ namespace synthese
 			r.push_back(DBTableSync::Index(CalendarTemplateElementTableSync::COL_CALENDAR_ID.c_str(), ""));
 			r.push_back(DBTableSync::Index(CalendarTemplateElementTableSync::COL_INCLUDE_ID.c_str(), ""));
 			return r;
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<CalendarTemplateElementTableSync,CalendarTemplateElement>::Load(
-			CalendarTemplateElement* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
-			object->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<CalendarTemplateElementTableSync,CalendarTemplateElement>::Save(
-			CalendarTemplateElement* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<CalendarTemplateElementTableSync> query(*object);
-			query.addField(object->getCalendar() ? object->getCalendar()->getKey() : RegistryKeyType(0));
-			query.addField(object->getRank());
-			query.addField(object->getMinDate().is_special() ? string() : to_iso_extended_string(object->getMinDate()));
-			query.addField(object->getMaxDate().is_special() ? string() : to_iso_extended_string(object->getMaxDate()));
-			query.addFrameworkField<DaysField>(object->getStep());
-			query.addField(static_cast<int>(object->getOperation()));
-			query.addField(object->getInclude() ? object->getInclude()->getKey() : RegistryKeyType(0));
-			query.execute(transaction);
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<CalendarTemplateElementTableSync,CalendarTemplateElement>::Unlink(
-			CalendarTemplateElement* obj
-		){
-			obj->unlink();
 		}
 
 
@@ -283,5 +231,11 @@ namespace synthese
 			query.addWhereField(COL_CALENDAR_ID, calendarId);
 			query.execute(transaction);
 		}
+
+		bool CalendarTemplateElementTableSync::allowList(const server::Session* session) const
+		{
+			return true;
+		}
+
 	}
 }

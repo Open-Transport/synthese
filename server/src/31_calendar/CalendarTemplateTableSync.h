@@ -29,7 +29,6 @@
 #include <boost/optional.hpp>
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 #include "CalendarTemplate.h"
 
 namespace synthese
@@ -46,17 +45,12 @@ namespace synthese
 		class CalendarTemplateTableSync:
 			public db::DBDirectTableSyncTemplate<
 				CalendarTemplateTableSync,
-				CalendarTemplate,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				CalendarTemplate
 			>
 		{
 		public:
-			static const std::string COL_TEXT;
-			static const std::string COL_CATEGORY;
-			static const std::string COL_DATASOURCE_LINKS;
-			static const std::string COL_PARENT_ID;
 
+			virtual bool allowList( const server::Session* session ) const;
 
 			/** CalendarTemplate search.
 				@param env Environment to populate

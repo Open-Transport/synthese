@@ -31,7 +31,6 @@
 #include <iostream>
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 #include "CalendarTemplateElement.h"
 
 namespace synthese
@@ -49,10 +48,7 @@ namespace synthese
 		class CalendarTemplateElementTableSync:
 			public db::DBDirectTableSyncTemplate<
 				CalendarTemplateElementTableSync,
-				CalendarTemplateElement,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
-			>
+				CalendarTemplateElement>
 		{
 		public:
 			static const std::string COL_CALENDAR_ID;
@@ -62,6 +58,8 @@ namespace synthese
 			static const std::string COL_INTERVAL;
 			static const std::string COL_POSITIVE;
 			static const std::string COL_INCLUDE_ID;
+
+			virtual bool allowList( const server::Session* session ) const;
 
 			/** CalendarTemplateElement search.
 				@param env Environment to populate
