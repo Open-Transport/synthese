@@ -22,14 +22,19 @@
 
 #include "PTUseRule.h"
 
-#include "FareTableSync.hpp"
-#include "LineStop.h"
-#include "PTUseRuleTableSync.h"
-#include "JourneyPattern.hpp"
+#include "AccessParameters.h"
 #include "CommercialLine.h"
+#include "Fare.hpp"
+#include "FareTableSync.hpp"
+#include "JourneyPattern.hpp"
+#include "LineStop.h"
+#include "Profile.h"
+#include "PTUseRuleTableSync.h"
 #include "ServicePointer.h"
 #include "StopArea.hpp"
-#include "AccessParameters.h"
+#include "TransportNetworkRight.h"
+#include "User.h"
+
 
 using namespace boost;
 using namespace std;
@@ -44,10 +49,23 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 
-	namespace util
-	{
-		template<> const std::string Registry<pt::PTUseRule>::KEY("PTUseRule");
-	}
+	CLASS_DEFINITION(PTUseRule, "t061_pt_use_rules", 61)
+	FIELD_DEFINITION_OF_OBJECT(PTUseRule, "pt_use_rule_id", "pt_use_rule_ids")
+
+	FIELD_DEFINITION_OF_TYPE(Capacity, "capacity", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(ReservationType, "reservation_type", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(OriginIsReference, "origin_is_reference", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(MinDelayMinutes, "min_delay_minutes", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MinDelayMinutesExternal, "min_delay_minutes_external", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MinDelayDays, "min_delay_days", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MaxDelayDays, "max_delay_days", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(HourDeadLine, "hour_deadline", SQL_TIME)
+	FIELD_DEFINITION_OF_TYPE(ReservationMinDepartureTime, "reservation_min_departure_time", SQL_TIME)
+	FIELD_DEFINITION_OF_TYPE(ReservationForbiddenDays, "reservation_forbidden_days", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DefaultFare, "default_fare_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(ForbiddenInDepartureBoards, "forbidden_in_departure_boards", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(ForbiddenInTimetables, "forbidden_in_timetables", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(ForbiddenInJourneyPlanning, "forbidden_in_journey_planning", SQL_BOOLEAN)
 
 	namespace pt
 	{
@@ -61,19 +79,26 @@ namespace synthese
 		PTUseRule::PTUseRule(
 			util::RegistryKeyType key
 		):	Registrable(key),
-			_accessCapacity(0),
-			_defaultFare(NULL),
-			_reservationType(RESERVATION_RULE_FORBIDDEN),
-			_originIsReference(false),
-			_minDelayMinutes(minutes(0)),
-			_minDelayDays(days(0)),
-			_maxDelayDays(optional<date_duration>()),
-			_hourDeadLine(not_a_date_time),
-			_reservationMinDepartureTime(not_a_date_time),
-			_forbiddenInDepartureBoards(false),
-			_forbiddenInTimetables(false),
-			_forbiddenInJourneyPlanning(false),
-			_minDelayMinutesExternal(minutes(0))
+			Object<PTUseRule, PTUseRuleSchema> (
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_VALUE_CONSTRUCTOR(Capacity, "0"),
+					FIELD_VALUE_CONSTRUCTOR(ReservationType, RESERVATION_RULE_FORBIDDEN),
+					FIELD_VALUE_CONSTRUCTOR(OriginIsReference, false),
+					FIELD_VALUE_CONSTRUCTOR(MinDelayMinutes, minutes(0)),
+					FIELD_VALUE_CONSTRUCTOR(MinDelayMinutesExternal, minutes(0)),
+					FIELD_VALUE_CONSTRUCTOR(MinDelayDays, days(0)),
+					FIELD_DEFAULT_CONSTRUCTOR(MaxDelayDays),
+					FIELD_VALUE_CONSTRUCTOR(HourDeadLine, not_a_date_time),
+					FIELD_VALUE_CONSTRUCTOR(ReservationMinDepartureTime, not_a_date_time),
+					FIELD_DEFAULT_CONSTRUCTOR(pt::ReservationForbiddenDays),
+					FIELD_DEFAULT_CONSTRUCTOR(DefaultFare),
+					FIELD_VALUE_CONSTRUCTOR(ForbiddenInDepartureBoards, false),
+					FIELD_VALUE_CONSTRUCTOR(ForbiddenInTimetables, false),
+					FIELD_VALUE_CONSTRUCTOR(ForbiddenInJourneyPlanning, false)
+			)	),
+			_accessCapacity(0)
 		{}
 
 
@@ -83,11 +108,11 @@ namespace synthese
 		){
 			if (hourDeadLine == time_duration(0,0,0))
 			{
-				_hourDeadLine = time_duration(23,59,59);
+				set<HourDeadLine>(time_duration(23,59,59));
 			}
 			else
 			{
-				_hourDeadLine = hourDeadLine;
+				set<HourDeadLine>(hourDeadLine);
 			}
 		}
 
@@ -101,7 +126,7 @@ namespace synthese
 		) const {
 
 			const ptime& referenceTime(
-				_originIsReference ?
+				get<OriginIsReference>() ?
 				originDateTime :
 				departureTime
 			);
@@ -112,20 +137,20 @@ namespace synthese
 
 			if (reservationRulesDelayType == RESERVATION_INTERNAL_DELAY)
 			{
-				minDelayMinutes = _minDelayMinutes;
+				minDelayMinutes = get<MinDelayMinutes>();
 			}
 			else if (reservationRulesDelayType == RESERVATION_EXTERNAL_DELAY)
 			{
-				minDelayMinutes = _minDelayMinutesExternal;
+				minDelayMinutes = get<MinDelayMinutesExternal>();
 			}
 
-			if(	!_reservationMinDepartureTime.is_not_a_date_time() &&
-				referenceTime.time_of_day() < _reservationMinDepartureTime
+			if(	!get<ReservationMinDepartureTime>().is_not_a_date_time() &&
+				referenceTime.time_of_day() < get<ReservationMinDepartureTime>()
 			){
-				minutesMoment = minutesMoment - _minDelayDays + time_duration(23,59,59);
-				if ( _hourDeadLine < minutesMoment.time_of_day() )
+				minutesMoment = minutesMoment - get<MinDelayDays>() + time_duration(23,59,59);
+				if ( get<HourDeadLine>() < minutesMoment.time_of_day() )
 				{
-					minutesMoment = ptime(minutesMoment.date(), _hourDeadLine);
+					minutesMoment = ptime(minutesMoment.date(), get<HourDeadLine>());
 				}
 			}
 			else if (minDelayMinutes.total_seconds())
@@ -135,18 +160,18 @@ namespace synthese
 
 			// Days delay
 			ptime daysMoment(referenceTime);
-			if(	_minDelayDays.days()
+			if(	get<MinDelayDays>().days()
 			){
-				daysMoment = daysMoment - _minDelayDays + time_duration(23,59,59);
-				if ( _hourDeadLine < daysMoment.time_of_day() )
+				daysMoment = daysMoment - get<MinDelayDays>() + time_duration(23,59,59);
+				if ( get<HourDeadLine>() < daysMoment.time_of_day() )
 				{
-					daysMoment = ptime(daysMoment.date(), _hourDeadLine);
+					daysMoment = ptime(daysMoment.date(), get<HourDeadLine>());
 				}
 			}
-			else if ( _hourDeadLine.hours() > 0)
+			else if ( get<HourDeadLine>().hours() > 0)
 			{
 				daysMoment = daysMoment - time_duration(23,59,59);
-				daysMoment = ptime(daysMoment.date(), _hourDeadLine);
+				daysMoment = ptime(daysMoment.date(), get<HourDeadLine>());
 			}
 
 			// Choosing worse delay
@@ -162,9 +187,9 @@ namespace synthese
 				while( _reservationForbiddenDays.find(result.date().day_of_week()) != _reservationForbiddenDays.end())
 				{
 					result = ptime(result.date() - days(1), result.time_of_day());
-					if ( _hourDeadLine < result.time_of_day() )
+					if ( get<HourDeadLine>() < result.time_of_day() )
 					{
-						result = ptime(result.date(), _hourDeadLine);
+						result = ptime(result.date(), get<HourDeadLine>());
 					}
 				}
 			}
@@ -190,7 +215,7 @@ namespace synthese
 				return RUN_POSSIBLE;
 			}
 
-			switch(_reservationType)
+			switch(get<ReservationType>())
 			{
 			case RESERVATION_RULE_FORBIDDEN:
 			case RESERVATION_RULE_OPTIONAL:
@@ -245,7 +270,7 @@ namespace synthese
 				return RESERVATION_FORBIDDEN;
 			}
 
-			switch(_reservationType)
+			switch(get<ReservationType>())
 			{
 			case RESERVATION_RULE_FORBIDDEN:
 				return RESERVATION_FORBIDDEN;
@@ -370,9 +395,9 @@ namespace synthese
 		ptime PTUseRule::getReservationOpeningTime(
 			const graph::ServicePointer& servicePointer
 		) const {
-			if(_maxDelayDays)
+			if(get<MaxDelayDays>() != boost::gregorian::days(0))
 			{
-				return ptime(servicePointer.getOriginDateTime().date(), -hours(24 * _maxDelayDays->days()));
+				return ptime(servicePointer.getOriginDateTime().date(), -hours(24 * get<MaxDelayDays>().days()));
 			}
 			return neg_infin;
 		}
@@ -387,11 +412,11 @@ namespace synthese
 			// 				return false;
 
 			if (accessParameters.getDRTOnly() &&
-				_reservationType == RESERVATION_RULE_FORBIDDEN
+				get<ReservationType>() == RESERVATION_RULE_FORBIDDEN
 			) return false;
 
 			if (accessParameters.getWithoutDRT() &&
-				_reservationType != RESERVATION_RULE_FORBIDDEN
+				get<ReservationType>() != RESERVATION_RULE_FORBIDDEN
 			) return false;
 
 			return true;
@@ -432,350 +457,95 @@ namespace synthese
 			boost::logic::tribool withFiles,
 			std::string prefix
 		) const {
-			pm.insert(prefix + DATA_RESERVATION_COMPULSORY, _reservationType == RESERVATION_RULE_COMPULSORY);
-			pm.insert(prefix + DATA_RESERVATION_POSSIBLE, _reservationType != RESERVATION_RULE_FORBIDDEN);
-			if(_reservationType != RESERVATION_RULE_FORBIDDEN)
+			pm.insert(prefix + DATA_RESERVATION_COMPULSORY, get<ReservationType>() == RESERVATION_RULE_COMPULSORY);
+			pm.insert(prefix + DATA_RESERVATION_POSSIBLE, get<ReservationType>() != RESERVATION_RULE_FORBIDDEN);
+			if(get<ReservationType>() != RESERVATION_RULE_FORBIDDEN)
 			{
-				pm.insert(prefix + DATA_RESERVATION_MIN_DELAY_MINUTES, _minDelayMinutes.minutes());
-				pm.insert(prefix + DATA_RESERVATION_MIN_DELAY_MINUTES_EXTERNAL, _minDelayMinutesExternal.minutes());
+				pm.insert(prefix + DATA_RESERVATION_MIN_DELAY_MINUTES, get<MinDelayMinutes>().minutes());
+				pm.insert(prefix + DATA_RESERVATION_MIN_DELAY_MINUTES_EXTERNAL, get<MinDelayMinutesExternal>().minutes());
 			}
 
 			pm.insert(prefix + TABLE_COL_ID, getKey());
-			pm.insert(prefix + PTUseRuleTableSync::COL_NAME, getName());
+			pm.insert(prefix + SimpleObjectFieldDefinition<Name>::FIELD.name, getName());
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_CAPACITY,
+				prefix + Capacity::FIELD.name,
 				getAccessCapacity() ? lexical_cast<string>(*getAccessCapacity()) : string()
 			);
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_RESERVATION_TYPE,
+				prefix + pt::ReservationType::FIELD.name,
 				static_cast<int>(getReservationType())
 			);
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_ORIGINISREFERENCE,
+				prefix + OriginIsReference::FIELD.name,
 				getOriginIsReference()
 			);
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_MINDELAYMINUTES,
+				prefix + MinDelayMinutes::FIELD.name,
 				boost::lexical_cast<std::string>(getMinDelayMinutes().total_seconds() / 60)
 			);
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_MINDELAYMINUTESEXTERNAL,
+				prefix + MinDelayMinutesExternal::FIELD.name,
 				boost::lexical_cast<std::string>(getMinDelayMinutesExternal().total_seconds() / 60)
 			);
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_MINDELAYDAYS,
+				prefix + MinDelayDays::FIELD.name,
 				boost::lexical_cast<std::string>(static_cast<int>(getMinDelayDays().days()))
 			);
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_MAXDELAYDAYS,
+				prefix + MaxDelayDays::FIELD.name,
 				getMaxDelayDays() ? static_cast<int>(getMaxDelayDays()->days()) : int(0)
 			);
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_HOURDEADLINE,
+				prefix + HourDeadLine::FIELD.name,
 				getHourDeadLine().is_not_a_date_time() ? std::string() : boost::posix_time::to_simple_string(getHourDeadLine())
 			);
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_RESERVATION_MIN_DEPARTURE_TIME,
+				prefix + ReservationMinDepartureTime::FIELD.name,
 				getReservationMinDepartureTime().is_not_a_date_time() ? std::string() : boost::posix_time::to_simple_string(getReservationMinDepartureTime())
 			);
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_RESERVATION_FORBIDDEN_DAYS,
-				PTUseRuleTableSync::SerializeForbiddenDays(getReservationForbiddenDays())
+				prefix + pt::ReservationForbiddenDays::FIELD.name,
+				PTUseRule::SerializeForbiddenDays(getReservationForbiddenDays())
 			);
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_DEFAULT_FARE,
+				prefix + DefaultFare::FIELD.name,
 				getDefaultFare() ? getDefaultFare()->getKey() : RegistryKeyType(0)
 			);
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS,
+				prefix + ForbiddenInDepartureBoards::FIELD.name,
 				getForbiddenInDepartureBoards()
 			);
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_FORBIDDEN_IN_TIMETABLES,
+				prefix + ForbiddenInTimetables::FIELD.name,
 				getForbiddenInTimetables()
 			);
 			pm.insert(
-				prefix + PTUseRuleTableSync::COL_FORBIDDEN_IN_JOURNEY_PLANNING,
+				prefix + ForbiddenInJourneyPlanning::FIELD.name,
 				getForbiddenInJourneyPlanning()
 			);
 		}
 
 
 
-		bool PTUseRule::loadFromRecord( const Record& record, util::Env& env )
-		{
-			bool result(false);
-
-			// Rule type
-			if(record.isDefined(PTUseRuleTableSync::COL_RESERVATION_TYPE))
-			{
-				PTUseRule::ReservationRuleType ruleType(
-					static_cast<PTUseRule::ReservationRuleType>(
-						record.getDefault<int>(PTUseRuleTableSync::COL_RESERVATION_TYPE)
-				)	);
-				if(ruleType != getReservationType())
-				{
-					result = true;
-					setReservationType(ruleType);
-				}
-			}
-
-			// Origin is reference
-			if(record.isDefined(PTUseRuleTableSync::COL_ORIGINISREFERENCE))
-			{
-				bool originIsReference(
-					record.getDefault<bool>(PTUseRuleTableSync::COL_ORIGINISREFERENCE, false)
-				);
-				if(originIsReference != getOriginIsReference())
-				{
-					result = true;
-					setOriginIsReference(originIsReference);
-				}
-			}
-
-			// Min minutes delay (default=0)
-			if(record.isDefined(PTUseRuleTableSync::COL_MINDELAYMINUTES))
-			{
-				time_duration minDelayMinutes(minutes(0));
-				try
-				{
-					minDelayMinutes = minutes(
-						record.get<long>(PTUseRuleTableSync::COL_MINDELAYMINUTES)
-					);
-				}
-				catch(...)
-				{
-				}
-				if(minDelayMinutes != getMinDelayMinutes())
-				{
-					result = true;
-					setMinDelayMinutes(minDelayMinutes);
-				}
-			}
-			
-			if(record.isDefined(PTUseRuleTableSync::COL_MINDELAYMINUTESEXTERNAL))
-			{
-				time_duration minDelayMinutes(minutes(0));
-				try
-				{
-					minDelayMinutes = minutes(
-						record.get<long>(PTUseRuleTableSync::COL_MINDELAYMINUTESEXTERNAL)
-					);
-				}
-				catch(...)
-				{
-				}
-				if(minDelayMinutes != getMinDelayMinutesExternal())
-				{
-					result = true;
-					setMinDelayMinutesExternal(minDelayMinutes);
-				}
-			}
-
-			// Min days delay (default=0)
-			if(record.isDefined(PTUseRuleTableSync::COL_MINDELAYDAYS))
-			{
-				date_duration minDelayDays(days(0));
-				try
-				{
-					minDelayDays = days(
-						record.get<int>(PTUseRuleTableSync::COL_MINDELAYDAYS)
-					);
-				}
-				catch(...)
-				{
-				}
-				if(minDelayDays != getMinDelayDays())
-				{
-					result = true;
-					setMinDelayDays(minDelayDays);
-				}
-			}
-
-			// Max days delay
-			if(record.isDefined(PTUseRuleTableSync::COL_MAXDELAYDAYS))
-			{
-				optional<date_duration> value;
-				try
-				{
-					date_duration maxDelayDays = days(
-						record.get<int>(PTUseRuleTableSync::COL_MAXDELAYDAYS)
-					);
-					if(maxDelayDays.days() > 0)
-					{
-						value = maxDelayDays;
-					}
-				}
-				catch(...)
-				{
-				}
-				if(value != getMaxDelayDays())
-				{
-					result = true;
-					setMaxDelayDays(value);
-				}
-			}
-
-			// Hour deadline
-			if(record.isDefined(PTUseRuleTableSync::COL_HOURDEADLINE))
-			{
-				time_duration value(not_a_date_time);
-				try
-				{
-					string text(record.get<string>(PTUseRuleTableSync::COL_HOURDEADLINE));
-					if(!text.empty())
-					{
-						value = duration_from_string(text);
-					}
-				}
-				catch(...)
-				{
-				}
-				if(value != getHourDeadLine())
-				{
-					result = true;
-					setHourDeadLine(value);
-				}
-			}
-
-			// Reservation min departure time
-			if(record.isDefined(PTUseRuleTableSync::COL_RESERVATION_MIN_DEPARTURE_TIME))
-			{
-				time_duration value(not_a_date_time);
-				try
-				{
-					string text(record.get<string>(PTUseRuleTableSync::COL_RESERVATION_MIN_DEPARTURE_TIME));
-					if(!text.empty())
-					{
-						value = duration_from_string(text);
-					}
-				}
-				catch(...)
-				{
-				}
-				if(value != getReservationMinDepartureTime())
-				{
-					result = true;
-					setReservationMinDepartureTime(value);
-				}
-			}
-
-			// Reservation forbidden days
-			if(record.isDefined(PTUseRuleTableSync::COL_RESERVATION_FORBIDDEN_DAYS))
-			{
-				PTUseRule::ReservationForbiddenDays value(
-					PTUseRuleTableSync::UnserializeForbiddenDays(
-						record.get<string>(PTUseRuleTableSync::COL_RESERVATION_FORBIDDEN_DAYS)
-				)	);
-				if(value != getReservationForbiddenDays())
-				{
-					result = true;
-					setReservationForbiddenDays(value);
-				}
-			}
-
-			// Name
-			if(record.isDefined(PTUseRuleTableSync::COL_NAME))
-			{
-				string value(record.get<string>(PTUseRuleTableSync::COL_NAME));
-				if(value != getName())
-				{
-					result = true;
-					setName(value);
-				}
-			}
-
-			if(record.isDefined(PTUseRuleTableSync::COL_CAPACITY))
-			{
-				optional<size_t> value;
-				string text(record.get<string>(PTUseRuleTableSync::COL_CAPACITY));
-				if(!text.empty()) try
-				{
-					value = lexical_cast<size_t>(text);
-				}
-				catch(...)
-				{
-				}
-				if(value != getAccessCapacity())
-				{
-					result = true;
-					setAccessCapacity(value);
-				}
-			}
-
-			if(record.isDefined(PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS))
-			{
-				bool value(
-					record.getDefault<bool>(PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS, false)
-				);
-				if(value != getForbiddenInDepartureBoards())
-				{
-					result = true;
-					setForbiddenInDepartureBoards(value);
-				}
-			}
-
-			if(record.isDefined(PTUseRuleTableSync::COL_FORBIDDEN_IN_TIMETABLES))
-			{
-				bool value(
-					record.getDefault<bool>(PTUseRuleTableSync::COL_FORBIDDEN_IN_TIMETABLES, false)
-				);
-				if(value != getForbiddenInTimetables())
-				{
-					result = true;
-					setForbiddenInTimetables(value);
-				}
-			}
-
-			if(record.isDefined(PTUseRuleTableSync::COL_FORBIDDEN_IN_JOURNEY_PLANNING))
-			{
-				bool value(
-					record.getDefault<bool>(PTUseRuleTableSync::COL_FORBIDDEN_IN_JOURNEY_PLANNING, false)
-				);
-				if(value != getForbiddenInJourneyPlanning())
-				{
-					result = true;
-					setForbiddenInJourneyPlanning(value);
-				}
-			}
-
-
-//			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				// Default fare
-				if(record.isDefined(PTUseRuleTableSync::COL_DEFAULT_FARE))
-				{
-					Fare* value(NULL);
-					RegistryKeyType id(
-						record.getDefault<RegistryKeyType>(PTUseRuleTableSync::COL_DEFAULT_FARE, 0)
-					);
-					if(id > 0)
-					{
-						try
-						{
-							value = FareTableSync::GetEditable(id, env).get();
-						}
-						catch(ObjectNotFoundException<Fare> e)
-						{
-							Log::GetInstance().warn("Fare "+ lexical_cast<string>(id) +" not found in PT Use Rule "+ lexical_cast<string>(getKey()));
-						}
-					}
-					if(value != getDefaultFare())
-					{
-						result = true;
-						setDefaultFare(value);
-					}
-				}
-			}
-
-			return result;
-		}
-
-
-
 		void PTUseRule::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
+			// Reservation forbidden days
+			PTUseRule::ReservationForbiddenDays value(
+				PTUseRule::UnserializeForbiddenDays(
+					get<pt::ReservationForbiddenDays>()
+			)	);
+			setReservationForbiddenDays(value);
 
+			optional<size_t> capacity;
+			string text(get<Capacity>());
+			if(!text.empty()) try
+			{
+				capacity = lexical_cast<size_t>(text);
+			}
+			catch(...)
+			{
+			}
+			setAccessCapacity(capacity);
 		}
 
 
@@ -783,13 +553,93 @@ namespace synthese
 		synthese::LinkedObjectsIds PTUseRule::getLinkedObjectsIds( const Record& record ) const
 		{
 			synthese::LinkedObjectsIds result;
-			RegistryKeyType id(
-				record.getDefault<RegistryKeyType>(PTUseRuleTableSync::COL_DEFAULT_FARE, 0)
-			);
-			if(id)
+			if(get<DefaultFare>())
 			{
-				result.push_back(id);
+				result.push_back(get<DefaultFare>()->getKey());
 			}
 			return result;
+		}
+
+		std::string PTUseRule::SerializeForbiddenDays( const PTUseRule::ReservationForbiddenDays& value )
+		{
+			bool first(true);
+			stringstream forbiddenDays;
+			BOOST_FOREACH(const date::day_of_week_type& day, value)
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					forbiddenDays << ",";
+				}
+				forbiddenDays << int(day);
+			}
+			return forbiddenDays.str();
+		}
+
+		PTUseRule::ReservationForbiddenDays PTUseRule::UnserializeForbiddenDays( const std::string& value )
+		{
+			if(value.empty())
+			{
+				return PTUseRule::ReservationForbiddenDays();
+			}
+			else
+			{
+				PTUseRule::ReservationForbiddenDays days;
+				vector<string> daysVec;
+				split(daysVec, value, is_any_of(","));
+				BOOST_FOREACH(const string& dayStr, daysVec)
+				{
+					try
+					{
+						days.insert(static_cast<date::day_of_week_type>(lexical_cast<int>(dayStr)));
+					}
+					catch(bad_lexical_cast&)
+					{
+					}
+				}
+				return days;
+			}
+		}
+
+		void PTUseRule::setReservationForbiddenDays(const std::set<boost::gregorian::date::day_of_week_type>& value)
+		{
+			_reservationForbiddenDays = value;
+			string strForbiddenDays = SerializeForbiddenDays(value);
+			set<pt::ReservationForbiddenDays>(strForbiddenDays);
+		}
+
+		void PTUseRule::setDefaultFare(fare::Fare* value)
+		{
+			set<DefaultFare>(value
+				? boost::optional<fare::Fare&>(*value)
+				: boost::none);
+		}
+
+		const boost::optional<boost::gregorian::date_duration>&	PTUseRule::getMaxDelayDays() const
+		{
+			boost::optional<boost::gregorian::date_duration> value;
+			if (get<MaxDelayDays>() != boost::gregorian::days(0))
+			{
+				value = get<MaxDelayDays>();
+			}
+			return value;
+		}
+
+		bool PTUseRule::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::WRITE);
+		}
+
+		bool PTUseRule::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::WRITE);
+		}
+
+		bool PTUseRule::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::DELETE_RIGHT);
 		}
 }	}

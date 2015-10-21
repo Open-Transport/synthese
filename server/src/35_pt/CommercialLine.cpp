@@ -30,6 +30,7 @@
 #include "DataSourceLinksField.hpp"
 #include "DBConstants.h"
 #include "Edge.h"
+#include "Fare.hpp"
 #include "ForbiddenUseRule.h"
 #include "GraphConstants.h"
 #include "ImportableTableSync.hpp"

@@ -29,6 +29,7 @@
 #include "RoadPath.hpp"
 #include "RoadPlace.h"
 #include "PTModule.h"
+#include "Fare.hpp"
 #include "FreeDRTArea.hpp"
 #include "StopPoint.hpp"
 

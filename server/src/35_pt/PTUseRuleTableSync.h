@@ -28,7 +28,6 @@
 #include <iostream>
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 #include "PTUseRule.h"
 #include "RuleUser.h"
 
@@ -43,28 +42,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				PTUseRuleTableSync,
 				PTUseRule,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>
 		{
 		public:
-			static const std::string COL_NAME;
-			static const std::string COL_CAPACITY;
-			static const std::string COL_RESERVATION_TYPE;
-			static const std::string COL_ORIGINISREFERENCE;
-			static const std::string COL_MINDELAYMINUTES;
-			static const std::string COL_MINDELAYMINUTESEXTERNAL;
-			static const std::string COL_MINDELAYDAYS;
-			static const std::string COL_MAXDELAYDAYS;
-			static const std::string COL_HOURDEADLINE;
-			static const std::string COL_RESERVATION_MIN_DEPARTURE_TIME;
-			static const std::string COL_RESERVATION_FORBIDDEN_DAYS;
-			static const std::string COL_DEFAULT_FARE;
-			static const std::string COL_FORBIDDEN_IN_DEPARTURE_BOARDS;
-			static const std::string COL_FORBIDDEN_IN_TIMETABLES;
-			static const std::string COL_FORBIDDEN_IN_JOURNEY_PLANNING;
-
-
 			//////////////////////////////////////////////////////////////////////////
 			/// Search of use rules.
 			/// @author Hugues Romain
@@ -89,13 +70,7 @@ namespace synthese
 
 
 
-			static std::string SerializeForbiddenDays(
-				const PTUseRule::ReservationForbiddenDays& value
-			);
-
-			static PTUseRule::ReservationForbiddenDays UnserializeForbiddenDays(
-				const std::string& value
-			);
+			virtual bool allowList( const server::Session* session ) const;
 
 			static graph::RuleUser::Rules UnserializeUseRules(
 				const std::string& value,

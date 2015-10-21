@@ -30,6 +30,7 @@
 #include "DBConstants.h"
 #include "Edge.h"
 #include "Env.h"
+#include "Fare.hpp"
 #include "ForbiddenUseRule.h"
 #include "FreeDRTArea.hpp"
 #include "DRTArea.hpp"

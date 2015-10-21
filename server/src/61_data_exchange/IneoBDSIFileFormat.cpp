@@ -53,6 +53,7 @@
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
 #include "MessagesSection.hpp"
+#include "Fare.hpp"
 
 #include <boost/filesystem.hpp>
 

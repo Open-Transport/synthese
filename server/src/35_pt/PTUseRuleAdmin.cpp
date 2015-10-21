@@ -128,9 +128,9 @@ namespace synthese
 				t.getForm().getSelectInput(
 					PTUseRuleUpdateAction::PARAMETER_TYPE,
 					PTUseRule::GetTypesList(),
-					optional<PTUseRule::ReservationRuleType>(_rule->getReservationType())
+					optional<pt::ReservationRuleType>(_rule->getReservationType())
 			)	);
-			if(_rule->getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN)
+			if(_rule->getReservationType() != pt::RESERVATION_RULE_FORBIDDEN)
 			{
 				stream <<
 					t.cell(
@@ -195,7 +195,7 @@ namespace synthese
 						"Jours de réservation interdits (0=dimanche, 6=samedi)",
 						t.getForm().getTextInput(
 							PTUseRuleUpdateAction::PARAMETER_RESERVATION_FORBIDDEN_DAYS,
-							PTUseRuleTableSync::SerializeForbiddenDays(_rule->getReservationForbiddenDays())
+							PTUseRule::SerializeForbiddenDays(_rule->getReservationForbiddenDays())
 					)	)
 				;
 			}

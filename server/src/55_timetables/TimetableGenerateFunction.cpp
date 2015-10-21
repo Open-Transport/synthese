@@ -816,7 +816,7 @@ namespace synthese
 							dynamic_cast<const PTUseRule*>(
 								&(*service.begin())->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
 						)	);
-						if(ptUseRule && ptUseRule->getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN)
+						if(ptUseRule && ptUseRule->getReservationType() != pt::RESERVATION_RULE_FORBIDDEN)
 						{
 							aReservationRule = true;
 							break;

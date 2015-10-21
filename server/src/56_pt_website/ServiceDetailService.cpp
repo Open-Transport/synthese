@@ -229,7 +229,7 @@ namespace synthese
 			const UseRule& useRule(_service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
 			bool serviceIsReservable(
 				dynamic_cast<const PTUseRule*>(&useRule) &&
-				static_cast<const PTUseRule&>(useRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+				static_cast<const PTUseRule&>(useRule).getReservationType() != pt::RESERVATION_RULE_FORBIDDEN
 			);
 			map.insert(ATTR_IS_RESERVABLE, serviceIsReservable);
 

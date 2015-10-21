@@ -36,6 +36,7 @@
 #include "PTUseRuleTableSync.h"
 #include "RollingStock.hpp"
 #include "RollingStockTableSync.hpp"
+#include "Fare.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/predicate.hpp>

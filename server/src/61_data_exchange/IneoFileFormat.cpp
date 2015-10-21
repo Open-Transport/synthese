@@ -30,6 +30,7 @@
 #include "DesignatedLinePhysicalStop.hpp"
 #include "DriverAllocationTableSync.hpp"
 #include "DriverServiceTableSync.hpp"
+#include "Fare.hpp"
 #include "ForbiddenUseRule.h"
 #include "IConv.hpp"
 #include "ImpExModule.h"
