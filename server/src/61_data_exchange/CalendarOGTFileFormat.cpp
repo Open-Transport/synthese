@@ -210,7 +210,7 @@ namespace synthese
 				}
 
 				element->setRank(rank++);
-				element->setOperation(CalendarTemplateElement::ADD);
+				element->setOperation(ADD);
 				element->setStep(days(1));
 				element->setCalendar(currentCalendar.get());
 				currentCalendar->addElement(const_cast<CalendarTemplateElement&>(*element));

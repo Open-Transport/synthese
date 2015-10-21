@@ -66,6 +66,7 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<HouseTableSync>::_FIELDS[] =
 		{
+			Field()
 		};
 
 		template<>

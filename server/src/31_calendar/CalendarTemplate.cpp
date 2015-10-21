@@ -23,7 +23,6 @@
 #include "CalendarTemplate.h"
 
 #include "CalendarTemplateElement.h"
-#include "CalendarTemplateTableSync.h"
 #include "CalendarTemplateElementTableSync.h"
 #include "DataSourceLinksField.hpp"
 #include "ImportableTableSync.hpp"
@@ -40,49 +39,54 @@ namespace synthese
 	using namespace db;
 	using namespace impex;
 	using namespace util;
+	using namespace calendar;
 
-	namespace util
-	{
-		template<> const std::string Registry<calendar::CalendarTemplate>::KEY("CalendarTemplate");
-	}
+	CLASS_DEFINITION(CalendarTemplate, "t054_calendar_templates", 54)
+
+	FIELD_DEFINITION_OF_OBJECT(CalendarTemplate, "calendar_template_id", "calendar_template_ids")
+	FIELD_DEFINITION_OF_TYPE(Category, "category", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(ParentCalendarTemplate, "parent_id", SQL_INTEGER)
 
 	namespace calendar
 	{
 		const string CalendarTemplate::ATTR_NAME = "name";
 	
-
-
-		CalendarTemplate::CalendarTemplate(
-		):	util::Registrable(0),
-			_category(OTHER_CALENDAR)
-		{}
-
-
-
 		CalendarTemplate::CalendarTemplate(
 			RegistryKeyType id
 		):	util::Registrable(id),
-			_category(OTHER_CALENDAR)
+			Object<CalendarTemplate, CalendarTemplateSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_VALUE_CONSTRUCTOR(Category, OTHER_CALENDAR),
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
+					FIELD_DEFAULT_CONSTRUCTOR(ParentCalendarTemplate)
+			))
 		{}
 
 
 
 		CalendarTemplate::CalendarTemplate( const gregorian::date& day ):
-			Registrable(0)
+			Registrable(0),
+			Object<CalendarTemplate, CalendarTemplateSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, 0),
+					FIELD_VALUE_CONSTRUCTOR(Name, lexical_cast<string>(day.day()) + "/" +
+												  lexical_cast<string>(static_cast<int>(day.month())) + "/" +
+												  lexical_cast<string>(day.year())),
+					FIELD_DEFAULT_CONSTRUCTOR(Category),
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
+					FIELD_DEFAULT_CONSTRUCTOR(ParentCalendarTemplate)
+			))
 		{
 			CalendarTemplateElement element;
 			element.setCalendar(this);
 			element.setStep(days(1));
 			element.setMinDate(day);
 			element.setMaxDate(day);
-			element.setOperation(CalendarTemplateElement::ADD);
+			element.setOperation(ADD);
 			element.setRank(0);
 			addElement(element);
-			setName(
-				lexical_cast<string>(day.day()) + "/" +
-				lexical_cast<string>(static_cast<int>(day.month())) + "/" +
-				lexical_cast<string>(day.year())
-			);
 		}
 
 
@@ -124,8 +128,8 @@ namespace synthese
 				date elementMinDate(element.second.getRealMinDate());
 
 				if(	(elementMinDate < result &&
-					 element.second.getOperation() != CalendarTemplateElement::AND) ||
-					(element.second.getOperation() == CalendarTemplateElement::AND &&
+					 element.second.getOperation() != AND) ||
+					(element.second.getOperation() == AND &&
 					 elementMinDate > result)
 				){
 					result = elementMinDate;
@@ -144,8 +148,8 @@ namespace synthese
 				date elementMaxDate(element.second.getRealMaxDate());
 
 				if(	(elementMaxDate > result &&
-					 element.second.getOperation() != CalendarTemplateElement::AND) ||
-					(element.second.getOperation() == CalendarTemplateElement::AND &&
+					 element.second.getOperation() != AND) ||
+					(element.second.getOperation() == AND &&
 					 elementMaxDate < result)
 				){
 					result = elementMaxDate;
@@ -162,22 +166,13 @@ namespace synthese
 		}
 
 
-
-		CalendarTemplate::Category CalendarTemplate::getCategory() const
+		CalendarTemplateCategory CalendarTemplate::getCategory() const
 		{
-			return _category;
+			return get<Category>();
 		}
 
 
-
-		void CalendarTemplate::setCategory( Category value )
-		{
-			_category = value;
-		}
-
-
-
-		std::string CalendarTemplate::GetCategoryName( Category value )
+		std::string CalendarTemplate::GetCategoryName( CalendarTemplateCategory value )
 		{
 			switch(value)
 			{
@@ -200,9 +195,9 @@ namespace synthese
 
 
 
-		CalendarTemplate::CategoryList CalendarTemplate::GetCategoriesList()
+		CalendarTemplateCategoryList CalendarTemplate::GetCategoriesList()
 		{
-			CategoryList result;
+			CalendarTemplateCategoryList result;
 			result.push_back(make_pair(ALL_DAYS, GetCategoryName(ALL_DAYS)));
 			result.push_back(make_pair(ALL_DAYS_RESTRICTION, GetCategoryName(ALL_DAYS_RESTRICTION)));
 			result.push_back(make_pair(ALL_DAYS_SCHOOL, GetCategoryName(ALL_DAYS_SCHOOL)));
@@ -218,7 +213,6 @@ namespace synthese
 			result.push_back(make_pair(OTHER_CALENDAR, GetCategoryName(OTHER_CALENDAR)));
 			return result;
 		}
-
 
 
 		void CalendarTemplate::clearElements()
@@ -251,128 +245,27 @@ namespace synthese
 			dataSourceLinksToParametersMap(pm);
 
 			pm.insert(
-				CalendarTemplateTableSync::COL_TEXT,
+				Name::FIELD.name,
 				getName()
 			);
 			pm.insert(
-				CalendarTemplateTableSync::COL_CATEGORY,
+				Category::FIELD.name,
 				static_cast<int>(getCategory())
 			);
 			pm.insert(
-				CalendarTemplateTableSync::COL_DATASOURCE_LINKS,
+				impex::DataSourceLinks::FIELD.name,
 				impex::DataSourceLinks::Serialize(getDataSourceLinks())
 			);
 			pm.insert(
-				CalendarTemplateTableSync::COL_PARENT_ID,
+				ParentCalendarTemplate::FIELD.name,
 				getParent(true) ? getParent()->getKey() : 0
 			);
 		}
 
 
-
-		bool CalendarTemplate::loadFromRecord( const Record& record, util::Env& env )
-		{
-			bool result(false);
-
-			if(record.isDefined(TABLE_COL_ID))
-			{
-				RegistryKeyType id(record.getDefault<RegistryKeyType>(TABLE_COL_ID, 0));
-				if(id != getKey())
-				{
-					result = true;
-					setKey(id);
-				}
-
-			}
-
-			if(record.isDefined(CalendarTemplateTableSync::COL_TEXT))
-			{
-				string value(record.get<string>(CalendarTemplateTableSync::COL_TEXT));
-				if(value != getName())
-				{
-					result = true;
-					setName(value);
-				}
-			}
-
-			if(record.isDefined(CalendarTemplateTableSync::COL_CATEGORY))
-			{
-				CalendarTemplate::Category value(
-					static_cast<CalendarTemplate::Category>(
-						record.getDefault<int>(CalendarTemplateTableSync::COL_CATEGORY, 0)
-				)	);
-				if(value != getCategory())
-				{
-					result = true;
-					setCategory(value);
-				}
-			}
-
-//			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				// Elements
- 				CalendarTemplateElementTableSync::SearchResult elements(
- 					CalendarTemplateElementTableSync::Search(
- 						env,
- 						getKey(),
-						optional<RegistryKeyType>(),
- 						0, optional<size_t>(),
- 						UP_LINKS_LOAD_LEVEL
- 				)	);
- 				BOOST_FOREACH(const boost::shared_ptr<CalendarTemplateElement>& e, elements)
- 				{
- 					addElement(*e);
- 				}
-
-				// Data source links
-				if(record.isDefined(CalendarTemplateTableSync::COL_DATASOURCE_LINKS))
-				{
-					Importable::DataSourceLinks value(
-						ImportableTableSync::GetDataSourceLinksFromSerializedString(
-							record.get<string>(CalendarTemplateTableSync::COL_DATASOURCE_LINKS),
-							env
-					)	);
-					if(value != getDataSourceLinks())
-					{
-						result = true;
-						setDataSourceLinksWithoutRegistration(value);
-					}
-				}
-
-				// Parent
-				if(record.isDefined(CalendarTemplateTableSync::COL_PARENT_ID))
-				{
-					CalendarTemplate* value(NULL);
-					RegistryKeyType id(
-						record.getDefault<RegistryKeyType>(CalendarTemplateTableSync::COL_PARENT_ID, 0)
-					);
-						
-					if(id > 0) try
-					{
-						value = CalendarTemplateTableSync::GetEditable(
-							id, env
-						).get();
-					}
-					catch (ObjectNotFoundException<CalendarTemplate>& e)
-					{
-						Log::GetInstance().warn("Data corrupted in " + CalendarTemplateTableSync::TABLE.NAME + "/" + CalendarTemplateTableSync::COL_PARENT_ID +" (" + lexical_cast<string>(getKey()) + ")", e);
-					}
-
-					if(value != getParent(true))
-					{
-						result = true;
-						setParent(value);
-					}
-				}
-			}
-
-			return result;
-		}
-
-
-
 		void CalendarTemplate::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
+			setParent(get<ParentCalendarTemplate>() ? get<ParentCalendarTemplate>().get_ptr() : NULL);
 			registerInParentOrRoot();
 		}
 
@@ -404,6 +297,40 @@ namespace synthese
 			return result;
 		}
 
+
+		std::string
+		CalendarTemplate::getName() const
+		{
+			return get<Name>();
+		}
+
+		void
+		CalendarTemplate::setName(const std::string& value)
+		{
+			set<Name>(value);
+		}
+
+
+		void
+		CalendarTemplate::setCategory(CalendarTemplateCategory value)
+		{
+			set<Category>(value);
+		}
+
+		bool CalendarTemplate::allowUpdate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool CalendarTemplate::allowCreate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool CalendarTemplate::allowDelete(const server::Session* session) const
+		{
+			return true;
+		}
 
 		CalendarTemplate::InfiniteCalendarException::InfiniteCalendarException()
 			: Exception("The calendar template defines an infinite sized result.")

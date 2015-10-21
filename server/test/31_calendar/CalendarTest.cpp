@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(CalendarTemplateTest)
 	ct11.setMinDate(d1);
 	ct11.setMaxDate(d2);
 	ct11.setRank(0);
-	ct11.setOperation(CalendarTemplateElement::ADD);
+	ct11.setOperation(ADD);
 	ct1.addElement(CalendarTemplateElement(ct11));
 
 	Calendar r1(ct1.getResult());
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(CalendarTemplateTest)
 	CalendarTemplateElement ct21;
 	ct21.setMinDate(d2);
 	ct21.setMaxDate(d3);
-	ct21.setOperation(CalendarTemplateElement::ADD);
+	ct21.setOperation(ADD);
 	ct21.setRank(0);
 	ct2.addElement(CalendarTemplateElement(ct21));
 
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(CalendarTemplateTest)
 
 	CalendarTemplateElement ct12;
 	ct12.setInclude(&ct2);
-	ct12.setOperation(CalendarTemplateElement::ADD);
+	ct12.setOperation(ADD);
 	ct12.setRank(1);
 	ct1.addElement(ct12);
 

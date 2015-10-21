@@ -23,11 +23,15 @@
 #ifndef SYNTHESE_timetables_CalendarTemplateElement_h__
 #define SYNTHESE_timetables_CalendarTemplateElement_h__
 
-#include "Registrable.h"
+#include "Object.hpp"
 #include "Calendar.h"
-#include "Registry.h"
 
 #include "FrameworkTypes.hpp"
+#include "DateField.hpp"
+#include "CalendarTypes.h"
+#include "EnumObjectField.hpp"
+#include "DaysField.hpp"
+#include "PointerField.hpp"
 
 #include <boost/optional.hpp>
 
@@ -36,6 +40,25 @@ namespace synthese
 	namespace calendar
 	{
 		class CalendarTemplate;
+
+		FIELD_POINTER(CalendarTemplateField, CalendarTemplate)
+		FIELD_INT(RankField)
+		FIELD_DATE(MinDate)
+		FIELD_DATE(MaxDate)
+		FIELD_DAYS(Step)
+		FIELD_ENUM(Operation, CalendarTemplateElementOperation)
+		FIELD_POINTER(IncludeCalendarTemplate, CalendarTemplate)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(CalendarTemplateField),
+			FIELD(RankField),
+			FIELD(MinDate),
+			FIELD(MaxDate),
+			FIELD(Step),
+			FIELD(Operation),
+			FIELD(IncludeCalendarTemplate)
+		> CalendarTemplateElementSchema;
 
 		/** Element of calendar template class.
 			@ingroup m31
@@ -48,34 +71,13 @@ namespace synthese
 
 		*/
 		class CalendarTemplateElement:
-			public virtual util::Registrable
+				public Object<CalendarTemplateElement, CalendarTemplateElementSchema>
 		{
 		public:
 			/// Chosen registry class.
 			typedef util::Registry<CalendarTemplateElement>	Registry;
 
-			enum Operation
-			{
-				ADD = '+',
-				SUB = '-',
-				AND = '*'
-			};
-
 		private:
-			//! @name Key
-			//@{
-				const CalendarTemplate*	_calendar;
-				std::size_t			_rank;
-			//@}
-
-			//! @name Data
-			//@{
-				boost::gregorian::date	_minDate;
-				boost::gregorian::date	_maxDate;
-				boost::gregorian::date_duration	_step;
-				Operation		_operation;
-				const CalendarTemplate* _include;
-			//@}
 
 		public:
 			CalendarTemplateElement(
@@ -113,10 +115,10 @@ namespace synthese
 				size_t					getRank()		const;
 				const boost::gregorian::date&	getMinDate()	const;
 				const boost::gregorian::date&	getMaxDate()	const;
-				const boost::gregorian::date_duration& getStep() const { return _step; }
-				Operation				getOperation()	const;
 				const CalendarTemplate* getInclude()	const;
 				const CalendarTemplate*	getCalendar() const;
+				const boost::gregorian::date_duration& getStep() const;
+				CalendarTemplateElementOperation	getOperation()	const;
 			//@}
 
 			//! @name Setters
@@ -125,18 +127,14 @@ namespace synthese
 				void setRank(size_t text);
 				void setMinDate(const boost::gregorian::date& date);
 				void setMaxDate(const boost::gregorian::date& date);
-				void setStep(const boost::gregorian::date_duration& value){ _step = value; }
-				void setOperation(Operation value);
 				void setInclude(const CalendarTemplate* value);
+				void setStep(const boost::gregorian::date_duration& value);
+				void setOperation(CalendarTemplateElementOperation value);
+
 			//@}
 
 			//! @name Modifiers
 			//@{
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
-
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
 
@@ -144,6 +142,11 @@ namespace synthese
 					const Record& record
 				) const;
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
+
 		};
 	}
 }

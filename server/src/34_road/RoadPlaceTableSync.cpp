@@ -64,7 +64,8 @@ namespace synthese
 		);
 
 		template<> const Field DBTableSyncTemplate<RoadPlaceTableSync>::_FIELDS[]=
-		{	Field()
+		{
+			Field()
 		};
 
 

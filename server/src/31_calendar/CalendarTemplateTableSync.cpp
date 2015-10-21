@@ -54,10 +54,6 @@ namespace synthese
 
 	namespace calendar
 	{
-		const std::string CalendarTemplateTableSync::COL_TEXT("name");
-		const std::string CalendarTemplateTableSync::COL_CATEGORY("category");
-		const std::string CalendarTemplateTableSync::COL_DATASOURCE_LINKS("datasource_links");
-		const std::string CalendarTemplateTableSync::COL_PARENT_ID("parent_id");
 	}
 
 	namespace db
@@ -69,11 +65,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<CalendarTemplateTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(CalendarTemplateTableSync::COL_TEXT, SQL_TEXT),
-			Field(CalendarTemplateTableSync::COL_CATEGORY, SQL_INTEGER),
-			Field(CalendarTemplateTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			Field(CalendarTemplateTableSync::COL_PARENT_ID, SQL_INTEGER),
 			Field()
 		};
 
@@ -82,52 +73,9 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<CalendarTemplateTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(CalendarTemplateTableSync::COL_PARENT_ID.c_str(), ""));
+			r.push_back(DBTableSync::Index(ParentCalendarTemplate::FIELD.name.c_str(), ""));
 			return r;
 		}
-
-
-		template<>
-		void OldLoadSavePolicy<CalendarTemplateTableSync,CalendarTemplate>::Load(
-			CalendarTemplate* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
-			object->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<CalendarTemplateTableSync,CalendarTemplate>::Save(
-			CalendarTemplate* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<CalendarTemplateTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(static_cast<int>(object->getCategory()));
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-			query.addField(object->getParent(true) ? object->getParent()->getKey() : 0);
-			query.execute(transaction);
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<CalendarTemplateTableSync,CalendarTemplate>::Unlink(
-			CalendarTemplate* obj
-		){
-		}
-
 
 
 		template<> bool DBTableSyncTemplate<CalendarTemplateTableSync>::CanDelete(
@@ -196,37 +144,37 @@ namespace synthese
 			SelectQuery<CalendarTemplateTableSync> query;
 			if(name)
 			{
-				query.addWhereField(COL_TEXT, *name);
+				query.addWhereField(Name::FIELD.name, *name);
 			}
 			if(forbiddenId)
 			{
-				query.addWhereField(TABLE_COL_ID, *forbiddenId, ComposedExpression::OP_DIFF);
+				query.addWhereField(Key::FIELD.name, *forbiddenId, ComposedExpression::OP_DIFF);
 			}
 			if(parentId)
 			{
 				if(*parentId)
 				{
-					query.addWhereField(COL_PARENT_ID,  *parentId);
+					query.addWhereField(ParentCalendarTemplate::FIELD.name,  *parentId);
 				}
 				else
 				{
 					query.addWhere(
 						ComposedExpression::Get(
 							ComposedExpression::Get(
-								FieldExpression::Get(TABLE.NAME, COL_PARENT_ID),
+								FieldExpression::Get(TABLE.NAME, ParentCalendarTemplate::FIELD.name),
 								ComposedExpression::OP_EQ,
 								ValueExpression<int>::Get(0)
 							),
 							ComposedExpression::OP_OR,
 							SQLSingleOperatorExpression::Get(
 								SQLSingleOperatorExpression::OP_IS_NULL,
-								FieldExpression::Get(TABLE.NAME, COL_PARENT_ID)
+								FieldExpression::Get(TABLE.NAME, ParentCalendarTemplate::FIELD.name)
 					)	)	);
 				}
 			}
 			if (orderByName)
 			{
-				query.addOrderField(COL_TEXT, raisingOrder);
+				query.addOrderField(Name::FIELD.name, raisingOrder);
 			}
 			if (number)
 			{
@@ -271,5 +219,11 @@ namespace synthese
 			}
 			return r;
 		}
+
+		bool CalendarTemplateTableSync::allowList(const server::Session* session) const
+		{
+			return true;
+		}
+
 	}
 }

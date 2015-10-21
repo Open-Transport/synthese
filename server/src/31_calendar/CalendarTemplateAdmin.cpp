@@ -151,7 +151,7 @@ namespace synthese
 					pt.getForm().getSelectInput(
 						CalendarTemplatePropertiesUpdateAction::PARAMETER_CATEGORY,
 						CalendarTemplate::GetCategoriesList(),
-						optional<CalendarTemplate::Category>(_calendar->getCategory())
+						optional<CalendarTemplateCategory>(_calendar->getCategory())
 				)	);
 				stream << pt.cell(
 					"Parent",
@@ -277,15 +277,15 @@ namespace synthese
 
 				stream << t.col();
 
-				vector<pair<optional<CalendarTemplateElement::Operation>, string> > addSub;
-				addSub.push_back(make_pair(CalendarTemplateElement::ADD, "+"));
-				addSub.push_back(make_pair(CalendarTemplateElement::SUB, "-"));
-				addSub.push_back(make_pair(CalendarTemplateElement::AND, "&"));
+				vector<pair<optional<CalendarTemplateElementOperation>, string> > addSub;
+				addSub.push_back(make_pair(ADD, "+"));
+				addSub.push_back(make_pair(SUB, "-"));
+				addSub.push_back(make_pair(AND, "&"));
 
 				stream << t.col() << f.getSelectInput(
 					CalendarTemplateElementAddAction::PARAMETER_POSITIVE,
 					addSub,
-					optional<CalendarTemplateElement::Operation>(CalendarTemplateElement::ADD)
+					optional<CalendarTemplateElementOperation>(ADD)
 				);
 				stream << t.col() << f.getTextInput(CalendarTemplateElementAddAction::PARAMETER_MIN_DATE, string());
 				stream << t.col() << f.getTextInput(CalendarTemplateElementAddAction::PARAMETER_MAX_DATE, string());

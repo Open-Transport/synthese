@@ -21,6 +21,7 @@
 */
 
 #include "CalendarTemplateElement.h"
+#include "CalendarTemplate.h"
 
 #include "CalendarTemplateElementTableSync.h"
 #include "CalendarTemplateTableSync.h"
@@ -33,25 +34,37 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
+	using namespace calendar;
 
-	namespace util
-	{
-		template<> const std::string Registry<calendar::CalendarTemplateElement>::KEY("CalendarTemplateElement");
-	}
+	CLASS_DEFINITION(CalendarTemplateElement, "t055_calendar_template_elements", 55)
+	FIELD_DEFINITION_OF_OBJECT(CalendarTemplateElement, "calendar_template_element_id", "calendar_template_element_ids")
+
+	FIELD_DEFINITION_OF_TYPE(CalendarTemplateField, "calendar_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(RankField, "rank", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MinDate, "min_date", SQL_DATE)
+	FIELD_DEFINITION_OF_TYPE(MaxDate, "max_date", SQL_DATE)
+	FIELD_DEFINITION_OF_TYPE(Step, "interval", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Operation, "positive", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(IncludeCalendarTemplate, "include_id", SQL_INTEGER)
 
 	namespace calendar
 	{
 		CalendarTemplateElement::CalendarTemplateElement(
 			RegistryKeyType id
 		):	Registrable(id),
-			_calendar(NULL),
-			_rank(0),
-			_minDate(neg_infin),
-			_maxDate(pos_infin),
-			_step(days(1)),
-			_operation(ADD),
-			_include(NULL)
-		{}
+			Object<CalendarTemplateElement, CalendarTemplateElementSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(CalendarTemplateField),
+					FIELD_VALUE_CONSTRUCTOR(RankField, 0),
+					FIELD_VALUE_CONSTRUCTOR(MinDate, neg_infin),
+					FIELD_VALUE_CONSTRUCTOR(MaxDate, pos_infin),
+					FIELD_VALUE_CONSTRUCTOR(Step, days(1)),
+					FIELD_VALUE_CONSTRUCTOR(Operation, ADD),
+					FIELD_DEFAULT_CONSTRUCTOR(IncludeCalendarTemplate)
+			))
+		{
+		}
 
 
 
@@ -67,13 +80,13 @@ namespace synthese
 			}
 
 			// Min and max dates of the update
-			date minDate(_minDate);
+			date minDate(getMinDate());
 			if(	minDate.is_neg_infinity() ||
-				(minDate < mask.getFirstActiveDate() && _step.days() == 1)
+				(minDate < mask.getFirstActiveDate() && getStep().days() == 1)
 			){
 				minDate = mask.getFirstActiveDate();
 			}
-			date maxDate(_maxDate);
+			date maxDate(getMaxDate());
 			if (maxDate > mask.getLastActiveDate())
 			{
 				maxDate = mask.getLastActiveDate();
@@ -86,15 +99,15 @@ namespace synthese
 			}
 
 			// Base mask
-			Calendar elementMask(minDate, maxDate, _step);
+			Calendar elementMask(minDate, maxDate, getStep());
 			elementMask &= mask;
-			if(_include)
+			if(getInclude())
 			{
-				elementMask = _include->getResult(elementMask);
+				elementMask = getInclude()->getResult(elementMask);
 			}
 
 			// Applying the element on the result
-			switch(_operation)
+			switch(getOperation())
 			{
 			case ADD:
 				result |= elementMask;
@@ -114,99 +127,111 @@ namespace synthese
 
 		const CalendarTemplate* CalendarTemplateElement::getCalendar() const
 		{
-			return _calendar;
+			return get<CalendarTemplateField>() ? get<CalendarTemplateField>().get_ptr() : NULL;
 		}
 
 
 
 		size_t CalendarTemplateElement::getRank() const
 		{
-			return _rank;
+			return get<RankField>();
 		}
 
 
 
 		const date& CalendarTemplateElement::getMinDate() const
 		{
-			return  _minDate;
+			return  get<MinDate>();
 		}
 
 
 
 		const date& CalendarTemplateElement::getMaxDate() const
 		{
-			return _maxDate;
+			return get<MaxDate>();
+		}
+
+		const boost::gregorian::date_duration& CalendarTemplateElement::getStep() const
+		{
+			return get<Step>();
 		}
 
 
-
-		CalendarTemplateElement::Operation CalendarTemplateElement::getOperation() const
+		CalendarTemplateElementOperation CalendarTemplateElement::getOperation() const
 		{
-			return _operation;
+			return get<Operation>();
 		}
 
 
 
 		const CalendarTemplate* CalendarTemplateElement::getInclude() const
 		{
-			return _include;
+			return get<IncludeCalendarTemplate>() ? get<IncludeCalendarTemplate>().get_ptr() : NULL;
 		}
 
 
 
 		void CalendarTemplateElement::setRank(size_t text )
 		{
-			_rank = text;
+			set<RankField>(text);
 		}
 
 
 
 		void CalendarTemplateElement::setMinDate( const date& d)
 		{
-			_minDate = d;
+			set<MinDate>(d);
 		}
 
 
 
 		void CalendarTemplateElement::setMaxDate( const date& d)
 		{
-			_maxDate = d;
+			set<MaxDate>(d);
 		}
 
 
 
 		void CalendarTemplateElement::setOperation(
-			CalendarTemplateElement::Operation value
+			CalendarTemplateElementOperation value
 		){
-			_operation = value;
+			set<Operation>(value);
 		}
 
 
+		void CalendarTemplateElement::setStep(const boost::gregorian::date_duration& value)
+		{
+			set<Step>(value);
+		}
 
 		void CalendarTemplateElement::setInclude(const CalendarTemplate* value)
 		{
-			_include = value;
+			set<IncludeCalendarTemplate>(value
+						? boost::optional<CalendarTemplate&>(*const_cast<CalendarTemplate*>(value))
+						: boost::none);
 		}
 
 
 
 		void CalendarTemplateElement::setCalendar( const CalendarTemplate* value )
 		{
-			_calendar = value;
+			set<CalendarTemplateField>(value
+						? boost::optional<CalendarTemplate&>(*const_cast<CalendarTemplate*>(value))
+						: boost::none);
 		}
 
 
 
 		boost::gregorian::date CalendarTemplateElement::getRealMinDate() const
 		{
-			if(_include)
+			if(getInclude())
 			{
-				const date& incMinDate(_include->getMinDate());
-				return (incMinDate > _minDate) ? incMinDate : _minDate;
+				const date& incMinDate(getInclude()->getMinDate());
+				return (incMinDate > getMinDate()) ? incMinDate : getMinDate();
 			}
 			else
 			{
-				return _minDate;
+				return getMinDate();
 			}
 		}
 
@@ -214,14 +239,14 @@ namespace synthese
 
 		boost::gregorian::date CalendarTemplateElement::getRealMaxDate() const
 		{
-			if(_include)
+			if(getInclude())
 			{
-				const date& incMaxDate(_include->getMaxDate());
-				return (incMaxDate < _maxDate) ? incMaxDate : _maxDate;
+				const date& incMaxDate(getInclude()->getMaxDate());
+				return (incMaxDate < getMaxDate()) ? incMaxDate : getMaxDate();
 			}
 			else
 			{
-				return _maxDate;
+				return getMaxDate();
 			}
 		}
 
@@ -261,162 +286,6 @@ namespace synthese
 		}
 
 
-
-		bool CalendarTemplateElement::loadFromRecord( const Record& record, util::Env& env )
-		{
-			bool result(false);
-
-			if(record.isDefined(TABLE_COL_ID))
-			{
-				RegistryKeyType value(record.getDefault<RegistryKeyType>(TABLE_COL_ID, 0));
-				if(value != getKey())
-				{
-					result = true;
-					setKey(value);
-				}
-			}
-
-			// Rank
-			if(record.isDefined(CalendarTemplateElementTableSync::COL_RANK))
-			{
-				size_t value(
-					record.getDefault<size_t>(CalendarTemplateElementTableSync::COL_RANK, 0)
-				);
-				if(value != getRank())
-				{
-					result = true;
-					setRank(value);
-				}
-			}
-
-			// Min date
-			if(record.isDefined(CalendarTemplateElementTableSync::COL_MIN_DATE))
-			{
-				date value(neg_infin);
-				if(!record.get<string>(CalendarTemplateElementTableSync::COL_MIN_DATE).empty())
-				{
-					try
-					{
-						value = from_string(record.get<string>(CalendarTemplateElementTableSync::COL_MIN_DATE));
-					}
-					catch(...)
-					{
-					}
-				}
-				if(value != getMinDate())
-				{
-					result = true;
-					setMinDate(value);
-				}
-			}
-
-			// Max date
-			if(record.isDefined(CalendarTemplateElementTableSync::COL_MAX_DATE))
-			{
-				date value(pos_infin);
-				if(!record.get<string>(CalendarTemplateElementTableSync::COL_MAX_DATE).empty())
-				{
-					try
-					{
-						value = from_string(record.get<string>(CalendarTemplateElementTableSync::COL_MAX_DATE));
-					}
-					catch(...)
-					{
-					}
-				}
-				if(value != getMaxDate())
-				{
-					result = true;
-					setMaxDate(value);
-				}
-			}
-
-			// Days modulo
-			if(record.isDefined(CalendarTemplateElementTableSync::COL_INTERVAL))
-			{
-				days value(
-					record.getDefault<long>(CalendarTemplateElementTableSync::COL_INTERVAL, 0)
-				);
-				if(value != getStep())
-				{
-					result = true;
-					setStep(value);
-				}
-			}
-
-			// Operation
-			if(record.isDefined(CalendarTemplateElementTableSync::COL_POSITIVE))
-			{
-				Operation value(
-					static_cast<Operation>(
-						record.getDefault<int>(CalendarTemplateElementTableSync::COL_POSITIVE, 0)
-				)	);
-				if(value != getOperation())
-				{
-					result = true;
-					setOperation(value);
-				}
-			}
-
-			// Included calendar
-//			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				if(record.isDefined(CalendarTemplateElementTableSync::COL_INCLUDE_ID))
-				{
-					CalendarTemplate* value(NULL);
-					RegistryKeyType iid(
-						record.getDefault<RegistryKeyType>(
-							CalendarTemplateElementTableSync::COL_INCLUDE_ID,
-							0
-					)	);
-					if(iid > 0)	try
-					{
-						value = CalendarTemplateTableSync::GetEditable(iid, env).get();
-					}
-					catch (ObjectNotFoundException<CalendarTemplate> e)
-					{
-						Log::GetInstance().warn("Data corrupted in " + CalendarTemplateElementTableSync::TABLE.NAME + "/" + CalendarTemplateElementTableSync::COL_INCLUDE_ID, e);
-					}
-					if(value != getInclude())
-					{
-						result = true;
-						setInclude(value);
-					}
-				}
-			}
-
-			// Link with calendar template
-//			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
-			{
-				if(record.isDefined(CalendarTemplateElementTableSync::COL_CALENDAR_ID))
-				{
-					CalendarTemplate* value(NULL);
-					RegistryKeyType id(
-						record.getDefault<RegistryKeyType>(
-							CalendarTemplateElementTableSync::COL_CALENDAR_ID,
-							0
-					)	);
-					if(id > 0) try
-					{
-						value = CalendarTemplateTableSync::GetEditable(id, env).get();
-					}
-					catch (ObjectNotFoundException<CalendarTemplate> e)
-					{
-						Log::GetInstance().warn("Data corrupted in " + CalendarTemplateElementTableSync::TABLE.NAME + "/" + CalendarTemplateElementTableSync::COL_CALENDAR_ID, e);
-					}
-					if(value != getCalendar())
-					{
-						result = true;
-						setCalendar(value);
-					}
-				}
-			}
-
-			return result;
-		}
-
-
-
 		void CalendarTemplateElement::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			if(getCalendar())
@@ -441,4 +310,20 @@ namespace synthese
 				const_cast<CalendarTemplate*>(getCalendar())->removeElement(*this);
 			}
 		}
+
+		bool CalendarTemplateElement::allowUpdate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool CalendarTemplateElement::allowCreate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool CalendarTemplateElement::allowDelete(const server::Session* session) const
+		{
+			return true;
+		}
+
 }	}
