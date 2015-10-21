@@ -25,6 +25,7 @@
 #include "Crossing.h"
 #include "DataSourceLinksField.hpp"
 #include "DRTArea.hpp"
+#include "Fare.hpp"
 #include "ImportableTableSync.hpp"
 #include "Registry.h"
 #include "PTModule.h"

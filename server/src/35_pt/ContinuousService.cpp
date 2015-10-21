@@ -30,6 +30,7 @@
 #include "ContinuousServiceTableSync.h"
 #include "DBConstants.h"
 #include "Destination.hpp"
+#include "Fare.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "Profile.h"

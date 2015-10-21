@@ -27,6 +27,7 @@
 #include "CalendarTemplate.h"
 #include "CalendarTemplateElement.h"
 #include "Env.h"
+#include "Fare.hpp"
 #include "Timetable.h"
 
 using namespace synthese::timetables;
@@ -163,7 +164,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 
 	PTUseRule ur53(2305843009213693953ULL);
 	ur53.setName("Compulsory reservation");
-	ur53.setReservationType(PTUseRule::RESERVATION_RULE_COMPULSORY);
+	ur53.setReservationType(pt::RESERVATION_RULE_COMPULSORY);
 	ur53.setOriginIsReference(false);
 	ur53.setMinDelayMinutes(minutes(10));
 	ur53.setMinDelayDays(days(0));
@@ -174,7 +175,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 
 	PTUseRule ur54(2305843009213693954ULL);
 	ur54.setName("1 seat only");
-	ur54.setReservationType(PTUseRule::RESERVATION_RULE_FORBIDDEN);
+	ur54.setReservationType(pt::RESERVATION_RULE_FORBIDDEN);
 	ur54.setAccessCapacity(1);
 	SAVE(PTUseRule, ur54);
 

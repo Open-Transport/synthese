@@ -532,7 +532,7 @@ SAVE(TransportNetwork, n37);
 
 PTUseRule ur53(2305843009213693953ULL);
 ur53.setName("Compulsory reservation");
-ur53.setReservationType(PTUseRule::RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE);
+ur53.setReservationType(pt::RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE);
 ur53.setOriginIsReference(false);
 ur53.setMinDelayMinutes(minutes(10));
 ur53.setMinDelayDays(days(0));
@@ -543,7 +543,7 @@ SAVE(PTUseRule, ur53);
 
 PTUseRule ur54(2305843009213693954ULL);
 ur54.setName("1 seat only");
-ur54.setReservationType(PTUseRule::RESERVATION_RULE_FORBIDDEN);
+ur54.setReservationType(pt::RESERVATION_RULE_FORBIDDEN);
 ur54.setAccessCapacity(1);
 SAVE(PTUseRule, ur54);
 

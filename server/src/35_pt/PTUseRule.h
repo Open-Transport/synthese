@@ -23,10 +23,17 @@
 #ifndef SYNTHESE_PTUseRule_h__
 #define SYNTHESE_PTUseRule_h__
 
-#include "UseRule.h"
+#include "Object.hpp"
+
+#include "DaysField.hpp"
+#include "EnumObjectField.hpp"
+#include "MinutesField.hpp"
+#include "ParametersMap.h"
 #include "Registrable.h"
 #include "Registry.h"
-#include "ParametersMap.h"
+#include "StringField.hpp"
+#include "TimeField.hpp"
+#include "UseRule.h"
 
 #include "FrameworkTypes.hpp"
 
@@ -44,6 +51,55 @@ namespace synthese
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
+		/// Reservation rule type.
+		///	- FORBIDDEN : it is impossible to book a seat on the service
+		///	- COMPULSORY : it is impossible to use the service without having booked a seat
+		///	- OPTIONAL : is is possible to book a place on the service, but it is possible to use
+		///   the service without having booked a seat
+		///	- MIXED_BY_DEPARTURE_PLACE : it is impossible to use the service without having booked
+		///   a place, except for journeys beginning at several places, defined in the path.
+		typedef enum {
+			RESERVATION_RULE_FORBIDDEN = 0,
+			RESERVATION_RULE_COMPULSORY = 1,
+			RESERVATION_RULE_OPTIONAL = 2,
+			RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE = 3
+		} ReservationRuleType;
+
+		FIELD_STRING(Capacity)
+		FIELD_ENUM(ReservationType, pt::ReservationRuleType)
+		FIELD_BOOL(OriginIsReference)
+		FIELD_MINUTES(MinDelayMinutes)
+		FIELD_MINUTES(MinDelayMinutesExternal)
+		FIELD_DAYS(MinDelayDays)
+		FIELD_DAYS(MaxDelayDays)
+		FIELD_TIME(HourDeadLine)
+		FIELD_TIME(ReservationMinDepartureTime)
+		FIELD_STRING(ReservationForbiddenDays)
+		FIELD_POINTER(DefaultFare, fare::Fare)
+		FIELD_BOOL(ForbiddenInDepartureBoards)
+		FIELD_BOOL(ForbiddenInTimetables)
+		FIELD_BOOL(ForbiddenInJourneyPlanning)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(Capacity),
+			FIELD(ReservationType),				// Type of the reservation rule.
+			FIELD(OriginIsReference),			// Whether reference departure time is the line run departure time at its origin (true) or client departure time (false).
+			FIELD(MinDelayMinutes),				// Minimum delay in minutes between reservation and reference moment
+			FIELD(MinDelayMinutesExternal),		// Minimum external delay (used by Routeplanner if needed)
+			FIELD(MinDelayDays),				//!< Minimum delay in days between reservation and reference moment
+			FIELD(MaxDelayDays),				//!< Maxium number of days between reservation and departure.
+			FIELD(HourDeadLine),				//!< Latest reservation hour the last day open for reservation
+			FIELD(ReservationMinDepartureTime),	//!< Minimal time for reservation the day of the departure. If departure time is before, then the reservation must be done the preceding day, before _hourDeadLine or midnight if not defined
+			FIELD(ReservationForbiddenDays),
+			FIELD(DefaultFare),
+			FIELD(ForbiddenInDepartureBoards),
+			FIELD(ForbiddenInTimetables),
+			FIELD(ForbiddenInJourneyPlanning)
+		> PTUseRuleSchema;
+
+		//////////////////////////////////////////////////////////////////////////
 		/// Public transportation use rule.
 		///	@ingroup m35
 		/// @author Hugues Romain
@@ -57,7 +113,7 @@ namespace synthese
 		///	</ul>
 		///
 		class PTUseRule:
-			public util::Registrable,
+			public Object<PTUseRule, PTUseRuleSchema>,
 			public graph::UseRule
 		{
 		private:
@@ -67,26 +123,6 @@ namespace synthese
 			static const std::string DATA_RESERVATION_MIN_DELAY_MINUTES_EXTERNAL;
 
 		public:
-			/// Chosen registry class.
-			typedef util::Registry<PTUseRule>	Registry;
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Reservation rule type.
-			///	- FORBIDDEN : it is impossible to book a seat on the service
-			///	- COMPULSORY : it is impossible to use the service without having booked a seat
-			///	- OPTIONAL : is is possible to book a place on the service, but it is possible to use
-			///   the service without having booked a seat
-			///	- MIXED_BY_DEPARTURE_PLACE : it is impossible to use the service without having booked
-			///   a place, except for journeys beginning at several places, defined in the path.
-			typedef enum {
-				RESERVATION_RULE_FORBIDDEN = 0,
-				RESERVATION_RULE_COMPULSORY = 1,
-				RESERVATION_RULE_OPTIONAL = 2,
-				RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE = 3
-			} ReservationRuleType;
-
-
 			typedef std::vector<std::pair<boost::optional<ReservationRuleType>, std::string> > ReservationRuleTypesList;
 			typedef std::set<boost::gregorian::date::day_of_week_type> ReservationForbiddenDays;
 
@@ -94,8 +130,6 @@ namespace synthese
 
 			//! @name Access
 			//@{
-				std::string _name;
-
 				//////////////////////////////////////////////////////////////////////////
 				/// Maximal person number which can be served
 				/// The undefined value of the attribute seems unlimited capacity
@@ -108,35 +142,7 @@ namespace synthese
 
 			//! @name Reservation
 			//@{
-				////
-				/// Type of the reservation rule.
-				ReservationRuleType		_reservationType;
-
-
-				////
-				/// Whether reference departure time is the line run departure time at its origin (true)
-				/// or client departure time (false).
-				bool _originIsReference;
-
-				////
-				/// Minimum delay in minutes between reservation and reference moment
-				boost::posix_time::time_duration _minDelayMinutes;
-				
-				boost::gregorian::date_duration _minDelayDays;   //!< Minimum delay in days between reservation and reference moment
-				boost::optional<boost::gregorian::date_duration> _maxDelayDays;  //!< Maxium number of days between reservation and departure.
-
-				boost::posix_time::time_duration _hourDeadLine; //!< Latest reservation hour the last day open for reservation
-				boost::posix_time::time_duration _reservationMinDepartureTime; //!< Minimal time for reservation the day of the departure. If departure time is before, then the reservation must be done the preceding day, before _hourDeadLine or midnight if not defined
-
 				ReservationForbiddenDays _reservationForbiddenDays;
-				
-				bool _forbiddenInDepartureBoards;
-				bool _forbiddenInTimetables;
-				bool _forbiddenInJourneyPlanning;
-
-				// Minimum external delay (used by Routeplanner if needed)
-				boost::posix_time::time_duration _minDelayMinutesExternal;
-
 			//@}
 
 
@@ -154,20 +160,20 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				virtual std::string getName() const { return _name; }
+				virtual std::string getName() const { return get<Name>(); }
 				virtual AccessCapacity	getAccessCapacity()	const { return _accessCapacity; }
-				bool								getOriginIsReference()	const { return _originIsReference; }
-				const boost::posix_time::time_duration&	getHourDeadLine()				const { return _hourDeadLine; }
-				boost::gregorian::date_duration		getMinDelayDays()				const { return _minDelayDays; }
-				boost::posix_time::time_duration	getMinDelayMinutes()			const { return _minDelayMinutes; }
-				boost::posix_time::time_duration	getMinDelayMinutesExternal()	const { return _minDelayMinutesExternal; }
-				const boost::optional<boost::gregorian::date_duration>&	getMaxDelayDays()		const { return _maxDelayDays; }
-				ReservationRuleType	getReservationType()			const { return _reservationType; }
-				const fare::Fare*	getDefaultFare()				const { return _defaultFare; }
-				bool getForbiddenInDepartureBoards ()	const { return _forbiddenInDepartureBoards; }
-				bool getForbiddenInTimetables ()		const { return _forbiddenInTimetables; }
-				bool getForbiddenInJourneyPlanning ()	const { return _forbiddenInJourneyPlanning; }
-				const boost::posix_time::time_duration& getReservationMinDepartureTime() const { return _reservationMinDepartureTime; }
+				bool								getOriginIsReference()	const { return get<OriginIsReference>(); }
+				const boost::posix_time::time_duration&	getHourDeadLine()				const { return get<HourDeadLine>(); }
+				boost::gregorian::date_duration		getMinDelayDays()				const { return get<MinDelayDays>(); }
+				boost::posix_time::time_duration	getMinDelayMinutes()			const { return get<MinDelayMinutes>(); }
+				boost::posix_time::time_duration	getMinDelayMinutesExternal()	const { return get<MinDelayMinutesExternal>(); }
+				const boost::optional<boost::gregorian::date_duration>&	getMaxDelayDays()		const;
+				ReservationRuleType	getReservationType()			const { return get<ReservationType>(); }
+				const fare::Fare*	getDefaultFare()				const { return get<DefaultFare>() ? get<DefaultFare>().get_ptr() : NULL; }
+				bool getForbiddenInDepartureBoards ()	const { return get<ForbiddenInDepartureBoards>(); }
+				bool getForbiddenInTimetables ()		const { return get<ForbiddenInTimetables>(); }
+				bool getForbiddenInJourneyPlanning ()	const { return get<ForbiddenInJourneyPlanning>(); }
+				const boost::posix_time::time_duration& getReservationMinDepartureTime() const { return get<ReservationMinDepartureTime>(); }
 				const std::set<boost::gregorian::date::day_of_week_type>& getReservationForbiddenDays() const { return _reservationForbiddenDays; }
 			//@}
 
@@ -179,20 +185,20 @@ namespace synthese
 				/// @author Hugues Romain
 				void setHourDeadLine (const boost::posix_time::time_duration& hourDeadLine);
 
-				void setMinDelayMinutes (boost::posix_time::time_duration value) { _minDelayMinutes = value; }
-				void setMinDelayMinutesExternal (boost::posix_time::time_duration value) { _minDelayMinutesExternal = value; }
-				void setMinDelayDays (boost::gregorian::date_duration value) { _minDelayDays = value; }
-				void setMaxDelayDays (const boost::optional<boost::gregorian::date_duration> value){ _maxDelayDays = value; }
-				void setOriginIsReference (bool value){ _originIsReference = value; }
-				void setReservationType(ReservationRuleType value){ _reservationType = value; }
-				void setAccessCapacity(AccessCapacity value){ _accessCapacity = value; }
-				void setDefaultFare(const fare::Fare* value){ _defaultFare = value; }
-				void setForbiddenInDepartureBoards (bool value){ _forbiddenInDepartureBoards = value; }
-				void setForbiddenInJourneyPlanning (bool value){ _forbiddenInJourneyPlanning = value; }
-				void setForbiddenInTimetables (bool value){ _forbiddenInTimetables = value; }
-				void setReservationMinDepartureTime(const boost::posix_time::time_duration& value){ _reservationMinDepartureTime = value; }
-				void setReservationForbiddenDays(const std::set<boost::gregorian::date::day_of_week_type>& value){ _reservationForbiddenDays = value; }
-				void setName(const std::string& value){ _name = value; }
+				void setMinDelayMinutes (boost::posix_time::time_duration value) { set<MinDelayMinutes>(value); }
+				void setMinDelayMinutesExternal (boost::posix_time::time_duration value) { set<MinDelayMinutesExternal>(value); }
+				void setMinDelayDays (boost::gregorian::date_duration value) { set<MinDelayDays>(value); }
+				void setMaxDelayDays (const boost::optional<boost::gregorian::date_duration> value){ set<MaxDelayDays>(value ? *value : boost::gregorian::days(0)); }
+				void setOriginIsReference (bool value){ set<OriginIsReference>(value); }
+				void setReservationType(ReservationRuleType value){ set<ReservationType>(value); }
+				void setAccessCapacity(AccessCapacity value){ _accessCapacity = value; set<Capacity>(boost::lexical_cast<std::string>(value)); }
+				void setDefaultFare(fare::Fare* value);
+				void setForbiddenInDepartureBoards (bool value){ set<ForbiddenInDepartureBoards>(value); }
+				void setForbiddenInJourneyPlanning (bool value){ set<ForbiddenInJourneyPlanning>(value); }
+				void setForbiddenInTimetables (bool value){ set<ForbiddenInTimetables>(value); }
+				void setReservationMinDepartureTime(const boost::posix_time::time_duration& value){ set<ReservationMinDepartureTime>(value); }
+				void setReservationForbiddenDays(const std::set<boost::gregorian::date::day_of_week_type>& value);
+				void setName(const std::string& value){ set<Name>(value); }
 			//@}
 
 			//! @name Service
@@ -333,18 +339,24 @@ namespace synthese
 					std::string prefix = std::string()
 				) const;
 
-				
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
-
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 
 				virtual LinkedObjectsIds getLinkedObjectsIds(
 					const Record& record
 				) const;
 			//@}
+
+			static std::string SerializeForbiddenDays(
+				const ReservationForbiddenDays& value
+			);
+
+			static ReservationForbiddenDays UnserializeForbiddenDays(
+				const std::string& value
+			);
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 	}
 }

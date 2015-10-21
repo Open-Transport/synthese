@@ -125,7 +125,7 @@ namespace synthese
 				) &&
 				dynamic_cast<const PTUseRule&>(
 					_service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-				).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+				).getReservationType() != pt::RESERVATION_RULE_FORBIDDEN
 			){
 				// Getting the reservations
 				Env env;

@@ -25,6 +25,7 @@ Singleton Object List Should Work For Any Table
     ${HOUSES_TABLE_ID}
     ${ROAD_CHUNKS_TABLE_ID}
     ${FREE_DRT_TIME_SLOTS_TABLE_ID}
+    ${PT_USE_RULES_TABLE_ID}
     
 
 Empty Object List Should Work For Any Table
@@ -47,6 +48,7 @@ Empty Object List Should Work For Any Table
     ${HOUSES_TABLE_ID}
     ${ROAD_CHUNKS_TABLE_ID}
     ${FREE_DRT_TIME_SLOTS_TABLE_ID}
+    ${PT_USE_RULES_TABLE_ID}
 
 Object List Should Work For Some Tables
     On node 0

@@ -256,7 +256,7 @@ namespace synthese
             {
 				const PTUseRule& rule(*r.second);
 
-				if (rule.getReservationType() == PTUseRule::RESERVATION_RULE_FORBIDDEN || (rule.getMinDelayDays().days() == 0 && rule.getMinDelayMinutes().total_seconds() == 0))       continue;
+				if (rule.getReservationType() == pt::RESERVATION_RULE_FORBIDDEN || (rule.getMinDelayDays().days() == 0 && rule.getMinDelayMinutes().total_seconds() == 0))       continue;
 				resaIsCompulsory = true;
 				break;
 			}
@@ -763,7 +763,7 @@ namespace synthese
 				const ScheduledService* srv(itsrv.second.get());
 				bool isDRT(
 					dynamic_cast<const PTUseRule*>(&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)) != NULL &&
-					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)).getReservationType() != pt::RESERVATION_RULE_FORBIDDEN
 				);
 
 				os << "<VehicleJourney";
@@ -835,7 +835,7 @@ namespace synthese
 						"\n"
 					;
 					if(	dynamic_cast<const PTUseRule*>(&hRule) != NULL &&
-						static_cast<const PTUseRule&>(hRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+						static_cast<const PTUseRule&>(hRule).getReservationType() != pt::RESERVATION_RULE_FORBIDDEN
 					){
 						os << "<mobilityRestrictedReservationRule>" <<
 							TridentId(
@@ -856,7 +856,7 @@ namespace synthese
 						"\n"
 					;
 					if (dynamic_cast<const PTUseRule*>(&bRule) != NULL &&
-						static_cast<const PTUseRule&>(bRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+						static_cast<const PTUseRule&>(bRule).getReservationType() != pt::RESERVATION_RULE_FORBIDDEN
 					){
 						os <<
 							"<bikeReservationRule>" <<
@@ -886,7 +886,7 @@ namespace synthese
 				const ContinuousService* srv(itsrv.second.get());
 				bool isDRT(
 					dynamic_cast<const PTUseRule*>(&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)) &&
-					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)).getReservationType() != pt::RESERVATION_RULE_FORBIDDEN
 				);
 
 				os << "<VehicleJourney";
@@ -936,7 +936,7 @@ namespace synthese
 						"\n"
 					;
 					if(	dynamic_cast<const PTUseRule*>(&hRule) != NULL &&
-						static_cast<const PTUseRule&>(hRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+						static_cast<const PTUseRule&>(hRule).getReservationType() != pt::RESERVATION_RULE_FORBIDDEN
 					){
 						os << "<mobilityRestrictedReservationRule>" <<
 							TridentId(
@@ -957,7 +957,7 @@ namespace synthese
 						"\n"
 					;
 					if (dynamic_cast<const PTUseRule*>(&bRule) != NULL &&
-						static_cast<const PTUseRule&>(bRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+						static_cast<const PTUseRule&>(bRule).getReservationType() != pt::RESERVATION_RULE_FORBIDDEN
 					){
 						os <<
 							"<bikeReservationRule>" <<
@@ -992,11 +992,11 @@ namespace synthese
  				{
  					const PTUseRule& rule(*r.second);
 
-					if (rule.getReservationType() == PTUseRule::RESERVATION_RULE_FORBIDDEN || (rule.getMinDelayDays().days() == 0 && rule.getMinDelayMinutes().total_seconds() == 0))	continue;
+					if (rule.getReservationType() == pt::RESERVATION_RULE_FORBIDDEN || (rule.getMinDelayDays().days() == 0 && rule.getMinDelayMinutes().total_seconds() == 0))	continue;
 
  					os << "<ReservationRule>" << "\n";
  					os << "<objectId>" << TridentId (peerid, "ReservationRule", rule.getKey ()) << "</objectId>" << "\n";
-					os << "<ReservationCompulsory>" << ((rule.getReservationType() == PTUseRule::RESERVATION_RULE_COMPULSORY) ? "compulsory" : "optional") << "</ReservationCompulsory>" << "\n";
+					os << "<ReservationCompulsory>" << ((rule.getReservationType() == pt::RESERVATION_RULE_COMPULSORY) ? "compulsory" : "optional") << "</ReservationCompulsory>" << "\n";
  					os << "<deadLineIsTheCustomerDeparture>" << !rule.getOriginIsReference() << "</deadLineIsTheCustomerDeparture>" << "\n";
  					if (rule.getMinDelayMinutes().total_seconds() > 0)
  					{

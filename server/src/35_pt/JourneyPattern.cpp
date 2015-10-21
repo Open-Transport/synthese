@@ -26,6 +26,7 @@
 #include "DataSourceLinksField.hpp"
 #include "DBConstants.h"
 #include "DestinationTableSync.hpp"
+#include "Fare.hpp"
 #include "ImportableTableSync.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStop.h"

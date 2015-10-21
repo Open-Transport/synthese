@@ -69,8 +69,8 @@ namespace synthese
 			boost::optional<std::string> _name;
 			boost::optional<graph::UseRule::AccessCapacity> _capacity;
 			boost::optional<bool> _originIsReference;
-			boost::optional<boost::shared_ptr<const fare::Fare> > _fare;
-			boost::optional<PTUseRule::ReservationRuleType> _type;
+			boost::optional<boost::shared_ptr<fare::Fare> > _fare;
+			boost::optional<pt::ReservationRuleType> _type;
 			boost::optional<boost::posix_time::time_duration> _minDelayMinutes;
 			boost::optional<boost::posix_time::time_duration> _minDelayMinutesExternal;
 			boost::optional<boost::gregorian::date_duration> _minDelayDays;

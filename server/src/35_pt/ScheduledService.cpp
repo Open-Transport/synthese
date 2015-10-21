@@ -29,6 +29,7 @@
 #include "DBConstants.h"
 #include "Destination.hpp"
 #include "Edge.h"
+#include "Fare.hpp"
 #include "GraphConstants.h"
 #include "ImportableTableSync.hpp"
 #include "JourneyPatternTableSync.hpp"

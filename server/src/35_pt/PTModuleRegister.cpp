@@ -122,6 +122,7 @@
 #include "DRTArea.hpp"
 #include "ServiceQuota.hpp"
 
+#include "Fare.hpp"
 #include "RollingStock.hpp"
 
 #include "PTModule.inc.cpp"
@@ -243,7 +244,7 @@ void synthese::pt::moduleRegister()
 	INTEGRATE(synthese::pt::Destination);
 	INTEGRATE(synthese::pt::DRTArea);
 	INTEGRATE(synthese::pt::FreeDRTArea);
-	synthese::util::Env::Integrate<synthese::pt::FreeDRTTimeSlot>();
+	INTEGRATE(synthese::pt::FreeDRTTimeSlot);
 	INTEGRATE(synthese::pt::JourneyPattern);
 	INTEGRATE(synthese::pt::LineStop);
 	synthese::util::Env::Integrate<synthese::pt::StopArea>();
@@ -251,9 +252,9 @@ void synthese::pt::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt::StopPoint>();
 	INTEGRATE(synthese::pt::Junction);
 	INTEGRATE(synthese::pt::TransportNetwork);
-	synthese::util::Env::Integrate<synthese::pt::PTUseRule>();
-	synthese::util::Env::Integrate<synthese::pt::ContinuousService>();
-	synthese::util::Env::Integrate<synthese::pt::ScheduledService>();
+	INTEGRATE(synthese::pt::PTUseRule);
+	INTEGRATE(synthese::pt::ContinuousService);
+	INTEGRATE(synthese::pt::ScheduledService);
 	INTEGRATE(synthese::pt::NonConcurrencyRule);
 	INTEGRATE(synthese::pt::ReservationContact);
 	INTEGRATE(synthese::pt::ServiceQuota);

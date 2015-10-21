@@ -41,6 +41,7 @@
 #include "CalendarLinkTableSync.hpp"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
+#include "Fare.hpp"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>

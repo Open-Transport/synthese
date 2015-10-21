@@ -32,6 +32,7 @@
 #include "User.h"
 #include "Request.h"
 #include "PTUseRuleTableSync.h"
+#include "Fare.hpp"
 #include "FareTableSync.hpp"
 
 using namespace std;
@@ -161,7 +162,7 @@ namespace synthese
 			// Reservation forbidden days
 			if(_reservationForbiddenDays)
 			{
-				map.insert(PARAMETER_RESERVATION_FORBIDDEN_DAYS, PTUseRuleTableSync::SerializeForbiddenDays(*_reservationForbiddenDays));
+				map.insert(PARAMETER_RESERVATION_FORBIDDEN_DAYS, PTUseRule::SerializeForbiddenDays(*_reservationForbiddenDays));
 			}
 
 			if(_forbiddenInDepartureBoards)
@@ -238,7 +239,7 @@ namespace synthese
 				RegistryKeyType fid(map.getDefault<RegistryKeyType>(PARAMETER_FARE_ID, 0));
 				if(fid > 0) try
 				{
-					_fare = FareTableSync::Get(fid, *_env);
+					_fare = FareTableSync::GetEditable(fid, *_env);
 				}
 				catch(ObjectNotFoundException<Fare>&)
 				{
@@ -252,7 +253,7 @@ namespace synthese
 
 			if(map.isDefined(PARAMETER_TYPE))
 			{
-				_type = static_cast<PTUseRule::ReservationRuleType>(map.getDefault<int>(PARAMETER_TYPE, 0));
+				_type = static_cast<pt::ReservationRuleType>(map.getDefault<int>(PARAMETER_TYPE, 0));
 			}
 
 			if(map.isDefined(PARAMETER_MIN_DELAY_MINUTES))
@@ -305,7 +306,7 @@ namespace synthese
 
 			if(map.isDefined(PARAMETER_RESERVATION_FORBIDDEN_DAYS))
 			{
-				_reservationForbiddenDays = PTUseRuleTableSync::UnserializeForbiddenDays(map.get<string>(PARAMETER_RESERVATION_FORBIDDEN_DAYS));
+				_reservationForbiddenDays = PTUseRule::UnserializeForbiddenDays(map.get<string>(PARAMETER_RESERVATION_FORBIDDEN_DAYS));
 			}
 
 			if(map.isDefined(PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS))

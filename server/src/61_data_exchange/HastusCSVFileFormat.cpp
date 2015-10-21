@@ -40,6 +40,7 @@
 #include "IConv.hpp"
 #include "CommercialLineTableSync.h"
 #include "RollingStockTableSync.hpp"
+#include "Fare.hpp"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>

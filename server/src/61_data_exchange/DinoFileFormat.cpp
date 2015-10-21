@@ -42,6 +42,7 @@
 #include "IConv.hpp"
 #include "ContinuousService.h"
 #include "Path.h"
+#include "Fare.hpp"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>

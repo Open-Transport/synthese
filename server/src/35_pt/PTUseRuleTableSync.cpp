@@ -55,25 +55,6 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<DBTableSync,PTUseRuleTableSync>::FACTORY_KEY("35.10.06 Public transportation use rules");
 
-	namespace pt
-	{
-		const string PTUseRuleTableSync::COL_RESERVATION_TYPE("reservation_type");
-		const string PTUseRuleTableSync::COL_CAPACITY("capacity");
-		const string PTUseRuleTableSync::COL_ORIGINISREFERENCE ("origin_is_reference");
-		const string PTUseRuleTableSync::COL_MINDELAYMINUTES ("min_delay_minutes");
-		const string PTUseRuleTableSync::COL_MINDELAYMINUTESEXTERNAL ("min_delay_minutes_external");
-		const string PTUseRuleTableSync::COL_MINDELAYDAYS ("min_delay_days");
-		const string PTUseRuleTableSync::COL_MAXDELAYDAYS ("max_delay_days");
-		const string PTUseRuleTableSync::COL_HOURDEADLINE ("hour_deadline");
-		const string PTUseRuleTableSync::COL_RESERVATION_MIN_DEPARTURE_TIME = "reservation_min_departure_time";
-		const string PTUseRuleTableSync::COL_RESERVATION_FORBIDDEN_DAYS = "reservation_forbidden_days";
-		const string PTUseRuleTableSync::COL_NAME("name");
-		const string PTUseRuleTableSync::COL_DEFAULT_FARE("default_fare_id");
-		const string PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS("forbidden_in_departure_boards");
-		const string PTUseRuleTableSync::COL_FORBIDDEN_IN_TIMETABLES("forbidden_in_timetables");
-		const string PTUseRuleTableSync::COL_FORBIDDEN_IN_JOURNEY_PLANNING("forbidden_in_journey_planning");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<PTUseRuleTableSync>::TABLE(
@@ -82,22 +63,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<PTUseRuleTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(PTUseRuleTableSync::COL_NAME, SQL_TEXT),
-			Field(PTUseRuleTableSync::COL_CAPACITY, SQL_TEXT),
-			Field(PTUseRuleTableSync::COL_RESERVATION_TYPE, SQL_INTEGER),
-			Field(PTUseRuleTableSync::COL_ORIGINISREFERENCE, SQL_BOOLEAN),
-			Field(PTUseRuleTableSync::COL_MINDELAYMINUTES, SQL_INTEGER),
-			Field(PTUseRuleTableSync::COL_MINDELAYMINUTESEXTERNAL, SQL_INTEGER),
-			Field(PTUseRuleTableSync::COL_MINDELAYDAYS, SQL_INTEGER),
-			Field(PTUseRuleTableSync::COL_MAXDELAYDAYS, SQL_INTEGER),
-			Field(PTUseRuleTableSync::COL_HOURDEADLINE, SQL_TIME),
-			Field(PTUseRuleTableSync::COL_RESERVATION_MIN_DEPARTURE_TIME, SQL_TIME),
-			Field(PTUseRuleTableSync::COL_RESERVATION_FORBIDDEN_DAYS, SQL_TEXT),
-			Field(PTUseRuleTableSync::COL_DEFAULT_FARE, SQL_INTEGER),
-			Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS, SQL_BOOLEAN),
-			Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_TIMETABLES, SQL_BOOLEAN),
-			Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_JOURNEY_PLANNING, SQL_BOOLEAN),
 			Field()
 		};
 
@@ -105,55 +70,6 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<PTUseRuleTableSync>::GetIndexes()
 		{
 			return DBTableSync::Indexes();
-		}
-
-
-
-		template<> void OldLoadSavePolicy<PTUseRuleTableSync,PTUseRule>::Load(
-			PTUseRule* rr,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			DBModule::LoadObjects(rr->getLinkedObjectsIds(*rows), env, linkLevel);
-			rr->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				rr->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<PTUseRuleTableSync,PTUseRule>::Save(
-			PTUseRule* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<PTUseRuleTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(object->getAccessCapacity() ? lexical_cast<string>(*object->getAccessCapacity()) : string());
-			query.addField(static_cast<int>(object->getReservationType()));
-			query.addField(object->getOriginIsReference());
-			query.addFrameworkField<MinutesField>(object->getMinDelayMinutes());
-			query.addFrameworkField<MinutesField>(object->getMinDelayMinutesExternal());
-			query.addFrameworkField<DaysField>(object->getMinDelayDays());
-			query.addField(object->getMaxDelayDays() ? static_cast<int>(object->getMaxDelayDays()->days()) : int(0));
-			query.addFrameworkField<TimeField>(object->getHourDeadLine());
-			query.addFrameworkField<TimeField>(object->getReservationMinDepartureTime());
-			query.addField(PTUseRuleTableSync::SerializeForbiddenDays(object->getReservationForbiddenDays()));
-			query.addField(object->getDefaultFare() ? object->getDefaultFare()->getKey() : RegistryKeyType(0));
-			query.addField(object->getForbiddenInDepartureBoards());
-			query.addField(object->getForbiddenInTimetables());
-			query.addField(object->getForbiddenInJourneyPlanning());
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<PTUseRuleTableSync,PTUseRule>::Unlink(
-			PTUseRule* obj
-		){
-
 		}
 
 
@@ -207,11 +123,11 @@ namespace synthese
 			SelectQuery<PTUseRuleTableSync> query;
 			if(name)
 			{
-				query.addWhereField(COL_NAME, *name, ComposedExpression::OP_LIKE);
+				query.addWhereField(SimpleObjectFieldDefinition<Name>::FIELD.name, *name, ComposedExpression::OP_LIKE);
 			}
 			if(orderByName)
 			{
-				query.addOrderField(COL_NAME, raisingOrder);
+				query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 			}
 			if(number)
 			{
@@ -226,50 +142,9 @@ namespace synthese
 
 
 
-		std::string PTUseRuleTableSync::SerializeForbiddenDays( const PTUseRule::ReservationForbiddenDays& value )
+		bool PTUseRuleTableSync::allowList(const server::Session* session) const
 		{
-			bool first(true);
-			stringstream forbiddenDays;
-			BOOST_FOREACH(const date::day_of_week_type& day, value)
-			{
-				if(first)
-				{
-					first = false;
-				}
-				else
-				{
-					forbiddenDays << ",";
-				}
-				forbiddenDays << int(day);
-			}
-			return forbiddenDays.str();
-		}
-
-
-
-		PTUseRule::ReservationForbiddenDays PTUseRuleTableSync::UnserializeForbiddenDays( const std::string& value )
-		{
-			if(value.empty())
-			{
-				return PTUseRule::ReservationForbiddenDays();
-			}
-			else
-			{
-				PTUseRule::ReservationForbiddenDays days;
-				vector<string> daysVec;
-				split(daysVec, value, is_any_of(","));
-				BOOST_FOREACH(const string& dayStr, daysVec)
-				{
-					try
-					{
-						days.insert(static_cast<date::day_of_week_type>(lexical_cast<int>(dayStr)));
-					}
-					catch(bad_lexical_cast&)
-					{
-					}
-				}
-				return days;
-			}
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::READ);
 		}
 
 

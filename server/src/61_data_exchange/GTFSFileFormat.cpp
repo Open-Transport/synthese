@@ -45,6 +45,7 @@
 #include "Path.h"
 #include "ReservationContact.h"
 #include "ReservationContactTableSync.h"
+#include "Fare.hpp"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
