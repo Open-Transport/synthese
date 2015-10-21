@@ -60,14 +60,6 @@ namespace synthese
 
 	namespace pt
 	{
-		const string StopPointTableSync::COL_NAME = "name";
-		const string StopPointTableSync::COL_PLACEID = "place_id";
-		const string StopPointTableSync::COL_X = "x";
-		const string StopPointTableSync::COL_Y = "y";
-		const string StopPointTableSync::COL_OPERATOR_CODE = "operator_code";
-		const string StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID = "projected_road_chunk_id";
-		const string StopPointTableSync::COL_PROJECTED_METRIC_OFFSET = "projected_metric_offset";
-		const string StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID = "handicapped_compliance_id";
 	}
 
 	namespace db
@@ -76,118 +68,21 @@ namespace synthese
 			"t012_physical_stops"
 		);
 
+
 		template<> const Field DBTableSyncTemplate<StopPointTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(StopPointTableSync::COL_NAME, SQL_TEXT),
-			Field(StopPointTableSync::COL_PLACEID, SQL_INTEGER),
-			Field(StopPointTableSync::COL_X, SQL_DOUBLE),
-			Field(StopPointTableSync::COL_Y, SQL_DOUBLE),
-			Field(StopPointTableSync::COL_OPERATOR_CODE, SQL_TEXT),
-			Field(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, SQL_INTEGER),
-			Field(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET, SQL_DOUBLE),
-			Field(StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID, SQL_INTEGER),
-			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			Field()
 		};
+
 
 		template<>
 		DBTableSync::Indexes DBTableSyncTemplate<StopPointTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(StopPointTableSync::COL_PLACEID.c_str(), ""));
-			r.push_back(DBTableSync::Index(StopPointTableSync::COL_OPERATOR_CODE.c_str(), ""));
+			r.push_back(DBTableSync::Index(ConnectionPlace::FIELD.name.c_str(), ""));
+			r.push_back(DBTableSync::Index(OperatorCode::FIELD.name.c_str(), ""));
 			return r;
 		}
-
-
-		/** Does not update the place */
-		template<>
-		void OldLoadSavePolicy<StopPointTableSync,StopPoint>::Load(
-			StopPoint* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
-			object->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<StopPointTableSync,StopPoint>::Unlink(
-			StopPoint* obj
-		){
-			obj->unlink();
-		}
-
-
-
-		template<> void OldLoadSavePolicy<StopPointTableSync,StopPoint>::Save(
-			StopPoint* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<StopPointTableSync> query(*object);
-
-			// Name
-			query.addField(object->getName());
-
-			// Stop area
-			query.addField(dynamic_cast<const StopArea*>(object->getHub()) ? dynamic_cast<const StopArea*>(object->getHub())->getKey() : RegistryKeyType(0));
-
-			// X Y (deprecated)
-			if(object->hasGeometry())
-			{
-				query.addField(object->getGeometry()->getX());
-				query.addField(object->getGeometry()->getY());
-			}
-			else
-			{
-				query.addFieldNull();
-				query.addFieldNull();
-			}
-
-			// Data source links
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-
-			// Projected point
-			if(object->getProjectedPoint().getRoadChunk())
-			{
-				query.addField(object->getProjectedPoint().getRoadChunk()->getKey());
-				query.addField(object->getProjectedPoint().getMetricOffset());
-			}
-			else
-			{
-				query.addFieldNull();
-				query.addFieldNull();
-			}
-
-			// Handicapped compliance
-			query.addField(
-				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() : RegistryKeyType(0)
-			);
-
-			// Geometry
-			if(object->hasGeometry())
-			{
-				query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
-			}
-			else
-			{
-				query.addFieldNull();
-			}
-
-			query.execute(transaction);
-		}
-
 
 
 		template<> bool DBTableSyncTemplate<StopPointTableSync>::CanDelete(
@@ -250,6 +145,12 @@ namespace synthese
 
 	namespace pt
 	{
+
+		bool StopPointTableSync::allowList(const server::Session* session) const
+		{
+			return true;
+		}
+
 		StopPointTableSync::SearchResult StopPointTableSync::Search(
 			Env& env,
 			optional<RegistryKeyType> placeId,
@@ -263,19 +164,19 @@ namespace synthese
 			SelectQuery<StopPointTableSync> query;
 			if(operatorCode)
 			{
-				query.addWhereField(COL_OPERATOR_CODE, *operatorCode, ComposedExpression::OP_LIKE);
+				query.addWhereField(OperatorCode::FIELD.name, *operatorCode, ComposedExpression::OP_LIKE);
 			}
 			if(placeId)
 			{
-				query.addWhereField(COL_PLACEID, *placeId);
+				query.addWhereField(ConnectionPlace::FIELD.name, *placeId);
 			}
 			if(orderByCityAndStopName)
 			{
-				query.addTableAndEqualJoin<StopAreaTableSync>(TABLE_COL_ID, COL_PLACEID);
-				query.addTableAndEqualOtherJoin<CityTableSync, StopAreaTableSync>(TABLE_COL_ID, StopAreaTableSync::TABLE_COL_CITYID);
+				query.addTableAndEqualJoin<StopAreaTableSync>(Key::FIELD.name, ConnectionPlace::FIELD.name);
+				query.addTableAndEqualOtherJoin<CityTableSync, StopAreaTableSync>(Key::FIELD.name, StopAreaTableSync::TABLE_COL_CITYID);
 				query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
 				query.addOrderFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, raisingOrder);
-				query.addOrderField(StopPointTableSync::COL_NAME, raisingOrder);
+				query.addOrderField(Name::FIELD.name, raisingOrder);
 			}
 			if(number)
 			{
@@ -350,22 +251,22 @@ namespace synthese
 				Env env;
 				if(prefix)
 				{
-					query.addWhereField(StopPointTableSync::COL_NAME, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
+					query.addWhereField(Name::FIELD.name, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
 				}
 				if(optionalParameter)
 				{
-					query.addWhereField(StopPointTableSync::COL_PLACEID, *optionalParameter);
+					query.addWhereField(ConnectionPlace::FIELD.name, *optionalParameter);
 				}
 				if(limit)
 				{
 					query.setNumber(*limit);
 				}
-				query.addOrderField(StopPointTableSync::COL_NAME,true);
+				query.addOrderField(Name::FIELD.name, true);
 				StopPointTableSync::SearchResult stops(StopPointTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
 				BOOST_FOREACH(const boost::shared_ptr<StopPoint>& stop, stops)
 				{
 					result.push_back(std::make_pair(stop->getKey(), stop->getCodeBySources() + " / " + stop->getName()));
 				}
 				return result;
-		} ;
+		}
 }	}

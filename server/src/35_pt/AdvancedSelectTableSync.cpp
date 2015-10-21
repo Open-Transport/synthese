@@ -59,7 +59,7 @@ namespace synthese
 				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineNode::FIELD.name
 				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=ls." << Line::FIELD.name
 				<< " WHERE "
-				<< "p." << StopPointTableSync::COL_PLACEID << "=" << placeId
+				<< "p." << ConnectionPlace::FIELD.name << "=" << placeId
 				<< " AND l." << JourneyPatternCommercialLine::FIELD.name << "=" << lineId
 				<< " LIMIT 1";
 			DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
@@ -76,7 +76,7 @@ namespace synthese
 				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=ls." << Line::FIELD.name
 				<< " INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=l." << JourneyPatternCommercialLine::FIELD.name
 				<< " WHERE "
-				<< "p." << StopPointTableSync::COL_PLACEID << "=" << placeId
+				<< "p." << ConnectionPlace::FIELD.name << "=" << placeId
 				<< " AND c." << Network::FIELD.name << "=" << networkId
 				<< " LIMIT 1";
 			DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));

@@ -32,6 +32,9 @@
 #include "ScheduledServiceTableSync.h"
 #include "UpdateQuery.hpp"
 #include "DepotTableSync.hpp"
+#include "StopArea.hpp"
+#include "PTUseRule.h"
+
 
 #include <geos/geom/Point.h>
 #include <sstream>

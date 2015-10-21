@@ -29,7 +29,6 @@
 #include <iostream>
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 #include "FetcherTemplate.h"
 
 namespace synthese
@@ -65,23 +64,11 @@ namespace synthese
 		class StopPointTableSync:
 			public db::DBDirectTableSyncTemplate<
 				StopPointTableSync,
-				StopPoint,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
-			>,
+				StopPoint>,
 			public db::FetcherTemplate<graph::Vertex, StopPointTableSync>
 		{
 		public:
-			static const std::string COL_NAME;
-			static const std::string COL_PLACEID;
-			static const std::string COL_X;
-			static const std::string COL_Y;
-			static const std::string COL_OPERATOR_CODE;
-			static const std::string COL_PROJECTED_ROAD_CHUNK_ID;
-			static const std::string COL_PROJECTED_METRIC_OFFSET;
-			static const std::string COL_HANDICAPPED_COMPLIANCE_ID;
-
-
+			virtual bool allowList( const server::Session* session ) const;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Stop points search.
@@ -141,6 +128,7 @@ namespace synthese
 				const boost::optional<std::string> optionalParameter) const;
 
 		};
+
 	}
 }
 

@@ -28,6 +28,7 @@
 #include "ServerModule.h"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
+#include "PTUseRule.h"
 #include "StopArea.hpp"
 #include "StopPointTableSync.hpp"
 #include "Vehicle.hpp"

@@ -27,6 +27,7 @@ Singleton Object List Should Work For Any Table
     ${FREE_DRT_TIME_SLOTS_TABLE_ID}
     ${CALENDAR_TEMPLATES_TABLE_ID}
     ${CALENDAR_TEMPLATE_ELEMENTS_TABLE_ID}
+    ${PHYSICAL_STOPS_TABLE_ID}
     
 
 Empty Object List Should Work For Any Table
@@ -51,7 +52,8 @@ Empty Object List Should Work For Any Table
     ${FREE_DRT_TIME_SLOTS_TABLE_ID}
     ${CALENDAR_TEMPLATES_TABLE_ID}
     ${CALENDAR_TEMPLATE_ELEMENTS_TABLE_ID}
-
+    ${PHYSICAL_STOPS_TABLE_ID}
+    
 Object List Should Work For Some Tables
     On node 0
     # There Is One Object In Table  ${USERS_TABLE_ID}

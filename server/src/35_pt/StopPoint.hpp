@@ -23,12 +23,15 @@
 #ifndef SYNTHESE_ENV_PHYSICALSTOP_H
 #define SYNTHESE_ENV_PHYSICALSTOP_H
 
+#include "Object.hpp"
 #include "CommercialLine.h"
 #include "UtilConstants.h"
 #include "Vertex.h"
 #include "ImportableTemplate.hpp"
 #include "Address.h"
 #include "ReachableFromCrossing.hpp"
+#include "GeometryField.hpp"
+#include "PointerField.hpp"
 
 #include <string>
 
@@ -39,11 +42,38 @@ namespace synthese
 		class ParametersMap;
 	}
 
+	namespace road
+	{
+		class RoadChunk;
+	}
+
 	namespace pt
 	{
 		class LineStop;
 		class StopArea;
 		class JourneyPattern;
+		class PTUseRule;
+
+		FIELD_POINTER(ConnectionPlace, StopArea)
+		FIELD_DOUBLE(DeprecatedX)
+		FIELD_DOUBLE(DeprecatedY)
+		FIELD_STRING(OperatorCode)
+		FIELD_POINTER(ProjectedRoadChunk, road::RoadChunk)
+		FIELD_DOUBLE(ProjectedMetricOffset)
+		FIELD_POINTER(HandicappedCompliance, PTUseRule)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(ConnectionPlace),
+			FIELD(DeprecatedX),
+			FIELD(DeprecatedY),
+			FIELD(OperatorCode),
+			FIELD(ProjectedRoadChunk),
+			FIELD(ProjectedMetricOffset),
+			FIELD(HandicappedCompliance),
+			FIELD(PointGeometry)
+		> StopPointSchema;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Physical stop (bus stop, etc.).
@@ -53,6 +83,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		class StopPoint:
 			public graph::Vertex,
+			public Object<StopPoint, StopPointSchema>,
 			public impex::ImportableTemplate<StopPoint>,
 			public road::ReachableFromCrossing
 		{
@@ -71,7 +102,8 @@ namespace synthese
 
 		private:
 			road::Address _projectedPoint;
-			std::string _name;
+
+			void adaptDeprecatedGeometryIfNecessary();
 
 		public:
 
@@ -89,13 +121,13 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const road::Address& getProjectedPoint() const { return _projectedPoint; }
-				virtual std::string getName() const { return _name; }
+				virtual std::string getName() const;
 			//@}
 
 			//! @name Setters
 			//@{
 				void setProjectedPoint(const road::Address& value){ _projectedPoint = value; }
-				void setName(const std::string& value){ _name = value; }
+				void setName(const std::string& value);
 			//@}
 
 			//! @name Services
@@ -104,8 +136,6 @@ namespace synthese
 				virtual graph::GraphIdType getGraphType() const;
 				virtual graph::VertexAccess getVertexAccess(const road::Crossing& crossing) const;
 				virtual std::string getRuleUserName() const;
-
-
 
 				typedef std::set<const CommercialLine*, CommercialLine::PointerComparator> LinesSet;
 
@@ -158,10 +188,16 @@ namespace synthese
 					std::string prefix = std::string()
 				) const;
 
+				/*
 				virtual bool loadFromRecord(
 					const Record& record,
 					util::Env& env
 				);
+				*/
+
+				virtual bool allowUpdate(const server::Session* session) const;
+				virtual bool allowCreate(const server::Session* session) const;
+				virtual bool allowDelete(const server::Session* session) const;
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();

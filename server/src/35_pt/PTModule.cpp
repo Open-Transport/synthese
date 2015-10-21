@@ -51,6 +51,7 @@
 #include "StopPointTableSync.hpp"
 #include "SecurityConstants.hpp"
 #include "Right.h"
+#include "PTUseRule.h"
 #include "PTUseRuleTableSync.h"
 
 #include <boost/lexical_cast.hpp>

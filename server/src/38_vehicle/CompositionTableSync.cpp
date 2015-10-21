@@ -30,6 +30,8 @@
 #include "ScheduledServiceTableSync.h"
 #include "VehicleTableSync.hpp"
 #include "StopPointTableSync.hpp"
+#include "StopArea.hpp"
+#include "PTUseRule.h"
 #include "ScheduledServiceTableSync.h"
 #include "VehicleModule.hpp"
 #include "VehicleServiceTableSync.hpp"

@@ -82,7 +82,9 @@ namespace synthese
 			Object<RoadChunk, RoadChunkSchema>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
-					FIELD_VALUE_CONSTRUCTOR(FromCrossing, boost::optional<Crossing&>(*fromCrossing)),
+					FIELD_VALUE_CONSTRUCTOR(FromCrossing, fromCrossing == NULL ?
+												boost::optional<Crossing&>(boost::none) :
+												boost::optional<Crossing&>(*fromCrossing)),
 					FIELD_VALUE_CONSTRUCTOR(RankInPathField, rankInRoad),
 					FIELD_VALUE_CONSTRUCTOR(Road, boost::optional<Road&>(*street)),
 					FIELD_VALUE_CONSTRUCTOR(MetricOffsetField, metricOffset),

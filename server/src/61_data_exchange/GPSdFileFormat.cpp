@@ -24,6 +24,7 @@
 
 #include "Env.h"
 #include "Exception.h"
+#include "PTUseRule.h"
 #include "ScheduledService.h"
 #include "ServerModule.h"
 #include "StopArea.hpp"
