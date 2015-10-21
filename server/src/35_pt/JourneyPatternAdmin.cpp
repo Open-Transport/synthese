@@ -138,7 +138,7 @@ namespace synthese
 			}
 
 			// Search table initialization
-			_requestParameters.setFromParametersMap(map, ScheduledServiceTableSync::COL_SCHEDULES);
+			_requestParameters.setFromParametersMap(map, ServiceSchedules::FIELD.name);
 		}
 
 
@@ -168,7 +168,7 @@ namespace synthese
 					false,
 					0,
 					optional<size_t>(),
-					_requestParameters.orderField == ScheduledServiceTableSync::COL_SCHEDULES,
+					_requestParameters.orderField == ServiceSchedules::FIELD.name,
 					_requestParameters.raisingOrder,
 					UP_DOWN_LINKS_LOAD_LEVEL
 			)	);
@@ -180,7 +180,7 @@ namespace synthese
 					optional<RegistryKeyType>(),
 					0,
 					optional<size_t>(),
-					_requestParameters.orderField == ScheduledServiceTableSync::COL_SCHEDULES,
+					_requestParameters.orderField == ServiceSchedules::FIELD.name,
 					_requestParameters.raisingOrder,
 					UP_DOWN_LINKS_LOAD_LEVEL
 			)	);
@@ -673,7 +673,7 @@ namespace synthese
 				ActionResultHTMLTable::HeaderVector vs;
 				vs.push_back(make_pair(string(), "Num"));
 				vs.push_back(make_pair(string(), "Numéro"));
-				vs.push_back(make_pair(ScheduledServiceTableSync::COL_SCHEDULES, "Départ"));
+				vs.push_back(make_pair(ServiceSchedules::FIELD.name, "Départ"));
 				vs.push_back(make_pair(string(), "Arrivée"));
 				vs.push_back(make_pair(string(), "Durée"));
 				vs.push_back(make_pair(string(), "Dernier jour"));
@@ -758,7 +758,7 @@ namespace synthese
 
 				ActionResultHTMLTable::HeaderVector vc;
 				vc.push_back(make_pair(string(), "Num"));
-				vc.push_back(make_pair(ScheduledServiceTableSync::COL_SCHEDULES, "Départ premier"));
+				vc.push_back(make_pair(ServiceSchedules::FIELD.name, "Départ premier"));
 				vc.push_back(make_pair(string(), "Départ dernier"));
 				vc.push_back(make_pair(string(), "Arrivée premier"));
 				vc.push_back(make_pair(string(), "Arrivée dernier"));

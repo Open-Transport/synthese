@@ -31,10 +31,13 @@
 #include "CityTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "FreeDRTAreaTableSync.hpp"
+#include "Profile.h"
 #include "PTUseRuleTableSync.h"
 #include "ReplaceQuery.h"
 #include "RollingStock.hpp"
 #include "SelectQuery.hpp"
+#include "TransportNetworkRight.h"
+#include "User.h"
 
 #include <boost/algorithm/string/split.hpp>
 
@@ -59,19 +62,6 @@ namespace synthese
 		template<> const string FactorableTemplate<Fetcher<Calendar>, FreeDRTTimeSlotTableSync>::FACTORY_KEY("83");
 	}
 
-	namespace pt
-	{
-		const string FreeDRTTimeSlotTableSync::COL_AREA_ID = "area_id";
-		const string FreeDRTTimeSlotTableSync::COL_SERVICE_NUMBER = "service_number";
-		const string FreeDRTTimeSlotTableSync::COL_FIRST_DEPARTURE = "first_departure";
-		const string FreeDRTTimeSlotTableSync::COL_LAST_ARRIVAL = "last_arrival";
-		const string FreeDRTTimeSlotTableSync::COL_MAX_CAPACITY = "max_capacity";
-		const string FreeDRTTimeSlotTableSync::COL_COMMERCIAL_SPEED = "commercial_speed";
-		const string FreeDRTTimeSlotTableSync::COL_MAX_SPEED = "max_speed";
-		const string FreeDRTTimeSlotTableSync::COL_USE_RULES = "use_rules";
-		const string FreeDRTTimeSlotTableSync::COL_DATES = "dates";
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<FreeDRTTimeSlotTableSync>::TABLE(
@@ -82,16 +72,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<FreeDRTTimeSlotTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(FreeDRTTimeSlotTableSync::COL_AREA_ID, SQL_INTEGER),
-			Field(FreeDRTTimeSlotTableSync::COL_SERVICE_NUMBER, SQL_TEXT),
-			Field(FreeDRTTimeSlotTableSync::COL_FIRST_DEPARTURE, SQL_TEXT),
-			Field(FreeDRTTimeSlotTableSync::COL_LAST_ARRIVAL, SQL_TEXT),
-			Field(FreeDRTTimeSlotTableSync::COL_MAX_CAPACITY, SQL_INTEGER),
-			Field(FreeDRTTimeSlotTableSync::COL_COMMERCIAL_SPEED, SQL_DOUBLE),
-			Field(FreeDRTTimeSlotTableSync::COL_MAX_SPEED, SQL_DOUBLE),
-			Field(FreeDRTTimeSlotTableSync::COL_USE_RULES, SQL_TEXT),
-			Field(FreeDRTTimeSlotTableSync::COL_DATES, SQL_TEXT),
 			Field()
 		};
 
@@ -103,156 +83,10 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					FreeDRTTimeSlotTableSync::COL_AREA_ID.c_str(),
+					Area::FIELD.name.c_str(),
 			"")	);
 			return r;
 		};
-
-
-
-		template<> void OldLoadSavePolicy<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>::Load(
-			FreeDRTTimeSlot* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			// Area
-			object->setArea(NULL);
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				RegistryKeyType areaId(rows->getLongLong(FreeDRTTimeSlotTableSync::COL_AREA_ID));
-				try
-				{
-					FreeDRTArea* area(FreeDRTAreaTableSync::GetEditable(areaId, env, linkLevel).get());
-					object->setArea(area);
-				}
-				catch(ObjectNotFoundException<CommercialLine>)
-				{
-					Log::GetInstance().warn("Bad value " + lexical_cast<string>(areaId) + " for aera in free DRT time slot " + lexical_cast<string>(object->getKey()));
-				}
-			}
-
-			// Service number
-			object->setServiceNumber(rows->getText(FreeDRTTimeSlotTableSync::COL_SERVICE_NUMBER));
-
-			// First departure
-			object->setFirstDeparture(time_duration(not_a_date_time));
-			if(!rows->getText(FreeDRTTimeSlotTableSync::COL_FIRST_DEPARTURE).empty())
-			{
-				object->setFirstDeparture(duration_from_string(rows->getText(FreeDRTTimeSlotTableSync::COL_FIRST_DEPARTURE)));
-			}
-
-			// Last arrival
-			object->setLastArrival(time_duration(not_a_date_time));
-			if(!rows->getText(FreeDRTTimeSlotTableSync::COL_LAST_ARRIVAL).empty())
-			{
-				object->setLastArrival(duration_from_string(rows->getText(FreeDRTTimeSlotTableSync::COL_LAST_ARRIVAL)));
-			}
-
-			// Max capacity
-			object->setMaxCapacity(rows->getOptionalUnsignedInt(FreeDRTTimeSlotTableSync::COL_MAX_CAPACITY));
-
-			// Commercial speed
-			object->setCommercialSpeed(lexical_cast<FreeDRTTimeSlot::KMHSpeed>(rows->getText(FreeDRTTimeSlotTableSync::COL_COMMERCIAL_SPEED)));
-
-			// Max speed
-			object->setMaxSpeed(lexical_cast<FreeDRTTimeSlot::KMHSpeed>(rows->getText(FreeDRTTimeSlotTableSync::COL_MAX_SPEED)));
-
-			// Use rules
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				object->setRules(
-					PTUseRuleTableSync::UnserializeUseRules(
-						rows->getText(FreeDRTTimeSlotTableSync::COL_USE_RULES),
-						env,
-						linkLevel
-				)	);
-			}
-
-			// Calendar
-			if(linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
-			{
-				// Search of calendar template links (overrides manually defined calendar)
-				CalendarLinkTableSync::SearchResult links(
-					CalendarLinkTableSync::Search(
-						env,
-						object->getKey()
-				)	); // UP_LINK_LOAD_LEVEL to avoid multiple calls to setCalendarFromLinks
-				if(links.empty())
-				{
-					object->setFromSerializedString(rows->getText(FreeDRTTimeSlotTableSync::COL_DATES));
-				}
-				else
-				{
-					BOOST_FOREACH(const boost::shared_ptr<CalendarLink>& link, links)
-					{
-						object->addCalendarLink(*link, false);
-					}
-				}
-			}
-			else
-			{
-				object->setFromSerializedString(rows->getText(FreeDRTTimeSlotTableSync::COL_DATES));
-			}
-
-
-			// Registration in the line and in the path
-			if(	linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL &&
-				object->getArea()
-			){
-				// Registration in the path
-				object->getArea()->addService(*object, false);
-
-				// Registration in the line
-				if(object->getArea()->getLine())
-				{
-					object->getArea()->getLine()->registerService(*object);
-				}
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>::Save(
-			FreeDRTTimeSlot* object,
-			optional<DBTransaction&> transaction
-		){
-			// Dates preparation
-			stringstream datesStr;
-			if(object->getCalendarLinks().empty())
-			{
-				object->serialize(datesStr);
-			}
-
-			ReplaceQuery<FreeDRTTimeSlotTableSync> query(*object);
-			query.addField(object->getArea() ? object->getArea()->getKey() : RegistryKeyType(0));
-			query.addField(object->getServiceNumber());
-			query.addField(object->getFirstDeparture().is_not_a_date_time() ? string() : to_simple_string(object->getFirstDeparture()));
-			query.addField(object->getLastArrival().is_not_a_date_time() ? string() : to_simple_string(object->getLastArrival()));
-			query.addField(object->getMaxCapacity() ? lexical_cast<string>(*object->getMaxCapacity()) : string());
-			query.addField(object->getCommercialSpeed());
-			query.addField(object->getMaxSpeed());
-			query.addField(PTUseRuleTableSync::SerializeUseRules(object->getRules()));
-			query.addField(
-				datesStr.str()
-			);
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>::Unlink(
-			FreeDRTTimeSlot* obj
-		){
-			if(obj->getArea())
-			{
-				// Unregister from the area
-				obj->getPath()->removeService(*obj);
-
-				// Unregister from the line
-				obj->getArea()->getLine()->unregisterService(*obj);
-			}
-		}
 
 
 
@@ -305,11 +139,11 @@ namespace synthese
 			SelectQuery<FreeDRTTimeSlotTableSync> query;
 			if(areaId)
 			{
-			 	query.addWhereField(COL_AREA_ID, *areaId);
+			 	query.addWhereField(Area::FIELD.name, *areaId);
 			}
 			if(orderByServiceNumber)
 			{
-			 	query.addOrderField(COL_SERVICE_NUMBER, raisingOrder);
+			 	query.addOrderField(FreeDRTServiceNumber::FIELD.name, raisingOrder);
 			}
 			if (number)
 			{
@@ -321,5 +155,10 @@ namespace synthese
 			}
 
 			return LoadFromQuery(query, env, linkLevel);
+		}
+
+		bool FreeDRTTimeSlotTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::READ);
 		}
 }	}

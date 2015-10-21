@@ -32,9 +32,12 @@
 #include "Destination.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
+#include "Profile.h"
 #include "PTUseRuleTableSync.h"
 #include "Registry.h"
 #include "RollingStock.hpp"
+#include "TransportNetworkRight.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;
@@ -45,13 +48,15 @@ namespace synthese
 {
 	using namespace calendar;
 	using namespace db;
-	using namespace util;
 	using namespace graph;
+	using namespace pt;
+	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<pt::ContinuousService>::KEY("ContinuousService");
-	}
+	CLASS_DEFINITION(ContinuousService, "t017_continuous_services", 17)
+	FIELD_DEFINITION_OF_OBJECT(ContinuousService, "continuous_service_id", "continuous_service_ids")
+
+	FIELD_DEFINITION_OF_TYPE(Range, "range", SQL_TIME)
+	FIELD_DEFINITION_OF_TYPE(MaxWaitingTime, "max_waiting_time", SQL_TIME)
 
 	namespace pt
 	{
@@ -62,9 +67,20 @@ namespace synthese
 			boost::posix_time::time_duration range,
 			boost::posix_time::time_duration maxWaitingTime
 		):	Registrable(id),
+			Object<ContinuousService, ContinuousServiceSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_VALUE_CONSTRUCTOR(ServiceNumber, serviceNumber),
+					FIELD_DEFAULT_CONSTRUCTOR(ServiceSchedules),
+					FIELD_VALUE_CONSTRUCTOR(ServicePath, path ? boost::optional<JourneyPattern&>(*dynamic_cast<JourneyPattern*>(path)) : boost::none),
+					FIELD_VALUE_CONSTRUCTOR(Range, range),
+					FIELD_VALUE_CONSTRUCTOR(MaxWaitingTime, maxWaitingTime),
+					FIELD_DEFAULT_CONSTRUCTOR(BikeComplianceId),
+					FIELD_DEFAULT_CONSTRUCTOR(HandicappedComplianceId),
+					FIELD_DEFAULT_CONSTRUCTOR(PedestrianComplianceId),
+					FIELD_DEFAULT_CONSTRUCTOR(ServiceDates)
+			)	),
 			SchedulesBasedService(serviceNumber, path)
-			, _range (range)
-			, _maxWaitingTime (maxWaitingTime)
 		{}
 
 
@@ -79,7 +95,7 @@ namespace synthese
 		boost::posix_time::time_duration
 		ContinuousService::getMaxWaitingTime () const
 		{
-			return _maxWaitingTime;
+			return get<MaxWaitingTime>();
 		}
 
 
@@ -87,14 +103,14 @@ namespace synthese
 		void
 		ContinuousService::setMaxWaitingTime (boost::posix_time::time_duration maxWaitingTime)
 		{
-			_maxWaitingTime = maxWaitingTime;
+			set<MaxWaitingTime>(maxWaitingTime);
 		}
 
 
 
 		boost::posix_time::time_duration ContinuousService::getRange () const
 		{
-			return _range;
+			return get<Range>();
 		}
 
 
@@ -102,7 +118,7 @@ namespace synthese
 		void
 		ContinuousService::setRange (boost::posix_time::time_duration range)
 		{
-			_range = range;
+			set<Range>(range);
 		}
 
 
@@ -154,7 +170,7 @@ namespace synthese
 			if (getDeparture)
 			{
 				schedule = getDepartureSchedule(RTData, edgeIndex);
-				time_duration endSchedule(schedule + _range);
+				time_duration endSchedule(schedule + get<Range>());
 
 				if(	GetTimeOfDay(schedule) <= GetTimeOfDay(endSchedule)
 				){
@@ -202,8 +218,8 @@ namespace synthese
 			}
 			else
 			{
-				schedule = getArrivalSchedule(RTData, edgeIndex) + _maxWaitingTime;
-				time_duration endSchedule(schedule + _range);
+				schedule = getArrivalSchedule(RTData, edgeIndex) + get<MaxWaitingTime>();
+				time_duration endSchedule(schedule + get<Range>());
 				if (GetTimeOfDay(schedule) <= GetTimeOfDay(endSchedule))
 				{
 					if (presenceDateTime.time_of_day() < GetTimeOfDay(schedule))
@@ -248,7 +264,7 @@ namespace synthese
 					{
 						range = actualDateTime.time_of_day() - GetTimeOfDay(schedule);
 					}
-					range = _range - range;
+					range = get<Range>() - range;
 				}
 				else
 				{
@@ -323,11 +339,11 @@ namespace synthese
 				time_duration schedule(
 					getArrivalSchedule(servicePointer.getRTData(), edgeIndex)
 				);
-				schedule += _maxWaitingTime;
+				schedule += get<MaxWaitingTime>();
 				servicePointer.setArrivalInformations(
 					edge,
 					servicePointer.getOriginDateTime() + (schedule - getDepartureSchedule(servicePointer.getRTData(), 0)),
-					servicePointer.getOriginDateTime() + (getArrivalSchedule(false, edgeIndex) + _maxWaitingTime - getDepartureSchedule(servicePointer.getRTData(), 0)),
+					servicePointer.getOriginDateTime() + (getArrivalSchedule(false, edgeIndex) + get<MaxWaitingTime>() - getDepartureSchedule(servicePointer.getRTData(), 0)),
 					*edge.getFromVertex()
 				);
 			}
@@ -365,9 +381,9 @@ namespace synthese
 		) const	{
 			if(rankInPath == 0 && !RTData)
 			{
-				return getDataDepartureSchedules()[0] + _range;
+				return getDataDepartureSchedules()[0] + get<Range>();
 			}
-			return getDepartureSchedule(RTData, rankInPath) + _range;
+			return getDepartureSchedule(RTData, rankInPath) + get<Range>();
 		}
 
 
@@ -376,7 +392,7 @@ namespace synthese
 			bool RTData,
 			std::size_t rankInPath
 		) const	{
-			return getArrivalSchedule(RTData, rankInPath) + _maxWaitingTime;
+			return getArrivalSchedule(RTData, rankInPath) + get<MaxWaitingTime>();
 		}
 
 
@@ -385,7 +401,7 @@ namespace synthese
 			bool RTData,
 			std::size_t rankInPath
 		) const	{
-			return getArrivalSchedule(RTData, rankInPath) + _range + _maxWaitingTime;
+			return getArrivalSchedule(RTData, rankInPath) + get<Range>() + get<MaxWaitingTime>();
 		}
 
 
@@ -402,200 +418,118 @@ namespace synthese
 			}
 
 			map.insert(TABLE_COL_ID, getKey());
-			map.insert(ContinuousServiceTableSync::COL_SERVICENUMBER, getServiceNumber());
-			map.insert(ContinuousServiceTableSync::COL_SCHEDULES, encodeSchedules(-getMaxWaitingTime()));
+			map.insert(ServiceNumber::FIELD.name, getServiceNumber());
+			map.insert(ServiceSchedules::FIELD.name, encodeSchedules(-getMaxWaitingTime()));
 			map.insert(
-				ContinuousServiceTableSync::COL_PATHID, 
+				ServicePath::FIELD.name,
 				getPath() ? getPath()->getKey() : 0
 			);
 			map.insert(
-				ContinuousServiceTableSync::COL_RANGE,
+				Range::FIELD.name,
 				getRange().total_seconds() / 60
 			);
 			map.insert(
-				ContinuousServiceTableSync::COL_MAXWAITINGTIME,
+				MaxWaitingTime::FIELD.name,
 				getMaxWaitingTime().total_seconds() / 60
 			);
 
 			map.insert(
-				ContinuousServiceTableSync::COL_BIKE_USE_RULE,
+				BikeComplianceId::FIELD.name,
 				(	getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(getRule(USER_BIKE)) ?
 					static_cast<const PTUseRule*>(getRule(USER_BIKE))->getKey() :
 					RegistryKeyType(0)
 			)	);
 			map.insert(
-				ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE,
+				HandicappedComplianceId::FIELD.name,
 				(	getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(getRule(USER_HANDICAPPED)) ?
 					static_cast<const PTUseRule*>(getRule(USER_HANDICAPPED))->getKey() :
 					RegistryKeyType(0)
 			)	);
 			map.insert(
-				ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE,
+				PedestrianComplianceId::FIELD.name,
 				(	getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(getRule(USER_PEDESTRIAN)) ?
 					static_cast<const PTUseRule*>(getRule(USER_PEDESTRIAN))->getKey() :
 					RegistryKeyType(0)
 			)	);
-			map.insert(ContinuousServiceTableSync::COL_DATES, datesStr.str());
+			map.insert(ServiceDates::FIELD.name, datesStr.str());
 		}
 
 
 
-		bool ContinuousService::loadFromRecord( const Record& record, util::Env& env )
+		void ContinuousService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
-			bool result(false);
-
-			// Service number
-			if(record.isDefined(ContinuousServiceTableSync::COL_SERVICENUMBER))
+			if (!get<ServiceDates>().empty())
 			{
-				string serviceNumber(
-					record.get<string>(ContinuousServiceTableSync::COL_SERVICENUMBER)
+				Calendar valueDates;
+				valueDates.setFromSerializedString(
+					get<ServiceDates>()
 				);
-				if(serviceNumber != getServiceNumber())
-				{
-					setServiceNumber(serviceNumber);
-					result = true;
-				}
+				copyDates(valueDates);
 			}
 
-			// Range
-			if(record.isDefined(ContinuousServiceTableSync::COL_RANGE))
+			if (get<ServicePath>())
 			{
-				boost::posix_time::time_duration range(
-					minutes(record.getDefault<long>(ContinuousServiceTableSync::COL_RANGE, 0))
-				);
-				if(range != getRange())
+				setPath(get<ServicePath>().get_ptr());
+				if(get<ServicePath>()->getEdges().empty())
 				{
-					setRange(range);
-					result = true;
+					LineStopTableSync::Search(env, get<ServicePath>()->getKey());
 				}
 			}
-
-			// Max waiting time
-			if(record.isDefined(ContinuousServiceTableSync::COL_MAXWAITINGTIME))
-			{
-				boost::posix_time::time_duration maxWaitingTime(
-					minutes(record.getDefault<long>(ContinuousServiceTableSync::COL_MAXWAITINGTIME, 0))
-				);
-				if(maxWaitingTime != getMaxWaitingTime())
-				{
-					setMaxWaitingTime(maxWaitingTime);
-					result = true;
-				}
-			}
-
-			// Calendar dates
-			if(record.isDefined(ContinuousServiceTableSync::COL_DATES))
-			{
-				Calendar value;
-				value.setFromSerializedString(
-					record.get<string>(ContinuousServiceTableSync::COL_DATES)
-				);
-				if(value.getMarkedDates() != getMarkedDates())
-				{
-					copyDates(value);
-					result = true;
-				}
-			}
-
-
-			// Path
-			if(record.isDefined(ContinuousServiceTableSync::COL_PATHID))
-			{
-				util::RegistryKeyType pathId(
-					record.getDefault<RegistryKeyType>(
-						ContinuousServiceTableSync::COL_PATHID,
-						0
-				)	);
-				Path* path(
-					JourneyPatternTableSync::GetEditable(pathId, env).get()
-				);
-
-				if(path != getPath())
-				{
-					setPath(path);
-					if(path->getEdges().empty())
-					{
-						LineStopTableSync::Search(env, pathId);
-					}
-					result = true;
-				}
-			}
-
+			
 			// Use rules
-			RuleUser::Rules rules(RuleUser::GetEmptyRules());
+			RuleUser::Rules rules(getRules());
 
-//			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			// Bike compliance
+			if(get<BikeComplianceId>())
 			{
-				// Use rules
-				RuleUser::Rules rules(getRules());
-
-				// Use rules
-				if(record.isDefined(ContinuousServiceTableSync::COL_BIKE_USE_RULE))
+				if(get<BikeComplianceId>() > 0)
 				{
-					RegistryKeyType bikeComplianceId(
-						record.getDefault<RegistryKeyType>(
-							ContinuousServiceTableSync::COL_BIKE_USE_RULE,
-							0
-					)	);
-					const PTUseRule* value(NULL);
-					if(bikeComplianceId > 0)
-					{
-						 value = PTUseRuleTableSync::Get(bikeComplianceId, env).get();
-					}
-					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = value;
+					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(get<BikeComplianceId>(), env).get();
 				}
-				if(record.isDefined(ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE))
+				else
 				{
-					RegistryKeyType handicappedComplianceId(
-						record.getDefault<RegistryKeyType>(
-							ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE,
-							0
-					)	);
-					const PTUseRule* value(NULL);
-					if(handicappedComplianceId > 0)
-					{
-						value = PTUseRuleTableSync::Get(handicappedComplianceId, env).get();
-					}
-					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = value;
+					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = NULL;
 				}
-				if(record.isDefined(ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE))
+			}
+			
+			// Handicapped compliance
+			if(get<HandicappedComplianceId>())
+			{
+				if(get<HandicappedComplianceId>() > 0)
 				{
-					RegistryKeyType pedestrianComplianceId(
-						record.getDefault<RegistryKeyType>(
-							ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE,
-							0
-					)	);
-					const PTUseRule* value(NULL);
-					if(pedestrianComplianceId > 0)
-					{
-						value = PTUseRuleTableSync::Get(pedestrianComplianceId, env).get();
-					}
-					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = value;
+					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(get<HandicappedComplianceId>(), env).get();
 				}
-				if(rules != getRules())
+				else
 				{
-					setRules(rules);
-					result = true;
+					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = NULL;
 				}
 			}
 
-			// Schedules
-			if(record.isDefined(ContinuousServiceTableSync::COL_SCHEDULES))
+			// Pedestrian compliance
+			if(get<PedestrianComplianceId>())
+			{
+				if(get<PedestrianComplianceId>() > 0)
+				{
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(get<PedestrianComplianceId>(), env).get();
+				}
+				else
+				{
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = NULL;
+				}
+			}
+			RuleUser::setRules(rules);
+
+			if (!get<ServiceSchedules>().empty())
 			{
 				try
 				{
-					string rawSchedule = record.get<string>(ContinuousServiceTableSync::COL_SCHEDULES);
+					string rawSchedule = get<ServiceSchedules>();
 					SchedulesBasedService::SchedulesPair value(
 						SchedulesBasedService::DecodeSchedules(
 							rawSchedule,
-							_maxWaitingTime
+							get<MaxWaitingTime>()
 					)	);
-					if(	value.first != getDataDepartureSchedules() ||
-						value.second != getDataArrivalSchedules()
-					){
-						result = true;
-						setDataSchedules(value.first, value.second);
-					}
+					setDataSchedules(value.first, value.second);
 				}
 				catch(SchedulesBasedService::BadSchedulesException&)
 				{
@@ -603,13 +537,6 @@ namespace synthese
 				}
 			}
 
-			return result;
-		}
-
-
-
-		void ContinuousService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
-		{
 			// Registration in path
 			if( getPath()&&
 				!getPath()->contains(*this))
@@ -655,12 +582,12 @@ namespace synthese
 
 		const boost::posix_time::time_duration ContinuousService::getDataLastDepartureSchedule( size_t i ) const
 		{
-			return getDataFirstDepartureSchedule(i) + _range;
+			return getDataFirstDepartureSchedule(i) + get<Range>();
 		}
 
 		const boost::posix_time::time_duration ContinuousService::getDataLastArrivalSchedule( size_t i ) const
 		{
-			return getDataFirstArrivalSchedule(i) + _range + _maxWaitingTime;
+			return getDataFirstArrivalSchedule(i) + get<Range>() + get<MaxWaitingTime>();
 		}
 
 
@@ -671,14 +598,60 @@ namespace synthese
 			if(getPath())
 			{
 				getPath()->removeService(*this);
-	}
+			}
 
 			// Unregister from the line
 			if(	getRoute() &&
 				getRoute()->getCommercialLine()
 			){
 				getRoute()->getCommercialLine()->unregisterService(*this);
-}
+			}
+		}
+
+		void ContinuousService::setRules(const Rules& value)
+		{
+			RuleUser::setRules(value);
+			getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(getRule(USER_BIKE)) ?
+				set<BikeComplianceId>(static_cast<const PTUseRule*>(getRule(USER_BIKE))->getKey()) :
+				set<BikeComplianceId>(RegistryKeyType(0));
+			getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(getRule(USER_HANDICAPPED)) ?
+				set<HandicappedComplianceId>(static_cast<const PTUseRule*>(getRule(USER_HANDICAPPED))->getKey()) :
+				set<HandicappedComplianceId>(RegistryKeyType(0));
+			getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(getRule(USER_PEDESTRIAN)) ?
+				set<PedestrianComplianceId>(static_cast<const PTUseRule*>(getRule(USER_PEDESTRIAN))->getKey()) :
+				set<PedestrianComplianceId>(RegistryKeyType(0));
+		}
+
+		void ContinuousService::setPath(graph::Path* path)
+		{
+			SchedulesBasedService::setPath(path);
+			set<ServicePath>(path
+				? boost::optional<JourneyPattern&>(*dynamic_cast<JourneyPattern*>(path))
+				: boost::none);
+		}
+
+		void ContinuousService::setDataSchedules(
+			const Schedules& departureSchedules,
+			const Schedules& arrivalSchedules
+		)
+		{
+			SchedulesBasedService::setDataSchedules(departureSchedules, arrivalSchedules);
+			set<ServiceSchedules>(encodeSchedules());
+		}
+
+		bool ContinuousService::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::WRITE);
+		}
+
+		bool ContinuousService::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::WRITE);
+		}
+
+		bool ContinuousService::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::DELETE_RIGHT);
 		}
 	}
 }

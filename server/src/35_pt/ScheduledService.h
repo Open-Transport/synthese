@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_ENV_SCHEDULEDSERVICE_H
 #define SYNTHESE_ENV_SCHEDULEDSERVICE_H
 
+#include "Object.hpp"
+
 #include "ImportableTemplate.hpp"
 #include "ReservableService.hpp"
 #include "SchedulesBasedService.h"
@@ -49,12 +51,35 @@ namespace synthese
 
 	namespace pt
 	{
+		FIELD_STRING(Team)
+		FIELD_STRING(ServiceStops)
+		FIELD_DATASOURCE_LINKS(ServiceDataSource)
+		FIELD_STRING(DatesToForce)
+		FIELD_STRING(DatesToBypass)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(ServiceNumber),
+			FIELD(ServiceSchedules),
+			FIELD(ServicePath),
+			FIELD(BikeComplianceId),
+			FIELD(HandicappedComplianceId),
+			FIELD(PedestrianComplianceId),
+			FIELD(Team),
+			FIELD(ServiceDates),
+			FIELD(ServiceStops),
+			FIELD(ServiceDataSource),
+			FIELD(DatesToForce),
+			FIELD(DatesToBypass)
+		> ScheduledServiceSchema;
+
 		/** Scheduled service.
 		TRIDENT = VehicleJourney
 
 			@ingroup m35
 		*/
 		class ScheduledService:
+			public Object<ScheduledService, ScheduledServiceSchema>,
 			public SchedulesBasedService,
 			public impex::ImportableTemplate<ScheduledService>,
 			public ReservableService
@@ -63,12 +88,6 @@ namespace synthese
 
 			/// Chosen registry class.
 			typedef util::Registry<ScheduledService>	Registry;
-
-		private:
-			std::string	_team;
-
-
-		public:
 
 			ScheduledService(
 				util::RegistryKeyType id = 0,
@@ -86,6 +105,17 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void	setTeam(const std::string& team);
+				virtual void setRules(const Rules& value);
+				virtual void setPath(graph::Path* path);
+				virtual void setVertices(
+					const ServedVertices& vertices
+				);
+				virtual void setDatesToForce(const DatesSet& value);
+				virtual void setDatesToBypass(const DatesSet& value);
+				virtual void setDataSchedules(
+					const Schedules& departureSchedules,
+					const Schedules& arrivalSchedules
+				);
 			//@}
 
 			//! @name Update methods
@@ -152,13 +182,6 @@ namespace synthese
 				) const;
 
 
-
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
-
-
 				virtual void toParametersMap(
 					util::ParametersMap& map,
 					bool withAdditionalParameters,
@@ -176,6 +199,10 @@ namespace synthese
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

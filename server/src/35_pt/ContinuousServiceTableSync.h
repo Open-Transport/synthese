@@ -30,7 +30,6 @@
 #include <iostream>
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 #include "FetcherTemplate.h"
 
 #include <boost/optional.hpp>
@@ -47,25 +46,12 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				ContinuousServiceTableSync,
 				ContinuousService,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>,
 			public db::FetcherTemplate<SchedulesBasedService, ContinuousServiceTableSync>,
 			public db::FetcherTemplate<calendar::Calendar, ContinuousServiceTableSync>
 		{
 		public:
-			static const std::string COL_SERVICENUMBER;
-			static const std::string COL_SCHEDULES;
-			static const std::string COL_PATHID;
-			static const std::string COL_RANGE;
-			static const std::string COL_MAXWAITINGTIME;
-			static const std::string COL_PEDESTRIAN_USE_RULE;
-			static const std::string COL_HANDICAPPED_USE_RULE;
-			static const std::string COL_BIKE_USE_RULE;
-			static const std::string COL_DATES;
-
-
-
 			/** ContinuousService search.
 				@param lineId JourneyPattern
 				@param first First ContinuousService object to answer
@@ -84,6 +70,8 @@ namespace synthese
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 }	}
 

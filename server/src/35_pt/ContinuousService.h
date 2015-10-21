@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_ENV_CONTINUOUSSERVICE_H
 #define SYNTHESE_ENV_CONTINUOUSSERVICE_H
 
+#include "Object.hpp"
+
 #include "SchedulesBasedService.h"
 #include "Registry.h"
 
@@ -32,26 +34,35 @@ namespace synthese
 {
 	namespace pt
 	{
+		FIELD_TIME(Range)
+		FIELD_TIME(MaxWaitingTime)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(ServiceNumber),
+			FIELD(ServiceSchedules),
+			FIELD(ServicePath),
+			FIELD(Range),					//!< Continuous service range (minutes).
+			FIELD(MaxWaitingTime),			//!< Max waiting waiting time before next service.
+			FIELD(BikeComplianceId),
+			FIELD(HandicappedComplianceId),
+			FIELD(PedestrianComplianceId),
+			FIELD(ServiceDates)
+		> ContinuousServiceSchema;
+
 		class JourneyPattern;
 
 		/** Continuous service.
 			@ingroup m35
 		*/
 		class ContinuousService:
+			public Object<ContinuousService, ContinuousServiceSchema>,
 			public SchedulesBasedService
 		{
 		public:
 
 			/// Chosen registry class.
 			typedef util::Registry<ContinuousService>	Registry;
-
-		private:
-
-			boost::posix_time::time_duration			_range;				//!< Continuous service range (minutes).
-			boost::posix_time::time_duration			_maxWaitingTime;	//!< Max waiting waiting time before next service.
-
-
-		public:
 
 			ContinuousService(
 				util::RegistryKeyType id = 0,
@@ -74,6 +85,12 @@ namespace synthese
 			//@{
 				void setMaxWaitingTime (boost::posix_time::time_duration maxWaitingTime);
 				void setRange (boost::posix_time::time_duration range);
+				virtual void setRules(const Rules& value);
+				virtual void setPath(graph::Path* path);
+				virtual void setDataSchedules(
+					const Schedules& departureSchedules,
+					const Schedules& arrivalSchedules
+				);
 			//@}
 
 			//! @name Query methods
@@ -143,11 +160,6 @@ namespace synthese
 					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
 				) const;
-
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
 			
 				virtual SubObjects getSubObjects() const;
 
@@ -158,6 +170,10 @@ namespace synthese
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 
 		};
 	}

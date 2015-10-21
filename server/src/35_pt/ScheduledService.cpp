@@ -35,12 +35,15 @@
 #include "LineStopTableSync.h"
 #include "NonConcurrencyRule.h"
 #include "Path.h"
+#include "Profile.h"
 #include "PTUseRuleTableSync.h"
 #include "Registry.h"
 #include "RollingStock.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
+#include "TransportNetworkRight.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;
@@ -56,10 +59,14 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 
-	namespace util
-	{
-		template<> const string Registry<pt::ScheduledService>::KEY("ScheduledService");
-	}
+	CLASS_DEFINITION(ScheduledService, "t016_scheduled_services", 16)
+	FIELD_DEFINITION_OF_OBJECT(ScheduledService, "scheduled_service_id", "scheduled_service_ids")
+
+	FIELD_DEFINITION_OF_TYPE(Team, "team", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(ServiceStops, "stops", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(ServiceDataSource, "datasource_links", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DatesToForce, "dates_to_force", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DatesToBypass, "dates_to_bypass", SQL_TEXT)
 
 	namespace pt
 	{
@@ -69,6 +76,22 @@ namespace synthese
 			string serviceNumber,
 			Path* path
 		):	Registrable(id),
+			Object<ScheduledService, ScheduledServiceSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_VALUE_CONSTRUCTOR(ServiceNumber, serviceNumber),
+					FIELD_DEFAULT_CONSTRUCTOR(ServiceSchedules),
+					FIELD_VALUE_CONSTRUCTOR(ServicePath, path ? boost::optional<JourneyPattern&>(*dynamic_cast<JourneyPattern*>(path)) : boost::none),
+					FIELD_DEFAULT_CONSTRUCTOR(BikeComplianceId),
+					FIELD_DEFAULT_CONSTRUCTOR(HandicappedComplianceId),
+					FIELD_DEFAULT_CONSTRUCTOR(PedestrianComplianceId),
+					FIELD_DEFAULT_CONSTRUCTOR(Team),
+					FIELD_DEFAULT_CONSTRUCTOR(ServiceDates),
+					FIELD_DEFAULT_CONSTRUCTOR(ServiceStops),
+					FIELD_DEFAULT_CONSTRUCTOR(ServiceDataSource),
+					FIELD_DEFAULT_CONSTRUCTOR(DatesToForce),
+					FIELD_DEFAULT_CONSTRUCTOR(DatesToBypass)
+			)	),
 			SchedulesBasedService(serviceNumber, path)
 		{
 		}
@@ -305,14 +328,14 @@ namespace synthese
 
 		void ScheduledService::setTeam( const std::string& team )
 		{
-			_team = team;
+			set<Team>(team);
 		}
 
 
 
 		std::string ScheduledService::getTeam() const
 		{
-			return _team;
+			return get<Team>();
 		}
 
 
@@ -439,241 +462,6 @@ namespace synthese
 			return originPtr;
 		}
 
-
-
-		bool ScheduledService::loadFromRecord( const Record& record, util::Env& env )
-		{
-			bool result(false);
-
-			// Service number
-			if(record.isDefined(ScheduledServiceTableSync::COL_SERVICENUMBER))
-			{
-				string serviceNumber(
-					record.get<string>(ScheduledServiceTableSync::COL_SERVICENUMBER)
-				);
-				if(serviceNumber != getServiceNumber())
-				{
-					setServiceNumber(serviceNumber);
-					result = true;
-				}
-			}
-
-			// Team
-			if(record.isDefined(ScheduledServiceTableSync::COL_TEAM))
-			{
-				string value(
-					record.get<string>(ScheduledServiceTableSync::COL_TEAM)
-				);
-				if(value != getTeam())
-				{
-					setTeam(value);
-					result = true;
-				}
-			}
-
-			// Calendar dates
-			if(record.isDefined(ScheduledServiceTableSync::COL_DATES))
-			{
-				Calendar value;
-				value.setFromSerializedString(
-					record.get<string>(ScheduledServiceTableSync::COL_DATES)
-				);
-				if(value.getMarkedDates() != getMarkedDates())
-				{
-					copyDates(value);
-					result = true;
-				}
-			}
-
-			// Path
-			if(record.isDefined(ScheduledServiceTableSync::COL_PATHID))
-			{
-				util::RegistryKeyType pathId(
-					record.getDefault<RegistryKeyType>(
-						ScheduledServiceTableSync::COL_PATHID,
-						0
-				)	);
-				Path* path(
-					JourneyPatternTableSync::GetEditable(pathId, env).get()
-				);
-
-				if(path != getPath())
-				{
-					setPath(path);
-					if(path->getEdges().empty())
-					{
-						LineStopTableSync::Search(env, pathId, optional<RegistryKeyType>(), 0, optional<size_t>(), true, true, UP_DOWN_LINKS_LOAD_LEVEL);
-					}
-					result = true;
-				}
-			}
-
-
-			// Physical stops
-			if(record.isDefined(ScheduledServiceTableSync::COL_STOPS))
-			{
-				SchedulesBasedService::ServedVertices value(
-					decodeStops(
-						record.get<string>(ScheduledServiceTableSync::COL_STOPS),
-						env
-				)	);
-				if(value != getVertices(false))
-				{
-					setVertices(value);
-					result = true;
-				}
-			}
-
-
-			// Dates to force
-			if(record.isDefined(ScheduledServiceTableSync::COL_DATES_TO_FORCE))
-			{
-				string datesStr(
-					record.get<string>(ScheduledServiceTableSync::COL_DATES_TO_FORCE)
-				);
-				vector<string> datesVec;
-				split(datesVec, datesStr, is_any_of(","), token_compress_on);
-				Calendar::DatesSet dates;
-				BOOST_FOREACH(const string& dateStr, datesVec)
-				{
-					if(dateStr.empty())
-					{
-						continue;
-					}
-					dates.insert(from_string(dateStr));
-				}
-
-				if(dates != getDatesToForce())
-				{
-					setDatesToForce(dates);
-					result = true;
-				}
-			}
-
-			// Dates to bypass
-			if(record.isDefined(ScheduledServiceTableSync::COL_DATES_TO_BYPASS))
-			{
-				string datesStr(
-					record.get<string>(ScheduledServiceTableSync::COL_DATES_TO_BYPASS)
-				);
-				vector<string> datesVec;
-				split(datesVec, datesStr, is_any_of(","), token_compress_on);
-				Calendar::DatesSet dates;
-				BOOST_FOREACH(const string& dateStr, datesVec)
-				{
-					if(dateStr.empty())
-					{
-						continue;
-					}
-					dates.insert(from_string(dateStr));
-				}
-
-				if(dates != getDatesToBypass())
-				{
-					setDatesToBypass(dates);
-					result = true;
-				}
-			}
-
-//			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-//			{
-				// Use rules
-				RuleUser::Rules rules(getRules());
-
-				// Use rules
-				if(record.isDefined(ScheduledServiceTableSync::COL_BIKECOMPLIANCEID))
-				{
-					RegistryKeyType bikeComplianceId(
-						record.getDefault<RegistryKeyType>(
-							ScheduledServiceTableSync::COL_BIKECOMPLIANCEID,
-							0
-					)	);
-					const PTUseRule* value(NULL);
-					if(bikeComplianceId > 0)
-					{
-						 value = PTUseRuleTableSync::Get(bikeComplianceId, env).get();
-					}
-					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = value;
-				}
-				if(record.isDefined(ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID))
-				{
-					RegistryKeyType handicappedComplianceId(
-						record.getDefault<RegistryKeyType>(
-							ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID,
-							0
-					)	);
-					const PTUseRule* value(NULL);
-					if(handicappedComplianceId > 0)
-					{
-						value = PTUseRuleTableSync::Get(handicappedComplianceId, env).get();
-					}
-					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = value;
-				}
-				if(record.isDefined(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID))
-				{
-					RegistryKeyType pedestrianComplianceId(
-						record.getDefault<RegistryKeyType>(
-							ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID,
-							0
-					)	);
-					const PTUseRule* value(NULL);
-					if(pedestrianComplianceId > 0)
-					{
-						value = PTUseRuleTableSync::Get(pedestrianComplianceId, env).get();
-					}
-					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = value;
-				}
-				if(rules != getRules())
-				{
-					setRules(rules);
-					result = true;
-				}
-//			}
-
-			// Schedules
-			if(record.isDefined(ScheduledServiceTableSync::COL_SCHEDULES))
-			{
-				try
-				{
-					string rawSchedule(
-						record.get<string>(ScheduledServiceTableSync::COL_SCHEDULES)
-					);
-					SchedulesBasedService::SchedulesPair value(
-						SchedulesBasedService::DecodeSchedules(
-							rawSchedule
-					)	);
-					if( !comparePlannedSchedules(value.first, value.second)
-					){
-						result = true;
-						setDataSchedules(value.first, value.second);
-					}
-				}
-				catch(SchedulesBasedService::BadSchedulesException&)
-				{
-					throw Exception("Inconsistent schedules size");
-				}
-			}
-
-
-
-			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
-			if(record.isDefined(ScheduledServiceTableSync::COL_DATASOURCE_LINKS))
-			{
-				Importable::DataSourceLinks dsl(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						record.get<string>(ScheduledServiceTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
-				if(dsl != getDataSourceLinks())	
-				{
-						setDataSourceLinksWithRegistration(dsl);
-					result = true;
-				}
-			}
-
-			return result;
-		}
-
 		synthese::SubObjects ScheduledService::getSubObjects() const
 		{
 			SubObjects r;
@@ -693,35 +481,35 @@ namespace synthese
 			serialize(datesStr);
 
 			map.insert(TABLE_COL_ID, getKey());
-			map.insert(ScheduledServiceTableSync::COL_SERVICENUMBER, getServiceNumber());
-			map.insert(ScheduledServiceTableSync::COL_SCHEDULES, encodeSchedules());
+			map.insert(ServiceNumber::FIELD.name, getServiceNumber());
+			map.insert(ServiceSchedules::FIELD.name, encodeSchedules());
 			map.insert(
-				ScheduledServiceTableSync::COL_PATHID, 
+				ServicePath::FIELD.name,
 				getPath() ? getPath()->getKey() : 0
 			);
 			map.insert(
-				ScheduledServiceTableSync::COL_BIKECOMPLIANCEID,
+				BikeComplianceId::FIELD.name,
 				(	getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(getRule(USER_BIKE)) ?
 					static_cast<const PTUseRule*>(getRule(USER_BIKE))->getKey() :
 					RegistryKeyType(0)
 			)	);
 			map.insert(
-				ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID,
+				HandicappedComplianceId::FIELD.name,
 				(	getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(getRule(USER_HANDICAPPED)) ?
 					static_cast<const PTUseRule*>(getRule(USER_HANDICAPPED))->getKey() :
 					RegistryKeyType(0)
 			)	);
 			map.insert(
-				ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID,
+				PedestrianComplianceId::FIELD.name,
 				(	getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(getRule(USER_PEDESTRIAN)) ?
 					static_cast<const PTUseRule*>(getRule(USER_PEDESTRIAN))->getKey() :
 					RegistryKeyType(0)
 			)	);
-			map.insert(ScheduledServiceTableSync::COL_TEAM, getTeam());
-			map.insert(ScheduledServiceTableSync::COL_DATES, datesStr.str());
-			map.insert(ScheduledServiceTableSync::COL_STOPS, encodeStops());
+			map.insert(Team::FIELD.name, getTeam());
+			map.insert(ServiceDates::FIELD.name, datesStr.str());
+			map.insert(ServiceStops::FIELD.name, encodeStops());
 			map.insert(
-				ScheduledServiceTableSync::COL_DATASOURCE_LINKS,
+				ServiceDataSource::FIELD.name,
 				synthese::DataSourceLinks::Serialize(getDataSourceLinks())
 			);
 
@@ -742,7 +530,7 @@ namespace synthese
 					s << to_iso_extended_string(d);
 				}
 				map.insert(
-					ScheduledServiceTableSync::COL_DATES_TO_FORCE,
+					DatesToForce::FIELD.name,
 					s.str()
 				);
 			}
@@ -764,7 +552,7 @@ namespace synthese
 					s << to_iso_extended_string(d);
 				}
 				map.insert(
-					ScheduledServiceTableSync::COL_DATES_TO_BYPASS,
+					DatesToBypass::FIELD.name,
 					s.str()
 				);
 			}
@@ -781,6 +569,128 @@ namespace synthese
 
 		void ScheduledService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
+			if (!get<ServiceDates>().empty())
+			{
+				Calendar valueDates;
+				valueDates.setFromSerializedString(
+					get<ServiceDates>()
+				);
+				copyDates(valueDates);
+			}
+
+			if (get<ServicePath>())
+			{
+				SchedulesBasedService::setPath(get<ServicePath>().get_ptr());
+				if(get<ServicePath>()->getEdges().empty())
+				{
+					LineStopTableSync::Search(env, get<ServicePath>()->getKey(), optional<RegistryKeyType>(), 0, optional<size_t>(), true, true, UP_DOWN_LINKS_LOAD_LEVEL);
+				}
+			}
+
+			if (!get<ServiceStops>().empty() && get<ServicePath>())
+			{
+				SchedulesBasedService::ServedVertices valueStops(
+					decodeStops(
+						get<ServiceStops>(),
+						env
+				)	);
+				SchedulesBasedService::setVertices(valueStops);
+			}
+
+			string datesToForceStr(
+				get<DatesToForce>()
+			);
+			vector<string> datesToForceVec;
+			split(datesToForceVec, datesToForceStr, is_any_of(","), token_compress_on);
+			Calendar::DatesSet datesToForce;
+			BOOST_FOREACH(const string& dateStr, datesToForceVec)
+			{
+				if(dateStr.empty())
+				{
+					continue;
+				}
+				datesToForce.insert(from_string(dateStr));
+			}
+			Calendar::setDatesToForce(datesToForce);
+
+			string datesToBypassStr(
+				get<DatesToBypass>()
+			);
+			vector<string> datesToBypassVec;
+			split(datesToBypassVec, datesToBypassStr, is_any_of(","), token_compress_on);
+			Calendar::DatesSet datesToBypass;
+			BOOST_FOREACH(const string& dateStr, datesToBypassVec)
+			{
+				if(dateStr.empty())
+				{
+					continue;
+				}
+				datesToBypass.insert(from_string(dateStr));
+			}
+			Calendar::setDatesToBypass(datesToBypass);
+
+			// Use rules
+			RuleUser::Rules rules(getRules());
+
+			// Bike compliance
+			if(get<BikeComplianceId>())
+			{
+				if(get<BikeComplianceId>() > 0)
+				{
+					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(get<BikeComplianceId>(), env).get();
+				}
+				else
+				{
+					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = NULL;
+				}
+			}
+
+			// Handicapped compliance
+			if(get<HandicappedComplianceId>())
+			{
+				if(get<HandicappedComplianceId>() > 0)
+				{
+					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(get<HandicappedComplianceId>(), env).get();
+				}
+				else
+				{
+					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = NULL;
+				}
+			}
+
+			// Pedestrian compliance
+			if(get<PedestrianComplianceId>())
+			{
+				if(get<PedestrianComplianceId>() > 0)
+				{
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(get<PedestrianComplianceId>(), env).get();
+				}
+				else
+				{
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = NULL;
+				}
+			}
+			RuleUser::setRules(rules);
+
+			if (!get<ServiceSchedules>().empty())
+			{
+				try
+				{
+					string rawSchedule(
+						get<ServiceSchedules>()
+					);
+					SchedulesBasedService::SchedulesPair value(
+						SchedulesBasedService::DecodeSchedules(
+							rawSchedule
+					)	);
+					SchedulesBasedService::setDataSchedules(value.first, value.second);
+				}
+				catch(SchedulesBasedService::BadSchedulesException&)
+				{
+					throw Exception("Inconsistent schedules size");
+				}
+			}
+
 			// Registration in path
 			if( getPath()&&
 				!getPath()->contains(*this))
@@ -819,5 +729,98 @@ namespace synthese
 			{
 				getRoute()->getCommercialLine()->unregisterService(*this);
 			}
+		}
+
+		void ScheduledService::setRules(const Rules& value)
+		{
+			RuleUser::setRules(value);
+			getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(getRule(USER_BIKE)) ?
+				set<BikeComplianceId>(static_cast<const PTUseRule*>(getRule(USER_BIKE))->getKey()) :
+				set<BikeComplianceId>(RegistryKeyType(0));
+			getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(getRule(USER_HANDICAPPED)) ?
+				set<HandicappedComplianceId>(static_cast<const PTUseRule*>(getRule(USER_HANDICAPPED))->getKey()) :
+				set<HandicappedComplianceId>(RegistryKeyType(0));
+			getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(getRule(USER_PEDESTRIAN)) ?
+				set<PedestrianComplianceId>(static_cast<const PTUseRule*>(getRule(USER_PEDESTRIAN))->getKey()) :
+				set<PedestrianComplianceId>(RegistryKeyType(0));
+		}
+
+		void ScheduledService::setPath(graph::Path* path)
+		{
+			SchedulesBasedService::setPath(path);
+			set<ServicePath>(path
+				? boost::optional<JourneyPattern&>(*dynamic_cast<JourneyPattern*>(path))
+				: boost::none);
+		}
+
+		void ScheduledService::setVertices(
+			const ServedVertices& vertices
+		)
+		{
+			SchedulesBasedService::setVertices(vertices);
+			set<ServiceStops>(encodeStops());
+		}
+
+		void ScheduledService::setDatesToForce(const DatesSet& value)
+		{
+			Calendar::setDatesToForce(value);
+			stringstream s;
+			bool first(true);
+			BOOST_FOREACH(const date& d, getDatesToForce())
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					s << ",";
+				}
+				s << to_iso_extended_string(d);
+			}
+			set<DatesToForce>(s.str());
+		}
+
+		void ScheduledService::setDatesToBypass(const DatesSet& value)
+		{
+			Calendar::setDatesToBypass(value);
+			stringstream s;
+			bool first(true);
+			BOOST_FOREACH(const date& d, getDatesToBypass())
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					s << ",";
+				}
+				s << to_iso_extended_string(d);
+			}
+			set<DatesToBypass>(s.str());
+		}
+
+		void ScheduledService::setDataSchedules(
+			const Schedules& departureSchedules,
+			const Schedules& arrivalSchedules
+		){
+			SchedulesBasedService::setDataSchedules(departureSchedules, arrivalSchedules);
+			set<ServiceSchedules>(encodeSchedules());
+		}
+
+		bool ScheduledService::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::WRITE);
+		}
+
+		bool ScheduledService::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::WRITE);
+		}
+
+		bool ScheduledService::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::DELETE_RIGHT);
 		}
 }	}

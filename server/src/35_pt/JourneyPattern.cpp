@@ -114,6 +114,16 @@ namespace synthese
 			{
 				service->setPath(NULL);
 			}
+
+			BOOST_FOREACH(LineStop* edge, _lineStops)
+			{
+				BOOST_FOREACH(const LineStop::GeneratedLineStops::value_type& itGeneratedLineStop, edge->getGeneratedLineStops())
+				{
+					itGeneratedLineStop->setParentPath(NULL);
+				}
+
+				edge->set<Line>(boost::none);
+			}
 		}
 
 
