@@ -356,8 +356,8 @@ namespace synthese
 					"t1." << RankInPath::FIELD.name << "+1=t2." << RankInPath::FIELD.name << " AND " <<
 					"t1." << LineNode::FIELD.name << "=s1." << TABLE_COL_ID << " AND " <<
 					"t2." << LineNode::FIELD.name << "=s2." << TABLE_COL_ID << " AND " <<
-					"s1." << StopPointTableSync::COL_PLACEID << "=" << departure.getKey() << " AND " <<
-					"s2." << StopPointTableSync::COL_PLACEID << "=" << arrival.getKey() <<
+					"s1." << ConnectionPlace::FIELD.name << "=" << departure.getKey() << " AND " <<
+					"s2." << ConnectionPlace::FIELD.name << "=" << arrival.getKey() <<
 				" ORDER BY " <<
 					"NumPoints(t1." << TABLE_COL_GEOMETRY << ") DESC," <<
 					"t2." << MetricOffsetField::FIELD.name << "-t1." << MetricOffsetField::FIELD.name << " DESC" <<

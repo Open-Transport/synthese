@@ -34,6 +34,7 @@
 #include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
+#include "PTUseRule.h"
 #include "Request.h"
 #include "Session.h"
 #include "StopArea.hpp"

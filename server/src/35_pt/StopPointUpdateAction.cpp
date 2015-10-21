@@ -29,6 +29,7 @@
 #include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
+#include "PTUseRule.h"
 #include "Session.h"
 #include "TransportNetworkRight.h"
 #include "User.h"

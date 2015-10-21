@@ -51,6 +51,7 @@
 #include "AdminFunctionRequest.hpp"
 #include "PTPlacesAdmin.h"
 #include "PTPlaceAdmin.h"
+#include "PTUseRule.h"
 #include "CopyGeometriesAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "JourneyPatternRankContinuityRestoreAction.hpp"

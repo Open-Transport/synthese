@@ -45,6 +45,7 @@
 #include "LinePhysicalStop.hpp"
 #include "PTRoutePlannerResult.h"
 #include "PTTimeSlotRoutePlanner.h"
+#include "PTUseRule.h"
 #include "RoutePlanningTableGenerator.h"
 #include "StopAreaTableSync.hpp"
 #include "StopAreaAlarmRecipient.hpp"

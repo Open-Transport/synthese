@@ -35,6 +35,7 @@
 #include "StopPoint.hpp"
 #include "JunctionTableSync.hpp"
 #include "StopPointTableSync.hpp"
+#include "PTUseRule.h"
 
 using namespace std;
 using namespace boost;

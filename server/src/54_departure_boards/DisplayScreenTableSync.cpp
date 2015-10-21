@@ -198,7 +198,7 @@ namespace synthese
 			{
 				query.addTableAndEqualJoin<StopAreaTableSync>(TABLE_COL_ID, BroadCastPoint::FIELD.name);
 				query.addTableAndEqualOtherJoin<CityTableSync,StopAreaTableSync>(TABLE_COL_ID, StopAreaTableSync::TABLE_COL_CITYID);
-				query.addTableAndEqualOtherJoin<StopPointTableSync,StopAreaTableSync>(StopPointTableSync::COL_PLACEID, TABLE_COL_ID);
+				query.addTableAndEqualOtherJoin<StopPointTableSync,StopAreaTableSync>(ConnectionPlace::FIELD.name, TABLE_COL_ID);
 
 				if (lineid || neededLevel > FORBIDDEN)
 				{
@@ -402,17 +402,17 @@ namespace synthese
 			stringstream q;
 			q	<< "SELECT l." << TABLE_COL_ID
 				<< " FROM " << TABLE.NAME << " AS d"
-				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS s ON s." << StopPointTableSync::COL_PLACEID << "=d." << BroadCastPoint::FIELD.name
+				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS s ON s." << ConnectionPlace::FIELD.name << "=d." << BroadCastPoint::FIELD.name
 				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS l ON l." << LineNode::FIELD.name << "=s." << TABLE_COL_ID
 				<< " WHERE d." << TABLE_COL_ID << "=" << screenId
 				<< " AND (d." << AllPhysicalDisplayed::FIELD.name << " OR d." << PhysicalStops::FIELD.name << " LIKE ('%'|| s." << TABLE_COL_ID << " ||'%'))"
 				<< " AND (l." << IsDeparture::FIELD.name << " AND d." << Direction::FIELD.name << " OR l." << IsArrival::FIELD.name << " AND NOT d." << Direction::FIELD.name << ")"
 				<< " AND (NOT d." << OriginsOnly::FIELD.name << " OR l." << RankInPath::FIELD.name << "=0)"
-				<< " AND NOT EXISTS(SELECT p2." << StopPointTableSync::COL_PLACEID << " FROM " << StopPointTableSync::TABLE.NAME << " AS p2 INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS l2 ON l2." << LineNode::FIELD.name << "=p2." << TABLE_COL_ID
+				<< " AND NOT EXISTS(SELECT p2." << ConnectionPlace::FIELD.name << " FROM " << StopPointTableSync::TABLE.NAME << " AS p2 INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS l2 ON l2." << LineNode::FIELD.name << "=p2." << TABLE_COL_ID
 				<< " WHERE l2." << Line::FIELD.name << "=l." << Line::FIELD.name
 				<< " AND l2." << RankInPath::FIELD.name << ">l." << RankInPath::FIELD.name
 				<< " AND l2." << IsArrival::FIELD.name
-				<< " AND ('%'|| p2." << StopPointTableSync::COL_PLACEID << " ||'%') LIKE d." << ForbiddenArrivalPlaces::FIELD.name
+				<< " AND ('%'|| p2." << ConnectionPlace::FIELD.name << " ||'%') LIKE d." << ForbiddenArrivalPlaces::FIELD.name
 				<< ")"
 				<< " LIMIT 1";
 			DBResultSPtr rows = DBModule::GetDB()->execQuery(q.str());

@@ -31,6 +31,8 @@
 #include "ScheduledService.h"
 #include "StopPointTableSync.hpp"
 #include "ScheduledServiceTableSync.h"
+#include "StopArea.hpp"
+#include "PTUseRule.h"
 #include "Path.h"
 
 using namespace std;

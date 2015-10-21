@@ -33,6 +33,7 @@
 #include "Request.h"
 #include "StopPointTableSync.hpp"
 #include "LineStopTableSync.h"
+#include "PTUseRule.h"
 
 #include <geos/geom/LineString.h>
 

@@ -30,6 +30,7 @@
 #include "LineStop.h"
 #include "NonConcurrencyRule.h"
 #include "Path.h"
+#include "PTUseRule.h"
 #include "RealTimePTDataInterSYNTHESE.hpp"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"

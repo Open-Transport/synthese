@@ -31,11 +31,11 @@
 #include "PTUseRuleTableSync.h"
 #include "RoadChunkTableSync.h"
 #include "StopAreaTableSync.hpp"
-#include "StopPointTableSync.hpp"
 #include "CommercialLineTableSync.h"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
 #include "TransportNetwork.h"
+#include "RoadChunk.h"
 
 #include <boost/date_time/time_duration.hpp>
 
@@ -53,25 +53,28 @@ namespace synthese
 	using namespace graph;
 	using namespace impex;
 	using namespace road;
-	
+	using namespace pt;
 
-	namespace util
-	{
-		template<> const string Registry<StopPoint>::KEY("StopPoint");
-	}
+	CLASS_DEFINITION(StopPoint, "t012_physical_stops", 12)
+	FIELD_DEFINITION_OF_OBJECT(StopPoint, "physical_stop_id", "physical_stop_ids")
+
+	FIELD_DEFINITION_OF_TYPE(ConnectionPlace, "place_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(DeprecatedX, "x", SQL_DOUBLE)
+	FIELD_DEFINITION_OF_TYPE(DeprecatedY, "y", SQL_DOUBLE)
+	FIELD_DEFINITION_OF_TYPE(OperatorCode, "operator_code", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(ProjectedRoadChunk, "projected_road_chunk_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(ProjectedMetricOffset, "projected_metric_offset", SQL_DOUBLE)
+	FIELD_DEFINITION_OF_TYPE(HandicappedCompliance, "handicapped_compliance_id", SQL_INTEGER)
 
 	namespace pt
 	{
 		typedef boost::tuple<RegistryKeyType, RegistryKeyType> LineTuple;
 		typedef map<string, LineTuple> LinesMap;
 
-
 		const string StopPoint::DATA_OPERATOR_CODE = "operatorCode";
 		const string StopPoint::DATA_X = "x";
 		const string StopPoint::DATA_Y = "y";
 		const string StopPoint::TAG_STOP_AREA = "stopArea";
-
-
 
 		StopPoint::StopPoint(
 			RegistryKeyType id,
@@ -81,10 +84,22 @@ namespace synthese
 			bool withIndexation
 		):	Registrable(id),
 			Vertex(place, geometry, withIndexation),
-			_name(name)
+			Object<StopPoint, StopPointSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_VALUE_CONSTRUCTOR(Name, name),
+					FIELD_VALUE_CONSTRUCTOR(ConnectionPlace, place == NULL ?
+												boost::optional<StopArea&>(boost::none) :
+												boost::optional<StopArea&>(*const_cast<StopArea*>(place))),
+					FIELD_DEFAULT_CONSTRUCTOR(DeprecatedX),
+					FIELD_DEFAULT_CONSTRUCTOR(DeprecatedY),
+					FIELD_DEFAULT_CONSTRUCTOR(OperatorCode),
+					FIELD_DEFAULT_CONSTRUCTOR(ProjectedRoadChunk),
+					FIELD_DEFAULT_CONSTRUCTOR(ProjectedMetricOffset),
+					FIELD_DEFAULT_CONSTRUCTOR(HandicappedCompliance),
+					FIELD_VALUE_CONSTRUCTOR(PointGeometry, geometry)))
 		{
 		}
-
 
 
 		StopPoint::~StopPoint()
@@ -105,7 +120,7 @@ namespace synthese
 
 		const StopArea* StopPoint::getConnectionPlace() const
 		{
-			return static_cast<const StopArea*>(Vertex::getHub());
+			return (get<ConnectionPlace>() ? get<ConnectionPlace>().get_ptr() : NULL);
 		}
 
 
@@ -265,12 +280,12 @@ namespace synthese
 			std::string prefix /*= std::string() */
 		) const	{
 
-			pm.insert(prefix + TABLE_COL_ID, getKey());
-			pm.insert(prefix + StopPointTableSync::COL_NAME, getName());
+			pm.insert(prefix + Key::FIELD.name, getKey());
+			pm.insert(prefix + Name::FIELD.name, getName());
 
 			// Stop area
 			pm.insert(
-				prefix + StopPointTableSync::COL_PLACEID,
+				prefix + ConnectionPlace::FIELD.name,
 				(	dynamic_cast<const StopArea*>(getHub()) ?
 					dynamic_cast<const StopArea*>(getHub())->getKey() :
 					RegistryKeyType(0)
@@ -317,22 +332,22 @@ namespace synthese
 			if(hasGeometry())
 			{
 				pm.insert(
-					prefix + StopPointTableSync::COL_X,
+					prefix + DeprecatedX::FIELD.name,
 					getGeometry()->getX()
 				);
 				pm.insert(
-					prefix + StopPointTableSync::COL_Y,
+					prefix + DeprecatedY::FIELD.name,
 					getGeometry()->getY()
 				);
 			}
 			else
 			{
 				pm.insert(
-					prefix + StopPointTableSync::COL_X,
+					prefix + DeprecatedX::FIELD.name,
 					string()
 				);
 				pm.insert(
-					prefix + StopPointTableSync::COL_Y,
+					prefix + DeprecatedY::FIELD.name,
 					string()
 				);
 			}
@@ -341,29 +356,29 @@ namespace synthese
 			if(getProjectedPoint().getRoadChunk())
 			{
 				pm.insert(
-					prefix + StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID,
+					prefix + ProjectedRoadChunk::FIELD.name,
 					getProjectedPoint().getRoadChunk()->getKey()
 				);
 				pm.insert(
-					prefix + StopPointTableSync::COL_PROJECTED_METRIC_OFFSET,
+					prefix + ProjectedMetricOffset::FIELD.name,
 					getProjectedPoint().getMetricOffset()
 				);
 			}
 			else
 			{
 				pm.insert(
-					prefix + StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID,
+					prefix + ProjectedRoadChunk::FIELD.name,
 					string()
 				);
 				pm.insert(
-					prefix + StopPointTableSync::COL_PROJECTED_METRIC_OFFSET,
+					prefix + ProjectedMetricOffset::FIELD.name,
 					string()
 				);
 			}
 
 			// Handicapped compliance
 			pm.insert(
-				prefix + StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID,
+				prefix + HandicappedCompliance::FIELD.name,
 				(	getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(getRule(USER_HANDICAPPED)) ?
 					static_cast<const PTUseRule*>(getRule(USER_HANDICAPPED))->getKey() :
 					RegistryKeyType(0)
@@ -374,26 +389,26 @@ namespace synthese
 			{
 				geos::io::WKTWriter writer;
 				pm.insert(
-					prefix + TABLE_COL_GEOMETRY,
+					prefix + PointGeometry::FIELD.name,
 					writer.write(static_pointer_cast<geos::geom::Geometry, Point>(getGeometry()).get())
 				);
 			}
 			else
 			{
 				pm.insert(
-					prefix + TABLE_COL_GEOMETRY,
+					prefix + PointGeometry::FIELD.name,
 					string()
 				);
 			}
 
 			pm.insert(
-				prefix + StopPointTableSync::COL_PLACEID,
+				prefix + ConnectionPlace::FIELD.name,
 				(	dynamic_cast<const StopArea*>(getHub()) ?
 					dynamic_cast<const StopArea*>(getHub())->getKey() :
 					RegistryKeyType(0)
 			)	);
 			pm.insert(
-				prefix + StopPointTableSync::COL_OPERATOR_CODE,
+				prefix + OperatorCode::FIELD.name,
 				impex::DataSourceLinks::Serialize(getDataSourceLinks())
 			);
 
@@ -401,29 +416,29 @@ namespace synthese
 			if(getProjectedPoint().getRoadChunk())
 			{
 				pm.insert(
-					prefix + StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, 
+					prefix + ProjectedRoadChunk::FIELD.name,
 					getProjectedPoint().getRoadChunk()->getKey()
 				);
 				pm.insert(
-					prefix + StopPointTableSync::COL_PROJECTED_METRIC_OFFSET,
+					prefix + ProjectedMetricOffset::FIELD.name,
 					getProjectedPoint().getMetricOffset()
 				);
 			}
 			else
 			{
 				pm.insert(
-					prefix + StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, 
+					prefix + ProjectedRoadChunk::FIELD.name,
 					0
 				);
 				pm.insert(
-					prefix + StopPointTableSync::COL_PROJECTED_METRIC_OFFSET,
+					prefix + ProjectedMetricOffset::FIELD.name,
 					0
 				);
 			}
 
 			// Handicapped compliance
 			pm.insert(
-				prefix + StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID,
+				prefix + HandicappedCompliance::FIELD.name,
 				(	getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(getRule(USER_HANDICAPPED)) ?
 					static_cast<const PTUseRule*>(getRule(USER_HANDICAPPED))->getKey() :
 					RegistryKeyType(0)
@@ -441,13 +456,13 @@ namespace synthese
 
 				geos::io::WKTWriter writer;
 				pm.insert(
-					prefix + TABLE_COL_GEOMETRY,
+					prefix + PointGeometry::FIELD.name,
 					writer.write(projected.get())
 				);
 			}
 			else
 			{
-				pm.insert(prefix + TABLE_COL_GEOMETRY, string());
+				pm.insert(prefix + PointGeometry::FIELD.name, string());
 			}
 
 
@@ -491,163 +506,68 @@ namespace synthese
 			);
 		}
 
-		bool StopPoint::loadFromRecord( const Record& record, util::Env& env )
-		{
-			bool result(false);
-
-			// Name
-			if(record.isDefined(StopPointTableSync::COL_NAME))
-			{
-				string value(record.get<string>(StopPointTableSync::COL_NAME));
-				if(value != getName())
-				{
-					setName(value);
-					result = true;
-				}
-			}
-
-			// Position : Lon/lat prior to x/y
-			if(	record.isDefined(TABLE_COL_GEOMETRY) ||
-				(record.isDefined(StopPointTableSync::COL_X) && record.isDefined(StopPointTableSync::COL_Y))
-			){
-				boost::shared_ptr<Point> value;
-				if(!record.get<string>(TABLE_COL_GEOMETRY).empty())
-				{
-					value = static_pointer_cast<Point, geos::geom::Geometry>(
-						record.getGeometryFromWKT(TABLE_COL_GEOMETRY)
-					);
-				}
-				else if(
-					record.getDefault<double>(StopPointTableSync::COL_X, 0) > 0 &&
-					record.getDefault<double>(StopPointTableSync::COL_Y, 0) > 0
-				){
-					value = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
-						record.getDefault<double>(StopPointTableSync::COL_X, 0),
-						record.getDefault<double>(StopPointTableSync::COL_Y, 0)
-					);
-				}
-				if( (!value.get() && getGeometry().get()) ||
-					(value.get() && !getGeometry().get()) ||
-					(value.get() && getGeometry().get() && !value->equalsExact(getGeometry().get(), 0.01))
-				){
-					setGeometry(value);
-					result = true;
-				}
-			}
-
-//			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-//			{
-				// Stop area
-			if(record.isDefined(StopPointTableSync::COL_PLACEID))
-			{
-				StopArea* place(NULL);
-				try
-				{
-					place = StopAreaTableSync::GetEditable(
-						record.getDefault<RegistryKeyType>(StopPointTableSync::COL_PLACEID, 0),
-						env
-					).get();
-				}
-				catch (ObjectNotFoundException<StopArea>& e)
-				{
-					throw Exception("Not found");
-				}
-				if(place != getConnectionPlace())
-				{
-					setHub(place);
-					result = true;
-				}
-			}
-
-			// Projected point
-			if(	record.isDefined(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID) &&
-				record.isDefined(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET)
-			){
-				RegistryKeyType chunkId(
-					record.getDefault<RegistryKeyType>(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID,0));
-				RoadChunk* chunk(NULL);
-				MetricOffset metricOffset(0);
-				if(chunkId > 0)
-				{
-					try
-					{
-						chunk = RoadChunkTableSync::GetEditable(chunkId, env).get();
-						metricOffset = record.getDefault<double>(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET, 0);
-					}
-					catch (ObjectNotFoundException<RoadChunk>&)
-					{
-						Log::GetInstance().warn("Bad value " + lexical_cast<string>(chunkId) + " for projected chunk in stop " + lexical_cast<string>(getKey()));
-					}
-				}
-				if(	getProjectedPoint().getRoadChunk() != chunk ||
-					getProjectedPoint().getMetricOffset() != metricOffset
-				){
-					if(chunk)
-					{
-						setProjectedPoint(Address(*chunk, metricOffset));
-					}
-					else
-					{
-						setProjectedPoint(Address());
-					}
-					result = true;
-				}
-			}
-
-
-				// Handicapped compliance
-				if(record.isDefined(StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID))
-				{
-					RuleUser::Rules rules(getRules());
-					RegistryKeyType handicappedComplianceId(
-						record.getDefault<RegistryKeyType>(StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID, 0)
-					);
-					if(handicappedComplianceId > 0)
-					{
-						try
-						{
-							rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env).get();
-						}
-						catch(ObjectNotFoundException<PTUseRule>&)
-						{
-							Log::GetInstance().warn("Bad value " + lexical_cast<string>(handicappedComplianceId) + " for handicapped compliance in stop " + lexical_cast<string>(getKey()));
-					}	}
-					if(rules != getRules())
-					{
-						setRules(rules);
-						result = true;
-					}
-				}
-
-				// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
-				if(record.isDefined(StopPointTableSync::COL_OPERATOR_CODE))
-				{
-					Importable::DataSourceLinks value(
-						ImportableTableSync::GetDataSourceLinksFromSerializedString(
-							record.get<string>(StopPointTableSync::COL_OPERATOR_CODE),
-							env
-					)	);
-					if(value != getDataSourceLinks())
-					{
-						setDataSourceLinksWithRegistration(value);
-						result = true;
-					}
-				}
-//			}
-			return result;
-		}
-
 		synthese::LinkedObjectsIds StopPoint::getLinkedObjectsIds( const Record& record ) const
 		{
 			return LinkedObjectsIds();
 		}
 
+
+		void StopPoint::adaptDeprecatedGeometryIfNecessary()
+		{
+			// Position : Lon/lat prior to x/y
+			if (get<PointGeometry>()) return;
+			if ((get<DeprecatedX>() == 0) && (get<DeprecatedY>() == 0)) return;
+
+			boost::shared_ptr<Point> value =
+					CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(get<DeprecatedX>(), get<DeprecatedY>());
+			set<PointGeometry>(value);
+		}
+
+
 		void StopPoint::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
-			if(getConnectionPlace())
+			adaptDeprecatedGeometryIfNecessary();
+
+			// TODO : connection place member field is redundant with Vertex _hub. Vertex should become
+			// a pure interface.
+			const pt::StopArea* connectionPlace = getConnectionPlace();
+			if (connectionPlace != NULL)
 			{
-				const_cast<StopArea*>(getConnectionPlace())->addPhysicalStop(*this);
+				setHub(connectionPlace);
+				const_cast<StopArea*>(connectionPlace)->addPhysicalStop(*this);
 			}
+
+			// Projected point
+			if(get<ProjectedRoadChunk>() && get<ProjectedMetricOffset>())
+			{
+				if ((_projectedPoint.getRoadChunk() != get<ProjectedRoadChunk>().get_ptr()) ||
+					(_projectedPoint.getMetricOffset() != get<ProjectedMetricOffset>()))
+				{
+					setProjectedPoint(Address(get<ProjectedRoadChunk>().get(), get<ProjectedMetricOffset>()));
+				}
+			}
+			else
+			{
+					setProjectedPoint(Address());
+			}
+
+			RuleUser::Rules rules(getRules());
+			if(get<HandicappedCompliance>())
+			{
+				rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = get<HandicappedCompliance>().get_ptr();
+			}
+			if(rules != getRules())
+			{
+				setRules(rules);
+			}
+
+			Importable::DataSourceLinks value(
+				ImportableTableSync::GetDataSourceLinksFromSerializedString(get<OperatorCode>(), env));
+			if(value != getDataSourceLinks())
+			{
+				setDataSourceLinksWithRegistration(value);
+			}
+
 			if(getProjectedPoint().getRoadChunk() &&
 				getProjectedPoint().getRoadChunk()->getFromCrossing())
 			{
@@ -678,4 +598,33 @@ namespace synthese
 				static_cast<Crossing*>(getProjectedPoint().getRoadChunk()->getForwardEdge().getFromVertex())->removeReachableVertex(this);
 			}
 		}
+
+
+		std::string StopPoint::getName() const
+		{
+			return get<Name>();
+		}
+
+
+		void StopPoint::setName(const std::string& value)
+		{
+			set<Name>(value);
+		}
+
+
+		bool StopPoint::allowUpdate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool StopPoint::allowCreate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool StopPoint::allowDelete(const server::Session* session) const
+		{
+			return true;
+		}
+
 }	}

@@ -22,6 +22,7 @@
 
 #include "DeadRunEdge.hpp"
 #include "DeadRun.hpp"
+#include "PTUseRule.h"
 #include "StopPoint.hpp"
 #include "Depot.hpp"
 

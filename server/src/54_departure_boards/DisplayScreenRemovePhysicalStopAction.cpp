@@ -32,6 +32,7 @@
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
+#include "PTUseRule.h"
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"

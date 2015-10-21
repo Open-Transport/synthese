@@ -25,6 +25,7 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "Profile.h"
+#include "PTUseRule.h"
 #include "Request.h"
 #include "Session.h"
 #include "User.h"
