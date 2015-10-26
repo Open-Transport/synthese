@@ -21,8 +21,13 @@
 */
 
 #include "Depot.hpp"
+
 #include "ForbiddenUseRule.h"
+#include "GlobalRight.h"
+#include "Profile.h"
 #include "PTOperationModule.hpp"
+#include "Session.h"
+#include "User.h"
 
 #include <geos/geom/Point.h>
 
@@ -31,19 +36,26 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace util;
 	using namespace graph;
+	using namespace pt_operation;
+	using namespace util;
 
-	namespace util
-	{
-		template<>
-		const std::string Registry<pt_operation::Depot>::KEY("Depot");
-	}
+	CLASS_DEFINITION(Depot, "t073_depots", 73)
+	FIELD_DEFINITION_OF_OBJECT(Depot, "depot_id", "depot_ids")
+
+	FIELD_DEFINITION_OF_TYPE(DepotDataSource, "datasource_links", SQL_TEXT)
 
 	namespace pt_operation
 	{
 		Depot::Depot(RegistryKeyType id /*= 0*/ ):
 			Registrable(id),
+			Object<Depot, DepotSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(DepotDataSource),
+					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
+			)	),
 			Vertex(NULL, boost::shared_ptr<geos::geom::Point>())
 		{
 			_hub = this;
@@ -118,5 +130,20 @@ namespace synthese
 				result.push_back(this);
 			}
 			return result;
+		}
+
+		bool Depot::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool Depot::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool Depot::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}

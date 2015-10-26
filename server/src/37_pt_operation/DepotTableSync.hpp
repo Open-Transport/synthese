@@ -27,7 +27,6 @@
 
 #include "Depot.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -43,18 +42,11 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				DepotTableSync,
 				Depot,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>
 		{
 		public:
-			//! @name Field names
-			//@{
-				static const std::string COL_NAME;
-				static const std::string COL_DATASOURCE_LINKS;
-			//@}
-
-				typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > DepotsList;
+			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > DepotsList;
 
 			//! @name Services
 			//@{
@@ -86,6 +78,8 @@ namespace synthese
 					boost::optional<std::string> noDepotLabel
 				);
 			//@}
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

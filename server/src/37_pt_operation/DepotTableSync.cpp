@@ -25,9 +25,12 @@
 #include "DepotTableSync.hpp"
 
 #include "DataSourceLinksField.hpp"
+#include "GlobalRight.h"
+#include "ImportableTableSync.hpp"
+#include "Profile.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
-#include "ImportableTableSync.hpp"
+#include "User.h"
 
 #include <sstream>
 
@@ -47,12 +50,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,DepotTableSync>::FACTORY_KEY("37.15 Depot");
 	}
 
-	namespace pt_operation
-	{
-		const string DepotTableSync::COL_NAME = "name";
-		const string DepotTableSync::COL_DATASOURCE_LINKS = "datasource_links";
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<DepotTableSync>::TABLE(
@@ -63,10 +60,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<DepotTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(DepotTableSync::COL_NAME, SQL_TEXT),
-			Field(DepotTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			Field()
 		};
 
@@ -78,71 +71,9 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					DepotTableSync::COL_NAME.c_str(),
+					SimpleObjectFieldDefinition<Name>::FIELD.name.c_str(),
 			"")	);
 			return r;
-		}
-
-
-
-		template<> void OldLoadSavePolicy<DepotTableSync,Depot>::Load(
-			Depot* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			object->setName(rows->getText(DepotTableSync::COL_NAME));
-			string pointsStr(rows->getText(TABLE_COL_GEOMETRY));
-			if(pointsStr.empty())
-			{
-				object->setGeometry(boost::shared_ptr<Point>());
-			}
-			else
-			{
-				object->setGeometry(
-					dynamic_pointer_cast<Point,Geometry>(rows->getGeometryFromWKT(TABLE_COL_GEOMETRY))
-				);
-			}
-
-			// Datasource links
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				object->setDataSourceLinksWithRegistration(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(DepotTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<DepotTableSync,Depot>::Save(
-			Depot* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<DepotTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-			if(object->hasGeometry())
-			{
-				query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
-			}
-			else
-			{
-				query.addFieldNull();
-			}
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<DepotTableSync,Depot>::Unlink(
-			Depot* obj
-		){
 		}
 
 
@@ -196,11 +127,11 @@ namespace synthese
 			SelectQuery<DepotTableSync> query;
 			if(name)
 			{
-			 	query.addWhereField(COL_NAME, *name);
+			 	query.addWhereField(SimpleObjectFieldDefinition<Name>::FIELD.name, *name);
 			}
 			if(orderByName)
 			{
-				query.addOrderField(COL_NAME, raisingOrder);
+				query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 			}
 			if (number)
 			{
@@ -229,6 +160,11 @@ namespace synthese
 				result.push_back(make_pair(optional<RegistryKeyType>(depot->getKey()), depot->getName()));
 			}
 			return result;
+		}
+
+		bool DepotTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::READ);
 		}
 	}
 }

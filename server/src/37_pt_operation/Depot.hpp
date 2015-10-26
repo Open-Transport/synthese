@@ -23,36 +23,45 @@
 #ifndef SYNTHESE_pt_operation_Depot_hpp__
 #define SYNTHESE_pt_operation_Depot_hpp__
 
-#include "Registrable.h"
-#include "Registry.h"
-#include "Vertex.h"
+#include "Object.hpp"
+
+#include "DataSourceLinksField.hpp"
+#include "GeometryField.hpp"
 #include "Hub.h"
 #include "ImportableTemplate.hpp"
+#include "Registry.h"
+#include "Vertex.h"
 
 namespace synthese
 {
 	namespace pt_operation
 	{
+		FIELD_DATASOURCE_LINKS(DepotDataSource)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(DepotDataSource),
+			FIELD(PointGeometry)
+		> DepotSchema;
+
 		/** Depot class.
 			@ingroup m37
 		*/
 		class Depot:
+			public Object<Depot, DepotSchema>,
 			public graph::Vertex,
 			public graph::Hub,
 			public impex::ImportableTemplate<Depot>
 		{
-		private:
-			std::string _name;
-
-		public:
 			typedef util::Registry<Depot> Registry;
 
 			Depot(util::RegistryKeyType id = 0);
 
 			virtual graph::GraphIdType getGraphType() const;
-			virtual std::string getName() const { return _name; }
+			virtual std::string getName() const { return get<Name>(); }
 
-			void setName(const std::string& value){ _name = value; }
+			void setName(const std::string& value){ set<Name>(value); }
 
 			virtual boost::posix_time::time_duration getMinTransferDelay() const;
 			virtual void getVertexAccessMap(synthese::graph::VertexAccessMap &,synthese::graph::GraphIdType,const synthese::graph::Vertex &,bool) const;
@@ -72,6 +81,10 @@ namespace synthese
 			virtual Vertices getVertices(
 				graph::GraphIdType graphId
 			) const;
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 	}
 }

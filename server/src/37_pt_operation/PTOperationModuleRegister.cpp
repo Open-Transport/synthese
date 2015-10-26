@@ -77,7 +77,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::pt_operation::VehicleServicesAdmin::integrate();
 	synthese::pt_operation::VehicleServiceAdmin::integrate();
 
-	synthese::util::Env::Integrate<synthese::pt_operation::Depot>();
+	INTEGRATE(synthese::pt_operation::Depot);
 	synthese::util::Env::Integrate<synthese::pt_operation::DeadRun>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DeadRunEdge>();
 	INTEGRATE(synthese::pt_operation::DriverActivity);
