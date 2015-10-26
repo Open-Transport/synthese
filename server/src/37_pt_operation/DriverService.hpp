@@ -23,8 +23,11 @@
 #ifndef SYNTHESE_pt_operation_DriverService_hpp__
 #define SYNTHESE_pt_operation_DriverService_hpp__
 
-#include "ImportableTemplate.hpp"
+#include "Object.hpp"
+
 #include "Calendar.h"
+#include "DataSourceLinksField.hpp"
+#include "ImportableTemplate.hpp"
 #include "PointerField.hpp"
 #include "PointersVectorField.hpp"
 
@@ -41,14 +44,27 @@ namespace synthese
 		class OperationUnit;
 		class VehicleService;
 
+		FIELD_STRING(DriverServiceServices)
+		FIELD_STRING(DriverServiceDates)
+		FIELD_DATASOURCE_LINKS(DriverServiceDataSource)
+		FIELD_POINTER(DriverServiceOperationUnit, OperationUnit)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(DriverServiceServices),
+			FIELD(DriverServiceDates),
+			FIELD(DriverServiceDataSource),
+			FIELD(DriverServiceOperationUnit)
+		> DriverServiceSchema;
+
 		/** DriverService class.
 			@ingroup m37
 		*/
 		class DriverService:
 			public impex::ImportableTemplate<DriverService>,
 			public calendar::Calendar,
-			public virtual util::Registrable,
-			public PointerField<DriverService, DriverService>
+			public Object<DriverService, DriverServiceSchema>
 		{
 		public:
 			static const std::string TAG_CHUNK;
@@ -120,8 +136,6 @@ namespace synthese
 
 		private:
 			Chunks _chunks;
-			std::string _name;
-			boost::optional<OperationUnit&> _operationUnit;
 
 		public:
 			DriverService(util::RegistryKeyType id = 0);
@@ -129,15 +143,15 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const Chunks& getChunks() const { return _chunks; }
-				virtual std::string getName() const { return _name; }
-				const boost::optional<OperationUnit&>& getOperationUnit() const { return _operationUnit; }
+				virtual std::string getName() const { return get<Name>(); }
+				const boost::optional<OperationUnit&> getOperationUnit() const;
 			//@}
 
 			//! @name Setters
 			//@{
 				void setChunks(const Chunks& value);
-				void setName(const std::string& value){ _name = value; }
-				void setOperationUnit(const boost::optional<OperationUnit&>& value){ _operationUnit = value; }
+				void setName(const std::string& value){ set<Name>(value); }
+				void setOperationUnit(const boost::optional<OperationUnit&>& value);
 			//@}
 
 			/// @name Services
@@ -159,7 +173,24 @@ namespace synthese
 				boost::posix_time::time_duration getWorkDuration() const;
 				boost::posix_time::time_duration getServiceBeginning() const;
 				boost::posix_time::time_duration getServiceEnd() const;
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
+
+				static std::string SerializeServices(
+					const DriverService::Chunks& services
+				);
+
+				static DriverService::Chunks UnserializeServices(
+					const std::string& value,
+					util::Env& env,
+					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+				);
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

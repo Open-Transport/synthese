@@ -83,7 +83,7 @@ void synthese::pt_operation::moduleRegister()
 	INTEGRATE(synthese::pt_operation::DriverActivity);
 	INTEGRATE(synthese::pt_operation::DriverAllocation);
 	INTEGRATE(synthese::pt_operation::DriverAllocationTemplate);
-	synthese::util::Env::Integrate<synthese::pt_operation::DriverService>();
+	INTEGRATE(synthese::pt_operation::DriverService);
 	INTEGRATE(synthese::pt_operation::OperationUnit);
 	INTEGRATE(synthese::pt_operation::VehicleService);
 }

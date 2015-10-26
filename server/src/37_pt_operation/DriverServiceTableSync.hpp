@@ -28,7 +28,6 @@
 #include "DriverService.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
 #include "FetcherTemplate.h"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -44,22 +43,11 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				DriverServiceTableSync,
 				DriverService,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>,
 			public db::FetcherTemplate<calendar::Calendar, DriverServiceTableSync>
 		{
 		public:
-			//! @name Field names
-			//@{
-				static const std::string COL_NAME;
-				static const std::string COL_SERVICES;
-				static const std::string COL_DATES;
-				static const std::string COL_DATASOURCE_LINKS;
-				static const std::string COL_OPERATION_UNIT_ID;
-			//@}
-
-
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
@@ -85,22 +73,9 @@ namespace synthese
 					bool raisingOrder = true,
 					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 				);
-
-
-
-				static std::string SerializeServices(
-					const DriverService::Chunks& services
-				);
-
-
-
-				static DriverService::Chunks UnserializeServices(
-					const std::string& value,
-					util::Env& env,
-					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
-				);
-
 			//@}
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 }	}
 

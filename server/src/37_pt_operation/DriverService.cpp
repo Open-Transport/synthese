@@ -22,12 +22,22 @@
 
 #include "DriverService.hpp"
 
+#include "DeadRunTableSync.hpp"
 #include "DriverActivity.hpp"
+#include "DriverActivityTableSync.hpp"
 #include "OperationUnit.hpp"
+#include "Profile.h"
 #include "ScheduledService.h"
+#include "ScheduledServiceTableSync.h"
 #include "StopPoint.hpp"
 #include "VehicleService.hpp"
+#include "VehicleServiceTableSync.hpp"
+#include "User.h"
 
+#include <sstream>
+#include <boost/algorithm/string/split.hpp>
+
+using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
 
@@ -37,13 +47,13 @@ namespace synthese
 	using namespace pt_operation;
 	using namespace util;
 
-	namespace util
-	{
-		template<>
-		const std::string Registry<pt_operation::DriverService>::KEY("DriverService");
-	}
-
+	CLASS_DEFINITION(DriverService, "t081_driver_services", 81)
 	FIELD_DEFINITION_OF_OBJECT(DriverService, "driver_service_id", "driver_service_ids")
+
+	FIELD_DEFINITION_OF_TYPE(DriverServiceServices, "services", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DriverServiceDates, "dates", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DriverServiceDataSource, "datasource_links", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DriverServiceOperationUnit, "operation_unit_id", SQL_INTEGER)
 
 	namespace pt_operation
 	{
@@ -68,7 +78,16 @@ namespace synthese
 
 		DriverService::DriverService(util::RegistryKeyType id):
 			util::Registrable(id),
-			impex::ImportableTemplate<DriverService>()
+			impex::ImportableTemplate<DriverService>(),
+			Object<DriverService, DriverServiceSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(DriverServiceServices),
+					FIELD_DEFAULT_CONSTRUCTOR(DriverServiceDates),
+					FIELD_DEFAULT_CONSTRUCTOR(DriverServiceDataSource),
+					FIELD_DEFAULT_CONSTRUCTOR(DriverServiceOperationUnit)
+			)	)
 		{}
 
 
@@ -80,6 +99,8 @@ namespace synthese
 			{
 				chunk.driverService = this;
 			}
+
+			set<DriverServiceServices>(SerializeServices(_chunks));
 		}
 
 
@@ -370,5 +391,252 @@ namespace synthese
 				return elements.rbegin()->service->getArrivalSchedule(false, elements.rbegin()->endRank);
 			}
 			return time_duration(not_a_date_time);
+		}
+
+		std::string DriverService::SerializeServices( const DriverService::Chunks& services )
+		{
+			stringstream servicesStr;
+			bool firstService(true);
+			BOOST_FOREACH(const Chunk& chunk, services)
+			{
+				bool firstElement(true);
+				if(chunk.elements.empty())
+				{
+					if(firstService)
+					{
+						firstService = false;
+					}
+					else
+					{
+						servicesStr << ",";
+					}
+					servicesStr <<
+						"0:0:0:" <<
+						(chunk.activity ? chunk.activity->getKey() : RegistryKeyType(0))
+					;
+					if(	!chunk.driverStartTime.is_not_a_date_time() &&
+						!chunk.driverEndTime.is_not_a_date_time()
+					){
+						servicesStr << ":" << to_simple_string(chunk.driverStartTime);
+						servicesStr << ":" << to_simple_string(chunk.driverEndTime);
+					}
+				}
+				else
+				{
+					BOOST_FOREACH(const Chunk::Element& service, chunk.elements)
+					{
+						if(!service.service)
+						{
+							Log::GetInstance().warn("Null service in driver service has been ignored");
+							continue;
+						}
+						if(firstService)
+						{
+							firstService = false;
+						}
+						else
+						{
+							servicesStr << ",";
+						}
+						servicesStr <<
+							service.service->getKey() << ":" <<
+							service.startRank << ":" <<
+							service.endRank
+						;
+						if(firstElement)
+						{
+							firstElement = false;
+							servicesStr <<
+								":" <<
+								(chunk.vehicleService ? chunk.vehicleService->getKey() : RegistryKeyType(0))
+							;
+							if(	!chunk.driverStartTime.is_not_a_date_time() &&
+								!chunk.driverEndTime.is_not_a_date_time()
+							){
+								servicesStr << ":" << to_simple_string(chunk.driverStartTime);
+								servicesStr << ":" << to_simple_string(chunk.driverEndTime);
+							}
+						}
+			}	}	}
+			return servicesStr.str();
+		}
+
+		DriverService::Chunks DriverService::UnserializeServices(
+			const std::string& value,
+			util::Env& env,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
+		){
+			vector<string> servicesStrs;
+			if(!value.empty())
+			{
+				split(servicesStrs, value, is_any_of(","));
+			}
+
+			Chunks services;
+
+			Chunks::reverse_iterator itServices(services.rend());
+			BOOST_FOREACH(const string& elementStr, servicesStrs)
+			{
+				if(elementStr.empty())
+				{
+					continue;
+				}
+				vector<string> elementStrs;
+				split(elementStrs, elementStr, is_any_of(":"));
+
+				if(elementStrs.size() < 3)
+				{
+					continue;
+				}
+
+				if(elementStrs.size() >= 4 || itServices == services.rend())
+				{
+					Chunk chunk;
+					if(	elementStrs.size() >= 4)
+					{
+						RegistryKeyType activityVehicleServiceId(
+							lexical_cast<RegistryKeyType>(elementStrs[3])
+						);
+						if(activityVehicleServiceId > 0)
+						{
+							if(decodeTableId(activityVehicleServiceId) == VehicleServiceTableSync::TABLE.ID) try
+							{
+								chunk.vehicleService = VehicleServiceTableSync::GetEditable(
+									activityVehicleServiceId,
+									env,
+									linkLevel
+								).get();
+							}
+							catch (ObjectNotFoundException<VehicleService>&)
+							{
+								Log::GetInstance().warn("No such vehicle service "+ elementStrs[3]);
+							}
+							else if(decodeTableId(activityVehicleServiceId) == DriverActivityTableSync::TABLE.ID) try
+							{
+								chunk.activity = DriverActivityTableSync::GetEditable(
+									activityVehicleServiceId,
+									env,
+									linkLevel
+								).get();
+							}
+							catch (ObjectNotFoundException<DriverActivity>&)
+							{
+								Log::GetInstance().warn("No such activity "+ elementStrs[3]);
+							}
+					}	}
+					if(elementStrs.size() >= 9)
+					{
+						chunk.driverStartTime =
+							hours(lexical_cast<long>(elementStrs[4])) +
+							minutes(lexical_cast<long>(elementStrs[5]));
+						chunk.driverEndTime =
+							hours(lexical_cast<long>(elementStrs[7])) +
+							minutes(lexical_cast<long>(elementStrs[8]));
+					}
+					services.push_back(chunk);
+					itServices = services.rbegin();
+				}
+
+				try
+				{
+					if(lexical_cast<RegistryKeyType>(elementStrs[0]) > 0)
+					{
+						Chunk::Element element;
+
+						RegistryKeyType id(lexical_cast<RegistryKeyType>(elementStrs[0]));
+						if(decodeTableId(id) == ScheduledServiceTableSync::TABLE.ID)
+						{
+							element.service = ScheduledServiceTableSync::GetEditable(id, env, linkLevel).get();
+						}
+						else if(decodeTableId(id) == DeadRunTableSync::TABLE.ID)
+						{
+							element.service = DeadRunTableSync::GetEditable(id, env, linkLevel).get();
+						}
+						element.startRank = lexical_cast<size_t>(elementStrs[1]);
+						element.endRank = lexical_cast<size_t>(elementStrs[2]);
+
+						itServices->elements.push_back(element);
+				}	}
+				catch(ObjectNotFoundException<ScheduledService>&)
+				{
+					Log::GetInstance().warn("No such service "+ elementStrs[0]);
+				}
+				catch(ObjectNotFoundException<DeadRun>&)
+				{
+					Log::GetInstance().warn("No such dead run "+ elementStrs[0]);
+				}
+				catch(bad_lexical_cast&)
+				{
+					Log::GetInstance().warn("Inconsistent service id "+ elementStrs[0]);
+				}
+			}
+
+			return services;
+		}
+
+		void DriverService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			// Dates
+			setFromSerializedString(get<DriverServiceDates>());
+
+			// Services
+			_chunks = UnserializeServices(
+				get<DriverServiceServices>(),
+				env
+			);
+			BOOST_FOREACH(Chunk& chunk, _chunks)
+			{
+				chunk.driverService = this;
+			}
+			BOOST_FOREACH(const DriverService::Chunk& chunk, getChunks())
+			{
+				if(chunk.vehicleService)
+				{
+					chunk.vehicleService->addDriverServiceChunk(chunk);
+				}
+			}
+		}
+
+		void DriverService::unlink()
+		{
+			BOOST_FOREACH(const DriverService::Chunk& chunk, getChunks())
+			{
+				if(chunk.vehicleService)
+				{
+					chunk.vehicleService->removeDriverServiceChunk(chunk);
+				}
+			}
+		}
+
+		const boost::optional<OperationUnit&> DriverService::getOperationUnit() const
+		{
+			boost::optional<OperationUnit&> value = boost::optional<OperationUnit&>();
+			if (get<DriverServiceOperationUnit>())
+			{
+				value = get<DriverServiceOperationUnit>().get();
+			}
+			return value;
+		}
+
+		void DriverService::setOperationUnit(const boost::optional<OperationUnit&>& value)
+		{
+			set<DriverServiceOperationUnit>(value
+				? boost::optional<OperationUnit&>(*value)
+				: boost::none);
+		}
+
+		bool DriverService::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool DriverService::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool DriverService::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}

@@ -30,6 +30,7 @@ Singleton Object List Should Work For Any Table
     ${CALENDAR_TEMPLATE_ELEMENTS_TABLE_ID}
     ${PHYSICAL_STOPS_TABLE_ID}
     ${DEPOTS_TABLE_ID}
+    ${DRIVER_SERVICES_TABLE_ID}
     
 
 Empty Object List Should Work For Any Table
@@ -57,6 +58,7 @@ Empty Object List Should Work For Any Table
     ${CALENDAR_TEMPLATE_ELEMENTS_TABLE_ID}
     ${PHYSICAL_STOPS_TABLE_ID}
     ${DEPOTS_TABLE_ID}
+    ${DRIVER_SERVICES_TABLE_ID}
     
 Object List Should Work For Some Tables
     On node 0
