@@ -54,6 +54,7 @@ namespace synthese
 			public graph::Hub,
 			public impex::ImportableTemplate<Depot>
 		{
+		public:
 			typedef util::Registry<Depot> Registry;
 
 			Depot(util::RegistryKeyType id = 0);
