@@ -68,6 +68,11 @@ namespace synthese
 			bool numberAtBeginning,
 			std::string separator
 		):	Registrable(0),
+			Address(
+				chunk,
+				chunk.getHouseNumberMetricOffset(houseNumber),
+				houseNumber
+			),
 			Object<House, HouseSchema>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, 0),
@@ -76,11 +81,6 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Number, houseNumber),
 					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
 			)),
-			Address(
-				chunk,
-				chunk.getHouseNumberMetricOffset(houseNumber),
-				houseNumber
-			),
 			_numberAtBeginning(numberAtBeginning)
 		{
 			setName(
@@ -100,6 +100,11 @@ namespace synthese
 			bool numberAtBeginning,
 			std::string separator
 		):	Registrable(0),
+			Address(
+				chunk,
+				metricOffset,
+				chunk.getHouseNumberFromOffset(metricOffset)
+			),
 			Object<House, HouseSchema>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, 0),
@@ -108,11 +113,6 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Number, chunk.getHouseNumberFromOffset(metricOffset)),
 					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
 			)),
-			Address(
-				chunk,
-				metricOffset,
-				chunk.getHouseNumberFromOffset(metricOffset)
-			),
 			_numberAtBeginning(numberAtBeginning)
 		{
 			setName(

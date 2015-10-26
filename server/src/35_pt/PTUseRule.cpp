@@ -618,7 +618,7 @@ namespace synthese
 				: boost::none);
 		}
 
-		const boost::optional<boost::gregorian::date_duration>&	PTUseRule::getMaxDelayDays() const
+		const boost::optional<boost::gregorian::date_duration>	PTUseRule::getMaxDelayDays() const
 		{
 			boost::optional<boost::gregorian::date_duration> value;
 			if (get<MaxDelayDays>() != boost::gregorian::days(0))

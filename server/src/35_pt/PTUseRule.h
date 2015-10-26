@@ -167,7 +167,7 @@ namespace synthese
 				boost::gregorian::date_duration		getMinDelayDays()				const { return get<MinDelayDays>(); }
 				boost::posix_time::time_duration	getMinDelayMinutes()			const { return get<MinDelayMinutes>(); }
 				boost::posix_time::time_duration	getMinDelayMinutesExternal()	const { return get<MinDelayMinutesExternal>(); }
-				const boost::optional<boost::gregorian::date_duration>&	getMaxDelayDays()		const;
+				const boost::optional<boost::gregorian::date_duration>	getMaxDelayDays()		const;
 				ReservationRuleType	getReservationType()			const { return get<ReservationType>(); }
 				const fare::Fare*	getDefaultFare()				const { return get<DefaultFare>() ? get<DefaultFare>().get_ptr() : NULL; }
 				bool getForbiddenInDepartureBoards ()	const { return get<ForbiddenInDepartureBoards>(); }
