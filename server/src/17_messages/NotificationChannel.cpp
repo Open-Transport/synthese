@@ -70,6 +70,7 @@ namespace synthese
 		const string NotificationChannel::VARIABLE_MESSAGE = "message";
 		const string NotificationChannel::VARIABLE_STOP_IDS = "stop_ids";
 		const string NotificationChannel::VARIABLE_LINE_IDS = "line_ids";
+		const string NotificationChannel::VARIABLE_LINE_NAMES = "line_names";
 		const string NotificationChannel::VARIABLE_ID_SEPARATOR = ",";
 		const string NotificationChannel::VARIABLE_URL = "url";
 		const string NotificationChannel::VARIABLE_APPLICATION_BEGIN = "application_begin";
@@ -246,6 +247,7 @@ namespace synthese
 
 			// Browse alarm linked objects to build lines and stops ID lists
 			std::stringstream linesStream;
+			std::stringstream linesIdsStream;
 			bool firstLineInStream = true;
 			BOOST_FOREACH(const AlarmObjectLink* link, alarm->getLinkedObjects("line"))
 			{
@@ -262,8 +264,10 @@ namespace synthese
 						else
 						{
 							linesStream << VARIABLE_ID_SEPARATOR;
+							linesIdsStream << VARIABLE_ID_SEPARATOR;
 						}
 						linesStream << line->getName();
+						linesIdsStream << line->getKey();
 					}
 				}
 				else if (tableId == pt::TransportNetworkTableSync::TABLE.ID)
@@ -278,12 +282,15 @@ namespace synthese
 						else
 						{
 							linesStream << VARIABLE_ID_SEPARATOR;
+							linesIdsStream << VARIABLE_ID_SEPARATOR;
 						}
 						linesStream << network->getName();
+						linesIdsStream << network->getKey();
 					}
 				}
 			}
-			scriptParameters.insert(VARIABLE_LINE_IDS, linesStream.str());
+			scriptParameters.insert(VARIABLE_LINE_IDS, linesIdsStream.str());
+			scriptParameters.insert(VARIABLE_LINE_NAMES, linesStream.str());
 
 			std::stringstream stopsStream;
 			bool firstStopInStream = true;
