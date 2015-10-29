@@ -341,9 +341,6 @@ namespace synthese
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 
-				virtual LinkedObjectsIds getLinkedObjectsIds(
-					const Record& record
-				) const;
 			//@}
 
 			static std::string SerializeForbiddenDays(

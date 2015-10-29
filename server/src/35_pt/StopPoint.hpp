@@ -188,13 +188,6 @@ namespace synthese
 					std::string prefix = std::string()
 				) const;
 
-				/*
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
-				*/
-
 				virtual bool allowUpdate(const server::Session* session) const;
 				virtual bool allowCreate(const server::Session* session) const;
 				virtual bool allowDelete(const server::Session* session) const;
@@ -202,9 +195,6 @@ namespace synthese
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
 
-				virtual LinkedObjectsIds getLinkedObjectsIds(
-					const Record& record
-				) const;
 			//@}
 		};
 

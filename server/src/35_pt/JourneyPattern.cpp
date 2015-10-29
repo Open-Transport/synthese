@@ -586,10 +586,7 @@ namespace synthese
 			return *_calendar;
 		}
 
-		synthese::LinkedObjectsIds JourneyPattern::getLinkedObjectsIds( const Record& record ) const
-		{
-			return LinkedObjectsIds();
-		}
+
 
 		void JourneyPattern::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{

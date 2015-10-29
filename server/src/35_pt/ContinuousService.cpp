@@ -85,12 +85,10 @@ namespace synthese
 		{}
 
 
-
 		ContinuousService::~ContinuousService ()
 		{
 			unlink();
 		}
-
 
 
 		boost::posix_time::time_duration
@@ -100,13 +98,11 @@ namespace synthese
 		}
 
 
-
 		void
 		ContinuousService::setMaxWaitingTime (boost::posix_time::time_duration maxWaitingTime)
 		{
 			set<MaxWaitingTime>(maxWaitingTime);
 		}
-
 
 
 		boost::posix_time::time_duration ContinuousService::getRange () const
@@ -115,13 +111,11 @@ namespace synthese
 		}
 
 
-
 		void
 		ContinuousService::setRange (boost::posix_time::time_duration range)
 		{
 			set<Range>(range);
 		}
-
 
 
 		bool
@@ -328,7 +322,6 @@ namespace synthese
 		}
 
 
-
 		void ContinuousService::completeServicePointer(
 			ServicePointer& servicePointer,
 			const Edge& edge,
@@ -363,7 +356,6 @@ namespace synthese
 		}
 
 
-
 		time_duration ContinuousService::getDepartureBeginScheduleToIndex(
 			bool RTData, size_t rankInPath
 		) const	{
@@ -373,7 +365,6 @@ namespace synthese
 			}
 			return getDepartureSchedule(RTData, rankInPath);
 		}
-
 
 
 		time_duration ContinuousService::getDepartureEndScheduleToIndex(
@@ -388,7 +379,6 @@ namespace synthese
 		}
 
 
-
 		time_duration ContinuousService::getArrivalBeginScheduleToIndex(
 			bool RTData,
 			std::size_t rankInPath
@@ -397,14 +387,12 @@ namespace synthese
 		}
 
 
-
 		time_duration ContinuousService::getArrivalEndScheduleToIndex(
 			bool RTData,
 			std::size_t rankInPath
 		) const	{
 			return getArrivalSchedule(RTData, rankInPath) + get<Range>() + get<MaxWaitingTime>();
 		}
-
 
 
 		void ContinuousService::toParametersMap( util::ParametersMap& map, bool withAdditionalParameters, boost::logic::tribool withFiles /*= boost::logic::indeterminate*/, std::string prefix /*= std::string() */ ) const
@@ -454,7 +442,6 @@ namespace synthese
 			)	);
 			map.insert(ServiceDates::FIELD.name, datesStr.str());
 		}
-
 
 
 		void ContinuousService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
@@ -563,7 +550,6 @@ namespace synthese
 		}
 
 
-
 		synthese::SubObjects ContinuousService::getSubObjects() const
 		{
 			SubObjects r;
@@ -575,22 +561,16 @@ namespace synthese
 		}
 
 
-
-		synthese::LinkedObjectsIds ContinuousService::getLinkedObjectsIds( const Record& record ) const
-		{
-			return LinkedObjectsIds();
-		}
-
 		const boost::posix_time::time_duration ContinuousService::getDataLastDepartureSchedule( size_t i ) const
 		{
 			return getDataFirstDepartureSchedule(i) + get<Range>();
 		}
 
+
 		const boost::posix_time::time_duration ContinuousService::getDataLastArrivalSchedule( size_t i ) const
 		{
 			return getDataFirstArrivalSchedule(i) + get<Range>() + get<MaxWaitingTime>();
 		}
-
 
 
 		void ContinuousService::unlink()
@@ -609,6 +589,7 @@ namespace synthese
 			}
 		}
 
+
 		void ContinuousService::setRules(const Rules& value)
 		{
 			RuleUser::setRules(value);
@@ -623,6 +604,7 @@ namespace synthese
 				set<PedestrianComplianceId>(RegistryKeyType(0));
 		}
 
+
 		void ContinuousService::setPath(graph::Path* path)
 		{
 			SchedulesBasedService::setPath(path);
@@ -630,6 +612,7 @@ namespace synthese
 				? boost::optional<JourneyPattern&>(*dynamic_cast<JourneyPattern*>(path))
 				: boost::none);
 		}
+
 
 		void ContinuousService::setDataSchedules(
 			const Schedules& departureSchedules,
@@ -640,15 +623,18 @@ namespace synthese
 			set<ServiceSchedules>(encodeSchedules());
 		}
 
+
 		bool ContinuousService::allowUpdate(const server::Session* session) const
 		{
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::WRITE);
 		}
 
+
 		bool ContinuousService::allowCreate(const server::Session* session) const
 		{
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::WRITE);
 		}
+
 
 		bool ContinuousService::allowDelete(const server::Session* session) const
 		{

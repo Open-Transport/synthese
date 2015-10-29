@@ -622,10 +622,6 @@ namespace synthese
 			return r;
 		}
 
-		synthese::LinkedObjectsIds CommercialLine::getLinkedObjectsIds( const Record& record ) const
-		{
-			return LinkedObjectsIds();
-		}
 
 		void CommercialLine::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{

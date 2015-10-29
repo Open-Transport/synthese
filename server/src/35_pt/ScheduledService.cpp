@@ -561,13 +561,6 @@ namespace synthese
 
 
 
-		synthese::LinkedObjectsIds ScheduledService::getLinkedObjectsIds( const Record& record ) const
-		{
-			return LinkedObjectsIds();
-		}
-
-
-
 		void ScheduledService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			if (!get<ServiceDates>().empty())

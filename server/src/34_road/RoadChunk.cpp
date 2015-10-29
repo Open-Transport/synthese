@@ -496,14 +496,6 @@ namespace synthese
 		}
 
 
-
-		synthese::LinkedObjectsIds RoadChunk::getLinkedObjectsIds( const Record& record ) const
-		{
-			LinkedObjectsIds result;
-			return result;
-		}
-
-
 		void RoadChunk::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			_updateEdges();
