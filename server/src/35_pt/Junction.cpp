@@ -289,24 +289,6 @@ namespace synthese
 
 
 
-		synthese::LinkedObjectsIds Junction::getLinkedObjectsIds( const Record& record ) const
-		{
-			LinkedObjectsIds result;
-			RegistryKeyType sid(get<StartPhysicalStop>() ? get<StartPhysicalStop>()->getKey() : RegistryKeyType(0));
-			if(sid)
-			{
-				result.push_back(sid);
-			}
-			RegistryKeyType eid(get<EndPhysicalStop>() ? get<EndPhysicalStop>()->getKey() : RegistryKeyType(0));
-			if(eid)
-			{
-				result.push_back(eid);
-			}
-			return result;
-		}
-
-
-
 		void Junction::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			time_duration duration(minutes(get<DurationMinutes>()));

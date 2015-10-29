@@ -549,17 +549,6 @@ namespace synthese
 		}
 
 
-
-		synthese::LinkedObjectsIds PTUseRule::getLinkedObjectsIds( const Record& record ) const
-		{
-			synthese::LinkedObjectsIds result;
-			if(get<DefaultFare>())
-			{
-				result.push_back(get<DefaultFare>()->getKey());
-			}
-			return result;
-		}
-
 		std::string PTUseRule::SerializeForbiddenDays( const PTUseRule::ReservationForbiddenDays& value )
 		{
 			bool first(true);
@@ -578,6 +567,7 @@ namespace synthese
 			}
 			return forbiddenDays.str();
 		}
+
 
 		PTUseRule::ReservationForbiddenDays PTUseRule::UnserializeForbiddenDays( const std::string& value )
 		{

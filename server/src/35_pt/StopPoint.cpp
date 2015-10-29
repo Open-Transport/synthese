@@ -507,11 +507,6 @@ namespace synthese
 			);
 		}
 
-		synthese::LinkedObjectsIds StopPoint::getLinkedObjectsIds( const Record& record ) const
-		{
-			return LinkedObjectsIds();
-		}
-
 
 		void StopPoint::adaptDeprecatedGeometryIfNecessary()
 		{

@@ -163,10 +163,6 @@ namespace synthese
 			
 				virtual SubObjects getSubObjects() const;
 
-				virtual LinkedObjectsIds getLinkedObjectsIds(
-					const Record& record
-				) const;
-
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
 			//@}
