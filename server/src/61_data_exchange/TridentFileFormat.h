@@ -59,6 +59,7 @@ namespace synthese
 	namespace pt
 	{
 		class CommercialLine;
+		class LinePhysicalStop;
 	}
 
 	namespace data_exchange
@@ -269,6 +270,7 @@ namespace synthese
 				static std::string TridentId (const std::string& peer, const std::string clazz, const util::RegistryKeyType& id);
 				static std::string TridentId (const std::string& peer, const std::string clazz, const std::string& s);
 				static std::string TridentId (const std::string& peer, const std::string clazz, const util::Registrable& obj);
+				static std::string TridentId (const std::string& peer, const std::string clazz, const pt::LinePhysicalStop& linePhysicalStop);
 
 				bool _isUseRuleHLP(const pt::PTUseRule* pedestrianUseRule) const;
 				bool _hasJPOnlyHLP(const pt::JourneyPattern* jp) const;
