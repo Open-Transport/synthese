@@ -23,8 +23,13 @@
 #ifndef SYNTHESE_pt_StopArea_hpp__
 #define SYNTHESE_pt_StopArea_hpp__
 
+#include "Object.hpp"
+
+#include "City.h"
 #include "CommercialLine.h"
 #include "CoordinatesSystem.hpp"
+#include "DataSourceLinksField.hpp"
+#include "GeometryField.hpp"
 #include "Hub.h"
 #include "ImportableTemplate.hpp"
 #include "NamedPlaceTemplate.h"
@@ -58,6 +63,38 @@ namespace synthese
 		class FreeDRTArea;
 		class StopPoint;
 		class DRTArea;
+
+		FIELD_ID(CityId)
+		FIELD_BOOL(ConnectionType)
+		FIELD_BOOL(IsCityMainConnection)
+		FIELD_INT(DefaultTransferDelay)
+		FIELD_STRING(TransferDelays)
+		FIELD_BOOL(IsRelayPark)
+		FIELD_STRING(ShortDisplayName)
+		FIELD_STRING(LongDisplayName)
+		FIELD_DATASOURCE_LINKS(StopAreaDataSource)
+		FIELD_STRING(StopAreaTimetableName)
+		FIELD_DOUBLE(X)
+		FIELD_DOUBLE(Y)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(CityId),
+			FIELD(ConnectionType),
+			FIELD(IsCityMainConnection),
+			FIELD(DefaultTransferDelay),
+			FIELD(TransferDelays),
+			FIELD(IsRelayPark),
+			FIELD(ShortDisplayName),
+			FIELD(LongDisplayName),
+			FIELD(StopAreaDataSource),
+			FIELD(StopAreaTimetableName),
+			FIELD(HandicappedComplianceId),
+			FIELD(X),
+			FIELD(Y),
+			FIELD(PointGeometry)
+		> StopAreaSchema;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Stop area.
@@ -158,10 +195,10 @@ namespace synthese
 		/// StopArea.</li>
 		/// </ul>
 		class StopArea:
+			public Object<StopArea, StopAreaSchema>,
 			public graph::Hub,
 			public geography::NamedPlaceTemplate<StopArea>,
-			public impex::ImportableTemplate<StopArea>,
-			public PointerField<StopArea, StopArea>
+			public impex::ImportableTemplate<StopArea>
 		{
 		public:
 			static const std::string DATA_STOP_ID;
@@ -176,9 +213,6 @@ namespace synthese
 			{
 
 			};
-
-			/// Chosen registry class.
-			typedef util::Registry<StopArea>	Registry;
 
 			typedef std::map<util::RegistryKeyType,const pt::StopPoint*> PhysicalStops;
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > PhysicalStopsLabels;
@@ -197,17 +231,12 @@ namespace synthese
 			//! @name Content
 			//@{
 				PhysicalStops			_physicalStops;
-				std::string				_timetableName;
-//				Addresses _addresses; //<! Station entrances
 			//@}
 
 			//! @name Transfer parameters
 			//@{
-				bool					_isMainPlaceOfCity;
-				bool					_allowedConnection;
 				TransferDelaysMap		_transferDelays; //!< Transfer delays between vertices (in minutes)
 				boost::posix_time::time_duration	_defaultTransferDelay;
-				bool					_isRelayPark;
 			//@}
 
 			//! @name Caching
@@ -236,13 +265,14 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const PhysicalStops& getPhysicalStops() const { return _physicalStops; }
-				bool getAllowedConnection() const { return _allowedConnection; }
+				bool getAllowedConnection() const { return get<ConnectionType>(); }
 				boost::posix_time::time_duration	getDefaultTransferDelay() const { return _defaultTransferDelay; }
 				const TransferDelaysMap& getTransferDelays() const { return _transferDelays; }
-				const std::string& getTimetableName() const { return _timetableName; }
+				const std::string& getTimetableName() const { return get<StopAreaTimetableName>(); }
 				const boost::shared_ptr<geos::geom::Point>& getLocation() const { return _location; }
 				const DRTAreas& getDRTAreas() const { return _drtAreas; }
 				bool getIsRelayPark() const { return _isRelayPark; }
+				virtual std::string getName() const;
 			//@}
 
 			//! @name Setters
@@ -250,11 +280,16 @@ namespace synthese
 				void setDefaultTransferDelay(
 					boost::posix_time::time_duration defaultTransferDelay
 				);
-				void setTimetableName(const std::string& value){ _timetableName = value; }
-				void setAllowedConnection(bool value) { _allowedConnection = value; }
-				void setLocation(const boost::shared_ptr<geos::geom::Point>& value){ _location = value; }
+				void setTimetableName(const std::string& value){ set<StopAreaTimetableName>(value); }
+				void setAllowedConnection(bool value) { set<ConnectionType>(value); }
+				void setLocation(const boost::shared_ptr<geos::geom::Point>& value);
 				void setTransferDelaysMatrix(const TransferDelaysMap& value);
-				void setIsRelayPark(bool value) { _isRelayPark = value; }
+				void setIsRelayPark(bool value) { set<IsRelayPark>(value); }
+				virtual void setName(const std::string& value);
+				virtual void setName13(const std::string& value);
+				virtual void setName26(const std::string& value);
+				virtual void setCity(geography::City* value);
+				virtual void setRules(const Rules& value);
 			//@}
 
 			//! @name Update methods.
@@ -433,11 +468,6 @@ namespace synthese
 					const Record& record
 				) const;
 
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
-
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 
 				virtual void unlink();
@@ -446,6 +476,10 @@ namespace synthese
 
 				static std::string SerializeTransferDelaysMatrix(const TransferDelaysMap& matrix);
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

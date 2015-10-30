@@ -243,6 +243,7 @@ void checkJourneyEquals(size_t i, PTRoutePlannerResult::Journeys& journeys,
 BOOST_AUTO_TEST_CASE (scheduledVSscheduled)
 {
 	ScopedRegistrable<CommercialLine> scopedCommercialLine;
+	ScopedRegistrable<StopArea> scopedStopArea;
 
 	TestAreaMap testAreaMap(NB_STOP);
 	

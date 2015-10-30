@@ -52,6 +52,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 {
 	Env env;
 	GeographyModule::PreInit();
+	ScopedRegistrable<StopArea> scopedStopArea;
 
 	date today(day_clock::local_day());
 

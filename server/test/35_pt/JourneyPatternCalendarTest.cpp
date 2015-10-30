@@ -26,6 +26,7 @@
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "GeographyModule.h"
+#include "TestUtils.hpp"
 
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/date_time/date.hpp>
@@ -42,6 +43,7 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 	GeographyModule::PreInit();
 
 	{
+		ScopedRegistrable<StopArea> scopedStopArea;
 		Env env;
 		JourneyPattern jp;
 		StopArea sa(0, true);

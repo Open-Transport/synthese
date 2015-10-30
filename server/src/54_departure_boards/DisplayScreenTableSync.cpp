@@ -197,7 +197,7 @@ namespace synthese
 			if(!localizationid || *localizationid != 0)
 			{
 				query.addTableAndEqualJoin<StopAreaTableSync>(TABLE_COL_ID, BroadCastPoint::FIELD.name);
-				query.addTableAndEqualOtherJoin<CityTableSync,StopAreaTableSync>(TABLE_COL_ID, StopAreaTableSync::TABLE_COL_CITYID);
+				query.addTableAndEqualOtherJoin<CityTableSync,StopAreaTableSync>(TABLE_COL_ID, pt::CityId::FIELD.name);
 				query.addTableAndEqualOtherJoin<StopPointTableSync,StopAreaTableSync>(ConnectionPlace::FIELD.name, TABLE_COL_ID);
 
 				if (lineid || neededLevel > FORBIDDEN)
@@ -233,7 +233,7 @@ namespace synthese
 				}
 				if (!stopName.empty())
 				{
-					query.addWhereFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, "%"+stopName+"%", ComposedExpression::OP_LIKE);
+					query.addWhereFieldOther<StopAreaTableSync>(SimpleObjectFieldDefinition<Name>::FIELD.name, "%"+stopName+"%", ComposedExpression::OP_LIKE);
 				}
 				if (lineid)
 				{
@@ -276,12 +276,12 @@ namespace synthese
 			else if ((!localizationid || *localizationid != 0) && orderByCity)
 			{
 				query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
-				query.addOrderFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, raisingOrder);
+				query.addOrderFieldOther<StopAreaTableSync>(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 				query.addOrderField(BroadCastPointComment::FIELD.name, raisingOrder);
 			}
 			else if ((!localizationid || *localizationid != 0) && orderByStopName)
 			{
-				query.addOrderFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, raisingOrder);
+				query.addOrderFieldOther<StopAreaTableSync>(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 				query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
 				query.addOrderField(BroadCastPointComment::FIELD.name, raisingOrder);
 			}
@@ -291,7 +291,7 @@ namespace synthese
 				if(!localizationid || *localizationid != 0)
 				{
 					query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
-					query.addOrderFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, raisingOrder);
+					query.addOrderFieldOther<StopAreaTableSync>(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 			}	}
 			else if (orderByType)
 			{
@@ -299,7 +299,7 @@ namespace synthese
 				if(!localizationid || *localizationid != 0)
 				{
 					query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
-					query.addOrderFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, raisingOrder);
+					query.addOrderFieldOther<StopAreaTableSync>(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 				}
 				query.addOrderField(BroadCastPointComment::FIELD.name, raisingOrder);
 			}

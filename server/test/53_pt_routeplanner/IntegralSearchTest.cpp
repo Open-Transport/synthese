@@ -41,6 +41,7 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 {
 	ScopedRegistrable<CommercialLine> scopedCommercialLine;
 	ScopedCoordinatesSystemUser scopedCoordinatesSystemUser;
+	ScopedRegistrable<StopArea> scopedStopArea;
 
 	#include "RoutePlannerTestData.hpp"
 

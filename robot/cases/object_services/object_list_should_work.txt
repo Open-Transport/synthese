@@ -31,6 +31,7 @@ Singleton Object List Should Work For Any Table
     ${PHYSICAL_STOPS_TABLE_ID}
     ${DEPOTS_TABLE_ID}
     ${DRIVER_SERVICES_TABLE_ID}
+    ${CONNECTION_PLACES_TABLE_ID}
     
 
 Empty Object List Should Work For Any Table
@@ -59,6 +60,7 @@ Empty Object List Should Work For Any Table
     ${PHYSICAL_STOPS_TABLE_ID}
     ${DEPOTS_TABLE_ID}
     ${DRIVER_SERVICES_TABLE_ID}
+    ${CONNECTION_PLACES_TABLE_ID}
     
 Object List Should Work For Some Tables
     On node 0

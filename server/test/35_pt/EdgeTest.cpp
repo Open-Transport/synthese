@@ -31,6 +31,7 @@
 #include "DRTArea.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "AreaGeneratedLineStop.hpp"
+#include "TestUtils.hpp"
 
 #include "UtilConstants.h"
 
@@ -49,6 +50,7 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 {
 	GeographyModule::PreInit();
 	{
+		ScopedRegistrable<StopArea> scopedStopArea;
 		Env env;
 
 		JourneyPattern l;

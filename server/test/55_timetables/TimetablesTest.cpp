@@ -57,7 +57,9 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 	ScopedCoordinatesSystemUser scopedCoordinatesSystemUser;
 	ScopedRegistrable<JourneyPattern> scopedJourneyPattern;
 	ScopedRegistrable<CommercialLine> scopedCommercialLine;
+	ScopedRegistrable<StopArea> scopedStopArea;
 	Env env;
+	synthese::pt::StopArea::integrate();
 
 
 	GeographyModule::PreInit();

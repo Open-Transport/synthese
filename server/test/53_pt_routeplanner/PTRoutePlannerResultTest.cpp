@@ -37,6 +37,7 @@
 #include "Crossing.h"
 #include "Address.h"
 #include "GeographyModule.h"
+#include "TestUtils.hpp"
 
 #include <boost/test/auto_unit_test.hpp>
 
@@ -54,6 +55,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 {
 	Env env;
 	GeographyModule::PreInit();
+	ScopedRegistrable<StopArea> scopedStopArea;
 
 	ptime now(second_clock::local_time());
 

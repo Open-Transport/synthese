@@ -59,9 +59,9 @@ namespace synthese
 			s << " FROM " << ReservationTableSync::TABLE.NAME << " AS r " <<
 				" INNER JOIN " << ReservationTransactionTableSync::TABLE.NAME << " AS t ON t." << TABLE_COL_ID << "=r." << Transaction::FIELD.name <<
 				" LEFT JOIN " << StopAreaTableSync::TABLE.NAME << " AS sd ON sd." << TABLE_COL_ID << "=r." << DeparturePlaceId::FIELD.name <<
-				" LEFT JOIN " << CityTableSync::TABLE.NAME << " AS cd ON cd." << TABLE_COL_ID << "=sd." << StopAreaTableSync::TABLE_COL_CITYID <<
+				" LEFT JOIN " << CityTableSync::TABLE.NAME << " AS cd ON cd." << TABLE_COL_ID << "=sd." << pt::CityId::FIELD.name <<
 				" LEFT JOIN " << StopAreaTableSync::TABLE.NAME << " AS sa ON sa." << TABLE_COL_ID << "=r." << ArrivalPlaceId::FIELD.name <<
-				" LEFT JOIN " << CityTableSync::TABLE.NAME << " AS ca ON ca." << TABLE_COL_ID << "=sa." << StopAreaTableSync::TABLE_COL_CITYID <<
+				" LEFT JOIN " << CityTableSync::TABLE.NAME << " AS ca ON ca." << TABLE_COL_ID << "=sa." << pt::CityId::FIELD.name <<
 				" WHERE " <<
 				OriginDateTime::FIELD.name << ">='" << gregorian::to_iso_extended_string(period.begin())  << " 00:00:00' AND " <<
 				OriginDateTime::FIELD.name << "<'" << gregorian::to_iso_extended_string(period.end()) << " 00:00:00'";
@@ -126,9 +126,9 @@ namespace synthese
 			else
 			{
 				if(step == DEPARTURE_STOP_STEP) return DeparturePlaceId::FIELD.name;
-				if(step == DEPARTURE_CITY_STEP) return "sd." + StopAreaTableSync::TABLE_COL_CITYID;
+				if(step == DEPARTURE_CITY_STEP) return "sd." + pt::CityId::FIELD.name;
 				if(step == ARRIVAL_STOP_STEP) return ArrivalPlaceId::FIELD.name;
-				if(step == ARRIVAL_CITY_STEP) return "sa." + StopAreaTableSync::TABLE_COL_CITYID;
+				if(step == ARRIVAL_CITY_STEP) return "sa." + pt::CityId::FIELD.name;
 			}
 			if(db->isBackend(DB::SQLITE_BACKEND))
 			{
