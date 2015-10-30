@@ -46,6 +46,7 @@ using namespace synthese;
 BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 {
 	ScopedRegistrable<CommercialLine> scopedCommercialLine;
+	ScopedRegistrable<StopArea> scopedStopArea;
 	Env env;
 
 	// Stops

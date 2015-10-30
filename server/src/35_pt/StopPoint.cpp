@@ -529,6 +529,8 @@ namespace synthese
 		{
 			adaptDeprecatedGeometryIfNecessary();
 
+			setGeometry(get<PointGeometry>());
+
 			// TODO : connection place member field is redundant with Vertex _hub. Vertex should become
 			// a pure interface.
 			const pt::StopArea* connectionPlace = getConnectionPlace();

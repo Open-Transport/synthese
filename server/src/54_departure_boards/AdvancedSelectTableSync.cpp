@@ -81,7 +81,7 @@ namespace synthese
 					<< ",(SELECT COUNT(s." << TABLE_COL_ID << ") FROM " << DisplayScreenCPUTableSync::TABLE.NAME << " AS s WHERE s." << DisplayScreenCPUTableSync::COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS cc"
 				<< " FROM " // Tables
 					<< StopAreaTableSync::TABLE.NAME << " AS p"
-					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << StopAreaTableSync::TABLE_COL_CITYID
+					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << pt::CityId::FIELD.name
 					<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS ps ON " 	<< " ps." << ConnectionPlace::FIELD.name << "=p." << TABLE_COL_ID
 					<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineNode::FIELD.name
 					<< " INNER JOIN " << JourneyPatternCommercialLine::FIELD.name << " as l ON l." << TABLE_COL_ID << "=ls." << Line::FIELD.name;
@@ -121,11 +121,11 @@ namespace synthese
 			// Order
 			if (orderByCity)
 			{
-				query << " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",p."  << StopAreaTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",p."  << pt::CityId::FIELD.name << (raisingOrder ? " ASC" : " DESC");
 			}
 			else if (orderByName)
 			{
-				query << " ORDER BY p." << StopAreaTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY p." << SimpleObjectFieldDefinition<Name>::FIELD.name << (raisingOrder ? " ASC" : " DESC");
 			}
 			else if (orderByNumber)
 			{

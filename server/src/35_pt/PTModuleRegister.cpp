@@ -247,9 +247,9 @@ void synthese::pt::moduleRegister()
 	INTEGRATE(synthese::pt::FreeDRTTimeSlot);
 	INTEGRATE(synthese::pt::JourneyPattern);
 	INTEGRATE(synthese::pt::LineStop);
-	synthese::util::Env::Integrate<synthese::pt::StopArea>();
+	INTEGRATE(synthese::pt::StopArea);
 	INTEGRATE(synthese::pt::CommercialLine);
-	synthese::util::Env::Integrate<synthese::pt::StopPoint>();
+	INTEGRATE(synthese::pt::StopPoint);
 	INTEGRATE(synthese::pt::Junction);
 	INTEGRATE(synthese::pt::TransportNetwork);
 	INTEGRATE(synthese::pt::PTUseRule);

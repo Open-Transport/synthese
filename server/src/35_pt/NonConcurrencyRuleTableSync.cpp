@@ -75,14 +75,6 @@ namespace synthese
 
 
 
-		template<> void OldLoadSavePolicy<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Unlink(
-			NonConcurrencyRule* obj
-		){
-			obj->unlink();
-		}
-
-
-
 		template<> bool DBTableSyncTemplate<NonConcurrencyRuleTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id

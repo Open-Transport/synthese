@@ -26,7 +26,6 @@
 #include "StopArea.hpp"
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 #include "FetcherTemplate.h"
 
 #include <string>
@@ -48,27 +47,11 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				StopAreaTableSync,
 				StopArea,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>,
 			public db::FetcherTemplate<geography::NamedPlace, StopAreaTableSync>
 		{
 		public:
-			static const std::string TABLE_COL_NAME;
-			static const std::string TABLE_COL_CITYID;
-			static const std::string TABLE_COL_CONNECTIONTYPE;
-			static const std::string TABLE_COL_ISCITYMAINCONNECTION;
-			static const std::string TABLE_COL_DEFAULTTRANSFERDELAY;
-			static const std::string TABLE_COL_TRANSFERDELAYS;
-			static const std::string TABLE_COL_ISRELAYPARK;
-			static const std::string COL_NAME13;
-			static const std::string COL_NAME26;
-			static const std::string COL_CODE_BY_SOURCE;
-			static const std::string COL_TIMETABLE_NAME;
-			static const std::string COL_HANDICAPPED_COMPLIANCE_ID;
-			static const std::string COL_X;
-			static const std::string COL_Y;
-
 			static const std::string FORBIDDEN_DELAY_SYMBOL;
 
 
@@ -108,6 +91,8 @@ namespace synthese
 				util::Env& env,
 				util::LinkLevel linkLevel
 			);
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

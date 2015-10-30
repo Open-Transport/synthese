@@ -288,6 +288,18 @@ namespace synthese
 
 		void CalendarTemplateElement::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
+			if (get<MinDate>() == boost::gregorian::date(boost::gregorian::not_a_date_time))
+			{
+				date mindate(neg_infin);
+				set<MinDate>(mindate);
+			}
+
+			if (get<MaxDate>() == boost::gregorian::date(boost::gregorian::not_a_date_time))
+			{
+				date maxdate(pos_infin);
+				set<MaxDate>(maxdate);
+			}
+
 			if(getCalendar())
 			{
 				const_cast<CalendarTemplate*>(getCalendar())->addElement(*this);

@@ -173,9 +173,9 @@ namespace synthese
 			if(orderByCityAndStopName)
 			{
 				query.addTableAndEqualJoin<StopAreaTableSync>(Key::FIELD.name, ConnectionPlace::FIELD.name);
-				query.addTableAndEqualOtherJoin<CityTableSync, StopAreaTableSync>(Key::FIELD.name, StopAreaTableSync::TABLE_COL_CITYID);
+				query.addTableAndEqualOtherJoin<CityTableSync, StopAreaTableSync>(Key::FIELD.name, pt::CityId::FIELD.name);
 				query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
-				query.addOrderFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, raisingOrder);
+				query.addOrderFieldOther<StopAreaTableSync>(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 				query.addOrderField(Name::FIELD.name, raisingOrder);
 			}
 			if(number)

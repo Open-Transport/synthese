@@ -175,7 +175,7 @@ namespace synthese
 				{
 					const_cast<City*>(_alias->getCity())->removeIncludedPlace(*_alias);
 				}
-				_alias->set<IsCityMainConnection>(*_isCityMainPlace);
+				_alias->set<geography::IsCityMainConnection>(*_isCityMainPlace);
 			}
 
 			PlaceAliasTableSync::Save(_alias.get());

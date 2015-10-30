@@ -77,10 +77,10 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setName (const std::string& value){ _name = value; }
-				void setCity(City* value){ _city = value; }
-				void setName13(const std::string& value){ _name13 = value; }
-				void setName26(const std::string& value){ _name26 = value; }
+				virtual void setName (const std::string& value){ _name = value; }
+				virtual void setCity(City* value){ _city = value; }
+				virtual void setName13(const std::string& value){ _name13 = value; }
+				virtual void setName26(const std::string& value){ _name26 = value; }
 			//@}
 
 

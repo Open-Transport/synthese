@@ -66,21 +66,6 @@ namespace synthese
 
 	namespace pt
 	{
-		const string StopAreaTableSync::TABLE_COL_NAME = "name";
-		const string StopAreaTableSync::TABLE_COL_CITYID = "city_id";
-		const string StopAreaTableSync::TABLE_COL_CONNECTIONTYPE = "connection_type";
-		const string StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION = "is_city_main_connection";
-		const string StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY = "default_transfer_delay";
-		const string StopAreaTableSync::TABLE_COL_TRANSFERDELAYS = "transfer_delays";
-		const string StopAreaTableSync::TABLE_COL_ISRELAYPARK = "is_relay_park";
-		const string StopAreaTableSync::COL_NAME13 = "short_display_name";
-		const string StopAreaTableSync::COL_NAME26 = "long_display_name";
-		const string StopAreaTableSync::COL_CODE_BY_SOURCE = "code_by_source";
-		const string StopAreaTableSync::COL_TIMETABLE_NAME = "timetable_name";
-		const string StopAreaTableSync::COL_HANDICAPPED_COMPLIANCE_ID = "handicapped_compliance_id";
-		const string StopAreaTableSync::COL_X = "x";
-		const string StopAreaTableSync::COL_Y = "y";
-
 		const string StopAreaTableSync::FORBIDDEN_DELAY_SYMBOL = "F";
 	}
 
@@ -92,22 +77,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<StopAreaTableSync>::_FIELDS[] =
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(StopAreaTableSync::TABLE_COL_NAME, SQL_TEXT),
-			Field(StopAreaTableSync::TABLE_COL_CITYID, SQL_INTEGER),
-			Field(StopAreaTableSync::TABLE_COL_CONNECTIONTYPE, SQL_INTEGER),
-			Field(StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
-			Field(StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY, SQL_INTEGER),
-			Field(StopAreaTableSync::TABLE_COL_TRANSFERDELAYS, SQL_TEXT),
-			Field(StopAreaTableSync::TABLE_COL_ISRELAYPARK, SQL_BOOLEAN),
-			Field(StopAreaTableSync::COL_NAME13, SQL_TEXT),
-			Field(StopAreaTableSync::COL_NAME26, SQL_TEXT),
-			Field(StopAreaTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
-			Field(StopAreaTableSync::COL_TIMETABLE_NAME, SQL_TEXT),
-			Field(StopAreaTableSync::COL_HANDICAPPED_COMPLIANCE_ID, SQL_INTEGER),
-			Field(StopAreaTableSync::COL_X, SQL_DOUBLE),
-			Field(StopAreaTableSync::COL_Y, SQL_DOUBLE),
-			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			Field()
 		};
 
@@ -115,129 +84,9 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<StopAreaTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(StopAreaTableSync::TABLE_COL_CITYID.c_str(), StopAreaTableSync::TABLE_COL_NAME.c_str(), ""));
-			r.push_back(DBTableSync::Index(StopAreaTableSync::COL_CODE_BY_SOURCE.c_str(), ""));
+			r.push_back(DBTableSync::Index(pt::CityId::FIELD.name.c_str(), SimpleObjectFieldDefinition<Name>::FIELD.name.c_str(), ""));
+			r.push_back(DBTableSync::Index(StopAreaDataSource::FIELD.name.c_str(), ""));
 			return r;
-		}
-
-
-		template<> void OldLoadSavePolicy<StopAreaTableSync,StopArea>::Load(
-			StopArea* cp,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			DBModule::LoadObjects(cp->getLinkedObjectsIds(*rows), env, linkLevel);
-			cp->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				cp->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<StopAreaTableSync,StopArea>::Save(
-			StopArea* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<StopAreaTableSync> query(*object);
-
-			// Name
-			query.addField(object->getName());
-
-			// City
-			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
-
-			// Transfer allowed
-			query.addField(object->getAllowedConnection());
-
-			// Is a main stop of the city
-			query.addField(object->getCity() ? object->getCity()->includes(*object) : false);
-
-			// Default transfer delay
-			query.addField(object->getDefaultTransferDelay().total_seconds() / 60);
-
-			// Transfer delay matrix
-			query.addField(StopArea::SerializeTransferDelaysMatrix(object->getTransferDelays()));
-			
-			// Is relay park
-			query.addField(object->getIsRelayPark());
-
-			// Name 13
-			query.addField(object->getName13());
-
-			// Name 26
-			query.addField(object->getName26());
-
-			// Data source links
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-
-			// Timetable name
-			query.addField(object->getTimetableName());
-
-			// Handicapped compliance
-			query.addField(
-				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() : RegistryKeyType(0)
-			);
-
-			// X Y (deprecated)
-			if(object->getLocation())
-			{
-				query.addField(object->getLocation()->getX());
-				query.addField(object->getLocation()->getY());
-			}
-			else
-			{
-				query.addFieldNull();
-				query.addFieldNull();
-			}
-
-			// Geometry
-			if(object->getLocation())
-			{
-				query.addField(static_pointer_cast<Geometry,Point>(object->getLocation()));
-			}
-			else
-			{
-				query.addFieldNull();
-			}
-
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<StopAreaTableSync,StopArea>::Unlink(
-			StopArea* cp
-		){
-			// City
-			City* city(const_cast<City*>(cp->getCity()));
-			if (city != NULL)
-			{
-				city->removePlaceFromMatcher(*cp);
-				city->removeIncludedPlace(*cp);
-			}
-
-			if(Env::GetOfficialEnv().contains(*cp))
-			{
-				// General all places
-				GeographyModule::GetGeneralAllPlacesMatcher().remove(
-					cp->getFullName()
-				);
-
-				// General public places
-				PTModule::GetGeneralStopsMatcher().remove(
-					cp->getFullName()
-				);
-
-				// Unregister data source links
-				cp->cleanDataSourceLinks(true);
-			}
 		}
 
 
@@ -299,25 +148,25 @@ namespace synthese
 			SelectQuery<StopAreaTableSync> query;
 			if(orderByCityNameAndName || cityNameFilter)
 			{
-				query.addTableAndEqualJoin<CityTableSync>(TABLE_COL_ID, TABLE_COL_CITYID);
+				query.addTableAndEqualJoin<CityTableSync>(TABLE_COL_ID, pt::CityId::FIELD.name);
 			}
 
 			// Filters
 			if (cityId)
 			{
-				query.addWhereField(TABLE_COL_CITYID, *cityId);
+				query.addWhereField(pt::CityId::FIELD.name, *cityId);
 			}
 			if (!logic::indeterminate(mainConnectionOnly))
 			{
-				query.addWhereField(TABLE_COL_ISCITYMAINCONNECTION, mainConnectionOnly);
+				query.addWhereField(IsCityMainConnection::FIELD.name, mainConnectionOnly);
 			}
 			if(creatorIdFilter)
 			{
-				query.addWhereField(COL_CODE_BY_SOURCE, *creatorIdFilter);
+				query.addWhereField(StopAreaDataSource::FIELD.name, *creatorIdFilter);
 			}
 			if(nameFilter)
 			{
-				query.addWhereField(TABLE_COL_NAME, *nameFilter, ComposedExpression::OP_LIKE);
+				query.addWhereField(SimpleObjectFieldDefinition<Name>::FIELD.name, *nameFilter, ComposedExpression::OP_LIKE);
 			}
 			if(cityNameFilter)
 			{
@@ -327,8 +176,8 @@ namespace synthese
 			// Ordering
 			if(orderByCityNameAndName)
 			{
-				query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
-				query.addOrderField(TABLE_COL_NAME, raisingOrder);
+				query.addOrderFieldOther<CityTableSync>(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
+				query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 			}
 			if (number > 0)
 			{
@@ -369,6 +218,11 @@ namespace synthese
 			);
 
 			return LoadFromQuery(query, env, linkLevel);
+		}
+
+		bool StopAreaTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(security::READ);
 		}
 	}
 }

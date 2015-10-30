@@ -146,6 +146,7 @@ string displayJourneyDifferences(string message, PTRoutePlannerResult& result)
 BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 {
 	ScopedRegistrable<CommercialLine> scopedCommercialLine;
+	ScopedRegistrable<StopArea> scopedStopArea;
 	ScopedCoordinatesSystemUser scopedCoordinatesSystemUser;
 
 	#include "RoutePlannerTestData.hpp"
