@@ -271,7 +271,7 @@ namespace synthese
 				const std::string& getTimetableName() const { return get<StopAreaTimetableName>(); }
 				const boost::shared_ptr<geos::geom::Point>& getLocation() const { return _location; }
 				const DRTAreas& getDRTAreas() const { return _drtAreas; }
-				bool getIsRelayPark() const { return _isRelayPark; }
+				bool getIsRelayPark() const { return get<IsRelayPark>(); }
 				virtual std::string getName() const;
 			//@}
 
