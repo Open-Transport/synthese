@@ -617,14 +617,14 @@ namespace synthese
 				}
 				os << "</publishedName>" << "\n";
 
-				const Edge* from(NULL);
+				const LinePhysicalStop* from(NULL);
 				BOOST_FOREACH(const Edge* to, line->getEdges())
 				{
 					if (from != NULL)
 					{
 						os << "<ptLinkId>" << TridentId (peerid, "PtLink", *from) << "</ptLinkId>" << "\n";
 					}
-					from = to;
+					from = static_cast<const LinePhysicalStop*>(to);
 				}
 
 
@@ -710,9 +710,11 @@ namespace synthese
 			// --------------------------------------------------- PtLink
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env.getRegistry<JourneyPattern>())
 			{
-				const Edge* from(NULL);
-				BOOST_FOREACH(const Edge* to, line.second->getEdges())
+				const LinePhysicalStop* from(NULL);
+				BOOST_FOREACH(const Edge* toEdge, line.second->getEdges())
 				{
+					const LinePhysicalStop* to = static_cast<const LinePhysicalStop*>(toEdge);
+
 					if (from != NULL)
 					{
 						os << "<PtLink>" << "\n";
@@ -739,8 +741,10 @@ namespace synthese
 				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", *line) << "</routeId>" << "\n";
 
 				const vector<Edge*>& edges = line->getEdges ();
-				os << "<origin>" << TridentId (peerid, "StopPoint", *edges.at(0)) << "</origin>" << "\n";
-				os << "<destination>" << TridentId (peerid, "StopPoint", *edges.at(edges.size()-1)) << "</destination>" << "\n";
+				const LinePhysicalStop* origin = static_cast<const LinePhysicalStop*>(edges.at(0));
+				const LinePhysicalStop* destination = static_cast<const LinePhysicalStop*>(edges.at(edges.size()-1));
+				os << "<origin>" << TridentId (peerid, "StopPoint", *origin) << "</origin>" << "\n";
+				os << "<destination>" << TridentId (peerid, "StopPoint", *destination) << "</destination>" << "\n";
 
 				for (vector<Edge*>::const_iterator itedge = edges.begin ();
 					 itedge != edges.end (); ++itedge)
@@ -2319,6 +2323,17 @@ namespace synthese
 			return ss.str ();
 		}
 
+
+		string TridentFileFormat::Exporter_::TridentId(
+			const string& peer,
+			const string clazz,
+			const LinePhysicalStop& linePhysicalStop
+		){
+			stringstream ss;
+			pt::LineStop* lineStop = linePhysicalStop.getLineStop();
+			ss << peer << ":" << clazz << ":" << ((NULL != lineStop) ? lineStop->getKey() : 0);
+			return ss.str ();
+		}
 
 
 		TridentFileFormat::Exporter_::Exporter_(
