@@ -127,14 +127,21 @@ if int(needs_play_tts) != 0:
       childLine.text = line
 
 # {Start,Stop}{Date,Time}
+# The start/stop dates sent are the one from the current exploitation day so the dates must be changed 
+# if the message is sent during period ranging from 00:00 to the end time of the exploitation day
+currentDay = now
+# Note : the '2' must be kept in sync with the exploitation day = 04:00:00; 26:00:00
+if now.hour < 2:
+  currentDay = now - datetime.timedelta(1)
+
 childStartDate = etree.SubElement(childMessaging, "StartDate")
-childStartDate.text = "01/01/1970"
+childStartDate.text = currentDay.strftime("%d/%m/%Y")
 childStopDate = etree.SubElement(childMessaging, "StopDate")
-childStopDate.text = "31/12/2037"
+childStopDate.text = currentDay.strftime("%d/%m/%Y")
 childStartTime = etree.SubElement(childMessaging, "StartTime")
-childStartTime.text = "03:00:00"
+childStartTime.text = "04:00:00"
 childStopTime = etree.SubElement(childMessaging, "StopTime")
-childStopTime.text = "27:00:00"
+childStopTime.text = "26:00:00"
 
 # Alternance
 childAlternance = etree.SubElement(childMessaging, "Alternance")

@@ -151,10 +151,17 @@ childDispatching = etree.SubElement(childMessaging, "Dispatching")
 childDispatching.text = "Repete"
 
 # {Start,Stop}{Date,Time}
+# The start/stop dates sent are the one from the current exploitation day so the dates must be changed 
+# if the message is sent during period ranging from 00:00 to the end time of the exploitation day
+currentDay = now
+# Note : the '3' must be kept in sync with the exploitation day = 03:00:00; 27:00:00
+if now.hour < 3:
+  currentDay = now - datetime.timedelta(1)
+
 childStartDate = etree.SubElement(childMessaging, "StartDate")
-childStartDate.text = "01/01/1970"
+childStartDate.text = currentDay.strftime("%d/%m/%Y")
 childStopDate = etree.SubElement(childMessaging, "StopDate")
-childStopDate.text = "31/12/2037"
+childStopDate.text = currentDay.strftime("%d/%m/%Y")
 childStartTime = etree.SubElement(childMessaging, "StartTime")
 childStartTime.text = "03:00:00"
 childStopTime = etree.SubElement(childMessaging, "StopTime")
