@@ -1000,30 +1000,56 @@ namespace synthese
 					{
 						_scenariosToRemove.erase(scenario->getKey());
 
-						// Message content
-						const Scenario::Messages& messages(scenario->getMessages());
-						if(messages.size() != 1)
-						{
-							_logWarning(
-								"Corrupted message : scenario should contain one message : " + lexical_cast<string>(scenario->getKey())
-							);
+                        // Message content
+                        const Scenario::Messages& messages(scenario->getMessages());
 
-							SentScenario::Messages::const_iterator it(messages.begin());
-							for(++it; it != messages.end(); ++it)
-							{
-								_messagesToRemove.insert((*it)->getKey());
-							}
-						}
-						message = const_cast<Alarm*>(*messages.begin());
-						if(	message->getLongMessage() != programmation.content ||
-							message->getShortMessage() != programmation.messageTitle ||
-							(message->getLevel() == ALARM_LEVEL_WARNING) != programmation.priority
-						){
-							updatedMessage = AlarmTableSync::GetCastEditable<SentAlarm>(
-								message->getKey(),
-								_env
-							);
-						}
+                        // No message, this should not happen
+                        if (messages.size() == 0)
+                        {
+                            _logWarning(
+                                "Corrupted scenario : scenario should contain at least one message : " + lexical_cast<string>(scenario->getKey())
+                            );
+
+                            // Creation of the message
+                            updatedMessage.reset(
+                                new SentAlarm(
+                                    AlarmTableSync::getId()
+                            )	);
+                            updatedMessage->setScenario(scenario);
+                            scenario->addMessage(*updatedMessage);
+                            _env.getEditableRegistry<Alarm>().add(updatedMessage);
+
+                        }
+
+                        // More than one message. This should not happen
+                        else if(messages.size() > 1)
+                        {
+                            _logWarning(
+                                "Corrupted message : scenario should contain only one message : " + lexical_cast<string>(scenario->getKey())
+                            );
+
+                            SentScenario::Messages::const_iterator it(messages.begin());
+                            for(++it; it != messages.end(); ++it)
+                            {
+                                _messagesToRemove.insert((*it)->getKey());
+                            }
+                        }
+
+                        // One message to update
+                        else
+                        {
+                            message = const_cast<Alarm*>(*messages.begin());
+                            if(	message->getLongMessage() != programmation.content ||
+                                message->getShortMessage() != programmation.messageTitle ||
+                                (message->getLevel() == ALARM_LEVEL_WARNING) != programmation.priority
+                            ){
+                                updatedMessage = AlarmTableSync::GetCastEditable<SentAlarm>(
+                                    message->getKey(),
+                                    _env
+                                );
+                            }
+                        }
+
 
 						// Scenario updates
 						if(	scenario->getName() != programmation.title ||
