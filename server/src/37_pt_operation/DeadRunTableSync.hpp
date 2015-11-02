@@ -27,7 +27,6 @@
 
 #include "DBDirectTableSyncTemplate.hpp"
 #include "DeadRun.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -43,25 +42,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				DeadRunTableSync,
 				DeadRun,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>
 		{
 		public:
-			//! @name Field names
-			//@{
-				static const std::string COL_NETWORK_ID;
-				static const std::string COL_DEPOT_ID;
-				static const std::string COL_STOP_ID;
-				static const std::string COL_DIRECTION;
-				static const std::string COL_SCHEDULES;
-				static const std::string COL_DATES;
-				static const std::string COL_SERVICE_NUMBER;
-				static const std::string COL_LENGTH;
-				static const std::string COL_DATASOURCE_LINKS;
-				static const std::string COL_OPERATION_UNIT_ID;
-			//@}
-
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
@@ -86,6 +70,8 @@ namespace synthese
 					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 				);
 			//@}
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

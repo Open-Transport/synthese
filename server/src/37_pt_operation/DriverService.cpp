@@ -30,6 +30,7 @@
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
 #include "StopPoint.hpp"
+#include "TransportNetwork.h"
 #include "VehicleService.hpp"
 #include "VehicleServiceTableSync.hpp"
 #include "User.h"

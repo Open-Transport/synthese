@@ -40,6 +40,8 @@
 #include "OperationUnit.hpp"
 #include "VehicleService.hpp"
 
+#include "TransportNetwork.h"
+
 #include "PTOperationModule.inc.cpp"
 
 void synthese::pt_operation::moduleRegister()
@@ -78,7 +80,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::pt_operation::VehicleServiceAdmin::integrate();
 
 	INTEGRATE(synthese::pt_operation::Depot);
-	synthese::util::Env::Integrate<synthese::pt_operation::DeadRun>();
+	INTEGRATE(synthese::pt_operation::DeadRun);
 	synthese::util::Env::Integrate<synthese::pt_operation::DeadRunEdge>();
 	INTEGRATE(synthese::pt_operation::DriverActivity);
 	INTEGRATE(synthese::pt_operation::DriverAllocation);
