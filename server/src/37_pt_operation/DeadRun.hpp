@@ -23,10 +23,12 @@
 #ifndef SYNTHESE_pt_operation_DeadRun_hpp__
 #define SYNTHESE_pt_operation_DeadRun_hpp__
 
-#include "SchedulesBasedService.h"
-#include "Path.h"
-#include "WithGeometry.hpp"
+#include "Object.hpp"
+
 #include "ImportableTemplate.hpp"
+#include "Path.h"
+#include "SchedulesBasedService.h"
+#include "WithGeometry.hpp"
 
 namespace synthese
 {
@@ -41,10 +43,33 @@ namespace synthese
 		class Depot;
 		class OperationUnit;
 
+		FIELD_POINTER(DeadRunNetwork, pt::TransportNetwork)
+		FIELD_ID(DepotId)
+		FIELD_ID(StopId)
+		FIELD_BOOL(Direction)
+		FIELD_DOUBLE(Length)
+		FIELD_DATASOURCE_LINKS(DeadRunDataSource)
+		FIELD_POINTER(DeadRunOperationUnit, OperationUnit)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(DeadRunNetwork),
+			FIELD(DepotId),
+			FIELD(StopId),
+			FIELD(Direction),
+			FIELD(pt::ServiceSchedules),
+			FIELD(pt::ServiceDates),
+			FIELD(pt::ServiceNumber),
+			FIELD(Length),
+			FIELD(DeadRunDataSource),
+			FIELD(DeadRunOperationUnit)
+		> DeadRunSchema;
+
 		/** Dead run class.
 			@ingroup m37
 		*/
 		class DeadRun:
+			public Object<DeadRun, DeadRunSchema>,
 			public pt::SchedulesBasedService,
 			public graph::Path,
 			public impex::ImportableTemplate<DeadRun>
@@ -57,8 +82,6 @@ namespace synthese
 			static const std::string ATTR_ARR_PLACE_NAME;
 			static const std::string ATTR_DEP_SCHEDULE;
 			static const std::string ATTR_ARR_SCHEDULE;
-			pt::TransportNetwork* _network;
-			boost::optional<pt_operation::OperationUnit&> _operationUnit;
 
 
 		public:
@@ -82,14 +105,15 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				pt::TransportNetwork* getTransportNetwork() const { return _network; }
-				const boost::optional<pt_operation::OperationUnit&>& getOperationUnit() const { return _operationUnit; }
+				pt::TransportNetwork* getTransportNetwork() const;
+				const boost::optional<OperationUnit&> getOperationUnit() const;
 			//@}
 
 			//! @name Setters
 			//@{
-				void setTransportNetwork(pt::TransportNetwork* value){ _network = value; }
-				void setOperationUnit(const boost::optional<pt_operation::OperationUnit&>& value){ _operationUnit = value; }
+				void setTransportNetwork(pt::TransportNetwork* value);
+				void setOperationUnit(const boost::optional<pt_operation::OperationUnit&>& value);
+				virtual void setServiceNumber(std::string serviceNumber);
 			//@}
 
 			//! @name Services
@@ -117,12 +141,6 @@ namespace synthese
 					std::string prefix = std::string()
 				) const;
 
-				
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
-
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
 
@@ -130,6 +148,10 @@ namespace synthese
 					const Record& record
 				) const;
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 	}
 }

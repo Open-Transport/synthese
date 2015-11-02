@@ -25,15 +25,18 @@
 #include "DeadRunTableSync.hpp"
 
 #include "DataSourceLinksField.hpp"
-#include "OperationUnitTableSync.hpp"
-#include "ReplaceQuery.h"
-#include "SelectQuery.hpp"
 #include "Depot.hpp"
 #include "DepotTableSync.hpp"
+#include "GlobalRight.h"
+#include "ImportableTableSync.hpp"
+#include "OperationUnitTableSync.hpp"
+#include "Profile.h"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
-#include "ImportableTableSync.hpp"
 #include "TransportNetworkTableSync.h"
+#include "User.h"
 
 #include <sstream>
 
@@ -54,20 +57,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync, DeadRunTableSync>::FACTORY_KEY("37.30 Dead runs");
 	}
 
-	namespace pt_operation
-	{
-		const std::string DeadRunTableSync::COL_NETWORK_ID("network_id");
-		const std::string DeadRunTableSync::COL_DEPOT_ID("depot_id");
-		const std::string DeadRunTableSync::COL_STOP_ID("stop_id");
-		const std::string DeadRunTableSync::COL_DIRECTION("direction");
-		const std::string DeadRunTableSync::COL_SCHEDULES("schedules");
-		const std::string DeadRunTableSync::COL_DATES("dates");
-		const std::string DeadRunTableSync::COL_SERVICE_NUMBER("service_number");
-		const std::string DeadRunTableSync::COL_LENGTH("length");
-		const std::string DeadRunTableSync::COL_DATASOURCE_LINKS("datasource_links");
-		const std::string DeadRunTableSync::COL_OPERATION_UNIT_ID = "operation_unit_id";
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<DeadRunTableSync>::TABLE(
@@ -78,17 +67,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<DeadRunTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(DeadRunTableSync::COL_NETWORK_ID, SQL_INTEGER),
-			Field(DeadRunTableSync::COL_DEPOT_ID, SQL_INTEGER),
-			Field(DeadRunTableSync::COL_STOP_ID, SQL_INTEGER),
-			Field(DeadRunTableSync::COL_DIRECTION, SQL_BOOLEAN),
-			Field(DeadRunTableSync::COL_SCHEDULES, SQL_TEXT),
-			Field(DeadRunTableSync::COL_DATES, SQL_TEXT),
-			Field(DeadRunTableSync::COL_SERVICE_NUMBER, SQL_TEXT),
-			Field(DeadRunTableSync::COL_LENGTH, SQL_DOUBLE),
-			Field(DeadRunTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			Field(DeadRunTableSync::COL_OPERATION_UNIT_ID, SQL_TEXT),
 			Field()
 		};
 
@@ -100,100 +78,9 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					DeadRunTableSync::COL_NETWORK_ID.c_str(),
+					DeadRunNetwork::FIELD.name.c_str(),
 			"")	);
 			return r;
-		}
-
-
-
-		template<> void OldLoadSavePolicy<DeadRunTableSync, DeadRun>::Load(
-			DeadRun* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
-			object->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-
-			// Schedules
-			try
-			{
-				SchedulesBasedService::SchedulesPair value(
-					SchedulesBasedService::DecodeSchedules(
-						rows->get<string>(DeadRunTableSync::COL_SCHEDULES)
-				)	);
-				object->setDataSchedules(value.first, value.second);
-			}
-			catch(SchedulesBasedService::BadSchedulesException&)
-			{
-				Log::GetInstance().warn("Bad schedules in the dead run "+ lexical_cast<string>(object->getKey()));
-			}
-
-			// Dates
-			object->setFromSerializedString(rows->getText(DeadRunTableSync::COL_DATES));
-		}
-
-
-
-		template<> void OldLoadSavePolicy<DeadRunTableSync, DeadRun>::Save(
-			DeadRun* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<DeadRunTableSync> query(*object);
-
-			// Network
-			query.addField(object->getTransportNetwork() ? object->getTransportNetwork()->getKey() : RegistryKeyType(0));
-
-			// Depot
-			Depot* depot(object->getDepot());
-			query.addField(depot ? depot->getKey() : RegistryKeyType(0));
-
-			// Stop
-			StopPoint* stop(object->getStop());
-			query.addField(stop ? stop->getKey() : RegistryKeyType(0));
-
-			// Direction
-			query.addField(object->getFromDepotToStop());
-
-			// Schedules
-			query.addField(object->encodeSchedules());
-
-			// Dates
-			stringstream datesStr;
-			object->serialize(datesStr);
-			query.addField(datesStr.str());
-
-			// Service number
-			query.addField(object->getServiceNumber());
-
-			// Length
-			query.addField(object->isUndefined() ? 0 : object->getEdge(1)->getMetricOffset());
-
-			// Data source links
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-
-			// Operation unit
-			query.addField(
-				object->getOperationUnit() ? object->getOperationUnit()->getKey() : RegistryKeyType(0)
-			);
-
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<DeadRunTableSync, DeadRun>::Unlink(
-			DeadRun* obj
-		){
-			obj->unlink();
 		}
 
 
@@ -247,7 +134,7 @@ namespace synthese
 			SelectQuery<DeadRunTableSync> query;
 			if(networkId)
 			{
-				query.addWhereField(COL_NETWORK_ID, *networkId);
+				query.addWhereField(DeadRunNetwork::FIELD.name, *networkId);
 			}
 			if (number)
 			{
@@ -259,5 +146,10 @@ namespace synthese
 			}
 
 			return LoadFromQuery(query.toString(), env, linkLevel);
+		}
+
+		bool DeadRunTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::READ);
 		}
 }	}
