@@ -35,6 +35,7 @@
 
 namespace synthese
 {
+	using namespace messages;
 	using namespace util;
 
 	CLASS_DEFINITION(AlarmObjectLink, "t040_alarm_object_links", 40)
