@@ -116,8 +116,8 @@ childName.text = u"{:04d} {:.27s}".format(messageID, messageTitle)
 # The start/stop dates sent are the one from the current exploitation day so the dates must be changed 
 # if the message is sent during period ranging from 00:00 to the end time of the exploitation day
 currentDay = now
-# Note : the '2' must be kept in sync with the exploitation day = 04:00:00; 26:00:00
-if now.hour < 2:
+# Note : the '3' must be kept in sync with the exploitation day = 03:05:00; 27:00:00
+if now.hour < 3:
   currentDay = now - datetime.timedelta(1)
 
 childStartDate = etree.SubElement(childMessaging, "StartDate")
@@ -125,9 +125,9 @@ childStartDate.text = currentDay.strftime("%d/%m/%Y")
 childStopDate = etree.SubElement(childMessaging, "StopDate")
 childStopDate.text = currentDay.strftime("%d/%m/%Y")
 childStartTime = etree.SubElement(childMessaging, "StartTime")
-childStartTime.text = "04:00:00"
+childStartTime.text = "03:05:00"
 childStopTime = etree.SubElement(childMessaging, "StopTime")
-childStopTime.text = "26:00:00"
+childStopTime.text = "27:00:00"
 
 # Text
 # Extract HTML text lines 
