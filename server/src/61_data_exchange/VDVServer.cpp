@@ -186,7 +186,7 @@ namespace synthese
 			bool updateFromServer(false);
 			try
 			{
-				Log::GetInstance().warn("VDVServer : Envoie d'une requ√™te de statut pour " + get<Name>() + " √† " + _getURL("status"));
+				Log::GetInstance().warn("VDVServer : Envoie d'une requete de statut pour " + get<Name>() + " a " + _getURL("status"));
 				string statusAntwortStr(
 					c.post(_getURL("status"), statusAnfrage.str(), contentType)
 				);
@@ -324,8 +324,7 @@ namespace synthese
 			}
 			catch(...)
 			{
-				Log::GetInstance().warn("VDVServer : la demande de nettoyage des abonnements a √©chou√©");
-			}
+				Log::GetInstance().warn("VDVServer : la demande de nettoyage des abonnements a ÈchouÈ");			}
 
 
 			this_thread::sleep(seconds(1));
@@ -513,8 +512,7 @@ namespace synthese
 				if (!plannedDataSource.get())
 				{
 					// The planned does not exist : log so that the user knows he has to configure it
-					Log::GetInstance().warn("La source des donn√©es plannifi√©es associ√©e √† la connexion VDV n'a pas √©t√© trouv√©e");
-					return;
+					Log::GetInstance().warn("La source des donnÈes plannifiÈes associÈe ‡ la connexion VDV n'a pas ÈtÈ trouvÈe");					return;
 				}
 
 				// Read the results :
@@ -536,8 +534,7 @@ namespace synthese
 				if (datenAbrufenAntwortResults.error != eXMLErrorNone ||
 					datenAbrufenAntwortNode.isEmpty()
 				){
-					Log::GetInstance().warn("R√©ception d'un DatenAbrufenAntwort vide ou mal form√©");
-					return;
+					Log::GetInstance().warn("RÈception d'un DatenAbrufenAntwort vide ou mal formÈ");					return;
 				}
 				
 				// Loop on AZBNachricht to link with a subscription
@@ -552,7 +549,7 @@ namespace synthese
 					// If no corresponding subscription, log it and continue
 					if (!currentSubscription)
 					{
-						Log::GetInstance().warn("R√©ception d'un DatenAbrufenAntwort contenant un AZBNachtricht ne correspondant √† aucun abonnement");
+						Log::GetInstance().warn("RÈception d'un DatenAbrufenAntwort contenant un AZBNachtricht ne correspondant ‡ aucun abonnement");
 						continue;
 					}
 					
@@ -565,7 +562,7 @@ namespace synthese
 						string readAZBID = AZBFahrplanlageNode.getChildNode("AZBID").getText();
 						if (!_checkStop(currentSubscription, readAZBID))
 						{
-							Log::GetInstance().warn("R√©ception d'un DatenAbrufenAntwort contenant un AZBNachtricht avec un AZBID ne correspondant √† l'abonnement");
+							Log::GetInstance().warn("RÈception d'un DatenAbrufenAntwort contenant un AZBNachtricht avec un AZBID ne correspondant ‡ l'abonnement");
 							break;
 						}
 						
@@ -603,7 +600,7 @@ namespace synthese
 						}
 						
 						// The service is not found in the theorical data, it has to be created
-						Log::GetInstance().warn("VDVServer : R√©ception d'un DatenAbrufenAntwort contenant un service non connu (" + serviceCode + "), cr√©ation du service non cod√©e");
+						Log::GetInstance().warn("VDVServer : RÈception d'un DatenAbrufenAntwort contenant un service non connu (" + serviceCode + "), crÈation du service non codÈe");
 						// TO-DO ? : code the creation of the service (why not in a different network to easily detect errors in HAFAS or special events received ?)
 					}
 				}
@@ -619,7 +616,7 @@ namespace synthese
 					// If no corresponding subscription, log it and continue
 					if (!currentSubscription)
 					{
-						Log::GetInstance().warn("R√©ception d'un DatenAbrufenAntwort contenant un Zubringernachricht ne correspondant √† aucun abonnement");
+						Log::GetInstance().warn("RÈception d'un DatenAbrufenAntwort contenant un Zubringernachricht ne correspondant ‡ aucun abonnement");
 						continue;
 					}
 
@@ -632,7 +629,7 @@ namespace synthese
 						string readASBID = ASBFahrplanlageNode.getChildNode("ASBID").getText();
 						if (!_checkStop(currentSubscription, readASBID))
 						{
-							Log::GetInstance().warn("R√©ception d'un DatenAbrufenAntwort contenant un Zubringernachricht avec un ASBID ne correspondant √† l'abonnement");
+							Log::GetInstance().warn("RÈception d'un DatenAbrufenAntwort contenant un Zubringernachricht avec un ASBID ne correspondant ‡ l'abonnement");
 							break;
 						}
 
@@ -662,7 +659,7 @@ namespace synthese
 						}
 
 						// The service is not found in the theorical data, it has to be created
-						Log::GetInstance().warn("VDVServer : R√©ception d'un DatenAbrufenAntwort contenant un service non connu (" + serviceCode + "), cr√©ation du service non cod√©e");
+						Log::GetInstance().warn("VDVServer : RÈception d'un DatenAbrufenAntwort contenant un service non connu (" + serviceCode + "), crÈation du service non codÈe");
 						// TO-DO ? : code the creation of the service (why not in a different network to easily detect errors in HAFAS or special events received ?)
 					}
 				}
@@ -747,8 +744,7 @@ namespace synthese
 				}
 			}
 
-			return subscriptionFound;
-		}
+			return subscriptionFound;		}
 
 		bool VDVServer::_checkStop(VDVServerSubscription* subscription, std::string stopCode) const
 		{
@@ -758,8 +754,7 @@ namespace synthese
 				if ((stopAreaCode.size() == 7 && stopAreaCode == stopCode.substr(1)) ||
 					((stopAreaCode.size() == 8 && stopAreaCode == stopCode)))
 				{
-					return true;
-				}
+					return true;				}
 			}
 
 			return false;
@@ -776,9 +771,7 @@ namespace synthese
 				split(vectServiceCode, serviceCode, is_any_of("-"));
 				if (vectServiceCode.size() != 3)
 				{
-					Log::GetInstance().warn("R√©ception d'un DatenAbrufenAntwort contenant un service indecodable " + serviceCode);
-					return NULL;
-				}
+					return NULL;				}
 				localServiceCode = vectServiceCode[1];
 			}
 			else
@@ -799,7 +792,7 @@ namespace synthese
 			// - one already activated for today (theorical calendar OK)
 			if (service)
 			{
-				Log::GetInstance().debug("VDVServer : Service par d√©faut : " + lexical_cast<string>(service->getKey()));
+							Log::GetInstance().debug("VDVServer : Service par defaut : " + lexical_cast<string>(service->getKey()));
 			}
 			vector<ScheduledService*> services;
 			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*plannedDataSource, Env::GetOfficialEnv());
@@ -847,11 +840,11 @@ namespace synthese
 
 			if (numTheoricalActivatedServices != 1)
 			{
-				Log::GetInstance().debug("VDVServer : " + lexical_cast<string>(numTheoricalActivatedServices) + " services candidats sont th√©oriquement activ√©s aujourd'hui");
+							Log::GetInstance().debug("VDVServer : " + lexical_cast<string>(numTheoricalActivatedServices) + " services candidats sont theoriquement actives aujourd'hui");
 			}
 			else
 			{
-				Log::GetInstance().debug("VDVServer : un seul service candidat est th√©oriquement activ√© aujourd'hui");
+							Log::GetInstance().debug("VDVServer : un seul service candidat est theoriquement active aujourd'hui");
 			}
 
 			return service;
@@ -900,7 +893,7 @@ namespace synthese
 				arrivalSchedules[rank] = rtArrivalTime;
 			}
 
-			Log::GetInstance().debug("VDVServer : Mise √† jour TR du service");
+							Log::GetInstance().debug("VDVServer : Mise a jour TR du service");
 
 			// Link the service to the RT datasource
 			Importable::DataSourceLinks links(service->getDataSourceLinks());
@@ -919,7 +912,7 @@ namespace synthese
 			ScheduledServiceTableSync::Save(service);
 		}
 
-
+				}
 		bool VDVServer::allowUpdate(const server::Session* session) const
 		{
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
