@@ -25,8 +25,9 @@
 
 #include <string>
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
+
+#include "StringField.hpp"
 
 namespace synthese
 {
@@ -35,32 +36,47 @@ namespace synthese
 		class Alarm;
 		class AlarmRecipient;
 
+		FIELD_STRING(RecipientKey)
+		FIELD_ID(ObjectId)
+		FIELD_POINTER(LinkedAlarm, Alarm)
+		FIELD_STRING(Parameter)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(RecipientKey),
+			FIELD(ObjectId),
+			FIELD(LinkedAlarm),
+			FIELD(Parameter)
+		> AlarmObjectLinkSchema;
+
 		class AlarmObjectLink:
-			public virtual util::Registrable
+			public virtual Object<AlarmObjectLink, AlarmObjectLinkSchema>
 		{
-		public:
-
-			/// Chosen registry class.
-			typedef util::Registry<AlarmObjectLink>	Registry;
-
 		private:
-			util::RegistryKeyType	_objectId;
-			Alarm*			_alarm;
 			std::auto_ptr<AlarmRecipient> _recipient;
-			std::string		_parameter;
 
 		public:
 			AlarmObjectLink(util::RegistryKeyType key = 0);
 
-			util::RegistryKeyType getObjectId() const { return _objectId; }
-			Alarm* getAlarm() const { return _alarm; }
+			util::RegistryKeyType getObjectId() const { return get<ObjectId>(); }
+			Alarm* getAlarm() const;
 			const AlarmRecipient* getRecipient() const { return _recipient.get(); }
-			const std::string& getParameter() const { return _parameter; }
+			const std::string& getParameter() const { return get<Parameter>(); }
 
-			void setObjectId(util::RegistryKeyType value){ _objectId = value; }
-			void setAlarm(Alarm* value){ _alarm = value; }
+			void setObjectId(util::RegistryKeyType value){ set<ObjectId>(value); }
+			void setAlarm(Alarm* value);
 			void setRecipient(const std::string& key);
-			void setParameter(const std::string& value){ _parameter = value; }
+			void setParameter(const std::string& value){ set<Parameter>(value); }
+
+			//! @name Modifiers
+			//@{
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
+			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

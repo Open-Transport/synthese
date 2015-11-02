@@ -337,10 +337,10 @@ namespace synthese
 			ptime now(second_clock::local_time());
 
 			SelectQuery<AlarmObjectLinkTableSync> query;
-			query.addTableField(AlarmObjectLinkTableSync::COL_ALARM_ID);
-			query.addTableAndEqualJoin<AlarmTableSync>(TABLE_COL_ID, AlarmObjectLinkTableSync::COL_ALARM_ID);
+			query.addTableField(LinkedAlarm::FIELD.name);
+			query.addTableAndEqualJoin<AlarmTableSync>(TABLE_COL_ID, LinkedAlarm::FIELD.name);
 			query.addTableAndEqualOtherJoin<SentScenarioTableSync, AlarmTableSync>(TABLE_COL_ID, messages::ParentScenario::FIELD.name);
-			query.addWhereField(AlarmObjectLinkTableSync::COL_OBJECT_ID, screenId);
+			query.addWhereField(ObjectId::FIELD.name, screenId);
 			query.addWhereFieldOther<SentScenarioTableSync>(ScenarioTableSync::COL_ENABLED, 1);
 
 			query.addWhere(
@@ -387,7 +387,7 @@ namespace synthese
 			{
 				result.push_back(
 					AlarmTableSync::GetEditable(
-							rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID),
+							rows->getLongLong(LinkedAlarm::FIELD.name),
 							env
 				)		);
 			}
@@ -428,11 +428,11 @@ namespace synthese
 		){
 			ptime now(second_clock::local_time());
 			stringstream q;
-			q	<< "SELECT " << AlarmObjectLinkTableSync::COL_ALARM_ID
+			q	<< "SELECT " << LinkedAlarm::FIELD.name
 				<< " FROM " << AlarmObjectLinkTableSync::TABLE.NAME << " AS aol "
-				<< " INNER JOIN " << AlarmTableSync::TABLE.NAME << " AS a ON a." << TABLE_COL_ID << "=aol." << AlarmObjectLinkTableSync::COL_ALARM_ID
+				<< " INNER JOIN " << AlarmTableSync::TABLE.NAME << " AS a ON a." << TABLE_COL_ID << "=aol." << LinkedAlarm::FIELD.name
 				<< " INNER JOIN " << SentScenarioTableSync::TABLE.NAME << " AS s ON s." << TABLE_COL_ID << "=a." << messages::ParentScenario::FIELD.name
-				<< " WHERE aol." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << screenId
+				<< " WHERE aol." << ObjectId::FIELD.name << "=" << screenId
 				<< " AND s." << ScenarioTableSync::COL_ENABLED
 				<< " AND s." << ScenarioTableSync::COL_PERIODSTART << ">'" << to_iso_extended_string(now.date()) << " " << to_simple_string(now.time_of_day()) << "'"
 				<< " ORDER BY s." << ScenarioTableSync::COL_PERIODSTART;
@@ -444,7 +444,7 @@ namespace synthese
 			vector<boost::shared_ptr<Alarm> > result;
 			while(rows->next())
 			{
-				result.push_back(AlarmTableSync::GetEditable(rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID), env));
+				result.push_back(AlarmTableSync::GetEditable(rows->getLongLong(LinkedAlarm::FIELD.name), env));
 			}
 			return result;
 		}

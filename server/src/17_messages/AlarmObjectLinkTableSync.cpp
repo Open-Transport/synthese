@@ -58,14 +58,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,AlarmObjectLinkTableSync>::FACTORY_KEY("99.00.01 Alarm links");
 	}
 
-	namespace messages
-	{
-		const string AlarmObjectLinkTableSync::COL_RECIPIENT_KEY("recipient_key");
-		const string AlarmObjectLinkTableSync::COL_OBJECT_ID("object_id");
-		const string AlarmObjectLinkTableSync::COL_ALARM_ID("alarm_id");
-		const string AlarmObjectLinkTableSync::COL_PARAMETER = "parameter";
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<AlarmObjectLinkTableSync>::TABLE(
@@ -74,11 +66,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<AlarmObjectLinkTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY, SQL_TEXT),
-			Field(AlarmObjectLinkTableSync::COL_OBJECT_ID, SQL_INTEGER),
-			Field(AlarmObjectLinkTableSync::COL_ALARM_ID, SQL_INTEGER),
-			Field(AlarmObjectLinkTableSync::COL_PARAMETER, SQL_TEXT),
 			Field()
 		};
 
@@ -86,82 +73,9 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<AlarmObjectLinkTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(AlarmObjectLinkTableSync::COL_OBJECT_ID.c_str(),	AlarmObjectLinkTableSync::COL_ALARM_ID.c_str(), ""));
-			r.push_back(DBTableSync::Index(AlarmObjectLinkTableSync::COL_ALARM_ID.c_str(), ""));
+			r.push_back(DBTableSync::Index(ObjectId::FIELD.name.c_str(),	LinkedAlarm::FIELD.name.c_str(), ""));
+			r.push_back(DBTableSync::Index(LinkedAlarm::FIELD.name.c_str(), ""));
 			return r;
-		}
-
-		template<>
-		void OldLoadSavePolicy<AlarmObjectLinkTableSync,AlarmObjectLink>::Load(
-			AlarmObjectLink* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			// It makes no sense to load such an object without the up links
-			assert(linkLevel > FIELDS_ONLY_LOAD_LEVEL);
-
-			// Recipient type
-			object->setRecipient(
-				rows->get<string>( AlarmObjectLinkTableSync::COL_RECIPIENT_KEY)
-			);
-
-			// Parameter
-			object->setParameter(
-				rows->get<string>(AlarmObjectLinkTableSync::COL_PARAMETER)
-			);
-
-			// Object ID
-			object->setObjectId(
-				rows->getDefault<RegistryKeyType>(AlarmObjectLinkTableSync::COL_OBJECT_ID, 0)
-			);
-
-			// Message
-			try
-			{
-				util::RegistryKeyType alarmId(rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID));
-				boost::shared_ptr<Alarm> alarm;
-				alarm = AlarmTableSync::GetEditable(
-					alarmId,
-					env,
-					linkLevel
-					);
-				object->setAlarm(alarm.get());
-				alarm->addLinkedObject(*object);
-				alarm->clearBroadcastPointsCache();
-			}
-			catch(ObjectNotFoundException<Alarm> e)
-			{
-				throw LinkException<AlarmObjectLinkTableSync>(rows, AlarmObjectLinkTableSync::COL_ALARM_ID, e);
-			}
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<AlarmObjectLinkTableSync,AlarmObjectLink>::Unlink(
-			AlarmObjectLink* object
-		){
-			if(object->getAlarm())
-			{
-				object->getAlarm()->removeLinkedObject(*object);
-				object->getAlarm()->clearBroadcastPointsCache();
-			}
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<AlarmObjectLinkTableSync,AlarmObjectLink>::Save(
-			AlarmObjectLink* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<AlarmObjectLinkTableSync> query(*object);
-			query.addField(object->getRecipient()->getFactoryKey());
-			query.addField(object->getObjectId());
-			query.addField(object->getAlarm() ? object->getAlarm()->getKey() : RegistryKeyType(0));
-			query.addField(object->getParameter());
-			query.execute(transaction);
 		}
 
 
@@ -240,10 +154,10 @@ namespace synthese
 			optional<DBTransaction&> transaction
 		){
 			DeleteQuery<AlarmObjectLinkTableSync> query;
-			query.addWhereField(COL_ALARM_ID, alarmId);
+			query.addWhereField(LinkedAlarm::FIELD.name, alarmId);
 			if(objectId)
 			{
-				query.addWhereField(COL_OBJECT_ID, *objectId);
+				query.addWhereField(ObjectId::FIELD.name, *objectId);
 			}
 			query.execute(transaction);
 		}
@@ -284,7 +198,7 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE "
-				<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << alarmId;
+				<< LinkedAlarm::FIELD.name << "=" << alarmId;
 			if (number)
 				query << " LIMIT " << (*number + 1);
 			if (first > 0)
@@ -300,7 +214,12 @@ namespace synthese
 			optional<DBTransaction&> transaction
 		){
 			DeleteQuery<AlarmObjectLinkTableSync> query;
-			query.addWhereField(COL_OBJECT_ID, objectId);
+			query.addWhereField(ObjectId::FIELD.name, objectId);
 			query.execute(transaction);
+		}
+
+		bool AlarmObjectLinkTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(security::READ);
 		}
 }	}

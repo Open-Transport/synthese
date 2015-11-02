@@ -35,7 +35,6 @@
 
 #include "DBModule.h"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 #include "AlarmObjectLink.h"
 #include "MessagesModule.h"
@@ -62,16 +61,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				AlarmObjectLinkTableSync,
 				AlarmObjectLink,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>
 		{
 		public:
-			static const std::string COL_RECIPIENT_KEY;
-			static const std::string COL_OBJECT_ID;
-			static const std::string COL_ALARM_ID;
-			static const std::string COL_PARAMETER;
-
 			/** Search of alarm object links for a specified alarm in a specified recipient type.
 				@param alarm Alarm to the object must be liked with
 				@param recipientKey Key of the recipient to search (REMOVE THIS PARAMETER WHEN THE FACTORY KEY WILL BE STATIC)
@@ -140,6 +133,8 @@ namespace synthese
 				Alarm& destAlarm,
 				boost::optional<db::DBTransaction&> transaction
 			);
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 
 
@@ -156,11 +151,11 @@ namespace synthese
 			std::stringstream query;
 			query
 				<< " SELECT "
-					<< AlarmObjectLinkTableSync::COL_OBJECT_ID
+					<< ObjectId::FIELD.name
 				<< " FROM " << TABLE.NAME
 				<< " WHERE "
-					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << alarmId
-					<< " AND " << AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << util::Conversion::ToDBString(recipientKey);
+					<< LinkedAlarm::FIELD.name << "=" << alarmId
+					<< " AND " << RecipientKey::FIELD.name << "=" << util::Conversion::ToDBString(recipientKey);
 			if (number)
 				query << " LIMIT " << (*number + 1);
 			if (first > 0)
@@ -174,7 +169,7 @@ namespace synthese
 				{
 					objects.push_back(
 						K::GetEditable(
-							rows->getLongLong (COL_OBJECT_ID),
+							rows->getLongLong (ObjectId::FIELD.name),
 							env,
 							linkLevel
 					)	);
