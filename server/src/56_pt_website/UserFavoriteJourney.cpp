@@ -21,41 +21,51 @@
 */
 
 #include "UserFavoriteJourney.h"
+
+#include "Profile.h"
 #include "Registry.h"
+#include "Session.h"
+#include "TransportWebsiteRight.h"
+#include "User.h"
 
 using namespace std;
 
 namespace synthese
 {
+	using namespace graph;
+	using namespace pt_website;
 	using namespace security;
 	using namespace util;
-	using namespace graph;
 
-	namespace util
-	{
-		template<> const string Registry<pt_website::UserFavoriteJourney>::KEY("UserFavoriteJourney");
-	}
+	CLASS_DEFINITION(UserFavoriteJourney, "t048_user_favorite_journey", 48)
+	FIELD_DEFINITION_OF_OBJECT(UserFavoriteJourney, "user_favorite_journey_id", "user_favorite_journey_ids")
+
+	FIELD_DEFINITION_OF_TYPE(FavoriteJourneyUser, "user_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(OriginCityName, "origin_city_name", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(OriginPlaceName, "origin_place_name", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DestinationCityName, "destination_city_name", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DestinationPlaceName, "destination_place_name", SQL_TEXT)
 
 	namespace pt_website
 	{
 		void UserFavoriteJourney::setOriginCityName( const std::string& value )
 		{
-			_originCityName = value;
+			set<OriginCityName>(value);
 		}
 
 		void UserFavoriteJourney::setOriginPlaceName( const std::string& value )
 		{
-			_originPlaceName = value;
+			set<OriginPlaceName>(value);
 		}
 
 		void UserFavoriteJourney::setDestinationCityName( const std::string& value )
 		{
-			_destinationCityName = value;
+			set<DestinationCityName>(value);
 		}
 
 		void UserFavoriteJourney::setDestinationPlaceName( const std::string& value )
 		{
-			_destinationPlaceName = value;
+			set<DestinationPlaceName>(value);
 		}
 
 		void UserFavoriteJourney::setAccessParameters( const AccessParameters& value )
@@ -65,22 +75,22 @@ namespace synthese
 
 		const std::string& UserFavoriteJourney::getOriginCityName() const
 		{
-			return _originCityName;
+			return get<OriginCityName>();
 		}
 
 		const std::string& UserFavoriteJourney::getOriginPlaceName() const
 		{
-			return _originPlaceName;
+			return get<OriginPlaceName>();
 		}
 
 		const std::string& UserFavoriteJourney::getDestinationCityName() const
 		{
-			return _destinationCityName;
+			return get<DestinationCityName>();
 		}
 
 		const std::string& UserFavoriteJourney::getDestinationPlaceName() const
 		{
-			return _destinationPlaceName;
+			return get<DestinationPlaceName>();
 		}
 
 		const AccessParameters& UserFavoriteJourney::getAccessParameters() const
@@ -90,10 +100,57 @@ namespace synthese
 
 		UserFavoriteJourney::UserFavoriteJourney(
 			RegistryKeyType key
-		):	Registrable(key)
-			, _user(NULL)
+		):	Registrable(key),
+			Object<UserFavoriteJourney, UserFavoriteJourneySchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_DEFAULT_CONSTRUCTOR(FavoriteJourneyUser),
+					FIELD_DEFAULT_CONSTRUCTOR(Rank),
+					FIELD_DEFAULT_CONSTRUCTOR(OriginCityName),
+					FIELD_DEFAULT_CONSTRUCTOR(OriginPlaceName),
+					FIELD_DEFAULT_CONSTRUCTOR(DestinationCityName),
+					FIELD_DEFAULT_CONSTRUCTOR(DestinationPlaceName)
+			)	)
 		{
 
+		}
+
+		boost::optional<std::size_t> UserFavoriteJourney::getRank() const
+		{
+			if (get<Rank>() == 0)
+				return boost::optional<std::size_t>();
+
+			return boost::optional<std::size_t>(get<Rank>());
+		}
+
+		const security::User* UserFavoriteJourney::getUser() const
+		{
+			if (get<FavoriteJourneyUser>())
+				return get<FavoriteJourneyUser>().get_ptr();
+
+			return NULL;
+		}
+
+		void UserFavoriteJourney::setUser(security::User* value)
+		{
+			set<FavoriteJourneyUser>(value
+				? boost::optional<security::User&>(*value)
+				: boost::none);
+		}
+
+		bool UserFavoriteJourney::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(security::WRITE);
+		}
+
+		bool UserFavoriteJourney::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(security::WRITE);
+		}
+
+		bool UserFavoriteJourney::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(security::DELETE_RIGHT);
 		}
 
 	}

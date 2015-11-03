@@ -53,7 +53,7 @@ namespace synthese
 			static const std::string PARAMETER_DESTINATION_PLACE_NAME;
 
 		private:
-			boost::shared_ptr<const security::User>	_user;
+			boost::shared_ptr<security::User>	_user;
 			std::string						_originCityName;
 			std::string						_originPlaceName;
 			std::string						_destinationCityName;

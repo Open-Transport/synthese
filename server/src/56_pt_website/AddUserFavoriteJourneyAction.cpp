@@ -81,7 +81,7 @@ namespace synthese
 			{
 				try
 				{
-					_user = UserTableSync::Get(map.get<RegistryKeyType>(PARAMETER_USER_ID), *_env);
+					_user = UserTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_USER_ID), *_env);
 				}
 				catch (ObjectNotFoundException<User>& e)
 				{

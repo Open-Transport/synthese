@@ -28,7 +28,6 @@
 #include "UserFavoriteJourney.h"
 #include "DBDirectTableSyncTemplate.hpp"
 #include "NoSynchronizationPolicy.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -48,20 +47,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				UserFavoriteJourneyTableSync,
 				UserFavoriteJourney,
-				db::NoSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::NoSynchronizationPolicy
 			>
 		{
 		public:
-			static const std::string COL_USER_ID;
-			static const std::string COL_RANK;
-			static const std::string COL_ORIGIN_CITY_NAME;
-			static const std::string COL_ORIGIN_PLACE_NAME;
-			static const std::string COL_DESTINATION_CITY_NAME;
-			static const std::string COL_DESTINATION_PLACE_NAME;
-
-
-
 			/** UserFavoriteJourney search.
 				(other search parameters)
 				@param first First UserFavoriteJourney object to answer
@@ -79,7 +68,7 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
-
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

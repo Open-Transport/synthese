@@ -25,9 +25,11 @@
 
 #include <string>
 
+#include "Object.hpp"
+
 #include "AccessParameters.h"
-#include "Registrable.h"
-#include "Registry.h"
+#include "NumericField.hpp"
+#include "StringField.hpp"
 
 namespace synthese
 {
@@ -38,24 +40,29 @@ namespace synthese
 
 	namespace pt_website
 	{
+		FIELD_POINTER(FavoriteJourneyUser, security::User)
+		FIELD_STRING(OriginCityName)
+		FIELD_STRING(OriginPlaceName)
+		FIELD_STRING(DestinationCityName)
+		FIELD_STRING(DestinationPlaceName)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(FavoriteJourneyUser),
+			FIELD(Rank),
+			FIELD(OriginCityName),
+			FIELD(OriginPlaceName),
+			FIELD(DestinationCityName),
+			FIELD(DestinationPlaceName)
+		> UserFavoriteJourneySchema;
+
 		/** UserFavoriteJourney class.
 			@ingroup m56
 		*/
 		class UserFavoriteJourney
-		:	public virtual util::Registrable
+		:	public Object<UserFavoriteJourney, UserFavoriteJourneySchema>
 		{
-		public:
-
-			/// Chosen registry class.
-			typedef util::Registry<UserFavoriteJourney>	Registry;
-
 		private:
-			const security::User*	_user;
-			boost::optional<std::size_t>	_rank;
-			std::string				_originCityName;
-			std::string				_originPlaceName;
-			std::string				_destinationCityName;
-			std::string				_destinationPlaceName;
 			graph::AccessParameters	_accessParameters;
 
 		public:
@@ -65,8 +72,8 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-			void setRank(boost::optional<std::size_t> value) { _rank = value; }
-				void setUser(const security::User* value) { _user = value; }
+				void setRank(boost::optional<std::size_t> value) { set<Rank>(value ? *value : 0); }
+				void setUser(security::User* value);
 				void setOriginCityName(const std::string& value);
 				void setOriginPlaceName(const std::string& value);
 				void setDestinationCityName(const std::string& value);
@@ -76,14 +83,18 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				boost::optional<std::size_t>	getRank()					const { return _rank; }
-				const security::User*			getUser()					const { return _user; }
+				boost::optional<std::size_t>	getRank()					const;
+				const security::User*			getUser()					const;
 				const std::string&				getOriginCityName()			const;
 				const std::string&				getOriginPlaceName()		const;
 				const std::string&				getDestinationCityName()	const;
 				const std::string&				getDestinationPlaceName()	const;
 				const graph::AccessParameters&	getAccessParameters()		const;
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 	}
 }

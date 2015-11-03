@@ -48,16 +48,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,UserFavoriteJourneyTableSync>::FACTORY_KEY("53.1 User favorite journey");
 	}
 
-	namespace pt_website
-	{
-		const std::string UserFavoriteJourneyTableSync::COL_USER_ID("user_id");
-		const std::string UserFavoriteJourneyTableSync::COL_RANK("rank");
-		const std::string UserFavoriteJourneyTableSync::COL_ORIGIN_CITY_NAME("origin_city_name");
-		const std::string UserFavoriteJourneyTableSync::COL_ORIGIN_PLACE_NAME("origin_place_name");
-		const std::string UserFavoriteJourneyTableSync::COL_DESTINATION_CITY_NAME("destination_city_name");
-		const std::string UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME("destination_place_name");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<UserFavoriteJourneyTableSync>::TABLE(
@@ -66,13 +56,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<UserFavoriteJourneyTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(UserFavoriteJourneyTableSync::COL_USER_ID, SQL_INTEGER),
-			Field(UserFavoriteJourneyTableSync::COL_RANK, SQL_INTEGER),
-			Field(UserFavoriteJourneyTableSync::COL_ORIGIN_CITY_NAME, SQL_TEXT),
-			Field(UserFavoriteJourneyTableSync::COL_ORIGIN_PLACE_NAME, SQL_TEXT),
-			Field(UserFavoriteJourneyTableSync::COL_DESTINATION_CITY_NAME, SQL_TEXT),
-			Field(UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME, SQL_TEXT),
 			Field()
 		};
 
@@ -80,52 +63,6 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<UserFavoriteJourneyTableSync>::GetIndexes()
 		{
 			return DBTableSync::Indexes();
-		}
-
-
-
-		template<> void OldLoadSavePolicy<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Load(
-			UserFavoriteJourney* object
-			, const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			// Properties
-			object->setRank(rows->getInt(UserFavoriteJourneyTableSync::COL_RANK));
-			object->setDestinationCityName(rows->getText(UserFavoriteJourneyTableSync::COL_DESTINATION_CITY_NAME));
-			object->setDestinationPlaceName(rows->getText(UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME));
-			object->setOriginCityName(rows->getText(UserFavoriteJourneyTableSync::COL_ORIGIN_CITY_NAME));
-			object->setOriginPlaceName(rows->getText(UserFavoriteJourneyTableSync::COL_ORIGIN_PLACE_NAME));
-
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				const User* user(UserTableSync::Get(rows->getLongLong(UserFavoriteJourneyTableSync::COL_USER_ID), env, linkLevel).get());
-				object->setUser(user);
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Save(
-			UserFavoriteJourney* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<UserFavoriteJourneyTableSync> query(*object);
-			query.addField(object->getUser() ? object->getUser()->getKey() : RegistryKeyType(0));
-			query.addField(object->getRank().value_or(0));
-			query.addField(object->getOriginCityName());
-			query.addField(object->getOriginPlaceName());
-			query.addField(object->getDestinationCityName());
-			query.addField(object->getDestinationPlaceName());
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Unlink(
-			UserFavoriteJourney* object
-		){
-			object->setUser(NULL);
 		}
 
 
@@ -180,8 +117,8 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE "
-				<< COL_USER_ID << "=" << user->getKey()
-				<< " ORDER BY " << COL_RANK << (raisingOrder ? " ASC" : " DESC");
+				<< FavoriteJourneyUser::FIELD.name << "=" << user->getKey()
+				<< " ORDER BY " << Rank::FIELD.name << (raisingOrder ? " ASC" : " DESC");
 			if (number)
 			{
 				query << " LIMIT " << (*number + 1);
@@ -190,6 +127,11 @@ namespace synthese
 			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+		bool UserFavoriteJourneyTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(security::READ);
 		}
 	}
 }

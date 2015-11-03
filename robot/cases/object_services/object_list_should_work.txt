@@ -66,6 +66,7 @@ Empty Object List Should Work For Any Table
     ${DEAD_RUNS_TABLE_ID}
     ${ALARM_OBJECT_LINKS_TABLE_ID}
     ${LOG_ENTRIES_TABLE_ID}
+    ${USER_FAVORITE_JOURNEY_TABLE_ID}
     
 Object List Should Work For Some Tables
     On node 0
