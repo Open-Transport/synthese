@@ -65,6 +65,7 @@ Empty Object List Should Work For Any Table
     ${CONNECTION_PLACES_TABLE_ID}
     ${DEAD_RUNS_TABLE_ID}
     ${ALARM_OBJECT_LINKS_TABLE_ID}
+    ${LOG_ENTRIES_TABLE_ID}
     
 Object List Should Work For Some Tables
     On node 0

@@ -41,7 +41,7 @@ namespace synthese
 
 		RegistryKeyType DBLog::_addEntry(
 			const std::string& logKey
-			, DBLogEntry::Level level
+			, Level level
 			, const DBLogEntry::Content& content
 			, const security::User* user /*= NULL*/
 			, util::RegistryKeyType objectId,
@@ -78,7 +78,7 @@ namespace synthese
 					ptime(not_a_date_time),
 					ptime(not_a_date_time),
 					optional<RegistryKeyType>(),
-					DBLogEntry::DB_LOG_UNKNOWN,
+					DB_LOG_UNKNOWN,
 					objectId,
 					optional<RegistryKeyType>(),
 					string(),
@@ -114,7 +114,7 @@ namespace synthese
 
 		RegistryKeyType DBLog::AddSimpleEntry(
 			const std::string& logKey,
-			DBLogEntry::Level level,
+			Level level,
 			const std::string& content,
 			const security::User* user,
 			util::RegistryKeyType objectId /*= 0 */,

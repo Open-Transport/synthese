@@ -27,42 +27,59 @@
 #include <string>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
+
+#include "EnumObjectField.hpp"
+#include "PtimeField.hpp"
+#include "StringField.hpp"
 
 namespace synthese
 {
 	namespace dblog
 	{
+		typedef enum
+		{
+			DB_LOG_UNKNOWN = 0
+			, DB_LOG_OK = 5
+			, DB_LOG_INFO = 10
+			, DB_LOG_WARNING = 50
+			, DB_LOG_ERROR = 99
+		}	Level;
+
+		FIELD_STRING(LogKey)
+		FIELD_PTIME(LogDate)
+		FIELD_ID(LogUser)
+		FIELD_ENUM(LogLevel, Level)
+		FIELD_STRING(LogContent)
+		FIELD_ID(ObjectId)
+		FIELD_ID(Object2Id)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(LogKey),
+			FIELD(LogDate),
+			FIELD(LogUser),
+			FIELD(LogLevel),
+			FIELD(LogContent),
+			FIELD(ObjectId),
+			FIELD(Object2Id)
+		> DBLogEntrySchema;
+
 		/** DBLogEntry class.
 			@ingroup m13
 		*/
 		class DBLogEntry
-		:	public virtual util::Registrable
+		:	public Object<DBLogEntry, DBLogEntrySchema>
 		{
 		public:
+			static const std::string CONTENT_SEPARATOR;
 
 			/// Chosen registry class.
 			typedef util::Registry<DBLogEntry>	Registry;
-
-			typedef enum
-			{
-				DB_LOG_UNKNOWN = 0
-				, DB_LOG_OK = 5
-				, DB_LOG_INFO = 10
-				, DB_LOG_WARNING = 50
-				, DB_LOG_ERROR = 99
-			}	Level;
 			typedef std::vector<std::string>	Content;
 
 		private:
-			std::string				_logKey;
-			boost::posix_time::ptime	_date;
-			util::RegistryKeyType	_userId;
 			Content					_content;
-			Level					_level;
-			util::RegistryKeyType	_objectId;
-			util::RegistryKeyType	_objectId2;
 
 		public:
 			DBLogEntry(util::RegistryKeyType key = 0);
@@ -83,6 +100,12 @@ namespace synthese
 			Level					getLevel()			const;
 			util::RegistryKeyType	getObjectId()		const;
 			util::RegistryKeyType	getObjectId2()		const;
+
+			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 	}
 }

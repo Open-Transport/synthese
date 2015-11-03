@@ -48,18 +48,6 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<DBTableSync,DBLogEntryTableSync>::FACTORY_KEY("13.01 DB Log entries");
 
-	namespace dblog
-	{
-		const string DBLogEntryTableSync::CONTENT_SEPARATOR("|");
-		const std::string DBLogEntryTableSync::COL_LOG_KEY = "log_key";
-		const std::string DBLogEntryTableSync::COL_DATE = "date";
-		const std::string DBLogEntryTableSync::COL_USER_ID = "user_id";
-		const std::string DBLogEntryTableSync::COL_LEVEL = "level";
-		const std::string DBLogEntryTableSync::COL_CONTENT = "content";
-		const std::string DBLogEntryTableSync::COL_OBJECT_ID = "object_id";
-		const std::string DBLogEntryTableSync::COL_OBJECT2_ID = "object2_id";
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<DBLogEntryTableSync>::TABLE(
@@ -68,16 +56,7 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<DBLogEntryTableSync>::_FIELDS[] =
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(DBLogEntryTableSync::COL_LOG_KEY, SQL_TEXT),
-			Field(DBLogEntryTableSync::COL_DATE, SQL_DATETIME),
-			Field(DBLogEntryTableSync::COL_USER_ID, SQL_INTEGER),
-			Field(DBLogEntryTableSync::COL_LEVEL, SQL_INTEGER),
-			Field(DBLogEntryTableSync::COL_CONTENT, SQL_TEXT),
-			Field(DBLogEntryTableSync::COL_OBJECT_ID, SQL_INTEGER),
-			Field(DBLogEntryTableSync::COL_OBJECT2_ID, SQL_INTEGER),
 			Field()
-
 		};
 
 		template<>
@@ -86,89 +65,25 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					DBLogEntryTableSync::COL_LOG_KEY.c_str(),
-					DBLogEntryTableSync::COL_OBJECT_ID.c_str(),
-					DBLogEntryTableSync::COL_DATE.c_str(),
+					LogKey::FIELD.name.c_str(),
+					ObjectId::FIELD.name.c_str(),
+					LogDate::FIELD.name.c_str(),
 					""
 			)	);
 			r.push_back(
 				DBTableSync::Index(
-					DBLogEntryTableSync::COL_LOG_KEY.c_str(),
-					DBLogEntryTableSync::COL_OBJECT2_ID.c_str(),
-					DBLogEntryTableSync::COL_DATE.c_str(),
+					LogKey::FIELD.name.c_str(),
+					Object2Id::FIELD.name.c_str(),
+					LogDate::FIELD.name.c_str(),
 					""
 			)	);
 			r.push_back(
 				DBTableSync::Index(
-					DBLogEntryTableSync::COL_LOG_KEY.c_str(),
-					DBLogEntryTableSync::COL_DATE.c_str(),
+					LogKey::FIELD.name.c_str(),
+					LogDate::FIELD.name.c_str(),
 					""
 			)	);
 			return r;
-		}
-
-		template<>
-		void OldLoadSavePolicy<DBLogEntryTableSync,DBLogEntry>::Load(
-			DBLogEntry* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			object->setLogKey(rows->getText ( DBLogEntryTableSync::COL_LOG_KEY));
-			object->setDate(rows->getDateTime( DBLogEntryTableSync::COL_DATE));
-			object->setLevel((DBLogEntry::Level) rows->getInt ( DBLogEntryTableSync::COL_LEVEL));
-			object->setObjectId(rows->getLongLong(DBLogEntryTableSync::COL_OBJECT_ID));
-			object->setObjectId2(rows->getLongLong(DBLogEntryTableSync::COL_OBJECT2_ID));
-
-			// Content column : parse all contents separated by |
-			DBLogEntry::Content v;
-			typedef tokenizer<char_separator<char> > tokenizer;
-			string content = rows->getText ( DBLogEntryTableSync::COL_CONTENT);
-			char_separator<char> sep (DBLogEntryTableSync::CONTENT_SEPARATOR.c_str(), "", keep_empty_tokens);
-
-			tokenizer columns (content, sep);
-			for (tokenizer::iterator it = columns.begin(); it != columns.end (); ++it)
-				v.push_back(*it);
-			object->setContent(v);
-
-			object->setUserId(rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID));
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<DBLogEntryTableSync, DBLogEntry>::Unlink(
-			DBLogEntry* obj
-		){
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<DBLogEntryTableSync,DBLogEntry>::Save(
-			DBLogEntry* object,
-			optional<DBTransaction&> transaction
-		){
-			// Preparation
-			stringstream content;
-			DBLogEntry::Content c = object->getContent();
-			for (DBLogEntry::Content::const_iterator it = c.begin(); it != c.end(); ++it)
-			{
-				if (it != c.begin())
-					content << DBLogEntryTableSync::CONTENT_SEPARATOR;
-				content << *it;
-			}
-
-			// Query
-			ReplaceQuery<DBLogEntryTableSync> query(*object);
-			query.addField(object->getLogKey());
-			query.addFrameworkField<PtimeField>(object->getDate());
-			query.addField(object->getUserId());
-			query.addField(static_cast<int>(object->getLevel()));
-			query.addField(content.str());
-			query.addField(object->getObjectId());
-			query.addField(object->getObjectId2());
-			query.execute(transaction);
 		}
 
 		template<> bool DBTableSyncTemplate<DBLogEntryTableSync>::CanDelete(
@@ -232,7 +147,7 @@ namespace synthese
 			, const ptime& startDate
 			, const ptime& endDate
 			, optional<RegistryKeyType> userId
-			, DBLogEntry::Level level
+			, Level level
 			, optional<RegistryKeyType> objectId
 			, optional<RegistryKeyType> objectId2
 			, const std::string& text
@@ -245,48 +160,48 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			SelectQuery<DBLogEntryTableSync> query;
-			query.addWhereField(COL_LOG_KEY, logKey);
+			query.addWhereField(LogKey::FIELD.name, logKey);
 			if (!startDate.is_not_a_date_time())
 			{
-				query.addWhereField(COL_DATE, startDate, ComposedExpression::OP_SUPEQ);
+				query.addWhereField(LogDate::FIELD.name, startDate, ComposedExpression::OP_SUPEQ);
 			}
 			if (!endDate.is_not_a_date_time())
 			{
-				query.addWhereField(COL_DATE, endDate, ComposedExpression::OP_INFEQ);
+				query.addWhereField(LogDate::FIELD.name, endDate, ComposedExpression::OP_INFEQ);
 			}
 			if(userId)
 			{
-				query.addWhereField(COL_USER_ID, *userId);
+				query.addWhereField(LogUser::FIELD.name, *userId);
 			}
-			if (level != DBLogEntry::DB_LOG_UNKNOWN)
+			if (level != DB_LOG_UNKNOWN)
 			{
-				query.addWhereField(COL_LEVEL, static_cast<int>(level));
+				query.addWhereField(LogLevel::FIELD.name, static_cast<int>(level));
 			}
 			if (!text.empty())
 			{
-				query.addWhereField(COL_CONTENT, "%" + text + "%", ComposedExpression::OP_LIKE);
+				query.addWhereField(LogContent::FIELD.name, "%" + text + "%", ComposedExpression::OP_LIKE);
 			}
 			if(objectId)
 			{
-				query.addWhereField(COL_OBJECT_ID, *objectId);
+				query.addWhereField(ObjectId::FIELD.name, *objectId);
 			}
 			if(objectId2)
 			{
-				query.addWhereField(COL_OBJECT2_ID, *objectId2);
+				query.addWhereField(Object2Id::FIELD.name, *objectId2);
 			}
 			if (orderByDate)
 			{
-				query.addOrderField(COL_DATE, raisingOrder);
+				query.addOrderField(LogDate::FIELD.name, raisingOrder);
 			}
 			else if (orderByUser)
 			{
-				query.addOrderField(COL_USER_ID, raisingOrder);
-				query.addOrderField(COL_DATE, raisingOrder);
+				query.addOrderField(LogUser::FIELD.name, raisingOrder);
+				query.addOrderField(LogDate::FIELD.name, raisingOrder);
 			}
 			else if (orderByLevel)
 			{
-				query.addOrderField(COL_LEVEL, raisingOrder);
-				query.addOrderField(COL_DATE, raisingOrder);
+				query.addOrderField(LogLevel::FIELD.name, raisingOrder);
+				query.addOrderField(LogLevel::FIELD.name, raisingOrder);
 			}
 			if (number)
 			{
@@ -307,7 +222,7 @@ namespace synthese
 			SelectQuery<DBLogEntryTableSync> query;
 
 			if (objectId)
-				query.addWhereField(COL_OBJECT_ID, objectId);
+				query.addWhereField(ObjectId::FIELD.name, objectId);
 			return LoadFromQuery(query, env, linkLevel);
 		}
 
@@ -316,9 +231,14 @@ namespace synthese
 		void DBLogEntryTableSync::Purge( const std::string& logKey, const ptime& endDate )
 		{
 			DeleteQuery<DBLogEntryTableSync> query;
-			query.addWhereField(COL_DATE, endDate, ComposedExpression::OP_INFEQ);
-			query.addWhereField(COL_LOG_KEY, logKey);
+			query.addWhereField(LogDate::FIELD.name, endDate, ComposedExpression::OP_INFEQ);
+			query.addWhereField(LogKey::FIELD.name, logKey);
 			query.execute();
+		}
+
+		bool DBLogEntryTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::READ);
 		}
 	}
 }

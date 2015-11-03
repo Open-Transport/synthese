@@ -66,7 +66,7 @@ namespace synthese
 				boost::shared_ptr<DBLog>		_dbLog;
 				boost::posix_time::ptime		_searchStartDate;
 				boost::posix_time::ptime		_searchEndDate;
-				DBLogEntry::Level				_searchLevel;
+				Level							_searchLevel;
 				boost::optional<util::RegistryKeyType>			_searchUserId;
 				std::string						_searchText;
 				boost::optional<util::RegistryKeyType>			_searchObjectId;

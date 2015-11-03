@@ -32,5 +32,5 @@ void synthese::dblog::moduleRegister()
 	synthese::dblog::DBLogViewService::integrate();
 
 	// Registries
-	synthese::util::Env::Integrate<synthese::dblog::DBLogEntry>();
+	INTEGRATE(synthese::dblog::DBLogEntry);
 }

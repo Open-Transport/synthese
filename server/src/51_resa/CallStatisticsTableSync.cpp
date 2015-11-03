@@ -47,20 +47,20 @@ namespace synthese
 			DB* db = DBModule::GetDB();
 
 			s << "SELECT " <<
-				db->getSQLConvertInteger(DBLogEntryTableSync::COL_CONTENT) << " AS type," <<
-				db->getSQLDateFormat(GetGroupBy(step), DBLogEntryTableSync::COL_DATE) << " AS step," <<
+				db->getSQLConvertInteger(LogContent::FIELD.name) << " AS type," <<
+				db->getSQLDateFormat(GetGroupBy(step), LogDate::FIELD.name) << " AS step," <<
 				"COUNT(" << TABLE_COL_ID << ") AS number" <<
 				" FROM " << DBLogEntryTableSync::TABLE.NAME <<
 				" WHERE " <<
-					DBLogEntryTableSync::COL_LOG_KEY << "='" << ResaDBLog::FACTORY_KEY << "' AND " <<
-					DBLogEntryTableSync::COL_DATE << ">='" << gregorian::to_iso_extended_string(period.begin())  << " 00:00:00' AND " <<
-					DBLogEntryTableSync::COL_DATE << "<'" << gregorian::to_iso_extended_string(period.end()) << " 00:00:00'";
+					LogKey::FIELD.name << "='" << ResaDBLog::FACTORY_KEY << "' AND " <<
+					LogDate::FIELD.name << ">='" << gregorian::to_iso_extended_string(period.begin())  << " 00:00:00' AND " <<
+					LogDate::FIELD.name << "<'" << gregorian::to_iso_extended_string(period.end()) << " 00:00:00'";
 			if(!indeterminate(autoresa))
-				s << " AND " << DBLogEntryTableSync::COL_OBJECT_ID << (autoresa ? "=" : "!=") << DBLogEntryTableSync::COL_USER_ID;
+				s << " AND " << ObjectId::FIELD.name << (autoresa ? "=" : "!=") << LogUser::FIELD.name;
 			s <<
-				" GROUP BY " << db->getSQLDateFormat(GetGroupBy(step), DBLogEntryTableSync::COL_DATE) << "," <<
-				db->getSQLConvertInteger(DBLogEntryTableSync::COL_CONTENT) <<
-				" ORDER BY " << db->getSQLConvertInteger(DBLogEntryTableSync::COL_CONTENT)
+				" GROUP BY " << db->getSQLDateFormat(GetGroupBy(step), LogDate::FIELD.name) << "," <<
+				db->getSQLConvertInteger(LogContent::FIELD.name) <<
+				" ORDER BY " << db->getSQLConvertInteger(LogContent::FIELD.name)
 			;
 			optional<ResaDBLog::_EntryType> lastStep;
 			DBResultSPtr rows = db->execQuery(s.str());

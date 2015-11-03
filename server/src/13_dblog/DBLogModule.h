@@ -83,8 +83,8 @@ namespace synthese
 		public:
 			typedef std::vector<std::pair<boost::optional<int>, std::string> > Labels;
 			static Labels	getEntryLevelLabels(bool withAll=false);
-			static std::string					getEntryLevelLabel(const DBLogEntry::Level& level);
-			static std::string					getEntryIcon(const DBLogEntry::Level& level);
+			static std::string					getEntryLevelLabel(const Level& level);
+			static std::string					getEntryIcon(const Level& level);
 
 			template<class T>
 			static void appendToLogIfChange(std::stringstream& s, const std::string& label, const T& oldValue, const T& newValue)

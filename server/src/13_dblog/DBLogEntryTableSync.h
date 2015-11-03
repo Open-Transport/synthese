@@ -26,7 +26,6 @@
 #include "DBLogEntry.h"
 #include "DBDirectTableSyncTemplate.hpp"
 #include "NoSynchronizationPolicy.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -44,22 +43,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				DBLogEntryTableSync,
 				DBLogEntry,
-				db::NoSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::NoSynchronizationPolicy
 			>
 		{
 		public:
-			static const std::string CONTENT_SEPARATOR;
-			static const std::string COL_LOG_KEY;
-			static const std::string COL_DATE;
-			static const std::string COL_USER_ID;
-			static const std::string COL_LEVEL;
-			static const std::string COL_CONTENT;
-			static const std::string COL_OBJECT_ID;
-			static const std::string COL_OBJECT2_ID;
-
-
-
 			/** DBLog search.
 				@param logKey key of the log (LIKE format)
 				@param startDate start date
@@ -81,7 +68,7 @@ namespace synthese
 				const boost::posix_time::ptime& startDate,
 				const boost::posix_time::ptime& endDate,
 				boost::optional<util::RegistryKeyType> userId,
-				DBLogEntry::Level level,
+				Level level,
 				boost::optional<util::RegistryKeyType> id,
 				boost::optional<util::RegistryKeyType> id2,
 				const std::string& text,
@@ -113,6 +100,8 @@ namespace synthese
 				const std::string& logKey,
 				const boost::posix_time::ptime& endDate
 			);
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

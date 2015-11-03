@@ -84,7 +84,7 @@ namespace synthese
 			bool							_fixedStartDate;
 			boost::posix_time::ptime		_searchEndDate;
 			bool							_fixedEndDate;
-			DBLogEntry::Level				_searchLevel;
+			Level							_searchLevel;
 			bool							_fixedLevel;
 			boost::optional<util::RegistryKeyType>			_searchUserId;
 			bool							_fixedUserId;
@@ -136,7 +136,7 @@ namespace synthese
 					boost::optional<util::RegistryKeyType> searchObjectId = boost::optional<util::RegistryKeyType>(),
 					boost::optional<util::RegistryKeyType> searchObjectId2 = boost::optional<util::RegistryKeyType>(),
 					boost::optional<util::RegistryKeyType> searchUserId = boost::optional<util::RegistryKeyType>(),
-					DBLogEntry::Level searchLevel = DBLogEntry::DB_LOG_UNKNOWN,
+					Level searchLevel = DB_LOG_UNKNOWN,
 					boost::posix_time::ptime searchStartDate = boost::posix_time::ptime(boost::posix_time::not_a_date_time),
 					boost::posix_time::ptime searchEndDate = boost::posix_time::ptime(boost::posix_time::not_a_date_time),
 					std::string searchText = std::string()

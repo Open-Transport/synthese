@@ -84,7 +84,7 @@ namespace synthese
 				"Etat en ligne de l'afficheur",
 				lexical_cast<string>(_displayScreen->get<MaintenanceIsOnline>()),
 				lexical_cast<string>(_online),
-				_online ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_WARNING
+				_online ? DB_LOG_INFO : DB_LOG_WARNING
 			);
 			_displayScreen->set<MaintenanceIsOnline>(_online);
 

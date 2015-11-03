@@ -130,7 +130,7 @@ namespace synthese
 			content.push_back("Réservation");
 			content.push_back(lexical_cast<string>(transaction.getKey()));
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session->getUser().get(), transaction.get<Customer>()->getKey(), callId);
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, session->getUser().get(), transaction.get<Customer>()->getKey(), callId);
 
 			UpdateCallEntryCustomer(callId, transaction.get<Customer>()->getKey());
 		}
@@ -145,7 +145,7 @@ namespace synthese
 			content.push_back("Réception d'appel");
 			content.push_back(string());
 
-			return _addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, 0);
+			return _addEntry(FACTORY_KEY, DB_LOG_INFO, content, user, 0);
 		}
 
 		void ResaDBLog::UpdateCallEntryDate( RegistryKeyType callId )
@@ -186,7 +186,7 @@ namespace synthese
 			const Reservation* r1(*transaction.getReservations().begin());
 			RegistryKeyType callId(ResaModule::GetCurrentCallId(session));
 			string description;
-			DBLogEntry::Level level;
+			Level level;
 			DBLog::ColumnsVector content;
 			_EntryType type(ResaDBLog::OTHER);
 
@@ -195,13 +195,13 @@ namespace synthese
 			case OPTION:
 				type = ResaDBLog::CANCELLATION_ENTRY;
 				description = "Annulation";
-				level = DBLogEntry::DB_LOG_INFO;
+				level = DB_LOG_INFO;
 				break;
 
 			case TO_BE_DONE:
 				type = ResaDBLog::DELAYED_CANCELLATION_ENTRY;
 				description = "Annulation hors délai";
-				level = DBLogEntry::DB_LOG_WARNING;
+				level = DB_LOG_WARNING;
 				break;
 
 			case AT_WORK:
@@ -210,7 +210,7 @@ namespace synthese
 			case SHOULD_BE_AT_WORK:
 				type = ResaDBLog::NO_SHOW_ENTRY;
 				description = "Absence";
-				level = DBLogEntry::DB_LOG_ERROR;
+				level = DB_LOG_ERROR;
 				break;
 
 			default:
@@ -421,7 +421,7 @@ namespace synthese
 			c.push_back(text);
 			c.push_back(string());
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, &user, callEntry.getObjectId(), callEntry.getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, c, &user, callEntry.getObjectId(), callEntry.getKey());
 		}
 
 		std::string ResaDBLog::GetIconURL(
@@ -593,7 +593,7 @@ namespace synthese
 			content.push_back(text);
 			content.push_back(string());
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
 
 			UpdateCallEntryCustomer(callId, subject.getKey());
 		}
@@ -614,7 +614,7 @@ namespace synthese
 			content.push_back(string());
 			content.push_back(string());
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
 
 			UpdateCallEntryCustomer(callId, subject.getKey());
 		}
@@ -631,7 +631,7 @@ namespace synthese
 			content.push_back(subject.getFullName());
 			content.push_back(string());
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
 
 			UpdateCallEntryCustomer(callId, subject.getKey());
 		}
@@ -648,7 +648,7 @@ namespace synthese
 			content.push_back(text);
 			content.push_back(string());
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
 
 			UpdateCallEntryCustomer(callId, subject.getKey());
 		}
@@ -665,7 +665,7 @@ namespace synthese
 			content.push_back("Réinitialisation aléatoire");
 			content.push_back(string());
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
 
 			UpdateCallEntryCustomer(callId, subject.getKey());
 		}
@@ -685,7 +685,7 @@ namespace synthese
 			content.push_back(detail);
 			content.push_back(lexical_cast<string>(reservation.get<Transaction>()->getKey()));
 
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), reservation.getKey(), callId);
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, session.getUser().get(), reservation.getKey(), callId);
 		}
 	}
 }

@@ -82,7 +82,7 @@ namespace synthese
 		void IneoTerminusLog::AddIneoTerminusErrorMessageEntry(
 			XMLNode node
 		) {
-			DBLogEntry::Level level = DBLogEntry::DB_LOG_ERROR;
+			Level level = DB_LOG_ERROR;
 			DBLog::ColumnsVector content;
 			string tagName(node.getName());
 			content.push_back(tagName);
@@ -128,7 +128,7 @@ namespace synthese
 			string requestID,
 			string shortMessage
 		) {
-			DBLogEntry::Level level = DBLogEntry::DB_LOG_INFO;
+			Level level = DB_LOG_INFO;
 			DBLog::ColumnsVector content;
 			content.push_back(requestName);
 			content.push_back("Envoi d'un message au SAE Ineo depuis Terminus");

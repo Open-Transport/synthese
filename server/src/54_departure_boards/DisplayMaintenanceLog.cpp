@@ -77,7 +77,7 @@ namespace synthese
 			, const std::string& field
 			, const std::string& oldValue
 			, const std::string& newValue
-			, const DBLogEntry::Level level
+			, const Level level
 		){
 			if (oldValue == newValue)
 				return;
@@ -89,7 +89,7 @@ namespace synthese
 			DBLog::_addEntry(FACTORY_KEY, level, c, &user, screen.getKey());
 		}
 
-		void DisplayMaintenanceLog::AddAdminEntry( const DisplayScreenCPU& cpu , const security::User& user , const std::string& field , const std::string& oldValue , const std::string& newValue , const dblog::DBLogEntry::Level level /*= dblog::DBLogEntry::DB_LOG_INFO */ )
+		void DisplayMaintenanceLog::AddAdminEntry( const DisplayScreenCPU& cpu , const security::User& user , const std::string& field , const std::string& oldValue , const std::string& newValue , const dblog::Level level /*= dblog::DB_LOG_INFO */ )
 		{
 			if (oldValue == newValue)
 				return;
@@ -177,14 +177,14 @@ namespace synthese
 			c.push_back(s.str());
 			c.push_back(newValue.getDetail());
 
-			DBLogEntry::Level level(DBLogEntry::DB_LOG_ERROR);
+			Level level(DB_LOG_ERROR);
 			if (newStatus == DisplayMonitoringStatus::DISPLAY_MONITORING_OK)
 			{
-				level = DBLogEntry::DB_LOG_INFO;
+				level = DB_LOG_INFO;
 			}
 			else if (newStatus == DisplayMonitoringStatus::DISPLAY_MONITORING_WARNING || newStatus == DisplayMonitoringStatus::DISPLAY_MONITORING_UNKNOWN)
 			{
-				level = DBLogEntry::DB_LOG_WARNING;
+				level = DB_LOG_WARNING;
 			}
 
 			DBLog::_addEntry(
@@ -209,7 +209,7 @@ namespace synthese
 
 			DBLog::_addEntry(
 				FACTORY_KEY,
-				DBLogEntry::DB_LOG_INFO,
+				DB_LOG_INFO,
 				c,
 				NULL,
 				screen.getKey()
@@ -227,7 +227,7 @@ namespace synthese
 
 			DBLog::_addEntry(
 				FACTORY_KEY,
-				DBLogEntry::DB_LOG_INFO,
+				DB_LOG_INFO,
 				c,
 				NULL,
 				cpu.getKey()
@@ -255,7 +255,7 @@ namespace synthese
 
 			DBLog::_addEntry(
 				FACTORY_KEY,
-				DBLogEntry::DB_LOG_ERROR,
+				DB_LOG_ERROR,
 				c,
 				NULL,
 				screen.getKey()
@@ -278,7 +278,7 @@ namespace synthese
 
 				DBLog::_addEntry(
 					FACTORY_KEY,
-					DBLogEntry::DB_LOG_INFO,
+					DB_LOG_INFO,
 					c,
 					NULL,
 					screen.getKey()
@@ -294,14 +294,14 @@ namespace synthese
 				c.push_back(s.str());
 				c.push_back(value.getDetail());
 
-				DBLogEntry::Level level(DBLogEntry::DB_LOG_ERROR);
+				Level level(DB_LOG_ERROR);
 				if (newStatus == DisplayMonitoringStatus::DISPLAY_MONITORING_OK)
 				{
-					level = DBLogEntry::DB_LOG_INFO;
+					level = DB_LOG_INFO;
 				}
 				else if (newStatus == DisplayMonitoringStatus::DISPLAY_MONITORING_WARNING || newStatus == DisplayMonitoringStatus::DISPLAY_MONITORING_UNKNOWN)
 				{
-					level = DBLogEntry::DB_LOG_WARNING;
+					level = DB_LOG_WARNING;
 				}
 
 				DBLog::_addEntry(
@@ -323,7 +323,7 @@ namespace synthese
 
 			DBLog::_addEntry(
 				FACTORY_KEY,
-				DBLogEntry::DB_LOG_INFO,
+				DB_LOG_INFO,
 				c,
 				NULL,
 				cpu.getKey()
@@ -348,7 +348,7 @@ namespace synthese
 
 			DBLog::_addEntry(
 				FACTORY_KEY,
-				DBLogEntry::DB_LOG_ERROR,
+				DB_LOG_ERROR,
 				c,
 				NULL,
 				cpu.getKey()

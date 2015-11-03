@@ -80,7 +80,7 @@ namespace synthese
 			DBLogEntryTableSync::Purge(_dbLog->getFactoryKey(), _endDate);
 
 			// Log
-			DBLog::AddSimpleEntry(_dbLog->getFactoryKey(), DBLogEntry::DB_LOG_INFO, "Log purge -> " + to_simple_string(_endDate), request.getUser().get());
+			DBLog::AddSimpleEntry(_dbLog->getFactoryKey(), DB_LOG_INFO, "Log purge -> " + to_simple_string(_endDate), request.getUser().get());
 		}
 
 

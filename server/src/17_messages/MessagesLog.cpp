@@ -66,7 +66,7 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(alarm.getKey()));
 			content.push_back("Ajout de message");
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario.getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, user, scenario.getKey());
 		}
 
 
@@ -79,7 +79,7 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(string());
 			content.push_back("Création d'après le modèle "+ scenarioTemplate.getName());
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, sentScenario.getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, user, sentScenario.getKey());
 		}
 
 
@@ -95,7 +95,7 @@ namespace synthese
 				"Création par copie de "+ scenarioTemplate.getName() +
 				(scenarioTemplate.getTemplate() ? (" (modèle "+ scenarioTemplate.getTemplate()->getName() +")") : "")
 			);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, sentScenario.getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, user, sentScenario.getKey());
 		}
 
 		void MessagesLog::AddNewSentScenarioEntry( const SentScenario& sentScenario, const security::User& user )
@@ -103,7 +103,7 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(string());
 			content.push_back("Création");
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, sentScenario.getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, &user, sentScenario.getKey());
 		}
 
 		void MessagesLog::addUpdateEntry(
@@ -114,7 +114,7 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(string());
 			content.push_back(text);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, user, scenario->getKey());
 		}
 
 		void MessagesLog::addUpdateEntry(
@@ -127,7 +127,7 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(alarm->getKey()));
 			content.push_back(text);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
 		}
 
 		std::string MessagesLog::getObjectName(
@@ -171,7 +171,7 @@ namespace synthese
 				<< "Suppression du message " << alarm->getShortMessage()
 				<< " du scénario " << alarm->getScenario()->getName();
 			content.push_back(text.str());
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
 		}
 
 
@@ -183,6 +183,6 @@ namespace synthese
 			stringstream text;
 			text << "Suppression du scénario " << scenario.getName();
 			content.push_back(text.str());
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, scenario.getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, &user, scenario.getKey());
 		}
 }	}

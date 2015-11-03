@@ -88,7 +88,7 @@ namespace synthese
 			*/
 			static util::RegistryKeyType _addEntry(
 				const std::string& logKey
-				, DBLogEntry::Level level
+				, Level level
 				, const DBLogEntry::Content& content
 				, const security::User* user
 				, util::RegistryKeyType objectId = 0
@@ -168,7 +168,7 @@ namespace synthese
 
 			static util::RegistryKeyType AddSimpleEntry(
 				const std::string& logKey,
-				DBLogEntry::Level level,
+				Level level,
 				const std::string& content,
 				const security::User* user,
 				util::RegistryKeyType objectId = 0,

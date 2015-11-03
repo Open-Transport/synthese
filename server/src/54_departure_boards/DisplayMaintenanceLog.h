@@ -118,7 +118,7 @@ namespace synthese
 				, const std::string& field
 				, const std::string& oldValue
 				, const std::string& newValue
-				, const dblog::DBLogEntry::Level level = dblog::DBLogEntry::DB_LOG_INFO
+				, const dblog::Level level = dblog::DB_LOG_INFO
 			);
 
 
@@ -143,7 +143,7 @@ namespace synthese
 				, const std::string& field
 				, const std::string& oldValue
 				, const std::string& newValue
-				, const dblog::DBLogEntry::Level level = dblog::DBLogEntry::DB_LOG_INFO
+				, const dblog::Level level = dblog::DB_LOG_INFO
 			);
 
 

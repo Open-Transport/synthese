@@ -107,7 +107,7 @@ namespace synthese
 			);
 			if (id)
 			{
-				_searchLevel = static_cast<DBLogEntry::Level>(*id);
+				_searchLevel = static_cast<Level>(*id);
 			}
 		
 			// Text
@@ -234,7 +234,7 @@ namespace synthese
 		DBLogViewService::DBLogViewService(
 		):	_searchStartDate(not_a_date_time),
 			_searchEndDate(not_a_date_time),
-			_searchLevel(DBLogEntry::DB_LOG_UNKNOWN),
+			_searchLevel(DB_LOG_UNKNOWN),
 			_first(0),
 			_number(50),
 			_upSort(false)

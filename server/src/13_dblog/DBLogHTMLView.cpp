@@ -77,7 +77,7 @@ namespace synthese
 			_fixedStartDate(true),
 			_searchEndDate(not_a_date_time),
 			_fixedEndDate(true),
-			_searchLevel(DBLogEntry::DB_LOG_UNKNOWN),
+			_searchLevel(DB_LOG_UNKNOWN),
 			_fixedLevel(true),
 			_fixedUserId(true),
 			_fixedText(true),
@@ -97,7 +97,7 @@ namespace synthese
 			optional<util::RegistryKeyType> searchObjectId,
 			optional<util::RegistryKeyType> searchObjectId2,
 			optional<util::RegistryKeyType> searchUserId,
-			DBLogEntry::Level searchLevel,
+			Level searchLevel,
 			ptime searchStartDate,
 			ptime searchEndDate,
 			std::string searchText
@@ -136,14 +136,14 @@ namespace synthese
 			_searchUserId = searchUserId;
 
 			// Level
-			if(searchLevel == DBLogEntry::DB_LOG_UNKNOWN)
+			if(searchLevel == DB_LOG_UNKNOWN)
 			{
 				optional<int> id(
 					map.getOptional<int>(_getParameterName(PARAMETER_SEARCH_TYPE))
 				);
 				if (id)
 				{
-					searchLevel = static_cast<DBLogEntry::Level>(*id);
+					searchLevel = static_cast<Level>(*id);
 				}
 				_fixedLevel = false;
 			}

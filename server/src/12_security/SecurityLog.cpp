@@ -65,7 +65,7 @@ namespace synthese
 			c.push_back(lexical_cast<string>(LOGIN_ENTRY));
 			c.push_back(string());
 			c.push_back("Login succeeded");
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, user, user->getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, c, user, user->getKey());
 		}
 
 		void SecurityLog::addUserAdmin(const User* user, const User* subject, const string& text)
@@ -74,7 +74,7 @@ namespace synthese
 			c.push_back(lexical_cast<string>(USER_ADMIN_ENTRY));
 			c.push_back(string());
 			c.push_back(text);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, user, subject->getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, c, user, subject->getKey());
 		}
 
 		void SecurityLog::addProfileAdmin(const User* user, const Profile* subject, const std::string& text )
@@ -83,7 +83,7 @@ namespace synthese
 			c.push_back(lexical_cast<string>(PROFILE_ADMIN_ENTRY));
 			c.push_back(string());
 			c.push_back(text);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, c, user, subject->getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, c, user, subject->getKey());
 		}
 
 
@@ -159,7 +159,7 @@ namespace synthese
 			c.push_back(lexical_cast<string>(QUIT_ENTRY));
 			c.push_back(string());
 			c.push_back("SYNTHESE exited by user command");
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_WARNING, c, &user, user.getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_WARNING, c, &user, user.getKey());
 		}
 	}
 }

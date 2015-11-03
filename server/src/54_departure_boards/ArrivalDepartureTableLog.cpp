@@ -116,7 +116,7 @@ namespace synthese
 		){
 			DBLogEntry::Content content;
 			content.push_back(text);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, screen.getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, &user, screen.getKey());
 		}
 
 
@@ -125,7 +125,7 @@ namespace synthese
 		{
 			DBLogEntry::Content content;
 			content.push_back(text);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, cpu.getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, &user, cpu.getKey());
 		}
 
 
@@ -142,7 +142,7 @@ namespace synthese
 		){
 			DBLogEntry::Content content;
 			content.push_back("Suppression de l'afficheur " + screen->getFullName());
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, screen->getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, user, screen->getKey());
 		}
 
 		void ArrivalDepartureTableLog::addRemoveEntry(
@@ -151,42 +151,42 @@ namespace synthese
 		){
 			DBLogEntry::Content content;
 			content.push_back("Suppression de l'unité centrale " + cpu.getFullName());
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, cpu.getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, &user, cpu.getKey());
 		}
 
 		void ArrivalDepartureTableLog::addUpdateTypeEntry(const DisplayType* type , const security::User* user , const std::string& text )
 		{
 			DBLogEntry::Content content;
 			content.push_back("Mise à jour type d'afficheur " + type->get<Name>() + text);
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, type->getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, user, type->getKey());
 		}
 
 		void ArrivalDepartureTableLog::addCreateEntry(const DisplayType& type , const security::User& user )
 		{
 			DBLogEntry::Content content;
 			content.push_back("Création type d'afficheur " + type.get<Name>());
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, type.getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, &user, type.getKey());
 		}
 
 		void ArrivalDepartureTableLog::addDeleteTypeEntry(const DisplayType* type , const security::User* user )
 		{
 			DBLogEntry::Content content;
 			content.push_back("Suppression type d'afficheur " + type->get<Name>());
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, type->getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, user, type->getKey());
 		}
 
 		void ArrivalDepartureTableLog::addCreateEntry( const DisplayScreenCPU& cpu , const security::User& user )
 		{
 			DBLogEntry::Content content;
 			content.push_back("Création");
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, cpu.getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, &user, cpu.getKey());
 		}
 
 		void ArrivalDepartureTableLog::addCreateEntry( const DisplayScreen& cpu , const security::User& user )
 		{
 			DBLogEntry::Content content;
 			content.push_back("Création");
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, cpu.getKey());
+			_addEntry(FACTORY_KEY, DB_LOG_INFO, content, &user, cpu.getKey());
 		}
 	}
 }

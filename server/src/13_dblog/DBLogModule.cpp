@@ -82,33 +82,33 @@ namespace synthese
 			Labels m;
 			if (withAll)
 				m.push_back(make_pair(boost::optional<int>(), "(tous)"));
-			m.push_back(make_pair((int) DBLogEntry::DB_LOG_INFO, getEntryLevelLabel(DBLogEntry::DB_LOG_INFO)));
-			m.push_back(make_pair((int) DBLogEntry::DB_LOG_WARNING, getEntryLevelLabel(DBLogEntry::DB_LOG_WARNING)));
-			m.push_back(make_pair((int) DBLogEntry::DB_LOG_ERROR, getEntryLevelLabel(DBLogEntry::DB_LOG_ERROR)));
+			m.push_back(make_pair((int) DB_LOG_INFO, getEntryLevelLabel(DB_LOG_INFO)));
+			m.push_back(make_pair((int) DB_LOG_WARNING, getEntryLevelLabel(DB_LOG_WARNING)));
+			m.push_back(make_pair((int) DB_LOG_ERROR, getEntryLevelLabel(DB_LOG_ERROR)));
 			return m;
 		}
 
-		std::string DBLogModule::getEntryLevelLabel( const DBLogEntry::Level& level )
+		std::string DBLogModule::getEntryLevelLabel( const Level& level )
 		{
 			switch (level)
 			{
-			case DBLogEntry::DB_LOG_UNKNOWN : return "(inconnu)";
-			case DBLogEntry::DB_LOG_INFO : return "Information";
-			case DBLogEntry::DB_LOG_WARNING : return "Alerte";
-			case DBLogEntry::DB_LOG_ERROR : return "Erreur";
-			case DBLogEntry::DB_LOG_OK : return "Ok";
+			case DB_LOG_UNKNOWN : return "(inconnu)";
+			case DB_LOG_INFO : return "Information";
+			case DB_LOG_WARNING : return "Alerte";
+			case DB_LOG_ERROR : return "Erreur";
+			case DB_LOG_OK : return "Ok";
 			}
 			return string();
 		}
 
-		std::string DBLogModule::getEntryIcon( const DBLogEntry::Level& level )
+		std::string DBLogModule::getEntryIcon( const Level& level )
 		{
 			switch(level)
 			{
-			case DBLogEntry::DB_LOG_OK : return IMG_URL_OK;
-			case DBLogEntry::DB_LOG_INFO : return IMG_URL_INFO;
-			case DBLogEntry::DB_LOG_WARNING : return IMG_URL_WARNING;
-			case DBLogEntry::DB_LOG_ERROR : return IMG_URL_ERROR;
+			case DB_LOG_OK : return IMG_URL_OK;
+			case DB_LOG_INFO : return IMG_URL_INFO;
+			case DB_LOG_WARNING : return IMG_URL_WARNING;
+			case DB_LOG_ERROR : return IMG_URL_ERROR;
 			default : return string();
 			}
 		}
