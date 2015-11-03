@@ -48,6 +48,7 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/regex.hpp>
 #include <iostream>
 #include <iomanip>
 
@@ -1136,17 +1137,18 @@ namespace synthese
 
 			util::Log::GetInstance().info("Ineo Terminus : SYNTHESE has " + boost::lexical_cast<std::string>(activatedMessages.size()) + " active messages for " + ineoMessageType);
 
-			// Compute the "Ineo title" of each message and create a dictionary based on that key for fast lookup
-			BOOST_FOREACH(MessagesModule::ActivatedMessages::value_type message, activatedMessages)
+			// Compute the "Ineo title" of each activated message and create a map based on that key for fast lookup
+			BOOST_FOREACH(MessagesModule::SortedActivatedMessages::value_type message, activatedMessages)
 			{
 				std::string messageTitle = message->get<ShortMessage>();
 				RegistryKeyType messageId = message->getKey();
 				std::stringstream messageKeyStream;
-				messageKeyStream << std::setfill('0') << (messageId % 10000) << " " << messageTitle.substr(0, 27);
+				messageKeyStream << std::setw(4) << std::setfill('0') << (messageId % 10000);
+				messageKeyStream << std::setw(0) << " " << messageTitle.substr(0, 27);
 				mapActivatedMessages.insert(std::make_pair(messageKeyStream.str(), message));
 			}
 
-			// Perform a copy the map of currently activated messages that will be used to determine which messages must be sent to Ineo
+			// Perform a copy of the map of currently activated messages that will be used to determine which messages must be sent to Ineo
 			mapMessagesUnknownFromIneo = mapActivatedMessages;
 
 			XMLNode idNode = node.getChildNode("ID", 0);
@@ -1184,16 +1186,29 @@ namespace synthese
 
 					if(mapActivatedMessages.end() == it)
 					{
-						// This message is not a currently activated message of SYNTHESE, create it with origin = Ineo
-						vector<Messaging> messages;
-						messages.push_back(message);
+						// Ineo specified that SYNTHESE messages must comply to a specific naming convention
+						// Messages that are unknown from SYNTHESE but match this convention are ignored
+						static const boost::regex isFromSyntheseRegexp("[0-9]{4} ");
 
-						// Creation of a scenario and a message in SYNTHESE
-						// Note : Ineo does not expect SYNTHESE to reply to a XXXGetStatesResponse, so we do not create an error response
-						IneoApplicationError unused = AucuneErreur;
-						_createMessages(messages, fakeBroadCastPoint, unused);
+						if(true == boost::regex_match(message.name, isFromSyntheseRegexp))
+						{
+							// TODO : send Delete requests to remove them from SAE ?
+							util::Log::GetInstance().warn("Ineo Terminus : message " + message.name + " from Ineo ignored (seems to be a SYNTHESE message, but could not be matched)");
+						}
 
-						numCreatedMessages++;
+						else
+						{
+							// This message is not a currently activated message of SYNTHESE, create it with origin = Ineo
+							vector<Messaging> messages;
+							messages.push_back(message);
+
+							// Creation of a scenario and a message in SYNTHESE
+							// Note : Ineo does not expect SYNTHESE to reply to a XXXGetStatesResponse, so we do not create an error response
+							IneoApplicationError unused = AucuneErreur;
+							_createMessages(messages, fakeBroadCastPoint, unused);
+
+							numCreatedMessages++;
+						}
 					}
 
 					else
