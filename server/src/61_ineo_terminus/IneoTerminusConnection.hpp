@@ -245,6 +245,8 @@ namespace synthese
 
 				std::string _generateResponse(XMLNode& requestNode, const IneoApplicationError& errorCode);
 
+				std::string _generateDeleteRequest(const std::string& messageType, XMLNode& messageNode);
+
 				void _copyXMLNode(
 					XMLNode& node,
 					const int tabDepth,

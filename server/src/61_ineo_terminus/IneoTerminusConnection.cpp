@@ -1187,13 +1187,15 @@ namespace synthese
 					if(mapActivatedMessages.end() == it)
 					{
 						// Ineo specified that SYNTHESE messages must comply to a specific naming convention
-						// Messages that are unknown from SYNTHESE but match this convention are ignored
 						static const boost::regex isFromSyntheseRegexp("[0-9]{4} ");
 
 						if(true == boost::regex_match(message.name, isFromSyntheseRegexp))
 						{
-							// TODO : send Delete requests to remove them from SAE ?
-							util::Log::GetInstance().warn("Ineo Terminus : message " + message.name + " from Ineo ignored (seems to be a SYNTHESE message, but could not be matched)");
+							// This message matches SYNTHESE naming convention but is unknown
+							// Log a warning and send a delete request to Ineo
+							util::Log::GetInstance().warn("Ineo Terminus : message " + message.name + " from Ineo seems to be a SYNTHESE message, but could not be matched");
+							std::string deleteRequest = _generateDeleteRequest(ineoMessageType, messagingNode);
+							IneoTerminusConnection::GetTheConnection()->addMessage(deleteRequest);
 						}
 
 						else
@@ -1309,6 +1311,50 @@ namespace synthese
 				_copyXMLNode(messagingNode, tabDepth, responseStream);
 				responseStream << "\t</Messaging>" << char(10);
 			}
+
+			responseStream << "</" << responseTag << ">" << char(10);
+
+			return responseStream.str();
+		}
+
+
+		std::string IneoTerminusConnection::tcp_connection::_generateDeleteRequest(const std::string& messageType, XMLNode& messageNode)
+		{
+			std::stringstream responseStream;
+
+			// TODO : factor
+			boost::posix_time::ptime now = second_clock::local_time();
+			std::stringstream timestampStream;
+			timestampStream << setfill('0') << setw(2) << now.date().day() << "/"
+							<< setfill('0') << setw(2) << int(now.date().month()) << "/"
+							<< setfill('0') << setw(4) << now.date().year() << " "
+							<< setfill('0') << setw(2) << now.time_of_day().hours() << ":"
+							<< setfill('0') << setw(2) << now.time_of_day().minutes() << ":"
+							<< setfill('0') << setw(2) << now.time_of_day().seconds();
+
+			// Build the response tag
+			std::string responseTag = messageType + "DeleteRequest";
+
+			// Build the response header
+			responseStream << INEO_TERMINUS_XML_HEADER << char(10);
+
+			std::string xsdLocation = IneoTerminusConnection::GetTheConnection()->getIneoXSDLocation();
+			responseStream << "<" << responseTag;
+			if(false == xsdLocation.empty())
+			{
+				responseStream << " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"" << xsdLocation << "\"";
+			}
+			responseStream << ">" << char(10);
+
+			responseStream << "\t<ID>" << boost::lexical_cast<std::string>(IneoTerminusConnection::GetTheConnection()->getNextRequestID()) << "</ID>" << char(10);
+			responseStream << "\t<RequestTimeStamp>" << timestampStream.str() << "</RequestTimeStamp>" << char(10);
+			responseStream << "\t<RequestorRef>Terminus</RequestorRef>" << char(10);
+
+			// Copy the content of 'Messaging' node
+			responseStream << "\t<Messaging>" << char(10);
+			int tabDepth = 2;
+			_copyXMLNode(messageNode, tabDepth, responseStream);
+			responseStream << "\t</Messaging>" << char(10);
 
 			responseStream << "</" << responseTag << ">" << char(10);
 
