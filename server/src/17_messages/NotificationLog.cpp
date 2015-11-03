@@ -161,7 +161,7 @@ namespace synthese
 			Alarm& alarm = event->get<Alarm>().get();
 			NotificationProvider& provider = event->get<NotificationProvider>().get();
 
-			Level level = DB_LOG_INFO;
+			dblog::Level level = dblog::DB_LOG_INFO;
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(alarm.getKey()));
 
@@ -171,12 +171,12 @@ namespace synthese
 			if (event->get<Status>() == FAILED)
 			{
 				text << "' en échec pour le message '";
-				level = DB_LOG_ERROR;
+				level = dblog::DB_LOG_ERROR;
 			}
 			else if (event->get<Status>() == IN_PROGRESS)
 			{
 				text << "' en reprise pour le message '";
-				level = DB_LOG_WARNING;
+				level = dblog::DB_LOG_WARNING;
 			}
 			else if (event->get<Status>() == SUCCESS)
 			{
