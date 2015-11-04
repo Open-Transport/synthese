@@ -1216,7 +1216,7 @@ namespace synthese
 			for (int cptMessagingStateNode = 0; cptMessagingStateNode < numMessagingStateNode; cptMessagingStateNode++)
 			{
 				// Ineo specified that SYNTHESE messages must comply to a specific naming convention
-				static const boost::regex isFromSyntheseRegexp("[0-9]{4} ");
+				static const boost::regex isFromSyntheseRegexp("^[0-9]{4} [\\d|\\D]*");
 
 				XMLNode messagingStateNode = messagingStatesNode.getChildNode("MessagingState", cptMessagingStateNode);
 				XMLNode messagingNode = messagingStateNode.getChildNode("Messaging");
@@ -1891,8 +1891,9 @@ namespace synthese
 						scenarioSaveAction.run(fakeRequest);
 
 						// Enable or disable the scenario
-						isActive = isActive && sscenario->shouldBeEnabled(second_clock::local_time());
-						sscenario->setIsEnabled(isActive);
+						boost::shared_ptr<SentScenario> registryScenario = Env::GetOfficialEnv().getEditableRegistry<SentScenario>().getEditable(sscenario->getKey());
+						isActive = isActive && registryScenario->shouldBeEnabled(second_clock::local_time());
+						registryScenario->setIsEnabled(isActive);
 
 						// If the Ineo Terminus data source is configured, set it as the source of the scenario
 						std::string ineoDataSourceStr = IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE);
@@ -1901,7 +1902,7 @@ namespace synthese
 						if(0 != ineoDataSourceId) try
 						{
 							boost::shared_ptr<const DataSource> ineoDataSource = Env::GetOfficialEnv().getRegistry<DataSource>().get(ineoDataSourceId);
-							sscenario->addCodeBySource(*ineoDataSource, "");
+							registryScenario->addCodeBySource(*ineoDataSource, "");
 						}
 
 						catch(synthese::util::ObjectNotFoundException<impex::DataSource>&)
@@ -1909,7 +1910,7 @@ namespace synthese
 							util::Log::GetInstance().warn("Ineo Terminus : data source " + boost::lexical_cast<string>(_datasource_id) + " does not exist");
 						}
 
-						SentScenarioTableSync::Save(sscenario.get());
+						SentScenarioTableSync::Save(registryScenario.get());
 					}
 
 					else
