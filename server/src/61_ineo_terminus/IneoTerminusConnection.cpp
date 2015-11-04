@@ -22,6 +22,7 @@
 
 #include "IneoTerminusConnection.hpp"
 
+#include "TransportNetwork.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 #include "StopPoint.hpp"
@@ -30,14 +31,14 @@
 #include "DisplayScreenTableSync.h"
 #include "DataSourceTableSync.h"
 #include "ImportableTableSync.hpp"
+#include "SentScenarioTableSync.h"
+#include "CustomBroadcastPoint.hpp"
 #include "IneoTerminusModule.hpp"
 #include "Log.h"
 #include "Request.h"
 #include "ScenarioSaveAction.h"
 #include "ScenarioStopAction.h"
-#include "SentScenarioTableSync.h"
 #include "ServerModule.h"
-#include "TransportNetwork.h"
 #include "XmlToolkit.h"
 #include "NotificationProvider.hpp"
 #include "IneoNotificationChannel.hpp"
@@ -93,7 +94,13 @@ namespace synthese
 		boost::shared_ptr<IneoTerminusConnection> IneoTerminusConnection::_theConnection(new IneoTerminusConnection);
 		int IneoTerminusConnection::_idRequest(0);
 		
-		std::map<std::string, util::RegistryKeyType> IneoTerminusConnection::_fakeBroadcastPoints;
+		std::map<std::string, util::RegistryKeyType> IneoTerminusConnection::_fakeBroadcastPointIds;
+		std::map<std::string, boost::shared_ptr<messages::CustomBroadcastPoint> > IneoTerminusConnection::_fakeBroadcastPoints;
+
+		util::RegistryKeyType IneoTerminusConnection::_ineoNetworkID = 0;
+		util::RegistryKeyType IneoTerminusConnection::_ineoDatasource = 0;
+		std::string IneoTerminusConnection::_ineoXsdLocation = "";
+
 		std::set<std::string> IneoTerminusConnection::_creationRequestTags;
 		std::set<std::string> IneoTerminusConnection::_deletionRequestTags;
 		std::set<std::string> IneoTerminusConnection::_creationOrDeletionResponseTags;
@@ -102,8 +109,6 @@ namespace synthese
 		IneoTerminusConnection::IneoTerminusConnection(
 		)
 		{
-			_ineoNetworkID = 0;
-			_ineoDatasource = 0;
 			_ineoTickInterval = 0;
 			_ineoPort = "";
 		}
@@ -365,7 +370,7 @@ namespace synthese
 				changed = (_theConnection->_ineoDatasource != lexical_cast<RegistryKeyType>(value));
 				_theConnection->_ineoDatasource = lexical_cast<RegistryKeyType>(value);
 			}
-			if (name == MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL &&
+			if(name == MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL &&
 				!value.empty())
 			{
 				changed = (_theConnection->_ineoTickInterval != lexical_cast<int>(value));
@@ -387,82 +392,93 @@ namespace synthese
 				}
 			}
 
-			if (name == MODULE_PARAM_INEO_TERMINUS_XSD_LOCATION)
+			if(name == MODULE_PARAM_INEO_TERMINUS_XSD_LOCATION)
 			{
-				_theConnection ->_ineoXsdLocation = value;
+				_theConnection->_ineoXsdLocation = value;
 			}
 
 			if(name == MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST)
 			{
-				std::string ineoMessageType = "Passenger";
-				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
-				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+				ParameterBroadcastPointCallback(name, value, "Passenger");
 			}
 
 			if(name == MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST)
 			{
-				std::string ineoMessageType = "Driver";
-				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
-				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+				ParameterBroadcastPointCallback(name, value, "Driver");
 			}
 
 			if(name == MODULE_PARAM_INEO_TERMINUS_PPDS_FAKE_BROADCAST)
 			{
-				std::string ineoMessageType = "Ppds";
-				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
-				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+				ParameterBroadcastPointCallback(name, value, "Ppds");
 			}
 
 			if(name == MODULE_PARAM_INEO_TERMINUS_GIROUETTE_FAKE_BROADCAST)
 			{
-				std::string ineoMessageType = "Girouette";
-				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
-				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+				ParameterBroadcastPointCallback(name, value, "Girouette");
 			}
 
 			if(name == MODULE_PARAM_INEO_TERMINUS_SONOPASSENGER_FAKE_BROADCAST)
 			{
-				std::string ineoMessageType = "SonoPassenger";
-				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
-				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+				ParameterBroadcastPointCallback(name, value, "SonoPassenger");
 			}
 
 			if(name == MODULE_PARAM_INEO_TERMINUS_SONODRIVER_FAKE_BROADCAST)
 			{
-				std::string ineoMessageType = "SonoDriver";
-				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
-				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+				ParameterBroadcastPointCallback(name, value, "SonoDriver");
 			}
 
 			if(name == MODULE_PARAM_INEO_TERMINUS_SONOSTOPPOINT_FAKE_BROADCAST)
 			{
-				std::string ineoMessageType = "SonoStopPoint";
-				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
-				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+				ParameterBroadcastPointCallback(name, value, "SonoStopPoint");
 			}
 
 			if(name == MODULE_PARAM_INEO_TERMINUS_BIVGENERAL_FAKE_BROADCAST)
 			{
-				std::string ineoMessageType = "BivGeneral";
-				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
-				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+				ParameterBroadcastPointCallback(name, value, "BivGeneral");
 			}
 
 			if(name == MODULE_PARAM_INEO_TERMINUS_BIVLINEMAN_FAKE_BROADCAST)
 			{
-				std::string ineoMessageType = "BivLineMan";
-				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
-				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+				ParameterBroadcastPointCallback(name, value, "BivLineMan");
 			}
 
 			if(name == MODULE_PARAM_INEO_TERMINUS_BIVLINEAUTO_FAKE_BROADCAST)
 			{
-				std::string ineoMessageType = "BivLineAuto";
-				RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
-				_fakeBroadcastPoints[ineoMessageType] = registryKey;
+				ParameterBroadcastPointCallback(name, value, "BivLineAuto");
 			}
 		}
 
+
+		void IneoTerminusConnection::ParameterBroadcastPointCallback(
+			const std::string& name,
+			const std::string& value,
+			const std::string& messageType
+		) {
+			RegistryKeyType registryKey = boost::lexical_cast<RegistryKeyType>(value);
+
+			if(0 != registryKey)
+			{
+				try
+				{
+					boost::shared_ptr<CustomBroadcastPoint> bcastPoint = Env::GetOfficialEnv().getEditable<CustomBroadcastPoint>(registryKey);
+					_fakeBroadcastPoints[messageType]   = bcastPoint;
+					_fakeBroadcastPointIds[messageType] = registryKey;
+				}
+
+				catch(util::ObjectNotFoundException<CustomBroadcastPoint>&)
+				{
+					util::Log::GetInstance().warn(name + " " + value + " is not a valid broadcast point");
+					registryKey = 0;
+				}
+			}
+
+			_fakeBroadcastPointIds[messageType] = registryKey;
+
+			if(0 == registryKey)
+			{
+				_fakeBroadcastPoints[messageType] = boost::shared_ptr<CustomBroadcastPoint>();
+			}
+		}
 
 		int IneoTerminusConnection::getNextRequestID()
 		{
@@ -894,7 +910,7 @@ namespace synthese
 			// Extract Ineo message type from tag name
 			std::string tagName(node.getName());
 			std::string ineoMessageType = tagName.substr(0, tagName.find("CreateMessageRequest"));
-			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
+			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPointIds.at(ineoMessageType);
 
 			XMLNode IDNode = node.getChildNode("ID", 0);
 			string idStr = IDNode.getText();
@@ -926,7 +942,7 @@ namespace synthese
 			);
 
 			// Creation of a scenario and a message using ScenarioSaveAction
-			status = _createMessages(messages, fakeBroadCastPoint, errorCode);
+			status = _createMessages(messages, fakeBroadCastPoint, true, errorCode);
 
 			// Generate the XML response to this request
 			response = _generateResponse(node, errorCode);
@@ -958,7 +974,7 @@ namespace synthese
 			// Extract Ineo message type from tag name
 			std::string tagName(node.getName());
 			std::string ineoMessageType = tagName.substr(0, tagName.find("DeleteMessageRequest"));
-			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
+			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPointIds.at(ineoMessageType);
 
 			XMLNode IDNode = node.getChildNode("ID", 0);
 			string idStr = IDNode.getText();
@@ -1103,12 +1119,15 @@ namespace synthese
 				return status;
 			}
 
-			RegistryKeyType fakeBroadCastPoint = _fakeBroadcastPoints.at(ineoMessageType);
+			RegistryKeyType fakeBroadcastPointId = _fakeBroadcastPointIds.at(ineoMessageType);
+			boost::shared_ptr<CustomBroadcastPoint> fakeBroadcastPoint = _fakeBroadcastPoints.at(ineoMessageType);
 			boost::shared_ptr<NotificationProvider> provider;
 			MessagesModule::SortedActivatedMessages activatedMessages;
 			typedef std::map< std::string, boost::shared_ptr<Alarm> > MessageMap;
+			typedef std::map< std::string, boost::shared_ptr<SentScenario> > ScenarioMap;
 			MessageMap mapActivatedMessages;
 			MessageMap mapMessagesUnknownFromIneo;
+			ScenarioMap mapScenariosCreatedByIneo;
 
 			// Find the NotificationProvider matching this response and query its activated messages
 			BOOST_FOREACH(const NotificationProvider::Registry::value_type& providerEntry, Env::GetOfficialEnv().getRegistry<NotificationProvider>())
@@ -1139,8 +1158,40 @@ namespace synthese
 				mapActivatedMessages.insert(std::make_pair(messageKeyStream.str(), message));
 			}
 
-			// Perform a copy of the map of currently activated messages that will be used to determine which messages must be sent to Ineo
+			// Copy the map of currently activated messages to determine which messages must be sent to Ineo
 			mapMessagesUnknownFromIneo = mapActivatedMessages;
+
+			// Build the map of messages created by Ineo with this message type
+			if((0 != _ineoDatasource) && (0 != fakeBroadcastPointId))
+			{
+				boost::shared_ptr<DataSource> ineoDataSource = Env::GetOfficialEnv().getEditable<DataSource>(_ineoDatasource);
+				DataSource::LinkedObjects ineoSaeScenarios(ineoDataSource->getLinkedObjects<SentScenario>());
+
+				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& ineoSaeScenario, ineoSaeScenarios)
+				{
+					util::RegistryKeyType ineoSaeScenarioKey = ineoSaeScenario.second->getKey();
+
+					try
+					{
+						boost::shared_ptr<SentScenario> scenario = Env::GetOfficialEnv().getEditable<SentScenario>(ineoSaeScenarioKey);
+						SentScenario::Messages messages = scenario->getMessages();
+						const Alarm* firstMessage = (0 < messages.size() ? *(messages.begin()) : NULL);
+						if((NULL != firstMessage) && (firstMessage->isOnBroadcastPoint(*fakeBroadcastPoint, ParametersMap())))
+						{
+							mapScenariosCreatedByIneo.insert(std::make_pair(scenario->getName(), scenario));
+						}
+					}
+
+					catch(util::ObjectNotFoundException<SentScenario>&)
+					{
+						util::Log::GetInstance().warn(
+							"Ineo data source " + boost::lexical_cast<std::string>(_ineoDatasource) + " links to scenario " +
+							boost::lexical_cast<std::string>(ineoSaeScenarioKey) + " which does not exist in the official environment"
+						);
+					}
+				}
+			}
+
 
 			XMLNode idNode = node.getChildNode("ID", 0);
 			string idStr = idNode.getText();
@@ -1164,56 +1215,66 @@ namespace synthese
 
 			for (int cptMessagingStateNode = 0; cptMessagingStateNode < numMessagingStateNode; cptMessagingStateNode++)
 			{
+				// Ineo specified that SYNTHESE messages must comply to a specific naming convention
+				static const boost::regex isFromSyntheseRegexp("[0-9]{4} ");
+
 				XMLNode messagingStateNode = messagingStatesNode.getChildNode("MessagingState", cptMessagingStateNode);
 				XMLNode messagingNode = messagingStateNode.getChildNode("Messaging");
 				XMLNode isActiveNode = messagingStateNode.getChildNode("IsActive");
-				std::string isActiveText(isActiveNode.getText());
 
-				// Process this message only if it is active
-				if("oui" == isActiveText)
+				Messaging message = _readMessagingNode(messagingNode, ineoMessageType);
+				MessageMap::iterator itActivatedMessage = mapActivatedMessages.find(message.name);
+				ScenarioMap::iterator itIneoScenario = mapScenariosCreatedByIneo.find(message.name);
+
+				bool isActive = ("oui" == std::string(isActiveNode.getText()));
+				bool isFromSynthese = boost::regex_match(message.name, isFromSyntheseRegexp);
+
+				// Case 1 : message is from SYNTHESE
+				if(true == isFromSynthese)
 				{
-					Messaging message = _readMessagingNode(messagingNode, ineoMessageType);
-					MessageMap::iterator it = mapActivatedMessages.find(message.name);
-
-					if(mapActivatedMessages.end() == it)
+					if(mapActivatedMessages.end() == itActivatedMessage)
 					{
-						// Ineo specified that SYNTHESE messages must comply to a specific naming convention
-						static const boost::regex isFromSyntheseRegexp("[0-9]{4} ");
-
-						if(true == boost::regex_match(message.name, isFromSyntheseRegexp))
-						{
-							// This message matches SYNTHESE naming convention but is unknown
-							// Log a warning and send a delete request to Ineo
-							util::Log::GetInstance().warn("Ineo Terminus : message " + message.name + " from Ineo seems to be a SYNTHESE message, but could not be matched");
-							std::string deleteRequest = _generateDeleteRequest(ineoMessageType, messagingNode);
-							IneoTerminusConnection::GetTheConnection()->addMessage(deleteRequest);
-						}
-
-						else
-						{
-							// This message is not a currently activated message of SYNTHESE, create it with origin = Ineo
-							vector<Messaging> messages;
-							messages.push_back(message);
-
-							// Creation of a scenario and a message in SYNTHESE
-							// Note : Ineo does not expect SYNTHESE to reply to a XXXGetStatesResponse, so we do not create an error response
-							IneoApplicationError unused = AucuneErreur;
-							_createMessages(messages, fakeBroadCastPoint, unused);
-
-							numCreatedMessages++;
-						}
+						// Case 1a : message matches SYNTHESE naming convention but is either not currently active or unknown
+						// Log a warning and send a delete request to Ineo
+						util::Log::GetInstance().warn("Ineo Terminus : message " + message.name + " from Ineo seems to be a SYNTHESE message, but could not be matched");
+						std::string deleteRequest = _generateDeleteRequest(ineoMessageType, messagingNode);
+						IneoTerminusConnection::GetTheConnection()->addMessage(deleteRequest);
 					}
 
 					else
 					{
-						// This message is a currently activated message of SYNTHESE, remove it from the list of messages unknown from Ineo
+						// Case 1b : message is a currently activated message of SYNTHESE, remove it from the list of messages unknown from Ineo
 						mapMessagesUnknownFromIneo.erase(message.name);
 						util::Log::GetInstance().debug("Ineo Terminus : message " + message.name + " from Ineo matches a SYNTHESE message, do not recreate");
 					}
 				}
+
+				// Case 2 : message is from Ineo
+				else
+				{
+					if(mapScenariosCreatedByIneo.end() == itIneoScenario)
+					{
+						// Case 2a : this Ineo message is a new one, create it with origin = Ineo
+						vector<Messaging> messages;
+						messages.push_back(message);
+
+						// Creation of a scenario and a message in SYNTHESE
+						// Note : Ineo does not expect SYNTHESE to reply to a XXXGetStatesResponse, so we do not create an error response
+						IneoApplicationError unused = AucuneErreur;
+						_createMessages(messages, fakeBroadcastPointId, isActive, unused);
+
+						numCreatedMessages++;
+					}
+
+					else
+					{
+						// Case 2b : this Ineo message already exists in SYNTHESE
+						// TODO : update existing message ?
+					}
+				}
 			}
 
-			// Loop through the list of currently activated messages that Ineo does not know, and send them to Ineo
+			// Loop through the list of currently activated messages unknown from Ineo, and send them to Ineo
 			BOOST_FOREACH(MessageMap::value_type messageEntry, mapMessagesUnknownFromIneo)
 			{
 				// NotificationProvider does not process Alarm, it requires a NotificationEvent
@@ -1788,8 +1849,12 @@ namespace synthese
 		}
 
 
-		bool IneoTerminusConnection::tcp_connection::_createMessages(std::vector<Messaging> messages, RegistryKeyType fakeBroadCastPoint, IneoApplicationError& errorCode)
-		{
+		bool IneoTerminusConnection::tcp_connection::_createMessages(
+				std::vector<Messaging> messages,
+				RegistryKeyType fakeBroadCastPoint,
+				bool isActive,
+				IneoApplicationError& errorCode
+		) {
 			boost::shared_ptr<ParametersMap> messagesAndCalendarsPM(new ParametersMap);
 			bool status = _buildMessagingParametersMap(messages, fakeBroadCastPoint, messagesAndCalendarsPM, errorCode);
 
@@ -1825,8 +1890,9 @@ namespace synthese
 						Request fakeRequest;
 						scenarioSaveAction.run(fakeRequest);
 
-						// Enable the scenario
-						sscenario->setIsEnabled(true);
+						// Enable or disable the scenario
+						isActive = isActive && sscenario->shouldBeEnabled(second_clock::local_time());
+						sscenario->setIsEnabled(isActive);
 
 						// If the Ineo Terminus data source is configured, set it as the source of the scenario
 						std::string ineoDataSourceStr = IneoTerminusModule::GetParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE);

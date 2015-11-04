@@ -46,6 +46,11 @@ namespace synthese
 		class StopPoint;
 	}
 
+	namespace messages
+	{
+		class CustomBroadcastPoint;
+	}
+
 	namespace ineo_terminus
 	{
 		/** IneoTerminusConnection class.
@@ -109,17 +114,18 @@ namespace synthese
 		private:
 			static boost::shared_ptr<IneoTerminusConnection> _theConnection;
 			static int _idRequest;
-			static std::map<std::string, util::RegistryKeyType> _fakeBroadcastPoints;
+			static std::map<std::string, util::RegistryKeyType> _fakeBroadcastPointIds;
+			static std::map<std::string, boost::shared_ptr<messages::CustomBroadcastPoint> > _fakeBroadcastPoints;
 			static std::set<std::string> _creationRequestTags;
 			static std::set<std::string> _deletionRequestTags;
 			static std::set<std::string> _creationOrDeletionResponseTags;
 			static std::set<std::string> _getStatesResponseTags;
+			static util::RegistryKeyType _ineoNetworkID;
+			static util::RegistryKeyType _ineoDatasource;
+			static std::string _ineoXsdLocation;
 
 			std::string _ineoPort;
-			util::RegistryKeyType _ineoNetworkID;
-			util::RegistryKeyType _ineoDatasource;
 			int _ineoTickInterval;
-			std::string _ineoXsdLocation;
 
 			mutable Status _status;
 
@@ -264,7 +270,7 @@ namespace synthese
 					IneoApplicationError& errorCode
 				);
 
-				bool _createMessages(std::vector<Messaging> messages, util::RegistryKeyType fakeBroadCastPoint, IneoApplicationError& errorCode);
+				bool _createMessages(std::vector<Messaging> messages, util::RegistryKeyType fakeBroadCastPoint, bool isActive, IneoApplicationError& errorCode);
 
 				//generic writers
 				bool _addRecipientsPM(util::ParametersMap& pm, std::vector<IneoTerminusConnection::Recipient>, IneoApplicationError& errorCode);
@@ -342,6 +348,12 @@ namespace synthese
 			static void ParameterCallback(
 				const std::string& name,
 				const std::string& value
+			);
+
+			static void ParameterBroadcastPointCallback(
+				const std::string& name,
+				const std::string& value,
+				const std::string& messageType
 			);
 
 			static void MessageSender();
