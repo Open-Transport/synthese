@@ -35,6 +35,7 @@
 #include "RankUpdateQuery.hpp"
 #include "ReplaceQuery.h"
 #include "Session.h"
+#include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "Timetable.h"
 #include "TimetableRight.h"

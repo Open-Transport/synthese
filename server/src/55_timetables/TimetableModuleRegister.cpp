@@ -63,7 +63,7 @@ void synthese::timetables::moduleRegister()
 	// Registries
 	INTEGRATE(synthese::timetables::TimetableRowGroupItem);
 	INTEGRATE(synthese::timetables::TimetableRowGroup);
-	synthese::util::Env::Integrate<synthese::timetables::TimetableRow>();
+	INTEGRATE(synthese::timetables::TimetableRow);
 	INTEGRATE(synthese::timetables::Timetable);
 
 }

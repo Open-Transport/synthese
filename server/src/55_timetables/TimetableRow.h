@@ -23,8 +23,9 @@
 #ifndef SYNTHESE_timetables_TimetableRow_h__
 #define SYNTHESE_timetables_TimetableRow_h__
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
+
+#include "EnumObjectField.hpp"
 
 namespace synthese
 {
@@ -35,6 +36,30 @@ namespace synthese
 
 	namespace timetables
 	{
+		enum tTypeGareIndicateur
+		{
+			PassageFacultatif = -1
+			, PassageObligatoire = 0
+			, PassageSuffisant = 1
+			, CompulsoryHidden = 2
+		};
+
+		FIELD_ID(TimetableParent)
+		FIELD_POINTER(TimetableStopArea, pt::StopArea)
+		FIELD_BOOL(IsDeparture)
+		FIELD_BOOL(IsArrival)
+		FIELD_ENUM(Compulsory, tTypeGareIndicateur)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(TimetableParent),
+			FIELD(Rank),
+			FIELD(TimetableStopArea),
+			FIELD(IsDeparture),
+			FIELD(IsArrival),
+			FIELD(Compulsory)
+		> TimetableRowSchema;
+
 		/** Time table row class.
 
 			caractérisée par:
@@ -47,29 +72,8 @@ namespace synthese
 			@ingroup m55
 		*/
 		class TimetableRow
-		:	public virtual util::Registrable
+		:	public Object<TimetableRow, TimetableRowSchema>
 		{
-		public:
-			/// Chosen registry class.
-			typedef util::Registry<TimetableRow>	Registry;
-
-			enum tTypeGareIndicateur
-			{
-				PassageFacultatif = -1
-				, PassageObligatoire = 0
-				, PassageSuffisant = 1
-				, CompulsoryHidden = 2
-			};
-
-		private:
-			// Variables
-			const pt::StopArea*	_place;
-			bool												_isDeparture;
-			bool												_isArrival;
-			tTypeGareIndicateur									_compulsory;
-			std::size_t											_rank;
-			util::RegistryKeyType								_timetableId;
-
 		public:
 			// Constructor
 			TimetableRow(
@@ -78,23 +82,27 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const pt::StopArea*	getPlace()			const { return _place; }
-				tTypeGareIndicateur 								getCompulsory()		const { return _compulsory; }
-				std::size_t											getRank()			const { return _rank; }
-				util::RegistryKeyType								getTimetableId()	const { return _timetableId; }
-				bool												getIsArrival()		const { return _isArrival; }
-				bool												getIsDeparture()	const { return _isDeparture; }
+				const pt::StopArea*									getPlace()			const;
+				tTypeGareIndicateur 								getCompulsory()		const { return get<Compulsory>(); }
+				std::size_t											getRank()			const { return get<Rank>(); }
+				util::RegistryKeyType								getTimetableId()	const { return get<TimetableParent>(); }
+				bool												getIsArrival()		const { return get<IsArrival>(); }
+				bool												getIsDeparture()	const { return get<IsDeparture>(); }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setRank(std::size_t value) { _rank = value; }
-				void setPlace(const pt::StopArea* place) { _place = place; }
-				void setCompulsory(tTypeGareIndicateur compulsory) { _compulsory = compulsory; }
-				void setTimetableId(util::RegistryKeyType id) { _timetableId = id; }
-				void setIsArrival(bool value) { _isArrival = value; }
-				void setIsDeparture(bool value) { _isDeparture = value; }
+				void setRank(std::size_t value) { set<Rank>(value); }
+				void setPlace(const pt::StopArea* place);
+				void setCompulsory(tTypeGareIndicateur compulsory) { set<Compulsory>(compulsory); }
+				void setTimetableId(util::RegistryKeyType id) { set<TimetableParent>(id); }
+				void setIsArrival(bool value) { set<IsArrival>(value); }
+				void setIsDeparture(bool value) { set<IsDeparture>(value); }
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 	}
 }

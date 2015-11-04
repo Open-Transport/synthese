@@ -46,8 +46,6 @@ namespace synthese
 			FirstIsForbidden = 3
 		};
 
-		FIELD_BOOL(IsDeparture)
-		FIELD_BOOL(IsArrival)
 		FIELD_BOOL(Display)
 		FIELD_ENUM(TimetableRowRule, TimetableRowRuleEnum)
 		FIELD_BOOL(AutoRowsOrder)

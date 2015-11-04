@@ -28,7 +28,6 @@
 
 #include "TimetableRow.h"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -45,20 +44,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				TimetableRowTableSync,
 				TimetableRow,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>
 		{
 		public:
-			static const std::string COL_TIMETABLE_ID;
-			static const std::string COL_RANK;
-			static const std::string COL_PLACE_ID;
-			static const std::string COL_IS_DEPARTURE;
-			static const std::string COL_IS_ARRIVAL;
-			static const std::string COL_IS_COMPULSORY;
-
-
-
 			/** TimetablesRow search.
 				@param env Environment to populate
 				@param timetableId ID of the timetable which the rows must belong
@@ -89,6 +78,7 @@ namespace synthese
 
 			static boost::optional<size_t> GetMaxRank(util::RegistryKeyType timetableId);
 
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

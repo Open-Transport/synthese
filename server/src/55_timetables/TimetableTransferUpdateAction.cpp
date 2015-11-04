@@ -27,12 +27,13 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "Profile.h"
-#include "Session.h"
-#include "TimetableRight.h"
-#include "User.h"
 #include "Request.h"
-#include "TimetableTableSync.h"
+#include "Session.h"
+#include "StopArea.hpp"
 #include "Timetable.h"
+#include "TimetableRight.h"
+#include "TimetableTableSync.h"
+#include "User.h"
 
 using namespace std;
 

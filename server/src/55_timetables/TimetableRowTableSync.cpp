@@ -51,16 +51,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,TimetableRowTableSync>::FACTORY_KEY("55.02 Timetable rows");
 	}
 
-	namespace timetables
-	{
-		const string TimetableRowTableSync::COL_TIMETABLE_ID("timetable_id");
-		const string TimetableRowTableSync::COL_RANK("rank");
-		const string TimetableRowTableSync::COL_PLACE_ID("place_id");
-		const string TimetableRowTableSync::COL_IS_DEPARTURE("is_departure");
-		const string TimetableRowTableSync::COL_IS_ARRIVAL("is_arrival");
-		const string TimetableRowTableSync::COL_IS_COMPULSORY("is_compulsory");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<TimetableRowTableSync>::TABLE(
@@ -70,13 +60,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<TimetableRowTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(TimetableRowTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
-			Field(TimetableRowTableSync::COL_RANK, SQL_INTEGER),
-			Field(TimetableRowTableSync::COL_PLACE_ID, SQL_INTEGER),
-			Field(TimetableRowTableSync::COL_IS_DEPARTURE, SQL_INTEGER),
-			Field(TimetableRowTableSync::COL_IS_ARRIVAL, SQL_INTEGER),
-			Field(TimetableRowTableSync::COL_IS_COMPULSORY, SQL_INTEGER),
 			Field()
 		};
 
@@ -85,66 +68,10 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					TimetableRowTableSync::COL_TIMETABLE_ID.c_str(),
-					TimetableRowTableSync::COL_RANK.c_str(),
+					TimetableParent::FIELD.name.c_str(),
+					Rank::FIELD.name.c_str(),
 			"")	);
 			return r;
-		}
-
-
-
-		template<> void OldLoadSavePolicy<TimetableRowTableSync,TimetableRow>::Load(
-			TimetableRow* object
-			, const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			// Properties
-			object->setKey(rows->getLongLong(TABLE_COL_ID));
-			object->setCompulsory(static_cast<TimetableRow::tTypeGareIndicateur>(rows->getInt(TimetableRowTableSync::COL_IS_COMPULSORY)));
-			object->setIsArrival(rows->getBool(TimetableRowTableSync::COL_IS_ARRIVAL));
-			object->setIsDeparture(rows->getBool(TimetableRowTableSync::COL_IS_DEPARTURE));
-
-			try
-			{
-				object->setPlace(
-					StopAreaTableSync::GetEditable(
-						rows->getLongLong(TimetableRowTableSync::COL_PLACE_ID),
-						env, linkLevel
-					).get()
-				);
-			}
-			catch (...)
-			{
-				Log::GetInstance().warn("Error in timetable definition : no such place");
-			}
-
-			object->setRank(rows->getInt(TimetableRowTableSync::COL_RANK));
-
-			object->setTimetableId(rows->getLongLong(TimetableRowTableSync::COL_TIMETABLE_ID));
-		}
-
-
-
-		template<> void OldLoadSavePolicy<TimetableRowTableSync,TimetableRow>::Save(
-			TimetableRow* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<TimetableRowTableSync> query(*object);
-			query.addField(object->getTimetableId());
-			query.addField(object->getRank());
-			query.addField(object->getPlace() ? object->getPlace()->getKey() : RegistryKeyType(0));
-			query.addField(object->getIsDeparture());
-			query.addField(object->getIsArrival());
-			query.addField(static_cast<int>(object->getCompulsory()));
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<TimetableRowTableSync,TimetableRow>::Unlink(
-			TimetableRow* obj
-		){
 		}
 
 
@@ -203,14 +130,14 @@ namespace synthese
 			// Selection
 			if (timetableId)
 			{
-				query.addWhereField(COL_TIMETABLE_ID, *timetableId);
+				query.addWhereField(TimetableParent::FIELD.name, *timetableId);
 			}
 
 			// Ordering
 			if (orderByTimetable)
 			{
-				query.addOrderField(COL_TIMETABLE_ID, raisingOrder);
-				query.addOrderField(COL_RANK, raisingOrder);
+				query.addOrderField(TimetableParent::FIELD.name, raisingOrder);
+				query.addOrderField(Rank::FIELD.name, raisingOrder);
 			}
 
 			// Size
@@ -230,8 +157,8 @@ namespace synthese
 			int delta,
 			optional<DBTransaction&> transaction
 		){
-			RankUpdateQuery<TimetableRowTableSync> query(COL_RANK, delta, rank);
-			query.addWhereField(COL_TIMETABLE_ID, timetableId);
+			RankUpdateQuery<TimetableRowTableSync> query(Rank::FIELD.name, delta, rank);
+			query.addWhereField(TimetableParent::FIELD.name, timetableId);
 			query.execute(transaction);
 		}
 
@@ -245,9 +172,9 @@ namespace synthese
 
 			// Content
 			query
-				<< "SELECT MAX(" << COL_RANK << ") AS mr "
+				<< "SELECT MAX(" << Rank::FIELD.name << ") AS mr "
 				<< " FROM " << TABLE.NAME
-				<< " WHERE " << COL_TIMETABLE_ID << "=" << timetableId
+				<< " WHERE " << TimetableId::FIELD.name << "=" << timetableId
 			;
 
 			try
@@ -263,6 +190,11 @@ namespace synthese
 			{
 				throw Exception(e.getMessage());
 			}
+		}
+
+		bool TimetableRowTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(security::READ);
 		}
 	}
 }

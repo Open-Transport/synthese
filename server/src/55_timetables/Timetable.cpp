@@ -23,12 +23,13 @@
 #include "Timetable.h"
 
 #include "CalendarTemplate.h"
+#include "CommercialLine.h"
+#include "Conversion.h"
 #include "Request.h"
+#include "StopArea.hpp"
+#include "StopPoint.hpp"
 #include "TimetableRowTableSync.h"
 #include "TimetableRowGroupTableSync.hpp"
-#include "Conversion.h"
-#include "StopPoint.hpp"
-#include "CommercialLine.h"
 
 using namespace std;
 using namespace boost;

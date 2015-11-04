@@ -22,14 +22,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "MultipleTimetableGenerateFunction.hpp"
+
+#include "CalendarTemplateTableSync.h"
 #include "RequestException.h"
 #include "Request.h"
-#include "MultipleTimetableGenerateFunction.hpp"
-#include "WebPageTableSync.h"
-#include "CalendarTemplateTableSync.h"
-#include "TimetableTableSync.h"
+#include "StopArea.hpp"
 #include "Timetable.h"
 #include "TimetableGenerateFunction.h"
+#include "TimetableTableSync.h"
+#include "WebPageTableSync.h"
 
 using namespace std;
 using namespace boost;

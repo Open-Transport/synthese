@@ -21,10 +21,12 @@
 */
 
 #include "TimetableModule.h"
-#include "TimetableTableSync.h"
-#include "Timetable.h"
+
 #include "CalendarTemplate.h"
 #include "Env.h"
+#include "StopArea.hpp"
+#include "Timetable.h"
+#include "TimetableTableSync.h"
 
 using namespace std;
 using namespace boost;

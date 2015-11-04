@@ -25,17 +25,17 @@
 #include "TimetableSetPhysicalStopAction.h"
 
 #include "ActionException.h"
+#include "Env.h"
 #include "ParametersMap.h"
 #include "Profile.h"
+#include "Request.h"
 #include "Session.h"
+#include "StopArea.hpp"
+#include "StopPoint.hpp"
+#include "Timetable.h"
+#include "TimetableTableSync.h"
 #include "TimetableRight.h"
 #include "User.h"
-#include "Request.h"
-#include "StopPoint.hpp"
-#include "TimetableTableSync.h"
-#include "StopPoint.hpp"
-#include "Env.h"
-#include "Timetable.h"
 
 using namespace std;
 using namespace boost;

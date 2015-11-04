@@ -25,16 +25,17 @@
 #include "TimetableUpdateAction.h"
 
 #include "ActionException.h"
+#include "CalendarTemplate.h"
+#include "CalendarTemplateTableSync.h"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "Request.h"
 #include "Session.h"
-#include "TimetableRight.h"
+#include "StopArea.hpp"
 #include "Timetable.h"
+#include "TimetableRight.h"
 #include "TimetableTableSync.h"
 #include "User.h"
-#include "CalendarTemplate.h"
-#include "CalendarTemplateTableSync.h"
 
 using namespace std;
 

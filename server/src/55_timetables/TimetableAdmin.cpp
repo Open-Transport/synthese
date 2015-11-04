@@ -25,46 +25,46 @@
 #include "TimetableAdmin.h"
 
 #include "ActionResultHTMLTable.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
+#include "AdminInterfaceElement.h"
+#include "AdminParametersException.h"
+#include "Calendar.h"
 #include "CalendarModule.h"
+#include "CalendarTemplateTableSync.h"
+#include "CommercialLine.h"
 #include "City.h"
 #include "HTMLModule.h"
+#include "JourneyPattern.hpp"
 #include "LinePhysicalStop.hpp"
+#include "LineStop.h"
+#include "ModuleAdmin.h"
 #include "ObjectCreateAction.hpp"
 #include "ObjectUpdateAction.hpp"
+#include "Profile.h"
 #include "PropertiesHTMLTable.h"
+#include "RemoveObjectAction.hpp"
 #include "StopArea.hpp"
-#include "TimetableModule.h"
-#include "TimetableGenerateFunction.h"
-#include "TimetableTableSync.h"
-#include "User.h"
-#include "Calendar.h"
-#include "JourneyPattern.hpp"
-#include "CommercialLine.h"
-#include "CalendarTemplateTableSync.h"
+#include "StopPoint.hpp"
+#include "StopPointTableSync.hpp"
 #include "Timetable.h"
+#include "TimetableAddAction.h"
+#include "TimetableGenerateFunction.h"
+#include "TimetableModule.h"
+#include "TimetableResult.hpp"
 #include "TimetableRight.h"
 #include "TimetableRow.h"
+#include "TimetableRowAddAction.h"
 #include "TimetableRowGroup.hpp"
 #include "TimetableRowGroupItem.hpp"
 #include "TimetableRowGroupItemAddAction.hpp"
 #include "TimetableRowTableSync.h"
-#include "TimetableUpdateAction.h"
-#include "TimetableRowAddAction.h"
-#include "AdminActionFunctionRequest.hpp"
-#include "AdminFunctionRequest.hpp"
-#include "ModuleAdmin.h"
-#include "AdminInterfaceElement.h"
-#include "AdminParametersException.h"
-#include "TimetableAddAction.h"
 #include "TimetableSetLineAction.h"
-#include "StopPoint.hpp"
-#include "LineStop.h"
-#include "Profile.h"
 #include "TimetableSetPhysicalStopAction.h"
-#include "StopPointTableSync.hpp"
-#include "TimetableResult.hpp"
+#include "TimetableTableSync.h"
 #include "TimetableTransferUpdateAction.hpp"
-#include "RemoveObjectAction.hpp"
+#include "TimetableUpdateAction.h"
+#include "User.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -477,14 +477,14 @@ namespace synthese
 							;
 							stream <<
 								t.col() <<
-								(	(row->getCompulsory() == TimetableRow::PassageObligatoire) ?
+								(	(row->getCompulsory() == PassageObligatoire) ?
 									HTMLModule::getHTMLImage("/admin/img/bullet_green.png", "Obligatoire") :
 									HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Non obligatoire")
 								)
 							;
 							stream <<
 								t.col() <<
-								(	(row->getCompulsory() == TimetableRow::PassageSuffisant) ?
+								(	(row->getCompulsory() == PassageSuffisant) ?
 									HTMLModule::getHTMLImage("/admin/img/bullet_green.png", "Suffisant") :
 									HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Non suffisant")
 								)

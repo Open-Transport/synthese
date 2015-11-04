@@ -26,6 +26,7 @@
 #include "RankUpdateQuery.hpp"
 #include "SelectQuery.hpp"
 #include "SQLSingleOperatorExpression.hpp"
+#include "StopArea.hpp"
 
 #include <boost/foreach.hpp>
 

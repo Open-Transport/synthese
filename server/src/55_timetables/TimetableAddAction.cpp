@@ -25,18 +25,19 @@
 #include "TimetableAddAction.h"
 
 #include "ActionException.h"
+#include "CalendarTemplate.h"
 #include "DBTransaction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "Request.h"
 #include "Session.h"
+#include "StopArea.hpp"
+#include "Timetable.h"
 #include "TimetableRight.h"
 #include "TimetableRow.h"
-#include "Timetable.h"
-#include "TimetableTableSync.h"
 #include "TimetableRowTableSync.h"
+#include "TimetableTableSync.h"
 #include "User.h"
-#include "CalendarTemplate.h"
 
 #include <boost/foreach.hpp>
 

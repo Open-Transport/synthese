@@ -22,28 +22,75 @@
 
 #include "TimetableRow.h"
 
+#include "Profile.h"
+#include "Session.h"
+#include "StopArea.hpp"
+#include "TimetableRight.h"
+#include "User.h"
+
 using namespace std;
 
 namespace synthese
 {
+	using namespace timetables;
 	using namespace util;
 
-	namespace util
-	{
-		template<> const std::string Registry<timetables::TimetableRow>::KEY("TimetableRow");
-	}
+	CLASS_DEFINITION(TimetableRow, "t053_timetable_rows", 53)
+	FIELD_DEFINITION_OF_OBJECT(TimetableRow, "timetable_row_id", "timetable_row_ids")
+
+	FIELD_DEFINITION_OF_TYPE(TimetableParent, "timetable_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(TimetableStopArea, "place_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(IsDeparture, "is_departure", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(IsArrival, "is_arrival", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(Compulsory, "is_compulsory", SQL_INTEGER)
 
 	namespace timetables
 	{
 		TimetableRow::TimetableRow(
 			RegistryKeyType id
 		):	Registrable(id),
-			_place(NULL),
-			_isDeparture(true),
-			_isArrival(true),
-			_compulsory(PassageFacultatif),
-			_rank(0),
-			_timetableId(0)
+			Object<TimetableRow, TimetableRowSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_VALUE_CONSTRUCTOR(TimetableParent, 0),
+					FIELD_VALUE_CONSTRUCTOR(Rank, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(TimetableStopArea),
+					FIELD_VALUE_CONSTRUCTOR(IsDeparture, true),
+					FIELD_VALUE_CONSTRUCTOR(IsArrival, true),
+					FIELD_VALUE_CONSTRUCTOR(Compulsory, PassageFacultatif)
+			)	)
 		{
+		}
+
+		const pt::StopArea* TimetableRow::getPlace() const
+		{
+			if (get<TimetableStopArea>())
+			{
+				return get<TimetableStopArea>().get_ptr();
+			}
+
+			return NULL;
+		}
+
+		void TimetableRow::setPlace(const pt::StopArea* place)
+		{
+			set<TimetableStopArea>(place
+				? boost::optional<pt::StopArea&>(*const_cast<pt::StopArea*>(place))
+				: boost::none);
+		}
+
+		bool TimetableRow::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(security::WRITE);
+		}
+
+		bool TimetableRow::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(security::WRITE);
+		}
+
+		bool TimetableRow::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(security::DELETE_RIGHT);
 		}
 }	}

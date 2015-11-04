@@ -40,8 +40,6 @@ namespace synthese
 	CLASS_DEFINITION(TimetableRowGroup, "t090_timetable_rowgroups", 90)
 	FIELD_DEFINITION_OF_OBJECT(TimetableRowGroup, "row_group_id", "row_group_ids")
 
-	FIELD_DEFINITION_OF_TYPE(IsDeparture, "is_departure", SQL_BOOLEAN)
-	FIELD_DEFINITION_OF_TYPE(IsArrival, "is_arrival", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(Display, "display", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(TimetableRowRule, "rule", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(AutoRowsOrder, "auto_rows_order", SQL_BOOLEAN)
