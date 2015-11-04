@@ -69,6 +69,7 @@ Empty Object List Should Work For Any Table
     ${LOG_ENTRIES_TABLE_ID}
     ${USER_FAVORITE_JOURNEY_TABLE_ID}
     ${TIMETABLE_ROWS_TABLE_ID}
+    ${DISPLAY_MONITORING_STATUS_TABLE_ID}
     
 Object List Should Work For Some Tables
     On node 0

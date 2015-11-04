@@ -419,7 +419,7 @@ namespace synthese
 
 				if(_status.get() != NULL)
 				{
-					DisplayMonitoringStatus::Status globalStatus(_status->getGlobalStatus());
+					Status globalStatus(_status->getGlobalStatus());
 					stream << l.element() << "Dernière mesure le " << to_simple_string(_status->getTime());
 					stream << l.element() << "Dernier état mesuré : " <<
 						HTMLModule::getHTMLImage(

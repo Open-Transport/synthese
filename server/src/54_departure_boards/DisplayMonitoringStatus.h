@@ -31,8 +31,11 @@
 #include <boost/optional.hpp>
 #include <boost/optional/optional_io.hpp>
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
+
+#include "EnumObjectField.hpp"
+#include "PtimeField.hpp"
+#include "StringField.hpp"
 
 namespace synthese
 {
@@ -40,6 +43,54 @@ namespace synthese
 	{
 		class DisplayScreen;
 		class DisplayScreenCPU;
+
+		// Typedef
+		typedef enum
+		{
+			DISPLAY_MONITORING_OK		= 0,
+			DISPLAY_MONITORING_WARNING	= 10,
+			DISPLAY_MONITORING_ERROR	= 20,
+			DISPLAY_MONITORING_UNKNOWN	= 30
+		} Status;
+
+		FIELD_ID(StatusScreen)
+		FIELD_PTIME(StatusTime)
+		FIELD_ENUM(GeneralStatus, Status)
+		FIELD_ENUM(MemoryStatus, Status)
+		FIELD_ENUM(ClockStatus, Status)
+		FIELD_ENUM(EepromStatus, Status)
+		FIELD_ENUM(TempSensorStatus, Status)
+		FIELD_ENUM(LightStatus, Status)
+		FIELD_STRING(LightDetail)
+		FIELD_ENUM(DisplayStatus, Status)
+		FIELD_STRING(DisplayDetail)
+		FIELD_ENUM(SoundStatus, Status)
+		FIELD_STRING(SoundDetail)
+		FIELD_ENUM(TemperatureStatus, Status)
+		FIELD_DOUBLE(TemperatureValue)
+		FIELD_ENUM(CommunicationStatus, Status)
+		FIELD_ENUM(LocalizationStatus, Status)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(StatusScreen),
+			FIELD(StatusTime),
+			FIELD(GeneralStatus),
+			FIELD(MemoryStatus),
+			FIELD(ClockStatus),
+			FIELD(EepromStatus),
+			FIELD(TempSensorStatus),
+			FIELD(LightStatus),
+			FIELD(LightDetail),
+			FIELD(DisplayStatus),
+			FIELD(DisplayDetail),
+			FIELD(SoundStatus),
+			FIELD(SoundDetail),
+			FIELD(TemperatureStatus),
+			FIELD(TemperatureValue),
+			FIELD(CommunicationStatus),
+			FIELD(LocalizationStatus)
+		> DisplayMonitoringStatusSchema;
 
 		////////////////////////////////////////////////////////////////////////
 		///	Display monitoring status class.
@@ -49,40 +100,12 @@ namespace synthese
 		///	@ingroup m54
 		////////////////////////////////////////////////////////////////////////
 		class DisplayMonitoringStatus
-		:	public util::Registrable
+		:	public Object<DisplayMonitoringStatus, DisplayMonitoringStatusSchema>
 		{
-		public:
-			// Typedefs
-			typedef enum
-			{
-				DISPLAY_MONITORING_OK		= 0,
-				DISPLAY_MONITORING_WARNING	= 10,
-				DISPLAY_MONITORING_ERROR	= 20,
-				DISPLAY_MONITORING_UNKNOWN	= 30
-			} Status;
-
-			typedef util::Registry<DisplayMonitoringStatus> Registry;
-
 		protected:
 			// Attributes
 			const DisplayScreen*		_displayScreen;
 			const DisplayScreenCPU*		_cpu;
-			boost::posix_time::ptime	_time;
-			Status					_generalStatus;
-			Status					_memoryStatus;
-			Status					_clockStatus;
-			Status					_eepromStatus;
-			Status					_tempSensorStatus;
-			Status					_lightStatus;
-			std::string				_lightDetail;
-			Status					_displayStatus;
-			std::string				_displayDetail;
-			Status					_soundStatus;
-			std::string				_soundDetail;
-			Status					_temperatureStatus;
-			boost::optional<double>	_temperatureValue;
-			Status					_communicationStatus;
-			Status					_localizationStatus;
 
 		public:
 			////////////////////////////////////////////////////////////////////
@@ -162,7 +185,7 @@ namespace synthese
 				Status				getSoundStatus()			const;
 				const std::string&	getSoundDetail()			const;
 				Status				getTemperatureStatus()		const;
-				boost::optional<double>	getTemperatureValue()		const { return _temperatureValue; }
+				boost::optional<double>	getTemperatureValue()	const;
 				Status				getCommunicationStatus()	const;
 				Status				getLocalizationStatus()		const;
 				const boost::posix_time::ptime&	 getTime()		const;
@@ -184,7 +207,7 @@ namespace synthese
 				void	setSoundStatus(Status value);
 				void	setSoundDetail(const std::string& value);
 				void	setTemperatureStatus(Status value);
-				void	setTemperatureValue(boost::optional<double> value) { _temperatureValue = value; }
+				void	setTemperatureValue(boost::optional<double> value);
 				void	setCommunicationStatus(Status value);
 				void	setTime(const boost::posix_time::ptime& value);
 				void	setLocalizationStatus(Status value);
@@ -270,7 +293,13 @@ namespace synthese
 				///	@date 2008
 				////////////////////////////////////////////////////////////////////
 				static std::string GetStatusIcon(Status value);
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 			//@}
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 	}
 }

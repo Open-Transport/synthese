@@ -24,7 +24,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "DisplayMonitoringStatus.h"
+
+#include "DisplayMaintenanceRight.h"
 #include "DisplayScreen.h"
+#include "DisplayScreenCPUTableSync.h"
+#include "DisplayScreenTableSync.h"
+#include "Profile.h"
+#include "User.h"
 
 #include <sstream>
 #include <assert.h>
@@ -38,12 +44,29 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace departure_boards;
 	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<departure_boards::DisplayMonitoringStatus>::KEY("DisplayMonitoringStatus");
-	}
+	CLASS_DEFINITION(DisplayMonitoringStatus, "t057_display_monitoring_status", 57)
+	FIELD_DEFINITION_OF_OBJECT(DisplayMonitoringStatus, "display_monitoring_status_id", "display_monitoring_status_ids")
+
+	FIELD_DEFINITION_OF_TYPE(StatusScreen, "screen_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(StatusTime, "time", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(GeneralStatus, "general_status", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MemoryStatus, "memory_status", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(ClockStatus, "clock_status", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(EepromStatus, "eeprom_status", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(TempSensorStatus, "temp_sensor_status", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(LightStatus, "light_status", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(LightDetail, "light_detail", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DisplayStatus, "display_status", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(DisplayDetail, "display_detail", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(SoundStatus, "sound_status", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(SoundDetail, "sound_detail", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(TemperatureStatus, "temperature_status", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(TemperatureValue, "temperature_value", SQL_DOUBLE)
+	FIELD_DEFINITION_OF_TYPE(CommunicationStatus, "communication_status", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(LocalizationStatus, "localization_status", SQL_INTEGER)
 
 	namespace departure_boards
 	{
@@ -52,20 +75,29 @@ namespace synthese
 		DisplayMonitoringStatus::DisplayMonitoringStatus(
 			util::RegistryKeyType id
 		):	Registrable(id),
+			Object<DisplayMonitoringStatus, DisplayMonitoringStatusSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(StatusScreen),
+					FIELD_VALUE_CONSTRUCTOR(StatusTime, second_clock::local_time()),
+					FIELD_VALUE_CONSTRUCTOR(GeneralStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(MemoryStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(ClockStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(EepromStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(TempSensorStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(LightStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_DEFAULT_CONSTRUCTOR(LightDetail),
+					FIELD_VALUE_CONSTRUCTOR(DisplayStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_DEFAULT_CONSTRUCTOR(DisplayDetail),
+					FIELD_VALUE_CONSTRUCTOR(SoundStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_DEFAULT_CONSTRUCTOR(SoundDetail),
+					FIELD_VALUE_CONSTRUCTOR(TemperatureStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_DEFAULT_CONSTRUCTOR(TemperatureValue),
+					FIELD_VALUE_CONSTRUCTOR(CommunicationStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(LocalizationStatus, DISPLAY_MONITORING_UNKNOWN)
+			)	),
 			_displayScreen(NULL),
-			_cpu(NULL),
-			_time(second_clock::local_time()),
-			_generalStatus(DISPLAY_MONITORING_UNKNOWN),
-			_memoryStatus(DISPLAY_MONITORING_UNKNOWN),
-			_clockStatus(DISPLAY_MONITORING_UNKNOWN),
-			_eepromStatus(DISPLAY_MONITORING_UNKNOWN),
-			_tempSensorStatus(DISPLAY_MONITORING_UNKNOWN),
-			_lightStatus(DISPLAY_MONITORING_UNKNOWN),
-			_displayStatus(DISPLAY_MONITORING_UNKNOWN),
-			_soundStatus(DISPLAY_MONITORING_UNKNOWN),
-			_temperatureStatus(DISPLAY_MONITORING_UNKNOWN),
-			_communicationStatus(DISPLAY_MONITORING_UNKNOWN),
-			_localizationStatus(DISPLAY_MONITORING_UNKNOWN)
+			_cpu(NULL)
 		{
 
 		}
@@ -76,20 +108,29 @@ namespace synthese
 			const std::string& monitoringInterfaceReturn,
 			const DisplayScreen* screen
 		):	Registrable(0),
+			Object<DisplayMonitoringStatus, DisplayMonitoringStatusSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(StatusScreen),
+					FIELD_VALUE_CONSTRUCTOR(StatusTime, second_clock::local_time()),
+					FIELD_VALUE_CONSTRUCTOR(GeneralStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(MemoryStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(ClockStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(EepromStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(TempSensorStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(LightStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_DEFAULT_CONSTRUCTOR(LightDetail),
+					FIELD_VALUE_CONSTRUCTOR(DisplayStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_DEFAULT_CONSTRUCTOR(DisplayDetail),
+					FIELD_VALUE_CONSTRUCTOR(SoundStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_DEFAULT_CONSTRUCTOR(SoundDetail),
+					FIELD_VALUE_CONSTRUCTOR(TemperatureStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_DEFAULT_CONSTRUCTOR(TemperatureValue),
+					FIELD_VALUE_CONSTRUCTOR(CommunicationStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(LocalizationStatus, DISPLAY_MONITORING_UNKNOWN)
+			)	),
 			_displayScreen(screen),
-			_cpu(NULL),
-			_time(second_clock::local_time()),
-			_generalStatus(DISPLAY_MONITORING_UNKNOWN),
-			_memoryStatus(DISPLAY_MONITORING_UNKNOWN),
-			_clockStatus(DISPLAY_MONITORING_UNKNOWN),
-			_eepromStatus(DISPLAY_MONITORING_UNKNOWN),
-			_tempSensorStatus(DISPLAY_MONITORING_UNKNOWN),
-			_lightStatus(DISPLAY_MONITORING_UNKNOWN),
-			_displayStatus(DISPLAY_MONITORING_UNKNOWN),
-			_soundStatus(DISPLAY_MONITORING_UNKNOWN),
-			_temperatureStatus(DISPLAY_MONITORING_UNKNOWN),
-			_communicationStatus(DISPLAY_MONITORING_UNKNOWN),
-			_localizationStatus(DISPLAY_MONITORING_UNKNOWN)
+			_cpu(NULL)
 		{
 			typedef tokenizer<char_separator<char> > tokenizer;
 			char_separator<char> sep1 ("|","",keep_empty_tokens);
@@ -200,163 +241,164 @@ namespace synthese
 			// Localization
 			if (_displayScreen != NULL)
 			{
-				_localizationStatus = (_displayScreen->getLocation() != NULL) ?
-					DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR;
+				setLocalizationStatus(
+					(_displayScreen->getLocation() != NULL) ?
+					DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR
+				);
 			}
 		}
 
 		DisplayMonitoringStatus::DisplayMonitoringStatus(
 			const DisplayScreenCPU* cpu
 		):	Registrable(0),
+			Object<DisplayMonitoringStatus, DisplayMonitoringStatusSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(StatusScreen),
+					FIELD_VALUE_CONSTRUCTOR(StatusTime, second_clock::local_time()),
+					FIELD_VALUE_CONSTRUCTOR(GeneralStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(MemoryStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(ClockStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(EepromStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(TempSensorStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(LightStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_DEFAULT_CONSTRUCTOR(LightDetail),
+					FIELD_VALUE_CONSTRUCTOR(DisplayStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_DEFAULT_CONSTRUCTOR(DisplayDetail),
+					FIELD_VALUE_CONSTRUCTOR(SoundStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_DEFAULT_CONSTRUCTOR(SoundDetail),
+					FIELD_VALUE_CONSTRUCTOR(TemperatureStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_DEFAULT_CONSTRUCTOR(TemperatureValue),
+					FIELD_VALUE_CONSTRUCTOR(CommunicationStatus, DISPLAY_MONITORING_UNKNOWN),
+					FIELD_VALUE_CONSTRUCTOR(LocalizationStatus, DISPLAY_MONITORING_UNKNOWN)
+			)	),
 			_displayScreen(NULL),
-			_cpu(cpu),
-			_time(second_clock::local_time()),
-			_generalStatus(DISPLAY_MONITORING_UNKNOWN),
-			_memoryStatus(DISPLAY_MONITORING_UNKNOWN),
-			_clockStatus(DISPLAY_MONITORING_UNKNOWN),
-			_eepromStatus(DISPLAY_MONITORING_UNKNOWN),
-			_tempSensorStatus(DISPLAY_MONITORING_UNKNOWN),
-			_lightStatus(DISPLAY_MONITORING_UNKNOWN),
-			_displayStatus(DISPLAY_MONITORING_UNKNOWN),
-			_soundStatus(DISPLAY_MONITORING_UNKNOWN),
-			_temperatureStatus(DISPLAY_MONITORING_UNKNOWN),
-			_communicationStatus(DISPLAY_MONITORING_UNKNOWN),
-			_localizationStatus(DISPLAY_MONITORING_UNKNOWN)
+			_cpu(cpu)
 		{
 		}
 
 
-		DisplayMonitoringStatus::Status DisplayMonitoringStatus::getGeneralStatus(
+		Status DisplayMonitoringStatus::getGeneralStatus(
 		) const {
-			return _generalStatus;
+			return get<GeneralStatus>();
 		}
 
 
 
-		DisplayMonitoringStatus::Status DisplayMonitoringStatus::getMemoryStatus(
-
+		Status DisplayMonitoringStatus::getMemoryStatus(
 			) const {
-			return _memoryStatus;
+			return get<MemoryStatus>();
 		}
 
 
 
-		DisplayMonitoringStatus::Status DisplayMonitoringStatus::getClockStatus(
-
+		Status DisplayMonitoringStatus::getClockStatus(
 			) const {
-			return _clockStatus;
+			return get<ClockStatus>();
 		}
 
 
 
-		DisplayMonitoringStatus::Status DisplayMonitoringStatus::getEepromStatus(
-
+		Status DisplayMonitoringStatus::getEepromStatus(
 			) const {
-			return _eepromStatus;
+			return get<EepromStatus>();
 		}
 
 
 
-		DisplayMonitoringStatus::Status DisplayMonitoringStatus::getTempSensorStatus(
-
+		 Status DisplayMonitoringStatus::getTempSensorStatus(
 			) const {
-			return _temperatureStatus;
+			return get<TemperatureStatus>();
 		}
 
 
 
-		DisplayMonitoringStatus::Status DisplayMonitoringStatus::getDisplayStatus(
-
+		Status DisplayMonitoringStatus::getDisplayStatus(
 			) const {
-			return _displayStatus;
+			return get<DisplayStatus>();
 		}
 
 
 
 		const std::string& DisplayMonitoringStatus::getDisplayDetail(
-
 			) const {
-			return _displayDetail;
+			return get<DisplayDetail>();
 		}
 
 
 
-		DisplayMonitoringStatus::Status DisplayMonitoringStatus::getSoundStatus(
-
+		Status DisplayMonitoringStatus::getSoundStatus(
 			) const {
-			return _soundStatus;
+			return get<SoundStatus>();
 		}
 
 
 
 		const std::string& DisplayMonitoringStatus::getSoundDetail(
-
 			) const {
-			return _displayDetail;
+			return get<SoundDetail>();
 		}
 
 
 
-		DisplayMonitoringStatus::Status DisplayMonitoringStatus::getTemperatureStatus(
-
+		Status DisplayMonitoringStatus::getTemperatureStatus(
 			) const {
-			return _temperatureStatus;
+			return get<TemperatureStatus>();
 		}
 
 
 
-		DisplayMonitoringStatus::Status DisplayMonitoringStatus::getCommunicationStatus(
-
+		Status DisplayMonitoringStatus::getCommunicationStatus(
 			) const {
-			return _communicationStatus;
+			return get<CommunicationStatus>();
 		}
 
 
 
 		void DisplayMonitoringStatus::setGeneralStatus(
-			DisplayMonitoringStatus::Status value
+			Status value
 			) {
-			_generalStatus = value;
+			set<GeneralStatus>(value);
 		}
 
 
 
 		void DisplayMonitoringStatus::setMemoryStatus(
-			DisplayMonitoringStatus::Status value
+			Status value
 			) {
-			_memoryStatus = value;
+			set<MemoryStatus>(value);
 		}
 
 
 
 		void DisplayMonitoringStatus::setClockStatus(
-			DisplayMonitoringStatus::Status value
+			Status value
 			) {
-			_clockStatus = value;
+			set<ClockStatus>(value);
 		}
 
 
 
 		void DisplayMonitoringStatus::setEepromStatus(
-			DisplayMonitoringStatus::Status value
+			Status value
 			) {
-			_eepromStatus = value;
+			set<EepromStatus>(value);
 		}
 
 
 
 		void DisplayMonitoringStatus::setTempSensorStatus(
-			DisplayMonitoringStatus::Status value
+			Status value
 			) {
-			_tempSensorStatus = value;
+			set<TempSensorStatus>(value);
 		}
 
 
 
 		void DisplayMonitoringStatus::setDisplayStatus(
-			DisplayMonitoringStatus::Status value
+			Status value
 			) {
-			_displayStatus = value;
+			set<DisplayStatus>(value);
 		}
 
 
@@ -364,15 +406,15 @@ namespace synthese
 		void DisplayMonitoringStatus::setDisplayDetail(
 			const std::string& value
 			) {
-			_displayDetail = value;
+			set<DisplayDetail>(value);
 		}
 
 
 
 		void DisplayMonitoringStatus::setSoundStatus(
-			DisplayMonitoringStatus::Status value
+			Status value
 			) {
-			_soundStatus = value;
+			set<SoundStatus>(value);
 		}
 
 
@@ -380,30 +422,30 @@ namespace synthese
 		void DisplayMonitoringStatus::setSoundDetail(
 			const std::string& value
 			) {
-			_soundDetail = value;
+			set<SoundDetail>(value);
 		}
 
 
 
 		void DisplayMonitoringStatus::setTemperatureStatus(
-			DisplayMonitoringStatus::Status value
+			Status value
 			) {
-			_temperatureStatus = value;
+			set<TemperatureStatus>(value);
 		}
 
 
 
 		void DisplayMonitoringStatus::setCommunicationStatus(
-			DisplayMonitoringStatus::Status value
+			Status value
 			) {
-			_communicationStatus = value;
+			set<CommunicationStatus>(value);
 		}
 
 
 
 		const ptime& DisplayMonitoringStatus::getTime(
 		) const {
-			return _time;
+			return get<StatusTime>();
 		}
 
 
@@ -411,31 +453,29 @@ namespace synthese
 		void DisplayMonitoringStatus::setTime(
 		const ptime& value
 		) {
-			_time = value;
+			set<StatusTime>(value);
 		}
 
 
 
-		DisplayMonitoringStatus::Status DisplayMonitoringStatus::getLightStatus(
-
+		Status DisplayMonitoringStatus::getLightStatus(
 			) const {
-			return _lightStatus;
+			return get<LightStatus>();
 		}
 
 
 
 		const std::string& DisplayMonitoringStatus::getLightDetail(
-
 			) const {
-			return _lightDetail;
+			return get<LightDetail>();
 		}
 
 
 
 		void DisplayMonitoringStatus::setLightStatus(
-			DisplayMonitoringStatus::Status value
+			Status value
 		) {
-			_lightStatus = value;
+			set<LightStatus>(value);
 		}
 
 
@@ -443,37 +483,37 @@ namespace synthese
 		void DisplayMonitoringStatus::setLightDetail(
 			const std::string& value
 			) {
-			_lightDetail = value;
+			set<LightDetail>(value);
 		}
 
 
 
-		DisplayMonitoringStatus::Status DisplayMonitoringStatus::getGlobalStatus(
+		Status DisplayMonitoringStatus::getGlobalStatus(
 		) const {
 			// Attempt to return OK
-			if(	_generalStatus == DISPLAY_MONITORING_OK	&&
-				(_memoryStatus == DISPLAY_MONITORING_OK || _memoryStatus == DISPLAY_MONITORING_UNKNOWN) &&
-				(_clockStatus == DISPLAY_MONITORING_OK || _clockStatus == DISPLAY_MONITORING_UNKNOWN) &&
-				(_eepromStatus == DISPLAY_MONITORING_OK || _eepromStatus == DISPLAY_MONITORING_UNKNOWN) &&
-				(_tempSensorStatus == DISPLAY_MONITORING_OK || _tempSensorStatus == DISPLAY_MONITORING_UNKNOWN) &&
-				(_lightStatus == DISPLAY_MONITORING_OK || _lightStatus == DISPLAY_MONITORING_UNKNOWN) &&
-				(_displayStatus == DISPLAY_MONITORING_OK || _displayStatus == DISPLAY_MONITORING_UNKNOWN) &&
-				(_soundStatus == DISPLAY_MONITORING_OK || _soundStatus == DISPLAY_MONITORING_UNKNOWN) &&
-				(_temperatureStatus == DISPLAY_MONITORING_OK || _temperatureStatus == DISPLAY_MONITORING_UNKNOWN) &&
-				(_communicationStatus == DISPLAY_MONITORING_OK || _communicationStatus == DISPLAY_MONITORING_UNKNOWN) &&
-				(_localizationStatus == DISPLAY_MONITORING_OK || _localizationStatus == DISPLAY_MONITORING_UNKNOWN)
+			if(	getGeneralStatus() == DISPLAY_MONITORING_OK	&&
+				(getMemoryStatus() == DISPLAY_MONITORING_OK || getMemoryStatus() == DISPLAY_MONITORING_UNKNOWN) &&
+				(getClockStatus() == DISPLAY_MONITORING_OK || getClockStatus() == DISPLAY_MONITORING_UNKNOWN) &&
+				(getEepromStatus() == DISPLAY_MONITORING_OK || getEepromStatus() == DISPLAY_MONITORING_UNKNOWN) &&
+				(getTempSensorStatus() == DISPLAY_MONITORING_OK || getTempSensorStatus() == DISPLAY_MONITORING_UNKNOWN) &&
+				(getLightStatus() == DISPLAY_MONITORING_OK || getLightStatus() == DISPLAY_MONITORING_UNKNOWN) &&
+				(getDisplayStatus() == DISPLAY_MONITORING_OK || getDisplayStatus() == DISPLAY_MONITORING_UNKNOWN) &&
+				(getSoundStatus() == DISPLAY_MONITORING_OK || getSoundStatus() == DISPLAY_MONITORING_UNKNOWN) &&
+				(getTemperatureStatus() == DISPLAY_MONITORING_OK || getTemperatureStatus() == DISPLAY_MONITORING_UNKNOWN) &&
+				(getCommunicationStatus() == DISPLAY_MONITORING_OK || getCommunicationStatus() == DISPLAY_MONITORING_UNKNOWN) &&
+				(getLocalizationStatus() == DISPLAY_MONITORING_OK || getLocalizationStatus() == DISPLAY_MONITORING_UNKNOWN)
 			){
 				return DISPLAY_MONITORING_OK;
 			}
 
 			// Attempt to return WARNING
-			if(	(_generalStatus == DISPLAY_MONITORING_OK || _generalStatus == DISPLAY_MONITORING_WARNING) 	&&
-				(_memoryStatus == DISPLAY_MONITORING_OK || _memoryStatus == DISPLAY_MONITORING_UNKNOWN || _memoryStatus == DISPLAY_MONITORING_WARNING) &&
-				(_eepromStatus == DISPLAY_MONITORING_OK || _eepromStatus == DISPLAY_MONITORING_UNKNOWN || _eepromStatus == DISPLAY_MONITORING_WARNING) &&
-				(_displayStatus == DISPLAY_MONITORING_OK || _displayStatus == DISPLAY_MONITORING_UNKNOWN || _displayStatus == DISPLAY_MONITORING_WARNING) &&
-				(_tempSensorStatus == DISPLAY_MONITORING_ERROR || _temperatureStatus == DISPLAY_MONITORING_OK || _temperatureStatus == DISPLAY_MONITORING_UNKNOWN || _temperatureStatus == DISPLAY_MONITORING_WARNING) &&
-				(_communicationStatus == DISPLAY_MONITORING_OK || _communicationStatus == DISPLAY_MONITORING_UNKNOWN || _communicationStatus == DISPLAY_MONITORING_WARNING) &&
-				(_localizationStatus == DISPLAY_MONITORING_OK || _localizationStatus == DISPLAY_MONITORING_UNKNOWN || _localizationStatus == DISPLAY_MONITORING_WARNING)
+			if(	(getGeneralStatus() == DISPLAY_MONITORING_OK || getGeneralStatus() == DISPLAY_MONITORING_WARNING) 	&&
+				(getMemoryStatus() == DISPLAY_MONITORING_OK || getMemoryStatus() == DISPLAY_MONITORING_UNKNOWN || getMemoryStatus() == DISPLAY_MONITORING_WARNING) &&
+				(getEepromStatus() == DISPLAY_MONITORING_OK || getEepromStatus() == DISPLAY_MONITORING_UNKNOWN || getEepromStatus() == DISPLAY_MONITORING_WARNING) &&
+				(getDisplayStatus() == DISPLAY_MONITORING_OK || getDisplayStatus() == DISPLAY_MONITORING_UNKNOWN || getDisplayStatus() == DISPLAY_MONITORING_WARNING) &&
+				(getTempSensorStatus() == DISPLAY_MONITORING_ERROR || getTemperatureStatus() == DISPLAY_MONITORING_OK || getTemperatureStatus() == DISPLAY_MONITORING_UNKNOWN || getTemperatureStatus() == DISPLAY_MONITORING_WARNING) &&
+				(getCommunicationStatus() == DISPLAY_MONITORING_OK || getCommunicationStatus() == DISPLAY_MONITORING_UNKNOWN || getCommunicationStatus() == DISPLAY_MONITORING_WARNING) &&
+				(getLocalizationStatus() == DISPLAY_MONITORING_OK || getLocalizationStatus() == DISPLAY_MONITORING_UNKNOWN || getLocalizationStatus() == DISPLAY_MONITORING_WARNING)
 			){
 				return DISPLAY_MONITORING_WARNING;
 			}
@@ -553,7 +593,7 @@ namespace synthese
 
 
 		std::string DisplayMonitoringStatus::GetStatusString(
-			DisplayMonitoringStatus::Status value
+			Status value
 		){
 			switch(value)
 			{
@@ -575,17 +615,17 @@ namespace synthese
 
 
 
-		DisplayMonitoringStatus::Status DisplayMonitoringStatus::getLocalizationStatus(
+		Status DisplayMonitoringStatus::getLocalizationStatus(
 		) const {
-			return _localizationStatus;
+			return get<LocalizationStatus>();
 		}
 
 
 
 		void DisplayMonitoringStatus::setLocalizationStatus(
-			DisplayMonitoringStatus::Status value
+			Status value
 		){
-			_localizationStatus = value;
+			set<LocalizationStatus>(value);
 		}
 
 
@@ -594,6 +634,10 @@ namespace synthese
 			const DisplayScreen* value
 		) {
 			_displayScreen = value;
+			if (value)
+			{
+				set<StatusScreen>(value->getKey());
+			}
 		}
 
 
@@ -641,6 +685,72 @@ namespace synthese
 		void DisplayMonitoringStatus::setCPU( const DisplayScreenCPU* value )
 		{
 			_cpu = value;
+			if (value)
+			{
+				set<StatusScreen>(value->getKey());
+			}
+		}
+
+		void DisplayMonitoringStatus::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			RegistryKeyType id(get<StatusScreen>());
+			try
+			{
+				setScreen(NULL);
+				setCPU(NULL);
+				if(decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
+				{
+					setScreen(DisplayScreenTableSync::Get(id, env).get());
+				}
+				else if(decodeTableId(id) == DisplayScreenCPUTableSync::TABLE.ID)
+				{
+					setCPU(DisplayScreenCPUTableSync::Get(id, env).get());
+				}
+				else
+				{
+					Log::GetInstance().warn("Data corrupted in "+ DisplayMonitoringStatus::TABLE_NAME + " on display screen : "+ lexical_cast<string>(id) + " not found");
+				}
+			}
+			catch (ObjectNotFoundException<DisplayScreen>&)
+			{
+				Log::GetInstance().warn("Data corrupted in "+ DisplayMonitoringStatus::TABLE_NAME + " on display screen : "+ lexical_cast<string>(id) + " not found");
+			}
+			catch (ObjectNotFoundException<DisplayScreenCPU>&)
+			{
+				Log::GetInstance().warn("Data corrupted in "+ DisplayMonitoringStatus::TABLE_NAME + " on display screen : "+ lexical_cast<string>(id) + " not found");
+			}
+		}
+
+		boost::optional<double>	DisplayMonitoringStatus::getTemperatureValue()	const
+		{
+			if (get<TemperatureValue>() == 0.0)
+			{
+				return boost::optional<double>();
+			}
+
+			return boost::optional<double>(get<TemperatureValue>());
+		}
+
+		void DisplayMonitoringStatus::setTemperatureValue(boost::optional<double> value)
+		{
+			set<TemperatureValue>(value
+				? *value
+				: 0.0);
+		}
+
+		bool DisplayMonitoringStatus::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<DisplayMaintenanceRight>(security::WRITE);
+		}
+
+		bool DisplayMonitoringStatus::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<DisplayMaintenanceRight>(security::WRITE);
+		}
+
+		bool DisplayMonitoringStatus::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<DisplayMaintenanceRight>(security::DELETE_RIGHT);
 		}
 	}
 }

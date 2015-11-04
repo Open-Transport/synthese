@@ -95,8 +95,8 @@ namespace synthese
 					stream << "2\nContact lost.|temp=-1\n";
 				} else {
 					string returnCode("2");
-					if (status->getGlobalStatus() == DisplayMonitoringStatus::DISPLAY_MONITORING_OK) returnCode = "0";
-					if (status->getGlobalStatus() == DisplayMonitoringStatus::DISPLAY_MONITORING_WARNING) returnCode = "1";
+					if (status->getGlobalStatus() == DISPLAY_MONITORING_OK) returnCode = "0";
+					if (status->getGlobalStatus() == DISPLAY_MONITORING_WARNING) returnCode = "1";
 					stream << returnCode << "\n";
 					stream << status->getDetail() << "|temp=" << status->getTemperatureValue() << "\n";
 				}

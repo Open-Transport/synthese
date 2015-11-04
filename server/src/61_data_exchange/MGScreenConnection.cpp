@@ -488,13 +488,13 @@ namespace synthese
 							)	);
 							status->setLightStatus(
 								(screen.getBacklight1_OK() && screen.getBacklight2_OK()) ?
-								DisplayMonitoringStatus::DISPLAY_MONITORING_OK :
-								DisplayMonitoringStatus::DISPLAY_MONITORING_ERROR
+								DISPLAY_MONITORING_OK :
+								DISPLAY_MONITORING_ERROR
 							);
 							status->setGeneralStatus(
 								screen.getConnected() ?
-								DisplayMonitoringStatus::DISPLAY_MONITORING_OK :
-								DisplayMonitoringStatus::DISPLAY_MONITORING_ERROR
+								DISPLAY_MONITORING_OK :
+								DISPLAY_MONITORING_ERROR
 							);
 							status->setLightDetail(lexical_cast<string>(screen.getBacklightValue()));
 							DisplayMonitoringStatusTableSync::Save(status.get());

@@ -29,7 +29,6 @@
 #include "DisplayMonitoringStatus.h"
 #include "DBDirectTableSyncTemplate.hpp"
 #include "NoSynchronizationPolicy.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 #include <vector>
 #include <string>
@@ -52,31 +51,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				DisplayMonitoringStatusTableSync,
 				DisplayMonitoringStatus,
-				db::NoSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::NoSynchronizationPolicy
 			>
 		{
 		public:
-			static const std::string COL_SCREEN_ID;
-			static const std::string COL_TIME;
-			static const std::string COL_GENERAL_STATUS;
-			static const std::string COL_MEMORY_STATUS;
-			static const std::string COL_CLOCK_STATUS;
-			static const std::string COL_EEPROM_STATUS;
-			static const std::string COL_TEMP_SENSOR_STATUS;
-			static const std::string COL_LIGHT_STATUS;
-			static const std::string COL_LIGHT_DETAIL;
-			static const std::string COL_DISPLAY_STATUS;
-			static const std::string COL_DISPLAY_DETAIL;
-			static const std::string COL_SOUND_STATUS;
-			static const std::string COL_SOUND_DETAIL;
-			static const std::string COL_TEMPERATURE_STATUS;
-			static const std::string COL_TEMPERATURE_VALUE;
-			static const std::string COL_COMMUNICATION_STATUS;
-			static const std::string COL_LOCALIZATION_STATUS;
-
-
-
 			/** DisplayMonitoringStatus search.
 				(other search parameters)
 				@param first First DisplayMonitoringStatus object to answer
@@ -140,6 +118,8 @@ namespace synthese
 				const DisplayScreen& screen,
 				bool archive
 			);
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

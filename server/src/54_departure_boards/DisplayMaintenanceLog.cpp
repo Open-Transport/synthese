@@ -166,7 +166,7 @@ namespace synthese
 			const DisplayMonitoringStatus& oldValue,
 			const DisplayMonitoringStatus& newValue
 		) {
-			DisplayMonitoringStatus::Status newStatus(newValue.getGlobalStatus());
+			Status newStatus(newValue.getGlobalStatus());
 
 			stringstream s;
 			s	<< DisplayMonitoringStatus::GetStatusString(oldValue.getGlobalStatus()) << " => "
@@ -178,11 +178,11 @@ namespace synthese
 			c.push_back(newValue.getDetail());
 
 			Level level(DB_LOG_ERROR);
-			if (newStatus == DisplayMonitoringStatus::DISPLAY_MONITORING_OK)
+			if (newStatus == DISPLAY_MONITORING_OK)
 			{
 				level = DB_LOG_INFO;
 			}
-			else if (newStatus == DisplayMonitoringStatus::DISPLAY_MONITORING_WARNING || newStatus == DisplayMonitoringStatus::DISPLAY_MONITORING_UNKNOWN)
+			else if (newStatus == DISPLAY_MONITORING_WARNING || newStatus == DISPLAY_MONITORING_UNKNOWN)
 			{
 				level = DB_LOG_WARNING;
 			}
@@ -268,7 +268,7 @@ namespace synthese
 			const DisplayScreen& screen,
 			const DisplayMonitoringStatus& value
 		) {
-			DisplayMonitoringStatus::Status newStatus(value.getGlobalStatus());
+			Status newStatus(value.getGlobalStatus());
 
 			{
 				DBLogEntry::Content c;
@@ -295,11 +295,11 @@ namespace synthese
 				c.push_back(value.getDetail());
 
 				Level level(DB_LOG_ERROR);
-				if (newStatus == DisplayMonitoringStatus::DISPLAY_MONITORING_OK)
+				if (newStatus == DISPLAY_MONITORING_OK)
 				{
 					level = DB_LOG_INFO;
 				}
-				else if (newStatus == DisplayMonitoringStatus::DISPLAY_MONITORING_WARNING || newStatus == DisplayMonitoringStatus::DISPLAY_MONITORING_UNKNOWN)
+				else if (newStatus == DISPLAY_MONITORING_WARNING || newStatus == DISPLAY_MONITORING_UNKNOWN)
 				{
 					level = DB_LOG_WARNING;
 				}
