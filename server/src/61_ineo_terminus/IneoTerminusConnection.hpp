@@ -347,6 +347,7 @@ namespace synthese
 			static void MessageSender();
 			static void Initialize();
 			static boost::shared_ptr<IneoTerminusConnection> GetTheConnection(){ return _theConnection; }
+			static std::string BuildIneoTerminusTimestamp();
 			int getNextRequestID();
 		};
 }	}

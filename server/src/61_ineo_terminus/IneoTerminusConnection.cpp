@@ -309,16 +309,7 @@ namespace synthese
 
 			// Build the request tag
 			std::string requestTag = ineoMessageType + "GetStatesRequest";
-
-			// Set the format of datetime objects to the format expected by Ineo
-			boost::posix_time::ptime now = second_clock::local_time();
-			std::stringstream timestampStream;
-			timestampStream << setfill('0') << setw(2) << now.date().day() << "/"
-							<< setfill('0') << setw(2) << int(now.date().month()) << "/"
-							<< setfill('0') << setw(4) << now.date().year() << " "
-							<< setfill('0') << setw(2) << now.time_of_day().hours() << ":"
-							<< setfill('0') << setw(2) << now.time_of_day().minutes() << ":"
-							<< setfill('0') << setw(2) << now.time_of_day().seconds();
+			std::string timestampStr = IneoTerminusConnection::BuildIneoTerminusTimestamp();
 
 			// Build the request header
 			requestStream << INEO_TERMINUS_XML_HEADER << char(10);
@@ -332,7 +323,7 @@ namespace synthese
 			requestStream << ">" << char(10);
 
 			requestStream << "\t<ID>" << boost::lexical_cast<std::string>(getNextRequestID()) << "</ID>" << char(10);
-			requestStream << "\t<RequestTimeStamp>" << timestampStream.str() << "</RequestTimeStamp>" << char(10);
+			requestStream << "\t<RequestTimeStamp>" << timestampStr << "</RequestTimeStamp>" << char(10);
 			requestStream << "\t<RequestorRef>Terminus</RequestorRef>" << char(10);
 			requestStream << "</" << requestTag << ">" << char(10);
 
@@ -1322,18 +1313,9 @@ namespace synthese
 		{
 			std::stringstream responseStream;
 
-			// TODO : factor
-			boost::posix_time::ptime now = second_clock::local_time();
-			std::stringstream timestampStream;
-			timestampStream << setfill('0') << setw(2) << now.date().day() << "/"
-							<< setfill('0') << setw(2) << int(now.date().month()) << "/"
-							<< setfill('0') << setw(4) << now.date().year() << " "
-							<< setfill('0') << setw(2) << now.time_of_day().hours() << ":"
-							<< setfill('0') << setw(2) << now.time_of_day().minutes() << ":"
-							<< setfill('0') << setw(2) << now.time_of_day().seconds();
-
 			// Build the response tag
 			std::string responseTag = messageType + "DeleteRequest";
+			std::string timestampStr = IneoTerminusConnection::BuildIneoTerminusTimestamp();
 
 			// Build the response header
 			responseStream << INEO_TERMINUS_XML_HEADER << char(10);
@@ -1347,7 +1329,7 @@ namespace synthese
 			responseStream << ">" << char(10);
 
 			responseStream << "\t<ID>" << boost::lexical_cast<std::string>(IneoTerminusConnection::GetTheConnection()->getNextRequestID()) << "</ID>" << char(10);
-			responseStream << "\t<RequestTimeStamp>" << timestampStream.str() << "</RequestTimeStamp>" << char(10);
+			responseStream << "\t<RequestTimeStamp>" << timestampStr << "</RequestTimeStamp>" << char(10);
 			responseStream << "\t<RequestorRef>Terminus</RequestorRef>" << char(10);
 
 			// Copy the content of 'Messaging' node
@@ -2191,5 +2173,21 @@ namespace synthese
 
 			return loadedStopPoints;
 		}
+
+
+		std::string IneoTerminusConnection::BuildIneoTerminusTimestamp()
+		{
+			boost::posix_time::ptime now = second_clock::local_time();
+			std::stringstream timestampStream;
+			timestampStream << setfill('0') << setw(2) << now.date().day() << "/"
+							<< setfill('0') << setw(2) << int(now.date().month()) << "/"
+							<< setfill('0') << setw(4) << now.date().year() << " "
+							<< setfill('0') << setw(2) << now.time_of_day().hours() << ":"
+							<< setfill('0') << setw(2) << now.time_of_day().minutes() << ":"
+							<< setfill('0') << setw(2) << now.time_of_day().seconds();
+
+			return timestampStream.str();
+		}
+
 }	}
 
