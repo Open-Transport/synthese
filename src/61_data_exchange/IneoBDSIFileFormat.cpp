@@ -1000,55 +1000,48 @@ namespace synthese
 					{
 						_scenariosToRemove.erase(scenario->getKey());
 
-                        // Message content
-                        const Scenario::Messages& messages(scenario->getMessages());
+					// Message content
+					const Scenario::Messages& messages(scenario->getMessages());
 
-                        // No message, this should not happen
-                        if (messages.size() == 0)
-                        {
-                            _logWarning(
-                                "Corrupted scenario : scenario should contain at least one message : " + lexical_cast<string>(scenario->getKey())
-                            );
+					// No message, this should not happen
+					if (messages.size() == 0)
+					{
+						_logWarning(
+							"Corrupted scenario : scenario should contain at least one message : " + lexical_cast<string>(scenario->getKey())
+						);
 
-                            // Creation of the message
-                            updatedMessage.reset(
-                                new SentAlarm(
-                                    AlarmTableSync::getId()
-                            )	);
-                            updatedMessage->setScenario(scenario);
-                            scenario->addMessage(*updatedMessage);
-                            _env.getEditableRegistry<Alarm>().add(updatedMessage);
+						// We should be able to create directly a message there
+						// Abandonned because of a crash on the second import
+					}
 
-                        }
+					// More than one message. This should not happen
+					else if(messages.size() > 1)
+					{
+						_logWarning(
+							"Corrupted message : scenario should contain only one message : " + lexical_cast<string>(scenario->getKey())
+						);
 
-                        // More than one message. This should not happen
-                        else if(messages.size() > 1)
-                        {
-                            _logWarning(
-                                "Corrupted message : scenario should contain only one message : " + lexical_cast<string>(scenario->getKey())
-                            );
+						SentScenario::Messages::const_iterator it(messages.begin());
+						for(++it; it != messages.end(); ++it)
+						{
+							_messagesToRemove.insert((*it)->getKey());
+						}
+					}
 
-                            SentScenario::Messages::const_iterator it(messages.begin());
-                            for(++it; it != messages.end(); ++it)
-                            {
-                                _messagesToRemove.insert((*it)->getKey());
-                            }
-                        }
-
-                        // One message to update
-                        else
-                        {
-                            message = const_cast<Alarm*>(*messages.begin());
-                            if(	message->getLongMessage() != programmation.content ||
-                                message->getShortMessage() != programmation.messageTitle ||
-                                (message->getLevel() == ALARM_LEVEL_WARNING) != programmation.priority
-                            ){
-                                updatedMessage = AlarmTableSync::GetCastEditable<SentAlarm>(
-                                    message->getKey(),
-                                    _env
-                                );
-                            }
-                        }
+					// One message to update
+					else
+					{
+						message = const_cast<Alarm*>(*messages.begin());
+						if(	message->getLongMessage() != programmation.content ||
+							message->getShortMessage() != programmation.messageTitle ||
+							(message->getLevel() == ALARM_LEVEL_WARNING) != programmation.priority
+						){
+							updatedMessage = AlarmTableSync::GetCastEditable<SentAlarm>(
+								message->getKey(),
+								_env
+							);
+						}
+					}
 
 
 						// Scenario updates
@@ -1088,10 +1081,17 @@ namespace synthese
 
 
 					// Adding of existing object links to the removal list
-					Alarm::LinkedObjects::mapped_type existingRecipients(
-						(*scenario->getMessages().begin())->getLinkedObjects(
-							BroadcastPointAlarmRecipient::FACTORY_KEY
-					)	);
+					Alarm::LinkedObjects::mapped_type existingRecipients;
+
+					if (scenario)
+					{
+						const Alarm *alarm = *scenario->getMessages().begin();
+						if (alarm)
+						{
+							existingRecipients = alarm->getLinkedObjects(BroadcastPointAlarmRecipient::FACTORY_KEY);
+						}
+					}
+
 					BOOST_FOREACH(const Alarm::LinkedObjects::mapped_type::value_type& aol, existingRecipients)
 					{
 						_alarmObjectLinksToRemove.insert(aol->getKey());
