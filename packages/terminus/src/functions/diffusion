@@ -877,7 +877,17 @@
 		<?notification_providers&
 		template=<{provider&template=
           <div>
-            <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>"> <@name@> (<@channel@>)</label>
+            <@param_repeat_interval=<@needs_repeat_interval ? "repeat_interval;" : ""@>@>
+            <@param_with_ack=<@needs_with_ack ? "with_ack;" : ""@>@>
+            <@param_multiple_stops=<@needs_multiple_stops ? "multiple_stops;" : ""@>@>
+            <@param_play_tts=<@needs_play_tts ? "play_tts;" : ""@>@>
+            <@param_light=<@needs_light ? "light;" : ""@>@>
+            <@param_direction_sign_code=<@needs_direction_sign_code ? "direction_sign_code;" : ""@>@>
+            <@param_start_stop_point=<@needs_start_stop_point ? "start_stop_point;" : ""@>@>
+            <@param_end_stop_point=<@needs_end_stop_point ? "end_stop_point;" : ""@>@>
+            <@params_provider=<@param_repeat_interval@><@param_with_ack@><@param_multiple_stops@><@param_play_tts@><@param_light@><@param_direction_sign_code@><@param_start_stop_point@><@param_end_stop_point@>@>
+            <@params_provider_length=<?strlen&t=<@params_provider@>?>@>
+            <label class="checkbox"><input type="checkbox" factory="displayscreen" <?if&cond=<@params_provider_length==0@>&then=noparam="1"&else=parameter="<@params_provider@>"?> value="<@id@>"> <@name@> (<@channel@>)</label>
           </div>
 		}>?>
         </div>

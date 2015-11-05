@@ -58,7 +58,7 @@
   <label class="control-label" id="label_needs_direction_sign_code">Girouette pré-encodée</label>
   <div class="controls">
     <label class="radio inline"><input type="radio" is_parameter="true" name="needs_direction_sign_code" <@needs_direction_sign_code?"checked=\"true\"":""@> value="1" /> Oui</label>
-    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_direction_sign_code" <@needs_direction_sign_code"":"checked=\"true\""@> value="0" /> Non</label>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_direction_sign_code" <@needs_direction_sign_code?"":"checked=\"true\""@> value="0" /> Non</label>
   </div>
 </div>
 
@@ -66,7 +66,7 @@
   <label class="control-label" id="label_needs_start_stop_point">Affichage sur tronçon : arrêt de début</label>
   <div class="controls">
     <label class="radio inline"><input type="radio" is_parameter="true" name="needs_start_stop_point" <@needs_start_stop_point?"checked=\"true\"":""@> value="1" /> Oui</label>
-    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_start_stop_point" <@needs_start_stop_point"":"checked=\"true\""@> value="0" /> Non</label>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_start_stop_point" <@needs_start_stop_point?"":"checked=\"true\""@> value="0" /> Non</label>
   </div>
 </div>
 
@@ -74,6 +74,6 @@
   <label class="control-label" id="label_needs_end_stop_point">Affichage sur tronçon : arrêt de fin</label>
   <div class="controls">
     <label class="radio inline"><input type="radio" is_parameter="true" name="needs_end_stop_point" <@needs_end_stop_point?"checked=\"true\"":""@> value="1" /> Oui</label>
-    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_end_stop_point" <@needs_end_stop_point"":"checked=\"true\""@> value="0" /> Non</label>
+    <label class="radio inline"><input type="radio" is_parameter="true" name="needs_end_stop_point" <@needs_end_stop_point?"":"checked=\"true\""@> value="0" /> Non</label>
   </div>
 </div>
