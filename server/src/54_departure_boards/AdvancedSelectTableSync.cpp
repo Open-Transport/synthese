@@ -78,7 +78,7 @@ namespace synthese
 					<< "p.*"
 					<< ",c." << CityTableSync::TABLE_COL_NAME << " AS city_name"
 					<< ",(SELECT COUNT(b." << TABLE_COL_ID << ") FROM " << DisplayScreenTableSync::TABLE.NAME << " AS b WHERE b." << BroadCastPoint::FIELD.name << "=p." << TABLE_COL_ID << ") AS bc"
-					<< ",(SELECT COUNT(s." << TABLE_COL_ID << ") FROM " << DisplayScreenCPUTableSync::TABLE.NAME << " AS s WHERE s." << DisplayScreenCPUTableSync::COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS cc"
+					<< ",(SELECT COUNT(s." << TABLE_COL_ID << ") FROM " << DisplayScreenCPUTableSync::TABLE.NAME << " AS s WHERE s." << PlaceId::FIELD.name << "=p." << TABLE_COL_ID << ") AS cc"
 				<< " FROM " // Tables
 					<< StopAreaTableSync::TABLE.NAME << " AS p"
 					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << pt::CityId::FIELD.name

@@ -25,20 +25,20 @@
 
 #include "DisplayScreenCPUTableSync.h"
 
-#include "DisplayScreenCPU.h"
+#include "ArrivalDepartureTableLog.h"
+#include "ArrivalDepartureTableRight.h"
+#include "Conversion.h"
+#include "DBException.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
-#include "DBException.hpp"
+#include "DisplayMaintenanceRight.h"
+#include "DisplayScreenCPU.h"
+#include "DisplayScreenTableSync.h"
 #include "Profile.h"
 #include "ReplaceQuery.h"
 #include "Session.h"
-#include "User.h"
-#include "Conversion.h"
 #include "StopArea.hpp"
-#include "Fetcher.h"
-#include "ArrivalDepartureTableRight.h"
-#include "DisplayScreenTableSync.h"
-#include "ArrivalDepartureTableLog.h"
+#include "User.h"
 
 #include <sstream>
 
@@ -60,16 +60,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,DisplayScreenCPUTableSync>::FACTORY_KEY("54.49 Display screen CPU");
 	}
 
-	namespace departure_boards
-	{
-		const std::string DisplayScreenCPUTableSync::COL_NAME("name");
-		const std::string DisplayScreenCPUTableSync::COL_PLACE_ID("place_id");
-		const std::string DisplayScreenCPUTableSync::COL_MAC_ADDRESS("mac_address");
-		const std::string DisplayScreenCPUTableSync::COL_MONITORING_DELAY("monitoring_delay");
-		const std::string DisplayScreenCPUTableSync::COL_IS_ONLINE("is_online");
-		const std::string DisplayScreenCPUTableSync::COL_MAINTENANCE_MESSAGE("maintenance_message");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<DisplayScreenCPUTableSync>::TABLE(
@@ -78,13 +68,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<DisplayScreenCPUTableSync>::_FIELDS[] =
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(DisplayScreenCPUTableSync::COL_NAME, SQL_TEXT),
-			Field(DisplayScreenCPUTableSync::COL_PLACE_ID, SQL_INTEGER),
-			Field(DisplayScreenCPUTableSync::COL_MAC_ADDRESS, SQL_TEXT),
-			Field(DisplayScreenCPUTableSync::COL_MONITORING_DELAY, SQL_INTEGER),
-			Field(DisplayScreenCPUTableSync::COL_IS_ONLINE, SQL_INTEGER),
-			Field(DisplayScreenCPUTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
 			Field()
 		};
 
@@ -93,65 +76,12 @@ namespace synthese
 		{
 			DBTableSync::Indexes r;
 			r.push_back(
-				DBTableSync::Index(DisplayScreenCPUTableSync::COL_PLACE_ID.c_str(), "")
+				DBTableSync::Index(PlaceId::FIELD.name.c_str(), "")
 			);
 			r.push_back(
-				DBTableSync::Index(DisplayScreenCPUTableSync::COL_MAC_ADDRESS.c_str(), "")
+				DBTableSync::Index(MacAddress::FIELD.name.c_str(), "")
 			);
 			return r;
-		}
-
-
-		template<> void OldLoadSavePolicy<DisplayScreenCPUTableSync,DisplayScreenCPU>::Load(
-			DisplayScreenCPU* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			object->setName(rows->getText(DisplayScreenCPUTableSync::COL_NAME));
-			object->setMacAddress(rows->getText(DisplayScreenCPUTableSync::COL_MAC_ADDRESS));
-			object->setMaintenanceMessage(rows->getText(DisplayScreenCPUTableSync::COL_MAINTENANCE_MESSAGE));
-			object->setMonitoringDelay(minutes(rows->getInt(DisplayScreenCPUTableSync::COL_MONITORING_DELAY)));
-			object->setIsOnline(rows->getBool(DisplayScreenCPUTableSync::COL_IS_ONLINE));
-
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				// Links
-				object->setPlace(NULL);
-				RegistryKeyType placeId(rows->getLongLong(DisplayScreenCPUTableSync::COL_PLACE_ID));
-				if(placeId != 0) try
-				{
-					object->setPlace(Fetcher<NamedPlace>::Fetch(placeId, env, linkLevel).get());
-				}
-				catch(ObjectNotFoundException<DisplayScreenCPU>& e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + DisplayScreenCPUTableSync::TABLE.NAME + "/" + DisplayScreenCPUTableSync::COL_PLACE_ID + e.getMessage());
-				}
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<DisplayScreenCPUTableSync,DisplayScreenCPU>::Save(
-			DisplayScreenCPU* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<DisplayScreenCPUTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(object->getPlace() ? object->getPlace()->getKey() : RegistryKeyType(0));
-			query.addField(object->getMacAddress());
-			query.addField(object->getMonitoringDelay().minutes());
-			query.addField(object->getIsOnline());
-			query.addField(object->getMaintenanceMessage());
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<DisplayScreenCPUTableSync,DisplayScreenCPU>::Unlink(
-			DisplayScreenCPU* object
-		){
-			object->setPlace(NULL);
 		}
 
 
@@ -241,15 +171,15 @@ namespace synthese
 				<< " WHERE 1 ";
 			if (placeId)
 			{
-				query << " AND " << COL_PLACE_ID << "=" << *placeId;
+				query << " AND " << PlaceId::FIELD.name << "=" << *placeId;
 			}
 			if(macAddress)
 			{
-				query << " AND " << COL_MAC_ADDRESS << "=" << Conversion::ToDBString(*macAddress);
+				query << " AND " << MacAddress::FIELD.name << "=" << Conversion::ToDBString(*macAddress);
 			}
 			if (orderByName)
 			{
-				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY " << SimpleObjectFieldDefinition<Name>::FIELD.name << (raisingOrder ? " ASC" : " DESC");
 			}
 			if (number)
 			{
@@ -261,6 +191,11 @@ namespace synthese
 			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+		bool DisplayScreenCPUTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<DisplayMaintenanceRight>(security::READ);
 		}
 	}
 }

@@ -26,8 +26,10 @@
 #ifndef SYNTHESE_departurestable_DisplayScreenCPU_h__
 #define SYNTHESE_departurestable_DisplayScreenCPU_h__
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
+
+#include "StringField.hpp"
+#include "TimeField.hpp"
 #include "TreeAlphabeticalOrderingPolicy.hpp"
 #include "TreeRoot.hpp"
 
@@ -46,6 +48,22 @@ namespace synthese
 	{
 		class DisplayScreen;
 
+		FIELD_ID(PlaceId)
+		FIELD_STRING(MacAddress)
+		FIELD_TIME(MonitoringDelay)
+		FIELD_BOOL(IsOnline)
+		FIELD_STRING(MaintenanceMessage)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(PlaceId),
+			FIELD(MacAddress),
+			FIELD(MonitoringDelay),
+			FIELD(IsOnline),
+			FIELD(MaintenanceMessage)
+		> DisplayScreenCPUSchema;
+
 		////////////////////////////////////////////////////////////////////////
 		///	Display screen CPU class.
 		///
@@ -55,20 +73,12 @@ namespace synthese
 		///	@ingroup m54
 		////////////////////////////////////////////////////////////////////////
 		class DisplayScreenCPU:
-			public util::Registrable,
+			public Object<DisplayScreenCPU, DisplayScreenCPUSchema>,
 			public tree::TreeRoot<DisplayScreen, tree::TreeAlphabeticalOrderingPolicy>
 		{
-		public:
-			typedef util::Registry<DisplayScreenCPU> Registry;
-
 		protected:
 			// Attributes
 			const geography::NamedPlace*		_place;
-			std::string											_mac_address;
-			boost::posix_time::time_duration					_monitoring_delay;
-			bool												_is_online;
-			std::string											_maintenance_message;
-			std::string _name;
 
 		public:
 			////////////////////////////////////////////////////////////////////
@@ -92,17 +102,17 @@ namespace synthese
 				boost::posix_time::time_duration					getMonitoringDelay()	const;
 				bool												getIsOnline()			const;
 				const std::string&									getMaintenanceMessage()	const;
-				virtual std::string getName() const { return _name; }
+				virtual std::string getName() const { return get<Name>(); }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setPlace(const geography::NamedPlace* value){ _place = value; }
+				void setPlace(const geography::NamedPlace* value);
 				void setMacAddress(const std::string& value);
 				void setMonitoringDelay(const boost::posix_time::time_duration value);
 				void setIsOnline(const bool value);
 				void setMaintenanceMessage(const std::string& value);
-				void setName(const std::string& value){ _name = value; }
+				void setName(const std::string& value){ set<Name>(value); }
 			//@}
 
 			//! @name Queries
@@ -124,6 +134,12 @@ namespace synthese
 			//@{
 				void copy(const DisplayScreenCPU& e);
 			//@}
+
+			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 

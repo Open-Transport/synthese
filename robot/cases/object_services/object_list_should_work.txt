@@ -75,10 +75,13 @@ Object List Should Work For Some Tables
     On node 0
     # There Is One Object In Table  ${USERS_TABLE_ID}
     There Is Three Objects In Table  ${PROFILES_TABLE_ID}
+    There Is One Object In Table  ${DISPLAY_SCREEN_CPU_TABLE_ID}
     # Create Synthese Object  table_id=${USERS_TABLE_ID}
     # There Is Two Objects In Table  table_id=${USERS_TABLE_ID}
     Create Synthese Object  table_id=${PROFILES_TABLE_ID}
     There Is Four Objects In Table  table_id=${PROFILES_TABLE_ID}
+    Create Synthese Object  table_id=${DISPLAY_SCREEN_CPU_TABLE_ID}
+    There Is Two Objects In Table  table_id=${DISPLAY_SCREEN_CPU_TABLE_ID}
 
 *** Keywords ***
 

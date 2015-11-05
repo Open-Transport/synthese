@@ -27,7 +27,6 @@
 #define SYNTHESE_DisplayScreenCPUTableSync_H__
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 #include <vector>
 #include <string>
@@ -49,20 +48,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				DisplayScreenCPUTableSync,
 				DisplayScreenCPU,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>
 		{
 		public:
-			static const std::string COL_NAME;
-			static const std::string COL_PLACE_ID;
-			static const std::string COL_MAC_ADDRESS;
-			static const std::string COL_MONITORING_DELAY;
-			static const std::string COL_IS_ONLINE;
-			static const std::string COL_MAINTENANCE_MESSAGE;
-
-
-
 			////////////////////////////////////////////////////////////////////
 			/// DisplayScreenCPU search.
 			///	@param env Environment to populate
@@ -82,6 +71,8 @@ namespace synthese
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }
