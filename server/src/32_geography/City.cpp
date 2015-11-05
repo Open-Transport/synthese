@@ -83,7 +83,15 @@ namespace synthese
 
 
 		City::~City ()
-		{}
+		{
+			BOOST_FOREACH(const PlacesMatchers::value_type& matcher, _lexicalMatchers)
+			{
+				BOOST_FOREACH(const LexicalMatcher<boost::shared_ptr<NamedPlace> >::Map::value_type& it, matcher.second.entries())
+				{
+					it.second->setCity(NULL);
+				}
+			}
+		}
 
 
 

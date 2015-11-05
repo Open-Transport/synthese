@@ -1011,7 +1011,10 @@ namespace synthese
 		void StopArea::setCity(geography::City* value)
 		{
 			NamedPlace::setCity(value);
-			set<CityId>(value->getKey());
+			if (value)
+			{
+				set<CityId>(value->getKey());
+			}
 		}
 
 		void StopArea::setRules(const Rules& value)
