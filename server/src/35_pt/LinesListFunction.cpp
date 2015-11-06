@@ -43,6 +43,7 @@
 #include "Session.h"
 #include "User.h"
 #include "Path.h"
+#include "PTServiceConfig.hpp"
 #include "Request.h"
 #include "RequestException.h"
 #include "ReservationContact.h"
@@ -50,11 +51,11 @@
 #include "RollingStockFilter.h"
 #include "TransportNetwork.h"
 #include "StopArea.hpp"
+#include "StopPoint.hpp"
 #include "TransportNetworkTableSync.h"
 #include "TreeFolder.hpp"
 #include "Vertex.h"
 #include "Webpage.h"
-#include "StopPoint.hpp"
 
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryCollection.h>
