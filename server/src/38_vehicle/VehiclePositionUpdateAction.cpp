@@ -240,7 +240,7 @@ namespace synthese
 
 			if(map.isDefined(PARAMETER_STATUS))
 			{
-				_status = static_cast<VehiclePosition::Status>(map.get<int>(PARAMETER_STATUS));
+				_status = static_cast<VehiclePositionStatusEnum>(map.get<int>(PARAMETER_STATUS));
 			}
 
 			if(map.isDefined(PARAMETER_METER_OFFSET))
@@ -286,10 +286,10 @@ namespace synthese
 			}
 			if(_passengers)
 			{
-				_vehiclePosition->setPassangers(*_passengers);
+				_vehiclePosition->setPassengers(*_passengers);
 				if(_setAsCurrentPosition)
 				{
-					vp.setPassangers(_vehiclePosition->getPassengers());
+					vp.setPassengers(_vehiclePosition->getPassengers());
 				}
 			}
 			if(_rankInPath)

@@ -23,6 +23,7 @@
 #include "VehicleModule.hpp"
 
 #include "RollingStockTableSync.hpp"
+#include "ScheduledService.h"
 #include "ServiceComposition.hpp"
 #include "Vehicle.hpp"
 #include "VehiclePositionTableSync.hpp"

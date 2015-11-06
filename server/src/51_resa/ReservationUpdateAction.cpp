@@ -415,7 +415,7 @@ namespace synthese
 					{
 						position->setGeometry(stopPoint->getGeometry());
 					}
-					position->setStatus(VehiclePosition::COMMERCIAL);
+					position->setStatus(COMMERCIAL);
 					position->setStopPoint(const_cast<StopPoint*>(stopPoint));
 					position->setService(service.get());
 					if(edge)
@@ -493,7 +493,7 @@ namespace synthese
 					{
 						position->setGeometry(stopPoint->getGeometry());
 					}
-					position->setStatus(VehiclePosition::COMMERCIAL);
+					position->setStatus(COMMERCIAL);
 					position->setStopPoint(const_cast<StopPoint*>(stopPoint));
 					position->setService(service.get());
 					if(edge)

@@ -56,8 +56,8 @@ namespace synthese
 				if(hasColStep) s << "," << GetSQLColumnOrGroupBy(db, colStep, true) << " AS col";
 			s << " FROM " << VehiclePositionTableSync::TABLE.NAME << " AS r " <<
 				" WHERE " <<
-				VehiclePositionTableSync::COL_TIME << ">='" << gregorian::to_iso_extended_string(period.begin())  << " 00:00:00' AND " <<
-				VehiclePositionTableSync::COL_TIME << "<'" << gregorian::to_iso_extended_string(period.end()) << " 00:00:00'";
+				Time::FIELD.name << ">='" << gregorian::to_iso_extended_string(period.begin())  << " 00:00:00' AND " <<
+				Time::FIELD.name << "<'" << gregorian::to_iso_extended_string(period.end()) << " 00:00:00'";
 			if(hasRowStep || hasColStep)
 			{
 				s << " GROUP BY ";
@@ -94,13 +94,13 @@ namespace synthese
 
 		string PTOperationStatisticsTableSync::GetSQLColumnOrGroupBy(DB* db, Step step, bool column)
 		{
-			if(step == SERVICE_STEP) return VehiclePositionTableSync::COL_SERVICE_ID;
-			if(step == DATE_STEP) return db->getSQLDateFormat("%Y-%m-%d", VehiclePositionTableSync::COL_TIME);
-			if(step == HOUR_STEP) return db->getSQLDateFormat("%H", VehiclePositionTableSync::COL_TIME);
-			if(step == WEEK_DAY_STEP) return db->getSQLDateFormat("%w", VehiclePositionTableSync::COL_TIME);
-			if(step == WEEK_STEP) return db->getSQLDateFormat("%W", VehiclePositionTableSync::COL_TIME);
-			if(step == MONTH_STEP) return db->getSQLDateFormat("%Y-%m", VehiclePositionTableSync::COL_TIME);
-			if(step == YEAR_STEP) return db->getSQLDateFormat("%Y", VehiclePositionTableSync::COL_TIME);
+			if(step == SERVICE_STEP) return VehiclePositionService::FIELD.name;
+			if(step == DATE_STEP) return db->getSQLDateFormat("%Y-%m-%d", Time::FIELD.name);
+			if(step == HOUR_STEP) return db->getSQLDateFormat("%H", Time::FIELD.name);
+			if(step == WEEK_DAY_STEP) return db->getSQLDateFormat("%w", Time::FIELD.name);
+			if(step == WEEK_STEP) return db->getSQLDateFormat("%W", Time::FIELD.name);
+			if(step == MONTH_STEP) return db->getSQLDateFormat("%Y-%m", Time::FIELD.name);
+			if(step == YEAR_STEP) return db->getSQLDateFormat("%Y", Time::FIELD.name);
 			if(column)
 			{
 				if(step == LINE_STEP)
@@ -110,10 +110,10 @@ namespace synthese
 							"jp."+ JourneyPatternCommercialLine::FIELD.name +"=c."+ TABLE_COL_ID +
 						" INNER JOIN "+ ScheduledServiceTableSync::TABLE.NAME +" AS s ON "
 							"s."+ ServicePath::FIELD.name +"=jp."+ TABLE_COL_ID +
-						" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_SERVICE_ID +")";
+						" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionService::FIELD.name +")";
 				if(step == VEHICLE_STEP)
 					return "(SELECT v."+ Name::FIELD.name +" FROM "+ VehicleTableSync::TABLE.NAME +" AS v "+
-						"WHERE v."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_VEHICLE_ID +")";
+						"WHERE v."+ TABLE_COL_ID +"=r."+ VehiclePositionVehicle::FIELD.name +")";
 			}
 			else
 			{
@@ -122,9 +122,9 @@ namespace synthese
 						" FROM "+ JourneyPatternTableSync::TABLE.NAME +" AS jp "+
 						"INNER JOIN "+ ScheduledServiceTableSync::TABLE.NAME +" AS s ON "+
 							"s."+ ServicePath::FIELD.name +"=jp."+ TABLE_COL_ID +
-						" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_SERVICE_ID +")";
+						" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionService::FIELD.name +")";
 				if(step == VEHICLE_STEP)
-					return "r."+ VehiclePositionTableSync::COL_VEHICLE_ID;
+					return "r."+ VehiclePositionVehicle::FIELD.name;
 			}
 			return string();
 		}
@@ -134,11 +134,11 @@ namespace synthese
 		std::string PTOperationStatisticsTableSync::GetSQLWhat( What what )
 		{
 			stringstream s;
-			s << "(SELECT p2." << VehiclePositionTableSync::COL_METER_OFFSET << " FROM " << VehiclePositionTableSync::TABLE.NAME << " AS p2 WHERE p2." <<
-				VehiclePositionTableSync::COL_TIME << ">r." << VehiclePositionTableSync::COL_TIME <<
-				" AND p2." << VehiclePositionTableSync::COL_METER_OFFSET << ">0" <<
-				" AND p2." << VehiclePositionTableSync::COL_VEHICLE_ID << "=r." << VehiclePositionTableSync::COL_VEHICLE_ID <<
-				" ORDER BY p2." << VehiclePositionTableSync::COL_TIME << " LIMIT 1) - " << VehiclePositionTableSync::COL_METER_OFFSET;
+			s << "(SELECT p2." << MeterOffset::FIELD.name << " FROM " << VehiclePositionTableSync::TABLE.NAME << " AS p2 WHERE p2." <<
+				Time::FIELD.name << ">r." << Time::FIELD.name <<
+				" AND p2." << MeterOffset::FIELD.name << ">0" <<
+				" AND p2." << VehiclePositionVehicle::FIELD.name << "=r." << VehiclePositionVehicle::FIELD.name <<
+				" ORDER BY p2." << Time::FIELD.name << " LIMIT 1) - " << MeterOffset::FIELD.name;
 			return s.str();
 		}
 	}

@@ -236,7 +236,7 @@ namespace synthese
 					}
 				}
 				
-				VehicleModule::GetCurrentVehiclePosition().setStatus(VehiclePosition::UNKNOWN_STATUS);
+				VehicleModule::GetCurrentVehiclePosition().setStatus(UNKNOWN_STATUS);
 				// Wait 30 s
 				ServerModule::SetCurrentThreadWaiting();
 				this_thread::sleep(seconds(30));
@@ -412,22 +412,22 @@ namespace synthese
 					try
 					{
 						int etatLoc(lexical_cast<int>(etatLocNode.getText()));
-						VehiclePosition::Status status(VehiclePosition::UNKNOWN_STATUS);
+						VehiclePositionStatusEnum status(UNKNOWN_STATUS);
 						switch(etatLoc)
 						{
 						case 0:
-							status = VehiclePosition::OUT_OF_SERVICE;
+							status = OUT_OF_SERVICE;
 							VehicleModule::GetCurrentJourney().setTerminusDeparture(posix_time::not_a_date_time);
 							break;
 
 						case 1:
-							status = VehiclePosition::SERVICE;
+							status = SERVICE;
 							VehicleModule::GetCurrentJourney().setTerminusDeparture(posix_time::not_a_date_time);
 							break;
 
 						case 3:
 						case 5:
-							status = VehiclePosition::TERMINUS_START;
+							status = TERMINUS_START;
 							// We will get a Departure Time from MsgInfo
 							break;
 
@@ -435,18 +435,18 @@ namespace synthese
 						case 4:
 						case 7:
 						case 8:
-							status = VehiclePosition::COMMERCIAL;
+							status = COMMERCIAL;
 							VehicleModule::GetCurrentJourney().setTerminusDeparture(posix_time::not_a_date_time);
 							break;
 
 						case 6:
-							status = VehiclePosition::DEAD_RUN_TRANSFER;
+							status = DEAD_RUN_TRANSFER;
 							VehicleModule::GetCurrentJourney().setTerminusDeparture(posix_time::not_a_date_time);
 							break;
 
 						case 9:
 						case 10:
-							status = VehiclePosition::NOT_IN_SERVICE;
+							status = NOT_IN_SERVICE;
 							VehicleModule::GetCurrentJourney().setTerminusDeparture(posix_time::not_a_date_time);
 							break;
 						}

@@ -77,5 +77,5 @@ void synthese::vehicle::moduleRegister()
 	INTEGRATE(synthese::vehicle::RollingStock);
 	INTEGRATE(synthese::vehicle::Vehicle);
 	INTEGRATE(synthese::vehicle::VehicleCall);
-	synthese::util::Env::Integrate<synthese::vehicle::VehiclePosition>();
+	INTEGRATE(synthese::vehicle::VehiclePosition);
 }

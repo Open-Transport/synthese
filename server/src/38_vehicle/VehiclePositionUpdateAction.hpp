@@ -81,7 +81,7 @@ namespace synthese
 			boost::shared_ptr<VehiclePosition> _vehiclePosition;
 			bool _setAsCurrentPosition;
 			boost::optional<Vehicle*> _vehicle;
-			boost::optional<VehiclePosition::Status> _status;
+			boost::optional<VehiclePositionStatusEnum> _status;
 			boost::optional<boost::posix_time::ptime> _time;
 			boost::optional<VehiclePosition::Meters> _meterOffset;
 			boost::optional<pt::StopPoint*> _stopPoint;

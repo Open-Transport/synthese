@@ -21,10 +21,17 @@
 
 #include "VehiclePosition.hpp"
 
-#include "ParametersMap.h"
-#include "ScheduledService.h"
-#include "StopPoint.hpp"
 #include "CoordinatesSystem.hpp"
+#include "Depot.hpp"
+#include "DepotTableSync.hpp"
+#include "ParametersMap.h"
+#include "Profile.h"
+#include "PTUseRule.h"
+#include "ScheduledService.h"
+#include "StopArea.hpp"
+#include "StopPoint.hpp"
+#include "StopPointTableSync.hpp"
+#include "User.h"
 #include "Vehicle.hpp"
 
 #include <geos/geom/Point.h>
@@ -38,11 +45,19 @@ namespace synthese
 	using namespace util;
 	using namespace vehicle;
 
-	namespace util
-	{
-		template<>
-		const std::string Registry<VehiclePosition>::KEY("VehiclePosition");
-	}
+	CLASS_DEFINITION(VehiclePosition, "t072_vehicle_positions", 72)
+	FIELD_DEFINITION_OF_OBJECT(VehiclePosition, "vehicle_position_id", "vehicle_position_ids")
+
+	FIELD_DEFINITION_OF_TYPE(VehiclePositionStatus, "status", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(VehiclePositionVehicle, "vehicle_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MeterOffset, "meter_offset", SQL_DOUBLE)
+	FIELD_DEFINITION_OF_TYPE(StopPointId, "stop_point_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Comment, "comment", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(VehiclePositionService, "service_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(VehiclePositionRankInPath, "rank_in_path", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Passengers, "passengers", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(InStopArea, "in_stop_area", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(NextStopFoundTime, "stop_found_time", SQL_TIME)
 
 	namespace vehicle
 	{
@@ -61,21 +76,29 @@ namespace synthese
 		VehiclePosition::VehiclePosition(
 			RegistryKeyType id
 		):	Registrable(id),
-			_status(UNKNOWN_STATUS),
-			_vehicle(NULL),
-			_time(not_a_date_time),
-			_meterOffset(0),
+			Object<VehiclePosition, VehiclePositionSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_VALUE_CONSTRUCTOR(VehiclePositionStatus, UNKNOWN_STATUS),
+					FIELD_DEFAULT_CONSTRUCTOR(VehiclePositionVehicle),
+					FIELD_VALUE_CONSTRUCTOR(Time, not_a_date_time),
+					FIELD_VALUE_CONSTRUCTOR(MeterOffset, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(StopPointId),
+					FIELD_DEFAULT_CONSTRUCTOR(Comment),
+					FIELD_DEFAULT_CONSTRUCTOR(VehiclePositionService),
+					FIELD_DEFAULT_CONSTRUCTOR(VehiclePositionRankInPath),
+					FIELD_VALUE_CONSTRUCTOR(Passengers, 0),
+					FIELD_VALUE_CONSTRUCTOR(InStopArea, false),
+					FIELD_VALUE_CONSTRUCTOR(NextStopFoundTime, not_a_date_time),
+					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
+			)	),
 			_stopPoint(NULL),
-			_depot(NULL),
-			_service(NULL),
-			_passengers(0),
-			_inStopArea(false),
-			_nextStopFoundTime(not_a_date_time)
+			_depot(NULL)
 		{}
 
 
 
-		std::string VehiclePosition::GetStatusName( Status value )
+		std::string VehiclePosition::GetStatusName( VehiclePositionStatusEnum value )
 		{
 			switch(value)
 			{
@@ -95,12 +118,12 @@ namespace synthese
 
 
 
-		vector<pair<optional<VehiclePosition::Status>, string> > VehiclePosition::GetStatusList()
+		vector<pair<optional<VehiclePositionStatusEnum>, string> > VehiclePosition::GetStatusList()
 		{
-			vector<pair<optional<Status>,string> > result;
+			vector<pair<optional<VehiclePositionStatusEnum>,string> > result;
 			for(int i(0); i<9; ++i)
 			{
-				result.push_back(make_pair(optional<Status>(static_cast<Status>(i)), GetStatusName(static_cast<Status>(i))));
+				result.push_back(make_pair(optional<VehiclePositionStatusEnum>(static_cast<VehiclePositionStatusEnum>(i)), GetStatusName(static_cast<VehiclePositionStatusEnum>(i))));
 			}
 			return result;
 		}
@@ -133,22 +156,136 @@ namespace synthese
 				}
 			}
 
-			pm.insert(ATTR_METER_OFFSET, _meterOffset);
-			pm.insert(ATTR_STATUS, _status);
-			pm.insert(ATTR_IN_STOP_AREA, _inStopArea);
+			pm.insert(ATTR_METER_OFFSET, getMeterOffset());
+			pm.insert(ATTR_STATUS, getStatus());
+			pm.insert(ATTR_IN_STOP_AREA, getInStopArea());
 			pm.insert(ATTR_VEHICLE_NUMBER, _vehicleNumber);
-			pm.insert(ATTR_STOP_FOUND_TIME, _nextStopFoundTime);
+			pm.insert(ATTR_STOP_FOUND_TIME, getNextStopFoundTime());
 			if(_stopPoint)
 			{
 				boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 				_stopPoint->toParametersMap(*stopPM, false);
 				pm.insert(TAG_STOP, stopPM);
 			}
-			if(_service)
+			if(get<VehiclePositionService>())
 			{
 				boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
-				_service->toParametersMap(*servicePM, false);
+				get<VehiclePositionService>()->toParametersMap(*servicePM, false);
 				pm.insert(TAG_SERVICE, servicePM);
 			}
+		}
+
+		void VehiclePosition::setVehicle(Vehicle* value)
+		{
+			set<VehiclePositionVehicle>(value
+				? boost::optional<Vehicle&>(*value)
+				: boost::none);
+		}
+
+		void VehiclePosition::setStopPoint(pt::StopPoint* value)
+		{
+			_stopPoint = value;
+			if (value)
+			{
+				set<StopPointId>(value->getKey());
+			}
+		}
+
+		void VehiclePosition::setService(pt::ScheduledService* value)
+		{
+			set<VehiclePositionService>(value
+				? boost::optional<pt::ScheduledService&>(*value)
+				: boost::none);
+		}
+
+		void VehiclePosition::setDepot(pt_operation::Depot* value)
+		{
+			_depot = value;
+			if (value)
+			{
+				set<StopPointId>(value->getKey());
+			}
+		}
+
+		void VehiclePosition::setRankInPath(boost::optional<std::size_t> value)
+		{
+			set<VehiclePositionRankInPath>(value
+				? *value
+				: 0);
+		}
+
+		Vehicle* VehiclePosition::getVehicle() const
+		{
+			if (get<VehiclePositionVehicle>())
+			{
+				return get<VehiclePositionVehicle>().get_ptr();
+			}
+
+			return NULL;
+		}
+
+		pt::ScheduledService* VehiclePosition::getService() const
+		{
+			if (get<VehiclePositionService>())
+			{
+				return get<VehiclePositionService>().get_ptr();
+			}
+
+			return NULL;
+		}
+
+		boost::optional<std::size_t> VehiclePosition::getRankInPath() const
+		{
+			if (get<VehiclePositionRankInPath>() == 0)
+			{
+				return boost::optional<std::size_t>();
+			}
+
+			return boost::optional<std::size_t>(get<VehiclePositionRankInPath>());
+		}
+
+		void VehiclePosition::link(util::Env& env, bool withAlgorithmOptimizations)
+		{
+			setGeometry(get<PointGeometry>());
+
+			RegistryKeyType sid(get<StopPointId>());
+			if(sid > 0)
+			{
+				try
+				{
+					RegistryTableType tableId(decodeTableId(sid));
+					if(tableId == pt::StopPointTableSync::TABLE.ID)
+					{
+						_stopPoint = pt::StopPointTableSync::GetEditable(sid, env).get();
+					}
+					else if(tableId == pt_operation::DepotTableSync::TABLE.ID)
+					{
+						_depot = pt_operation::DepotTableSync::GetEditable(sid, env).get();
+					}
+				}
+				catch(ObjectNotFoundException<pt::StopPoint>&)
+				{
+					Log::GetInstance().warn("No such stop point "+ lexical_cast<string>(sid) +" in VehiclePosition "+ lexical_cast<string>(getKey()));
+				}
+				catch(ObjectNotFoundException<pt_operation::Depot>&)
+				{
+					Log::GetInstance().warn("No such depot "+ lexical_cast<string>(sid) +" in VehiclePosition "+ lexical_cast<string>(getKey()));
+				}
+			}
+		}
+
+		bool VehiclePosition::allowUpdate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool VehiclePosition::allowCreate(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
+		}
+
+		bool VehiclePosition::allowDelete(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::DELETE_RIGHT);
 		}
 }	}

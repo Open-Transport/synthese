@@ -72,6 +72,7 @@ Empty Object List Should Work For Any Table
     ${TIMETABLE_ROWS_TABLE_ID}
     ${DISPLAY_MONITORING_STATUS_TABLE_ID}
     ${ROLLING_STOCK_FILTERS_TABLE_ID}
+    ${VEHICLE_POSITIONS_TABLE_ID}
     
 Object List Should Work For Some Tables
     On node 0

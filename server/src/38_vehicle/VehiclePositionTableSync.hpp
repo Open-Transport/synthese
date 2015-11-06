@@ -28,7 +28,6 @@
 #include "VehiclePosition.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
 #include "NoSynchronizationPolicy.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -44,27 +43,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				VehiclePositionTableSync,
 				VehiclePosition,
-				db::NoSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::NoSynchronizationPolicy
 			>
 		{
 		public:
-			//! @name Field names
-			//@{
-				static const std::string COL_STATUS;
-				static const std::string COL_VEHICLE_ID;
-				static const std::string COL_TIME;
-				static const std::string COL_METER_OFFSET;
-				static const std::string COL_STOP_POINT_ID;
-				static const std::string COL_COMMENT;
-				static const std::string COL_SERVICE_ID;
-				static const std::string COL_RANK_IN_PATH;
-				static const std::string COL_PASSENGERS;
-				static const std::string COL_IN_STOP_AREA;
-				static const std::string COL_STOP_FOUND_TIME;
-			//@}
-
-
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
@@ -101,6 +83,8 @@ namespace synthese
 					boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
 				);
 			//@}
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

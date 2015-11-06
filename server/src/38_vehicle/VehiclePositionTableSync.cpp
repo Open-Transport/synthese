@@ -24,16 +24,18 @@
 
 #include "VehiclePositionTableSync.hpp"
 
-#include "PtimeField.hpp"
-#include "ReplaceQuery.h"
-#include "SelectQuery.hpp"
-#include "VehicleTableSync.hpp"
-#include "StopPointTableSync.hpp"
-#include "ScheduledServiceTableSync.h"
-#include "UpdateQuery.hpp"
 #include "DepotTableSync.hpp"
-#include "StopArea.hpp"
+#include "Profile.h"
+#include "PtimeField.hpp"
 #include "PTUseRule.h"
+#include "ReplaceQuery.h"
+#include "ScheduledServiceTableSync.h"
+#include "SelectQuery.hpp"
+#include "StopArea.hpp"
+#include "StopPointTableSync.hpp"
+#include "UpdateQuery.hpp"
+#include "User.h"
+#include "VehicleTableSync.hpp"
 
 
 #include <geos/geom/Point.h>
@@ -56,21 +58,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,VehiclePositionTableSync>::FACTORY_KEY("37.20 Vehicle positions");
 	}
 
-	namespace vehicle
-	{
-		const std::string VehiclePositionTableSync::COL_STATUS("status");
-		const std::string VehiclePositionTableSync::COL_VEHICLE_ID("vehicle_id");
-		const std::string VehiclePositionTableSync::COL_TIME("time");
-		const std::string VehiclePositionTableSync::COL_METER_OFFSET("meter_offset");
-		const std::string VehiclePositionTableSync::COL_STOP_POINT_ID("stop_point_id");
-		const std::string VehiclePositionTableSync::COL_COMMENT("comment");
-		const std::string VehiclePositionTableSync::COL_SERVICE_ID("service_id");
-		const std::string VehiclePositionTableSync::COL_RANK_IN_PATH("rank_in_path");
-		const std::string VehiclePositionTableSync::COL_PASSENGERS("passengers");
-		const std::string VehiclePositionTableSync::COL_IN_STOP_AREA = "in_stop_area";
-		const std::string VehiclePositionTableSync::COL_STOP_FOUND_TIME = "stop_found_time";
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<VehiclePositionTableSync>::TABLE(
@@ -81,19 +68,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<VehiclePositionTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(VehiclePositionTableSync::COL_STATUS, SQL_INTEGER),
-			Field(VehiclePositionTableSync::COL_VEHICLE_ID, SQL_INTEGER),
-			Field(VehiclePositionTableSync::COL_TIME, SQL_TEXT),
-			Field(VehiclePositionTableSync::COL_METER_OFFSET, SQL_DOUBLE),
-			Field(VehiclePositionTableSync::COL_STOP_POINT_ID, SQL_INTEGER),
-			Field(VehiclePositionTableSync::COL_COMMENT, SQL_TEXT),
-			Field(VehiclePositionTableSync::COL_SERVICE_ID, SQL_INTEGER),
-			Field(VehiclePositionTableSync::COL_RANK_IN_PATH, SQL_INTEGER),
-			Field(VehiclePositionTableSync::COL_PASSENGERS, SQL_INTEGER),
-			Field(VehiclePositionTableSync::COL_IN_STOP_AREA, SQL_BOOLEAN),
-			Field(VehiclePositionTableSync::COL_STOP_FOUND_TIME, SQL_TEXT),
-			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			Field()
 		};
 
@@ -105,146 +79,10 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					VehiclePositionTableSync::COL_VEHICLE_ID.c_str(),
-					VehiclePositionTableSync::COL_TIME.c_str(),
+					VehiclePositionVehicle::FIELD.name.c_str(),
+					Time::FIELD.name.c_str(),
 			"")	);
 			return r;
-		}
-
-
-
-		template<> void OldLoadSavePolicy<VehiclePositionTableSync,VehiclePosition>::Load(
-			VehiclePosition* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			object->setStatus(static_cast<VehiclePosition::Status>(rows->getInt(VehiclePositionTableSync::COL_STATUS)));
-			object->setTime(rows->getDateTime(VehiclePositionTableSync::COL_TIME));
-			object->setMeterOffset(static_cast<VehiclePosition::Meters>(rows->getDouble(VehiclePositionTableSync::COL_METER_OFFSET)));
-			object->setComment(rows->getText(VehiclePositionTableSync::COL_COMMENT));
-			object->setRankInPath(rows->getOptionalUnsignedInt(VehiclePositionTableSync::COL_RANK_IN_PATH));
-			object->setPassangers(rows->getInt(VehiclePositionTableSync::COL_PASSENGERS));
-			object->setInStopArea(rows->getBool(VehiclePositionTableSync::COL_IN_STOP_AREA));
-			object->setNextStopFoundTime(rows->getDateTime(VehiclePositionTableSync::COL_STOP_FOUND_TIME));
-
-
-			string pointsStr(rows->getText(TABLE_COL_GEOMETRY));
-			if(pointsStr.empty())
-			{
-				object->setGeometry(boost::shared_ptr<Point>());
-			}
-			else
-			{
-				object->setGeometry(
-					dynamic_pointer_cast<Point,Geometry>(rows->getGeometryFromWKT(TABLE_COL_GEOMETRY))
-				);
-			}
-
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				RegistryKeyType pid(rows->getLongLong(VehiclePositionTableSync::COL_VEHICLE_ID));
-				if(pid > 0)
-				{
-					try
-					{
-						object->setVehicle(VehicleTableSync::GetEditable(pid, env, linkLevel).get());
-					}
-					catch(ObjectNotFoundException<Vehicle>&)
-					{
-						Log::GetInstance().warn("No such vehicle "+ lexical_cast<string>(pid) +" in VehiclePosition "+ lexical_cast<string>(object->getKey()));
-					}
-				}
-
-				RegistryKeyType sid(rows->getLongLong(VehiclePositionTableSync::COL_STOP_POINT_ID));
-				if(sid > 0)
-				{
-					try
-					{
-						RegistryTableType tableId(decodeTableId(sid));
-						if(tableId == StopPointTableSync::TABLE.ID)
-						{
-							object->setStopPoint(StopPointTableSync::GetEditable(sid, env, linkLevel).get());
-						}
-						else if(tableId == DepotTableSync::TABLE.ID)
-						{
-							object->setDepot(DepotTableSync::GetEditable(sid, env, linkLevel).get());
-						}
-					}
-					catch(ObjectNotFoundException<StopPoint>&)
-					{
-						Log::GetInstance().warn("No such stop point "+ lexical_cast<string>(sid) +" in VehiclePosition "+ lexical_cast<string>(object->getKey()));
-					}
-					catch(ObjectNotFoundException<Depot>&)
-					{
-						Log::GetInstance().warn("No such depot "+ lexical_cast<string>(sid) +" in VehiclePosition "+ lexical_cast<string>(object->getKey()));
-					}
-				}
-
-				RegistryKeyType cid(rows->getLongLong(VehiclePositionTableSync::COL_SERVICE_ID));
-				if(cid > 0)
-				{
-					try
-					{
-						object->setService(ScheduledServiceTableSync::GetEditable(cid, env, linkLevel).get());
-					}
-					catch(ObjectNotFoundException<ScheduledService>&)
-					{
-						Log::GetInstance().warn("No such stop point "+ lexical_cast<string>(cid) +" in VehiclePosition "+ lexical_cast<string>(object->getKey()));
-					}
-				}
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<VehiclePositionTableSync,VehiclePosition>::Save(
-			VehiclePosition* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<VehiclePositionTableSync> query(*object);
-			query.addField(static_cast<int>(object->getStatus()));
-			query.addField(object->getVehicle() ? object->getVehicle()->getKey() : RegistryKeyType(0));
-			query.addFrameworkField<PtimeField>(object->getTime());
-			query.addField(object->getMeterOffset());
-			if(object->getStopPoint())
-			{
-				query.addField(object->getStopPoint()->getKey());
-			}
-			else if(object->getDepot())
-			{
-				query.addField(object->getDepot()->getKey());
-			}
-			else
-			{
-				query.addFieldNull();
-			}
-			query.addField(object->getComment());
-			query.addField(object->getService() ? object->getService()->getKey() : RegistryKeyType(0));
-			query.addField(object->getRankInPath() ? lexical_cast<string>(*object->getRankInPath()) : string());
-			query.addField(object->getPassengers());
-			query.addField(object->getInStopArea());
-			query.addFrameworkField<PtimeField>(object->getNextStopFoundTime());
-			if(object->hasGeometry())
-			{
-				query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
-			}
-			else
-			{
-				query.addFieldNull();
-			}
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<VehiclePositionTableSync,VehiclePosition>::Unlink(
-			VehiclePosition* obj
-		){
-			obj->setVehicle(NULL);
-			obj->setStopPoint(NULL);
-			obj->setService(NULL);
-			obj->setDepot(NULL);
 		}
 
 
@@ -301,19 +139,19 @@ namespace synthese
 			SelectQuery<VehiclePositionTableSync> query;
 			if(startDate)
 			{
-				query.addWhereField(COL_TIME, *startDate, ComposedExpression::OP_SUPEQ);
+				query.addWhereField(Time::FIELD.name, *startDate, ComposedExpression::OP_SUPEQ);
 			}
 			if(endDate)
 			{
-				query.addWhereField(COL_TIME, *endDate, ComposedExpression::OP_INFEQ);
+				query.addWhereField(Time::FIELD.name, *endDate, ComposedExpression::OP_INFEQ);
 			}
 			if(vehicleId)
 			{
-				query.addWhereField(COL_VEHICLE_ID, *vehicleId);
+				query.addWhereField(VehiclePositionVehicle::FIELD.name, *vehicleId);
 			}
 			if(orderByDate)
 			{
-				query.addOrderField(COL_TIME, raisingOrder);
+				query.addOrderField(Time::FIELD.name, raisingOrder);
 			}
 			if (number)
 			{
@@ -338,14 +176,19 @@ namespace synthese
 		){
 			UpdateQuery<VehiclePositionTableSync> query;
 			query.addUpdateField(
-				COL_PASSENGERS,
+				Passengers::FIELD.name,
 				RawSQL(
-					COL_PASSENGERS+ "+" + lexical_cast<string>(passengersToAdd) + "-" + lexical_cast<string>(passengersToRemove)
+					Passengers::FIELD.name + "+" + lexical_cast<string>(passengersToAdd) + "-" + lexical_cast<string>(passengersToRemove)
 			)	);
-			query.addWhereField(COL_VEHICLE_ID, startPosition.getVehicle()->getKey());
-			query.addWhereField(COL_TIME, startPosition.getTime(), ComposedExpression::OP_SUPEQ);
-			query.addWhereField(COL_TIME, endPosition.getTime(), ComposedExpression::OP_INF);
+			query.addWhereField(VehiclePositionVehicle::FIELD.name, startPosition.getVehicle()->getKey());
+			query.addWhereField(Time::FIELD.name, startPosition.getTime(), ComposedExpression::OP_SUPEQ);
+			query.addWhereField(Time::FIELD.name, endPosition.getTime(), ComposedExpression::OP_INF);
 			query.execute(transaction);
+		}
+
+		bool VehiclePositionTableSync::allowList(const server::Session* session) const
+		{
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::READ);
 		}
 	}
 }

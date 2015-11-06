@@ -23,8 +23,12 @@
 #ifndef SYNTHESE_pt_operation_VehiclePosition_hpp__
 #define SYNTHESE_pt_operation_VehiclePosition_hpp__
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
+
+#include "EnumObjectField.hpp"
+#include "GeometryField.hpp"
+#include "PtimeField.hpp"
+#include "StringField.hpp"
 #include "WithGeometry.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -60,11 +64,52 @@ namespace synthese
 	{
 		class Vehicle;
 
+		typedef enum
+		{
+			TRAINING = 0,
+			DEAD_RUN_DEPOT = 1,
+			DEAD_RUN_TRANSFER = 2,
+			SERVICE = 3,
+			COMMERCIAL = 4,
+			NOT_IN_SERVICE = 5,
+			OUT_OF_SERVICE = 6,
+			UNKNOWN_STATUS = 999,
+			REFUELING = 8,
+			TERMINUS_START = 9
+		} VehiclePositionStatusEnum;
+
+		FIELD_ENUM(VehiclePositionStatus, VehiclePositionStatusEnum)
+		FIELD_POINTER(VehiclePositionVehicle, Vehicle)
+		FIELD_DOUBLE(MeterOffset)
+		FIELD_ID(StopPointId)
+		FIELD_STRING(Comment)
+		FIELD_POINTER(VehiclePositionService, pt::ScheduledService)
+		FIELD_SIZE_T(VehiclePositionRankInPath)
+		FIELD_SIZE_T(Passengers)
+		FIELD_BOOL(InStopArea)
+		FIELD_PTIME(NextStopFoundTime)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(VehiclePositionStatus),
+			FIELD(VehiclePositionVehicle),
+			FIELD(Time),
+			FIELD(MeterOffset),
+			FIELD(StopPointId),
+			FIELD(Comment),
+			FIELD(VehiclePositionService),
+			FIELD(VehiclePositionRankInPath),
+			FIELD(Passengers),
+			FIELD(InStopArea),
+			FIELD(NextStopFoundTime),
+			FIELD(PointGeometry)
+		> VehiclePositionSchema;
+
 		/** VehiclePosition class.
 			@ingroup m38
 		*/
 		class VehiclePosition:
-			public util::Registrable,
+			public Object<VehiclePosition, VehiclePositionSchema>,
 			public WithGeometry<geos::geom::Point>
 		{
 		private:
@@ -79,80 +124,60 @@ namespace synthese
 			static const std::string TAG_SERVICE;
 
 		public:
-			typedef util::Registry<VehiclePosition> Registry;
-
 			typedef double Meters;
 
-			typedef enum
-			{
-				TRAINING = 0,
-				DEAD_RUN_DEPOT = 1,
-				DEAD_RUN_TRANSFER = 2,
-				SERVICE = 3,
-				COMMERCIAL = 4,
-				NOT_IN_SERVICE = 5,
-				OUT_OF_SERVICE = 6,
-				UNKNOWN_STATUS = 999,
-				REFUELING = 8,
-				TERMINUS_START = 9
-			} Status;
-
-			static std::string GetStatusName(Status value);
-			static std::vector<std::pair<boost::optional<Status>, std::string> > GetStatusList();
+			static std::string GetStatusName(VehiclePositionStatusEnum value);
+			static std::vector<std::pair<boost::optional<VehiclePositionStatusEnum>, std::string> > GetStatusList();
 
 
 		private:
-			Status _status;
-			Vehicle* _vehicle;
 			std::string _vehicleNumber;
-			boost::posix_time::ptime _time;
-			Meters _meterOffset;
 			pt::StopPoint* _stopPoint;
 			pt_operation::Depot* _depot;
-			std::string _comment;
-			pt::ScheduledService* _service;
-			boost::optional<std::size_t> _rankInPath;
-			std::size_t _passengers;
-			bool _inStopArea;
-			boost::posix_time::ptime _nextStopFoundTime;
 
 		public:
 			VehiclePosition(
 				util::RegistryKeyType id = 0
 			);
 
-			void setStatus(Status value){ _status = value; }
-			void setVehicle(Vehicle* value){ _vehicle = value; }
-			void setTime(const boost::posix_time::ptime& value){ _time = value; }
-			void setMeterOffset(const Meters& value){ _meterOffset = value; }
-			void setStopPoint(pt::StopPoint* value){ _stopPoint = value; }
-			void setComment(const std::string& value){ _comment = value; }
-			void setService(pt::ScheduledService* value){ _service = value; }
-			void setRankInPath(boost::optional<std::size_t> value){ _rankInPath = value; }
-			void setPassangers(std::size_t value){ _passengers = value; }
-			void setDepot(pt_operation::Depot* value){ _depot = value; }
-			void setInStopArea(bool value){ _inStopArea = value; }
+			void setStatus(VehiclePositionStatusEnum value){ set<VehiclePositionStatus>(value); }
+			void setVehicle(Vehicle* value);
+			void setTime(const boost::posix_time::ptime& value){ set<Time>(value); }
+			void setMeterOffset(const Meters& value){ set<MeterOffset>(value); }
+			void setStopPoint(pt::StopPoint* value);
+			void setComment(const std::string& value){ set<Comment>(value); }
+			void setService(pt::ScheduledService* value);
+			void setRankInPath(boost::optional<std::size_t> value);
+			void setPassengers(std::size_t value){ set<Passengers>(value); }
+			void setDepot(pt_operation::Depot* value);
+			void setInStopArea(bool value){ set<InStopArea>(value); }
 			void setVehicleNumber(const std::string& value){ _vehicleNumber = value; }
-			void setNextStopFoundTime(const boost::posix_time::ptime& value){ _nextStopFoundTime = value; }
+			void setNextStopFoundTime(const boost::posix_time::ptime& value){ set<NextStopFoundTime>(value); }
 
-			const Status& getStatus() const { return _status; }
-			Vehicle* getVehicle() const { return _vehicle; }
-			const boost::posix_time::ptime& getTime() const { return _time; }
-			const Meters& getMeterOffset() const { return _meterOffset; }
+			const VehiclePositionStatusEnum& getStatus() const { return get<VehiclePositionStatus>(); }
+			Vehicle* getVehicle() const;
+			const boost::posix_time::ptime& getTime() const { return get<Time>(); }
+			const Meters& getMeterOffset() const { return get<MeterOffset>(); }
 			pt::StopPoint* getStopPoint() const { return _stopPoint; }
-			const std::string& getComment() const { return _comment; }
-			pt::ScheduledService* getService() const { return _service; }
-			boost::optional<std::size_t> getRankInPath() const { return _rankInPath; }
-			std::size_t getPassengers() const { return _passengers; }
+			const std::string& getComment() const { return get<Comment>(); }
+			pt::ScheduledService* getService() const;
+			boost::optional<std::size_t> getRankInPath() const;
+			std::size_t getPassengers() const { return get<Passengers>(); }
 			pt_operation::Depot* getDepot() const { return _depot; }
-			bool getInStopArea() const { return _inStopArea; }
+			bool getInStopArea() const { return get<InStopArea>(); }
 			const std::string& getVehicleNumber() const { return _vehicleNumber; }
-			const boost::posix_time::ptime& getNextStopFoundTime() const { return _nextStopFoundTime; }
+			const boost::posix_time::ptime& getNextStopFoundTime() const { return get<NextStopFoundTime>(); }
 
 			virtual void toParametersMap(util::ParametersMap& pm,
 				bool withAdditionalParameters,
 				boost::logic::tribool withFiles = boost::logic::indeterminate,
 				std::string prefix = std::string()) const;
+
+			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 }	}
 
