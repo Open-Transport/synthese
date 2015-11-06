@@ -23,9 +23,10 @@
 #ifndef SYNTHESE_transporwebsite_RollingStockFilter_h__
 #define SYNTHESE_transporwebsite_RollingStockFilter_h__
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
+
 #include "AccessParameters.h"
+#include "StringField.hpp"
 
 #include <string>
 #include <set>
@@ -42,11 +43,24 @@ namespace synthese
 	{
 		class PTServiceConfig;
 
+		FIELD_POINTER(ServiceConfig, PTServiceConfig)
+		FIELD_BOOL(AuthorizedOnly)
+		FIELD_STRING(RollingStockIds)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(ServiceConfig),
+			FIELD(Rank),
+			FIELD(Name),
+			FIELD(AuthorizedOnly),
+			FIELD(RollingStockIds)
+		> RollingStockFilterSchema;
+
 		/** RollingStockFilter class.
 			@ingroup m56
 		*/
 		class RollingStockFilter:
-			public util::Registrable
+			public Object<RollingStockFilter, RollingStockFilterSchema>
 		{
 		public:
 			typedef std::set<const vehicle::RollingStock*> List;
@@ -55,46 +69,45 @@ namespace synthese
 			typedef util::Registry<RollingStockFilter>	Registry;
 
 		private:
-
-			std::string _name;
-			const PTServiceConfig* _site;
-			std::size_t _rank;
 			List _list;
-			bool _authorized_only;
 
 		public:
-			RollingStockFilter(util::RegistryKeyType key = 0)
-				: util::Registrable(key) {}
-
-			~RollingStockFilter() {}
+			RollingStockFilter(util::RegistryKeyType key = 0);
+			~RollingStockFilter();
 
 			//! @name Getters
 			//@{
-				virtual std::string getName() const { return _name; }
-				bool getAuthorizedOnly() const { return _authorized_only; }
+				virtual std::string getName() const { return get<Name>(); }
+				bool getAuthorizedOnly() const { return get<AuthorizedOnly>(); }
 				const List& getList() const { return _list; }
-				const PTServiceConfig* getSite() const { return _site; }
-				std::size_t getRank() const { return _rank; }
+				const PTServiceConfig* getSite() const;
+				std::size_t getRank() const { return get<Rank>(); }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setName(const std::string& value) { _name=value; }
-				void setAuthorizedOnly(bool value) { _authorized_only = value; }
-				void setSite(const PTServiceConfig* value) { _site = value; }
-				void setRank(std::size_t value) { _rank = value; }
+				void setName(const std::string& value) { set<Name>(value); }
+				void setAuthorizedOnly(bool value) { set<AuthorizedOnly>(value); }
+				void setSite(PTServiceConfig* value);
+				void setRank(std::size_t value) { set<Rank>(value); }
 			//@}
 
 			//! @name Modifiers
 			//@{
-				void addRollingStock(const vehicle::RollingStock* value) { _list.insert(value); }
-				void cleanRollingStocks() { _list.clear(); }
+				void addRollingStock(const vehicle::RollingStock* value);
+				void cleanRollingStocks();
 			//@}
 
 			//! @name Queries
 			//@{
 				graph::AccessParameters::AllowedPathClasses getAllowedPathClasses() const;
 			//@}
+
+			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
 		};
 	}
 }

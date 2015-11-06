@@ -31,7 +31,6 @@
 #include <iostream>
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -46,18 +45,10 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				RollingStockFilterTableSync,
 				RollingStockFilter,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::FullSynchronizationPolicy
 			>
 		{
 		public:
-			static const std::string COL_SITE_ID;
-			static const std::string COL_RANK;
-			static const std::string COL_NAME;
-			static const std::string COL_AUTHORIZED_ONLY;
-			static const std::string COL_ROLLING_STOCK_IDS;
-
-
 			/** RollingStockFilter search.
 				(other search parameters)
 				@param first First RollingStockFilter object to answer
@@ -73,6 +64,8 @@ namespace synthese
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+			virtual bool allowList( const server::Session* session ) const;
 		};
 	}
 }

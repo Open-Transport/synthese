@@ -25,20 +25,21 @@
 #include "StopPointsListFunction.hpp"
 
 #include "alphanum.hpp"
+#include "City.h"
+#include "DRTArea.hpp"
+#include "JourneyPattern.hpp"
+#include "LinePhysicalStop.hpp"
 #include "MimeTypes.hpp"
+#include "PTServiceConfig.hpp"
 #include "RequestException.h"
 #include "Request.h"
+#include "RollingStock.hpp"
+#include "RollingStockFilter.h"
+#include "SchedulesBasedService.h"
 #include "ServicePointer.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
-#include "RollingStock.hpp"
-#include "RollingStockFilter.h"
-#include "LinePhysicalStop.hpp"
-#include "SchedulesBasedService.h"
-#include "JourneyPattern.hpp"
-#include "City.h"
 #include "Webpage.h"
-#include "DRTArea.hpp"
 
 #ifndef UNIX
 #include <geos/util/math.h>
