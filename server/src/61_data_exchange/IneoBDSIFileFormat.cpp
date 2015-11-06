@@ -1332,20 +1332,37 @@ namespace synthese
 					{
 						_scenariosToRemove.erase(scenario->getKey());
 
-						// Message content
-						const std::set<const Alarm*>& messages(scenario->getMessages());
-						if(messages.size() != 1)
+					// Message content
+					const std::set<const Alarm*>& messages(scenario->getMessages());
+
+					// No message, this should not happen
+					if (messages.size() == 0)
+					{
+						_logWarning(
+							"Corrupted scenario : scenario should contain at least one message : " + lexical_cast<string>(scenario->getKey())
+						);
+
+						// We should be able to create directly a message there
+						// Abandonned because of a crash on the second import
+					}
+
+					// More than one message. This should not happen
+					else if(messages.size() > 1)
+					{
+						_logWarning(
+							"Corrupted message : scenario should contain only one message : " + lexical_cast<string>(scenario->getKey())
+						);
+
+						std::set<const Alarm*>::const_iterator it(messages.begin());
+						for(++it; it != messages.end(); ++it)
 						{
-							_logWarning(
-								"Corrupted message : scenario should contain one message : " + lexical_cast<string>(scenario->getKey())
-							);
-							
-							std::set<const Alarm*>::const_iterator it(messages.begin());
-							for(++it; it != messages.end(); ++it)
-							{
-								_messagesToRemove.insert((*it)->getKey());
-							}
+							_messagesToRemove.insert((*it)->getKey());
 						}
+					}
+
+					// One message to update
+					else
+					{
 						message = const_cast<Alarm*>(*messages.begin());
 						if(	message->getLongMessage() != programmation.content ||
 							message->getShortMessage() != programmation.messageTitle ||
@@ -1356,6 +1373,8 @@ namespace synthese
 								_env
 							);
 						}
+					}
+
 
 						// Scenario updates
 						if(	scenario->getName() != programmation.title ||
@@ -1394,10 +1413,17 @@ namespace synthese
 
 
 					// Adding of existing object links to the removal list
-					Alarm::LinkedObjects::mapped_type existingRecipients(
-						(*scenario->getMessages().begin())->getLinkedObjects(
-							BroadcastPointAlarmRecipient::FACTORY_KEY
-					)	);
+					Alarm::LinkedObjects::mapped_type existingRecipients;
+
+					if (scenario)
+					{
+						const Alarm *alarm = *scenario->getMessages().begin();
+						if (alarm)
+						{
+							existingRecipients = alarm->getLinkedObjects(BroadcastPointAlarmRecipient::FACTORY_KEY);
+						}
+					}
+
 					BOOST_FOREACH(const Alarm::LinkedObjects::mapped_type::value_type& aol, existingRecipients)
 					{
 						_alarmObjectLinksToRemove.insert(aol->getKey());
