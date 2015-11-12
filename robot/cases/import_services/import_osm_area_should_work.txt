@@ -1,12 +1,23 @@
 *** Settings ***
 Resource          ../../resources/s3-fakeclient/import_services.txt    
+Resource          ../../resources/s3-fakeclient/object_services.txt    
 Test Setup        Start Synthese On Node 0
 Test Teardown     Stop Synthese On Node 0
 
 *** Test Cases ***
 
-Import OSM Export Of Small Swiss Tile Should Work
-    Import OSM Export  ${CURDIR}/../data/small_swiss_tile.osm.bz2
+Import OSM Export (direct OSM web export) Of Small Swiss Tile Should Work
+    On node 0
+    Import OSM Export  ${CURDIR}/../../resources/data/small_swiss_tile.osm.bz2
+    There are 31 Objects In Table ${CITIES_TABLE_ID}
+    There are 30260 Objects In Table ${ROADS_TABLE_ID}
+
+Import OSM Export (Geofabrik) Of Monaco Tile Should Work
+    On node 0
+    Import OSM Export  ${CURDIR}/../../resources/data/monaco.osm.bz2
+    There are 5 Objects In Table ${CITIES_TABLE_ID}
+    There are 1277 Objects In Table ${ROADS_TABLE_ID}
 
 
-    
+
+
