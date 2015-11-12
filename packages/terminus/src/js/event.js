@@ -360,8 +360,7 @@ function generate_alternative_click()
     for(var i=0; i<textAreas.length; ++i)
     {
       var field = tinyMCE.get(textAreas.eq(i).attr('id'));
-      var limitedTxt = txt.substring(0, textAreas.eq(i).attr('limit')).replace(/\n/ig,"<br>");
-      field.setContent(limitedTxt);
+      field.setContent(txt);
     }
     $('#alternatives textarea.mceEditor').each(update_chars_alternative);
     activateForm();
@@ -379,7 +378,6 @@ function generate_alternative_click()
       }
     }
     var txt = tinyMCE.get('tinymce').getContent({format: 'text'});
-    txt = txt.substring(0, limit).replace(/\n/ig,"<br>");
     field.setContent(txt);
     $('#alternatives textarea.mceEditor').each(update_chars_alternative);
     activateForm();
@@ -390,12 +388,21 @@ function generate_alternative_click()
 function update_chars_alternative(alternativeEditor)
 {
   if (typeof(alternativeEditor)==='undefined') {
-    alternativeEditor = tinyMCE.activeEditor;  
+    alternativeEditor = tinyMCE.activeEditor;
   } else {
     alternativeEditor = tinyMCE.get($(this).attr('id'));
   }
   var size = alternativeEditor.getContent({format: 'text'}).length;
-  $('#' + alternativeEditor.id).nextAll('[field=counter]').html(size + ' caractère' + (size > 1 ? 's' : ''));
+  var limit = $('#' + alternativeEditor.id).attr('limit');
+  var counter = $('#' + alternativeEditor.id).nextAll('[field=counter]');
+  var counterText  = '' + size + ' caractère' + (size > 1 ? 's' : '') + ' sur ' + limit;
+  counter.html(size + ' caractère' + (size > 1 ? 's' : '') + ' sur ' + limit);
+  if(size > limit) {
+    counter.html(counterText.fontcolor('red').bold());
+  }
+  else {
+    counter.html(counterText);
+  }
 }
 
 function update_chars()
