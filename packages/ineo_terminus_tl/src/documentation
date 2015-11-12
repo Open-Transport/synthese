@@ -1,0 +1,53 @@
+<@message_level_tooltip=Niveau de priorité du message
+
+Messageries SAE: bandeaux passagers (requis), annonces sonores passagers (requis), zone des horaires sur les bornes IV (requis).
+
+Le message est diffusé en alternance si son niveau est inférieur à prioritaire.@>
+
+<@message_displayDuration_tooltip=Inutilisé par les messageries SAE@>
+
+<@message_repeat_interval_tooltip=Période de répétition du message
+
+Messageries SAE: bandeaux passagers (requis), conducteurs (requis) et annonces sonores aux passagers (requis), aux stations (requis) et aux conducteurs (requis).
+
+Cette durée est arrondie à la minute inférieure avant envoi au SAE.
+Valeurs autorisées:
+- messagerie conducteurs: 0 = pas de répétition ou 60..14400 secondes
+- autres messageries: 60..14400 secondes@>
+
+<@message_with_ack_tooltip=Accusé de réception requis
+
+Messageries SAE: conducteurs (requis).
+
+La valeur par défaut est 'non'.@>
+
+<@message_multiple_stops_tooltip=Inutilisé par les messageries SAE.@>
+
+<@message_play_tts_tooltip=Inutilisé par les messageries SAE.@>
+
+<@message_light_tooltip=Allumage des LED clignotantes
+
+Messageries SAE: messages sur bornes IV (requis).
+
+La valeur par défaut est 'non'.@>
+
+<@message_direction_sign_code_tooltip=Code girouette
+
+Messageries SAE: girouette (requis).@>
+
+<@message_start_stop_point_tooltip=Arrêt de début de tronçon
+
+Messageries SAE: bandeaux passagers (optionnel), annonces sonores passagers (optionnel).
+
+Ce paramètre ne peut être saisi que si une seule ligne commerciale est sélectionnée parmi les destinataires.@>
+
+<@message_end_stop_point_tooltip=Arrêt de fin de tronçon
+
+Messageries SAE: bandeaux passagers (optionnel), annonces sonores passagers (optionnel).
+
+Ce paramètre ne peut être saisi que si une seule ligne commerciale est sélectionnée parmi les destinataires.@>
+
+
+<@message_displayDuration_default_value=0@>
+<@message_repeat_interval_default_value=120@>
+

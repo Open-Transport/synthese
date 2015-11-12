@@ -1,0 +1,37 @@
+<@message_level_tooltip=Niveau de priorité du message
+
+Messageries SAE: bandeaux passagers (requis), zone des messages sur les bornes IV (requis), zone des horaires sur les bornes IV (requis).@>
+
+<@message_displayDuration_tooltip=Durée d'affichage
+
+Messageries SAE: zone des messages sur les bornes IV (optionnel).@>
+
+<@message_repeat_interval_tooltip=Période de répétition du message
+
+Messageries SAE: bandeaux passagers (requis).@>
+
+<@message_with_ack_tooltip=Inutilisé par les messageries SAE.@>
+
+<@message_multiple_stops_tooltip=Message diffusé au premier passage sur l'arrêt choisi dans les destinataires (ou au terminus si aucun arrêt choisi) ou à chaque passage
+
+Messageries SAE: conducteurs (requis).@>
+
+<@message_play_tts_tooltip=Lecture TTS pendant l'affichage
+
+Messageries SAE: bandeaux passagers (requis), zone des horaires sur les bornes IV (requis).@>
+
+<@message_light_tooltip=Inutilisé par les messageries SAE.@>
+
+<@message_direction_sign_code_tooltip=Inutilisé par les messageries SAE.@>
+
+<@message_start_stop_point_tooltip=Arrêt de début de tronçon
+
+Messageries SAE: bandeaux passagers (optionnel).@>
+
+<@message_end_stop_point_tooltip=Arrêt de fin de tronçon
+
+Messageries SAE: bandeaux passagers (optionnel).@>
+
+
+<@message_displayDuration_default_value=0@>
+<@message_repeat_interval_default_value=120@>

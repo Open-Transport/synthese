@@ -38,6 +38,7 @@ namespace synthese
 			public Expression
 		{
 		private:
+			std::string _siteURL;
 			CMSScript _pageName;
 			typedef std::vector<std::pair<std::string, CMSScript> > Parameters;
 			Parameters _parameters;
