@@ -229,7 +229,7 @@ namespace synthese
 				else
 				{
 					const Road* road(static_cast<const RoadPath*>(its->getService()->getPath())->getRoad());
-					stream << road->get<RoadPlace>()->getName();
+					stream << road->getAnyRoadPlace()->getName();
 				}
 
 				// Transfers
@@ -279,7 +279,7 @@ namespace synthese
 						else
 						{
 							const Road* road(static_cast<const RoadPath*>(its->getService()->getPath())->getRoad());
-							stream << road->get<RoadPlace>()->getName();
+							stream << road->getAnyRoadPlace()->getName();
 						}
 
 						// Exit if last service use

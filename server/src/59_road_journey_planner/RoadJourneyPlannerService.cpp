@@ -395,12 +395,12 @@ namespace synthese
 					{
 						curDistance = static_cast<int>(distance);
 						arrivalTime = departureTime + boost::posix_time::seconds(static_cast<int>(distance / speed));
-						curRoadPlace = &*road->get<RoadPlace>();
+						curRoadPlace = &*road->getAnyRoadPlace();
 						curGeom.push_back(geometryProjected.get()->clone());
 						rank++;
 						first = false;
 					}
-					else if(curRoadPlace->getName() == road->get<RoadPlace>()->getName())
+					else if(curRoadPlace->getName() == road->getAnyRoadPlace()->getName())
 					{
 						curDistance += static_cast<int>(distance);
 						arrivalTime = arrivalTime + boost::posix_time::seconds(static_cast<int>(distance / speed));
@@ -428,7 +428,7 @@ namespace synthese
 						curDistance = static_cast<int>(distance);
 						departureTime = arrivalTime;
 						arrivalTime = departureTime + boost::posix_time::seconds(static_cast<int>(distance / speed));
-						curRoadPlace = &*road->get<RoadPlace>();
+						curRoadPlace = &*road->getAnyRoadPlace();
 
 						BOOST_FOREACH(Geometry* geomToDelete, curGeom)
 						{

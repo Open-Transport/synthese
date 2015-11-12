@@ -133,7 +133,7 @@ rp40.setCity(&city54);
 SAVE(RoadPlace, rp40);
 
 Road ro40(4222124650659840ULL);
-ro40.set<RoadPlace>(rp40);
+ro40.get<RoadPlace::Vector>().push_back(&rp40);
 SAVE(Road, ro40);
 ro40.link(env);
 
@@ -153,7 +153,7 @@ rp41.setCity(&city54);
 SAVE(RoadPlace, rp41);
 
 Road ro41(4222124650659841ULL);
-ro41.set<RoadPlace>(rp41);
+ro41.get<RoadPlace::Vector>().push_back(&rp41);
 SAVE(Road, ro41);
 ro41.link(env);
 
@@ -181,7 +181,7 @@ rp42.setCity(&city38);
 SAVE(RoadPlace, rp42);
 
 Road ro42(4222124650659842ULL);
-ro42.set<RoadPlace>(rp42);
+ro42.get<RoadPlace::Vector>().push_back(&rp42);
 SAVE(Road, ro42);
 ro42.link(env);
 
@@ -195,7 +195,7 @@ rc97.link(env);
 
 Road ro44(4222124650659844ULL);
 SAVE(Road, ro44);
-ro44.set<RoadPlace>(rp42);
+ro44.get<RoadPlace::Vector>().push_back(&rp42);
 ro44.link(env);
 
 RoadChunk rc98_44(3940649673949498ULL, &c98, 0, &ro44, 0);
@@ -219,7 +219,7 @@ rp43.setCity(&city38);
 SAVE(RoadPlace, rp43);
 
 Road ro43(4222124650659843ULL);
-ro43.set<RoadPlace>(rp43);
+ro43.get<RoadPlace::Vector>().push_back(&rp43);
 SAVE(Road, ro43);
 ro43.link(env);
 
@@ -243,7 +243,7 @@ rp45.setCity(&city54);
 SAVE(RoadPlace, rp45);
 
 Road ro45(4222124650659845ULL);
-ro45.set<RoadPlace>(rp45);
+ro45.get<RoadPlace::Vector>().push_back(&rp45);
 SAVE(Road, ro45);
 ro45.link(env);
 
@@ -263,7 +263,7 @@ rp46.setCity(&city38);
 SAVE(RoadPlace, rp46);
 
 Road ro46(4222124650659846ULL);
-ro46.set<RoadPlace>(rp46);
+ro46.get<RoadPlace::Vector>().push_back(&rp46);
 SAVE(Road, ro46);
 ro46.link(env);
 
@@ -287,7 +287,7 @@ rp47.setCity(&city54);
 SAVE(RoadPlace, rp47);
 
 Road ro47(4222124650659847ULL);
-ro47.set<RoadPlace>(rp47);
+ro47.get<RoadPlace::Vector>().push_back(&rp47);
 SAVE(Road, ro47);
 ro47.link(env);
 

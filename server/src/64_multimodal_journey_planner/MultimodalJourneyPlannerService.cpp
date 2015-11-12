@@ -383,7 +383,7 @@ namespace synthese
 						{
 							curDistance = static_cast<int>(distance);
 							arrivalTime = startDate + boost::posix_time::seconds(static_cast<int>(distance / speed));
-							curRoadPlace = &*road->get<road::RoadPlace>();
+							curRoadPlace = &*road->getAnyRoadPlace();
 							curGeom.push_back(geometryProjected.get()->clone());
 							first = false;
 
@@ -405,7 +405,7 @@ namespace synthese
 								submapLegDeparturePlace->insert("latitude", wgs84Point->getY());
 							}
 						}
-						else if(curRoadPlace->getName() == road->get<road::RoadPlace>()->getName())
+						else if(curRoadPlace->getName() == road->getAnyRoadPlace()->getName())
 						{
 							curDistance += static_cast<int>(distance);
 							arrivalTime = arrivalTime + boost::posix_time::seconds(static_cast<int>(distance / speed));
@@ -458,7 +458,7 @@ namespace synthese
 							curDistance = static_cast<int>(distance);
 							departureTime = arrivalTime;
 							arrivalTime = departureTime + boost::posix_time::seconds(static_cast<int>(distance / speed));
-							curRoadPlace = &*road->get<road::RoadPlace>();
+							curRoadPlace = &*road->getAnyRoadPlace();
 
 							BOOST_FOREACH(geos::geom::Geometry* geomToDelete, curGeom)
 							{
@@ -696,7 +696,7 @@ namespace synthese
 
 							const road::Road* road(dynamic_cast<const road::RoadPath*>(its->getService()->getPath())->getRoad());
 
-							std::string roadName = road->get<road::RoadPlace>()->getName();
+							std::string roadName = road->getAnyRoadPlace()->getName();
 							if(roadName.empty()) {
 								if(	road->get<RoadTypeField>() == road::ROAD_TYPE_PEDESTRIANPATH ||
 									road->get<RoadTypeField>() == road::ROAD_TYPE_PEDESTRIANSTREET
@@ -732,7 +732,7 @@ namespace synthese
 							while (next != it->getServiceUses().end())
 							{
 								string nextRoadName(
-									dynamic_cast<const road::RoadPath*>(next->getService()->getPath())->getRoad()->get<road::RoadPlace>()->getName()
+									dynamic_cast<const road::RoadPath*>(next->getService()->getPath())->getRoad()->getAnyRoadPlace()->getName()
 								);
 								if(!roadName.compare(nextRoadName))
 								{
@@ -786,7 +786,7 @@ namespace synthese
 
 							boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
 							submapLegRoad->insert("name", roadName);
-							submapLegRoad->insert("id", road->get<road::RoadPlace>()->getKey());
+							submapLegRoad->insert("id", road->getAnyRoadPlace()->getKey());
 
 							submapLeg->insert("road", submapLegRoad);
 

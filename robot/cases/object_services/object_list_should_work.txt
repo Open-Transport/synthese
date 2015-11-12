@@ -36,6 +36,7 @@ Singleton Object List Should Work For Any Table
     ${ALARM_OBJECT_LINKS_TABLE_ID}
     ${TIMETABLE_ROWS_TABLE_ID}
     ${ROLLING_STOCK_FILTERS_TABLE_ID}
+    ${ROADS_TABLE_ID}
     
 
 Empty Object List Should Work For Any Table
@@ -73,6 +74,7 @@ Empty Object List Should Work For Any Table
     ${DISPLAY_MONITORING_STATUS_TABLE_ID}
     ${ROLLING_STOCK_FILTERS_TABLE_ID}
     ${VEHICLE_POSITIONS_TABLE_ID}
+    ${ROADS_TABLE_ID}
     
 Object List Should Work For Some Tables
     On node 0

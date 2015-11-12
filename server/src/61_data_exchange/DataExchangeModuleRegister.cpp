@@ -34,6 +34,7 @@
 #include "HousesCSVFileFormat.hpp"
 #include "IGNstreetsFileFormat.hpp"
 #include "NavstreetsFileFormat.hpp"
+#include "OpenStreetMapFileFormat.hpp"
 #include "OSMFileFormat.hpp"
 #include "RoadShapeFileFormat.hpp"
 
@@ -109,6 +110,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::ServicesCSVFileFormat::integrate();
 	synthese::data_exchange::HousesCSVFileFormat::integrate();
 	synthese::data_exchange::NavstreetsFileFormat::integrate();
+	synthese::data_exchange::OpenStreetMapFileFormat::integrate();
 	synthese::data_exchange::OSMFileFormat::integrate();
 	synthese::data_exchange::RoadShapeFileFormat::integrate();
 	synthese::data_exchange::IGNstreetsFileFormat::integrate();

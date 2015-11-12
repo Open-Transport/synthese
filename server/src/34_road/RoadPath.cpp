@@ -107,7 +107,7 @@ namespace synthese
 		std::string RoadPath::getRuleUserName() const
 		{
 			if(!_road) return string();
-			return "Route " + _road->get<RoadPlace>()->getFullName();
+			return "Route " + _road->getAnyRoadPlace()->getFullName();
 		}
 
 

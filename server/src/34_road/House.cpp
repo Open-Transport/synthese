@@ -77,7 +77,7 @@ namespace synthese
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, 0),
 					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
-					FIELD_VALUE_CONSTRUCTOR(RoadPlace, chunk.getRoad()->get<RoadPlace>()),
+					FIELD_VALUE_CONSTRUCTOR(RoadPlace, chunk.getRoad()->getAnyRoadPlace()),
 					FIELD_VALUE_CONSTRUCTOR(Number, houseNumber),
 					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
 			)),
@@ -85,11 +85,11 @@ namespace synthese
 		{
 			setName(
 				string(
-					(numberAtBeginning ? lexical_cast<string>(houseNumber) : chunk.getRoad()->get<RoadPlace>()->getName()) +
+					(numberAtBeginning ? lexical_cast<string>(houseNumber) : chunk.getRoad()->getAnyRoadPlace()->getName()) +
 					separator +
-					(numberAtBeginning ? chunk.getRoad()->get<RoadPlace>()->getName() : lexical_cast<string>(houseNumber))
+					(numberAtBeginning ? chunk.getRoad()->getAnyRoadPlace()->getName() : lexical_cast<string>(houseNumber))
 			)	);
-			setCity(chunk.getRoad()->get<RoadPlace>()->getCity());
+			setCity(chunk.getRoad()->getAnyRoadPlace()->getCity());
 		}
 
 
@@ -109,7 +109,7 @@ namespace synthese
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, 0),
 					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
-					FIELD_VALUE_CONSTRUCTOR(RoadPlace, chunk.getRoad()->get<RoadPlace>()),
+					FIELD_VALUE_CONSTRUCTOR(RoadPlace, chunk.getRoad()->getAnyRoadPlace()),
 					FIELD_VALUE_CONSTRUCTOR(Number, chunk.getHouseNumberFromOffset(metricOffset)),
 					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
 			)),
@@ -117,11 +117,11 @@ namespace synthese
 		{
 			setName(
 				string(
-					(numberAtBeginning ? lexical_cast<string>(*(this->getHouseNumber())) : chunk.getRoad()->get<RoadPlace>()->getName()) +
+					(numberAtBeginning ? lexical_cast<string>(*(this->getHouseNumber())) : chunk.getRoad()->getAnyRoadPlace()->getName()) +
 					separator +
-					(numberAtBeginning ? chunk.getRoad()->get<RoadPlace>()->getName() : lexical_cast<string>(*(this->getHouseNumber())))
+					(numberAtBeginning ? chunk.getRoad()->getAnyRoadPlace()->getName() : lexical_cast<string>(*(this->getHouseNumber())))
 			)	);
-			setCity(chunk.getRoad()->get<RoadPlace>()->getCity());
+			setCity(chunk.getRoad()->getAnyRoadPlace()->getCity());
 		}
 
 
@@ -208,7 +208,7 @@ namespace synthese
 			// Road place informations
 			if (getRoadChunk() != 0)
 			{
-				getRoadChunk()->getRoad()->get<RoadPlace>()->toParametersMap(pm, coordinatesSystem, DATA_ROAD_PREFIX);
+				getRoadChunk()->getRoad()->getAnyRoadPlace()->toParametersMap(pm, coordinatesSystem, DATA_ROAD_PREFIX);
 			}
 
 			// Number

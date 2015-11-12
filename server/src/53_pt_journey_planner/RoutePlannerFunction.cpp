@@ -1687,7 +1687,7 @@ namespace synthese
 													_xmlDisplayAddress(
 														stream,
 														*dynamic_cast<const Crossing*>(jl.begin()->getDepartureEdge()->getFromVertex()),
-														*road->getRoad()->get<RoadPlace>(),
+														*road->getRoad()->getAnyRoadPlace(),
 														_showCoords
 													);
 												}
@@ -1704,7 +1704,7 @@ namespace synthese
 												_xmlDisplayAddress(
 													stream,
 													*dynamic_cast<const Crossing*>((itl-1)->getArrivalEdge()->getFromVertex()),
-													*road->getRoad()->get<RoadPlace>(),
+													*road->getRoad()->getAnyRoadPlace(),
 													_showCoords
 												);
 											}
@@ -1851,8 +1851,8 @@ namespace synthese
 								stream <<
 									"<street" <<
 									" length=\"" << ceil(leg.getDistance()) << "\"" <<
-									" city=\"" << road->getRoad()->get<RoadPlace>()->getCity()->getName() << "\"" <<
-									" name=\"" << road->getRoad()->get<RoadPlace>()->getName() << "\"" <<
+									" city=\"" << road->getRoad()->getAnyRoadPlace()->getCity()->getName() << "\"" <<
+									" name=\"" << road->getRoad()->getAnyRoadPlace()->getName() << "\"" <<
 									" departureTime=\"" << posix_time::to_iso_extended_string(leg.getDepartureDateTime()) << "\"" <<
 									" arrivalTime=\"" << posix_time::to_iso_extended_string(leg.getArrivalDateTime()) << "\"";
 								if(journey.getContinuousServiceRange().total_seconds() > 0)
@@ -1887,7 +1887,7 @@ namespace synthese
 										_xmlDisplayAddress(
 											stream,
 											*dynamic_cast<const Crossing*>(leg.getDepartureEdge()->getFromVertex()),
-											*road->getRoad()->get<RoadPlace>(),
+											*road->getRoad()->getAnyRoadPlace(),
 											_showCoords
 											);
 									}
@@ -1914,7 +1914,7 @@ namespace synthese
 										_xmlDisplayAddress(
 											stream,
 											*dynamic_cast<const Crossing*>(leg.getArrivalEdge()->getFromVertex()),
-											*road->getRoad()->get<RoadPlace>(),
+											*road->getRoad()->getAnyRoadPlace(),
 											_showCoords
 										);
 									}
@@ -1981,7 +1981,7 @@ namespace synthese
 							_xmlDisplayAddress(
 								stream,
 								*dynamic_cast<const Crossing*>(lastApproachBeginning->getDepartureEdge()->getFromVertex()),
-								*road->getRoad()->get<RoadPlace>(),
+								*road->getRoad()->getAnyRoadPlace(),
 								_showCoords
 							);
 						}
@@ -2008,7 +2008,7 @@ namespace synthese
 								_xmlDisplayAddress(
 									stream,
 									*dynamic_cast<const Crossing*>((jl.end()-1)->getArrivalEdge()->getFromVertex()),
-									*road->getRoad()->get<RoadPlace>(),
+									*road->getRoad()->getAnyRoadPlace(),
 									_showCoords
 								);
 							}
@@ -3530,8 +3530,8 @@ namespace synthese
 							const RoadPath* nextRoad(dynamic_cast<const RoadPath*>(nextLeg.getService()->getPath()));
 
 							if(	nextRoad &&
-								(	&*nextRoad->getRoad()->get<RoadPlace>() == &*road->getRoad()->get<RoadPlace>() ||
-									nextRoad->getRoad()->get<RoadPlace>()->getName() == road->getRoad()->get<RoadPlace>()->getName()
+								(	&*nextRoad->getRoad()->getAnyRoadPlace() == &*road->getRoad()->getAnyRoadPlace() ||
+									nextRoad->getRoad()->getAnyRoadPlace()->getName() == road->getRoad()->getAnyRoadPlace()->getName()
 							)	){
 								continue;
 							}
@@ -3799,9 +3799,9 @@ namespace synthese
 			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(arrivalVertex.getHub()) != NULL);
 
 			pm.insert(DATA_ODD_ROW, color);
-			if(road && road->get<RoadPlace>())
+			if(road && road->getAnyRoadPlace())
 			{
-				pm.insert(DATA_ROAD_NAME, road->get<RoadPlace>()->getName());
+				pm.insert(DATA_ROAD_NAME, road->getAnyRoadPlace()->getName());
 			}
 			pm.insert(DATA_LENGTH, static_cast<int>(floor(distance)));
 			pm.insert(DATA_IS_FIRST_LEG, isFirstLeg);

@@ -36,6 +36,7 @@ double Node::getLat() {
    return lat;
 }
 
+
 int Node::numConnectedWay() {
    return ways.size();
 }

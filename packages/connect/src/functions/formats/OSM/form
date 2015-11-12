@@ -1,0 +1,14 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<#forms/text_input&
+  name=pa&
+  label=Fichier de données&
+#>
+
+<h3>Paramètres optionnels</h3>
+
+<#forms/text_input&
+  name=country_code&
+  label=Code pays (ex: FR, CH)&
+#>
+

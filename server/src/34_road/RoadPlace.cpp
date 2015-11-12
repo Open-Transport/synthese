@@ -93,7 +93,7 @@ namespace synthese
 		{
 			BOOST_FOREACH(Road* road, _roads)
 			{
-				road->set<RoadPlace>(boost::none);
+				road->get<RoadPlace::Vector>().clear();
 				road->getForwardPath().setPathGroup(NULL);
 				road->getReversePath().setPathGroup(NULL);
 			}

@@ -379,7 +379,7 @@ namespace synthese
 						continue;
 					}
 
-					if(!chunk.getRoad() || !chunk.getRoad()->get<RoadPlace>() || chunk.getRoad()->get<RoadPlace>()->getName().empty())
+					if(!chunk.getRoad() || !chunk.getRoad()->getAnyRoadPlace() || chunk.getRoad()->getAnyRoadPlace()->getName().empty())
 					{
 						continue;
 					}
@@ -391,7 +391,7 @@ namespace synthese
 					string name;
 					if(!house->getHouseNumber() || *(house->getHouseNumber()) == 0)
 					{
-						name = chunk.getRoad()->get<RoadPlace>()->getName();
+						name = chunk.getRoad()->getAnyRoadPlace()->getName();
 					}
 					else
 					{
@@ -424,7 +424,7 @@ namespace synthese
 							if(*(house.get())->getHouseNumber() == 0)
 							{
 								//Don't insert same road twice
-								string roadName = (house.get())->getRoadChunk()->getRoad()->get<RoadPlace>()->getName();
+								string roadName = (house.get())->getRoadChunk()->getRoad()->getAnyRoadPlace()->getName();
 								set<string>::iterator frenchIt = insertedRoadName.find(roadName);
 								if(frenchIt == insertedRoadName.end())
 								{
