@@ -1,0 +1,7 @@
+*** Settings ***
+Resource          ../s3-server/common.txt
+
+*** Variables ***
+
+*** Keywords ***
+

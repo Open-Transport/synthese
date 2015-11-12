@@ -1,0 +1,12 @@
+*** Settings ***
+Resource          ../../resources/s3-fakeclient/import_services.txt    
+Test Setup        Start Synthese On Node 0
+Test Teardown     Stop Synthese On Node 0
+
+*** Test Cases ***
+
+Import OSM Export Of Small Swiss Tile Should Work
+    Import OSM Export  ${CURDIR}/../data/small_swiss_tile.osm.bz2
+
+
+    
