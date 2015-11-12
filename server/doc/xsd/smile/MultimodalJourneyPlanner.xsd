@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://schemas.open-transport.org/smile/MultimodalJourneyPlanner.xsd" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:mjp="http://schemas.open-transport.org/smile/MultimodalJourneyPlanner.xsd">
+
+	<simpleType name="ObjectIdentifier">
+		<annotation>
+			<documentation>Internal identifier of a SYNTHESE object</documentation>
+		</annotation>
+		<restriction base="int"></restriction>
+	</simpleType>
+
+	<simpleType name="WKTString">
+		<annotation>
+			<documentation>Geometry expressed in Well-Known Text format</documentation>
+		</annotation>
+		<restriction base="string"></restriction>
+	</simpleType>
+	
+	<simpleType name="PlaceType">
+        <annotation>
+        	<documentation>An enumerate indicating what kind of place is represented</documentation>
+        </annotation>
+        <restriction base="string">
+			<enumeration value="stop area"></enumeration>
+			<enumeration value="address"></enumeration>
+			<enumeration value="point of interest"></enumeration>
+		</restriction>
+	</simpleType>
+
+	<complexType name="Place">
+        <annotation>
+        	<documentation></documentation>
+        </annotation>
+        <attribute name="name" type="string">
+			<annotation>
+				<documentation>Name of the place (e.g. stop point name, address, name of the point of interest)</documentation>
+			</annotation></attribute>
+		<attribute name="type" type="mjp:PlaceType">
+			<annotation>
+				<documentation>Type of the place</documentation>
+			</annotation></attribute>
+		<attribute name="id" type="mjp:ObjectIdentifier">
+			<annotation>
+				<documentation>Internal object identifier</documentation>
+			</annotation></attribute>
+		<attribute name="latitude" type="double">
+			<annotation>
+				<documentation>Latitude</documentation>
+			</annotation></attribute>
+		<attribute name="longitude" type="double">
+			<annotation>
+				<documentation>Longitude</documentation>
+			</annotation></attribute>
+	</complexType>
+
+	<complexType name="Road">
+		<attribute name="name" type="string">
+			<annotation>
+				<documentation>Name of the road</documentation>
+			</annotation></attribute>
+		<attribute name="id" type="mjp:ObjectIdentifier">
+			<annotation>
+				<documentation>Internal object identifier</documentation>
+			</annotation></attribute>
+	</complexType>
+
+	<complexType name="Leg">
+        <annotation>
+        	<documentation></documentation>
+        </annotation>
+        <sequence>
+			<element name="departure" type="mjp:Place" maxOccurs="1"
+				minOccurs="1">
+                <annotation>
+                	<documentation>Place of departure</documentation>
+                </annotation>
+			</element>
+			<element name="arrival" type="mjp:Place" maxOccurs="1"
+				minOccurs="1">
+                <annotation>
+                	<documentation>Place of arrival</documentation>
+                </annotation>
+			</element>
+		</sequence>
+		<attribute name="departure_date_time" type="dateTime">
+			<annotation>
+				<documentation>Timestamp of departure</documentation>
+			</annotation></attribute>
+		<attribute name="arrival_date_time" type="dateTime">
+			<annotation>
+				<documentation>Timestamp of arrival</documentation>
+			</annotation></attribute>
+		<attribute name="geometry" type="mjp:WKTString">
+			<annotation>
+				<documentation>Geometry of this leg, expressed in Well-Known Text format</documentation>
+			</annotation></attribute>
+	</complexType>
+
+	<complexType name="Journey">
+		<sequence>
+			<element name="departure" type="mjp:Place">
+				<annotation>
+					<documentation>Place of departure</documentation>
+				</annotation></element>
+			<element name="leg" type="mjp:Leg" minOccurs="0" maxOccurs="unbounded">
+				<annotation>
+					<documentation>Element of the journey</documentation>
+				</annotation></element>
+			<element name="arrival" type="mjp:Place">
+				<annotation>
+					<documentation>Place of arrival</documentation>
+				</annotation></element>
+		</sequence>	
+   		<attribute name="departure_date_time" type="dateTime">
+   			<annotation>
+   				<documentation>Timestamp of departure</documentation>
+   			</annotation></attribute>
+   		<attribute name="arrival_date_time" type="dateTime">
+   			<annotation>
+   				<documentation>Timestamp of arrival</documentation>
+   			</annotation></attribute>
+	</complexType>
+
+	<complexType name="WalkJourney">
+		<complexContent>
+			<extension base="mjp:Journey"></extension>  		
+		</complexContent>
+	</complexType>
+
+	<complexType name="WalkLeg">
+		<complexContent>
+			<extension base="mjp:Leg">
+				<sequence>
+					<element name="road" type="mjp:Road" maxOccurs="1" minOccurs="1">
+						<annotation>
+							<documentation>Road treaded by this leg</documentation>
+						</annotation></element>
+				</sequence>
+				<attribute name="length" type="int">
+					<annotation>
+						<documentation>Length of this leg in meters</documentation>
+					</annotation></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="MultimodalJourneyPlannerResult">
+		<sequence>
+			<element name="journey" type="mjp:Journey" minOccurs="0" maxOccurs="unbounded"></element>
+		</sequence>
+	</complexType>
+
+    <element name="journeys" type="mjp:MultimodalJourneyPlannerResult"></element>
+</schema>
