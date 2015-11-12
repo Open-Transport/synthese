@@ -107,6 +107,20 @@ namespace synthese
 			}
 		}
 
+		bool Road::allowUpdate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool Road::allowCreate(const server::Session* session) const
+		{
+			return true;
+		}
+
+		bool Road::allowDelete(const server::Session* session) const
+		{
+			return true;
+		}
 
 
 		void Road::insertRoadChunk( RoadChunk& chunk, double length, size_t rankShift )

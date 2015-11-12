@@ -132,6 +132,10 @@ namespace synthese
 
 		//! @name Modifiers
 		//@{
+			virtual bool allowUpdate(const server::Session* session) const;
+			virtual bool allowCreate(const server::Session* session) const;
+			virtual bool allowDelete(const server::Session* session) const;
+
 			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 			virtual void unlink();
 		//@}
