@@ -1,0 +1,6 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<#forms/text_input&
+  name=pa&
+  label=Fichier de données&
+#>

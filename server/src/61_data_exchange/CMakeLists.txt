@@ -60,6 +60,8 @@ set(data_exchange_SRCS
   OGTFileFormat.hpp
   OSMFileFormat.cpp
   OSMFileFormat.hpp
+  OSMCityBoundariesFileFormat.cpp
+  OSMCityBoundariesFileFormat.hpp
   PegaseFileFormat.cpp
   PegaseFileFormat.hpp
   PhysicalStopsCSVExportFunction.cpp

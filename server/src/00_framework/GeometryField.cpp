@@ -28,5 +28,6 @@ namespace synthese
 {
 	FIELD_DEFINITION_OF_TYPE(PointGeometry, "geometry", SQL_GEOM_POINT)
 	FIELD_DEFINITION_OF_TYPE(LineStringGeometry, "geometry", SQL_GEOM_LINESTRING)
+	FIELD_DEFINITION_OF_TYPE(PolygonGeometry, "geometry", SQL_GEOM_POLYGON)
 }
 

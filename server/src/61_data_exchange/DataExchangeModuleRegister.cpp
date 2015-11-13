@@ -35,6 +35,7 @@
 #include "IGNstreetsFileFormat.hpp"
 #include "NavstreetsFileFormat.hpp"
 #include "OSMFileFormat.hpp"
+#include "OSMCityBoundariesFileFormat.hpp"
 #include "RoadShapeFileFormat.hpp"
 
 #include "NCEStatusService.hpp"
@@ -110,6 +111,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::HousesCSVFileFormat::integrate();
 	synthese::data_exchange::NavstreetsFileFormat::integrate();
 	synthese::data_exchange::OSMFileFormat::integrate();
+	synthese::data_exchange::OSMCityBoundariesFileFormat::integrate();
 	synthese::data_exchange::RoadShapeFileFormat::integrate();
 	synthese::data_exchange::IGNstreetsFileFormat::integrate();
 	synthese::data_exchange::CMSExport::integrate();
