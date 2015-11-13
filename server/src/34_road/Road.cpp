@@ -51,7 +51,7 @@ namespace synthese
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_VALUE_CONSTRUCTOR(RoadTypeField, type),
-					FIELD_DEFAULT_CONSTRUCTOR(RoadPlace)
+					FIELD_DEFAULT_CONSTRUCTOR(RoadPlace::Vector)
 			)	),
 			_forwardPath(new RoadPath(*this)),
 			_reversePath(new RoadPath(*this))
@@ -78,14 +78,18 @@ namespace synthese
 
 		void Road::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
-			// Roadplace registration
-			if(get<RoadPlace>())
+			if(!get<RoadPlace::Vector>().empty())
 			{
-				_forwardPath->_pathGroup = &*get<RoadPlace>();
-				get<RoadPlace>()->addRoad(*_forwardPath);
-				_reversePath->_pathGroup = &*get<RoadPlace>();
-				get<RoadPlace>()->addRoad(*_reversePath);
-				get<RoadPlace>()->addRoad(*this);
+				BOOST_FOREACH(RoadPlace* roadPlace, get<RoadPlace::Vector>())
+				{
+					assert(roadPlace != NULL);
+					_forwardPath->_pathGroup = roadPlace;
+					roadPlace->addRoad(*_forwardPath);
+					_reversePath->_pathGroup = roadPlace;
+					roadPlace->addRoad(*_reversePath);
+
+					roadPlace->addRoad(*this);
+				}
 			}
 			else
 			{
@@ -94,16 +98,15 @@ namespace synthese
 			}
 		}
 
-
-
 		void Road::unlink()
 		{
-			// Roadplace registration
-			if(get<RoadPlace>())
+			BOOST_FOREACH(RoadPlace* roadPlace, get<RoadPlace::Vector>())
 			{
-				get<RoadPlace>()->removeRoad(*_forwardPath);
-				get<RoadPlace>()->removeRoad(*_reversePath);
-				get<RoadPlace>()->removeRoad(*this);
+				assert(roadPlace != NULL);
+				roadPlace->removeRoad(*_forwardPath);
+				roadPlace->removeRoad(*_reversePath);
+
+				roadPlace->removeRoad(*this);
 			}
 		}
 
@@ -166,9 +169,9 @@ namespace synthese
 		/// The other road must be removed from the registry externally
 		void Road::merge( Road& other )
 		{
-			if(	!other.get<RoadPlace>() ||
-				!get<RoadPlace>() ||
-				&*get<RoadPlace>() != &*other.get<RoadPlace>() ||
+			if(	other.get<RoadPlace::Vector>().empty() ||
+				get<RoadPlace::Vector>().empty() ||
+				other.get<RoadPlace::Vector>() != get<RoadPlace::Vector>() ||
 				other.getForwardPath()._edges.empty() ||
 				getForwardPath()._edges.empty() ||
 				other.getForwardPath().getEdge(0)->getFromVertex() != getForwardPath().getLastEdge()->getFromVertex() ||
@@ -207,6 +210,20 @@ namespace synthese
 
 			// Detach the second road part from the road place
 			other.unlink();
-			other.set<RoadPlace>(boost::none);
+			other.get<RoadPlace::Vector>().clear();
 		}
+
+		boost::optional<RoadPlace&>
+		Road::getAnyRoadPlace() const
+		{
+			if (get<RoadPlace::Vector>().empty())
+			{
+				return boost::none;
+			}
+			else
+			{
+				return boost::optional<RoadPlace&>(*get<RoadPlace::Vector>().front());
+			}
+		}
+
 }	}

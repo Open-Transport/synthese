@@ -2560,9 +2560,9 @@ namespace synthese
 			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(arrivalVertex.getHub()) != NULL);
 
 			pm.insert(DATA_ODD_ROW, color);
-			if(road && road->get<RoadPlace>() && !concatenatedFootLegs)
+			if(road && road->getAnyRoadPlace() && !concatenatedFootLegs)
 			{
-				pm.insert(DATA_ROAD_NAME, road->get<RoadPlace>()->getName());
+				pm.insert(DATA_ROAD_NAME, road->getAnyRoadPlace()->getName());
 			}
 			pm.insert(DATA_LENGTH, static_cast<int>(floor(distance)));
 			pm.insert(DATA_IS_FIRST_FOOT, isFirstFoot);

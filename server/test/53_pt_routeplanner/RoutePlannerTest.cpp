@@ -119,8 +119,8 @@ string displayJourneyDifferences(string message, PTRoutePlannerResult& result)
 			if(road != NULL)
 			{
 				stream << "   take a street :" <<
-					" name = " << road->getRoad()->get<RoadPlace>()->getName() <<
-					" city = " << road->getRoad()->get<RoadPlace>()->getCity()->getName() <<
+					" name = " << road->getRoad()->getAnyRoadPlace()->getName() <<
+					" city = " << road->getRoad()->getAnyRoadPlace()->getCity()->getName() <<
 					" length = " << ceil(leg.getDistance()) <<
 					" departureTime = " << leg.getDepartureDateTime() <<
 					" arrivalTime = " << leg.getArrivalDateTime() ;

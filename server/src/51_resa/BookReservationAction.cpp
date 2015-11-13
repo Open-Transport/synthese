@@ -652,7 +652,7 @@ namespace synthese
 							else if(dynamic_cast<const House*>(_departurePlace.get()))
 							{
 								r->set<DeparturePlaceId>(
-									dynamic_cast<const House*>(_departurePlace.get())->getRoadChunk()->getRoad()->get<RoadPlace>()->getKey()
+									dynamic_cast<const House*>(_departurePlace.get())->getRoadChunk()->getRoad()->getAnyRoadPlace()->getKey()
 								);
 							}
 
@@ -701,7 +701,7 @@ namespace synthese
 							else if(dynamic_cast<const House*>(_arrivalPlace.get()))
 							{
 								r->set<DeparturePlaceId>(
-									dynamic_cast<const House*>(_arrivalPlace.get())->getRoadChunk()->getRoad()->get<RoadPlace>()->getKey()
+									dynamic_cast<const House*>(_arrivalPlace.get())->getRoadChunk()->getRoad()->getAnyRoadPlace()->getKey()
 								);
 							}
 						}
@@ -748,7 +748,7 @@ namespace synthese
 						const RoadPath* road(dynamic_cast<const RoadPath*>(su.getService()->getPath()));
 						if (road)
 						{
-							r->set<LineCode>(road->getRoad()->get<RoadPlace>()->getName());
+							r->set<LineCode>(road->getRoad()->getAnyRoadPlace()->getName());
 							r->set<LineId>(road->getRoad()->getKey());
 						}
 

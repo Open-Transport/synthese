@@ -176,7 +176,7 @@ namespace synthese
 				*_integralSearchFile << (
 						ls ?
 						static_cast<JourneyPattern*>(ls->getParentPath())->getCommercialLine()->getShortName() :
-						road->getRoad()->get<RoadPlace>()->getName()
+						road->getRoad()->getAnyRoadPlace()->getName()
 					) <<
 					"</td>"
 				;
@@ -222,7 +222,7 @@ namespace synthese
 						*_integralSearchFile <<
 							(	ls ?
 								static_cast<JourneyPattern*>(ls->getParentPath())->getCommercialLine()->getShortName() :
-								road->getRoad()->get<RoadPlace>()->getName()
+								road->getRoad()->getAnyRoadPlace()->getName()
 							) <<
 							"</td>"
 						;

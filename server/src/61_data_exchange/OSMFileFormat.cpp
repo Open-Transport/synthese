@@ -229,7 +229,7 @@ namespace synthese
 					// Create Road
 					boost::shared_ptr<Road> road(new Road(0, wayType));
 
-					road->set<RoadPlace>(*roadPlace);
+					road->get<RoadPlace::Vector>().push_back(roadPlace.get());
 					road->set<Key>(RoadTableSync::getId());
 					_env.getEditableRegistry<Road>().add(road);
 					road->link(_env);
@@ -377,7 +377,7 @@ namespace synthese
 
 					if(centralRoad != _recentlyCreatedRoadParts.end())
 					{
-						city->addIncludedPlace(static_cast<NamedPlace&>(*centralRoad->second->get<RoadPlace>()));
+						city->addIncludedPlace(static_cast<NamedPlace&>(*centralRoad->second->getAnyRoadPlace()));
 					}
 				}
 				delete centroid;

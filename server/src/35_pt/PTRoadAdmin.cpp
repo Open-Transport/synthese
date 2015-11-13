@@ -175,7 +175,7 @@ namespace synthese
 					{
 						if(road->getKey() <= 0 || road == _road.get()) continue;
 						openRoadRequest.getPage()->setRoad(Env::GetOfficialEnv().getSPtr(road));
-						stream << HTMLModule::getHTMLLink(openRoadRequest.getURL(), road->get<RoadPlace>()->getName()) << " ";
+						stream << HTMLModule::getHTMLLink(openRoadRequest.getURL(), road->getAnyRoadPlace()->getName()) << " ";
 					}
 				}
 				stream << t.close();
@@ -196,7 +196,7 @@ namespace synthese
 
 		std::string PTRoadAdmin::getTitle() const
 		{
-			return _road.get() ? _road->get<RoadPlace>()->getFullName() : DEFAULT_TITLE;
+			return _road.get() ? _road->getAnyRoadPlace()->getFullName() : DEFAULT_TITLE;
 		}
 
 
@@ -233,7 +233,7 @@ namespace synthese
 
 			boost::shared_ptr<PTRoadsAdmin> p(getNewPage<PTRoadsAdmin>());
 			p->setRoadPlace(Env::GetOfficialEnv().getSPtr(
-				&*_road->get<RoadPlace>()
+				&*_road->getAnyRoadPlace()
 			)	);
 			links = p->_getCurrentTreeBranch();
 			links.push_back(getNewCopiedPage());

@@ -549,7 +549,7 @@ namespace synthese
 								projection.get<2>()
 							);
 
-							const City* city = projectedAddress.getRoadChunk()->getRoad()->get<RoadPlace>()->getCity();
+							const City* city = projectedAddress.getRoadChunk()->getRoad()->getAnyRoadPlace()->getCity();
 
 							// PublicPlace
 							PublicPlace* publicPlace(

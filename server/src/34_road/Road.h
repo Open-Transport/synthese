@@ -38,7 +38,7 @@ namespace synthese
 	typedef boost::fusion::map<
 		FIELD(Key),
 		FIELD(RoadTypeField),
-		FIELD(road::RoadPlace)
+		FIELD(road::RoadPlace::Vector)
 	> RoadSchema;
 
 	namespace road
@@ -92,6 +92,8 @@ namespace synthese
 		//@{
 			RoadPath& getForwardPath() const { return *_forwardPath; }
 			RoadPath& getReversePath() const { return *_reversePath; }
+
+			boost::optional<RoadPlace&> getAnyRoadPlace() const;
 		//@}
 
 		//! @name Setters
@@ -122,8 +124,6 @@ namespace synthese
 				double length,
 				size_t rankShift
 			);
-
-
 
 			void merge(
 				Road& other
