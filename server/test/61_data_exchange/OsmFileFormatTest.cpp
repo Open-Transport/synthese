@@ -28,6 +28,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <boost/tuple/tuple.hpp>
+
 typedef std::map<std::string, std::string> AttributesMap;
 typedef std::map<std::string, std::string> TagsMap;
 
@@ -56,6 +58,33 @@ struct OSMRelation
 
 };
 
+class OSMEntityHandler
+{
+protected:
+
+	virtual ~OSMEntityHandler() {}
+
+public:
+
+	virtual void handleCity(const std::string& cityName, const std::string& cityCode, std::string cityBoundaries) = 0;
+
+};
+
+class FakeEntityHandler : public OSMEntityHandler
+{
+public:
+	std::vector<boost::tuple<std::string, std::string> > handledCities;
+
+	virtual void handleCity(const std::string& cityName, const std::string& cityCode, std::string cityBoundaries)
+	{
+		std::cerr << "Create city " << cityName << ", code = " << cityCode << ", boundaries = " << cityBoundaries << std::endl;
+		handledCities.push_back(boost::make_tuple(cityName, cityCode));
+	}
+
+};
+
+
+FakeEntityHandler fakeEntityHandler;
 
 bool inRelation(false);
 int createdCitiesCount = 0;
@@ -119,12 +148,6 @@ makeAttributesMap(const XML_Char **attrs) {
 }
 
 
-void createCity(const std::string& cityName, const std::string& cityCode, std::string cityBoundaries)
-{
-	std::cerr << "Create city " << cityName << ", code = " << cityCode << ", boundaries = " << cityBoundaries << std::endl;
-	++createdCitiesCount;
-}
-
 
 void startElement(void* userData, const XML_Char* name, const XML_Char** attrs)
 {
@@ -147,7 +170,7 @@ void endElement(void* userData, const XML_Char* name)
 		currentRelation.isAdministrativeBoundary() && 
 		currentRelation.isCityAdministrativeLevel())
 	{
-		createCity(currentRelation.getName(), currentRelation.getCode(), "");
+		fakeEntityHandler.handleCity(currentRelation.getName(), currentRelation.getCode(), "");
 		inRelation = false;
 	}
 }
@@ -196,7 +219,13 @@ BOOST_AUTO_TEST_CASE (should_parse_five_cities_from_osm_file)
    XML_ParserFree(p);
    osmStream.close();
 
-   BOOST_CHECK_EQUAL(5, createdCitiesCount);
+   BOOST_CHECK_EQUAL(5, fakeEntityHandler.handledCities.size());
+   int cityIndex = 0;
+   BOOST_CHECK_EQUAL("Hauterive (NE)", fakeEntityHandler.handledCities[cityIndex++].get<0>());
+   BOOST_CHECK_EQUAL("Neuchâtel", fakeEntityHandler.handledCities[cityIndex++].get<0>());
+   BOOST_CHECK_EQUAL("Saint-Blaise", fakeEntityHandler.handledCities[cityIndex++].get<0>());
+   BOOST_CHECK_EQUAL("Valangin", fakeEntityHandler.handledCities[cityIndex++].get<0>());
+   BOOST_CHECK_EQUAL("Val-de-Ruz", fakeEntityHandler.handledCities[cityIndex++].get<0>());
 
 }
 
