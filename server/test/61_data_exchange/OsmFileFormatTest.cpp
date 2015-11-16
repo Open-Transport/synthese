@@ -35,6 +35,21 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
 
+#include <geos/geom/Geometry.h>
+#include <geos/geom/GeometryFactory.h>
+#include <geos/geom/prep/PreparedPolygon.h>
+#include <geos/operation/polygonize/Polygonizer.h>
+#include <geos/operation/linemerge/LineMerger.h>
+#include <geos/geom/CoordinateSequence.h>
+#include <geos/geom/LinearRing.h>
+#include <geos/geom/Polygon.h>
+#include <geos/geom/MultiPolygon.h>
+#include <geos/util/TopologyException.h>
+#include <geos/operation/valid/IsValidOp.h>
+#include <geos/operation/valid/TopologyValidationError.h>
+
+//#include <geos.h>
+
 typedef std::map<std::string, std::string> AttributesMap;
 typedef long OSMId;
 
@@ -149,6 +164,11 @@ private:
     bool currentRelationIsAdministrativeBoundary() const;
 
     bool currentRelationIsCityAdministrativeLevel() const;
+
+	geos::geom::Geometry* makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std::vector<OSMWay*>& innerWays);
+
+	std::vector<geos::geom::Polygon*>* polygonize(const std::vector<OSMWay*>& ways);
+
 
 	void handleStartElement(const XML_Char* name, const XML_Char** attrs);
 	void handleEndElement(const XML_Char* name);
@@ -306,8 +326,8 @@ void OSMParser::secondPassEndElement(const XML_Char* name)
 		currentRelationIsAdministrativeBoundary() && 
 		currentRelationIsCityAdministrativeLevel())
 	{
-		std::vector<OSMWay*> innerBoundaries;
-		std::vector<OSMWay*> outerBoundaries;
+		std::vector<OSMWay*> innerWays;
+		std::vector<OSMWay*> outerWays;
 		BOOST_FOREACH(OSMMember wayMember, _currentRelation.getWayMembers())
 		{
 			std::map<OSMId, OSMWay>::iterator it = _boundaryWays.find(wayMember.ref);
@@ -315,15 +335,15 @@ void OSMParser::secondPassEndElement(const XML_Char* name)
 			if (it->second == NoOsmWay) continue;
 			if (wayMember.role == "outer")
 			{
-				outerBoundaries.push_back(&it->second);
+				outerWays.push_back(&it->second);
 			}
 			else if (wayMember.role == "inner")
 			{
-				innerBoundaries.push_back(&it->second);
+				innerWays.push_back(&it->second);
 			}
 		}
-
-		std::cerr << "OB " << outerBoundaries.size() << "  IB " << innerBoundaries.size() << std::endl;
+		makeGeometryFrom(outerWays, innerWays);
+		//std::cerr << "OB " << outerWays.size() << "  IB " << innerWays.size() << std::endl;
 
 		fakeEntityHandler.handleCity(currentRelationName(), currentRelationCode(), "");
 	}
@@ -331,6 +351,105 @@ void OSMParser::secondPassEndElement(const XML_Char* name)
 	{
 		++_passCount;
 	}
+}
+
+
+std::vector<geos::geom::Polygon*>* 
+OSMParser::polygonize(const std::vector<OSMWay*>& ways) {
+	/*
+   geos::geom::Geometry* g = NULL;
+   std::vector<geos::geom::Polygon*>* ret = new std::vector<geos::geom::Polygon*>();
+   const geos::geom::GeometryFactory *gf = geos::geom::GeometryFactory::getDefaultInstance();
+   if(ways.size() >= 2) {
+      geos::operation::linemerge::LineMerger lm;
+      BOOST_FOREACH(WayPtr w, ways) {
+         if(w->getNodes()->size() < 2)
+            continue;
+         lm.add(w->toGeometry().get());
+      }
+      std::vector< geos::geom::LineString * > *lss = lm.getMergedLineStrings();
+      BOOST_FOREACH(geos::geom::LineString *ls, *lss) {
+         if(ls->getNumPoints()>3 && ls->isClosed()) {
+            geos::geom::Polygon *p = gf->createPolygon(gf->createLinearRing(ls->getCoordinates()),0);
+			ret->push_back(p);
+         }
+         delete ls;
+      }
+      lss->clear();
+      delete lss;
+   } else if(ways.size() == 1){
+      WayPtr w = ways.front();
+      const std::list<std::pair<unsigned long long int,NodePtr> > *nodes = w->getNodes();
+      if(nodes->size()>3 && nodes->front().first == nodes->back().first) {
+         //we have a closed way, return it
+         g = w->toGeometry().get()->clone();
+         geos::geom::CoordinateSequence *cs = g->getCoordinates();
+         geos::geom::LinearRing *lr = gf->createLinearRing(cs);
+         //std::vector<geos::geom::Geometry*>* holes = new std::vector<geos::geom::Geometry*>();
+
+         geos::geom::Polygon *p = gf->createPolygon(lr,NULL);
+         ret->push_back(p);
+         delete g;
+      }
+   }
+
+   return ret;
+   */
+
+   return NULL;
+}
+
+
+geos::geom::Geometry*
+OSMParser::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std::vector<OSMWay*>& innerWays)
+{
+   const geos::geom::GeometryFactory *geometryFactory = geos::geom::GeometryFactory::getDefaultInstance();
+   std::vector<geos::geom::Polygon*>* polygons, *polygon_enclaves;
+   polygons = polygonize(outerWays);
+
+   if(!polygons->size()) {
+      delete polygons;
+      return NULL;
+   }
+
+   geos::geom::Geometry* poly = geometryFactory->createMultiPolygon((std::vector<geos::geom::Geometry*>*) polygons);
+   //the geometries stored in *polygons are now owned by the multipolygon
+
+   if (!poly->isValid()) {
+      geos::geom::Geometry *tmp = poly->buffer(0.0);
+      geometryFactory->destroyGeometry(poly);
+      poly = tmp;
+   }
+
+   if (innerWays.size()) {
+      polygon_enclaves = polygonize(innerWays);
+      BOOST_FOREACH(geos::geom::Geometry* enc, *polygon_enclaves)
+      {
+         if (!enc->isValid()) {
+            geos::geom::Geometry *tmp = enc->buffer(0.0);
+            geometryFactory->destroyGeometry(enc);
+            enc = tmp;
+         }
+         if (poly->intersects(enc)) {
+            try {
+               geos::geom::Geometry *tmp = poly->difference(enc);
+               geometryFactory->destroyGeometry(poly);
+               poly = tmp;
+            } catch (geos::util::TopologyException e) {
+               std::cout << std::endl << e.what() << std::endl;
+               geos::operation::valid::IsValidOp ivo(enc);
+               geos::operation::valid::TopologyValidationError *tve = ivo.getValidationError();
+               const std::string errloc = tve->getCoordinate().toString();
+               std::string errmsg(tve->getMessage());
+               errmsg += "[" + errloc + "]";
+
+            }
+            geometryFactory->destroyGeometry(enc);
+         }
+      }
+   }
+   return poly;
+
 }
 
 
