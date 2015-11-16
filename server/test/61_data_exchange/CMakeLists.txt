@@ -39,6 +39,7 @@ set(DEPS
   61_data_exchange
 )
 
+boost_test(OsmFileFormat "expat")
 add_definitions(-DPEGASE_TEST_SQL="${CMAKE_CURRENT_SOURCE_DIR}/test_data/pegase_test.sql")
 boost_test(PegaseFileFormat "${DEPS}")
 add_definitions(-DINEO_FILE_PATTERN="${CMAKE_CURRENT_SOURCE_DIR}/test_data/ineo")
