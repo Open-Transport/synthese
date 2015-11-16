@@ -28,12 +28,83 @@
 #include <fstream>
 #include <iostream>
 
-bool inRelation(false);
-bool isAdministrativeBoundary(false);
-bool isCityAdministrativeLevel(false);
-int createdCitiesCount = 0;
-
 typedef std::map<std::string, std::string> AttributesMap;
+typedef std::map<std::string, std::string> TagsMap;
+
+struct OSMRelation
+{
+
+   private :
+ 
+     TagsMap tags;
+
+     std::string getValueOrEmpty(const std::string& tag) const;
+
+   public :
+
+     void reset();
+
+     void addTag(const std::string& key, const std::string& value);
+
+     std::string getName() const;
+
+     std::string getCode() const;
+
+     bool isAdministrativeBoundary() const;
+
+     bool isCityAdministrativeLevel() const;
+
+};
+
+
+bool inRelation(false);
+int createdCitiesCount = 0;
+OSMRelation currentRelation;
+
+
+
+void OSMRelation::reset()
+{
+   tags.clear();
+}
+
+
+void OSMRelation::addTag(const std::string& key, const std::string& value)
+{
+	tags[key] = value;
+}
+
+
+std::string OSMRelation::getValueOrEmpty(const std::string& tag) const
+{
+	TagsMap::const_iterator it = tags.find(tag);
+	return (tags.end() == it) ? "" : it->second;
+}
+
+
+std::string OSMRelation::getName() const
+{
+	return getValueOrEmpty("name");
+}
+
+
+std::string OSMRelation::getCode() const
+{
+	return getValueOrEmpty("ref:INSEE");
+}
+
+
+bool OSMRelation::isAdministrativeBoundary() const
+{
+	return "administrative" == getValueOrEmpty("boundary");
+}
+
+
+bool OSMRelation::isCityAdministrativeLevel() const
+{
+	return "8" == getValueOrEmpty("admin_level");
+}
+
 
 AttributesMap 
 makeAttributesMap(const XML_Char **attrs) {
@@ -50,22 +121,8 @@ makeAttributesMap(const XML_Char **attrs) {
 
 void createCity(const std::string& cityName, const std::string& cityCode, std::string cityBoundaries)
 {
+	std::cerr << "Create city " << cityName << ", code = " << cityCode << ", boundaries = " << cityBoundaries << std::endl;
 	++createdCitiesCount;
-}
-
-void handleCityTag(const XML_Char** attrs)
-{
-   AttributesMap attributes = makeAttributesMap(attrs);
-   std::string key = attributes["k"];
-   std::string value = attributes["v"];
-   if ((key == "boundary") && (value == "administrative"))
-   {
-   		isAdministrativeBoundary = true;
-   }
-   else if ((key == "admin_level") && (value == "8"))
-   {
-   		isCityAdministrativeLevel = true;
-   }
 }
 
 
@@ -73,13 +130,13 @@ void startElement(void* userData, const XML_Char* name, const XML_Char** attrs)
 {
 	if (!std::strcmp(name, "relation")) 
 	{
+		currentRelation.reset();
 		inRelation = true;
-		isAdministrativeBoundary = false;
-		isCityAdministrativeLevel = false;
 	}
 	else if (inRelation && !std::strcmp(name, "tag")) 
 	{
-		handleCityTag(attrs);
+        AttributesMap attributes = makeAttributesMap(attrs);
+		currentRelation.addTag(attributes["k"], attributes["v"]);
 	}
 
 }
@@ -87,11 +144,10 @@ void startElement(void* userData, const XML_Char* name, const XML_Char** attrs)
 void endElement(void* userData, const XML_Char* name)
 {
 	if (!std::strcmp(name, "relation") &&
-		isAdministrativeBoundary && 
-		isCityAdministrativeLevel)
+		currentRelation.isAdministrativeBoundary() && 
+		currentRelation.isCityAdministrativeLevel())
 	{
-		createCity("", "", "");
-		std::cerr << "youhou" << std::endl;
+		createCity(currentRelation.getName(), currentRelation.getCode(), "");
 		inRelation = false;
 	}
 }
