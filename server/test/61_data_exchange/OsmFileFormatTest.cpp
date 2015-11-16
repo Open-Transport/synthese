@@ -47,6 +47,7 @@
 #include <geos/util/TopologyException.h>
 #include <geos/operation/valid/IsValidOp.h>
 #include <geos/operation/valid/TopologyValidationError.h>
+#include <geos/io/WKTReader.h>
 
 //#include <geos.h>
 
@@ -58,16 +59,21 @@ struct OSMNode
 {
 	double latitude;
 	double longitude;
+
+    bool operator==(const OSMNode& rhs) const {
+    	return (latitude == rhs.latitude) && (longitude == rhs.longitude); }
+
 };
 
 struct OSMWay
 {
 	OSMId id;
 	std::vector<OSMId> nodeRefs;
+	std::vector<OSMNode> nodes;
 
     void reset() { nodeRefs.clear(); }
 
-    bool operator==(const OSMWay& rhs) {
+    bool operator==(const OSMWay& rhs) const {
     	return (id == rhs.id) && (nodeRefs == rhs.nodeRefs); }
 };
 
@@ -165,6 +171,7 @@ private:
 
     bool currentRelationIsCityAdministrativeLevel() const;
 
+	geos::geom::Geometry* makeGeometryFrom(const OSMWay* way);
 	geos::geom::Geometry* makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std::vector<OSMWay*>& innerWays);
 
 	std::vector<geos::geom::Polygon*>* polygonize(const std::vector<OSMWay*>& ways);
@@ -318,8 +325,13 @@ void OSMParser::secondPassEndElement(const XML_Char* name)
 	if (!std::strcmp(name, "way") &&
 		_inBoundaryWay)
 	{
+		BOOST_FOREACH(OSMId nodeRef, _currentBoundaryWay.nodeRefs)
+		{
+			_currentBoundaryWay.nodes.push_back(_nodes[nodeRef]);
+		}
 		_boundaryWays[_currentBoundaryWay.id] = _currentBoundaryWay;
 		_inBoundaryWay = false;
+
 		std::cerr << "new boundaryWay ! " << _currentBoundaryWay.id << std::endl;
 	}
 	else if (!std::strcmp(name, "relation") &&
@@ -356,16 +368,15 @@ void OSMParser::secondPassEndElement(const XML_Char* name)
 
 std::vector<geos::geom::Polygon*>* 
 OSMParser::polygonize(const std::vector<OSMWay*>& ways) {
-	/*
    geos::geom::Geometry* g = NULL;
    std::vector<geos::geom::Polygon*>* ret = new std::vector<geos::geom::Polygon*>();
    const geos::geom::GeometryFactory *gf = geos::geom::GeometryFactory::getDefaultInstance();
    if(ways.size() >= 2) {
       geos::operation::linemerge::LineMerger lm;
-      BOOST_FOREACH(WayPtr w, ways) {
-         if(w->getNodes()->size() < 2)
+      BOOST_FOREACH(OSMWay* w, ways) {
+         if(w->nodes.size() < 2)
             continue;
-         lm.add(w->toGeometry().get());
+         lm.add(makeGeometryFrom(w));
       }
       std::vector< geos::geom::LineString * > *lss = lm.getMergedLineStrings();
       BOOST_FOREACH(geos::geom::LineString *ls, *lss) {
@@ -378,11 +389,11 @@ OSMParser::polygonize(const std::vector<OSMWay*>& ways) {
       lss->clear();
       delete lss;
    } else if(ways.size() == 1){
-      WayPtr w = ways.front();
-      const std::list<std::pair<unsigned long long int,NodePtr> > *nodes = w->getNodes();
-      if(nodes->size()>3 && nodes->front().first == nodes->back().first) {
+      OSMWay* w = ways.front();
+      const std::vector<OSMNode>& nodes = w->nodes;
+      if (nodes.size() > 3 && nodes.front() == nodes.back()) {
          //we have a closed way, return it
-         g = w->toGeometry().get()->clone();
+         g = makeGeometryFrom(w);
          geos::geom::CoordinateSequence *cs = g->getCoordinates();
          geos::geom::LinearRing *lr = gf->createLinearRing(cs);
          //std::vector<geos::geom::Geometry*>* holes = new std::vector<geos::geom::Geometry*>();
@@ -392,13 +403,29 @@ OSMParser::polygonize(const std::vector<OSMWay*>& ways) {
          delete g;
       }
    }
-
    return ret;
-   */
-
-   return NULL;
 }
 
+
+geos::geom::Geometry*
+OSMParser::makeGeometryFrom(const OSMWay* way)
+{
+   static geos::io::WKTReader wktReader;
+	std::stringstream wkt;
+	std::vector<OSMNode>::const_iterator it = way->nodes.begin();
+	wkt << "LINESTRING(";
+
+	if (it != way->nodes.end())
+		wkt << it->longitude << " " << it->latitude;
+
+	while (++it != way->nodes.end()) 
+	{
+		wkt << "," << it->longitude << " " << it->latitude;
+	}
+
+	wkt << ")";
+   return wktReader.read(wkt.str());
+}
 
 geos::geom::Geometry*
 OSMParser::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std::vector<OSMWay*>& innerWays)
