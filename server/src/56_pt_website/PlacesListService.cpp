@@ -80,6 +80,7 @@ namespace synthese
 		const string PlacesListService::PARAMETER_SORTED = "sorted";
 		const string PlacesListService::PARAMETER_TEXT = "text";
 		const string PlacesListService::PARAMETER_SRID = "srid";
+		const string PlacesListService::PARAMETER_PHONETIC = "phonetic";
 
 		const string PlacesListService::PARAMETER_COORDINATES_XY = "coordinates_xy";
 		const string PlacesListService::PARAMETER_MAX_DISTANCE = "maxDistance";
@@ -117,7 +118,8 @@ namespace synthese
 			_minScore(0),
 			_coordinatesSystem(NULL),
 			_maxDistance(300),
-			_requiredUserClasses()
+			_requiredUserClasses(),
+			_phonetic(true)
 		{}
 
 		ParametersMap PlacesListService::_getParametersMap() const
@@ -203,6 +205,9 @@ namespace synthese
 			{
 				map.insert(PARAMETER_DATA_SOURCE_FILTER, _dataSourceFilter->getKey());
 			}
+
+			// Phonetic search
+			map.insert(PARAMETER_PHONETIC, _phonetic);
 
 			return map;
 		}
@@ -329,6 +334,8 @@ namespace synthese
 			{
 				throw RequestException("No such data source");
 			}
+
+			_phonetic = map.getDefault<bool>(PARAMETER_PHONETIC, _phonetic);
 		}
 
 
@@ -501,7 +508,8 @@ namespace synthese
 						stopResult = _city->getLexicalMatcher(StopArea::FACTORY_KEY).bestMatches(
 								_text,
 								0,
-								_minScore
+								_minScore,
+								_phonetic
 						);
 
 						BOOST_FOREACH(const lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit& item, stopResult)
@@ -562,7 +570,8 @@ namespace synthese
 									_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
 										roadName,
 										_number ? *_number : 0,
-										_minScore
+										_minScore,
+										_phonetic
 								)	);
 
 								// Transformation into house places list
@@ -603,7 +612,8 @@ namespace synthese
 							_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
 								_text,
 								_number ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						result.insert(DATA_ROADS, pm);
 					}
@@ -617,7 +627,8 @@ namespace synthese
 							_city->getLexicalMatcher(PublicPlace::FACTORY_KEY).bestMatches(
 								_text,
 								_number ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						result.insert(DATA_PUBLIC_PLACES, pm);
 					}
@@ -637,7 +648,8 @@ namespace synthese
 							GeographyModule::GetCitiesMatcher().bestMatches(
 								_text,
 								(_number && !_citiesWithAtLeastAStop) ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						result.insert(DATA_CITIES, pm);
 					}
@@ -653,7 +665,8 @@ namespace synthese
 						stopResult = PTModule::GetGeneralStopsMatcher().bestMatches(
 								_text,
 								0,
-								_minScore
+								_minScore,
+								_phonetic
 						);
 
 						BOOST_FOREACH(const lexical_matcher::LexicalMatcher<boost::shared_ptr<StopArea> >::MatchHit& item, stopResult)
@@ -715,7 +728,8 @@ namespace synthese
 									RoadModule::GetGeneralRoadsMatcher().bestMatches(
 										roadName,
 										_number ? *_number : 0,
-										_minScore
+										_minScore,
+										_phonetic
 								)	);
 
 								// Transformation into house places list
@@ -760,7 +774,8 @@ namespace synthese
 							RoadModule::GetGeneralRoadsMatcher().bestMatches(
 								_text,
 								_number ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						// We add road results to the roadList
 						BOOST_FOREACH(const RoadModule::GeneralRoadsMatcher::MatchResult::value_type& road, roads)
@@ -789,7 +804,8 @@ namespace synthese
 							RoadModule::GetGeneralPublicPlacesMatcher().bestMatches(
 								_text,
 								_number ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						result.insert(DATA_PUBLIC_PLACES, pm);
 					}
@@ -805,7 +821,8 @@ namespace synthese
 						_city->getAllPlacesMatcher().bestMatches(
 							_text,
 							_number ? *_number : 0,
-							_minScore
+							_minScore,
+							_phonetic
 					)	);
 				}
 				else if(_config)
@@ -819,7 +836,8 @@ namespace synthese
 						GeographyModule::GetGeneralAllPlacesMatcher().bestMatches(
 							_text,
 							_number ? *_number : 0,
-							_minScore
+							_minScore,
+							_phonetic
 					)	);
 				}
 				result.insert(DATA_PLACES, pm);
