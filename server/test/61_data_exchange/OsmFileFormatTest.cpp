@@ -24,6 +24,9 @@
 
 #include <expat.h>
 #include <map>
+#include <set>
+#include <vector>
+#include <string>
 
 #include <fstream>
 #include <iostream>
@@ -32,6 +35,8 @@
 #include <boost/lexical_cast.hpp>
 
 typedef std::map<std::string, std::string> AttributesMap;
+typedef long OSMId;
+
 
 struct OSMNode
 {
@@ -48,11 +53,17 @@ struct OSMRelation
  
      TagsMap tags;
 
+     std::vector<OSMId> _wayMemberIds;
+
    public :
 
      void reset();
 
      void addTag(const std::string& key, const std::string& value);
+
+     void addWayMember(OSMId wayMemberId);
+
+     std::vector<OSMId> getWayMemberIds() const;
 
      std::string getValueOrEmpty(const std::string& tag) const;
 
@@ -89,12 +100,12 @@ FakeEntityHandler fakeEntityHandler;
 class OSMParser
 {
 private:
-	typedef long OSMId;
 
 	const std::string _cityCodeTag;
 	OSMRelation currentRelation;
 	bool inRelation;
 	std::map<OSMId, OSMNode> _nodes;
+	std::set<OSMId> _boundaryWayIds;
 
 public:
 	OSMParser(const std::string& cityCodeTag = std::string("ref:INSEE"));
@@ -129,21 +140,29 @@ void OSMParser::handleStartElement(const XML_Char* name, const XML_Char** attrs)
 		currentRelation.reset();
 		inRelation = true;
 	}
+	else if (!std::strcmp(name, "node")) 
+	{
+        AttributesMap attributes = makeAttributesMap(attrs);
+		OSMNode node;
+		node.latitude = boost::lexical_cast<double>(attributes["lat"]);
+		node.longitude = boost::lexical_cast<double>(attributes["lon"]);
+		_nodes.insert(std::make_pair(boost::lexical_cast<long>(attributes["id"]), node));
+	}
 	else if (inRelation && !std::strcmp(name, "tag")) 
 	{
         AttributesMap attributes = makeAttributesMap(attrs);
 		currentRelation.addTag(attributes["k"], attributes["v"]);
 	}
-	else if (!std::strcmp(name, "node")) 
+	else if (inRelation && !std::strcmp(name, "member")) 
 	{
         AttributesMap attributes = makeAttributesMap(attrs);
-		OSMNode node;
-		node.latitude = 3;
-		node.longitude = 3;
-		_nodes.insert(std::make_pair(boost::lexical_cast<long>(attributes["id"]), node));
+		if("way" == attributes["type"])
+		{
+			currentRelation.addWayMember(boost::lexical_cast<OSMId>(attributes["ref"]));
+		} 
 	}
-
 }
+
 
 void OSMParser::handleEndElement(const XML_Char* name)
 {
@@ -151,6 +170,8 @@ void OSMParser::handleEndElement(const XML_Char* name)
 		currentRelationIsAdministrativeBoundary() && 
 		currentRelationIsCityAdministrativeLevel())
 	{
+		std::vector<OSMId> currentRelationWayMemberIds = currentRelation.getWayMemberIds();
+		_boundaryWayIds.insert(currentRelationWayMemberIds.begin(), currentRelationWayMemberIds.end());
 		fakeEntityHandler.handleCity(currentRelationName(), currentRelationCode(), "");
 		inRelation = false;
 	}
@@ -228,7 +249,7 @@ OSMParser::parse(std::istream& osmInput)
          throw std::runtime_error(errorDesc.str());
       }
       count += n;
-      std::cout << "Read " << (count / (1024 * 1204)) << " MB " << std::endl;
+      std::cout << "Read " << (count / (1024 * 1024)) << " MB " << std::endl;
    } while (!done);
 
    XML_ParserFree(p);
@@ -263,15 +284,31 @@ OSMParser::currentRelationIsCityAdministrativeLevel() const
 
 
 
-void OSMRelation::reset()
+void 
+OSMRelation::reset()
 {
    tags.clear();
+   _wayMemberIds.clear();
 }
 
 
-void OSMRelation::addTag(const std::string& key, const std::string& value)
+void 
+OSMRelation::addTag(const std::string& key, const std::string& value)
 {
 	tags[key] = value;
+}
+
+
+void 
+OSMRelation::addWayMember(OSMId wayMemberId)
+{
+	_wayMemberIds.push_back(wayMemberId);
+}
+
+std::vector<OSMId>
+OSMRelation::getWayMemberIds() const
+{
+    return _wayMemberIds;
 }
 
 
