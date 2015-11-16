@@ -31,16 +31,21 @@
 #include <boost/tuple/tuple.hpp>
 
 typedef std::map<std::string, std::string> AttributesMap;
-typedef std::map<std::string, std::string> TagsMap;
+
+struct OSMNode
+{
+	double latitude;
+	double longitude;
+};
+
 
 struct OSMRelation
 {
+	typedef std::map<std::string, std::string> TagsMap;
 
    private :
  
      TagsMap tags;
-
-     std::string getValueOrEmpty(const std::string& tag) const;
 
    public :
 
@@ -48,13 +53,7 @@ struct OSMRelation
 
      void addTag(const std::string& key, const std::string& value);
 
-     std::string getName() const;
-
-     std::string getCode() const;
-
-     bool isAdministrativeBoundary() const;
-
-     bool isCityAdministrativeLevel() const;
+     std::string getValueOrEmpty(const std::string& tag) const;
 
 };
 
@@ -86,12 +85,171 @@ public:
 
 FakeEntityHandler fakeEntityHandler;
 
-bool inRelation(false);
-int createdCitiesCount = 0;
-OSMRelation currentRelation;
+class OSMParser
+{
+private:
 
-// TODO ref:INSEE should be the default
-const std::string cityCodeTag("swisstopo:BFS_NUMMER");
+	const std::string _cityCodeTag;
+	OSMRelation currentRelation;
+	bool inRelation;
+
+public:
+	OSMParser(const std::string& cityCodeTag = std::string("ref:INSEE"));
+
+	void parse(std::istream& osmInput);
+
+private:
+	AttributesMap makeAttributesMap(const XML_Char **attrs);
+
+    std::string currentRelationName() const;
+
+    std::string currentRelationCode() const;
+
+    bool currentRelationIsAdministrativeBoundary() const;
+
+    bool currentRelationIsCityAdministrativeLevel() const;
+
+
+
+	void handleStartElement(const XML_Char* name, const XML_Char** attrs);
+	void handleEndElement(const XML_Char* name);
+
+    friend void startElement(void* userData, const XML_Char* name, const XML_Char** attrs);
+    friend void endElement(void* userData, const XML_Char* name);
+    friend void characters(void* userData, const XML_Char* txt, int txtlen);
+};
+
+void OSMParser::handleStartElement(const XML_Char* name, const XML_Char** attrs)
+{
+	if (!std::strcmp(name, "relation")) 
+	{
+		currentRelation.reset();
+		inRelation = true;
+	}
+	else if (inRelation && !std::strcmp(name, "tag")) 
+	{
+        AttributesMap attributes = makeAttributesMap(attrs);
+		currentRelation.addTag(attributes["k"], attributes["v"]);
+	}
+
+}
+
+void OSMParser::handleEndElement(const XML_Char* name)
+{
+	if (!std::strcmp(name, "relation") &&
+		currentRelationIsAdministrativeBoundary() && 
+		currentRelationIsCityAdministrativeLevel())
+	{
+		fakeEntityHandler.handleCity(currentRelationName(), currentRelationCode(), "");
+		inRelation = false;
+	}
+}
+
+
+
+void startElement(void* userData, const XML_Char* name, const XML_Char** attrs)
+{
+	OSMParser* osmParser = static_cast<OSMParser*>(userData);
+	osmParser->handleStartElement(name, attrs);
+}
+
+void endElement(void* userData, const XML_Char* name)
+{
+	OSMParser* osmParser = static_cast<OSMParser*>(userData);
+	osmParser->handleEndElement(name);
+}
+
+
+void characters(void* userData, const XML_Char* txt, int txtlen)
+{
+
+}
+
+
+OSMParser::OSMParser(const std::string& cityCodeTag)
+: _cityCodeTag(cityCodeTag)
+, inRelation(false)
+{
+}
+
+AttributesMap 
+OSMParser::makeAttributesMap(const XML_Char **attrs) {
+   int count = 0;
+   AttributesMap attributesMap;
+   while (attrs[count]) {
+      attributesMap[attrs[count]] = attrs[count+1];
+      //std::cerr << attributesMap[attrs[count]] << attrs[count+1] << std::endl;
+      count += 2;
+   }
+   return attributesMap;
+}
+
+
+void
+OSMParser::parse(std::istream& osmInput)
+{
+   long long int count;
+   int done, n = 0;
+   char buf[1024*1024*4];
+
+   XML_Parser p = XML_ParserCreate(NULL);
+   XML_SetUserData(p, this);
+
+   if (!p) {
+      throw std::runtime_error("error creating expat parser");
+   }
+   XML_SetElementHandler(p, startElement, endElement);
+   XML_SetCharacterDataHandler(p, characters);
+
+   do {
+      osmInput.read(buf, 1024 * 1024 * 4);
+      n = osmInput.gcount();
+      done = (n != 1024 * 1024 * 4);
+      if (XML_Parse(p, buf, n, done) == XML_STATUS_ERROR) {
+         XML_Error errorCode = XML_GetErrorCode(p);
+         int errorLine = XML_GetCurrentLineNumber(p);
+         long errorCol = XML_GetCurrentColumnNumber(p);
+         const XML_LChar *errorString = XML_ErrorString(errorCode);
+         std::stringstream errorDesc;
+         errorDesc << "XML parsing error at line " << errorLine << ":"
+               << errorCol;
+         errorDesc << ": " << errorString;
+         throw std::runtime_error(errorDesc.str());
+      }
+      count += n;
+      std::cout << "Read " << (count / (1024 * 1204)) << " MB " << std::endl;
+   } while (!done);
+
+   XML_ParserFree(p);
+}
+
+std::string 
+OSMParser::currentRelationName() const
+{
+	return currentRelation.getValueOrEmpty("name");
+}
+
+
+std::string 
+OSMParser::currentRelationCode() const
+{
+	return currentRelation.getValueOrEmpty(_cityCodeTag);
+}
+
+
+bool 
+OSMParser::currentRelationIsAdministrativeBoundary() const
+{
+	return "administrative" == currentRelation.getValueOrEmpty("boundary");
+}
+
+
+bool 
+OSMParser::currentRelationIsCityAdministrativeLevel() const
+{
+	return "8" == currentRelation.getValueOrEmpty("admin_level");
+}
+
 
 
 void OSMRelation::reset()
@@ -113,113 +271,14 @@ std::string OSMRelation::getValueOrEmpty(const std::string& tag) const
 }
 
 
-std::string OSMRelation::getName() const
-{
-	return getValueOrEmpty("name");
-}
-
-
-std::string OSMRelation::getCode() const
-{
-	return getValueOrEmpty(cityCodeTag);
-
-}
-
-
-bool OSMRelation::isAdministrativeBoundary() const
-{
-	return "administrative" == getValueOrEmpty("boundary");
-}
-
-
-bool OSMRelation::isCityAdministrativeLevel() const
-{
-	return "8" == getValueOrEmpty("admin_level");
-}
-
-
-AttributesMap 
-makeAttributesMap(const XML_Char **attrs) {
-   int count = 0;
-   AttributesMap attributesMap;
-   while (attrs[count]) {
-      attributesMap[attrs[count]] = attrs[count+1];
-      //std::cerr << attributesMap[attrs[count]] << attrs[count+1] << std::endl;
-      count += 2;
-   }
-   return attributesMap;
-}
-
-
-
-void startElement(void* userData, const XML_Char* name, const XML_Char** attrs)
-{
-	if (!std::strcmp(name, "relation")) 
-	{
-		currentRelation.reset();
-		inRelation = true;
-	}
-	else if (inRelation && !std::strcmp(name, "tag")) 
-	{
-        AttributesMap attributes = makeAttributesMap(attrs);
-		currentRelation.addTag(attributes["k"], attributes["v"]);
-	}
-
-}
-
-void endElement(void* userData, const XML_Char* name)
-{
-	if (!std::strcmp(name, "relation") &&
-		currentRelation.isAdministrativeBoundary() && 
-		currentRelation.isCityAdministrativeLevel())
-	{
-		fakeEntityHandler.handleCity(currentRelation.getName(), currentRelation.getCode(), "");
-		inRelation = false;
-	}
-}
-
-void characters(void* userData, const XML_Char* txt, int txtlen)
-{
-
-}
 
 
 BOOST_AUTO_TEST_CASE (should_parse_five_cities_from_osm_file)
 {
 	//std::ifstream osmStream("/home/mjambert/workspace/rcsmobility/gitlab/switzerland-tests/robot/resources/data/swiss.osm");
 	std::ifstream osmStream("/home/mjambert/workspace/rcsmobility/git/synthese3/server/build/test/61_data_exchange/5_cities.osm");
-
-	long long int count;
-   int done, n = 0;
-   char buf[1024*1024*4];
-
-   XML_Parser p = XML_ParserCreate(NULL);
-   if (!p) {
-      throw std::runtime_error("error creating expat parser");
-   }
-   XML_SetElementHandler(p, startElement, endElement);
-   XML_SetCharacterDataHandler(p, characters);
-
-   do {
-      osmStream.read(buf, 1024 * 1024 * 4);
-      n = osmStream.gcount();
-      done = (n != 1024 * 1024 * 4);
-      if (XML_Parse(p, buf, n, done) == XML_STATUS_ERROR) {
-         XML_Error errorCode = XML_GetErrorCode(p);
-         int errorLine = XML_GetCurrentLineNumber(p);
-         long errorCol = XML_GetCurrentColumnNumber(p);
-         const XML_LChar *errorString = XML_ErrorString(errorCode);
-         std::stringstream errorDesc;
-         errorDesc << "XML parsing error at line " << errorLine << ":"
-               << errorCol;
-         errorDesc << ": " << errorString;
-         throw std::runtime_error(errorDesc.str());
-      }
-      count += n;
-      std::cout << "Read " << (count / (1024 * 1204)) << " MB " << std::endl;
-   } while (!done);
-
-   XML_ParserFree(p);
+	OSMParser parser("swisstopo:BFS_NUMMER");
+	parser.parse(osmStream);
    osmStream.close();
 
    BOOST_CHECK_EQUAL(5, fakeEntityHandler.handledCities.size());
