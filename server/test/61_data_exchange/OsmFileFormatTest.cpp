@@ -51,7 +51,17 @@ struct OSMWay
 	std::vector<OSMId> nodeRefs;
 
     void reset() { nodeRefs.clear(); }
+
+    bool operator==(const OSMWay& rhs) {
+    	return (id == rhs.id) && (nodeRefs == rhs.nodeRefs); }
 };
+
+struct OSMMember
+{
+	OSMId ref;
+	std::string role;
+};
+
 
 OSMWay NoOsmWay;
 
@@ -62,7 +72,7 @@ struct OSMRelation
    private :
  
      TagsMap _tags;
-     std::vector<OSMId> _wayMemberIds;
+     std::vector<OSMMember> _wayMembers;
 
    public :
 
@@ -70,9 +80,9 @@ struct OSMRelation
 
      void addTag(const std::string& key, const std::string& value);
 
-     void addWayMember(OSMId wayMemberId);
+     void addWayMember(OSMId wayMemberId, const std::string& role);
 
-     std::vector<OSMId> getWayMemberIds() const;
+     std::vector<OSMMember> getWayMembers() const;
 
      std::string getValueOrEmpty(const std::string& tag) const;
 
@@ -216,7 +226,7 @@ void OSMParser::firstPassStartElement(const XML_Char* name, const XML_Char** att
         AttributesMap attributes = makeAttributesMap(attrs);
 		if("way" == attributes["type"])
 		{
-			_currentRelation.addWayMember(boost::lexical_cast<OSMId>(attributes["ref"]));
+			_currentRelation.addWayMember(boost::lexical_cast<OSMId>(attributes["ref"]), attributes["role"]);
 		} 
 	}
 }
@@ -228,11 +238,11 @@ void OSMParser::firstPassEndElement(const XML_Char* name)
 		currentRelationIsAdministrativeBoundary() && 
 		currentRelationIsCityAdministrativeLevel())
 	{
-		std::vector<OSMId> currentRelationWayMemberIds = _currentRelation.getWayMemberIds();
-		std::cerr << "firstPassEndElement : found city relation with " << currentRelationWayMemberIds.size() << " way members" << std::endl;
-		BOOST_FOREACH(OSMId id, currentRelationWayMemberIds)
+		std::vector<OSMMember> currentRelationWayMembers = _currentRelation.getWayMembers();
+		std::cerr << "firstPassEndElement : found city relation with " << currentRelationWayMembers.size() << " way members" << std::endl;
+		BOOST_FOREACH(OSMMember wayMember, currentRelationWayMembers)
 		{
-			_boundaryWays.insert(std::make_pair(id, NoOsmWay));
+			_boundaryWays.insert(std::make_pair(wayMember.ref, NoOsmWay));
 		}
 		_inRelation = false;
 	}
@@ -272,6 +282,14 @@ void OSMParser::secondPassStartElement(const XML_Char* name, const XML_Char** at
         AttributesMap attributes = makeAttributesMap(attrs);
 		_currentBoundaryWay.nodeRefs.push_back(boost::lexical_cast<OSMId>(attributes["ref"]));
 	}
+	else if (_inRelation && !std::strcmp(name, "member")) 
+	{
+        AttributesMap attributes = makeAttributesMap(attrs);
+		if("way" == attributes["type"])
+		{
+			_currentRelation.addWayMember(boost::lexical_cast<OSMId>(attributes["ref"]), attributes["role"]);
+		} 
+	}
 }
 
 
@@ -288,6 +306,25 @@ void OSMParser::secondPassEndElement(const XML_Char* name)
 		currentRelationIsAdministrativeBoundary() && 
 		currentRelationIsCityAdministrativeLevel())
 	{
+		std::vector<OSMWay*> innerBoundaries;
+		std::vector<OSMWay*> outerBoundaries;
+		BOOST_FOREACH(OSMMember wayMember, _currentRelation.getWayMembers())
+		{
+			std::map<OSMId, OSMWay>::iterator it = _boundaryWays.find(wayMember.ref);
+			if (it == _boundaryWays.end()) continue;
+			if (it->second == NoOsmWay) continue;
+			if (wayMember.role == "outer")
+			{
+				outerBoundaries.push_back(&it->second);
+			}
+			else if (wayMember.role == "inner")
+			{
+				innerBoundaries.push_back(&it->second);
+			}
+		}
+
+		std::cerr << "OB " << outerBoundaries.size() << "  IB " << innerBoundaries.size() << std::endl;
+
 		fakeEntityHandler.handleCity(currentRelationName(), currentRelationCode(), "");
 	}
 	else if (!std::strcmp(name, "osm")) 
@@ -414,7 +451,7 @@ void
 OSMRelation::reset()
 {
    _tags.clear();
-   _wayMemberIds.clear();
+   _wayMembers.clear();
 }
 
 
@@ -426,15 +463,26 @@ OSMRelation::addTag(const std::string& key, const std::string& value)
 
 
 void 
-OSMRelation::addWayMember(OSMId wayMemberId)
+OSMRelation::addWayMember(OSMId wayMemberId, const std::string& role)
 {
-	_wayMemberIds.push_back(wayMemberId);
+	OSMMember member;
+	member.ref = wayMemberId;
+	member.role = role;
+	if ((member.role.empty()) || (member.role == "exclave")) 
+	{
+		member.role = "outer";
+	}
+	else if (member.role == "enclave")
+	{
+		member.role = "inner";
+	}
+	_wayMembers.push_back(member);
 }
 
-std::vector<OSMId>
-OSMRelation::getWayMemberIds() const
+std::vector<OSMMember>
+OSMRelation::getWayMembers() const
 {
-    return _wayMemberIds;
+    return _wayMembers;
 }
 
 
