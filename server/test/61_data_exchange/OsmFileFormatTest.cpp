@@ -33,6 +33,7 @@
 
 #include <boost/tuple/tuple.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/foreach.hpp>
 
 typedef std::map<std::string, std::string> AttributesMap;
 typedef long OSMId;
@@ -44,6 +45,15 @@ struct OSMNode
 	double longitude;
 };
 
+struct OSMWay
+{
+	OSMId id;
+	std::vector<OSMId> nodeRefs;
+
+    void reset() { nodeRefs.clear(); }
+};
+
+OSMWay NoOsmWay;
 
 struct OSMRelation
 {
@@ -105,10 +115,11 @@ private:
 	OSMRelation _currentRelation;
 	bool _inRelation;
 
+	OSMWay _currentBoundaryWay;
 	bool _inBoundaryWay;
 
 	std::map<OSMId, OSMNode> _nodes;
-	std::set<OSMId> _boundaryWayIds;
+	std::map<OSMId, OSMWay> _boundaryWays;
 	int _passCount;
 
 public:
@@ -117,7 +128,7 @@ public:
 	void parse(std::istream& osmInput);
 
 private:
-	void parseOnce(XML_Parser& expatParser, std::istream& osmInput);
+	void parseOnce(std::istream& osmInput);
 
 	AttributesMap makeAttributesMap(const XML_Char **attrs);
 
@@ -208,10 +219,6 @@ void OSMParser::firstPassStartElement(const XML_Char* name, const XML_Char** att
 			_currentRelation.addWayMember(boost::lexical_cast<OSMId>(attributes["ref"]));
 		} 
 	}
-	else if (!std::strcmp(name, "osm")) 
-	{
-		++_passCount;
-	}
 }
 
 
@@ -222,8 +229,16 @@ void OSMParser::firstPassEndElement(const XML_Char* name)
 		currentRelationIsCityAdministrativeLevel())
 	{
 		std::vector<OSMId> currentRelationWayMemberIds = _currentRelation.getWayMemberIds();
-		_boundaryWayIds.insert(currentRelationWayMemberIds.begin(), currentRelationWayMemberIds.end());
+		std::cerr << "firstPassEndElement : found city relation with " << currentRelationWayMemberIds.size() << " way members" << std::endl;
+		BOOST_FOREACH(OSMId id, currentRelationWayMemberIds)
+		{
+			_boundaryWays.insert(std::make_pair(id, NoOsmWay));
+		}
 		_inRelation = false;
+	}
+	else if (!std::strcmp(name, "osm")) 
+	{
+		++_passCount;
 	}
 }
 
@@ -243,14 +258,19 @@ void OSMParser::secondPassStartElement(const XML_Char* name, const XML_Char** at
 	else if (!std::strcmp(name, "way")) 
 	{
         AttributesMap attributes = makeAttributesMap(attrs);
-        if (_boundaryWayIds.find(boost::lexical_cast<OSMId>(attributes["id"])) != _boundaryWayIds.end())
+        OSMId wayId = boost::lexical_cast<OSMId>(attributes["id"]);
+		std::cerr << "way! " << _boundaryWays.size() << std::endl;
+        if (_boundaryWays.find(wayId) != _boundaryWays.end())
         {
+			_currentBoundaryWay.reset();
+	        _currentBoundaryWay.id = wayId;
 			_inBoundaryWay = true;
         }
 	}
-	else if (!std::strcmp(name, "osm")) 
+	else if (_inBoundaryWay && !std::strcmp(name, "nd")) 
 	{
-		++_passCount;
+        AttributesMap attributes = makeAttributesMap(attrs);
+		_currentBoundaryWay.nodeRefs.push_back(boost::lexical_cast<OSMId>(attributes["ref"]));
 	}
 }
 
@@ -260,13 +280,19 @@ void OSMParser::secondPassEndElement(const XML_Char* name)
 	if (!std::strcmp(name, "way") &&
 		_inBoundaryWay)
 	{
+		_boundaryWays[_currentBoundaryWay.id] = _currentBoundaryWay;
 		_inBoundaryWay = false;
+		std::cerr << "new boundaryWay ! " << _currentBoundaryWay.id << std::endl;
 	}
 	else if (!std::strcmp(name, "relation") &&
 		currentRelationIsAdministrativeBoundary() && 
 		currentRelationIsCityAdministrativeLevel())
 	{
 		fakeEntityHandler.handleCity(currentRelationName(), currentRelationCode(), "");
+	}
+	else if (!std::strcmp(name, "osm")) 
+	{
+		++_passCount;
 	}
 }
 
@@ -305,9 +331,19 @@ OSMParser::makeAttributesMap(const XML_Char **attrs) {
 
 
 void
-OSMParser::parseOnce(XML_Parser& expatParser, std::istream& osmInput)
+OSMParser::parseOnce(std::istream& osmInput)
 {
-   long long int count;
+   const XML_Char * encoding = NULL;
+   XML_Parser expatParser = XML_ParserCreate(encoding);
+   XML_SetUserData(expatParser, this);
+
+   if (!expatParser) {
+      throw std::runtime_error("error creating expat parser");
+   }
+   XML_SetElementHandler(expatParser, startElement, endElement);
+   XML_SetCharacterDataHandler(expatParser, characters);
+
+   long long int count = 0;
    int done, n = 0;
    char buf[1024*1024*4];
    do {
@@ -329,31 +365,20 @@ OSMParser::parseOnce(XML_Parser& expatParser, std::istream& osmInput)
       std::cout << "Read " << (count / (1024 * 1024)) << " MB " << std::endl;
    } while (!done);
 
+   XML_ParserFree(expatParser);
+
 }
 
 
 void
 OSMParser::parse(std::istream& osmInput)
 {
-   const XML_Char * encoding = NULL;
-   XML_Parser expatParser = XML_ParserCreate(encoding);
-   XML_SetUserData(expatParser, this);
-
-   if (!expatParser) {
-      throw std::runtime_error("error creating expat parser");
-   }
-   XML_SetElementHandler(expatParser, startElement, endElement);
-   XML_SetCharacterDataHandler(expatParser, characters);
-
-   parseOnce(expatParser, osmInput);
+   parseOnce(osmInput);
    
    osmInput.clear();
    osmInput.seekg(0);
 
-   XML_ParserReset(expatParser, encoding);
-   parseOnce(expatParser, osmInput);
-
-   XML_ParserFree(expatParser);
+   parseOnce(osmInput);
 }
 
 std::string 
