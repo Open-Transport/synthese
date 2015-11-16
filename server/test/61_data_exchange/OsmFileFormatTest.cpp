@@ -90,6 +90,8 @@ bool inRelation(false);
 int createdCitiesCount = 0;
 OSMRelation currentRelation;
 
+// TODO ref:INSEE should be the default
+const std::string cityCodeTag("swisstopo:BFS_NUMMER");
 
 
 void OSMRelation::reset()
@@ -119,7 +121,8 @@ std::string OSMRelation::getName() const
 
 std::string OSMRelation::getCode() const
 {
-	return getValueOrEmpty("ref:INSEE");
+	return getValueOrEmpty(cityCodeTag);
+
 }
 
 
@@ -221,11 +224,20 @@ BOOST_AUTO_TEST_CASE (should_parse_five_cities_from_osm_file)
 
    BOOST_CHECK_EQUAL(5, fakeEntityHandler.handledCities.size());
    int cityIndex = 0;
-   BOOST_CHECK_EQUAL("Hauterive (NE)", fakeEntityHandler.handledCities[cityIndex++].get<0>());
-   BOOST_CHECK_EQUAL("Neuchâtel", fakeEntityHandler.handledCities[cityIndex++].get<0>());
-   BOOST_CHECK_EQUAL("Saint-Blaise", fakeEntityHandler.handledCities[cityIndex++].get<0>());
-   BOOST_CHECK_EQUAL("Valangin", fakeEntityHandler.handledCities[cityIndex++].get<0>());
-   BOOST_CHECK_EQUAL("Val-de-Ruz", fakeEntityHandler.handledCities[cityIndex++].get<0>());
+   BOOST_CHECK_EQUAL("Hauterive (NE)", fakeEntityHandler.handledCities[cityIndex].get<0>());
+   BOOST_CHECK_EQUAL("6454", fakeEntityHandler.handledCities[cityIndex++].get<1>());
+
+   BOOST_CHECK_EQUAL("Neuchâtel", fakeEntityHandler.handledCities[cityIndex].get<0>());
+   BOOST_CHECK_EQUAL("6458", fakeEntityHandler.handledCities[cityIndex++].get<1>());
+
+   BOOST_CHECK_EQUAL("Saint-Blaise", fakeEntityHandler.handledCities[cityIndex].get<0>());
+   BOOST_CHECK_EQUAL("6459", fakeEntityHandler.handledCities[cityIndex++].get<1>());
+
+   BOOST_CHECK_EQUAL("Valangin", fakeEntityHandler.handledCities[cityIndex].get<0>());
+   BOOST_CHECK_EQUAL("6485", fakeEntityHandler.handledCities[cityIndex++].get<1>());
+
+   BOOST_CHECK_EQUAL("Val-de-Ruz", fakeEntityHandler.handledCities[cityIndex].get<0>());
+   BOOST_CHECK_EQUAL("6487", fakeEntityHandler.handledCities[cityIndex++].get<1>());
 
 }
 
