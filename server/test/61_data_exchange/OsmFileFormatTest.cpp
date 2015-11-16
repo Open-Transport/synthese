@@ -51,8 +51,7 @@ struct OSMRelation
 
    private :
  
-     TagsMap tags;
-
+     TagsMap _tags;
      std::vector<OSMId> _wayMemberIds;
 
    public :
@@ -102,10 +101,15 @@ class OSMParser
 private:
 
 	const std::string _cityCodeTag;
-	OSMRelation currentRelation;
-	bool inRelation;
+
+	OSMRelation _currentRelation;
+	bool _inRelation;
+
+	bool _inBoundaryWay;
+
 	std::map<OSMId, OSMNode> _nodes;
 	std::set<OSMId> _boundaryWayIds;
+	int _passCount;
 
 public:
 	OSMParser(const std::string& cityCodeTag = std::string("ref:INSEE"));
@@ -113,6 +117,8 @@ public:
 	void parse(std::istream& osmInput);
 
 private:
+	void parseOnce(XML_Parser& expatParser, std::istream& osmInput);
+
 	AttributesMap makeAttributesMap(const XML_Char **attrs);
 
     std::string currentRelationName() const;
@@ -123,22 +129,63 @@ private:
 
     bool currentRelationIsCityAdministrativeLevel() const;
 
-
-
 	void handleStartElement(const XML_Char* name, const XML_Char** attrs);
 	void handleEndElement(const XML_Char* name);
+
+	void firstPassStartElement(const XML_Char* name, const XML_Char** attrs);
+	void firstPassEndElement(const XML_Char* name);
+
+	void secondPassStartElement(const XML_Char* name, const XML_Char** attrs);
+	void secondPassEndElement(const XML_Char* name);
 
     friend void startElement(void* userData, const XML_Char* name, const XML_Char** attrs);
     friend void endElement(void* userData, const XML_Char* name);
     friend void characters(void* userData, const XML_Char* txt, int txtlen);
 };
 
+
+OSMParser::OSMParser(const std::string& cityCodeTag)
+: _cityCodeTag(cityCodeTag)
+, _passCount(0)
+, _inRelation(false)
+, _inBoundaryWay(false)
+{
+}
+
+
 void OSMParser::handleStartElement(const XML_Char* name, const XML_Char** attrs)
+{
+	if (_passCount == 0)
+	{
+		firstPassStartElement(name, attrs);
+	}
+	else if (_passCount == 1)
+	{
+		secondPassStartElement(name, attrs);
+	}
+
+}
+
+
+void OSMParser::handleEndElement(const XML_Char* name)
+{
+	if (_passCount == 0)
+	{
+		firstPassEndElement(name);
+	}
+	else if (_passCount == 1)
+	{
+		secondPassEndElement(name);
+	}
+}
+
+
+void OSMParser::firstPassStartElement(const XML_Char* name, const XML_Char** attrs)
 {
 	if (!std::strcmp(name, "relation")) 
 	{
-		currentRelation.reset();
-		inRelation = true;
+		_currentRelation.reset();
+		_inRelation = true;
 	}
 	else if (!std::strcmp(name, "node")) 
 	{
@@ -148,32 +195,78 @@ void OSMParser::handleStartElement(const XML_Char* name, const XML_Char** attrs)
 		node.longitude = boost::lexical_cast<double>(attributes["lon"]);
 		_nodes.insert(std::make_pair(boost::lexical_cast<long>(attributes["id"]), node));
 	}
-	else if (inRelation && !std::strcmp(name, "tag")) 
+	else if (_inRelation && !std::strcmp(name, "tag")) 
 	{
         AttributesMap attributes = makeAttributesMap(attrs);
-		currentRelation.addTag(attributes["k"], attributes["v"]);
+		_currentRelation.addTag(attributes["k"], attributes["v"]);
 	}
-	else if (inRelation && !std::strcmp(name, "member")) 
+	else if (_inRelation && !std::strcmp(name, "member")) 
 	{
         AttributesMap attributes = makeAttributesMap(attrs);
 		if("way" == attributes["type"])
 		{
-			currentRelation.addWayMember(boost::lexical_cast<OSMId>(attributes["ref"]));
+			_currentRelation.addWayMember(boost::lexical_cast<OSMId>(attributes["ref"]));
 		} 
+	}
+	else if (!std::strcmp(name, "osm")) 
+	{
+		++_passCount;
 	}
 }
 
 
-void OSMParser::handleEndElement(const XML_Char* name)
+void OSMParser::firstPassEndElement(const XML_Char* name)
 {
 	if (!std::strcmp(name, "relation") &&
 		currentRelationIsAdministrativeBoundary() && 
 		currentRelationIsCityAdministrativeLevel())
 	{
-		std::vector<OSMId> currentRelationWayMemberIds = currentRelation.getWayMemberIds();
+		std::vector<OSMId> currentRelationWayMemberIds = _currentRelation.getWayMemberIds();
 		_boundaryWayIds.insert(currentRelationWayMemberIds.begin(), currentRelationWayMemberIds.end());
+		_inRelation = false;
+	}
+}
+
+
+void OSMParser::secondPassStartElement(const XML_Char* name, const XML_Char** attrs)
+{
+	if (!std::strcmp(name, "relation")) 
+	{
+		_currentRelation.reset();
+		_inRelation = true;
+	}
+	else if (_inRelation && !std::strcmp(name, "tag")) 
+	{
+        AttributesMap attributes = makeAttributesMap(attrs);
+		_currentRelation.addTag(attributes["k"], attributes["v"]);
+	}
+	else if (!std::strcmp(name, "way")) 
+	{
+        AttributesMap attributes = makeAttributesMap(attrs);
+        if (_boundaryWayIds.find(boost::lexical_cast<OSMId>(attributes["id"])) != _boundaryWayIds.end())
+        {
+			_inBoundaryWay = true;
+        }
+	}
+	else if (!std::strcmp(name, "osm")) 
+	{
+		++_passCount;
+	}
+}
+
+
+void OSMParser::secondPassEndElement(const XML_Char* name)
+{
+	if (!std::strcmp(name, "way") &&
+		_inBoundaryWay)
+	{
+		_inBoundaryWay = false;
+	}
+	else if (!std::strcmp(name, "relation") &&
+		currentRelationIsAdministrativeBoundary() && 
+		currentRelationIsCityAdministrativeLevel())
+	{
 		fakeEntityHandler.handleCity(currentRelationName(), currentRelationCode(), "");
-		inRelation = false;
 	}
 }
 
@@ -198,12 +291,6 @@ void characters(void* userData, const XML_Char* txt, int txtlen)
 }
 
 
-OSMParser::OSMParser(const std::string& cityCodeTag)
-: _cityCodeTag(cityCodeTag)
-, inRelation(false)
-{
-}
-
 AttributesMap 
 OSMParser::makeAttributesMap(const XML_Char **attrs) {
    int count = 0;
@@ -218,29 +305,19 @@ OSMParser::makeAttributesMap(const XML_Char **attrs) {
 
 
 void
-OSMParser::parse(std::istream& osmInput)
+OSMParser::parseOnce(XML_Parser& expatParser, std::istream& osmInput)
 {
    long long int count;
    int done, n = 0;
    char buf[1024*1024*4];
-
-   XML_Parser p = XML_ParserCreate(NULL);
-   XML_SetUserData(p, this);
-
-   if (!p) {
-      throw std::runtime_error("error creating expat parser");
-   }
-   XML_SetElementHandler(p, startElement, endElement);
-   XML_SetCharacterDataHandler(p, characters);
-
    do {
       osmInput.read(buf, 1024 * 1024 * 4);
       n = osmInput.gcount();
       done = (n != 1024 * 1024 * 4);
-      if (XML_Parse(p, buf, n, done) == XML_STATUS_ERROR) {
-         XML_Error errorCode = XML_GetErrorCode(p);
-         int errorLine = XML_GetCurrentLineNumber(p);
-         long errorCol = XML_GetCurrentColumnNumber(p);
+      if (XML_Parse(expatParser, buf, n, done) == XML_STATUS_ERROR) {
+         XML_Error errorCode = XML_GetErrorCode(expatParser);
+         int errorLine = XML_GetCurrentLineNumber(expatParser);
+         long errorCol = XML_GetCurrentColumnNumber(expatParser);
          const XML_LChar *errorString = XML_ErrorString(errorCode);
          std::stringstream errorDesc;
          errorDesc << "XML parsing error at line " << errorLine << ":"
@@ -252,34 +329,58 @@ OSMParser::parse(std::istream& osmInput)
       std::cout << "Read " << (count / (1024 * 1024)) << " MB " << std::endl;
    } while (!done);
 
-   XML_ParserFree(p);
+}
+
+
+void
+OSMParser::parse(std::istream& osmInput)
+{
+   const XML_Char * encoding = NULL;
+   XML_Parser expatParser = XML_ParserCreate(encoding);
+   XML_SetUserData(expatParser, this);
+
+   if (!expatParser) {
+      throw std::runtime_error("error creating expat parser");
+   }
+   XML_SetElementHandler(expatParser, startElement, endElement);
+   XML_SetCharacterDataHandler(expatParser, characters);
+
+   parseOnce(expatParser, osmInput);
+   
+   osmInput.clear();
+   osmInput.seekg(0);
+
+   XML_ParserReset(expatParser, encoding);
+   parseOnce(expatParser, osmInput);
+
+   XML_ParserFree(expatParser);
 }
 
 std::string 
 OSMParser::currentRelationName() const
 {
-	return currentRelation.getValueOrEmpty("name");
+	return _currentRelation.getValueOrEmpty("name");
 }
 
 
 std::string 
 OSMParser::currentRelationCode() const
 {
-	return currentRelation.getValueOrEmpty(_cityCodeTag);
+	return _currentRelation.getValueOrEmpty(_cityCodeTag);
 }
 
 
 bool 
 OSMParser::currentRelationIsAdministrativeBoundary() const
 {
-	return "administrative" == currentRelation.getValueOrEmpty("boundary");
+	return "administrative" == _currentRelation.getValueOrEmpty("boundary");
 }
 
 
 bool 
 OSMParser::currentRelationIsCityAdministrativeLevel() const
 {
-	return "8" == currentRelation.getValueOrEmpty("admin_level");
+	return "8" == _currentRelation.getValueOrEmpty("admin_level");
 }
 
 
@@ -287,7 +388,7 @@ OSMParser::currentRelationIsCityAdministrativeLevel() const
 void 
 OSMRelation::reset()
 {
-   tags.clear();
+   _tags.clear();
    _wayMemberIds.clear();
 }
 
@@ -295,7 +396,7 @@ OSMRelation::reset()
 void 
 OSMRelation::addTag(const std::string& key, const std::string& value)
 {
-	tags[key] = value;
+	_tags[key] = value;
 }
 
 
@@ -314,8 +415,8 @@ OSMRelation::getWayMemberIds() const
 
 std::string OSMRelation::getValueOrEmpty(const std::string& tag) const
 {
-	TagsMap::const_iterator it = tags.find(tag);
-	return (tags.end() == it) ? "" : it->second;
+	TagsMap::const_iterator it = _tags.find(tag);
+	return (_tags.end() == it) ? "" : it->second;
 }
 
 
