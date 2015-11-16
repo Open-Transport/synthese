@@ -29,6 +29,7 @@
 #include <iostream>
 
 #include <boost/tuple/tuple.hpp>
+#include <boost/lexical_cast.hpp>
 
 typedef std::map<std::string, std::string> AttributesMap;
 
@@ -88,10 +89,12 @@ FakeEntityHandler fakeEntityHandler;
 class OSMParser
 {
 private:
+	typedef long OSMId;
 
 	const std::string _cityCodeTag;
 	OSMRelation currentRelation;
 	bool inRelation;
+	std::map<OSMId, OSMNode> _nodes;
 
 public:
 	OSMParser(const std::string& cityCodeTag = std::string("ref:INSEE"));
@@ -130,6 +133,14 @@ void OSMParser::handleStartElement(const XML_Char* name, const XML_Char** attrs)
 	{
         AttributesMap attributes = makeAttributesMap(attrs);
 		currentRelation.addTag(attributes["k"], attributes["v"]);
+	}
+	else if (!std::strcmp(name, "node")) 
+	{
+        AttributesMap attributes = makeAttributesMap(attrs);
+		OSMNode node;
+		node.latitude = 3;
+		node.longitude = 3;
+		_nodes.insert(std::make_pair(boost::lexical_cast<long>(attributes["id"]), node));
 	}
 
 }
