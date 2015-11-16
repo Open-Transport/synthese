@@ -1,0 +1,22 @@
+set_source_groups()
+
+set(multimodal_journey_planner_SRCS
+MultimodalJourneyPlannerService.cpp
+MultimodalJourneyPlannerService.hpp
+MultimodalJourneyPlannerModule.cpp
+MultimodalJourneyPlannerModule.gen.cpp
+MultimodalJourneyPlannerModuleRegister.cpp
+MultimodalJourneyPlannerModule.h
+MultimodalJourneyPlannerModule.inc.cpp
+MultimodalJourneyPlannerResult.cpp
+MultimodalJourneyPlannerResult.h
+)
+
+set_source_files_properties(MultimodalJourneyPlannerModule.gen.cpp MultimodalJourneyPlannerModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
+
+add_library(64_multimodal_journey_planner ${multimodal_journey_planner_SRCS})
+
+target_link_libraries(64_multimodal_journey_planner
+)
+
+install(TARGETS 64_multimodal_journey_planner DESTINATION lib)

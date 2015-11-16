@@ -57,7 +57,8 @@ set(MODULES
 59_road_journey_planner
 60_analysis
 61_data_exchange
-63_settings)
+63_settings
+64_multimodal_journey_planner)
 
 if(WITH_MYSQL)
   list(APPEND MODULES 10_db/102_mysql)
