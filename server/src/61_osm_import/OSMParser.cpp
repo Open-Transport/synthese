@@ -119,6 +119,7 @@ public :
 class OSMParserImpl
 {
 private:
+	geos::io::WKTReader _wktReader;
 
 	std::ostream& _logStream;
 	OSMEntityHandler& _osmEntityHandler;
@@ -389,15 +390,6 @@ std::vector<geos::geom::Polygon*>*
 OSMParserImpl::polygonize(const std::vector<OSMWay*>& ways) {
 	geos::geom::Geometry* g = NULL;
 
-	/*
-BOOST_FOREACH(OSMWay* w, ways) {
-std::string wkt = makeWKTFrom(w);
-std::cerr << wkt << " ";
-}
-std::cerr << std::endl;
-std::cerr << std::endl;
-*/
-
 	std::vector<geos::geom::Polygon*>* ret = new std::vector<geos::geom::Polygon*>();
 	const geos::geom::GeometryFactory *gf = geos::geom::GeometryFactory::getDefaultInstance();
 	if(ways.size() >= 2) {
@@ -458,22 +450,7 @@ OSMParserImpl::makeWKTFrom(OSMWay* way)
 geos::geom::Geometry*
 OSMParserImpl::makeGeometryFrom(OSMWay* way)
 {
-	static geos::io::WKTReader wktReader;
-	std::stringstream wkt;
-	std::vector<OSMNode>::const_iterator it = way->nodes.begin();
-	wkt << "LINESTRING(";
-
-	if (it != way->nodes.end())
-		wkt << it->longitude << " " << it->latitude;
-
-	while (++it != way->nodes.end())
-	{
-		wkt << "," << it->longitude << " " << it->latitude;
-	}
-
-	wkt << ")";
-	//std::cerr << "=========== " << wkt.str() << std::endl;
-	return wktReader.read(wkt.str());
+	return _wktReader.read(makeWKTFrom(way));
 }
 
 geos::geom::Geometry*
