@@ -45,8 +45,30 @@ public:
 	{
 		handledCities.push_back(boost::make_tuple(cityName, cityCode, boundary));
 	}
+
 };
 
+
+void check_city_handled_with_boundary(const boost::tuple<std::string, std::string, geos::geom::Geometry*>& handledCity,
+									  const std::string& expectedCityName,
+									  const std::string& expectedCityCode,
+									  const std::string expectedWktBoundary)
+{
+	BOOST_CHECK_EQUAL(expectedCityName, handledCity.get<0>());
+	BOOST_CHECK_EQUAL(expectedCityCode, handledCity.get<1>());
+	BOOST_CHECK(handledCity.get<2>() != 0);
+	BOOST_CHECK_EQUAL(expectedWktBoundary, handledCity.get<2>()->toString());
+}
+
+
+void check_city_handled_without_boundary(const boost::tuple<std::string, std::string, geos::geom::Geometry*>& handledCity,
+										 const std::string& expectedCityName,
+										 const std::string& expectedCityCode)
+{
+	BOOST_CHECK_EQUAL(expectedCityName, handledCity.get<0>());
+	BOOST_CHECK_EQUAL(expectedCityCode, handledCity.get<1>());
+	BOOST_CHECK(handledCity.get<2>() == 0);
+}
 
 
 BOOST_AUTO_TEST_CASE (should_find_five_cities_without_boundaries_from_osm_file)
@@ -58,32 +80,13 @@ BOOST_AUTO_TEST_CASE (should_find_five_cities_without_boundaries_from_osm_file)
 	osmStream.close();
 
 	BOOST_CHECK_EQUAL(5, fakeOSMEntityHandler.handledCities.size());
-	int cityIndex = 0;
-	BOOST_CHECK_EQUAL("Hauterive (NE)", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
-	BOOST_CHECK_EQUAL("6454", fakeOSMEntityHandler.handledCities[cityIndex].get<1>());
-	BOOST_CHECK_EQUAL((geos::geom::Geometry*) 0, fakeOSMEntityHandler.handledCities[cityIndex].get<2>());
-	++cityIndex;
-
-	BOOST_CHECK_EQUAL("Neuchâtel", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
-	BOOST_CHECK_EQUAL("6458", fakeOSMEntityHandler.handledCities[cityIndex].get<1>());
-	BOOST_CHECK_EQUAL((geos::geom::Geometry*) 0, fakeOSMEntityHandler.handledCities[cityIndex].get<2>());
-	++cityIndex;
-
-	BOOST_CHECK_EQUAL("Saint-Blaise", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
-	BOOST_CHECK_EQUAL("6459", fakeOSMEntityHandler.handledCities[cityIndex].get<1>());
-	BOOST_CHECK_EQUAL((geos::geom::Geometry*) 0, fakeOSMEntityHandler.handledCities[cityIndex].get<2>());
-	++cityIndex;
-
-	BOOST_CHECK_EQUAL("Valangin", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
-	BOOST_CHECK_EQUAL("6485", fakeOSMEntityHandler.handledCities[cityIndex].get<1>());
-	BOOST_CHECK_EQUAL((geos::geom::Geometry*) 0, fakeOSMEntityHandler.handledCities[cityIndex].get<2>());
-	++cityIndex;
-
-	BOOST_CHECK_EQUAL("Val-de-Ruz", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
-	BOOST_CHECK_EQUAL("6487", fakeOSMEntityHandler.handledCities[cityIndex].get<1>());
-	BOOST_CHECK_EQUAL((geos::geom::Geometry*) 0, fakeOSMEntityHandler.handledCities[cityIndex].get<2>());
-	++cityIndex;
-
+	std::vector<boost::tuple<std::string, std::string, geos::geom::Geometry*> >::iterator it =
+			fakeOSMEntityHandler.handledCities.begin();
+	check_city_handled_without_boundary(*it++, "Hauterive (NE)", "6454");
+	check_city_handled_without_boundary(*it++, "Neuchâtel", "6458");
+	check_city_handled_without_boundary(*it++, "Saint-Blaise", "6459");
+	check_city_handled_without_boundary(*it++, "Valangin", "6485");
+	check_city_handled_without_boundary(*it++, "Val-de-Ruz", "6487");
 }
 
 /*
