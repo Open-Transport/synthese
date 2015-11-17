@@ -1,4 +1,4 @@
-﻿namespace synthese
+namespace synthese
 {
 	namespace multimodal_journey_planner
 	{

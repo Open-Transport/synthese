@@ -1,1 +1,1 @@
-﻿synthese::multimodal_journey_planner::moduleRegister();
+synthese::multimodal_journey_planner::moduleRegister();
