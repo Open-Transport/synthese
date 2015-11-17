@@ -32,8 +32,8 @@
 
 namespace synthese
 {
-namespace data_exchange
-{
+	namespace data_exchange
+	{
 
 
 class FakeOSMEntityHandler : public OSMEntityHandler
@@ -49,31 +49,36 @@ public:
 
 
 
-
-BOOST_AUTO_TEST_CASE (should_parse_five_cities_from_osm_file)
+BOOST_AUTO_TEST_CASE (should_find_five_cities_without_boundaries_from_osm_file)
 {
 	std::ifstream osmStream("5_cities.osm");
 	FakeOSMEntityHandler fakeOSMEntityHandler;
-	OSMParser parser(fakeOSMEntityHandler);
+	OSMParser parser(fakeOSMEntityHandler, "swisstopo:BFS_NUMMER");
 	parser.parse(osmStream);
-    osmStream.close();
+	osmStream.close();
 
-   BOOST_CHECK_EQUAL(5, fakeOSMEntityHandler.handledCities.size());
-   int cityIndex = 0;
-   BOOST_CHECK_EQUAL("Hauterive (NE)", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
-   BOOST_CHECK_EQUAL("6454", fakeOSMEntityHandler.handledCities[cityIndex++].get<1>());
+	BOOST_CHECK_EQUAL(5, fakeOSMEntityHandler.handledCities.size());
+	int cityIndex = 0;
+	BOOST_CHECK_EQUAL("Hauterive (NE)", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
+	BOOST_CHECK_EQUAL("6454", fakeOSMEntityHandler.handledCities[cityIndex].get<1>());
+	//BOOST_CHECK_EQUAL((geos::geom::Geometry*) 0, fakeOSMEntityHandler.handledCities[cityIndex].get<2>());
+	++cityIndex;
 
-   BOOST_CHECK_EQUAL("Neuchâtel", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
-   BOOST_CHECK_EQUAL("6458", fakeOSMEntityHandler.handledCities[cityIndex++].get<1>());
+	BOOST_CHECK_EQUAL("Neuchâtel", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
+	BOOST_CHECK_EQUAL("6458", fakeOSMEntityHandler.handledCities[cityIndex].get<1>());
+	++cityIndex;
 
-   BOOST_CHECK_EQUAL("Saint-Blaise", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
-   BOOST_CHECK_EQUAL("6459", fakeOSMEntityHandler.handledCities[cityIndex++].get<1>());
+	BOOST_CHECK_EQUAL("Saint-Blaise", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
+	BOOST_CHECK_EQUAL("6459", fakeOSMEntityHandler.handledCities[cityIndex].get<1>());
+	++cityIndex;
 
-   BOOST_CHECK_EQUAL("Valangin", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
-   BOOST_CHECK_EQUAL("6485", fakeOSMEntityHandler.handledCities[cityIndex++].get<1>());
+	BOOST_CHECK_EQUAL("Valangin", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
+	BOOST_CHECK_EQUAL("6485", fakeOSMEntityHandler.handledCities[cityIndex].get<1>());
+	++cityIndex;
 
-   BOOST_CHECK_EQUAL("Val-de-Ruz", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
-   BOOST_CHECK_EQUAL("6487", fakeOSMEntityHandler.handledCities[cityIndex++].get<1>());
+	BOOST_CHECK_EQUAL("Val-de-Ruz", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
+	BOOST_CHECK_EQUAL("6487", fakeOSMEntityHandler.handledCities[cityIndex].get<1>());
+	++cityIndex;
 
 }
 
@@ -83,28 +88,28 @@ BOOST_AUTO_TEST_CASE (should_parse_city_boundary)
 	std::ifstream osmStream("capendu.osm");
 	OSMParser parser(fakeOSMEntityHandler);
 	parser.parse(osmStream);
-    osmStream.close();
+	osmStream.close();
 
-   //BOOST_CHECK_EQUAL(5, fakeEntityHandler.handledCities.size());
-   int cityIndex = 0;
-   BOOST_CHECK_EQUAL("Hauterive (NE)", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
-   BOOST_CHECK_EQUAL("6454", fakeOSMEntityHandler.handledCities[cityIndex++].get<1>());
+	//BOOST_CHECK_EQUAL(5, fakeEntityHandler.handledCities.size());
+	int cityIndex = 0;
+	BOOST_CHECK_EQUAL("Trèbes", fakeOSMEntityHandler.handledCities[cityIndex].get<0>());
+	BOOST_CHECK_EQUAL("11397", fakeOSMEntityHandler.handledCities[cityIndex++].get<1>());
 
-/*
-   BOOST_CHECK_EQUAL("Neuchâtel", fakeEntityHandler.handledCities[cityIndex].get<0>());
-   BOOST_CHECK_EQUAL("6458", fakeEntityHandler.handledCities[cityIndex++].get<1>());
+	/*
+BOOST_CHECK_EQUAL("Neuchâtel", fakeEntityHandler.handledCities[cityIndex].get<0>());
+BOOST_CHECK_EQUAL("6458", fakeEntityHandler.handledCities[cityIndex++].get<1>());
 
-   BOOST_CHECK_EQUAL("Saint-Blaise", fakeEntityHandler.handledCities[cityIndex].get<0>());
-   BOOST_CHECK_EQUAL("6459", fakeEntityHandler.handledCities[cityIndex++].get<1>());
+BOOST_CHECK_EQUAL("Saint-Blaise", fakeEntityHandler.handledCities[cityIndex].get<0>());
+BOOST_CHECK_EQUAL("6459", fakeEntityHandler.handledCities[cityIndex++].get<1>());
 
-   BOOST_CHECK_EQUAL("Valangin", fakeEntityHandler.handledCities[cityIndex].get<0>());
-   BOOST_CHECK_EQUAL("6485", fakeEntityHandler.handledCities[cityIndex++].get<1>());
+BOOST_CHECK_EQUAL("Valangin", fakeEntityHandler.handledCities[cityIndex].get<0>());
+BOOST_CHECK_EQUAL("6485", fakeEntityHandler.handledCities[cityIndex++].get<1>());
 
-   BOOST_CHECK_EQUAL("Val-de-Ruz", fakeEntityHandler.handledCities[cityIndex].get<0>());
-   BOOST_CHECK_EQUAL("6487", fakeEntityHandler.handledCities[cityIndex++].get<1>());
+BOOST_CHECK_EQUAL("Val-de-Ruz", fakeEntityHandler.handledCities[cityIndex].get<0>());
+BOOST_CHECK_EQUAL("6487", fakeEntityHandler.handledCities[cityIndex++].get<1>());
 */
 }
 
 
-}
+	}
 }

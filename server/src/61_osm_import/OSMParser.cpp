@@ -359,9 +359,7 @@ std::vector<geos::geom::Polygon*>*
 OSMParserImpl::polygonize(const std::vector<OSMWay*>& ways) {
    geos::geom::Geometry* g = NULL;
    BOOST_FOREACH(OSMWay* w, ways) {
-   		//geos::geom::Geometry* wayGeom = makeGeometryFrom(w);
    		std::string wkt = makeWKTFrom(w);
-   		//std::cerr << (wayGeom == 0 ? "bouh" : wayGeom->toText()) << " ";
    		std::cerr << wkt << " ";
 	}
 	std::cerr << std::endl;
@@ -378,9 +376,6 @@ OSMParserImpl::polygonize(const std::vector<OSMWay*>& ways) {
       }
       std::vector< geos::geom::LineString * > *lss = lm.getMergedLineStrings();
       BOOST_FOREACH(geos::geom::LineString *ls, *lss) {
-		std::cerr << " ls " << ls << std::endl;
-		std::cerr << " ls->isClosed() " << ls->isClosed() << std::endl;
-      	std::cerr << " ls->getNumPoints() " << ls->getNumPoints() << std::endl;
       	 if(ls->getNumPoints()>3 && ls->isClosed()) {
             geos::geom::Polygon *p = gf->createPolygon(gf->createLinearRing(ls->getCoordinates()),0);
 			ret->push_back(p);
@@ -455,7 +450,6 @@ OSMParserImpl::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std
    std::vector<geos::geom::Polygon*>* polygons, *polygon_enclaves;
 
    std::cerr << "=================================== " << outerWays.size() << " outer ways ; " <<  innerWays.size() << " inner ways" << std::endl;
-   //if (!outerWays.empty()) std::cerr << "FIRST BOUNDARY WAY = " << std::endl << makeGeometryFrom(outerWays.at(0))->toText() << std::endl;
 
    polygons = polygonize(outerWays);
 
