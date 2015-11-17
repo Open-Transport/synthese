@@ -82,7 +82,7 @@ private:
 		OSMWay(): id(0) {}
 
 		bool operator==(const OSMWay& rhs) const {
-			return (id == rhs.id) && (nodeRefs == rhs.nodeRefs); }
+			return (id == rhs.id); }
 	};
 
 	struct OSMMember
@@ -124,6 +124,10 @@ private:
 
 		std::string getValueOrEmpty(const std::string& tag) const;
 
+		bool operator==(const OSMRelation& rhs) const {
+			return (id == rhs.id);
+		}
+
 	};
 
 	geos::io::WKTReader _wktReader;
@@ -133,10 +137,7 @@ private:
 	const std::string _cityCodeTag;
 
 	OSMRelation _currentRelation;
-	bool _inRelation;
-
 	OSMWay _currentBoundaryWay;
-	bool _inBoundaryWay;
 
 	std::map<OSMId, OSMNode> _nodes;
 	std::map<OSMId, OSMWay> _boundaryWays;
@@ -150,6 +151,10 @@ public:
 	void parse(std::istream& osmInput);
 
 private:
+
+	bool inRelation() const { return !(_currentRelation == OSMRelation::EMPTY); }
+	bool inBoundaryWay() const { return !(_currentBoundaryWay == OSMWay::EMPTY); }
+
 	void parseOnce(std::istream& osmInput);
 
 	AttributesMap makeAttributesMap(const XML_Char **attrs);
@@ -244,8 +249,8 @@ OSMParserImpl::OSMParserImpl(std::ostream& logStream,
 	: _logStream(logStream)
 	, _osmEntityHandler(osmEntityHandler)
 	, _cityCodeTag(cityCodeTag)
-	, _inRelation(false)
-	, _inBoundaryWay(false)
+	, _currentRelation(OSMRelation::EMPTY)
+	, _currentBoundaryWay(OSMWay::EMPTY)
 	, _passCount(0)
 {
 }
@@ -286,7 +291,8 @@ OSMParserImpl::firstPassStartElement(const XML_Char* name, const XML_Char** attr
 	if (!std::strcmp(name, "relation"))
 	{
 		_currentRelation = OSMRelation::EMPTY;
-		_inRelation = true;
+		AttributesMap attributes = makeAttributesMap(attrs);
+		_currentRelation.id = boost::lexical_cast<OSMId>(attributes["id"]);
 	}
 	else if (!std::strcmp(name, "node"))
 	{
@@ -296,12 +302,12 @@ OSMParserImpl::firstPassStartElement(const XML_Char* name, const XML_Char** attr
 		node.longitude = boost::lexical_cast<double>(attributes["lon"]);
 		_nodes.insert(std::make_pair(boost::lexical_cast<long>(attributes["id"]), node));
 	}
-	else if (_inRelation && !std::strcmp(name, "tag"))
+	else if (inRelation() && !std::strcmp(name, "tag"))
 	{
 		AttributesMap attributes = makeAttributesMap(attrs);
 		_currentRelation.addTag(attributes["k"], attributes["v"]);
 	}
-	else if (_inRelation && !std::strcmp(name, "member"))
+	else if (inRelation() && !std::strcmp(name, "member"))
 	{
 		AttributesMap attributes = makeAttributesMap(attrs);
 		if("way" == attributes["type"])
@@ -324,7 +330,7 @@ OSMParserImpl::firstPassEndElement(const XML_Char* name)
 		{
 			_boundaryWays.insert(std::make_pair(wayMember.ref, OSMWay::EMPTY));
 		}
-		_inRelation = false;
+		_currentRelation = OSMRelation::EMPTY;
 	}
 	else if (!std::strcmp(name, "osm"))
 	{
@@ -342,9 +348,8 @@ OSMParserImpl::secondPassStartElement(const XML_Char* name, const XML_Char** att
 		_currentRelation = OSMRelation::EMPTY;
 		AttributesMap attributes = makeAttributesMap(attrs);
 		_currentRelation.id = boost::lexical_cast<OSMId>(attributes["id"]);
-		_inRelation = true;
 	}
-	else if (_inRelation && !std::strcmp(name, "tag"))
+	else if (inRelation() && !std::strcmp(name, "tag"))
 	{
 		AttributesMap attributes = makeAttributesMap(attrs);
 		_currentRelation.addTag(attributes["k"], attributes["v"]);
@@ -357,15 +362,14 @@ OSMParserImpl::secondPassStartElement(const XML_Char* name, const XML_Char** att
 		{
 			_currentBoundaryWay = OSMWay::EMPTY;
 			_currentBoundaryWay.id = wayId;
-			_inBoundaryWay = true;
 		}
 	}
-	else if (_inBoundaryWay && !std::strcmp(name, "nd"))
+	else if (inBoundaryWay() && !std::strcmp(name, "nd"))
 	{
 		AttributesMap attributes = makeAttributesMap(attrs);
 		_currentBoundaryWay.nodeRefs.push_back(boost::lexical_cast<OSMId>(attributes["ref"]));
 	}
-	else if (_inRelation && !std::strcmp(name, "member"))
+	else if (inRelation() && !std::strcmp(name, "member"))
 	{
 		AttributesMap attributes = makeAttributesMap(attrs);
 		if("way" == attributes["type"])
@@ -379,8 +383,7 @@ OSMParserImpl::secondPassStartElement(const XML_Char* name, const XML_Char** att
 void
 OSMParserImpl::secondPassEndElement(const XML_Char* name)
 {
-	if (!std::strcmp(name, "way") &&
-		_inBoundaryWay)
+	if (!std::strcmp(name, "way") && inBoundaryWay())
 	{
 		bool completeBoundaryWay = true;
 		BOOST_FOREACH(OSMId nodeRef, _currentBoundaryWay.nodeRefs)
@@ -398,7 +401,7 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 			_logStream << "Found complete city boundary way " << _currentBoundaryWay.id << std::endl;
 			_boundaryWays[_currentBoundaryWay.id] = _currentBoundaryWay;
 		}
-		_inBoundaryWay = false;
+		_currentBoundaryWay = OSMWay::EMPTY;
 	}
 	else if (!std::strcmp(name, "relation") &&
 			 _currentRelation.isAdministrativeBoundary() &&
