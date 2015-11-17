@@ -25,6 +25,7 @@
 #include <expat.h>
 
 #include <iostream>
+#include <limits>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
@@ -57,6 +58,7 @@ private:
 	typedef long OSMId;
 
 	static OSMId ToOSMId(const std::string& osmIdStr);
+	static OSMId ParseOSMId(const XML_Char** attrs);
 
 	struct OSMNode
 	{
@@ -158,7 +160,7 @@ private:
 
 	void parseOnce(std::istream& osmInput);
 
-	AttributesMap makeAttributesMap(const XML_Char **attrs);
+	AttributesMap makeAttributesMap(const XML_Char **attrs, size_t nFirst = std::numeric_limits<int>::max());
 	geos::geom::Geometry* makeGeometryFrom(OSMWay* way);
 	geos::geom::Geometry* makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std::vector<OSMWay*>& innerWays);
 	std::string makeWKTFrom(OSMWay* way);
@@ -367,7 +369,7 @@ OSMParserImpl::startNode(const XML_Char* name)
 void
 OSMParserImpl::handleStartNode(const XML_Char* name, const XML_Char** attrs)
 {
-	AttributesMap attributes = makeAttributesMap(attrs);
+	AttributesMap attributes = makeAttributesMap(attrs, 3);
 	OSMNode node;
 	node.latitude = boost::lexical_cast<double>(attributes["lat"]);
 	node.longitude = boost::lexical_cast<double>(attributes["lon"]);
@@ -381,12 +383,23 @@ OSMParserImpl::startRelation(const XML_Char* name)
 	return !std::strcmp(name, "relation");
 }
 
+OSMParserImpl::OSMId
+OSMParserImpl::ParseOSMId(const XML_Char** attrs)
+{
+	if(!strcmp("id", attrs[0])) return (OSMId) atol(attrs[1]);
+	int count = 2;
+	while (attrs[count]) {
+		if(!strcmp("id", attrs[count])) return (OSMId) atol(attrs[count+1]);
+		count += 2;
+	}
+	return -1;
+}
+
 void
 OSMParserImpl::handleStartRelation(const XML_Char* name, const XML_Char** attrs)
 {
 	_currentRelation = OSMRelation::EMPTY;
-	AttributesMap attributes = makeAttributesMap(attrs);
-	_currentRelation.id = ToOSMId(attributes["id"]);
+	_currentRelation.id = ParseOSMId(attrs);
 }
 
 bool
@@ -411,8 +424,7 @@ OSMParserImpl::startWay(const XML_Char* name)
 void
 OSMParserImpl::handleStartWay(const XML_Char* name, const XML_Char** attrs)
 {
-	AttributesMap attributes = makeAttributesMap(attrs);
-	OSMId wayId = ToOSMId(attributes["id"]);
+	OSMId wayId = ParseOSMId(attrs);
 	if (_boundaryWays.find(wayId) != _boundaryWays.end())
 	{
 		_currentBoundaryWay = OSMWay::EMPTY;
@@ -549,7 +561,8 @@ OSMParserImpl::handleEndCityRelation()
 		if ((it == _boundaryWays.end()) || (it->second == OSMWay::EMPTY))
 		{
 			completeRelation = false;
-			_logStream << "Ignoring incomplete city boundary (relation) " << _currentRelation.id << std::endl;
+			_logStream << "Ignoring incomplete city boundary in relation " << _currentRelation.id << std::endl;
+			break;
 		}
 		if (wayMember.role == "outer")
 		{
@@ -692,14 +705,14 @@ OSMParserImpl::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std
 }
 
 
-
 OSMParserImpl::AttributesMap
-OSMParserImpl::makeAttributesMap(const XML_Char **attrs) {
+OSMParserImpl::makeAttributesMap(const XML_Char **attrs, size_t nFirst) {
 	int count = 0;
 	AttributesMap attributesMap;
 	while (attrs[count]) {
 		attributesMap[attrs[count]] = attrs[count+1];
 		count += 2;
+		if (attributesMap.size() == nFirst) break;
 	}
 	return attributesMap;
 }
@@ -733,11 +746,12 @@ OSMParserImpl::parseOnce(std::istream& osmInput)
 
 	long long int count = 0;
 	int done, n = 0;
-	char buf[1024*1024*4];
+	const int bufferSize = 4 * 1024;
+	char buf[bufferSize];
 	do {
-		osmInput.read(buf, 1024 * 1024 * 4);
+		osmInput.read(buf, bufferSize);
 		n = osmInput.gcount();
-		done = (n != 1024 * 1024 * 4);
+		done = (n != bufferSize);
 		if (XML_Parse(expatParser, buf, n, done) == XML_STATUS_ERROR) {
 			XML_Error errorCode = XML_GetErrorCode(expatParser);
 			int errorLine = XML_GetCurrentLineNumber(expatParser);
@@ -750,7 +764,8 @@ OSMParserImpl::parseOnce(std::istream& osmInput)
 			throw std::runtime_error(errorDesc.str());
 		}
 		count += n;
-		// std::cout << "Read " << (count / (1024 * 1024)) << " MB " << std::endl;
+		//if (count % (1024 * 4 * 1024) == 0)
+		//std::cout << "Read " << (count / (1024 * 1024)) << " MB " << std::endl;
 	} while (!done);
 
 	XML_ParserFree(expatParser);
