@@ -71,7 +71,11 @@ struct OSMWay
 	std::vector<OSMId> nodeRefs;
 	std::vector<OSMNode> nodes;
 
-    void reset() { nodeRefs.clear(); }
+    void reset() 
+    { 
+    	nodeRefs.clear(); 
+    	nodes.clear(); 
+    }
 
     bool operator==(const OSMWay& rhs) const {
     	return (id == rhs.id) && (nodeRefs == rhs.nodeRefs); }
@@ -117,7 +121,7 @@ protected:
 
 public:
 
-	virtual void handleCity(const std::string& cityName, const std::string& cityCode, std::string cityBoundaries) = 0;
+	virtual void handleCity(const std::string& cityName, const std::string& cityCode, geos::geom::Geometry* boundary) = 0;
 
 };
 
@@ -126,9 +130,9 @@ class FakeEntityHandler : public OSMEntityHandler
 public:
 	std::vector<boost::tuple<std::string, std::string> > handledCities;
 
-	virtual void handleCity(const std::string& cityName, const std::string& cityCode, std::string cityBoundaries)
+	virtual void handleCity(const std::string& cityName, const std::string& cityCode, geos::geom::Geometry* boundary)
 	{
-		std::cerr << "Create city " << cityName << ", code = " << cityCode << ", boundaries = " << cityBoundaries << std::endl;
+		std::cerr << "Create city " << cityName << ", code = " << cityCode << ", boundary = " << boundary->toString() << std::endl;
 		handledCities.push_back(boost::make_tuple(cityName, cityCode));
 	}
 
@@ -327,6 +331,7 @@ void OSMParser::secondPassEndElement(const XML_Char* name)
 	{
 		BOOST_FOREACH(OSMId nodeRef, _currentBoundaryWay.nodeRefs)
 		{
+			if (_nodes.find(nodeRef) == _nodes.end()) continue;
 			_currentBoundaryWay.nodes.push_back(_nodes[nodeRef]);
 		}
 		_boundaryWays[_currentBoundaryWay.id] = _currentBoundaryWay;
@@ -354,10 +359,9 @@ void OSMParser::secondPassEndElement(const XML_Char* name)
 				innerWays.push_back(&it->second);
 			}
 		}
-		makeGeometryFrom(outerWays, innerWays);
+		geos::geom::Geometry* boundary = makeGeometryFrom(outerWays, innerWays);
 		//std::cerr << "OB " << outerWays.size() << "  IB " << innerWays.size() << std::endl;
-
-		fakeEntityHandler.handleCity(currentRelationName(), currentRelationCode(), "");
+		fakeEntityHandler.handleCity(currentRelationName(), currentRelationCode(), boundary);
 	}
 	else if (!std::strcmp(name, "osm")) 
 	{
@@ -424,6 +428,7 @@ OSMParser::makeGeometryFrom(const OSMWay* way)
 	}
 
 	wkt << ")";
+   std::cerr << "=========== " << wkt.str() << std::endl;
    return wktReader.read(wkt.str());
 }
 
@@ -436,6 +441,7 @@ OSMParser::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std::ve
 
    if(!polygons->size()) {
       delete polygons;
+      std::cerr << "===========WESH!!" << std::endl;
       return NULL;
    }
 
