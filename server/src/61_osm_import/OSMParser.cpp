@@ -68,9 +68,13 @@ struct OSMNode
 
 struct OSMWay
 {
+	static OSMWay EMPTY;
+
 	OSMId id;
 	std::vector<OSMId> nodeRefs;
 	std::vector<OSMNode> nodes;
+
+	OSMWay(): id(0) {}
 
 	void reset()
 	{
@@ -84,12 +88,14 @@ struct OSMWay
 
 struct OSMMember
 {
+	OSMMember(): ref(0) {}
+
 	OSMId ref;
 	std::string role;
 };
 
 
-OSMWay NoOsmWay;
+OSMWay OSMWay::EMPTY;
 
 struct OSMRelation
 {
@@ -161,7 +167,6 @@ private:
 
 	std::vector<geos::geom::Polygon*>* polygonize(const std::vector<OSMWay*>& ways);
 
-
 	void handleStartElement(const XML_Char* name, const XML_Char** attrs);
 	void handleEndElement(const XML_Char* name);
 
@@ -173,7 +178,6 @@ private:
 
 	friend void startElement(void* userData, const XML_Char* name, const XML_Char** attrs);
 	friend void endElement(void* userData, const XML_Char* name);
-	friend void characters(void* userData, const XML_Char* txt, int txtlen);
 };
 
 
@@ -262,7 +266,7 @@ OSMParserImpl::firstPassEndElement(const XML_Char* name)
 		std::vector<OSMMember> currentRelationWayMembers = _currentRelation.getWayMembers();
 		BOOST_FOREACH(OSMMember wayMember, currentRelationWayMembers)
 		{
-			_boundaryWays.insert(std::make_pair(wayMember.ref, NoOsmWay));
+			_boundaryWays.insert(std::make_pair(wayMember.ref, OSMWay::EMPTY));
 		}
 		_inRelation = false;
 	}
@@ -350,7 +354,7 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 		BOOST_FOREACH(OSMMember wayMember, _currentRelation.getWayMembers())
 		{
 			std::map<OSMId, OSMWay>::iterator it = _boundaryWays.find(wayMember.ref);
-			if ((it == _boundaryWays.end()) || (it->second == NoOsmWay))
+			if ((it == _boundaryWays.end()) || (it->second == OSMWay::EMPTY))
 			{
 				completeRelation = false;
 				_logStream << "Ignoring incomplete city boundary (relation) " << _currentRelation.id << std::endl;
@@ -507,7 +511,6 @@ OSMParserImpl::makeAttributesMap(const XML_Char **attrs) {
 	AttributesMap attributesMap;
 	while (attrs[count]) {
 		attributesMap[attrs[count]] = attrs[count+1];
-		//std::cerr << attributesMap[attrs[count]] << attrs[count+1] << std::endl;
 		count += 2;
 	}
 	return attributesMap;
