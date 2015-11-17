@@ -39,12 +39,13 @@ set(DEPS
   61_data_exchange
 )
 
-set(DEPS2
+
+set(OSMParser_DEPS
 	${EXPAT_LIBRARIES}
 	${GEOS_LIBRARIES}	
 )
 
-boost_test(OsmFileFormat "${DEPS2}")
+boost_test(OSMParser "${OSMParser_DEPS}")
 
 add_definitions(-DPEGASE_TEST_SQL="${CMAKE_CURRENT_SOURCE_DIR}/test_data/pegase_test.sql")
 boost_test(PegaseFileFormat "${DEPS}")
