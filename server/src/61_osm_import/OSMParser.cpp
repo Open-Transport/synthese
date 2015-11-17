@@ -55,7 +55,10 @@ class OSMParserImpl
 {
 private:
 	typedef std::map<std::string, std::string> AttributesMap;
+
 	typedef long OSMId;
+
+	static OSMId ToOSMId(const std::string& osmIdStr);
 
 	struct OSMNode
 	{
@@ -256,6 +259,12 @@ OSMParserImpl::OSMParserImpl(std::ostream& logStream,
 }
 
 
+OSMParserImpl::OSMId
+OSMParserImpl::ToOSMId(const std::string& osmIdStr)
+{
+	return boost::lexical_cast<OSMId>(osmIdStr);
+}
+
 void
 OSMParserImpl::handleStartElement(const XML_Char* name, const XML_Char** attrs)
 {
@@ -292,7 +301,7 @@ OSMParserImpl::firstPassStartElement(const XML_Char* name, const XML_Char** attr
 	{
 		_currentRelation = OSMRelation::EMPTY;
 		AttributesMap attributes = makeAttributesMap(attrs);
-		_currentRelation.id = boost::lexical_cast<OSMId>(attributes["id"]);
+		_currentRelation.id = ToOSMId(attributes["id"]);
 	}
 	else if (!std::strcmp(name, "node"))
 	{
@@ -300,7 +309,7 @@ OSMParserImpl::firstPassStartElement(const XML_Char* name, const XML_Char** attr
 		OSMNode node;
 		node.latitude = boost::lexical_cast<double>(attributes["lat"]);
 		node.longitude = boost::lexical_cast<double>(attributes["lon"]);
-		_nodes.insert(std::make_pair(boost::lexical_cast<long>(attributes["id"]), node));
+		_nodes.insert(std::make_pair(ToOSMId(attributes["id"]), node));
 	}
 	else if (inRelation() && !std::strcmp(name, "tag"))
 	{
@@ -312,7 +321,7 @@ OSMParserImpl::firstPassStartElement(const XML_Char* name, const XML_Char** attr
 		AttributesMap attributes = makeAttributesMap(attrs);
 		if("way" == attributes["type"])
 		{
-			_currentRelation.addWayMember(boost::lexical_cast<OSMId>(attributes["ref"]), attributes["role"]);
+			_currentRelation.addWayMember(ToOSMId(attributes["ref"]), attributes["role"]);
 		}
 	}
 }
@@ -347,7 +356,7 @@ OSMParserImpl::secondPassStartElement(const XML_Char* name, const XML_Char** att
 	{
 		_currentRelation = OSMRelation::EMPTY;
 		AttributesMap attributes = makeAttributesMap(attrs);
-		_currentRelation.id = boost::lexical_cast<OSMId>(attributes["id"]);
+		_currentRelation.id = ToOSMId(attributes["id"]);
 	}
 	else if (inRelation() && !std::strcmp(name, "tag"))
 	{
@@ -357,7 +366,7 @@ OSMParserImpl::secondPassStartElement(const XML_Char* name, const XML_Char** att
 	else if (!std::strcmp(name, "way"))
 	{
 		AttributesMap attributes = makeAttributesMap(attrs);
-		OSMId wayId = boost::lexical_cast<OSMId>(attributes["id"]);
+		OSMId wayId = ToOSMId(attributes["id"]);
 		if (_boundaryWays.find(wayId) != _boundaryWays.end())
 		{
 			_currentBoundaryWay = OSMWay::EMPTY;
@@ -367,14 +376,14 @@ OSMParserImpl::secondPassStartElement(const XML_Char* name, const XML_Char** att
 	else if (inBoundaryWay() && !std::strcmp(name, "nd"))
 	{
 		AttributesMap attributes = makeAttributesMap(attrs);
-		_currentBoundaryWay.nodeRefs.push_back(boost::lexical_cast<OSMId>(attributes["ref"]));
+		_currentBoundaryWay.nodeRefs.push_back(ToOSMId(attributes["ref"]));
 	}
 	else if (inRelation() && !std::strcmp(name, "member"))
 	{
 		AttributesMap attributes = makeAttributesMap(attrs);
 		if("way" == attributes["type"])
 		{
-			_currentRelation.addWayMember(boost::lexical_cast<OSMId>(attributes["ref"]), attributes["role"]);
+			_currentRelation.addWayMember(ToOSMId(attributes["ref"]), attributes["role"]);
 		}
 	}
 }
