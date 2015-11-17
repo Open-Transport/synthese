@@ -24,10 +24,8 @@
 
 #include <expat.h>
 
-#include <fstream>
 #include <iostream>
 
-#include <boost/tuple/tuple.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
 
