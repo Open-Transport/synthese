@@ -25,6 +25,7 @@
 
 #include <string>
 
+
 namespace synthese
 {
 namespace data_exchange
@@ -37,7 +38,8 @@ class OSMParser
 {
 public:
 
-	OSMParser(OSMEntityHandler& osmEntityHandler,
+	OSMParser(std::ostream& logStream,
+			  OSMEntityHandler& osmEntityHandler,
 			  const std::string& cityCodeTag = std::string("ref:INSEE"));
 
 	virtual ~OSMParser();

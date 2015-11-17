@@ -75,7 +75,7 @@ namespace synthese
 		{
 			std::ifstream osmStream("five_swiss_cities_with_incomplete_boundaries.osm");
 			FakeOSMEntityHandler fakeOSMEntityHandler;
-			OSMParser parser(fakeOSMEntityHandler, "swisstopo:BFS_NUMMER");
+			OSMParser parser(std::cout, fakeOSMEntityHandler, "swisstopo:BFS_NUMMER");
 			parser.parse(osmStream);
 			osmStream.close();
 
@@ -94,7 +94,7 @@ namespace synthese
 		{
 			FakeOSMEntityHandler fakeOSMEntityHandler;
 			std::ifstream osmStream("ten_french_cities_only_one_with_complete_boundary.osm");
-			OSMParser parser(fakeOSMEntityHandler);
+			OSMParser parser(std::cout, fakeOSMEntityHandler);
 			parser.parse(osmStream);
 			osmStream.close();
 
@@ -150,7 +150,6 @@ namespace synthese
 											  "2.5250499999999998 43.1987000000000023, 2.5228600000000001 43.2000999999999991, 2.5226999999999999 43.2006999999999977, "
 											  "2.5228000000000002 43.2010000000000005)))");
 
-			//BOOST_CHECK_EQUAL(5, fakeEntityHandler.handledCities.size());
 			BOOST_CHECK_EQUAL(10, fakeOSMEntityHandler.handledCities.size());
 			std::vector<boost::tuple<std::string, std::string, geos::geom::Geometry*> >::iterator it =
 					fakeOSMEntityHandler.handledCities.begin();
