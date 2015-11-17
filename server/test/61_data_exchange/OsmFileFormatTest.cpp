@@ -132,7 +132,8 @@ public:
 
 	virtual void handleCity(const std::string& cityName, const std::string& cityCode, geos::geom::Geometry* boundary)
 	{
-		std::cerr << "Create city " << cityName << ", code = " << cityCode << ", boundary = " << boundary->toString() << std::endl;
+		std::cerr << "Create city " << cityName << ", code = " << cityCode << ", boundary = " << 
+			(boundary == 0 ? " none" : boundary->toString()) << std::endl;
 		handledCities.push_back(boost::make_tuple(cityName, cityCode));
 	}
 
@@ -175,8 +176,9 @@ private:
 
     bool currentRelationIsCityAdministrativeLevel() const;
 
-	geos::geom::Geometry* makeGeometryFrom(const OSMWay* way);
+	geos::geom::Geometry* makeGeometryFrom(OSMWay* way);
 	geos::geom::Geometry* makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std::vector<OSMWay*>& innerWays);
+	std::string makeWKTFrom(OSMWay* way);
 
 	std::vector<geos::geom::Polygon*>* polygonize(const std::vector<OSMWay*>& ways);
 
@@ -300,7 +302,6 @@ void OSMParser::secondPassStartElement(const XML_Char* name, const XML_Char** at
 	{
         AttributesMap attributes = makeAttributesMap(attrs);
         OSMId wayId = boost::lexical_cast<OSMId>(attributes["id"]);
-		std::cerr << "way! " << _boundaryWays.size() << std::endl;
         if (_boundaryWays.find(wayId) != _boundaryWays.end())
         {
 			_currentBoundaryWay.reset();
@@ -331,13 +332,13 @@ void OSMParser::secondPassEndElement(const XML_Char* name)
 	{
 		BOOST_FOREACH(OSMId nodeRef, _currentBoundaryWay.nodeRefs)
 		{
-			if (_nodes.find(nodeRef) == _nodes.end()) continue;
+			//if (_nodes.find(nodeRef) == _nodes.end()) continue; // TODO !!!!
 			_currentBoundaryWay.nodes.push_back(_nodes[nodeRef]);
 		}
 		_boundaryWays[_currentBoundaryWay.id] = _currentBoundaryWay;
 		_inBoundaryWay = false;
 
-		std::cerr << "new boundaryWay ! " << _currentBoundaryWay.id << std::endl;
+		//std::cerr << "new boundaryWay ! " << _currentBoundaryWay.id << std::endl;
 	}
 	else if (!std::strcmp(name, "relation") &&
 		currentRelationIsAdministrativeBoundary() && 
@@ -373,6 +374,15 @@ void OSMParser::secondPassEndElement(const XML_Char* name)
 std::vector<geos::geom::Polygon*>* 
 OSMParser::polygonize(const std::vector<OSMWay*>& ways) {
    geos::geom::Geometry* g = NULL;
+   BOOST_FOREACH(OSMWay* w, ways) {
+   		//geos::geom::Geometry* wayGeom = makeGeometryFrom(w);
+   		std::string wkt = makeWKTFrom(w);
+   		//std::cerr << (wayGeom == 0 ? "bouh" : wayGeom->toText()) << " ";
+   		std::cerr << wkt << " ";
+	}
+	std::cerr << std::endl;
+	std::cerr << std::endl;
+
    std::vector<geos::geom::Polygon*>* ret = new std::vector<geos::geom::Polygon*>();
    const geos::geom::GeometryFactory *gf = geos::geom::GeometryFactory::getDefaultInstance();
    if(ways.size() >= 2) {
@@ -384,7 +394,10 @@ OSMParser::polygonize(const std::vector<OSMWay*>& ways) {
       }
       std::vector< geos::geom::LineString * > *lss = lm.getMergedLineStrings();
       BOOST_FOREACH(geos::geom::LineString *ls, *lss) {
-         if(ls->getNumPoints()>3 && ls->isClosed()) {
+		std::cerr << " ls " << ls << std::endl;
+		std::cerr << " ls->isClosed() " << ls->isClosed() << std::endl;
+      	std::cerr << " ls->getNumPoints() " << ls->getNumPoints() << std::endl;
+      	 if(ls->getNumPoints()>3 && ls->isClosed()) {
             geos::geom::Polygon *p = gf->createPolygon(gf->createLinearRing(ls->getCoordinates()),0);
 			ret->push_back(p);
          }
@@ -411,8 +424,27 @@ OSMParser::polygonize(const std::vector<OSMWay*>& ways) {
 }
 
 
+std::string
+OSMParser::makeWKTFrom(OSMWay* way)
+{
+	std::stringstream wkt;
+	std::vector<OSMNode>::const_iterator it = way->nodes.begin();
+	wkt << "LINESTRING(";
+
+	if (it != way->nodes.end())
+		wkt << it->longitude << " " << it->latitude;
+
+	while (++it != way->nodes.end()) 
+	{
+		wkt << "," << it->longitude << " " << it->latitude;
+	}
+
+	wkt << ")";
+   return wkt.str();
+}
+
 geos::geom::Geometry*
-OSMParser::makeGeometryFrom(const OSMWay* way)
+OSMParser::makeGeometryFrom(OSMWay* way)
 {
    static geos::io::WKTReader wktReader;
 	std::stringstream wkt;
@@ -428,7 +460,7 @@ OSMParser::makeGeometryFrom(const OSMWay* way)
 	}
 
 	wkt << ")";
-   std::cerr << "=========== " << wkt.str() << std::endl;
+   //std::cerr << "=========== " << wkt.str() << std::endl;
    return wktReader.read(wkt.str());
 }
 
@@ -437,11 +469,14 @@ OSMParser::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std::ve
 {
    const geos::geom::GeometryFactory *geometryFactory = geos::geom::GeometryFactory::getDefaultInstance();
    std::vector<geos::geom::Polygon*>* polygons, *polygon_enclaves;
+
+   std::cerr << "=================================== " << outerWays.size() << " outer ways ; " <<  innerWays.size() << " inner ways" << std::endl;
+   //if (!outerWays.empty()) std::cerr << "FIRST BOUNDARY WAY = " << std::endl << makeGeometryFrom(outerWays.at(0))->toText() << std::endl;
+
    polygons = polygonize(outerWays);
 
    if(!polygons->size()) {
       delete polygons;
-      std::cerr << "===========WESH!!" << std::endl;
       return NULL;
    }
 
@@ -646,7 +681,7 @@ std::string OSMRelation::getValueOrEmpty(const std::string& tag) const
 
 
 
-
+/*
 BOOST_AUTO_TEST_CASE (should_parse_five_cities_from_osm_file)
 {
 	//std::ifstream osmStream("/home/mjambert/workspace/rcsmobility/gitlab/switzerland-tests/robot/resources/data/swiss.osm");
@@ -672,5 +707,34 @@ BOOST_AUTO_TEST_CASE (should_parse_five_cities_from_osm_file)
    BOOST_CHECK_EQUAL("Val-de-Ruz", fakeEntityHandler.handledCities[cityIndex].get<0>());
    BOOST_CHECK_EQUAL("6487", fakeEntityHandler.handledCities[cityIndex++].get<1>());
 
+}
+*/
+
+BOOST_AUTO_TEST_CASE (should_parse_city_boundary)
+{
+	//std::ifstream osmStream("/home/mjambert/workspace/rcsmobility/git/synthese3/server/build/test/61_data_exchange/monaco.osm");
+	std::ifstream osmStream("/home/mjambert/workspace/rcsmobility/git/synthese3/server/build/test/61_data_exchange/capendu.osm");
+	OSMParser parser;
+	parser.parse(osmStream);
+    osmStream.close();
+
+   //BOOST_CHECK_EQUAL(5, fakeEntityHandler.handledCities.size());
+   int cityIndex = 0;
+   BOOST_CHECK_EQUAL("Hauterive (NE)", fakeEntityHandler.handledCities[cityIndex].get<0>());
+   BOOST_CHECK_EQUAL("6454", fakeEntityHandler.handledCities[cityIndex++].get<1>());
+
+/*
+   BOOST_CHECK_EQUAL("Neuchâtel", fakeEntityHandler.handledCities[cityIndex].get<0>());
+   BOOST_CHECK_EQUAL("6458", fakeEntityHandler.handledCities[cityIndex++].get<1>());
+
+   BOOST_CHECK_EQUAL("Saint-Blaise", fakeEntityHandler.handledCities[cityIndex].get<0>());
+   BOOST_CHECK_EQUAL("6459", fakeEntityHandler.handledCities[cityIndex++].get<1>());
+
+   BOOST_CHECK_EQUAL("Valangin", fakeEntityHandler.handledCities[cityIndex].get<0>());
+   BOOST_CHECK_EQUAL("6485", fakeEntityHandler.handledCities[cityIndex++].get<1>());
+
+   BOOST_CHECK_EQUAL("Val-de-Ruz", fakeEntityHandler.handledCities[cityIndex].get<0>());
+   BOOST_CHECK_EQUAL("6487", fakeEntityHandler.handledCities[cityIndex++].get<1>());
+*/
 }
 
