@@ -72,3 +72,5 @@ target_link_libraries(34_road
 )
 
 install(TARGETS 34_road DESTINATION lib)
+
+install(FILES from_unique_roadplace_to_multi_roadplaces.pl DESTINATION share/synthese)
