@@ -1,0 +1,1383 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version="0.6" generator="osmfilter 1.4.0">
+	<bounds minlat="47.024" minlon="6.86" maxlat="47.064" maxlon="6.968"/>
+	<node id="240025875" lat="47.0465806" lon="6.8726044" version="3" timestamp="2015-11-12T13:01:25Z" changeset="695451" uid="3796" user="gummibaerli">
+		<tag k="name" v="Les Hauts-Geneveys"/>
+		<tag k="is_in" v="District du Val-de-Ruz,Neuchâtel,Neuchâtel,Schweiz,Europe"/>
+		<tag k="place" v="village"/>
+		<tag k="created_by" v="opengeodb2osm0.5.2"/>
+		<tag k="population" v="983"/>
+		<tag k="openGeoDB:name" v="Les Hauts-Geneveys,Les Hauts-Geneveys"/>
+		<tag k="openGeoDB:type" v="Gemeinde"/>
+		<tag k="openGeoDB:is_in" v="District du Val-de-Ruz,Neuchâtel,Neuchâtel,Schweiz,Europe"/>
+		<tag k="openGeoDB:layer" v="6"/>
+		<tag k="openGeoDB:loc_id" v="31363"/>
+		<tag k="openGeoDB:version" v="0.2.6.11 / 2007-12-04 / http://fa-technik.adfc.de/code/opengeodb/dump/"/>
+		<tag k="openGeoDB:location" v="political_structure"/>
+		<tag k="openGeoDB:sort_name" v="LES HAUTS-GENEVEYS"/>
+		<tag k="openGeoDB:population" v="983"/>
+		<tag k="openGeoDB:auto_update" v="population,place,name,is_in"/>
+		<tag k="openGeoDB:is_in_loc_id" v="78691"/>
+		<tag k="openGeoDB:postal_codes" v="2208"/>
+		<tag k="openGeoDB:community_identification_number" v="G6481"/>
+	</node>
+	<node id="240030565" lat="47.050346" lon="6.956586" version="3" timestamp="2015-11-12T13:01:25Z" changeset="11178526" uid="74900" user="FischersFritz">
+		<tag k="name" v="Savagnier"/>
+		<tag k="place" v="village"/>
+		<tag k="population" v="903"/>
+	</node>
+	<node id="240034693" lat="47.0594538" lon="6.9053838" version="3" timestamp="2015-11-12T13:01:25Z" changeset="695451" uid="3796" user="gummibaerli">
+		<tag k="name" v="Cernier"/>
+		<tag k="is_in" v="District du Val-de-Ruz,Neuchâtel,Neuchâtel,Schweiz,Europe"/>
+		<tag k="place" v="village"/>
+		<tag k="created_by" v="opengeodb2osm0.5.2"/>
+		<tag k="population" v="1921"/>
+		<tag k="openGeoDB:name" v="Cernier,Cernier"/>
+		<tag k="openGeoDB:type" v="Gemeinde"/>
+		<tag k="openGeoDB:is_in" v="District du Val-de-Ruz,Neuchâtel,Neuchâtel,Schweiz,Europe"/>
+		<tag k="openGeoDB:layer" v="6"/>
+		<tag k="openGeoDB:loc_id" v="31346"/>
+		<tag k="openGeoDB:version" v="0.2.6.11 / 2007-12-04 / http://fa-technik.adfc.de/code/opengeodb/dump/"/>
+		<tag k="openGeoDB:location" v="political_structure"/>
+		<tag k="openGeoDB:sort_name" v="CERNIER"/>
+		<tag k="openGeoDB:population" v="1921"/>
+		<tag k="openGeoDB:auto_update" v="population,place,name,is_in"/>
+		<tag k="openGeoDB:is_in_loc_id" v="78691"/>
+		<tag k="openGeoDB:postal_codes" v="2053"/>
+		<tag k="openGeoDB:community_identification_number" v="G6472"/>
+	</node>
+	<node id="240039023" lat="47.0441369" lon="6.9004191" version="4" timestamp="2015-11-12T13:01:25Z" changeset="21427168" uid="92387" user="SimonPoole">
+		<tag k="name" v="Fontaines"/>
+		<tag k="is_in" v="District du Val-de-Ruz,Neuchâtel,Neuchâtel,Schweiz,Europe"/>
+		<tag k="place" v="village"/>
+		<tag k="population" v="912"/>
+		<tag k="official_name" v="Fontaines (NE)"/>
+		<tag k="openGeoDB:name" v="Fontaines (NE)"/>
+		<tag k="openGeoDB:type" v="Gemeinde"/>
+		<tag k="openGeoDB:is_in" v="District du Val-de-Ruz,Neuchâtel,Neuchâtel,Schweiz,Europe"/>
+		<tag k="openGeoDB:layer" v="6"/>
+		<tag k="openGeoDB:loc_id" v="79936"/>
+		<tag k="openGeoDB:version" v="0.2.6.11 / 2007-12-04 / http://fa-technik.adfc.de/code/opengeodb/dump/"/>
+		<tag k="openGeoDB:location" v="political_structure"/>
+		<tag k="openGeoDB:sort_name" v="FONTAINES"/>
+		<tag k="openGeoDB:population" v="912"/>
+		<tag k="openGeoDB:auto_update" v="population,place,name,is_in"/>
+		<tag k="openGeoDB:is_in_loc_id" v="78691"/>
+		<tag k="openGeoDB:postal_codes" v="2046"/>
+		<tag k="openGeoDB:license_plate_code" v="NE"/>
+		<tag k="openGeoDB:community_identification_number" v="G6479"/>
+	</node>
+	<node id="240053617" lat="47.0268716" lon="6.8904673" version="4" timestamp="2015-11-12T13:01:25Z" changeset="11178526" uid="74900" user="FischersFritz">
+		<tag k="name" v="Boudevilliers"/>
+		<tag k="place" v="village"/>
+		<tag k="population" v="718"/>
+	</node>
+	<node id="240110406" lat="47.0293438" lon="6.9279972" version="2" timestamp="2015-11-12T13:01:25Z" changeset="9574242" uid="212479" user="_guybrush_">
+		<tag k="name" v="Fenin-Vilars-Saules"/>
+		<tag k="is_in" v="District du Val-de-Ruz,Neuchâtel,Neuchâtel,Schweiz,Europe"/>
+		<tag k="place" v="village"/>
+		<tag k="population" v="765"/>
+		<tag k="openGeoDB:name" v="Fenin-Vilars-Saules"/>
+		<tag k="openGeoDB:type" v="Gemeinde"/>
+		<tag k="openGeoDB:is_in" v="District du Val-de-Ruz,Neuchâtel,Neuchâtel,Schweiz,Europe"/>
+		<tag k="openGeoDB:layer" v="6"/>
+		<tag k="openGeoDB:loc_id" v="79935"/>
+		<tag k="openGeoDB:version" v="0.2.6.11 / 2007-12-04 / http://fa-technik.adfc.de/code/opengeodb/dump/"/>
+		<tag k="openGeoDB:location" v="political_structure"/>
+		<tag k="openGeoDB:sort_name" v="FENIN-VILARS-SAULES"/>
+		<tag k="openGeoDB:population" v="765"/>
+		<tag k="openGeoDB:auto_update" v="population,place,name,is_in"/>
+		<tag k="openGeoDB:is_in_loc_id" v="78691"/>
+		<tag k="openGeoDB:postal_codes" v="2063"/>
+		<tag k="openGeoDB:license_plate_code" v="NE"/>
+		<tag k="openGeoDB:community_identification_number" v="G6477"/>
+	</node>
+	<node id="240113820" lat="47.0573737" lon="6.894437" version="3" timestamp="2015-11-12T13:01:25Z" changeset="695451" uid="3796" user="gummibaerli">
+		<tag k="name" v="Fontainemelon"/>
+		<tag k="is_in" v="District du Val-de-Ruz,Neuchâtel,Neuchâtel,Schweiz,Europe"/>
+		<tag k="place" v="village"/>
+		<tag k="created_by" v="opengeodb2osm0.5.2"/>
+		<tag k="population" v="1605"/>
+		<tag k="openGeoDB:name" v="Fontainemelon,Fontainemelon"/>
+		<tag k="openGeoDB:type" v="Gemeinde"/>
+		<tag k="openGeoDB:is_in" v="District du Val-de-Ruz,Neuchâtel,Neuchâtel,Schweiz,Europe"/>
+		<tag k="openGeoDB:layer" v="6"/>
+		<tag k="openGeoDB:loc_id" v="31353"/>
+		<tag k="openGeoDB:version" v="0.2.6.11 / 2007-12-04 / http://fa-technik.adfc.de/code/opengeodb/dump/"/>
+		<tag k="openGeoDB:location" v="political_structure"/>
+		<tag k="openGeoDB:sort_name" v="FONTAINEMELON"/>
+		<tag k="openGeoDB:population" v="1605"/>
+		<tag k="openGeoDB:auto_update" v="population,place,name,is_in"/>
+		<tag k="openGeoDB:is_in_loc_id" v="78691"/>
+		<tag k="openGeoDB:postal_codes" v="2052"/>
+		<tag k="openGeoDB:community_identification_number" v="G6478"/>
+	</node>
+	<node id="302084194" lat="47.0584888" lon="6.893517" version="2" timestamp="2015-11-12T13:01:25Z" changeset="14123514" uid="491312" user="Rom-1"/>
+	<node id="425855210" lat="47.0551292" lon="6.9483091" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855212" lat="47.0553686" lon="6.9486641" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855214" lat="47.0556266" lon="6.9482534" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855216" lat="47.0557603" lon="6.9484724" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855218" lat="47.0560059" lon="6.9481074" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855220" lat="47.0561831" lon="6.9483903" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855222" lat="47.0559922" lon="6.9487654" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855224" lat="47.0562813" lon="6.9491432" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855226" lat="47.0559997" lon="6.9496487" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855228" lat="47.0562639" lon="6.9503022" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855230" lat="47.0553779" lon="6.9516911" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855232" lat="47.0556621" lon="6.9524459" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855239" lat="47.0558069" lon="6.9523874" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855241" lat="47.0559033" lon="6.9526202" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855242" lat="47.0554929" lon="6.9532553" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855243" lat="47.0558041" lon="6.9537185" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855244" lat="47.055275" lon="6.9546329" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855245" lat="47.0544096" lon="6.9553249" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855252" lat="47.0543218" lon="6.9552014" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855255" lat="47.053657" lon="6.9544226" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855256" lat="47.0534045" lon="6.95395" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855259" lat="47.0527681" lon="6.9546459" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855261" lat="47.0530588" lon="6.9553123" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855263" lat="47.0527292" lon="6.9557047" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855264" lat="47.0527976" lon="6.9558827" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855266" lat="47.0523593" lon="6.9563846" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855268" lat="47.0519365" lon="6.955577" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855269" lat="47.0511903" lon="6.9564804" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855271" lat="47.0517375" lon="6.9572424" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855277" lat="47.051411" lon="6.9577991" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855279" lat="47.0509206" lon="6.9571774" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855281" lat="47.0507341" lon="6.9572687" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855282" lat="47.050532" lon="6.9570291" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855284" lat="47.0502599" lon="6.957474" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855286" lat="47.0498558" lon="6.9582896" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855287" lat="47.0494244" lon="6.9579988" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855289" lat="47.0492301" lon="6.9583809" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855291" lat="47.048892" lon="6.9580672" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855293" lat="47.048721" lon="6.9582497" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855295" lat="47.0488997" lon="6.9587003" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855296" lat="47.0487637" lon="6.9588771" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855298" lat="47.0490047" lon="6.9592707" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855300" lat="47.0487404" lon="6.9596985" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855302" lat="47.0484956" lon="6.9593905" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855303" lat="47.0482274" lon="6.9592308" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855305" lat="47.0480098" lon="6.9588942" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855307" lat="47.0482663" lon="6.9586148" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855309" lat="47.0468205" lon="6.955991" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855310" lat="47.0460743" lon="6.9569036" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855312" lat="47.0454874" lon="6.9558428" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855314" lat="47.0455068" lon="6.9556945" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855315" lat="47.044885" lon="6.9544682" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855317" lat="47.0447567" lon="6.9544568" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855319" lat="47.0445818" lon="6.9540005" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855326" lat="47.0449666" lon="6.9537324" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855328" lat="47.0448443" lon="6.9535727" version="3" timestamp="2015-11-12T13:01:25Z" changeset="28209626" uid="135755" user="jam9264"/>
+	<node id="425855330" lat="47.0458931" lon="6.9525458" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855332" lat="47.0455496" lon="6.9510174" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855333" lat="47.0459737" lon="6.9507238" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855335" lat="47.0460265" lon="6.9503204" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855336" lat="47.0463424" lon="6.9500763" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855338" lat="47.0468399" lon="6.9514167" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855340" lat="47.0472869" lon="6.9511828" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855341" lat="47.0474332" lon="6.9516818" version="2" timestamp="2015-11-12T13:01:25Z" changeset="1568560" uid="13840" user="mcdmx"/>
+	<node id="425855343" lat="47.046664" lon="6.9521659" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855345" lat="47.0470627" lon="6.9533696" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855350" lat="47.0476464" lon="6.9539162" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855352" lat="47.047869" lon="6.9545641" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855353" lat="47.0477228" lon="6.9546828" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855355" lat="47.0478596" lon="6.9551254" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855357" lat="47.0482638" lon="6.954701" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855359" lat="47.0485891" lon="6.9556829" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855361" lat="47.0487209" lon="6.9555452" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855365" lat="47.04905" lon="6.9552559" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855367" lat="47.0489012" lon="6.9549702" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855369" lat="47.0491468" lon="6.9547923" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855370" lat="47.04882" lon="6.9537793" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855377" lat="47.048923" lon="6.9537109" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855378" lat="47.0485157" lon="6.952739" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855380" lat="47.0498495" lon="6.9523146" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855382" lat="47.050447" lon="6.9537738" version="3" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855383" lat="47.0507596" lon="6.9544681" version="3" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855389" lat="47.0514661" lon="6.9538067" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855391" lat="47.0516309" lon="6.954158" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855393" lat="47.0522061" lon="6.9534553" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855395" lat="47.0518933" lon="6.9528019" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855396" lat="47.0522863" lon="6.9522717" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855416" lat="47.0522172" lon="6.9513853" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855417" lat="47.0520758" lon="6.9510859" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855419" lat="47.0528309" lon="6.9502978" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855426" lat="47.0527097" lon="6.9500377" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855427" lat="47.0532084" lon="6.9494773" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855428" lat="47.0531555" lon="6.9493878" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="425855429" lat="47.053462" lon="6.9489243" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855430" lat="47.0535895" lon="6.948614" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855431" lat="47.0539284" lon="6.9488924" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855432" lat="47.0538724" lon="6.9490795" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855433" lat="47.054289" lon="6.9494627" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855434" lat="47.0544071" lon="6.9491981" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="425855435" lat="47.0546838" lon="6.9495494" version="1" timestamp="2015-11-12T13:01:25Z" changeset="1568442" uid="13840" user="mcdmx"/>
+	<node id="610587805" lat="47.0544129" lon="6.8925615" version="2" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="610587806" lat="47.0557512" lon="6.8945803" version="2" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="610587807" lat="47.0560613" lon="6.8941624" version="2" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="610587808" lat="47.0585059" lon="6.8955687" version="2" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="610587809" lat="47.0574061" lon="6.8959264" version="2" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="610587810" lat="47.0577127" lon="6.8955548" version="2" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="610587811" lat="47.0579319" lon="6.8962186" version="2" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="1373203488" lat="47.0240588" lon="6.9112177" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203489" lat="47.0240726" lon="6.9411062" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203500" lat="47.0245893" lon="6.9112192" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203505" lat="47.0248026" lon="6.9592046" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203506" lat="47.0248842" lon="6.9115195" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203524" lat="47.0249507" lon="6.9118017" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203527" lat="47.0251194" lon="6.9120757" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203531" lat="47.0253675" lon="6.9122942" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203536" lat="47.0255042" lon="6.9123396" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203554" lat="47.0255522" lon="6.9438108" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203556" lat="47.0256389" lon="6.9122914" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203557" lat="47.0258158" lon="6.9118472" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203560" lat="47.0258707" lon="6.9675031" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203561" lat="47.0258824" lon="6.9080067" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203563" lat="47.0259116" lon="6.9117801" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203581" lat="47.0261102" lon="6.9117827" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203586" lat="47.0264512" lon="6.9120653" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203587" lat="47.0266184" lon="6.9123736" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203605" lat="47.0267546" lon="6.9131025" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203611" lat="47.0269151" lon="6.913394" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203612" lat="47.0269834" lon="6.9659158" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203614" lat="47.0270262" lon="6.9626809" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203618" lat="47.0270805" lon="6.9135218" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203630" lat="47.0271527" lon="6.9626946" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203637" lat="47.0273302" lon="6.9634609" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203639" lat="47.0273542" lon="6.946771" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203641" lat="47.0273976" lon="6.9135534" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203648" lat="47.0277112" lon="6.9136689" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203654" lat="47.0278194" lon="6.9640287" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203659" lat="47.0279366" lon="6.913376" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203666" lat="47.0280319" lon="6.9642739" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203669" lat="47.0280799" lon="6.9133167" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203673" lat="47.0282173" lon="6.9133299" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203676" lat="47.0283727" lon="6.9135877" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203687" lat="47.0287786" lon="6.9093656" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203694" lat="47.0288624" lon="6.9656372" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203700" lat="47.0291345" lon="6.9500574" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203704" lat="47.0291927" lon="6.965789" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203709" lat="47.0292948" lon="6.9117492" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203710" lat="47.0293363" lon="6.9097576" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203712" lat="47.0294253" lon="6.911639" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203714" lat="47.0299241" lon="6.9659756" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203717" lat="47.0300179" lon="6.9100206" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203728" lat="47.0303581" lon="6.9108894" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203734" lat="47.030471" lon="6.9100809" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203744" lat="47.030627" lon="6.965672" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203745" lat="47.0306431" lon="6.9102117" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203746" lat="47.0308931" lon="6.9102846" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203748" lat="47.0309112" lon="6.91029" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203750" lat="47.0311375" lon="6.9666097" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203756" lat="47.0313114" lon="6.9565184" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203760" lat="47.0314236" lon="6.957597" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203765" lat="47.0315246" lon="6.9575166" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203772" lat="47.0317541" lon="6.9589793" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203815" lat="47.0326083" lon="6.962877" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203838" lat="47.0329536" lon="6.9643396" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373203919" lat="47.0347528" lon="6.9666885" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373204521" lat="47.0550657" lon="6.893632" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports"/>
+	<node id="1373204733" lat="47.0585385" lon="6.8955318" version="2" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2045998915" lat="47.0581876" lon="6.8911341" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14123514" uid="491312" user="Rom-1"/>
+	<node id="2045998916" lat="47.0582189" lon="6.8914443" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14123514" uid="491312" user="Rom-1"/>
+	<node id="2045998917" lat="47.0582923" lon="6.8918758" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14123514" uid="491312" user="Rom-1"/>
+	<node id="2045998918" lat="47.0583162" lon="6.8930381" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14123514" uid="491312" user="Rom-1"/>
+	<node id="2045998919" lat="47.0583346" lon="6.8922075" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14123514" uid="491312" user="Rom-1"/>
+	<node id="2045998921" lat="47.0583475" lon="6.8927307" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14123514" uid="491312" user="Rom-1"/>
+	<node id="2045998922" lat="47.0583557" lon="6.8938747" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14123514" uid="491312" user="Rom-1"/>
+	<node id="2045998923" lat="47.058376" lon="6.894282" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14123514" uid="491312" user="Rom-1"/>
+	<node id="2045998924" lat="47.0583971" lon="6.8930489" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14123514" uid="491312" user="Rom-1"/>
+	<node id="2045998929" lat="47.0584531" lon="6.8938586" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14123514" uid="491312" user="Rom-1"/>
+	<node id="2045998930" lat="47.0584559" lon="6.8933051" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14123514" uid="491312" user="Rom-1"/>
+	<node id="2045998931" lat="47.0584792" lon="6.8936822" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14123514" uid="491312" user="Rom-1"/>
+	<node id="2045998932" lat="47.0585029" lon="6.8936542" version="2" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2046958535" lat="47.0586468" lon="6.8948543" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14130230" uid="491312" user="Rom-1"/>
+	<node id="2046958600" lat="47.058757" lon="6.8954725" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14130230" uid="491312" user="Rom-1"/>
+	<node id="2046958613" lat="47.0587932" lon="6.8956635" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14130230" uid="491312" user="Rom-1"/>
+	<node id="2046958619" lat="47.0588058" lon="6.8954194" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14130230" uid="491312" user="Rom-1"/>
+	<node id="2046958658" lat="47.0589269" lon="6.8956105" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14130230" uid="491312" user="Rom-1"/>
+	<node id="2046959427" lat="47.0618712" lon="6.8999272" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14130230" uid="491312" user="Rom-1"/>
+	<node id="2046959435" lat="47.06192" lon="6.9002403" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14130230" uid="491312" user="Rom-1"/>
+	<node id="2046959542" lat="47.0631797" lon="6.9027677" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14130230" uid="491312" user="Rom-1"/>
+	<node id="2046959562" lat="47.0638673" lon="6.9046438" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14130230" uid="491312" user="Rom-1"/>
+	<node id="2068439283" lat="47.051708" lon="6.8842229" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439284" lat="47.0517171" lon="6.8846686" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439285" lat="47.0517352" lon="6.8837639" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439286" lat="47.0519991" lon="6.8815936" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439287" lat="47.0520352" lon="6.8824798" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439288" lat="47.0520967" lon="6.881782" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439289" lat="47.0521057" lon="6.8831775" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439290" lat="47.0521383" lon="6.8821057" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439291" lat="47.0525812" lon="6.8855521" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439292" lat="47.052771" lon="6.8796223" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439293" lat="47.0528577" lon="6.8799699" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439294" lat="47.0529445" lon="6.87928" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439295" lat="47.052968" lon="6.8873828" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439296" lat="47.0530765" lon="6.8793411" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439297" lat="47.0531885" lon="6.8870432" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439298" lat="47.0533585" lon="6.8866081" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439299" lat="47.0534687" lon="6.8881337" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439300" lat="47.0535085" lon="6.8799672" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439301" lat="47.0535302" lon="6.8874943" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439302" lat="47.0536694" lon="6.8822277" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439303" lat="47.0537345" lon="6.8902907" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439304" lat="47.0537995" lon="6.8881575" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439305" lat="47.0538194" lon="6.8795613" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439306" lat="47.0538248" lon="6.8816812" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439307" lat="47.0539062" lon="6.887603" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439308" lat="47.0539676" lon="6.881514" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439309" lat="47.0539821" lon="6.8832943" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439310" lat="47.0539966" lon="6.8874147" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439311" lat="47.0541376" lon="6.8817952" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439312" lat="47.0541629" lon="6.8886245" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439313" lat="47.0542083" lon="6.8965953" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439314" lat="47.0542153" lon="6.880129" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439315" lat="47.0542261" lon="6.8817634" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439316" lat="47.0542858" lon="6.8884176" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439317" lat="47.0543002" lon="6.889447" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439318" lat="47.0543075" lon="6.8842653" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439319" lat="47.0543337" lon="6.891298" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439320" lat="47.0543364" lon="6.8819306" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439321" lat="47.0543527" lon="6.8882159" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439322" lat="47.0543656" lon="6.8924911" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439323" lat="47.0543762" lon="6.8819518" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439324" lat="47.0544051" lon="6.8803148" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439325" lat="47.0544774" lon="6.8816201" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439326" lat="47.0544918" lon="6.8882769" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439327" lat="47.0545515" lon="6.8895452" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439328" lat="47.054678" lon="6.8898609" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439329" lat="47.0546979" lon="6.880665" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439330" lat="47.0547261" lon="6.8919246" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439331" lat="47.054772" lon="6.8848968" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439332" lat="47.0548407" lon="6.8886245" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439333" lat="47.0548805" lon="6.8885396" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439334" lat="47.0548877" lon="6.8888023" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439335" lat="47.054904" lon="6.8894125" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439336" lat="47.0549998" lon="6.8849499" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439337" lat="47.0550396" lon="6.8892241" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439338" lat="47.0551046" lon="6.8889349" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439340" lat="47.0553999" lon="6.8940943" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439341" lat="47.0554774" lon="6.898593" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439342" lat="47.0557361" lon="6.8936248" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439343" lat="47.055738" lon="6.8982601" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439344" lat="47.0557716" lon="6.8839151" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439345" lat="47.0557855" lon="6.8998805" version="2" timestamp="2015-11-12T13:01:25Z" changeset="14722506" uid="103273" user="HB9DTX"/>
+	<node id="2068439346" lat="47.0558283" lon="6.9000285" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439347" lat="47.0558403" lon="6.883817" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439348" lat="47.0558421" lon="6.9007169" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439353" lat="47.055934" lon="6.9004447" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439360" lat="47.0559769" lon="6.9005482" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439365" lat="47.0559976" lon="6.9018758" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439367" lat="47.056003" lon="6.9003367" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439382" lat="47.0560781" lon="6.9010319" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439384" lat="47.0560988" lon="6.8848384" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439388" lat="47.0561033" lon="6.9016713" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439398" lat="47.0561515" lon="6.9023307" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439407" lat="47.0562242" lon="6.9014908" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439418" lat="47.0562723" lon="6.8855097" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439428" lat="47.0563709" lon="6.9006337" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439430" lat="47.0563986" lon="6.9025503" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439434" lat="47.0564124" lon="6.89934" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439440" lat="47.0564928" lon="6.8862207" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439450" lat="47.056532" lon="6.8996189" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439452" lat="47.0565669" lon="6.8864701" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439458" lat="47.0565731" lon="6.9000343" version="3" timestamp="2015-11-12T13:01:25Z" changeset="14722506" uid="103273" user="HB9DTX"/>
+	<node id="2068439460" lat="47.0566154" lon="6.902108" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439465" lat="47.0566209" lon="6.8995856" version="2" timestamp="2015-11-12T13:01:25Z" changeset="14294314" uid="491312" user="Rom-1"/>
+	<node id="2068439467" lat="47.0566718" lon="6.8867673" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439469" lat="47.0566844" lon="6.8863905" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439471" lat="47.056705" lon="6.9009194" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439473" lat="47.0567384" lon="6.9020895" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439474" lat="47.0567585" lon="6.887213" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439475" lat="47.0567658" lon="6.8866001" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439476" lat="47.0568543" lon="6.8876985" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439477" lat="47.0568644" lon="6.9012771" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439478" lat="47.0568765" lon="6.9082495" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439486" lat="47.0569827" lon="6.8876614" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439503" lat="47.0570253" lon="6.9014998" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439553" lat="47.0571171" lon="6.9086727" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439557" lat="47.0571815" lon="6.8879877" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439563" lat="47.0572428" lon="6.9086027" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439579" lat="47.0573189" lon="6.8883512" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439590" lat="47.0573642" lon="6.9069419" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439602" lat="47.0574237" lon="6.8884812" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439623" lat="47.0574692" lon="6.903355" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439629" lat="47.0575073" lon="6.9072346" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439688" lat="47.0576547" lon="6.9039039" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439711" lat="47.0576785" lon="6.9050424" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439715" lat="47.057685" lon="6.9055547" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439723" lat="47.0576912" lon="6.8888686" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439749" lat="47.0577609" lon="6.905332" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439764" lat="47.0578394" lon="6.8891737" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439789" lat="47.0579644" lon="6.9062638" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439795" lat="47.057969" lon="6.9061528" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439811" lat="47.0580166" lon="6.9047243" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439832" lat="47.0580516" lon="6.9034562" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439859" lat="47.0581738" lon="6.8900148" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439861" lat="47.0582005" lon="6.9067318" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439875" lat="47.0582393" lon="6.9031308" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439882" lat="47.058261" lon="6.9058769" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439891" lat="47.0582814" lon="6.9030734" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439892" lat="47.0582955" lon="6.9066496" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439898" lat="47.0583151" lon="6.9031274" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439910" lat="47.0583515" lon="6.9057037" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439911" lat="47.0583622" lon="6.9060118" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439913" lat="47.0583722" lon="6.8911782" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439915" lat="47.0583961" lon="6.8907099" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439917" lat="47.0584106" lon="6.8911404" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439919" lat="47.058415" lon="6.905932" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439920" lat="47.0584183" lon="6.8908843" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439921" lat="47.0584282" lon="6.8910522" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439922" lat="47.0584296" lon="6.8909872" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439934" lat="47.0585006" lon="6.8951996" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439939" lat="47.0585438" lon="6.9071738" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439946" lat="47.0585944" lon="6.9072222" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439947" lat="47.0586004" lon="6.895588" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439949" lat="47.0586317" lon="6.8950447" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439951" lat="47.0586672" lon="6.8960647" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439959" lat="47.058696" lon="6.9030419" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439964" lat="47.0587132" lon="6.9114785" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439966" lat="47.0587182" lon="6.9026617" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439967" lat="47.0587292" lon="6.895453" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439971" lat="47.0587491" lon="6.8958388" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439973" lat="47.0587582" lon="6.8961426" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439975" lat="47.0587629" lon="6.9075214" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439985" lat="47.0588232" lon="6.9028901" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068439991" lat="47.0588514" lon="6.8962619" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440011" lat="47.0589071" lon="6.9035783" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440015" lat="47.0589327" lon="6.8965149" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440031" lat="47.0589922" lon="6.9037915" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440068" lat="47.0591233" lon="6.9070309" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440073" lat="47.0591343" lon="6.8968474" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440082" lat="47.0591808" lon="6.9069466" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440088" lat="47.0592138" lon="6.903607" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440108" lat="47.0593239" lon="6.8973389" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440116" lat="47.0593619" lon="6.8974264" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440126" lat="47.0594199" lon="6.9072582" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440130" lat="47.0594349" lon="6.9045074" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440135" lat="47.0594757" lon="6.8971973" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440152" lat="47.0595807" lon="6.9104863" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440157" lat="47.059604" lon="6.9051374" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440162" lat="47.0596458" lon="6.8970192" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440181" lat="47.059787" lon="6.9060148" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440212" lat="47.0599373" lon="6.8975044" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440221" lat="47.059974" lon="6.9066132" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440226" lat="47.0599987" lon="6.8986305" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440227" lat="47.0599994" lon="6.9113217" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440245" lat="47.0600962" lon="6.8974176" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440271" lat="47.0602812" lon="6.9116049" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440272" lat="47.0603877" lon="6.8979989" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440273" lat="47.060533" lon="6.8996057" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440274" lat="47.0606063" lon="6.9116781" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440275" lat="47.0608353" lon="6.9001497" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440276" lat="47.0609054" lon="6.9115158" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440277" lat="47.0610229" lon="6.9122991" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440278" lat="47.0610958" lon="6.9122211" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440279" lat="47.0611496" lon="6.8998045" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440280" lat="47.061294" lon="6.9000961" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440281" lat="47.061617" lon="6.9012044" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440282" lat="47.061694" lon="6.8995291" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440283" lat="47.0617334" lon="6.9015103" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440284" lat="47.061907" lon="6.9004403" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440285" lat="47.0621075" lon="6.9109224" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440286" lat="47.0621503" lon="6.9011864" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440287" lat="47.0622169" lon="6.9108082" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440288" lat="47.0623085" lon="6.9107168" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440289" lat="47.0623542" lon="6.9107893" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440290" lat="47.0623985" lon="6.90924" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440291" lat="47.0624039" lon="6.9097634" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440292" lat="47.0625686" lon="6.9095916" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440293" lat="47.0625686" lon="6.9100815" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440294" lat="47.0626101" lon="6.9025137" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440295" lat="47.0627019" lon="6.9104602" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440296" lat="47.0627957" lon="6.9054799" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440297" lat="47.0628277" lon="6.9024417" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440298" lat="47.0630129" lon="6.9087166" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440299" lat="47.0630422" lon="6.9087803" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440300" lat="47.0631387" lon="6.905185" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440301" lat="47.0633156" lon="6.9080594" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440302" lat="47.0634485" lon="6.9083921" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440303" lat="47.0634746" lon="6.906079" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440304" lat="47.0635701" lon="6.9048918" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440305" lat="47.0637174" lon="6.9053123" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440306" lat="47.06374" lon="6.908174" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440307" lat="47.0637449" lon="6.9082106" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2068440308" lat="47.0638312" lon="6.9057315" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1"/>
+	<node id="2069861753" lat="47.0564473" lon="6.8994778" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14294314" uid="491312" user="Rom-1"/>
+	<node id="2069861774" lat="47.0564933" lon="6.899573" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14294314" uid="491312" user="Rom-1"/>
+	<node id="2069861861" lat="47.056582" lon="6.8996205" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14294314" uid="491312" user="Rom-1"/>
+	<node id="2121276809" lat="47.0542447" lon="6.8966526" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14722506" uid="103273" user="HB9DTX"/>
+	<node id="2121276821" lat="47.0554364" lon="6.8985284" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14722506" uid="103273" user="HB9DTX"/>
+	<node id="2121276828" lat="47.0565835" lon="6.8999365" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14722506" uid="103273" user="HB9DTX"/>
+	<node id="2121286979" lat="47.0603659" lon="6.8979554" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14722506" uid="103273" user="HB9DTX"/>
+	<node id="2418091224" lat="47.0461283" lon="6.9507374" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091225" lat="47.0467774" lon="6.952566" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091226" lat="47.0469266" lon="6.953015" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091227" lat="47.0471206" lon="6.9523607" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091228" lat="47.0472381" lon="6.9527987" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091229" lat="47.0473482" lon="6.9531053" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091230" lat="47.0478425" lon="6.9533654" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091231" lat="47.0478649" lon="6.9527358" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091232" lat="47.0479507" lon="6.9536665" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091233" lat="47.0480309" lon="6.9531984" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091234" lat="47.0500064" lon="6.9527508" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091235" lat="47.0501798" lon="6.952629" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091236" lat="47.0501854" lon="6.9532491" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091237" lat="47.0503579" lon="6.9531272" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091238" lat="47.0520992" lon="6.9515344" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091239" lat="47.0522089" lon="6.9520935" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091240" lat="47.052317" lon="6.9519758" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091242" lat="47.0534809" lon="6.9489837" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091243" lat="47.053654" lon="6.9553838" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091244" lat="47.0537649" lon="6.9546327" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091245" lat="47.053889" lon="6.9560518" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091246" lat="47.0540942" lon="6.956216" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091248" lat="47.0550863" lon="6.9543616" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="2418091250" lat="47.0558028" lon="6.9509136" version="1" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1"/>
+	<node id="3812790396" lat="47.0275362" lon="6.9471069" version="1" timestamp="2015-11-12T13:01:25Z" changeset="35016550" uid="3113214" user="St-Lettre"/>
+	<way id="36581871" version="2" timestamp="2015-11-12T13:01:25Z" changeset="17334945" uid="491312" user="Rom-1">
+		<nd ref="425855210"/>
+		<nd ref="425855212"/>
+		<nd ref="425855214"/>
+		<nd ref="425855216"/>
+		<nd ref="425855218"/>
+		<nd ref="425855220"/>
+		<nd ref="425855222"/>
+		<nd ref="425855224"/>
+		<nd ref="425855226"/>
+		<nd ref="425855228"/>
+		<nd ref="2418091250"/>
+		<nd ref="425855230"/>
+		<nd ref="425855232"/>
+		<nd ref="425855239"/>
+		<nd ref="425855241"/>
+		<nd ref="425855242"/>
+		<nd ref="425855243"/>
+		<nd ref="425855244"/>
+		<nd ref="2418091248"/>
+		<nd ref="425855245"/>
+		<nd ref="425855252"/>
+		<nd ref="2418091246"/>
+		<nd ref="2418091245"/>
+		<nd ref="2418091243"/>
+		<nd ref="2418091244"/>
+		<nd ref="425855255"/>
+		<nd ref="425855256"/>
+		<nd ref="425855259"/>
+		<nd ref="425855261"/>
+		<nd ref="425855263"/>
+		<nd ref="425855264"/>
+		<nd ref="425855266"/>
+		<nd ref="425855268"/>
+		<nd ref="425855269"/>
+		<nd ref="425855271"/>
+		<nd ref="425855277"/>
+		<nd ref="425855279"/>
+		<nd ref="425855281"/>
+		<nd ref="425855282"/>
+		<nd ref="425855284"/>
+		<nd ref="425855286"/>
+		<nd ref="425855287"/>
+		<nd ref="425855289"/>
+		<nd ref="425855291"/>
+		<nd ref="425855293"/>
+		<nd ref="425855295"/>
+		<nd ref="425855296"/>
+		<nd ref="425855298"/>
+		<nd ref="425855300"/>
+		<nd ref="425855302"/>
+		<nd ref="425855303"/>
+		<nd ref="425855305"/>
+		<nd ref="425855307"/>
+		<nd ref="425855309"/>
+		<nd ref="425855310"/>
+		<nd ref="425855312"/>
+		<nd ref="425855314"/>
+		<nd ref="425855315"/>
+		<nd ref="425855317"/>
+		<nd ref="425855319"/>
+		<nd ref="425855326"/>
+		<nd ref="425855328"/>
+		<nd ref="425855330"/>
+		<nd ref="425855332"/>
+		<nd ref="425855333"/>
+		<nd ref="2418091224"/>
+		<nd ref="425855335"/>
+		<nd ref="425855336"/>
+		<nd ref="425855338"/>
+		<nd ref="425855340"/>
+		<nd ref="425855341"/>
+		<nd ref="425855343"/>
+		<nd ref="2418091225"/>
+		<nd ref="2418091227"/>
+		<nd ref="2418091228"/>
+		<nd ref="2418091226"/>
+		<nd ref="425855345"/>
+		<nd ref="2418091229"/>
+		<nd ref="2418091231"/>
+		<nd ref="2418091233"/>
+		<nd ref="2418091230"/>
+		<nd ref="2418091232"/>
+		<nd ref="425855350"/>
+		<nd ref="425855352"/>
+		<nd ref="425855353"/>
+		<nd ref="425855355"/>
+		<nd ref="425855357"/>
+		<nd ref="425855359"/>
+		<nd ref="425855361"/>
+		<nd ref="425855365"/>
+		<nd ref="425855367"/>
+		<nd ref="425855369"/>
+		<nd ref="425855370"/>
+		<nd ref="425855377"/>
+		<nd ref="425855378"/>
+		<nd ref="425855380"/>
+		<nd ref="2418091234"/>
+		<nd ref="2418091235"/>
+		<nd ref="2418091237"/>
+		<nd ref="2418091236"/>
+		<nd ref="425855382"/>
+		<nd ref="425855383"/>
+		<nd ref="425855389"/>
+		<nd ref="425855391"/>
+		<nd ref="425855393"/>
+		<nd ref="425855395"/>
+		<nd ref="425855396"/>
+		<nd ref="2418091239"/>
+		<nd ref="2418091240"/>
+		<nd ref="2418091238"/>
+		<nd ref="425855416"/>
+		<nd ref="425855417"/>
+		<nd ref="425855419"/>
+		<nd ref="425855426"/>
+		<nd ref="425855427"/>
+		<nd ref="425855428"/>
+		<nd ref="2418091242"/>
+		<nd ref="425855429"/>
+		<nd ref="425855430"/>
+		<nd ref="425855431"/>
+		<nd ref="425855432"/>
+		<nd ref="425855433"/>
+		<nd ref="425855434"/>
+		<nd ref="425855435"/>
+		<nd ref="425855210"/>
+		<tag k="name" v="Savagnier"/>
+		<tag k="place" v="village"/>
+		<tag k="source" v="Orthophotos2006sitn50cm"/>
+		<tag k="landuse" v="residential"/>
+	</way>
+	<way id="123032906" version="2" timestamp="2015-11-12T13:01:25Z" changeset="9049981" uid="334389" user="ueliw0">
+		<nd ref="1373203772"/>
+		<nd ref="1373203815"/>
+		<nd ref="1373203838"/>
+		<nd ref="1373203919"/>
+		<nd ref="1373203987"/>
+		<nd ref="1373204125"/>
+		<nd ref="1373204310"/>
+		<nd ref="1373204449"/>
+		<nd ref="1373204760"/>
+		<nd ref="1373204902"/>
+		<nd ref="1373204992"/>
+		<tag k="source" v="swissBOUNDARIES3D swisstopo 2011"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="admin_level" v="6"/>
+	</way>
+	<way id="123032982" version="3" timestamp="2015-11-12T13:01:25Z" changeset="26616236" uid="2445408" user="johnfi">
+		<nd ref="1373203666"/>
+		<nd ref="1373203654"/>
+		<nd ref="1373203637"/>
+		<nd ref="1373203630"/>
+		<nd ref="1373203614"/>
+		<nd ref="1373203505"/>
+		<nd ref="1373203465"/>
+		<nd ref="1373203455"/>
+		<nd ref="1373203279"/>
+		<nd ref="1373203170"/>
+		<nd ref="1373203107"/>
+		<nd ref="1373203056"/>
+		<nd ref="1373203054"/>
+		<nd ref="1373203043"/>
+		<nd ref="1373203040"/>
+		<nd ref="1373202857"/>
+		<nd ref="1373202513"/>
+		<nd ref="1373202449"/>
+		<nd ref="1373202338"/>
+		<tag k="source" v="swissBOUNDARIES3D swisstopo 2011"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="admin_level" v="8"/>
+	</way>
+	<way id="123033002" version="5" timestamp="2015-11-12T13:01:25Z" changeset="35016550" uid="3113214" user="St-Lettre">
+		<nd ref="1373202760"/>
+		<nd ref="1373202831"/>
+		<nd ref="1373203031"/>
+		<nd ref="2299708940"/>
+		<nd ref="1373203068"/>
+		<nd ref="1373203110"/>
+		<nd ref="2317589166"/>
+		<nd ref="1373203231"/>
+		<nd ref="1373203251"/>
+		<nd ref="1373203260"/>
+		<nd ref="1373203338"/>
+		<nd ref="1373203347"/>
+		<nd ref="1373203384"/>
+		<nd ref="1373203467"/>
+		<nd ref="1373203489"/>
+		<nd ref="1373203554"/>
+		<nd ref="1373203639"/>
+		<nd ref="3812790396"/>
+		<nd ref="1373203700"/>
+		<nd ref="1373203756"/>
+		<nd ref="1373203765"/>
+		<nd ref="1373203760"/>
+		<nd ref="1373203772"/>
+		<tag k="admin_level" v="6"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="source" v="swissBOUNDARIES3D swisstopo 2011"/>
+	</way>
+	<way id="123033028" version="3" timestamp="2015-11-12T13:01:25Z" changeset="29618840" uid="208020" user="gg66">
+		<nd ref="1373203001"/>
+		<nd ref="1373203103"/>
+		<nd ref="1373203118"/>
+		<nd ref="3409138081"/>
+		<nd ref="3409138079"/>
+		<nd ref="3409138077"/>
+		<nd ref="3409138075"/>
+		<nd ref="3409138073"/>
+		<nd ref="427699420"/>
+		<nd ref="427699419"/>
+		<nd ref="1373203183"/>
+		<nd ref="1373203243"/>
+		<nd ref="1373203252"/>
+		<nd ref="1373203258"/>
+		<nd ref="1373203273"/>
+		<nd ref="1373203287"/>
+		<nd ref="1373203292"/>
+		<nd ref="1373203303"/>
+		<nd ref="1373203310"/>
+		<nd ref="1373203316"/>
+		<nd ref="1373203319"/>
+		<nd ref="1373203321"/>
+		<nd ref="1373203323"/>
+		<nd ref="1373203329"/>
+		<nd ref="1373203327"/>
+		<nd ref="1373203411"/>
+		<nd ref="1373203503"/>
+		<nd ref="1373203560"/>
+		<nd ref="1373203612"/>
+		<nd ref="1373203666"/>
+		<tag k="source" v="swissBOUNDARIES3D swisstopo 2011"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="admin_level" v="8"/>
+	</way>
+	<way id="123033032" version="2" timestamp="2015-11-12T13:01:25Z" changeset="9000231" uid="166700" user="archeopterox">
+		<nd ref="1373203748"/>
+		<nd ref="1373203746"/>
+		<nd ref="1373203745"/>
+		<nd ref="1373203734"/>
+		<nd ref="1373203717"/>
+		<nd ref="1373203710"/>
+		<nd ref="1373203687"/>
+		<nd ref="1373203561"/>
+		<nd ref="1373203432"/>
+		<nd ref="1373203381"/>
+		<nd ref="1373203357"/>
+		<nd ref="1373203348"/>
+		<nd ref="1373203331"/>
+		<nd ref="1373203313"/>
+		<nd ref="1396472497"/>
+		<nd ref="1373203341"/>
+		<nd ref="1373203345"/>
+		<nd ref="1373203360"/>
+		<nd ref="1373203362"/>
+		<nd ref="1373203359"/>
+		<nd ref="1373203340"/>
+		<nd ref="1373203326"/>
+		<nd ref="1373203293"/>
+		<nd ref="1373203196"/>
+		<tag k="source" v="swissBOUNDARIES3D swisstopo 2011"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="admin_level" v="8"/>
+	</way>
+	<way id="123033061" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports">
+		<nd ref="1373204377"/>
+		<nd ref="1373204362"/>
+		<nd ref="1373204346"/>
+		<nd ref="1373204321"/>
+		<nd ref="1373204302"/>
+		<nd ref="1373204289"/>
+		<nd ref="1373204236"/>
+		<nd ref="1373204220"/>
+		<nd ref="1373204204"/>
+		<nd ref="1373204190"/>
+		<nd ref="1373204170"/>
+		<nd ref="1373204191"/>
+		<nd ref="1373204164"/>
+		<nd ref="1373204123"/>
+		<nd ref="1373204076"/>
+		<nd ref="1373204056"/>
+		<nd ref="1373204029"/>
+		<nd ref="1373204008"/>
+		<nd ref="1373203984"/>
+		<nd ref="1373203973"/>
+		<nd ref="1373203915"/>
+		<nd ref="1373203860"/>
+		<nd ref="1373203785"/>
+		<nd ref="1373203774"/>
+		<nd ref="1373203750"/>
+		<nd ref="1373203744"/>
+		<nd ref="1373203714"/>
+		<nd ref="1373203704"/>
+		<nd ref="1373203694"/>
+		<nd ref="1373203666"/>
+		<tag k="source" v="swissBOUNDARIES3D swisstopo 2011"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="admin_level" v="8"/>
+	</way>
+	<way id="123033103" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports">
+		<nd ref="1373203709"/>
+		<nd ref="1373203712"/>
+		<nd ref="1373203728"/>
+		<nd ref="1373203748"/>
+		<tag k="source" v="swissBOUNDARIES3D swisstopo 2011"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="admin_level" v="8"/>
+	</way>
+	<way id="123033138" version="1" timestamp="2015-11-12T13:01:25Z" changeset="8821857" uid="340608" user="SwisstopoImports">
+		<nd ref="1373202760"/>
+		<nd ref="1373202837"/>
+		<nd ref="1373203009"/>
+		<nd ref="1373203102"/>
+		<nd ref="1373203138"/>
+		<nd ref="1373203163"/>
+		<nd ref="1373203204"/>
+		<nd ref="1373203255"/>
+		<nd ref="1373203320"/>
+		<nd ref="1373203350"/>
+		<nd ref="1373203358"/>
+		<nd ref="1373203374"/>
+		<nd ref="1373203387"/>
+		<nd ref="1373203394"/>
+		<nd ref="1373203399"/>
+		<nd ref="1373203408"/>
+		<nd ref="1373203417"/>
+		<nd ref="1373203427"/>
+		<nd ref="1373203433"/>
+		<nd ref="1373203440"/>
+		<nd ref="1373203452"/>
+		<nd ref="1373203456"/>
+		<nd ref="1373203468"/>
+		<nd ref="1373203488"/>
+		<nd ref="1373203500"/>
+		<nd ref="1373203506"/>
+		<nd ref="1373203524"/>
+		<nd ref="1373203527"/>
+		<nd ref="1373203531"/>
+		<nd ref="1373203536"/>
+		<nd ref="1373203556"/>
+		<nd ref="1373203557"/>
+		<nd ref="1373203563"/>
+		<nd ref="1373203581"/>
+		<nd ref="1373203586"/>
+		<nd ref="1373203587"/>
+		<nd ref="1373203605"/>
+		<nd ref="1373203611"/>
+		<nd ref="1373203618"/>
+		<nd ref="1373203641"/>
+		<nd ref="1373203648"/>
+		<nd ref="1373203659"/>
+		<nd ref="1373203669"/>
+		<nd ref="1373203673"/>
+		<nd ref="1373203676"/>
+		<nd ref="1373203709"/>
+		<tag k="source" v="swissBOUNDARIES3D swisstopo 2011"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="admin_level" v="8"/>
+	</way>
+	<way id="196520753" version="4" timestamp="2015-11-12T13:01:25Z" changeset="14722506" uid="103273" user="HB9DTX">
+		<nd ref="2068440296"/>
+		<nd ref="2068440306"/>
+		<nd ref="2068440307"/>
+		<nd ref="2068440301"/>
+		<nd ref="2068440302"/>
+		<nd ref="2068440299"/>
+		<nd ref="2068440298"/>
+		<nd ref="2068440290"/>
+		<nd ref="2068440292"/>
+		<nd ref="2068440291"/>
+		<nd ref="2068440293"/>
+		<nd ref="2068440295"/>
+		<nd ref="2068440289"/>
+		<nd ref="2068440288"/>
+		<nd ref="2068440287"/>
+		<nd ref="2068440285"/>
+		<nd ref="2068440278"/>
+		<nd ref="2068440277"/>
+		<nd ref="2068440276"/>
+		<nd ref="2068440274"/>
+		<nd ref="2068440271"/>
+		<nd ref="2068440227"/>
+		<nd ref="2068440152"/>
+		<nd ref="2068439964"/>
+		<nd ref="2068439563"/>
+		<nd ref="2068439553"/>
+		<nd ref="2068439478"/>
+		<nd ref="2068439629"/>
+		<nd ref="2068439590"/>
+		<nd ref="2068439795"/>
+		<nd ref="2068439715"/>
+		<nd ref="2068439749"/>
+		<nd ref="2068439711"/>
+		<nd ref="2068439811"/>
+		<nd ref="2068439910"/>
+		<nd ref="2068439919"/>
+		<nd ref="2068439911"/>
+		<nd ref="2068439882"/>
+		<nd ref="2068439789"/>
+		<nd ref="2068439861"/>
+		<nd ref="2068439892"/>
+		<nd ref="2068439939"/>
+		<nd ref="2068439946"/>
+		<nd ref="2068439975"/>
+		<nd ref="2068440068"/>
+		<nd ref="2068440082"/>
+		<nd ref="2068440126"/>
+		<nd ref="2068440221"/>
+		<nd ref="2068440181"/>
+		<nd ref="2068440157"/>
+		<nd ref="2068440130"/>
+		<nd ref="2068440088"/>
+		<nd ref="2068440031"/>
+		<nd ref="2068440011"/>
+		<nd ref="2068439959"/>
+		<nd ref="2068439985"/>
+		<nd ref="2068439966"/>
+		<nd ref="2068439898"/>
+		<nd ref="2068439891"/>
+		<nd ref="2068439875"/>
+		<nd ref="2068439832"/>
+		<nd ref="2068439688"/>
+		<nd ref="2068439623"/>
+		<nd ref="2068439473"/>
+		<nd ref="2068439430"/>
+		<nd ref="2068439398"/>
+		<nd ref="2068439365"/>
+		<nd ref="2068439388"/>
+		<nd ref="2068439407"/>
+		<nd ref="2068439460"/>
+		<nd ref="2068439503"/>
+		<nd ref="2068439477"/>
+		<nd ref="2068439471"/>
+		<nd ref="2068439428"/>
+		<nd ref="2068439382"/>
+		<nd ref="2068439348"/>
+		<nd ref="2068439360"/>
+		<nd ref="2068439353"/>
+		<nd ref="2068439367"/>
+		<nd ref="2068439346"/>
+		<nd ref="2068439345"/>
+		<nd ref="2068439458"/>
+		<nd ref="2121276828"/>
+		<nd ref="2068439465"/>
+		<nd ref="2069861861"/>
+		<nd ref="2068439450"/>
+		<nd ref="2069861774"/>
+		<nd ref="2069861753"/>
+		<nd ref="2068439434"/>
+		<nd ref="2068439343"/>
+		<nd ref="2068439341"/>
+		<nd ref="2121276821"/>
+		<nd ref="2121276809"/>
+		<nd ref="2068439313"/>
+		<nd ref="610587806"/>
+		<nd ref="610587807"/>
+		<nd ref="610587809"/>
+		<nd ref="610587810"/>
+		<nd ref="610587811"/>
+		<nd ref="610587808"/>
+		<nd ref="1373204733"/>
+		<nd ref="2068439947"/>
+		<nd ref="2068439967"/>
+		<nd ref="2046958600"/>
+		<nd ref="2046958619"/>
+		<nd ref="2046958658"/>
+		<nd ref="2046958613"/>
+		<nd ref="2068439971"/>
+		<nd ref="2068439951"/>
+		<nd ref="2068439973"/>
+		<nd ref="2068439991"/>
+		<nd ref="2068440015"/>
+		<nd ref="2068440073"/>
+		<nd ref="2068440108"/>
+		<nd ref="2068440116"/>
+		<nd ref="2068440135"/>
+		<nd ref="2068440162"/>
+		<nd ref="2068440212"/>
+		<nd ref="2068440245"/>
+		<nd ref="2121286979"/>
+		<nd ref="2068440272"/>
+		<nd ref="2068440226"/>
+		<nd ref="2068440273"/>
+		<nd ref="2068440275"/>
+		<nd ref="2068440279"/>
+		<nd ref="2068440280"/>
+		<nd ref="2068440282"/>
+		<nd ref="2046959427"/>
+		<nd ref="2046959435"/>
+		<nd ref="2068440284"/>
+		<nd ref="2068440281"/>
+		<nd ref="2068440283"/>
+		<nd ref="2068440286"/>
+		<nd ref="2068440294"/>
+		<nd ref="2068440297"/>
+		<nd ref="2046959542"/>
+		<nd ref="2046959562"/>
+		<nd ref="2068440304"/>
+		<nd ref="2068440305"/>
+		<nd ref="2068440308"/>
+		<nd ref="2068440303"/>
+		<nd ref="2068440300"/>
+		<nd ref="2068440296"/>
+		<tag k="name" v="Cernier"/>
+		<tag k="place" v="village"/>
+		<tag k="source" v="Orthophotos 2006 SITN 50cm"/>
+		<tag k="landuse" v="residential"/>
+	</way>
+	<way id="196520758" version="1" timestamp="2015-11-12T13:01:25Z" changeset="14282331" uid="491312" user="Rom-1">
+		<nd ref="2068439934"/>
+		<nd ref="1373204733"/>
+		<nd ref="610587808"/>
+		<nd ref="610587811"/>
+		<nd ref="610587810"/>
+		<nd ref="610587809"/>
+		<nd ref="610587807"/>
+		<nd ref="2068439342"/>
+		<nd ref="2068439340"/>
+		<nd ref="1373204521"/>
+		<nd ref="610587805"/>
+		<nd ref="2068439322"/>
+		<nd ref="2068439330"/>
+		<nd ref="2068439319"/>
+		<nd ref="2068439303"/>
+		<nd ref="2068439317"/>
+		<nd ref="2068439327"/>
+		<nd ref="2068439328"/>
+		<nd ref="2068439335"/>
+		<nd ref="2068439337"/>
+		<nd ref="2068439338"/>
+		<nd ref="2068439334"/>
+		<nd ref="2068439332"/>
+		<nd ref="2068439333"/>
+		<nd ref="2068439326"/>
+		<nd ref="2068439321"/>
+		<nd ref="2068439316"/>
+		<nd ref="2068439312"/>
+		<nd ref="2068439304"/>
+		<nd ref="2068439299"/>
+		<nd ref="2068439295"/>
+		<nd ref="2068439297"/>
+		<nd ref="2068439301"/>
+		<nd ref="2068439307"/>
+		<nd ref="2068439310"/>
+		<nd ref="2068439298"/>
+		<nd ref="2068439291"/>
+		<nd ref="2068439284"/>
+		<nd ref="2068439283"/>
+		<nd ref="2068439285"/>
+		<nd ref="2068439289"/>
+		<nd ref="2068439287"/>
+		<nd ref="2068439290"/>
+		<nd ref="2068439288"/>
+		<nd ref="2068439286"/>
+		<nd ref="2068439293"/>
+		<nd ref="2068439292"/>
+		<nd ref="2068439294"/>
+		<nd ref="2068439296"/>
+		<nd ref="2068439300"/>
+		<nd ref="2068439305"/>
+		<nd ref="2068439314"/>
+		<nd ref="2068439324"/>
+		<nd ref="2068439329"/>
+		<nd ref="2068439325"/>
+		<nd ref="2068439323"/>
+		<nd ref="2068439320"/>
+		<nd ref="2068439315"/>
+		<nd ref="2068439311"/>
+		<nd ref="2068439308"/>
+		<nd ref="2068439306"/>
+		<nd ref="2068439302"/>
+		<nd ref="2068439309"/>
+		<nd ref="2068439318"/>
+		<nd ref="2068439331"/>
+		<nd ref="2068439336"/>
+		<nd ref="2068439344"/>
+		<nd ref="2068439347"/>
+		<nd ref="2068439384"/>
+		<nd ref="2068439418"/>
+		<nd ref="2068439440"/>
+		<nd ref="2068439452"/>
+		<nd ref="2068439469"/>
+		<nd ref="2068439475"/>
+		<nd ref="2068439467"/>
+		<nd ref="2068439474"/>
+		<nd ref="2068439476"/>
+		<nd ref="2068439486"/>
+		<nd ref="2068439557"/>
+		<nd ref="2068439579"/>
+		<nd ref="2068439602"/>
+		<nd ref="2068439723"/>
+		<nd ref="2068439764"/>
+		<nd ref="2068439859"/>
+		<nd ref="2068439915"/>
+		<nd ref="2068439920"/>
+		<nd ref="2068439922"/>
+		<nd ref="2068439921"/>
+		<nd ref="2068439917"/>
+		<nd ref="2068439913"/>
+		<nd ref="2045998915"/>
+		<nd ref="2045998916"/>
+		<nd ref="2045998917"/>
+		<nd ref="2045998919"/>
+		<nd ref="2045998921"/>
+		<nd ref="2045998918"/>
+		<nd ref="2045998924"/>
+		<nd ref="2045998930"/>
+		<nd ref="302084194"/>
+		<nd ref="2045998932"/>
+		<nd ref="2045998931"/>
+		<nd ref="2045998929"/>
+		<nd ref="2045998922"/>
+		<nd ref="2045998923"/>
+		<nd ref="2046958535"/>
+		<nd ref="2068439949"/>
+		<nd ref="2068439934"/>
+		<tag k="name" v="Fontainemelon"/>
+		<tag k="place" v="village"/>
+		<tag k="source" v="Orthophotos 2006 SITN 50cm"/>
+		<tag k="landuse" v="residential"/>
+	</way>
+	<relation id="1685491" version="6" timestamp="2015-11-12T13:01:25Z" changeset="21705223" uid="92387" user="SimonPoole">
+		<member type="way" ref="148725877" role="outer"/>
+		<member type="way" ref="148725875" role="outer"/>
+		<member type="way" ref="148725883" role="outer"/>
+		<member type="way" ref="123033028" role="outer"/>
+		<member type="way" ref="123032982" role="outer"/>
+		<member type="node" ref="240043904" role="admin_centre"/>
+		<tag k="name" v="Hauterive (NE)"/>
+		<tag k="type" v="boundary"/>
+		<tag k="source" v="swissBOUNDARIES3D swisstopo 2011"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="wikipedia" v="fr:Hauterive (Neuchâtel)"/>
+		<tag k="admin_level" v="8"/>
+		<tag k="postal_code" v="2068"/>
+		<tag k="swisstopo:SHN" v="CH24046454"/>
+		<tag k="swisstopo:OBJEKTART" v="Gemeindegebiet"/>
+		<tag k="swisstopo:BEZIRKSNUM" v="2404"/>
+		<tag k="swisstopo:BFS_NUMMER" v="6454"/>
+		<tag k="swisstopo:KANTONSNUM" v="24"/>
+	</relation>
+	<relation id="1685519" version="10" timestamp="2015-11-12T13:01:25Z" changeset="26510618" uid="152074" user="beweta">
+		<member type="way" ref="123033010" role="outer"/>
+		<member type="way" ref="148742143" role="outer"/>
+		<member type="way" ref="148742139" role="outer"/>
+		<member type="way" ref="148742136" role="outer"/>
+		<member type="way" ref="148742460" role="outer"/>
+		<member type="way" ref="148742138" role="outer"/>
+		<member type="way" ref="148742142" role="outer"/>
+		<member type="way" ref="148739557" role="outer"/>
+		<member type="way" ref="148739554" role="outer"/>
+		<member type="way" ref="148739558" role="outer"/>
+		<member type="way" ref="148739555" role="outer"/>
+		<member type="way" ref="123033206" role="outer"/>
+		<member type="way" ref="123033107" role="outer"/>
+		<member type="way" ref="123033269" role="outer"/>
+		<member type="way" ref="123033002" role="outer"/>
+		<member type="way" ref="123032906" role="outer"/>
+		<member type="way" ref="123033102" role="outer"/>
+		<member type="way" ref="123033050" role="outer"/>
+		<member type="way" ref="123033061" role="outer"/>
+		<member type="way" ref="123032982" role="outer"/>
+		<member type="node" ref="3019197852" role="admin_centre"/>
+		<tag k="name" v="Neuchâtel"/>
+		<tag k="type" v="boundary"/>
+		<tag k="source" v="swissBOUNDARIES3D swisstopo 2011"/>
+		<tag k="name:de" v="Neuenburg"/>
+		<tag k="name:fr" v="Neuchâtel"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="wikipedia" v="fr:Neuchâtel"/>
+		<tag k="admin_level" v="8"/>
+		<tag k="swisstopo:SHN" v="CH24046458"/>
+		<tag k="swisstopo:OBJEKTART" v="Gemeindegebiet"/>
+		<tag k="swisstopo:BEZIRKSNUM" v="2404"/>
+		<tag k="swisstopo:BFS_NUMMER" v="6458"/>
+		<tag k="swisstopo:KANTONSNUM" v="24"/>
+	</relation>
+	<relation id="1685530" version="7" timestamp="2015-11-12T13:01:25Z" changeset="11230371" uid="505667" user="Bullroarer">
+		<member type="way" ref="148737347" role="outer"/>
+		<member type="way" ref="148716477" role="outer"/>
+		<member type="way" ref="148716478" role="outer"/>
+		<member type="way" ref="148716479" role="outer"/>
+		<member type="way" ref="148713228" role="outer"/>
+		<member type="way" ref="123033165" role="outer"/>
+		<member type="way" ref="123033028" role="outer"/>
+		<member type="way" ref="123033061" role="outer"/>
+		<member type="way" ref="123033108" role="outer"/>
+		<member type="way" ref="123033113" role="outer"/>
+		<member type="way" ref="123033038" role="outer"/>
+		<tag k="name" v="Saint-Blaise"/>
+		<tag k="type" v="boundary"/>
+		<tag k="source" v="swissBOUNDARIES3D swisstopo 2011"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="wikipedia" v="fr:Saint-Blaise (Neuchâtel)"/>
+		<tag k="admin_level" v="8"/>
+		<tag k="postal_code" v="2072"/>
+		<tag k="swisstopo:SHN" v="CH24046459"/>
+		<tag k="swisstopo:OBJEKTART" v="Gemeindegebiet"/>
+		<tag k="swisstopo:BEZIRKSNUM" v="2404"/>
+		<tag k="swisstopo:BFS_NUMMER" v="6459"/>
+		<tag k="swisstopo:KANTONSNUM" v="24"/>
+	</relation>
+	<relation id="1685537" version="5" timestamp="2015-11-12T13:01:25Z" changeset="11298303" uid="505667" user="Bullroarer">
+		<member type="way" ref="123033253" role="outer"/>
+		<member type="way" ref="123033069" role="outer"/>
+		<member type="way" ref="123033032" role="outer"/>
+		<member type="way" ref="123033103" role="outer"/>
+		<member type="way" ref="123033138" role="outer"/>
+		<member type="way" ref="123033269" role="outer"/>
+		<member type="node" ref="240068419" role="admin_centre"/>
+		<tag k="name" v="Valangin"/>
+		<tag k="type" v="boundary"/>
+		<tag k="source" v="swissBOUNDARIES3D swisstopo 2011"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="wikipedia" v="fr:Valangin"/>
+		<tag k="admin_level" v="8"/>
+		<tag k="postal_code" v="2042"/>
+		<tag k="swisstopo:SHN" v="CH24056485"/>
+		<tag k="swisstopo:OBJEKTART" v="Gemeindegebiet"/>
+		<tag k="swisstopo:BEZIRKSNUM" v="2405"/>
+		<tag k="swisstopo:BFS_NUMMER" v="6485"/>
+		<tag k="swisstopo:KANTONSNUM" v="24"/>
+	</relation>
+	<relation id="1689427" version="13" timestamp="2015-11-12T13:01:25Z" changeset="26510618" uid="152074" user="beweta">
+		<member type="way" ref="123033010" role="outer"/>
+		<member type="way" ref="148742143" role="outer"/>
+		<member type="way" ref="148742139" role="outer"/>
+		<member type="way" ref="148742136" role="outer"/>
+		<member type="way" ref="148742460" role="outer"/>
+		<member type="way" ref="148742138" role="outer"/>
+		<member type="way" ref="148742142" role="outer"/>
+		<member type="way" ref="148739557" role="outer"/>
+		<member type="way" ref="148739554" role="outer"/>
+		<member type="way" ref="148739558" role="outer"/>
+		<member type="way" ref="148739555" role="outer"/>
+		<member type="way" ref="123033206" role="outer"/>
+		<member type="way" ref="123033107" role="outer"/>
+		<member type="way" ref="123033269" role="outer"/>
+		<member type="way" ref="123033002" role="outer"/>
+		<member type="way" ref="123032906" role="outer"/>
+		<member type="way" ref="123033229" role="outer"/>
+		<member type="way" ref="123033205" role="outer"/>
+		<member type="way" ref="123032923" role="outer"/>
+		<member type="way" ref="122951904" role="outer"/>
+		<member type="way" ref="122952756" role="outer"/>
+		<member type="way" ref="122952755" role="outer"/>
+		<member type="way" ref="122953267" role="outer"/>
+		<member type="way" ref="123033238" role="outer"/>
+		<member type="way" ref="122951996" role="outer"/>
+		<member type="way" ref="122953635" role="outer"/>
+		<member type="way" ref="122953489" role="outer"/>
+		<member type="way" ref="122952512" role="outer"/>
+		<member type="way" ref="122951701" role="outer"/>
+		<member type="way" ref="123033275" role="outer"/>
+		<member type="way" ref="148737347" role="outer"/>
+		<member type="way" ref="148716477" role="outer"/>
+		<member type="way" ref="148716478" role="outer"/>
+		<member type="way" ref="148716479" role="outer"/>
+		<member type="way" ref="148713228" role="outer"/>
+		<member type="way" ref="123033165" role="outer"/>
+		<member type="way" ref="148725883" role="outer"/>
+		<member type="way" ref="148725875" role="outer"/>
+		<member type="way" ref="148725877" role="outer"/>
+		<tag k="name" v="District de Neuchâtel"/>
+		<tag k="type" v="boundary"/>
+		<tag k="name:de" v="Bezirk Neuenburg"/>
+		<tag k="name:it" v="Distretto di Neuchâtel"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="wikipedia" v="fr:District de Neuchâtel"/>
+		<tag k="admin_level" v="6"/>
+	</relation>
+	<relation id="1689429" version="3" timestamp="2015-11-12T13:01:25Z" changeset="11068705" uid="334389" user="ueliw0">
+		<member type="way" ref="122951938" role="outer"/>
+		<member type="way" ref="122952510" role="outer"/>
+		<member type="way" ref="122951563" role="outer"/>
+		<member type="way" ref="122952542" role="outer"/>
+		<member type="way" ref="122951709" role="outer"/>
+		<member type="way" ref="122951987" role="outer"/>
+		<member type="way" ref="122951843" role="outer"/>
+		<member type="way" ref="122951560" role="outer"/>
+		<member type="way" ref="122951851" role="outer"/>
+		<member type="way" ref="122951696" role="outer"/>
+		<member type="way" ref="123033186" role="outer"/>
+		<member type="way" ref="123033023" role="outer"/>
+		<member type="way" ref="123032983" role="outer"/>
+		<member type="way" ref="123033182" role="outer"/>
+		<member type="way" ref="123033056" role="outer"/>
+		<member type="way" ref="123033099" role="outer"/>
+		<member type="way" ref="123033214" role="outer"/>
+		<member type="way" ref="123032979" role="outer"/>
+		<member type="way" ref="123033008" role="outer"/>
+		<member type="way" ref="123033212" role="outer"/>
+		<member type="way" ref="123033253" role="outer"/>
+		<member type="way" ref="123033269" role="outer"/>
+		<member type="way" ref="123033002" role="outer"/>
+		<member type="way" ref="123032906" role="outer"/>
+		<member type="way" ref="123033229" role="outer"/>
+		<member type="way" ref="123033205" role="outer"/>
+		<member type="way" ref="123032923" role="outer"/>
+		<tag k="name" v="District du Val-de-Ruz"/>
+		<tag k="type" v="boundary"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="wikipedia" v="fr:District du Val-de-Ruz"/>
+		<tag k="admin_level" v="6"/>
+	</relation>
+	<relation id="2761758" version="1" timestamp="2015-11-12T13:01:25Z" changeset="15037880" uid="92387" user="SimonPoole">
+		<member type="way" ref="123033182" role="outer"/>
+		<member type="way" ref="123033056" role="outer"/>
+		<member type="way" ref="123033099" role="outer"/>
+		<member type="way" ref="123033214" role="outer"/>
+		<member type="way" ref="123032979" role="outer"/>
+		<member type="way" ref="123033008" role="outer"/>
+		<member type="way" ref="123033212" role="outer"/>
+		<member type="way" ref="123033069" role="outer"/>
+		<member type="way" ref="123033032" role="outer"/>
+		<member type="way" ref="123033103" role="outer"/>
+		<member type="way" ref="123033138" role="outer"/>
+		<member type="way" ref="123033002" role="outer"/>
+		<member type="way" ref="123032906" role="outer"/>
+		<member type="way" ref="123033229" role="outer"/>
+		<member type="way" ref="123033205" role="outer"/>
+		<member type="way" ref="123032923" role="outer"/>
+		<member type="way" ref="122951938" role="outer"/>
+		<member type="way" ref="122952510" role="outer"/>
+		<member type="way" ref="122951563" role="outer"/>
+		<member type="way" ref="122952542" role="outer"/>
+		<member type="way" ref="122951709" role="outer"/>
+		<member type="way" ref="122951987" role="outer"/>
+		<member type="way" ref="122951843" role="outer"/>
+		<member type="way" ref="122951560" role="outer"/>
+		<member type="way" ref="122951851" role="outer"/>
+		<member type="way" ref="122951696" role="outer"/>
+		<member type="way" ref="123033186" role="outer"/>
+		<member type="way" ref="123033023" role="outer"/>
+		<member type="way" ref="123032983" role="outer"/>
+		<tag k="name" v="Val-de-Ruz"/>
+		<tag k="type" v="boundary"/>
+		<tag k="boundary" v="administrative"/>
+		<tag k="wikipedia" v="fr:Val-de-Ruz"/>
+		<tag k="admin_level" v="8"/>
+		<tag k="swisstopo:OBJEKTART" v="Gemeindegebiet"/>
+		<tag k="swisstopo:BEZIRKSNUM" v="2405"/>
+		<tag k="swisstopo:BFS_NUMMER" v="6487"/>
+		<tag k="swisstopo:KANTONSNUM" v="24"/>
+	</relation>
+</osm>

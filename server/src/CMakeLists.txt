@@ -57,6 +57,7 @@ set(MODULES
 59_road_journey_planner
 60_analysis
 61_data_exchange
+61_osm_import
 63_settings)
 
 if(WITH_MYSQL)
