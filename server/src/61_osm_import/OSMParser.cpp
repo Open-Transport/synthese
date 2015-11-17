@@ -101,6 +101,7 @@ private :
 	std::vector<OSMMember> _wayMembers;
 
 public :
+	OSMId id;
 
 	void reset();
 
@@ -266,6 +267,7 @@ OSMParserImpl::firstPassEndElement(const XML_Char* name)
 	}
 	else if (!std::strcmp(name, "osm"))
 	{
+		_logStream << "Found " << _nodes.size() << " OSM nodes" << std::endl;
 		++_passCount;
 	}
 }
@@ -277,6 +279,8 @@ OSMParserImpl::secondPassStartElement(const XML_Char* name, const XML_Char** att
 	if (!std::strcmp(name, "relation"))
 	{
 		_currentRelation.reset();
+		AttributesMap attributes = makeAttributesMap(attrs);
+		_currentRelation.id = boost::lexical_cast<OSMId>(attributes["id"]);
 		_inRelation = true;
 	}
 	else if (_inRelation && !std::strcmp(name, "tag"))
@@ -341,11 +345,15 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 	{
 		std::vector<OSMWay*> innerWays;
 		std::vector<OSMWay*> outerWays;
+		bool completeRelation = true;
 		BOOST_FOREACH(OSMMember wayMember, _currentRelation.getWayMembers())
 		{
 			std::map<OSMId, OSMWay>::iterator it = _boundaryWays.find(wayMember.ref);
-			if (it == _boundaryWays.end()) continue;
-			if (it->second == NoOsmWay) continue;
+			if ((it == _boundaryWays.end()) || (it->second == NoOsmWay))
+			{
+				completeRelation = false;
+				_logStream << "Ignoring incomplete city boundary (relation) " << _currentRelation.id << std::endl;
+			}
 			if (wayMember.role == "outer")
 			{
 				outerWays.push_back(&it->second);
@@ -355,10 +363,20 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 				innerWays.push_back(&it->second);
 			}
 		}
-		geos::geom::Geometry* boundary = makeGeometryFrom(outerWays, innerWays);
-		//std::cerr << "....................... " << boundary->toString() << std::endl;
-		//std::cerr << "OB " << outerWays.size() << "  IB " << innerWays.size() << std::endl;
-		_osmEntityHandler.handleCity(currentRelationName(), currentRelationCode(), boundary);
+
+		if (completeRelation)
+		{
+			_logStream << "Found city with boundary : name =  " << currentRelationName()
+					   << " ; code = " << currentRelationCode() << std::endl;
+			geos::geom::Geometry* boundary = makeGeometryFrom(outerWays, innerWays);
+			_osmEntityHandler.handleCity(currentRelationName(), currentRelationCode(), boundary);
+		}
+		else
+		{
+			_logStream << "Found city without boundary : name =  " << currentRelationName()
+					   << " ; code = " << currentRelationCode() << std::endl;
+			_osmEntityHandler.handleCity(currentRelationName(), currentRelationCode(), 0);
+		}
 	}
 	else if (!std::strcmp(name, "osm"))
 	{
@@ -463,9 +481,6 @@ OSMParserImpl::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std
 {
 	const geos::geom::GeometryFactory *geometryFactory = geos::geom::GeometryFactory::getDefaultInstance();
 	std::vector<geos::geom::Polygon*>* polygons, *polygon_enclaves;
-
-	std::cerr << "=================================== " << outerWays.size() << " outer ways ; " <<  innerWays.size() << " inner ways" << std::endl;
-
 	polygons = polygonize(outerWays);
 
 	if(!polygons->size()) {
@@ -497,13 +512,7 @@ OSMParserImpl::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std
 					geometryFactory->destroyGeometry(poly);
 					poly = tmp;
 				} catch (geos::util::TopologyException e) {
-					std::cout << std::endl << e.what() << std::endl;
-					geos::operation::valid::IsValidOp ivo(enc);
-					geos::operation::valid::TopologyValidationError *tve = ivo.getValidationError();
-					const std::string errloc = tve->getCoordinate().toString();
-					std::string errmsg(tve->getMessage());
-					errmsg += "[" + errloc + "]";
-
+					_logStream << std::endl << e.what() << std::endl;
 				}
 				geometryFactory->destroyGeometry(enc);
 			}
@@ -584,16 +593,16 @@ OSMParserImpl::parseOnce(std::istream& osmInput)
 void
 OSMParserImpl::parse(std::istream& osmInput)
 {
-	_logStream << "Starting first pass over OSM input...";
+	_logStream << "Starting first pass over OSM input..." << std::endl;
 	parseOnce(osmInput);
-	_logStream << "First pass done";
+	_logStream << "First pass done" << std::endl;;
 
 	osmInput.clear();
 	osmInput.seekg(0);
 
-	_logStream << "Starting second pass over OSM input...";
+	_logStream << "Starting second pass over OSM input..." << std::endl;;
 	parseOnce(osmInput);
-	_logStream << "Second pass done";
+	_logStream << "Second pass done" << std::endl;;
 }
 
 
