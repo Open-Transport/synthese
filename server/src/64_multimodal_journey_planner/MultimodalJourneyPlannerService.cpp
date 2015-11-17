@@ -218,7 +218,7 @@ namespace synthese
 			string strFakePlaceType("RoadPlace");
 			string strFakeArrivalPlace("Lausanne, place de l'arrivée");
 			string strFakeArrivalPlaceId("2");
-			string strFakeLineString("LINESTRING(46.5320 6.5970,46.4974 6.6842");
+			string strFakeLineString("LINESTRING(46.5320 6.5970,46.4974 6.6842)");
 			string strFakeRoadName("Mega pont imaginaire");
 			string strFakeRoadId("1");
 			boost::shared_ptr<ParametersMap> submapFakeJourney(new ParametersMap);
