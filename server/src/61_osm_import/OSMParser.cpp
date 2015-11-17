@@ -578,9 +578,17 @@ OSMParserImpl::handleEndCityRelation()
 	std::string cityCode = _currentRelation.getValueOrEmpty(_cityCodeTag);
 	if (completeRelation)
 	{
-		_logStream << "Found city with boundary : name =  " << cityName << " ; code = " << cityCode << std::endl;
-		geos::geom::Geometry* boundary = makeGeometryFrom(outerWays, innerWays);
-		_osmEntityHandler.handleCity(cityName, cityCode, boundary);
+		try
+		{
+			geos::geom::Geometry* boundary = makeGeometryFrom(outerWays, innerWays);
+			_logStream << "Found city with boundary : name =  " << cityName << " ; code = " << cityCode << std::endl;
+			_osmEntityHandler.handleCity(cityName, cityCode, boundary);
+		}
+		catch (std::exception& e)
+		{
+			_logStream << "Found city with malformed boundary : name =  " << cityName << " ; code = " << cityCode << std::endl;
+			_osmEntityHandler.handleCity(cityName, cityCode, 0);
+		}
 	}
 	else
 	{
