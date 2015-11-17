@@ -316,7 +316,7 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 	{
 		BOOST_FOREACH(OSMId nodeRef, _currentBoundaryWay.nodeRefs)
 		{
-			//if (_nodes.find(nodeRef) == _nodes.end()) continue; // TODO !!!!
+			if (_nodes.find(nodeRef) == _nodes.end()) continue; // TODO !!!!
 			_currentBoundaryWay.nodes.push_back(_nodes[nodeRef]);
 		}
 		_boundaryWays[_currentBoundaryWay.id] = _currentBoundaryWay;
@@ -345,6 +345,7 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 			}
 		}
 		geos::geom::Geometry* boundary = makeGeometryFrom(outerWays, innerWays);
+		//std::cerr << "....................... " << boundary->toString() << std::endl;
 		//std::cerr << "OB " << outerWays.size() << "  IB " << innerWays.size() << std::endl;
 		_osmEntityHandler.handleCity(currentRelationName(), currentRelationCode(), boundary);
 	}
@@ -358,12 +359,15 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 std::vector<geos::geom::Polygon*>* 
 OSMParserImpl::polygonize(const std::vector<OSMWay*>& ways) {
    geos::geom::Geometry* g = NULL;
+
+   /*
    BOOST_FOREACH(OSMWay* w, ways) {
    		std::string wkt = makeWKTFrom(w);
    		std::cerr << wkt << " ";
 	}
 	std::cerr << std::endl;
 	std::cerr << std::endl;
+	*/
 
    std::vector<geos::geom::Polygon*>* ret = new std::vector<geos::geom::Polygon*>();
    const geos::geom::GeometryFactory *gf = geos::geom::GeometryFactory::getDefaultInstance();
