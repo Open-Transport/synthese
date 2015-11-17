@@ -1,4 +1,3 @@
-
 /** OsmParser class implementation.
 	@file OsmParser.cpp
 	@author Marc Jambert
@@ -52,79 +51,81 @@ namespace synthese
 namespace data_exchange
 {
 
-
-typedef std::map<std::string, std::string> AttributesMap;
-typedef long OSMId;
-
-struct OSMNode
-{
-	double latitude;
-	double longitude;
-
-	bool operator==(const OSMNode& rhs) const {
-		return (latitude == rhs.latitude) && (longitude == rhs.longitude); }
-
-};
-
-struct OSMWay
-{
-	static OSMWay EMPTY;
-
-	OSMId id;
-	std::vector<OSMId> nodeRefs;
-	std::vector<OSMNode> nodes;
-
-	OSMWay(): id(0) {}
-
-	void reset()
-	{
-		nodeRefs.clear();
-		nodes.clear();
-	}
-
-	bool operator==(const OSMWay& rhs) const {
-		return (id == rhs.id) && (nodeRefs == rhs.nodeRefs); }
-};
-
-struct OSMMember
-{
-	OSMMember(): ref(0) {}
-
-	OSMId ref;
-	std::string role;
-};
-
-
-OSMWay OSMWay::EMPTY;
-
-struct OSMRelation
-{
-	typedef std::map<std::string, std::string> TagsMap;
-
-private :
-
-	TagsMap _tags;
-	std::vector<OSMMember> _wayMembers;
-
-public :
-	OSMId id;
-
-	void reset();
-
-	void addTag(const std::string& key, const std::string& value);
-
-	void addWayMember(OSMId wayMemberId, const std::string& role);
-
-	std::vector<OSMMember> getWayMembers() const;
-
-	std::string getValueOrEmpty(const std::string& tag) const;
-
-};
-
-
 class OSMParserImpl
 {
 private:
+	typedef std::map<std::string, std::string> AttributesMap;
+	typedef long OSMId;
+
+	struct OSMNode
+	{
+		static OSMNode EMPTY;
+
+		double latitude;
+		double longitude;
+
+		OSMNode(): latitude(0.0), longitude(0.0) {}
+
+		bool operator==(const OSMNode& rhs) const {
+			return (latitude == rhs.latitude) && (longitude == rhs.longitude); }
+
+	};
+
+	struct OSMWay
+	{
+		static OSMWay EMPTY;
+
+		OSMId id;
+		std::vector<OSMId> nodeRefs;
+		std::vector<OSMNode> nodes;
+
+		OSMWay(): id(0) {}
+
+		bool operator==(const OSMWay& rhs) const {
+			return (id == rhs.id) && (nodeRefs == rhs.nodeRefs); }
+	};
+
+	struct OSMMember
+	{
+		static OSMMember EMPTY;
+
+		OSMMember(): ref(0) {}
+
+		OSMId ref;
+		std::string role;
+	};
+
+
+	struct OSMRelation
+	{
+	private :
+
+		typedef std::map<std::string, std::string> TagsMap;
+
+		TagsMap _tags;
+		std::vector<OSMMember> _wayMembers;
+
+	public :
+		static OSMRelation EMPTY;
+
+		OSMId id;
+
+		OSMRelation(): id(0) {}
+
+		void addTag(const std::string& key, const std::string& value);
+
+		void addWayMember(OSMId wayMemberId, const std::string& role);
+
+		std::vector<OSMMember> getWayMembers() const;
+
+		std::string getName() const;
+		bool isAdministrativeBoundary() const;
+		bool isCityAdministrativeLevel() const;
+
+		std::string getValueOrEmpty(const std::string& tag) const;
+
+	};
+
 	geos::io::WKTReader _wktReader;
 
 	std::ostream& _logStream;
@@ -152,15 +153,6 @@ private:
 	void parseOnce(std::istream& osmInput);
 
 	AttributesMap makeAttributesMap(const XML_Char **attrs);
-
-	std::string currentRelationName() const;
-
-	std::string currentRelationCode() const;
-
-	bool currentRelationIsAdministrativeBoundary() const;
-
-	bool currentRelationIsCityAdministrativeLevel() const;
-
 	geos::geom::Geometry* makeGeometryFrom(OSMWay* way);
 	geos::geom::Geometry* makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std::vector<OSMWay*>& innerWays);
 	std::string makeWKTFrom(OSMWay* way);
@@ -180,6 +172,70 @@ private:
 	friend void endElement(void* userData, const XML_Char* name);
 };
 
+
+OSMParserImpl::OSMNode OSMParserImpl::OSMNode::EMPTY;
+
+
+OSMParserImpl::OSMWay OSMParserImpl::OSMWay::EMPTY;
+
+OSMParserImpl::OSMMember OSMParserImpl::OSMMember::EMPTY;
+
+OSMParserImpl::OSMRelation OSMParserImpl::OSMRelation::EMPTY;
+
+void
+OSMParserImpl::OSMRelation::addTag(const std::string& key, const std::string& value)
+{
+	_tags[key] = value;
+}
+
+
+void
+OSMParserImpl::OSMRelation::addWayMember(OSMId wayMemberId, const std::string& role)
+{
+	OSMMember member;
+	member.ref = wayMemberId;
+	member.role = role;
+	if ((member.role.empty()) || (member.role == "exclave"))
+	{
+		member.role = "outer";
+	}
+	else if (member.role == "enclave")
+	{
+		member.role = "inner";
+	}
+	_wayMembers.push_back(member);
+}
+
+std::vector<OSMParserImpl::OSMMember>
+OSMParserImpl::OSMRelation::getWayMembers() const
+{
+	return _wayMembers;
+}
+
+bool
+OSMParserImpl::OSMRelation::isAdministrativeBoundary() const
+{
+	return "administrative" == getValueOrEmpty("boundary");
+}
+
+bool
+OSMParserImpl::OSMRelation::isCityAdministrativeLevel() const
+{
+	return "8" == getValueOrEmpty("admin_level");
+}
+
+std::string
+OSMParserImpl::OSMRelation::getName() const
+{
+	return getValueOrEmpty("name");
+}
+
+std::string
+OSMParserImpl::OSMRelation::getValueOrEmpty(const std::string& tag) const
+{
+	TagsMap::const_iterator it = _tags.find(tag);
+	return (_tags.end() == it) ? "" : it->second;
+}
 
 
 OSMParserImpl::OSMParserImpl(std::ostream& logStream,
@@ -229,7 +285,7 @@ OSMParserImpl::firstPassStartElement(const XML_Char* name, const XML_Char** attr
 {
 	if (!std::strcmp(name, "relation"))
 	{
-		_currentRelation.reset();
+		_currentRelation = OSMRelation::EMPTY;
 		_inRelation = true;
 	}
 	else if (!std::strcmp(name, "node"))
@@ -260,8 +316,8 @@ void
 OSMParserImpl::firstPassEndElement(const XML_Char* name)
 {
 	if (!std::strcmp(name, "relation") &&
-		currentRelationIsAdministrativeBoundary() &&
-		currentRelationIsCityAdministrativeLevel())
+		_currentRelation.isAdministrativeBoundary() &&
+		_currentRelation.isCityAdministrativeLevel())
 	{
 		std::vector<OSMMember> currentRelationWayMembers = _currentRelation.getWayMembers();
 		BOOST_FOREACH(OSMMember wayMember, currentRelationWayMembers)
@@ -283,7 +339,7 @@ OSMParserImpl::secondPassStartElement(const XML_Char* name, const XML_Char** att
 {
 	if (!std::strcmp(name, "relation"))
 	{
-		_currentRelation.reset();
+		_currentRelation = OSMRelation::EMPTY;
 		AttributesMap attributes = makeAttributesMap(attrs);
 		_currentRelation.id = boost::lexical_cast<OSMId>(attributes["id"]);
 		_inRelation = true;
@@ -299,7 +355,7 @@ OSMParserImpl::secondPassStartElement(const XML_Char* name, const XML_Char** att
 		OSMId wayId = boost::lexical_cast<OSMId>(attributes["id"]);
 		if (_boundaryWays.find(wayId) != _boundaryWays.end())
 		{
-			_currentBoundaryWay.reset();
+			_currentBoundaryWay = OSMWay::EMPTY;
 			_currentBoundaryWay.id = wayId;
 			_inBoundaryWay = true;
 		}
@@ -345,8 +401,8 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 		_inBoundaryWay = false;
 	}
 	else if (!std::strcmp(name, "relation") &&
-			 currentRelationIsAdministrativeBoundary() &&
-			 currentRelationIsCityAdministrativeLevel())
+			 _currentRelation.isAdministrativeBoundary() &&
+			 _currentRelation.isCityAdministrativeLevel())
 	{
 		std::vector<OSMWay*> innerWays;
 		std::vector<OSMWay*> outerWays;
@@ -369,18 +425,18 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 			}
 		}
 
+		std::string cityName = _currentRelation.getName();
+		std::string cityCode = _currentRelation.getValueOrEmpty(_cityCodeTag);
 		if (completeRelation)
 		{
-			_logStream << "Found city with boundary : name =  " << currentRelationName()
-					   << " ; code = " << currentRelationCode() << std::endl;
+			_logStream << "Found city with boundary : name =  " << cityName << " ; code = " << cityCode << std::endl;
 			geos::geom::Geometry* boundary = makeGeometryFrom(outerWays, innerWays);
-			_osmEntityHandler.handleCity(currentRelationName(), currentRelationCode(), boundary);
+			_osmEntityHandler.handleCity(cityName, cityCode, boundary);
 		}
 		else
 		{
-			_logStream << "Found city without boundary : name =  " << currentRelationName()
-					   << " ; code = " << currentRelationCode() << std::endl;
-			_osmEntityHandler.handleCity(currentRelationName(), currentRelationCode(), 0);
+			_logStream << "Found city without boundary : name =  " << cityName << " ; code = " << cityCode << std::endl;
+			_osmEntityHandler.handleCity(cityName, cityCode, 0);
 		}
 	}
 	else if (!std::strcmp(name, "osm"))
@@ -505,7 +561,7 @@ OSMParserImpl::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std
 
 
 
-AttributesMap
+OSMParserImpl::AttributesMap
 OSMParserImpl::makeAttributesMap(const XML_Char **attrs) {
 	int count = 0;
 	AttributesMap attributesMap;
@@ -583,81 +639,6 @@ OSMParserImpl::parse(std::istream& osmInput)
 	_logStream << "Starting second pass over OSM input..." << std::endl;;
 	parseOnce(osmInput);
 	_logStream << "Second pass done" << std::endl;;
-}
-
-
-std::string
-OSMParserImpl::currentRelationName() const
-{
-	return _currentRelation.getValueOrEmpty("name");
-}
-
-
-std::string
-OSMParserImpl::currentRelationCode() const
-{
-	return _currentRelation.getValueOrEmpty(_cityCodeTag);
-}
-
-
-bool
-OSMParserImpl::currentRelationIsAdministrativeBoundary() const
-{
-	return "administrative" == _currentRelation.getValueOrEmpty("boundary");
-}
-
-
-bool
-OSMParserImpl::currentRelationIsCityAdministrativeLevel() const
-{
-	return "8" == _currentRelation.getValueOrEmpty("admin_level");
-}
-
-
-
-void
-OSMRelation::reset()
-{
-	_tags.clear();
-	_wayMembers.clear();
-}
-
-
-void
-OSMRelation::addTag(const std::string& key, const std::string& value)
-{
-	_tags[key] = value;
-}
-
-
-void
-OSMRelation::addWayMember(OSMId wayMemberId, const std::string& role)
-{
-	OSMMember member;
-	member.ref = wayMemberId;
-	member.role = role;
-	if ((member.role.empty()) || (member.role == "exclave"))
-	{
-		member.role = "outer";
-	}
-	else if (member.role == "enclave")
-	{
-		member.role = "inner";
-	}
-	_wayMembers.push_back(member);
-}
-
-std::vector<OSMMember>
-OSMRelation::getWayMembers() const
-{
-	return _wayMembers;
-}
-
-
-std::string OSMRelation::getValueOrEmpty(const std::string& tag) const
-{
-	TagsMap::const_iterator it = _tags.find(tag);
-	return (_tags.end() == it) ? "" : it->second;
 }
 
 
