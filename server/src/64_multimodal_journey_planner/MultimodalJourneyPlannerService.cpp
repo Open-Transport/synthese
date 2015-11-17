@@ -229,14 +229,14 @@ namespace synthese
 			submapFakeDeparturePlace->insert("name", strFakeDeparturePlace);
 			submapFakeDeparturePlace->insert("type", strFakePlaceType);
 			submapFakeDeparturePlace->insert("id", strFakeDeparturePlaceId);
-			submapFakeDeparturePlace->insert("latitude", 6.5970);
-			submapFakeDeparturePlace->insert("longitude", 46.5320);
+			submapFakeDeparturePlace->insert("latitude", 46.5320);
+			submapFakeDeparturePlace->insert("longitude", 6.5970);
 			boost::shared_ptr<ParametersMap> submapFakeArrivalPlace(new ParametersMap);
 			submapFakeArrivalPlace->insert("name", strFakeArrivalPlace);
 			submapFakeArrivalPlace->insert("type", strFakePlaceType);
 			submapFakeArrivalPlace->insert("id", strFakeArrivalPlaceId);
-			submapFakeArrivalPlace->insert("latitude", 6.6842);
-			submapFakeArrivalPlace->insert("longitude", 46.4974);
+			submapFakeArrivalPlace->insert("latitude", 46.4974);
+			submapFakeArrivalPlace->insert("longitude", 6.6842);
 
 			boost::shared_ptr<ParametersMap> submapFakeLeg(new ParametersMap);
 			submapFakeLeg->insert("departure_date_time", strFakeDepartureTime);
@@ -248,14 +248,14 @@ namespace synthese
 			submapFakeLegDeparturePlace->insert("name", strFakeDeparturePlace);
 			submapFakeLegDeparturePlace->insert("type", strFakePlaceType);
 			submapFakeLegDeparturePlace->insert("id", strFakeDeparturePlaceId);
-			submapFakeLegDeparturePlace->insert("latitude", 6.5970);
-			submapFakeLegDeparturePlace->insert("longitude", 46.5320);
+			submapFakeLegDeparturePlace->insert("latitude", 46.5320);
+			submapFakeLegDeparturePlace->insert("longitude", 6.5970);
 			boost::shared_ptr<ParametersMap> submapFakeLegArrivalPlace(new ParametersMap);
 			submapFakeLegArrivalPlace->insert("name", strFakeArrivalPlace);
 			submapFakeLegArrivalPlace->insert("type", strFakePlaceType);
 			submapFakeLegArrivalPlace->insert("id", strFakeArrivalPlaceId);
-			submapFakeLegArrivalPlace->insert("latitude", 6.6842);
-			submapFakeLegArrivalPlace->insert("longitude", 46.4974);
+			submapFakeLegArrivalPlace->insert("latitude", 46.4974);
+			submapFakeLegArrivalPlace->insert("longitude", 6.6842);
 
 			submapFakeLeg->insert("departure", submapFakeLegDeparturePlace);
 			submapFakeLeg->insert("arrival", submapFakeLegArrivalPlace);
