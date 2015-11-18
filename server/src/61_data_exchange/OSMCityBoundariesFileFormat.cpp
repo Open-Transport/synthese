@@ -52,6 +52,9 @@ namespace synthese
 	namespace data_exchange
 	{
 
+		const string OSMCityBoundariesFileFormat::Importer_::PARAMETER_CITY_CODE_TAG("city_code_tag");
+
+
 		class OSMCitiesHandler : public OSMEntityHandler
 		{
 			private:
@@ -163,7 +166,7 @@ namespace synthese
 			}
 			std::string ext = boost::filesystem::extension(filePath);
 			OSMCitiesHandler handler(*this, _env);
-			OSMParser parser(*_fileStream, handler);
+			OSMParser parser = (_cityCodeTag ? OSMParser(*_fileStream, handler, *_cityCodeTag) : OSMParser(*_fileStream, handler));
 			if(ext == ".bz2")
 			{
 				in.push(boost::iostreams::bzip2_decompressor());
@@ -199,6 +202,12 @@ namespace synthese
 		util::ParametersMap OSMCityBoundariesFileFormat::Importer_::_getParametersMap() const
 		{
 			util::ParametersMap result;
+
+			if(_cityCodeTag)
+			{
+				result.insert(PARAMETER_CITY_CODE_TAG, *_cityCodeTag);
+			}
+
 			return result;
 		}
 
@@ -206,6 +215,7 @@ namespace synthese
 
 		void OSMCityBoundariesFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
+			_cityCodeTag = map.getOptional<std::string>(PARAMETER_CITY_CODE_TAG);
 		}
 
 

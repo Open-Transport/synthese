@@ -47,6 +47,13 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_: public impex::OneFileTypeImporter<OSMCityBoundariesFileFormat>
 			{
+			private:
+
+				static const std::string PARAMETER_CITY_CODE_TAG;
+
+				boost::optional<std::string> _cityCodeTag;
+
+
 			protected:
 
 				virtual bool _parse(
