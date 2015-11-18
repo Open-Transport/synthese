@@ -17,11 +17,11 @@ namespace synthese
 	namespace lexical_matcher
 	{
 		IConv FrenchPhoneticString::ICONV("UTF-8","CP1252");
-		std::string FrenchPhoneticString::ACCENTUATED_A(IConv("UTF-8","CP1252").convert("àäáâÀÄÁÂ"));
-		std::string FrenchPhoneticString::ACCENTUATED_E(IConv("UTF-8","CP1252").convert("èëéêÈËÉÊ"));
-		std::string FrenchPhoneticString::ACCENTUATED_I(IConv("UTF-8","CP1252").convert("ìíîÌÍÎ"));
-		std::string FrenchPhoneticString::ACCENTUATED_O(IConv("UTF-8","CP1252").convert("òóôÒÓÔ"));
-		std::string FrenchPhoneticString::ACCENTUATED_U(IConv("UTF-8","CP1252").convert("ùúûÙÚÛ"));
+		std::string FrenchPhoneticString::ACCENTUATED_A(IConv("UTF-8","CP1252").convert("àáâäÀÁÂÄ"));
+		std::string FrenchPhoneticString::ACCENTUATED_E(IConv("UTF-8","CP1252").convert("èéêëÈÉÊË"));
+		std::string FrenchPhoneticString::ACCENTUATED_I(IConv("UTF-8","CP1252").convert("ìíîïÌÍÎÏ"));
+		std::string FrenchPhoneticString::ACCENTUATED_O(IConv("UTF-8","CP1252").convert("òóôöÒÓÔÖ"));
+		std::string FrenchPhoneticString::ACCENTUATED_U(IConv("UTF-8","CP1252").convert("ùúûüÙÚÛÜ"));
 		std::string FrenchPhoneticString::VOWELS(IConv("UTF-8","CP1252").convert("aàäáâeèëéêiìïíîoòöóôuùüúûy"));
 		std::string FrenchPhoneticString::C_VOWELS(IConv("UTF-8","CP1252").convert("eèëéêiìïíîy"));
 
