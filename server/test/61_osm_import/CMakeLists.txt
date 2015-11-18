@@ -1,6 +1,7 @@
 include_directories(${GEOS_INCLUDE_DIRS})
 
 include_directories("${PROJECT_SOURCE_DIR}/src/61_osm_import")
+include_directories(${GEOS_INCLUDE_DIRS})
 
 set(DEPS
   61_osm_import

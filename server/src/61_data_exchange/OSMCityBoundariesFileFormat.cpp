@@ -20,27 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "OSMExpatParser.h"
 #include "OSMCityBoundariesFileFormat.hpp"
-
-#include "AdminFunctionRequest.hpp"
-#include "AllowedUseRule.h"
 #include "CityTableSync.h"
-#include "Crossing.h"
-#include "CrossingTableSync.hpp"
-#include "DataSource.h"
-#include "DataSourceAdmin.h"
-#include "EdgeProjector.hpp"
-#include "ForbiddenUseRule.h"
 #include "FrenchPhoneticString.h"
 #include "Import.hpp"
-#include "PropertiesHTMLTable.h"
-#include "RoadPath.hpp"
-#include "RoadPlaceTableSync.h"
-#include "RoadTableSync.h"
-#include "RoadChunkEdge.hpp"
-#include "RoadChunkTableSync.h"
-#include "StopAreaTableSync.hpp"
+#include "OSMParser.hpp"
+#include "OSMEntityHandler.hpp"
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
@@ -49,123 +34,145 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <geos/geom/Point.h>
-#include <geos/geom/LinearRing.h>
-#include <geos/geom/LineString.h>
 #include <geos/geom/Polygon.h>
-#include <geos/geom/CoordinateSequenceFactory.h>
-#include <geos/geom/prep/PreparedGeometry.h>
-#include <geos/operation/distance/DistanceOp.h>
+#include <geos/geom/LinearRing.h>
+#include <geos/geom/CoordinateSequence.h>
 
-using namespace std;
-using namespace boost;
-using namespace geos::geom;
-using namespace geos::operation;
-using namespace geos::geom::prep;
 
 namespace synthese 
 {
-	using namespace admin;
-	using namespace algorithm;
-	using namespace data_exchange;
-	using namespace db;
 	using namespace geography;
-	using namespace graph;
-	using namespace impex;
-	using namespace osm;
-	using namespace road;
-	using namespace util;
 
 	namespace util
 	{
 		template<>
-		const string FactorableTemplate<FileFormat, OSMCityBoundariesFileFormat>::FACTORY_KEY("OpenStreetMapCityBoundaries");
+		const string FactorableTemplate<impex::FileFormat, data_exchange::OSMCityBoundariesFileFormat>::FACTORY_KEY("OpenStreetMapCityBoundaries");
 	}
 
 	namespace data_exchange
 	{
+
+		class OSMCitiesHandler : public OSMEntityHandler
+		{
+			private:
+
+				const impex::Importer& _importer;
+
+				util::Env& _env;
+
+			public:
+
+				OSMCitiesHandler(const impex::Importer& importer, util::Env& env):
+					_importer(importer),
+					_env(env)
+				{ }
+
+
+				void handleCity(
+					const std::string&    cityName,
+					const std::string&    cityCode,
+					geos::geom::Geometry* boundary)
+				{
+					_importer._logDebug("Processing city " + cityName);
+
+					boost::shared_ptr<City> city;
+					std::string normalizedCityName = boost::to_upper_copy(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(cityName));
+					geos::geom::Polygon* polygonBoundary = NULL;
+
+					if(NULL != boundary)
+					{
+						// This block converts a geometry object into a polygon
+						// Note : this should be a multi-polygon instead, because some cities consist of multiple disjoint areas
+						geos::geom::CoordinateSequence *cs = boundary->getCoordinates();
+
+						if(0 < cs->size())
+						{
+							if(!cs->back().equals(cs->front()))
+							{
+								cs->add(cs->front());
+							}
+							geos::geom::LinearRing *lr = CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory().createLinearRing(cs);
+							polygonBoundary = CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory().createPolygon(lr, NULL);
+						}
+					}
+
+					CityTableSync::SearchResult cities = CityTableSync::Search(
+						_env,
+						boost::optional<std::string>(), // exactname
+						((cityCode != "0") ? boost::optional<std::string>() : boost::optional<std::string>(normalizedCityName)), // likeName
+						((cityCode != "0") ? boost::optional<std::string>(cityCode) : boost::optional<std::string>()),
+						0, 0, true, true,
+						util::UP_LINKS_LOAD_LEVEL // code
+					);
+
+					if(cities.empty())
+					{
+						// No matching city was found, create a new one
+						_importer._logCreation("New city " + normalizedCityName + " (" + cityCode + ")");
+
+						city = boost::shared_ptr<City>(new City);
+						city->set<Name>(normalizedCityName);
+						city->set<Code>(cityCode);
+						city->set<Key>(CityTableSync::getId());
+
+						if(NULL != polygonBoundary)
+						{
+							city->set<PolygonGeometry>(boost::shared_ptr<geos::geom::Polygon>(polygonBoundary));
+						}
+						else
+						{
+							_importer._logWarning("City " + normalizedCityName + " has no geometry");
+						}
+
+						// Add the new city to the registry
+						_env.getEditableRegistry<City>().add(city);
+					}
+
+					else
+					{
+						// At least one matching city found, update the first one
+						city = cities.front();
+
+						if(NULL != polygonBoundary)
+						{
+							city->set<PolygonGeometry>(boost::shared_ptr<geos::geom::Polygon>(polygonBoundary));
+						}
+						else
+						{
+							_importer._logWarning("City " + normalizedCityName + " has no geometry");
+						}
+					}
+				}
+
+		};
+
+
 		bool OSMCityBoundariesFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath
 		) const {
-			DataSource& dataSource(*_import.get<DataSource>());
-
-			NetworkPtr network;
 			boost::filesystem::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 			boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
 			if(!file.good())
 			{
 				_logError("Unable to open file");
-				throw std::runtime_error("unable to open file");
+				throw std::runtime_error("Unable to open file");
 			}
 			std::string ext = boost::filesystem::extension(filePath);
-			ExpatParser parser;
+			OSMCitiesHandler handler(*this, _env);
+			OSMParser parser(handler);
 			if(ext == ".bz2")
 			{
 				in.push(boost::iostreams::bzip2_decompressor());
 				in.push(file);
 				std::istream data(&in);
-				network = parser.parse(data);
+				parser.parse(data);
 			}
 			else
 			{
-				network = parser.parse(file);
+				parser.parse(file);
 			}
 
-			network->consolidate(true);
-
-			_logDebug("finished parsing osm xml");
-
-			typedef std::map<unsigned long long int, RelationPtr> RelationMap;
-			RelationMap boundaries = network->getAdministrativeBoundaries(8);
-
-			_logDebug("Extracted boundaries");
-
-			// cities
-			RelationMap::iterator boundaryIterator = boundaries.begin();
-			while(boundaryIterator != boundaries.end())
-			{
-				RelationPtr boundary = boundaryIterator->second;
-				string cityId("0");
-				if(boundary->hasTag("ref:INSEE"))
-					cityId = boundary->getTag("ref:INSEE");
-				std::string cityCode = cityId;
-				std::string cityName = to_upper_copy(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(boundary->getTag(Element::TAG_NAME)));
-				_logDebug("treating boundary of " + cityName);
-				CityTableSync::SearchResult cities = CityTableSync::Search(
-					_env,
-					boost::optional<std::string>(), // exactname
-					((cityId != "0") ? boost::optional<std::string>() : boost::optional<std::string>(cityName)), // likeName
-					((cityId != "0") ? boost::optional<std::string>(cityId) : boost::optional<std::string>()),
-					0, 0, true, true,
-					util::UP_LINKS_LOAD_LEVEL // code
-				);
-				boost::shared_ptr<City> city;
-
-				if(cities.empty())
-				{
-					_logCreation("New City " + cityName + "(" + cityCode + ")");
-					city = boost::shared_ptr<City>(new City);
-					city->set<Name>(cityName);
-					city->set<Code>(cityCode);
-					city->set<Key>(CityTableSync::getId());
-					_env.getEditableRegistry<City>().add(city);
-				}
-				else
-				{
-					city = cities.front();
-				}
-				geos::geom::CoordinateSequence *cs = boundary->toGeometry()->getCoordinates();
-				if (!cs->back().equals(cs->front()))
-				{
-					cs->add(cs->front());
-				}
-				geos::geom::LinearRing *lr = CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory().createLinearRing(cs);
-				geos::geom::Polygon *p = CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory().createPolygon(lr,NULL);
-				city->set<PolygonGeometry>(boost::shared_ptr<geos::geom::Polygon>(p));
-				boundaryIterator++;
-			}
-
-			_logDebug("finished work on city boundaries");
+			_logDebug("Finished work on city boundaries");
 
 			return true;
 		}
@@ -187,8 +194,7 @@ namespace synthese
 
 		util::ParametersMap OSMCityBoundariesFileFormat::Importer_::_getParametersMap() const
 		{
-			ParametersMap result;
-
+			util::ParametersMap result;
 			return result;
 		}
 
@@ -202,11 +208,12 @@ namespace synthese
 
 		db::DBTransaction OSMCityBoundariesFileFormat::Importer_::_save() const
 		{
-			DBTransaction transaction;
-			BOOST_FOREACH(const Registry<City>::value_type& city, _env.getEditableRegistry<City>())
+			db::DBTransaction transaction;
+			BOOST_FOREACH(const util::Registry<geography::City>::value_type& city, _env.getEditableRegistry<geography::City>())
 			{
-				CityTableSync::Save(city.second.get(), transaction);
+				geography::CityTableSync::Save(city.second.get(), transaction);
 			}
+
 			return transaction;
 		}
 	}
