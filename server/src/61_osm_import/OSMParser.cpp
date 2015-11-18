@@ -160,7 +160,7 @@ private:
 
 	void parseOnce(std::istream& osmInput);
 
-	AttributesMap makeAttributesMap(const XML_Char **attrs, size_t nFirst = std::numeric_limits<int>::max());
+	AttributesMap makeAttributesMap(const XML_Char **attrs);
 	geos::geom::Geometry* makeGeometryFrom(OSMWay* way);
 	geos::geom::Geometry* makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std::vector<OSMWay*>& innerWays);
 	std::string makeWKTFrom(OSMWay* way);
@@ -369,7 +369,7 @@ OSMParserImpl::startNode(const XML_Char* name)
 void
 OSMParserImpl::handleStartNode(const XML_Char* name, const XML_Char** attrs)
 {
-	AttributesMap attributes = makeAttributesMap(attrs, 3);
+	AttributesMap attributes = makeAttributesMap(attrs);
 	OSMNode node;
 	node.latitude = boost::lexical_cast<double>(attributes["lat"]);
 	node.longitude = boost::lexical_cast<double>(attributes["lon"]);
@@ -714,13 +714,12 @@ OSMParserImpl::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std
 
 
 OSMParserImpl::AttributesMap
-OSMParserImpl::makeAttributesMap(const XML_Char **attrs, size_t nFirst) {
+OSMParserImpl::makeAttributesMap(const XML_Char **attrs) {
 	int count = 0;
 	AttributesMap attributesMap;
 	while (attrs[count]) {
 		attributesMap[attrs[count]] = attrs[count+1];
 		count += 2;
-		if (attributesMap.size() == nFirst) break;
 	}
 	return attributesMap;
 }
