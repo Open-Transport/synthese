@@ -9,13 +9,13 @@ Test Teardown     Stop Synthese On Node 0
 Import OSM Export (direct OSM web export) Of Small Swiss Tile Should Work
     On node 0
     Import OSM Export  ${CURDIR}/../../resources/data/small_swiss_tile.osm
-    There are 31 Objects In Table ${CITIES_TABLE_ID}
+    There are 5 Objects In Table ${CITIES_TABLE_ID}
     There are 30260 Objects In Table ${ROADS_TABLE_ID}
 
-Import OSM Export (Geofabrik) Of Larger Swiss Tile Should Work
+Import OSM Export (direct OSM web export) Of Larger Swiss Tile Should Work
     On node 0
     Import OSM Export  ${CURDIR}/../../resources/data/larger_swiss_tile.osm
-    There are 5 Objects In Table ${CITIES_TABLE_ID}
+    There are 6 Objects In Table ${CITIES_TABLE_ID}
     There are 1277 Objects In Table ${ROADS_TABLE_ID}
 
 
