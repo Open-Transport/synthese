@@ -153,6 +153,7 @@ target_link_libraries(61_data_exchange
   33_algorithm
   37_pt_operation
   38_vehicle
+  61_osm_import
   ${EXPAT_LIBRARIES}
 )
 

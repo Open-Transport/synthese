@@ -20,35 +20,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_road_OSMCityBoundariesFileFormat_hpp__
-#define SYNTHESE_road_OSMCityBoundariesFileFormat_hpp__
+#ifndef SYNTHESE_dataexchange_OSMCityBoundariesFileFormat_hpp__
+#define SYNTHESE_dataexchange_OSMCityBoundariesFileFormat_hpp__
 
 #include "FileFormatTemplate.h"
 #include "OneFileTypeImporter.hpp"
 #include "NoExportPolicy.hpp"
-#include "OSMElements.h"
 
-#include "GraphTypes.h"
-
-#include <iostream>
-#include <map>
 #include <string>
-#include <vector>
+
 
 namespace synthese
 {
-	namespace geography
-	{
-		class City;
-	}
-
-	namespace road
-	{
-		class Crossing;
-		class Road;
-		class RoadChunk;
-		class RoadPlace;
-	}
 
 	namespace data_exchange
 	{
@@ -62,14 +45,21 @@ namespace synthese
 		public:
 
 			//////////////////////////////////////////////////////////////////////////
-			class Importer_:
-				public impex::OneFileTypeImporter<OSMCityBoundariesFileFormat>
+			class Importer_: public impex::OneFileTypeImporter<OSMCityBoundariesFileFormat>
 			{
+			private:
+
+				static const std::string PARAMETER_CITY_CODE_TAG;
+
+				boost::optional<std::string> _cityCodeTag;
+
+
 			protected:
 
 				virtual bool _parse(
 					const boost::filesystem::path& filePath
 				) const;
+
 
 			public:
 
@@ -81,7 +71,6 @@ namespace synthese
 					boost::optional<std::ostream&> outputStream,
 					util::ParametersMap& pm
 				);
-
 
 
 				//////////////////////////////////////////////////////////////////////////
@@ -118,4 +107,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_road_OSMCityBoundariesFileFormat_hpp__
+#endif // SYNTHESE_dataexchange_OSMCityBoundariesFileFormat_hpp__
