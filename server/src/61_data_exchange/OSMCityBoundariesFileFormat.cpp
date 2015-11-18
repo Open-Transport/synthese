@@ -129,9 +129,12 @@ namespace synthese
 					}
 
 					else
-					{
+					{						
 						// At least one matching city found, update the first one
 						city = cities.front();
+
+						_importer._logLoad("Updating city " + city->get<Name>());
+
 
 						if(NULL != polygonBoundary)
 						{
