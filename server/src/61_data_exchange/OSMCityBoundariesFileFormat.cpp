@@ -96,11 +96,12 @@ namespace synthese
 						}
 					}
 
+					bool cityCodeIsSet = !cityCode.empty() && ("0" != cityCode);
 					CityTableSync::SearchResult cities = CityTableSync::Search(
 						_env,
 						boost::optional<std::string>(), // exactname
-						((cityCode != "0") ? boost::optional<std::string>() : boost::optional<std::string>(normalizedCityName)), // likeName
-						((cityCode != "0") ? boost::optional<std::string>(cityCode) : boost::optional<std::string>()),
+						(cityCodeIsSet ? boost::optional<std::string>() : boost::optional<std::string>(normalizedCityName)), // likeName
+						(cityCodeIsSet ? boost::optional<std::string>(cityCode) : boost::optional<std::string>()),
 						0, 0, true, true,
 						util::UP_LINKS_LOAD_LEVEL // code
 					);
