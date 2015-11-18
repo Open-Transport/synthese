@@ -159,7 +159,7 @@ namespace synthese
 			}
 			std::string ext = boost::filesystem::extension(filePath);
 			OSMCitiesHandler handler(*this, _env);
-			OSMParser parser(handler);
+			OSMParser parser(*_fileStream, handler);
 			if(ext == ".bz2")
 			{
 				in.push(boost::iostreams::bzip2_decompressor());
