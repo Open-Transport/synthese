@@ -975,11 +975,13 @@ namespace synthese
 					}
 				}
 				
-				// Add the sorted results in ParametersMap
+				// Add the sorted results in ParametersMap, max _number (if defined)
 				boost::shared_ptr<ParametersMap> pm(new ParametersMap());
-				for (std::multimap< double,SharedParametersMap >::reverse_iterator i = resumes.rbegin(); i != resumes.rend(); i++ )
+				size_t count = 0;
+				for (std::multimap< double,SharedParametersMap >::reverse_iterator i = resumes.rbegin(); i != resumes.rend() && ( _number ? count < *_number : true ); i++ )
 				{
 					pm->insert(DATA_RESUME, (*i).second);
+					count++;
 				}
 				
 				// Add resumes in results, if not empty
