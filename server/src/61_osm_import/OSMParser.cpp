@@ -55,7 +55,7 @@ class OSMParserImpl
 private:
 	typedef std::map<std::string, std::string> AttributesMap;
 
-	typedef long OSMId;
+	typedef unsigned long long int OSMId;
 
 	static OSMId ToOSMId(const std::string& osmIdStr);
 	static OSMId ParseOSMId(const XML_Char** attrs);
