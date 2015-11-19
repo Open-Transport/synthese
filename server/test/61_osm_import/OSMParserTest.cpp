@@ -41,6 +41,7 @@ namespace synthese
 		{
 		public:
 			std::vector<boost::tuple<std::string, std::string, geos::geom::Geometry*> > handledCities;
+			std::vector<boost::tuple<TrafficDirection, double, bool, bool, bool, geos::geom::Geometry*> > handledRoads;
 
 			virtual void handleCity(const std::string& cityName, const std::string& cityCode, geos::geom::Geometry* boundary)
 			{
@@ -54,7 +55,7 @@ namespace synthese
 									bool isWalkable,
 									geos::geom::Geometry* path)
 			{
-				//handledRoads.push_back(boost::make_tuple(cityName, cityCode, boundary));
+				handledRoads.push_back(boost::make_tuple(trafficDirection, maxSpeed, isDrivable, isBikable, isWalkable, path));
 			}
 
 		};
@@ -174,6 +175,31 @@ namespace synthese
 			check_city_handled_without_boundary(*it++, "Comigne", "11095");
 			check_city_handled_without_boundary(*it++, "Pradelles-en-Val", "11298");
 
+		}
+
+		BOOST_AUTO_TEST_CASE (should_find_all_roads_from_ten_french_cities)
+		{
+			FakeOSMEntityHandler fakeOSMEntityHandler;
+			std::ifstream osmStream("ten_french_cities_only_one_with_complete_boundary.osm");
+			OSMParser parser(std::cout, fakeOSMEntityHandler, OSMLocale::OSMLocale_FR);
+			parser.parse(osmStream);
+			osmStream.close();
+
+
+			BOOST_CHECK_EQUAL(649, fakeOSMEntityHandler.handledRoads.size());
+			/*
+			std::vector<boost::tuple<std::string, std::string, geos::geom::Geometry*> >::iterator it =
+					fakeOSMEntityHandler.handledCities.begin();
+			check_city_handled_without_boundary(*it++, "Trèbes", "11397");
+			check_city_handled_without_boundary(*it++, "Badens", "11023");
+			check_city_handled_without_boundary(*it++, "Blomac", "11042");
+			check_city_handled_without_boundary(*it++, "Marseillette", "11220");
+			check_city_handled_without_boundary(*it++, "Barbaira", "11027");
+			check_city_handled_with_boundary(*it++, "Capendu", "11068", capenduBoundary);
+			check_city_handled_without_boundary(*it++, "Douzens", "11122");
+			check_city_handled_without_boundary(*it++, "Comigne", "11095");
+			check_city_handled_without_boundary(*it++, "Pradelles-en-Val", "11298");
+			*/
 		}
 
 
