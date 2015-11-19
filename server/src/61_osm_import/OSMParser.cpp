@@ -620,7 +620,8 @@ OSMParserImpl::OSMWay::computeIsDrivable() const
 	if (highwayTag != "")
 	{
 		if (highwayTag == "track" || highwayTag == "pedestrian" || highwayTag == "path" ||
-			highwayTag == "cycleway" || highwayTag == "footway" || highwayTag == "bridleway" || highwayTag == "steps")
+			highwayTag == "cycleway" || highwayTag == "footway" || highwayTag == "bridleway" ||
+			highwayTag == "steps" || highwayTag == "construction")
 			isDrivable = false;
 	}
 	if (accessTag != "")
