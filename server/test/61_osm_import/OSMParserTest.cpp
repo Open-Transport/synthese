@@ -46,7 +46,12 @@ namespace synthese
 				handledCities.push_back(boost::make_tuple(cityName, cityCode, boundary));
 			}
 
-			virtual void handleRoad()
+			virtual void handleRoad(TrafficDirection trafficDirection,
+									double maxSpeed,
+									bool isDrivable,
+									bool isBikable,
+									bool isWalkable,
+									geos::geom::Geometry* path)
 			{
 				//handledRoads.push_back(boost::make_tuple(cityName, cityCode, boundary));
 			}

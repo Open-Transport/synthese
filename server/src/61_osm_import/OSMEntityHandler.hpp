@@ -40,6 +40,13 @@ namespace synthese
 namespace data_exchange
 {
 
+typedef enum {
+	TWO_WAYS,
+	ONE_WAY,
+	REVERSED_ONE_WAY
+} TrafficDirection;
+
+
 class OSMEntityHandler
 {
 protected:
@@ -52,7 +59,12 @@ public:
 		                    const std::string& cityCode, 
 		                    geos::geom::Geometry* boundary) = 0;
 
-	virtual void handleRoad() = 0;
+	virtual void handleRoad(TrafficDirection trafficDirection,
+							double maxSpeed,
+							bool isDrivable,
+							bool isBikable,
+							bool isWalkable,
+							geos::geom::Geometry* path) = 0;
 
 };
 

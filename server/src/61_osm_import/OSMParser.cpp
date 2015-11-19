@@ -81,8 +81,10 @@ private:
 		OSMId id;
 		std::vector<OSMId> nodeRefs;
 		std::vector<OSMNode> nodes;
+		bool isBoundaryWay;
+		bool isHighway;
 
-		OSMWay(): id(0) {}
+		OSMWay(): id(0), isBoundaryWay(false), isHighway(false) {}
 
 		bool operator==(const OSMWay& rhs) const {
 			return (id == rhs.id); }
@@ -140,7 +142,7 @@ private:
 	const std::string _cityCodeTag;
 
 	OSMRelation _currentRelation;
-	OSMWay _currentBoundaryWay;
+	OSMWay _currentWay;
 
 	std::map<OSMId, OSMNode> _nodes;
 	std::map<OSMId, OSMWay> _boundaryWays;
@@ -156,7 +158,9 @@ public:
 private:
 
 	bool inRelation() const { return !(_currentRelation == OSMRelation::EMPTY); }
-	bool inBoundaryWay() const { return !(_currentBoundaryWay == OSMWay::EMPTY); }
+	bool inWay() const { return !(_currentWay == OSMWay::EMPTY); }
+	bool inBoundaryWay() const { return inWay() && _currentWay.isBoundaryWay; }
+	bool inHighway() const { return inWay() && _currentWay.isHighway; }
 
 	void parseOnce(std::istream& osmInput);
 
@@ -187,19 +191,22 @@ private:
 	bool startRelationTag(const XML_Char* name);
 	void handleStartRelationTag(const XML_Char* name, const XML_Char** attrs);
 
+	bool startWayTag(const XML_Char* name);
+	void handleStartWayTag(const XML_Char* name, const XML_Char** attrs);
+
 	bool startWay(const XML_Char* name);
 	void handleStartWay(const XML_Char* name, const XML_Char** attrs);
 
-	bool startBoundaryWayNodeRef(const XML_Char* name);
-	void handleStartBoundaryWayNodeRef(const XML_Char* name, const XML_Char** attrs);
+	bool startWayNodeRef(const XML_Char* name);
+	void handleStartWayNodeRef(const XML_Char* name, const XML_Char** attrs);
 
 	bool startRelationMember(const XML_Char* name);
 	void handleStartRelationMember(const XML_Char* name, const XML_Char** attrs);
 
 	bool endBoundaryWay(const XML_Char* name) const;
 	void handleEndBoundaryWay();
-	bool endWay(const XML_Char* name);
-	void handleEndWay(const XML_Char* name);
+	bool endHighway(const XML_Char* name);
+	void handleEndHighway(const XML_Char* name);
 	bool endCityRelation(const XML_Char* name) const;
 	void handleEndCityRelation();
 
@@ -280,7 +287,7 @@ OSMParserImpl::OSMParserImpl(std::ostream& logStream,
 	, _osmEntityHandler(osmEntityHandler)
 	, _cityCodeTag(cityCodeTag)
 	, _currentRelation(OSMRelation::EMPTY)
-	, _currentBoundaryWay(OSMWay::EMPTY)
+	, _currentWay(OSMWay::EMPTY)
 	, _passCount(0)
 {
 }
@@ -418,39 +425,57 @@ OSMParserImpl::handleStartRelationTag(const XML_Char* name, const XML_Char** att
 }
 
 bool
+OSMParserImpl::startWayTag(const XML_Char* name)
+{
+	return inWay() && !std::strcmp(name, "tag");
+}
+
+void
+OSMParserImpl::handleStartWayTag(const XML_Char* name, const XML_Char** attrs)
+{
+	AttributesMap attributes = makeAttributesMap(attrs);
+	if (attributes["k"] == "highway")
+	{
+		_currentWay.isHighway = true;
+	}
+}
+
+
+bool
 OSMParserImpl::startWay(const XML_Char* name)
 {
 	return !std::strcmp(name, "way");
 }
 
 bool
-OSMParserImpl::endWay(const XML_Char* name)
+OSMParserImpl::endHighway(const XML_Char* name)
 {
-	return !std::strcmp(name, "way");
+	return !std::strcmp(name, "way") && inHighway();
 }
 
 void
 OSMParserImpl::handleStartWay(const XML_Char* name, const XML_Char** attrs)
 {
 	OSMId wayId = ParseOSMId(attrs);
+	_currentWay = OSMWay::EMPTY;
+	_currentWay.id = wayId;
 	if (_boundaryWays.find(wayId) != _boundaryWays.end())
 	{
-		_currentBoundaryWay = OSMWay::EMPTY;
-		_currentBoundaryWay.id = wayId;
+		_currentWay.isBoundaryWay = true;
 	}
 }
 
 bool
-OSMParserImpl::startBoundaryWayNodeRef(const XML_Char* name)
+OSMParserImpl::startWayNodeRef(const XML_Char* name)
 {
-	return inBoundaryWay() && !std::strcmp(name, "nd");
+	return inWay() && !std::strcmp(name, "nd");
 }
 
 void
-OSMParserImpl::handleStartBoundaryWayNodeRef(const XML_Char* name, const XML_Char** attrs)
+OSMParserImpl::handleStartWayNodeRef(const XML_Char* name, const XML_Char** attrs)
 {
 	AttributesMap attributes = makeAttributesMap(attrs);
-	_currentBoundaryWay.nodeRefs.push_back(ToOSMId(attributes["ref"]));
+	_currentWay.nodeRefs.push_back(ToOSMId(attributes["ref"]));
 }
 
 bool
@@ -485,9 +510,9 @@ OSMParserImpl::secondPassStartElement(const XML_Char* name, const XML_Char** att
 	{
 		handleStartWay(name, attrs);
 	}
-	else if (startBoundaryWayNodeRef(name))
+	else if (startWayNodeRef(name))
 	{
-		handleStartBoundaryWayNodeRef(name, attrs);
+		handleStartWayNodeRef(name, attrs);
 	}
 	else if (startRelationMember(name))
 	{
@@ -510,9 +535,9 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 	{
 		handleEndBoundaryWay();
 	}
-	else if (endWay(name))
+	else if (endHighway(name))
 	{
-		handleEndWay(name);
+		handleEndHighway(name);
 	}
 	else if (endCityRelation(name))
 	{
@@ -525,9 +550,25 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 }
 
 void
-OSMParserImpl::handleEndWay(const XML_Char* name)
+OSMParserImpl::handleEndHighway(const XML_Char* name)
 {
-	_osmEntityHandler.handleRoad();
+	bool completeWay = true;
+	BOOST_FOREACH(OSMId nodeRef, _currentWay.nodeRefs)
+	{
+		if (_nodes.find(nodeRef) == _nodes.end())
+		{
+			_logStream << "Ignoring incomplete highway " << _currentWay.id << std::endl;
+			completeWay = false;
+			break;
+		}
+		_currentWay.nodes.push_back(_nodes[nodeRef]);
+	}
+	if (completeWay)
+	{
+		_logStream << "Found complete highway " << _currentWay.id << std::endl;
+		// TODO _osmEntityHandler.handleRoad();
+	}
+	_currentWay = OSMWay::EMPTY;
 }
 
 bool
@@ -540,22 +581,22 @@ void
 OSMParserImpl::handleEndBoundaryWay()
 {
 	bool completeBoundaryWay = true;
-	BOOST_FOREACH(OSMId nodeRef, _currentBoundaryWay.nodeRefs)
+	BOOST_FOREACH(OSMId nodeRef, _currentWay.nodeRefs)
 	{
 		if (_nodes.find(nodeRef) == _nodes.end())
 		{
-			_logStream << "Ignoring incomplete city boundary way " << _currentBoundaryWay.id << std::endl;
+			_logStream << "Ignoring incomplete city boundary way " << _currentWay.id << std::endl;
 			completeBoundaryWay = false;
 			break;
 		}
-		_currentBoundaryWay.nodes.push_back(_nodes[nodeRef]);
+		_currentWay.nodes.push_back(_nodes[nodeRef]);
 	}
 	if (completeBoundaryWay)
 	{
-		_logStream << "Found complete city boundary way " << _currentBoundaryWay.id << std::endl;
-		_boundaryWays[_currentBoundaryWay.id] = _currentBoundaryWay;
+		_logStream << "Found complete city boundary way " << _currentWay.id << std::endl;
+		_boundaryWays[_currentWay.id] = _currentWay;
 	}
-	_currentBoundaryWay = OSMWay::EMPTY;
+	_currentWay = OSMWay::EMPTY;
 }
 
 
