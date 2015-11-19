@@ -21,6 +21,7 @@
 */
 #include "OSMParser.hpp"
 #include "OSMEntityHandler.hpp"
+#include "OSMLocale.hpp"
 
 #include <expat.h>
 
@@ -143,7 +144,7 @@ private:
 
 	std::ostream& _logStream;
 	OSMEntityHandler& _osmEntityHandler;
-	const std::string _cityCodeTag;
+	const OSMLocale& _osmLocale;
 
 	OSMRelation _currentRelation;
 	OSMWay _currentWay;
@@ -155,7 +156,7 @@ private:
 public:
 	OSMParserImpl(std::ostream& logStream,
 				  OSMEntityHandler& osmEntityHandler,
-				  const std::string& cityCodeTag);
+				  const OSMLocale& osmLocale);
 
 	void parse(std::istream& osmInput);
 
@@ -286,10 +287,10 @@ OSMParserImpl::OSMRelation::getValueOrEmpty(const std::string& tag) const
 
 OSMParserImpl::OSMParserImpl(std::ostream& logStream,
 							 OSMEntityHandler& osmEntityHandler,
-							 const std::string& cityCodeTag)
+							 const OSMLocale& osmLocale)
 	: _logStream(logStream)
 	, _osmEntityHandler(osmEntityHandler)
-	, _cityCodeTag(cityCodeTag)
+	, _osmLocale(osmLocale)
 	, _currentRelation(OSMRelation::EMPTY)
 	, _currentWay(OSMWay::EMPTY)
 	, _passCount(0)
@@ -687,7 +688,7 @@ OSMParserImpl::handleEndCityRelation()
 	}
 
 	std::string cityName = _currentRelation.getName();
-	std::string cityCode = _currentRelation.getValueOrEmpty(_cityCodeTag);
+	std::string cityCode = _currentRelation.getValueOrEmpty(_osmLocale.getCityCodeTag());
 	if (completeRelation)
 	{
 		try
@@ -911,8 +912,8 @@ OSMParserImpl::parse(std::istream& osmInput)
 
 OSMParser::OSMParser(std::ostream& logStream,
 					 OSMEntityHandler& osmEntityHandler,
-					 const std::string& cityCodeTag)
-	: _pimpl(new OSMParserImpl(logStream, osmEntityHandler, cityCodeTag))
+					 const OSMLocale& osmLocale)
+	: _pimpl(new OSMParserImpl(logStream, osmEntityHandler, osmLocale))
 {
 }
 
