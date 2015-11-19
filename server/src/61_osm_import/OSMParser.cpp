@@ -83,6 +83,9 @@ private:
 		std::vector<OSMNode> nodes;
 		bool isBoundaryWay;
 		bool isHighway;
+		std::string highwayTag;
+		std::string onewayTag;
+		std::string junctionTag;
 
 		OSMWay(): id(0), isBoundaryWay(false), isHighway(false) {}
 
@@ -436,7 +439,15 @@ OSMParserImpl::handleStartWayTag(const XML_Char* name, const XML_Char** attrs)
 	AttributesMap attributes = makeAttributesMap(attrs);
 	if (attributes["k"] == "highway")
 	{
-		_currentWay.isHighway = true;
+		_currentWay.highwayTag = attributes["v"];
+	}
+	else if (attributes["k"] == "oneway")
+	{
+		_currentWay.onewayTag = attributes["v"];
+	}
+	else if (attributes["k"] == "junction")
+	{
+		_currentWay.junctionTag = attributes["v"];
 	}
 }
 
@@ -552,22 +563,46 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 void
 OSMParserImpl::handleEndHighway(const XML_Char* name)
 {
-	bool completeWay = true;
+	bool completeWayPath = true;
 	BOOST_FOREACH(OSMId nodeRef, _currentWay.nodeRefs)
 	{
 		if (_nodes.find(nodeRef) == _nodes.end())
 		{
-			_logStream << "Ignoring incomplete highway " << _currentWay.id << std::endl;
-			completeWay = false;
+			_logStream << "Ignoring incomplete highway path " << _currentWay.id << std::endl;
+			completeWayPath = false;
 			break;
 		}
 		_currentWay.nodes.push_back(_nodes[nodeRef]);
 	}
-	if (completeWay)
+
+	if (!completeWayPath) return;
+
+	TrafficDirection trafficDirection = TWO_WAYS;
+	if ((_currentWay.highwayTag == "motorway") || (_currentWay.highwayTag == "motorway_link"))
 	{
-		_logStream << "Found complete highway " << _currentWay.id << std::endl;
-		// TODO _osmEntityHandler.handleRoad();
+		trafficDirection = ONE_WAY;
 	}
+	if ((_currentWay.onewayTag == "true") || (_currentWay.onewayTag == "yes") || (_currentWay.onewayTag == "1"))
+	{
+		trafficDirection = ONE_WAY;
+	}
+	else if ((_currentWay.onewayTag == "false") || (_currentWay.onewayTag == "no") || (_currentWay.onewayTag == "0"))
+	{
+		trafficDirection = TWO_WAYS;
+	}
+	else if (_currentWay.onewayTag == "-1")
+	{
+		trafficDirection = REVERSED_ONE_WAY;
+	}
+
+	if(_currentWay.junctionTag == "roundabout")
+	{
+		trafficDirection = ONE_WAY;
+	}
+
+	_logStream << "Found complete highway " << _currentWay.id << std::endl;
+	_osmEntityHandler.handleRoad(trafficDirection, 0.0, true, true, true, 0);
+
 	_currentWay = OSMWay::EMPTY;
 }
 
@@ -770,6 +805,7 @@ OSMParserImpl::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std
 	return poly;
 
 }
+
 
 
 OSMParserImpl::AttributesMap
