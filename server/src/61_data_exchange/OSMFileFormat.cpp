@@ -424,7 +424,7 @@ namespace synthese
 							{
 								NodePtr intersection = network->getNode(viaList.front()->getId());
 
-								BOOST_FOREACH(Way* curWay, intersection->getWays())
+/*								BOOST_FOREACH(Way* curWay, intersection->getWays())
 								{
 									// If it's not the "to" way of the "only" restriction, mark the road pair as unreachable in the crossing
 									if(curWay->getId() != toList.front()->getId())
@@ -436,6 +436,7 @@ namespace synthese
 										}
 									}
 								}
+								*/
 							}
 						}
 					}

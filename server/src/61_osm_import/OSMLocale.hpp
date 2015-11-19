@@ -1,6 +1,6 @@
 
-/** OSMParser class header.
-	@file OSMParser.hpp
+/** OSMLocale class header.
+	@file OSMLocale.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_dataexchange_OSMParser_hpp__
-#define SYNTHESE_dataexchange_OSMParser_hpp__
+#ifndef SYNTHESE_dataexchange_OSMLocale_hpp__
+#define SYNTHESE_dataexchange_OSMLocale_hpp__
 
 #include <string>
 #include <map>
@@ -32,29 +32,37 @@ namespace synthese
 namespace data_exchange
 {
 
-class OSMParserImpl;
-class OSMEntityHandler;
-class OSMLocale;
-
-class OSMParser
+class OSMLocale
 {
 public:
 
-	OSMParser(std::ostream& logStream,
-			  OSMEntityHandler& osmEntityHandler,
-			  const OSMLocale& osmLocale);
+	static const OSMLocale OSMLocale_FR;
+	static const OSMLocale OSMLocale_CH;
 
-	virtual ~OSMParser();
+	const std::string& getCityCodeTag() const;
+	const std::map<std::string, unsigned int>& getImplicitSpeeds() const;
+	const std::map<std::string, std::string>& getDefaultRoadNames() const;
 
-	void parse(std::istream& osmInput);
+	static const OSMLocale& getInstance(const std::string& countryCode);
 
 private:
 
-	OSMParserImpl* _pimpl;
+	OSMLocale(const std::string& cityCodeTag,
+			  const std::map<std::string, std::string>& defaultRoadNames,
+			  const std::map<std::string, unsigned int>& implicitSpeeds);
+
+	virtual ~OSMLocale();
+
+private:
+
+	const std::string _cityCodeTag;
+	const std::map<std::string, std::string> _defaultRoadNames;
+	const std::map<std::string, unsigned int> _implicitSpeeds;
+
 };
 
 
 }
 }
 
-#endif // SYNTHESE_dataexchange_OSMParser_hpp__
+#endif // SYNTHESE_dataexchange_OSMLocale_hpp__

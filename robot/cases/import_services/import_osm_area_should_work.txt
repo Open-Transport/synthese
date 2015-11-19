@@ -12,35 +12,33 @@ Import OSM Export (direct OSM web export) Of Small Swiss Tile Should Work
     ${osm_file_path}=  Set Variable   ${CURDIR}/../../resources/data/small_swiss_tile.osm
     ${expected_city_count}=   Count Cities In OSM File ${osm_file_path}
     ${expected_road_count}=   Count Roads In OSM File ${osm_file_path}
-    ${expected_house_count}=   Count Houses In OSM File ${osm_file_path}
-    Import OSM Export  ${osm_file_path}
+    Import OSM Export  ${osm_file_path}  CH
     There are ${expected_city_count} Objects In Table ${CITIES_TABLE_ID}
     There are ${expected_road_count} Objects In Table ${ROADS_TABLE_ID}
-    There are ${expected_house_count} Objects In Table ${HOUSES_TABLE_ID}
 
 Import OSM Export (direct OSM web export) Of Larger Swiss Tile Should Work
     On node 0
     ${osm_file_path}=  Set Variable   ${CURDIR}/../../resources/data/larger_swiss_tile.osm
     ${expected_city_count}=   Count Cities In OSM File ${osm_file_path}
     ${expected_road_count}=   Count Roads In OSM File ${osm_file_path}
-    ${expected_house_count}=   Count Houses In OSM File ${osm_file_path}
-    Import OSM Export  ${osm_file_path}
+    Import OSM Export  ${osm_file_path}  CH
     There are ${expected_city_count} Objects In Table ${CITIES_TABLE_ID}
     There are ${expected_road_count} Objects In Table ${ROADS_TABLE_ID}
-    There are ${expected_house_count} Objects In Table ${HOUSES_TABLE_ID}
 
 Two Imports Of The Same OSM Export Should Work
     On node 0
     ${osm_file_path}=  Set Variable   ${CURDIR}/../../resources/data/larger_swiss_tile.osm
     ${expected_city_count}=   Count Cities In OSM File ${osm_file_path}
     ${expected_road_count}=   Count Roads In OSM File ${osm_file_path}
-    ${expected_house_count}=   Count Houses In OSM File ${osm_file_path}
-    Import OSM Export  ${osm_file_path}
-    Import OSM Export  ${osm_file_path}
+    Import OSM Export  ${osm_file_path}  CH
+    Import OSM Export  ${osm_file_path}  CH
     There are ${expected_city_count} Objects In Table ${CITIES_TABLE_ID}
     There are ${expected_road_count} Objects In Table ${ROADS_TABLE_ID}
-    There are ${expected_house_count} Objects In Table ${HOUSES_TABLE_ID}
 
+Import of Whole Switzerland OSM Export Should Work
+    On node 0
+    ${osm_file_path}=  Set Variable   /home/mjambert/workspace/rcsmobility/gitlab/switzerland-tests/robot/resources/data/swiss.osm
+    Import OSM Export  ${osm_file_path}  CH
 
 *** Keywords ***
 
@@ -48,11 +46,6 @@ Count Cities In OSM File ${osm_file_path}
     ${osm_xml}=   Parse XML   ${osm_file_path}
     ${osm_cities_count}=   Get Element Count   ${osm_xml}   xpath=relation[(tag[@k='boundary' and @v='administrative']) and (tag[@k='admin_level' and @v='8'])]
     [Return]    ${osm_cities_count}
-
-Count Houses In OSM File ${osm_file_path}
-    ${osm_xml}=   Parse XML   ${osm_file_path}
-    ${osm_houses_count}=   Get Element Count   ${osm_xml}   xpath=node[(tag[@k='addr:housenumber']) and (tag[@k='addr:street'])]
-    [Return]    ${osm_houses_count}
 
 Count Roads In OSM File ${osm_file_path}
     ${osm_xml}=   Parse XML   ${osm_file_path}

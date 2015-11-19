@@ -49,9 +49,9 @@ namespace synthese
 			{
 			private:
 
-				static const std::string PARAMETER_CITY_CODE_TAG;
+				static const std::string PARAMETER_COUNTRY_CODE;
 
-				boost::optional<std::string> _cityCodeTag;
+				boost::optional<std::string> _countryCode;
 
 
 			protected:

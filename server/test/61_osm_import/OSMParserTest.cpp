@@ -23,6 +23,7 @@
 #include <boost/test/auto_unit_test.hpp>
 
 #include "OSMParser.hpp"
+#include "OSMLocale.hpp"
 #include "OSMEntityHandler.hpp"
 
 #include <boost/tuple/tuple.hpp>
@@ -35,52 +36,98 @@ namespace synthese
 	namespace data_exchange
 	{
 
+		typedef boost::shared_ptr<geos::geom::Geometry> GeometryPtr;
+		typedef boost::shared_ptr<geos::geom::Point> PointPtr;
+		typedef boost::shared_ptr<geos::geom::LineString> LineStringPtr;
+
 
 		class FakeOSMEntityHandler : public OSMEntityHandler
 		{
 		public:
-			std::vector<boost::tuple<std::string, std::string, geos::geom::Geometry*> > handledCities;
+			std::vector<boost::tuple<std::string, std::string, GeometryPtr> > handledCities;
+			std::vector<boost::tuple<OSMId, std::string, road::RoadType, GeometryPtr> > handledRoads;
+			std::vector<boost::tuple<HouseNumber, std::string, PointPtr> > handledHouses;
 
-			virtual void handleCity(const std::string& cityName, const std::string& cityCode, geos::geom::Geometry* boundary)
+			void handleCity(const std::string& cityName, const std::string& cityCode, GeometryPtr boundary)
 			{
 				handledCities.push_back(boost::make_tuple(cityName, cityCode, boundary));
 			}
 
+			void handleRoad(const OSMId& roadSourceId, 
+					const std::string& name,
+					const road::RoadType& roadType, 
+					GeometryPtr path)
+			{
+				handledRoads.push_back(boost::make_tuple(roadSourceId, name, roadType, path));
+			}
+
+			void handleCrossing(const OSMId& crossingSourceId, PointPtr point)
+			{
+
+			}
+
+			void handleRoadChunk(size_t rank, 
+										 graph::MetricOffset metricOffset,
+										 TrafficDirection trafficDirection,
+										 double maxSpeed,
+					                     bool isDrivable,
+					                     bool isBikable,
+					                     bool isWalkable,
+										 LineStringPtr path)
+			{
+
+			}
+
+
+			void handleHouse(const HouseNumber& houseNumber,
+									 const std::string& streetName,
+									 PointPtr point)
+			{
+				handledHouses.push_back(boost::make_tuple(houseNumber, streetName, point));
+			}
+
+			void handleHouse(const HouseNumber& houseNumber,
+							 const OSMId& roadSourceId,
+							 PointPtr point)
+			{
+
+			}
+
+
 		};
 
 
-		void check_city_handled_with_boundary(const boost::tuple<std::string, std::string, geos::geom::Geometry*>& handledCity,
+		void check_city_handled_with_boundary(const boost::tuple<std::string, std::string, GeometryPtr>& handledCity,
 											  const std::string& expectedCityName,
 											  const std::string& expectedCityCode,
 											  const std::string expectedWktBoundary)
 		{
 			BOOST_CHECK_EQUAL(expectedCityName, handledCity.get<0>());
 			BOOST_CHECK_EQUAL(expectedCityCode, handledCity.get<1>());
-			BOOST_CHECK(handledCity.get<2>() != 0);
+			BOOST_CHECK(handledCity.get<2>().get() != 0);
 			BOOST_CHECK_EQUAL(expectedWktBoundary, handledCity.get<2>()->toString());
 		}
 
 
-		void check_city_handled_without_boundary(const boost::tuple<std::string, std::string, geos::geom::Geometry*>& handledCity,
+		void check_city_handled_without_boundary(const boost::tuple<std::string, std::string, GeometryPtr>& handledCity,
 												 const std::string& expectedCityName,
 												 const std::string& expectedCityCode)
 		{
 			BOOST_CHECK_EQUAL(expectedCityName, handledCity.get<0>());
 			BOOST_CHECK_EQUAL(expectedCityCode, handledCity.get<1>());
-			BOOST_CHECK_MESSAGE(handledCity.get<2>() == 0, "No boundary was expected!");
+			BOOST_CHECK_MESSAGE(handledCity.get<2>().get() == 0, "No boundary was expected!");
 		}
-
 
 		BOOST_AUTO_TEST_CASE (should_find_five_swiss_cities_without_boundaries_from_osm_file)
 		{
 			std::ifstream osmStream("five_swiss_cities_with_incomplete_boundaries.osm");
 			FakeOSMEntityHandler fakeOSMEntityHandler;
-			OSMParser parser(std::cout, fakeOSMEntityHandler, "swisstopo:BFS_NUMMER");
+			OSMParser parser(std::cout, fakeOSMEntityHandler, OSMLocale::OSMLocale_CH);
 			parser.parse(osmStream);
 			osmStream.close();
 
 			BOOST_CHECK_EQUAL(5, fakeOSMEntityHandler.handledCities.size());
-			std::vector<boost::tuple<std::string, std::string, geos::geom::Geometry*> >::iterator it =
+			std::vector<boost::tuple<std::string, std::string, GeometryPtr> >::iterator it =
 					fakeOSMEntityHandler.handledCities.begin();
 			check_city_handled_without_boundary(*it++, "Hauterive (NE)", "6454");
 			check_city_handled_without_boundary(*it++, "Neuchâtel", "6458");
@@ -94,7 +141,7 @@ namespace synthese
 		{
 			FakeOSMEntityHandler fakeOSMEntityHandler;
 			std::ifstream osmStream("ten_french_cities_only_one_with_complete_boundary.osm");
-			OSMParser parser(std::cout, fakeOSMEntityHandler);
+			OSMParser parser(std::cout, fakeOSMEntityHandler, OSMLocale::OSMLocale_FR);
 			parser.parse(osmStream);
 			osmStream.close();
 
@@ -151,7 +198,7 @@ namespace synthese
 											  "2.5228000000000002 43.2010000000000005)))");
 
 			BOOST_CHECK_EQUAL(10, fakeOSMEntityHandler.handledCities.size());
-			std::vector<boost::tuple<std::string, std::string, geos::geom::Geometry*> >::iterator it =
+			std::vector<boost::tuple<std::string, std::string, GeometryPtr> >::iterator it =
 					fakeOSMEntityHandler.handledCities.begin();
 			check_city_handled_without_boundary(*it++, "Trèbes", "11397");
 			check_city_handled_without_boundary(*it++, "Badens", "11023");
@@ -165,6 +212,32 @@ namespace synthese
 
 		}
 
+		BOOST_AUTO_TEST_CASE (should_find_all_roads_from_ten_french_cities)
+		{
+			FakeOSMEntityHandler fakeOSMEntityHandler;
+			std::ifstream osmStream("ten_french_cities_only_one_with_complete_boundary.osm");
+			OSMParser parser(std::cout, fakeOSMEntityHandler, OSMLocale::OSMLocale_FR);
+			parser.parse(osmStream);
+			osmStream.close();
 
+
+			BOOST_CHECK_EQUAL(649, fakeOSMEntityHandler.handledRoads.size());
+		}
+
+/*
+		BOOST_AUTO_TEST_CASE (should_parse_full_swiss)
+		{
+			FakeOSMEntityHandler fakeOSMEntityHandler;
+			//std::ifstream osmStream("/home/mjambert/workspace/rcsmobility/gitlab/switzerland-tests/robot/resources/data/swiss.osm");
+			std::ifstream osmStream("larger_swiss_tile.osm");
+			OSMParser parser(std::cout, fakeOSMEntityHandler, OSMLocale::OSMLocale_FR);
+			parser.parse(osmStream);
+			osmStream.close();
+
+
+			BOOST_CHECK_EQUAL(649, fakeOSMEntityHandler.handledRoads.size());
+		}
+		*/
 	}
 }
+	

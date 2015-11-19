@@ -2,6 +2,8 @@ set_source_groups()
 
 set(osm_import_SRCS
   OSMEntityHandler.hpp
+  OSMLocale.hpp
+  OSMLocale.cpp
   OSMParser.hpp
   OSMParser.cpp
 )

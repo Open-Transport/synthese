@@ -7,14 +7,14 @@ Library           XML
 *** Keywords ***
 
 Import OSM Export
-    [Arguments]  ${osm_export_file}
+    [Arguments]  ${osm_export_file}  ${country_code}
     ${http_response}=  Create Synthese Object    ${DATA_SOURCES_TABLE_ID}  field_name\=OpenStreetMapCityBoundaries  field_charset\=UTF-8  field_srid\=4326
     ${data_source_id}=  Get Element Attribute  source=${http_response.content}  name=id
 
     ${http_response}=  Create Synthese Object    ${IMPORTS_TABLE_ID}  ${IMPORTS_TABLE_ID}  field_name\=OSM_Import  field_file_format\=OpenStreetMapCityBoundaries  field_data_source_id\=${data_source_id}  field_log_path\=import_log  field_min_log_level\=10
     ${import_id}=  Get Element Attribute  source=${http_response.content}  name=id
 
-    ${response}=  Call Synthese Service    ImportFunction    ds\=${data_source_id}  di\=1  pa\=${osm_export_file}  import_id\=${import_id}
+    ${response}=  Call Synthese Service    ImportFunction    ds\=${data_source_id}  di\=1  pa\=${osm_export_file}  import_id\=${import_id}  country_code\=${country_code}
     Log Many  ${response.content}
     Should Be Equal As Strings    ${response.status_code}    200
     [Return]    ${response}
