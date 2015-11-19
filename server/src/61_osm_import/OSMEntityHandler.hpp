@@ -59,7 +59,8 @@ public:
 		                    const std::string& cityCode, 
 		                    geos::geom::Geometry* boundary) = 0;
 
-	virtual void handleRoad(TrafficDirection trafficDirection,
+	virtual void handleRoad(const std::string& name,
+							TrafficDirection trafficDirection,
 							double maxSpeed,
 							bool isDrivable,
 							bool isBikable,

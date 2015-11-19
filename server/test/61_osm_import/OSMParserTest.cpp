@@ -41,21 +41,22 @@ namespace synthese
 		{
 		public:
 			std::vector<boost::tuple<std::string, std::string, geos::geom::Geometry*> > handledCities;
-			std::vector<boost::tuple<TrafficDirection, double, bool, bool, bool, geos::geom::Geometry*> > handledRoads;
+			std::vector<boost::tuple<std::string, TrafficDirection, double, bool, bool, bool, geos::geom::Geometry*> > handledRoads;
 
 			virtual void handleCity(const std::string& cityName, const std::string& cityCode, geos::geom::Geometry* boundary)
 			{
 				handledCities.push_back(boost::make_tuple(cityName, cityCode, boundary));
 			}
 
-			virtual void handleRoad(TrafficDirection trafficDirection,
+			virtual void handleRoad(const std::string& name,
+									TrafficDirection trafficDirection,
 									double maxSpeed,
 									bool isDrivable,
 									bool isBikable,
 									bool isWalkable,
 									geos::geom::Geometry* path)
 			{
-				handledRoads.push_back(boost::make_tuple(trafficDirection, maxSpeed, isDrivable, isBikable, isWalkable, path));
+				handledRoads.push_back(boost::make_tuple(name, trafficDirection, maxSpeed, isDrivable, isBikable, isWalkable, path));
 			}
 
 		};
@@ -187,19 +188,6 @@ namespace synthese
 
 
 			BOOST_CHECK_EQUAL(649, fakeOSMEntityHandler.handledRoads.size());
-			/*
-			std::vector<boost::tuple<std::string, std::string, geos::geom::Geometry*> >::iterator it =
-					fakeOSMEntityHandler.handledCities.begin();
-			check_city_handled_without_boundary(*it++, "Trèbes", "11397");
-			check_city_handled_without_boundary(*it++, "Badens", "11023");
-			check_city_handled_without_boundary(*it++, "Blomac", "11042");
-			check_city_handled_without_boundary(*it++, "Marseillette", "11220");
-			check_city_handled_without_boundary(*it++, "Barbaira", "11027");
-			check_city_handled_with_boundary(*it++, "Capendu", "11068", capenduBoundary);
-			check_city_handled_without_boundary(*it++, "Douzens", "11122");
-			check_city_handled_without_boundary(*it++, "Comigne", "11095");
-			check_city_handled_without_boundary(*it++, "Pradelles-en-Val", "11298");
-			*/
 		}
 
 

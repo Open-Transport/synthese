@@ -41,10 +41,12 @@ public:
 
 	const std::string& getCityCodeTag() const;
 	const std::map<std::string, unsigned int>& getImplicitSpeeds() const;
+	const std::map<std::string, std::string>& getDefaultRoadNames() const;
 
 private:
 
 	OSMLocale(const std::string& cityCodeTag,
+			  const std::map<std::string, std::string>& defaultRoadNames,
 			  const std::map<std::string, unsigned int>& implicitSpeeds);
 
 	virtual ~OSMLocale();
@@ -52,6 +54,7 @@ private:
 private:
 
 	const std::string _cityCodeTag;
+	const std::map<std::string, std::string> _defaultRoadNames;
 	const std::map<std::string, unsigned int> _implicitSpeeds;
 
 };

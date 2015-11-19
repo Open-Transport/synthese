@@ -31,17 +31,35 @@ namespace data_exchange
 
 const OSMLocale OSMLocale::OSMLocale_FR(
 			"ref:INSEE",
+			boost::assign::map_list_of
+				("service", "Voie sans nom")
+				("pedestrian", "Chemin piéton")
+				("path", "Chemin piéton")
+				("cycleway", "Piste cyclable")
+				("footway", "Chemin piéton")
+				("steps", "Escaliers")
+				("unclassified", "Voie sans nom"),
 			boost::assign::map_list_of("FR:walk", 6) ("FR:urban", 50) ("FR:rural", 90) ("FR:trunk", 110) ("FR:motorway", 130)
 			);
+
 const OSMLocale OSMLocale::OSMLocale_CH(
 			"swisstopo:BFS_NUMMER",
+			boost::assign::map_list_of
+				("service", "Voie sans nom")
+				("pedestrian", "Chemin piéton")
+				("path", "Chemin piéton")
+				("cycleway", "Piste cyclable")
+				("footway", "Chemin piéton")
+				("steps", "Escaliers")
+				("unclassified", "Voie sans nom"),
 			boost::assign::map_list_of("CH:trunk", 100) ("CH:urban", 50) ("CH:rural", 80) ("CH:motorway", 120)
 			);
 
-
 OSMLocale::OSMLocale(const std::string& cityCodeTag,
+					 const std::map<std::string, std::string>& defaultRoadNames,
 					 const std::map<std::string, unsigned int>& implicitSpeeds)
 : _cityCodeTag(cityCodeTag)
+, _defaultRoadNames(defaultRoadNames)
 , _implicitSpeeds(implicitSpeeds)
 {
 
@@ -61,6 +79,12 @@ const std::map<std::string, unsigned int>&
 OSMLocale::getImplicitSpeeds() const
 {
 	return _implicitSpeeds;
+}
+
+const std::map<std::string, std::string>&
+OSMLocale::getDefaultRoadNames() const
+{
+	return _defaultRoadNames;
 }
 
 

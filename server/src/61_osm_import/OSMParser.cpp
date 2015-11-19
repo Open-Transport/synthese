@@ -84,6 +84,9 @@ private:
 		std::vector<OSMNode> nodes;
 		bool isBoundaryWay;
 
+		std::string nameTag;
+		std::string serviceTag;
+
 		std::string highwayTag;
 		std::string onewayTag;
 		std::string junctionTag;
@@ -95,11 +98,12 @@ private:
 		std::string motorVehicleTag;
 		std::string motorCarTag;
 
-		OSMWay(): id(0), isBoundaryWay(false), highwayTag(""), onewayTag(""), junctionTag(""), maxSpeedTag(""),
+		OSMWay(): id(0), isBoundaryWay(false), nameTag(""), serviceTag(""), highwayTag(""), onewayTag(""), junctionTag(""), maxSpeedTag(""),
 				  accessTag(""), footTag(""), bicycleTag(""), motorVehicleTag(""), motorCarTag("") {}
 
 		bool isHighway() const { return highwayTag != ""; }
 
+		std::string computeName() const;
 		bool computeIsWalkable() const;
 		bool computeIsDrivable() const;
 		bool computeIsBikable() const;
@@ -468,7 +472,15 @@ void
 OSMParserImpl::handleStartWayTag(const XML_Char* name, const XML_Char** attrs)
 {
 	AttributesMap attributes = makeAttributesMap(attrs);
-	if (attributes["k"] == "highway")
+	if (attributes["k"] == "name")
+	{
+		_currentWay.nameTag = attributes["v"];
+	}
+	else if (attributes["k"] == "service")
+	{
+		_currentWay.serviceTag = attributes["v"];
+	}
+	else if (attributes["k"] == "highway")
 	{
 		_currentWay.highwayTag = attributes["v"];
 	}
@@ -612,6 +624,28 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 	}
 }
 
+std::string
+OSMParserImpl::OSMWay::computeName() const
+{
+	std::string name;
+	if (nameTag != "")
+	{
+		name = nameTag;
+	}
+	else if (junctionTag  == "roundabout")
+	{
+		name = "Rond-point";
+	}
+	else if (highwayTag != "")
+	{
+		if ((highwayTag == "service") && (serviceTag == "parking_aisle"))
+		{
+			name = "Parking";
+		}
+	}
+	return name;
+}
+
 
 bool
 OSMParserImpl::OSMWay::computeIsDrivable() const
@@ -721,6 +755,13 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 		_currentWay.nodes.push_back(_nodes[nodeRef]);
 	}
 
+	std::string roadName = _currentWay.computeName();
+	if (roadName == "")
+	{
+		std::map<std::string, std::string>::const_iterator it = _osmLocale.getDefaultRoadNames().find(_currentWay.highwayTag);
+		if (it != _osmLocale.getDefaultRoadNames().end()) roadName = it->second;
+	}
+
 	TrafficDirection trafficDirection = TWO_WAYS;
 	if ((_currentWay.highwayTag == "motorway") || (_currentWay.highwayTag == "motorway_link"))
 	{
@@ -773,25 +814,27 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 	if (!completeWayPath)
 	{
 		_logStream << "Found highway with incomplete path : id = " << _currentWay.id <<
+					  " name = '" << roadName << "'" <<
 					  " trafficDirection = " << trafficDirection <<
 					  " maxSpeed = " << maxSpeed <<
 					  " isDrivable = " << isDrivable <<
 					  " isBikable = " << isBikable <<
 					  " isWalkable = " << isWalkable <<
 					  std::endl;
-		_osmEntityHandler.handleRoad(trafficDirection, maxSpeed, isDrivable, isBikable, isWalkable, 0);
+		_osmEntityHandler.handleRoad(name, trafficDirection, maxSpeed, isDrivable, isBikable, isWalkable, 0);
 	}
 	else
 	{
 		geos::geom::Geometry* path = makeGeometryFrom(&_currentWay);
 		_logStream << "Found highway with complete path : id = " << _currentWay.id <<
+					  " name = " << roadName <<
 					  " trafficDirection = " << trafficDirection <<
 					  " maxSpeed = " << maxSpeed <<
 					  " isDrivable = " << isDrivable <<
 					  " isBikable = " << isBikable <<
 					  " isWalkable = " << isWalkable <<
 					  std::endl;
-		_osmEntityHandler.handleRoad(trafficDirection, maxSpeed, isDrivable, isBikable, isWalkable, path);
+		_osmEntityHandler.handleRoad(name, trafficDirection, maxSpeed, isDrivable, isBikable, isWalkable, path);
 	}
 	_currentWay = OSMWay::EMPTY;
 }
