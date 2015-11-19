@@ -1170,8 +1170,8 @@ OSMParserImpl::parseOnce(std::istream& osmInput)
 			throw std::runtime_error(errorDesc.str());
 		}
 		count += n;
-		//if (count % (1024 * 4 * 1024) == 0)
-		//std::cout << "Read " << (count / (1024 * 1024)) << " MB " << std::endl;
+		if (count % (1024 * 4 * 1024) == 0)
+		std::cerr << "Read " << (count / (1024 * 1024)) << " MB " << std::endl;
 	} while (!done);
 
 	XML_ParserFree(expatParser);
