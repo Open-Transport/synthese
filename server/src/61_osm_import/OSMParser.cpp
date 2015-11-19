@@ -82,12 +82,13 @@ private:
 		std::vector<OSMId> nodeRefs;
 		std::vector<OSMNode> nodes;
 		bool isBoundaryWay;
-		bool isHighway;
 		std::string highwayTag;
 		std::string onewayTag;
 		std::string junctionTag;
 
-		OSMWay(): id(0), isBoundaryWay(false), isHighway(false) {}
+		OSMWay(): id(0), isBoundaryWay(false), highwayTag(""), onewayTag(""), junctionTag("") {}
+
+		bool isHighway() const { return highwayTag != ""; }
 
 		bool operator==(const OSMWay& rhs) const {
 			return (id == rhs.id); }
@@ -163,7 +164,7 @@ private:
 	bool inRelation() const { return !(_currentRelation == OSMRelation::EMPTY); }
 	bool inWay() const { return !(_currentWay == OSMWay::EMPTY); }
 	bool inBoundaryWay() const { return inWay() && _currentWay.isBoundaryWay; }
-	bool inHighway() const { return inWay() && _currentWay.isHighway; }
+	bool inHighway() const { return inWay() && _currentWay.isHighway(); }
 
 	void parseOnce(std::istream& osmInput);
 
@@ -346,6 +347,18 @@ OSMParserImpl::firstPassStartElement(const XML_Char* name, const XML_Char** attr
 	{
 		handleStartRelationTag(name, attrs);
 	}
+	else if (startWay(name))
+	{
+		handleStartWay(name, attrs);
+	}
+	else if (startWayNodeRef(name))
+	{
+		handleStartWayNodeRef(name, attrs);
+	}
+	else if (startWayTag(name))
+	{
+		handleStartWayTag(name, attrs);
+	}
 	else if (startRelationMember(name))
 	{
 		handleStartRelationMember(name, attrs);
@@ -364,6 +377,10 @@ OSMParserImpl::firstPassEndElement(const XML_Char* name)
 			_boundaryWays.insert(std::make_pair(wayMember.ref, OSMWay::EMPTY));
 		}
 		_currentRelation = OSMRelation::EMPTY;
+	}
+	else if (endHighway(name))
+	{
+		handleEndHighway(name);
 	}
 	else if (passEnd(name))
 	{
@@ -546,10 +563,6 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 	{
 		handleEndBoundaryWay();
 	}
-	else if (endHighway(name))
-	{
-		handleEndHighway(name);
-	}
 	else if (endCityRelation(name))
 	{
 		handleEndCityRelation();
@@ -568,14 +581,11 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 	{
 		if (_nodes.find(nodeRef) == _nodes.end())
 		{
-			_logStream << "Ignoring incomplete highway path " << _currentWay.id << std::endl;
 			completeWayPath = false;
 			break;
 		}
 		_currentWay.nodes.push_back(_nodes[nodeRef]);
 	}
-
-	if (!completeWayPath) return;
 
 	TrafficDirection trafficDirection = TWO_WAYS;
 	if ((_currentWay.highwayTag == "motorway") || (_currentWay.highwayTag == "motorway_link"))
@@ -600,9 +610,17 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 		trafficDirection = ONE_WAY;
 	}
 
-	_logStream << "Found complete highway " << _currentWay.id << std::endl;
-	_osmEntityHandler.handleRoad(trafficDirection, 0.0, true, true, true, 0);
-
+	if (!completeWayPath)
+	{
+		_logStream << "Found highway with incomplete path : id = " << _currentWay.id << std::endl;
+		_osmEntityHandler.handleRoad(trafficDirection, 0.0, true, true, true, 0);
+	}
+	else
+	{
+		geos::geom::Geometry* path = makeGeometryFrom(&_currentWay);
+		_logStream << "Found highway with complete path : id = " << _currentWay.id << std::endl;
+		_osmEntityHandler.handleRoad(trafficDirection, 0.0, true, true, true, path);
+	}
 	_currentWay = OSMWay::EMPTY;
 }
 
