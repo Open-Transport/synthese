@@ -83,14 +83,26 @@ private:
 		std::vector<OSMId> nodeRefs;
 		std::vector<OSMNode> nodes;
 		bool isBoundaryWay;
+
 		std::string highwayTag;
 		std::string onewayTag;
 		std::string junctionTag;
 		std::string maxSpeedTag;
 
-		OSMWay(): id(0), isBoundaryWay(false), highwayTag(""), onewayTag(""), junctionTag(""), maxSpeedTag("") {}
+		std::string accessTag;
+		std::string footTag;
+		std::string bicycleTag;
+		std::string motorVehicleTag;
+		std::string motorCarTag;
+
+		OSMWay(): id(0), isBoundaryWay(false), highwayTag(""), onewayTag(""), junctionTag(""), maxSpeedTag(""),
+				  accessTag(""), footTag(""), bicycleTag(""), motorVehicleTag(""), motorCarTag("") {}
 
 		bool isHighway() const { return highwayTag != ""; }
+
+		bool computeIsWalkable() const;
+		bool computeIsDrivable() const;
+		bool computeIsBikable() const;
 
 		bool operator==(const OSMWay& rhs) const {
 			return (id == rhs.id); }
@@ -472,6 +484,27 @@ OSMParserImpl::handleStartWayTag(const XML_Char* name, const XML_Char** attrs)
 	{
 		_currentWay.maxSpeedTag = attributes["v"];
 	}
+	else if (attributes["k"] == "access")
+	{
+		_currentWay.accessTag = attributes["v"];
+	}
+	else if (attributes["k"] == "foot")
+	{
+		_currentWay.footTag = attributes["v"];
+	}
+	else if (attributes["k"] == "bicycle")
+	{
+		_currentWay.bicycleTag = attributes["v"];
+	}
+	else if (attributes["k"] == "motor_vehicle")
+	{
+		_currentWay.motorVehicleTag = attributes["v"];
+	}
+	else if (attributes["k"] == "motorcar")
+	{
+		_currentWay.motorCarTag = attributes["v"];
+	}
+
 }
 
 
@@ -579,6 +612,100 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 	}
 }
 
+
+bool
+OSMParserImpl::OSMWay::computeIsDrivable() const
+{
+	bool isDrivable = true;
+	if (highwayTag != "")
+	{
+		if (highwayTag == "track" || highwayTag == "pedestrian" || highwayTag == "path" ||
+			highwayTag == "cycleway" || highwayTag == "footway" || highwayTag == "bridleway" || highwayTag == "steps")
+			isDrivable = false;
+	}
+	if (accessTag != "")
+	{
+		if(accessTag == "no" || accessTag == "private")
+			isDrivable = false;
+	}
+	if (motorVehicleTag != "")
+	{
+		if (motorVehicleTag == "no")
+			isDrivable = false;
+		else if (motorVehicleTag == "yes")
+			isDrivable = true;
+	}
+	if(motorCarTag != "")
+	{
+		if (motorCarTag == "no")
+			isDrivable = false;
+		else if (motorCarTag == "yes")
+			isDrivable = true;
+	}
+	return isDrivable;
+}
+
+
+bool
+OSMParserImpl::OSMWay::computeIsBikable() const
+{
+	bool isBikable = true;
+	if (highwayTag != "")
+	{
+		if(highwayTag == "motorway" || highwayTag == "motorway_link")
+			isBikable = false;
+	}
+
+	if (accessTag != "")
+	{
+		if(accessTag == "no" || accessTag == "private")
+			isBikable = false;
+	}
+
+	if (bicycleTag != "")
+	{
+		if (bicycleTag == "no")
+			isBikable = false;
+		else if (bicycleTag == "yes")
+			isBikable = true;
+	}
+	return isBikable;
+}
+
+
+bool
+OSMParserImpl::OSMWay::computeIsWalkable() const
+{
+	bool isWalkable(true);
+	if (highwayTag != "")
+	{
+		if(highwayTag == "motorway" || highwayTag == "motorway_link" || highwayTag == "cycleway")
+			isWalkable = false;
+	}
+
+	if (accessTag != "")
+	{
+		if(accessTag == "no" || accessTag == "private")
+			isWalkable = false;
+	}
+
+	if (footTag != "")
+	{
+		if(footTag == "no")
+			isWalkable = false;
+		else if(footTag == "yes")
+			isWalkable = true;
+	}
+	else if (bicycleTag != "")
+	{
+		if ((highwayTag != "") && (highwayTag != "cycleway") && (bicycleTag == "yes"))
+			isWalkable = true;
+	}
+	return isWalkable;
+}
+
+
+
 void
 OSMParserImpl::handleEndHighway(const XML_Char* name)
 {
@@ -622,7 +749,7 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 		// TODO : we should hanle default speed here
 		maxSpeed = 50.0;
 	}
-	if(_osmLocale.getImplicitSpeeds().find(_currentWay.maxSpeedTag) != _osmLocale.getImplicitSpeeds().end())
+	else if(_osmLocale.getImplicitSpeeds().find(_currentWay.maxSpeedTag) != _osmLocale.getImplicitSpeeds().end())
 	{
 		maxSpeed = _osmLocale.getImplicitSpeeds().find(_currentWay.maxSpeedTag)->second;
 	}
@@ -638,13 +765,20 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 		}
 	}
 
+	bool isDrivable = _currentWay.computeIsDrivable();
+	bool isBikable = _currentWay.computeIsBikable();
+	bool isWalkable = _currentWay.computeIsWalkable();
+
 	if (!completeWayPath)
 	{
 		_logStream << "Found highway with incomplete path : id = " << _currentWay.id <<
 					  " trafficDirection = " << trafficDirection <<
 					  " maxSpeed = " << maxSpeed <<
+					  " isDrivable = " << isDrivable <<
+					  " isBikable = " << isBikable <<
+					  " isWalkable = " << isWalkable <<
 					  std::endl;
-		_osmEntityHandler.handleRoad(trafficDirection, maxSpeed, true, true, true, 0);
+		_osmEntityHandler.handleRoad(trafficDirection, maxSpeed, isDrivable, isBikable, isWalkable, 0);
 	}
 	else
 	{
@@ -652,8 +786,11 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 		_logStream << "Found highway with complete path : id = " << _currentWay.id <<
 					  " trafficDirection = " << trafficDirection <<
 					  " maxSpeed = " << maxSpeed <<
+					  " isDrivable = " << isDrivable <<
+					  " isBikable = " << isBikable <<
+					  " isWalkable = " << isWalkable <<
 					  std::endl;
-		_osmEntityHandler.handleRoad(trafficDirection, maxSpeed, true, true, true, path);
+		_osmEntityHandler.handleRoad(trafficDirection, maxSpeed, isDrivable, isBikable, isWalkable, path);
 	}
 	_currentWay = OSMWay::EMPTY;
 }
