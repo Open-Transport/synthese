@@ -86,8 +86,9 @@ private:
 		std::string highwayTag;
 		std::string onewayTag;
 		std::string junctionTag;
+		std::string maxSpeedTag;
 
-		OSMWay(): id(0), isBoundaryWay(false), highwayTag(""), onewayTag(""), junctionTag("") {}
+		OSMWay(): id(0), isBoundaryWay(false), highwayTag(""), onewayTag(""), junctionTag(""), maxSpeedTag("") {}
 
 		bool isHighway() const { return highwayTag != ""; }
 
@@ -467,6 +468,10 @@ OSMParserImpl::handleStartWayTag(const XML_Char* name, const XML_Char** attrs)
 	{
 		_currentWay.junctionTag = attributes["v"];
 	}
+	else if (attributes["k"] == "maxspeed")
+	{
+		_currentWay.maxSpeedTag = attributes["v"];
+	}
 }
 
 
@@ -611,16 +616,44 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 		trafficDirection = ONE_WAY;
 	}
 
+	double maxSpeed = 0.0;
+	if (_currentWay.maxSpeedTag == "")
+	{
+		// TODO : we should hanle default speed here
+		maxSpeed = 50.0;
+	}
+	if(_osmLocale.getImplicitSpeeds().find(_currentWay.maxSpeedTag) != _osmLocale.getImplicitSpeeds().end())
+	{
+		maxSpeed = _osmLocale.getImplicitSpeeds().find(_currentWay.maxSpeedTag)->second;
+	}
+	else
+	{
+		try
+		{
+			maxSpeed = boost::lexical_cast<double>(_currentWay.maxSpeedTag);
+		}
+		catch(boost::bad_lexical_cast &)
+		{
+			_logStream << "Cannot parse maxspeed tag value : " << _currentWay.maxSpeedTag << " ; using default speed instead" << std::endl;
+		}
+	}
+
 	if (!completeWayPath)
 	{
-		_logStream << "Found highway with incomplete path : id = " << _currentWay.id << std::endl;
-		_osmEntityHandler.handleRoad(trafficDirection, 0.0, true, true, true, 0);
+		_logStream << "Found highway with incomplete path : id = " << _currentWay.id <<
+					  " trafficDirection = " << trafficDirection <<
+					  " maxSpeed = " << maxSpeed <<
+					  std::endl;
+		_osmEntityHandler.handleRoad(trafficDirection, maxSpeed, true, true, true, 0);
 	}
 	else
 	{
 		geos::geom::Geometry* path = makeGeometryFrom(&_currentWay);
-		_logStream << "Found highway with complete path : id = " << _currentWay.id << std::endl;
-		_osmEntityHandler.handleRoad(trafficDirection, 0.0, true, true, true, path);
+		_logStream << "Found highway with complete path : id = " << _currentWay.id <<
+					  " trafficDirection = " << trafficDirection <<
+					  " maxSpeed = " << maxSpeed <<
+					  std::endl;
+		_osmEntityHandler.handleRoad(trafficDirection, maxSpeed, true, true, true, path);
 	}
 	_currentWay = OSMWay::EMPTY;
 }
