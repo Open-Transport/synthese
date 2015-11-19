@@ -52,6 +52,8 @@ public:
 		                    const std::string& cityCode, 
 		                    geos::geom::Geometry* boundary) = 0;
 
+	virtual void handleRoad() = 0;
+
 };
 
 }

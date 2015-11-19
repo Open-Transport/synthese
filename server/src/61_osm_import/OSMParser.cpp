@@ -198,6 +198,8 @@ private:
 
 	bool endBoundaryWay(const XML_Char* name) const;
 	void handleEndBoundaryWay();
+	bool endWay(const XML_Char* name);
+	void handleEndWay(const XML_Char* name);
 	bool endCityRelation(const XML_Char* name) const;
 	void handleEndCityRelation();
 
@@ -421,6 +423,12 @@ OSMParserImpl::startWay(const XML_Char* name)
 	return !std::strcmp(name, "way");
 }
 
+bool
+OSMParserImpl::endWay(const XML_Char* name)
+{
+	return !std::strcmp(name, "way");
+}
+
 void
 OSMParserImpl::handleStartWay(const XML_Char* name, const XML_Char** attrs)
 {
@@ -502,6 +510,10 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 	{
 		handleEndBoundaryWay();
 	}
+	else if (endWay(name))
+	{
+		handleEndWay(name);
+	}
 	else if (endCityRelation(name))
 	{
 		handleEndCityRelation();
@@ -510,6 +522,12 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 	{
 		++_passCount;
 	}
+}
+
+void
+OSMParserImpl::handleEndWay(const XML_Char* name)
+{
+	_osmEntityHandler.handleRoad();
 }
 
 bool

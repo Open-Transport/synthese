@@ -46,6 +46,11 @@ namespace synthese
 				handledCities.push_back(boost::make_tuple(cityName, cityCode, boundary));
 			}
 
+			virtual void handleRoad()
+			{
+				//handledRoads.push_back(boost::make_tuple(cityName, cityCode, boundary));
+			}
+
 		};
 
 
