@@ -65,10 +65,15 @@ private:
 	{
 		static OSMNode EMPTY;
 
+		OSMId id;
 		double latitude;
 		double longitude;
+		std::string houseNumberTag;
+		std::string streetNameTag;
 
-		OSMNode(): latitude(0.0), longitude(0.0) {}
+		OSMNode(): latitude(0.0), longitude(0.0), houseNumberTag(""), streetNameTag("") {}
+
+		bool hasAddress() const { return houseNumberTag != "" && streetNameTag != ""; }
 
 		bool operator==(const OSMNode& rhs) const {
 			return (latitude == rhs.latitude) && (longitude == rhs.longitude); }
@@ -163,6 +168,7 @@ private:
 	OSMEntityHandler& _osmEntityHandler;
 	const OSMLocale& _osmLocale;
 
+	OSMNode _currentNode;
 	OSMRelation _currentRelation;
 	OSMWay _currentWay;
 
@@ -179,6 +185,7 @@ public:
 
 private:
 
+	bool inNode() const { return !(_currentNode == OSMNode::EMPTY); }
 	bool inRelation() const { return !(_currentRelation == OSMRelation::EMPTY); }
 	bool inWay() const { return !(_currentWay == OSMWay::EMPTY); }
 	bool inBoundaryWay() const { return inWay() && _currentWay.isBoundaryWay; }
@@ -187,6 +194,7 @@ private:
 	void parseOnce(std::istream& osmInput);
 
 	AttributesMap makeAttributesMap(const XML_Char **attrs);
+	geos::geom::Point* makeGeometryFrom(OSMNode* way);
 	geos::geom::Geometry* makeGeometryFrom(OSMWay* way);
 	geos::geom::Geometry* makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std::vector<OSMWay*>& innerWays);
 	std::string makeWKTFrom(OSMWay* way);
@@ -201,6 +209,11 @@ private:
 
 	bool startNode(const XML_Char* name);
 	void handleStartNode(const XML_Char* name, const XML_Char** attrs);
+	bool endNode(const XML_Char* name);
+	void handleEndNode(const XML_Char* name);
+
+	bool startNodeTag(const XML_Char* name);
+	void handleStartNodeTag(const XML_Char* name, const XML_Char** attrs);
 
 	void secondPassStartElement(const XML_Char* name, const XML_Char** attrs);
 	void secondPassEndElement(const XML_Char* name);
@@ -361,6 +374,10 @@ OSMParserImpl::firstPassStartElement(const XML_Char* name, const XML_Char** attr
 	{
 		handleStartNode(name, attrs);
 	}
+	else if (startNodeTag(name))
+	{
+		handleStartNodeTag(name, attrs);
+	}
 	else if (startRelationTag(name))
 	{
 		handleStartRelationTag(name, attrs);
@@ -387,7 +404,11 @@ OSMParserImpl::firstPassStartElement(const XML_Char* name, const XML_Char** attr
 void
 OSMParserImpl::firstPassEndElement(const XML_Char* name)
 {
-	if (endCityRelation(name))
+	if (endNode(name))
+	{
+		handleEndNode(name);
+	}
+	else if (endCityRelation(name))
 	{
 		std::vector<OSMMember> currentRelationWayMembers = _currentRelation.getWayMembers();
 		BOOST_FOREACH(OSMMember wayMember, currentRelationWayMembers)
@@ -417,10 +438,51 @@ void
 OSMParserImpl::handleStartNode(const XML_Char* name, const XML_Char** attrs)
 {
 	AttributesMap attributes = makeAttributesMap(attrs);
-	OSMNode node;
-	node.latitude = boost::lexical_cast<double>(attributes["lat"]);
-	node.longitude = boost::lexical_cast<double>(attributes["lon"]);
-	_nodes.insert(std::make_pair(ToOSMId(attributes["id"]), node));
+	_currentNode.id = boost::lexical_cast<OSMId>(attributes["id"]);
+	_currentNode.latitude = boost::lexical_cast<double>(attributes["lat"]);
+	_currentNode.longitude = boost::lexical_cast<double>(attributes["lon"]);
+}
+
+bool
+OSMParserImpl::startNodeTag(const XML_Char* name)
+{
+	return inNode() && !std::strcmp(name, "tag");
+}
+
+bool
+OSMParserImpl::endNode(const XML_Char* name)
+{
+	return !std::strcmp(name, "node");
+}
+
+void
+OSMParserImpl::handleEndNode(const XML_Char* name)
+{
+	if (_currentNode.hasAddress())
+	{
+		_osmEntityHandler.handleHouse(_currentNode.houseNumberTag, _currentNode.streetNameTag, makeGeometryFrom(&_currentNode));
+	}
+	else
+	{
+		_nodes.insert(std::make_pair(_currentNode.id, _currentNode));
+	}
+	_currentNode = OSMNode::EMPTY;
+
+}
+
+
+void
+OSMParserImpl::handleStartNodeTag(const XML_Char* name, const XML_Char** attrs)
+{
+	AttributesMap attributes = makeAttributesMap(attrs);
+	if (attributes["k"] == "addr:housenumber")
+	{
+		_currentNode.houseNumberTag = attributes["v"];
+	}
+	else if (attributes["k"] == "addr:street")
+	{
+		_currentNode.streetNameTag = attributes["v"];
+	}
 }
 
 
@@ -986,6 +1048,15 @@ OSMParserImpl::makeWKTFrom(OSMWay* way)
 	wkt << ")";
 	return wkt.str();
 }
+
+
+geos::geom::Point*
+OSMParserImpl::makeGeometryFrom(OSMNode* node)
+{
+	const geos::geom::GeometryFactory *geometryFactory = geos::geom::GeometryFactory::getDefaultInstance();
+	return geometryFactory->createPoint(geos::geom::Coordinate(node->longitude, node->latitude));
+}
+
 
 geos::geom::Geometry*
 OSMParserImpl::makeGeometryFrom(OSMWay* way)

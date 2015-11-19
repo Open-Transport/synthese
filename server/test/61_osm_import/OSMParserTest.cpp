@@ -42,6 +42,7 @@ namespace synthese
 		public:
 			std::vector<boost::tuple<std::string, std::string, geos::geom::Geometry*> > handledCities;
 			std::vector<boost::tuple<std::string, TrafficDirection, double, bool, bool, bool, geos::geom::Geometry*> > handledRoads;
+			std::vector<boost::tuple<HouseNumber, std::string, geos::geom::Point*> > handledHouses;
 
 			virtual void handleCity(const std::string& cityName, const std::string& cityCode, geos::geom::Geometry* boundary)
 			{
@@ -57,6 +58,13 @@ namespace synthese
 									geos::geom::Geometry* path)
 			{
 				handledRoads.push_back(boost::make_tuple(name, trafficDirection, maxSpeed, isDrivable, isBikable, isWalkable, path));
+			}
+
+			virtual void handleHouse(const HouseNumber& houseNumber,
+									 const std::string& streetName,
+									 geos::geom::Point* boundary)
+			{
+				handledHouses.push_back(boost::make_tuple(houseNumber, streetName, boundary));
 			}
 
 		};

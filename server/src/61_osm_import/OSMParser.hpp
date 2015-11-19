@@ -40,9 +40,6 @@ class OSMParser
 {
 public:
 
-	static const std::map<std::string, unsigned int> FR_IMPLICIT_SPEEDS;
-	static const std::map<std::string, unsigned int> CH_IMPLICIT_SPEEDS;
-
 	OSMParser(std::ostream& logStream,
 			  OSMEntityHandler& osmEntityHandler,
 			  const OSMLocale& osmLocale);

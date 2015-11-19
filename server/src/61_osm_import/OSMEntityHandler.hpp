@@ -31,6 +31,7 @@ namespace geos
 	namespace geom
 	{
 		class Geometry;
+		class Point;
 	}
 }
 
@@ -46,6 +47,7 @@ typedef enum {
 	REVERSED_ONE_WAY
 } TrafficDirection;
 
+typedef std::string HouseNumber;
 
 class OSMEntityHandler
 {
@@ -66,6 +68,11 @@ public:
 							bool isBikable,
 							bool isWalkable,
 							geos::geom::Geometry* path) = 0;
+
+	virtual void handleHouse(const HouseNumber& houseNumber,
+							 const std::string& streetName,
+							 geos::geom::Point* boundary) = 0;
+
 
 };
 
