@@ -28,6 +28,7 @@
 #include "CrossingTableSync.hpp"
 #include "Road.h"
 #include "RoadChunk.h"
+#include "RoadPath.hpp"
 #include "RoadPlace.h"
 #include "Crossing.h"
 
@@ -71,6 +72,7 @@ class OSMCitiesHandler : public OSMEntityHandler
 		typedef std::map<std::string, boost::shared_ptr<road::RoadPlace> > _RecentlyCreatedRoadPlaces;
 		typedef std::map<unsigned long long int, boost::shared_ptr<road::RoadPlace> > _LinkBetweenWayAndRoadPlaces;
 		typedef std::map<unsigned long long int, boost::shared_ptr<road::Crossing> > _CrossingsMap;
+		typedef std::map<util::RegistryKeyType, std::vector<road::HouseNumber> > _ChunksAssociatedHouseNumbers;
 
 		const impex::Importer& _importer;
 
@@ -79,12 +81,20 @@ class OSMCitiesHandler : public OSMEntityHandler
 		boost::shared_ptr<road::RoadPlace> _getOrCreateRoadPlace(const OSMId& roadSourceId,
 										const std::string& roadName, 
 										boost::shared_ptr<City> city) const;
-		
+
+		std::vector<boost::shared_ptr<road::RoadPlace> > _collectRoadPlaces(const std::string& roadName);
+		void _updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(road::RoadChunk* chunk) const;
+		void _projectHouseAndUpdateChunkHouseNumberBounds(const HouseNumber& houseNumber,
+														  const std::vector<road::RoadChunk*>& roadChunks,
+															geos::geom::Point* point,
+															const bool autoUpdatePolicy) const;
+
 		std::string _toAlphanumericString(const std::string& input) const;
 
 		mutable _CrossingsMap _crossingsMap;
 		mutable _RecentlyCreatedRoadPlaces _recentlyCreatedRoadPlaces;
 		mutable _LinkBetweenWayAndRoadPlaces _linkBetweenWayAndRoadPlaces;
+		mutable _ChunksAssociatedHouseNumbers _chunksAssociatedHouseNumbers;
 
 		boost::shared_ptr<road::Crossing> _currentCrossing;
 		boost::shared_ptr<road::Road> _currentRoad;
@@ -238,6 +248,24 @@ OSMCitiesHandler::_getOrCreateRoadPlace(const OSMId& roadSourceId,
 	return roadPlace;
 }
 
+
+std::vector<boost::shared_ptr<road::RoadPlace> >
+OSMCitiesHandler::_collectRoadPlaces(const std::string& roadName)
+{
+	std::vector<boost::shared_ptr<road::RoadPlace> > roadPlaces;
+	std::string plainRoadName = _toAlphanumericString(roadName);
+	BOOST_FOREACH(const road::RoadPlace::Registry::value_type& roadPlace, _env.getEditableRegistry<road::RoadPlace>())
+	{
+		std::string plainRoadPlaceName = _toAlphanumericString(roadPlace.second->getName());
+		if (plainRoadPlaceName == plainRoadName)
+		{
+			roadPlaces.push_back(roadPlace.second);
+		}
+	}
+	return roadPlaces;
+}
+
+
 void
 OSMCitiesHandler::handleRoad(const OSMId& roadSourceId, 
 							 const std::string& name,
@@ -329,12 +357,128 @@ OSMCitiesHandler::handleRoadChunk(size_t rank,
 }
 
 
+void 
+OSMCitiesHandler::_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(road::RoadChunk* chunk) const {
+	_ChunksAssociatedHouseNumbers::iterator itChunk = _chunksAssociatedHouseNumbers.find(chunk->getKey());
+	if(itChunk == _chunksAssociatedHouseNumbers.end()) return;
+
+	road::HouseNumberingPolicy policy(road::ALL_NUMBERS);
+	if(itChunk->second.size() > 2)
+	{
+		unsigned int curMod(*(itChunk->second.begin()) % 2);
+		bool multipleMod(false);
+
+		BOOST_FOREACH(road::HouseNumber n, itChunk->second)
+		{
+			if(curMod != (n % 2))
+			{
+				multipleMod = true;
+				break;
+			}
+		}
+
+		if(!multipleMod && curMod)
+		{
+			policy = road::ODD_NUMBERS;
+		}
+		else if(!multipleMod)
+		{
+			policy = road::EVEN_NUMBERS;
+		}
+	}
+
+	chunk->setLeftHouseNumberingPolicy(policy);
+	chunk->setRightHouseNumberingPolicy(policy);
+}
+
+
+void 
+OSMCitiesHandler::_projectHouseAndUpdateChunkHouseNumberBounds(
+	const HouseNumber& houseNumber,
+	const std::vector<road::RoadChunk*>& roadChunks,
+	geos::geom::Point* point,
+	const bool autoUpdatePolicy) const {
+
+	road::HouseNumber num = boost::lexical_cast<road::HouseNumber>(houseNumber);
+	try
+	{
+		num = boost::lexical_cast<road::HouseNumber>(houseNumber);
+	}
+	catch(boost::bad_lexical_cast)
+	{
+		return;
+	}
+
+	boost::shared_ptr<geos::geom::Point> houseCoord(point);
+	try
+	{
+		// Use Projector to get the closest road chunk according to the geometry 
+		algorithm::EdgeProjector<road::RoadChunk*> projector(roadChunks, 200);
+		algorithm::EdgeProjector<road::RoadChunk*>::PathNearby projection(
+			projector.projectEdge(*houseCoord->getCoordinate()));
+
+		road::RoadChunk* linkedRoadChunk(projection.get<1>());
+		_chunksAssociatedHouseNumbers[linkedRoadChunk->getKey()].push_back(num);
+		road::HouseNumberBounds leftBounds = linkedRoadChunk->getLeftHouseNumberBounds();
+
+		// If we haven't set any bounds, we set a default one
+		if(!leftBounds)
+		{
+			road::HouseNumberBounds bounds(std::make_pair(num, num));
+			linkedRoadChunk->setLeftHouseNumberBounds(bounds);
+			linkedRoadChunk->setRightHouseNumberBounds(bounds);
+		}
+		else
+		{
+			// If there is one and the lower bounds is higher than the current house number, update
+			if(num < leftBounds->first)
+			{
+				road::HouseNumberBounds bounds(std::make_pair(num, leftBounds->second));
+				linkedRoadChunk->setLeftHouseNumberBounds(bounds);
+				linkedRoadChunk->setRightHouseNumberBounds(bounds);
+			}
+			// Or the upper bounds is lower than the current house number, update
+			else if(num > leftBounds->second)
+			{
+				road::HouseNumberBounds bounds(std::make_pair(leftBounds->first, num));
+				linkedRoadChunk->setLeftHouseNumberBounds(bounds);
+				linkedRoadChunk->setRightHouseNumberBounds(bounds);
+			}
+		}
+
+		if (autoUpdatePolicy) 
+		{
+			_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(linkedRoadChunk);
+		}
+	}
+	catch(algorithm::EdgeProjector<road::RoadChunk*>::NotFoundException)
+	{
+	}
+}
+
+
+
+
 void
 OSMCitiesHandler::handleHouse(const HouseNumber& houseNumber,
-						 const std::string& streetName,
-						 geos::geom::Point* point)
+							 const std::string& streetName,
+							 geos::geom::Point* point)
 {
-	// TODO
+	std::vector<boost::shared_ptr<road::RoadPlace> > roadPlaces = _collectRoadPlaces(streetName);
+	std::vector<road::RoadChunk*> roadChunks;
+	BOOST_FOREACH(boost::shared_ptr<road::RoadPlace> roadPlace, roadPlaces)
+	{
+		BOOST_FOREACH(road::Road* path, roadPlace->getRoads())
+		{
+			BOOST_FOREACH(graph::Edge* edge, path->getForwardPath().getEdges())
+			{
+				roadChunks.push_back(static_cast<road::RoadChunkEdge*>(edge)->getRoadChunk());
+			}
+		}
+	}
+	std::cerr << "???????????????????????? waou " << roadChunks.size() << std::endl;
+	_projectHouseAndUpdateChunkHouseNumberBounds(houseNumber, roadChunks, point, true);
+
 }
 
 

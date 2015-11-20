@@ -229,6 +229,8 @@ private:
 	void secondPassEndElement(const XML_Char* name);
 
 	bool passEnd(const XML_Char* name) const;
+	void handleFirstPassEnd();
+	void handleSecondPassEnd();
 
 	bool startRelation(const XML_Char* name);
 	void handleStartRelation(const XML_Char* name, const XML_Char** attrs);
@@ -457,10 +459,33 @@ OSMParserImpl::firstPassEndElement(const XML_Char* name)
 	}
 	else if (passEnd(name))
 	{
-		_logStream << "Found " << _nodes.size() << " OSM nodes" << std::endl;
-		++_passCount;
+		handleFirstPassEnd();
 	}
 }
+
+void 
+OSMParserImpl::handleFirstPassEnd()
+{
+	_logStream << "Found " << _nodes.size() << " OSM nodes" << std::endl;
+	// here we are sure that all roads and road chunks have been created
+	std::map<OSMId, OSMNode>::iterator nodeIt = _nodes.begin();
+	while (nodeIt != _nodes.end())
+	{
+		if (nodeIt->second.hasAddress())
+		{
+			handleHouse(nodeIt->second.houseNumberTag, nodeIt->second.streetNameTag, makeGeometryFrom(&nodeIt->second));
+		}
+	}
+
+	++_passCount;
+}
+
+void 
+OSMParserImpl::handleSecondPassEnd()
+{
+	++_passCount;
+}
+
 
 bool
 OSMParserImpl::startNode(const XML_Char* name)
@@ -492,14 +517,7 @@ OSMParserImpl::endNode(const XML_Char* name)
 void
 OSMParserImpl::handleEndNode(const XML_Char* name)
 {
-	if (_currentNode.hasAddress())
-	{
-		handleHouse(_currentNode.houseNumberTag, _currentNode.streetNameTag, makeGeometryFrom(&_currentNode));
-	}
-	else
-	{
-		_nodes.insert(std::make_pair(_currentNode.id, _currentNode));
-	}
+	_nodes.insert(std::make_pair(_currentNode.id, _currentNode));
 	_currentNode = OSMNode::EMPTY;
 
 }
@@ -724,7 +742,7 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 	}
 	else if (passEnd(name))
 	{
-		++_passCount;
+		handleSecondPassEnd();
 	}
 }
 
