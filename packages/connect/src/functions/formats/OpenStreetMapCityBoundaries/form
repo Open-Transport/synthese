@@ -8,7 +8,7 @@
 <h3>Paramètres optionnels</h3>
 
 <#forms/text_input&
-  name=city_code_tag&
-  label=Champ d'identifiant de ville&
+  name=country_code&
+  label=Code pays (ex: FR, CH)&
 #>
 
