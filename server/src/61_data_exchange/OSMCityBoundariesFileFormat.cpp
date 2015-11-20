@@ -86,7 +86,7 @@ class OSMCitiesHandler : public OSMEntityHandler
 		void _updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(road::RoadChunk* chunk) const;
 		void _projectHouseAndUpdateChunkHouseNumberBounds(const HouseNumber& houseNumber,
 														  const std::vector<road::RoadChunk*>& roadChunks,
-															geos::geom::Point* point,
+															boost::shared_ptr<geos::geom::Point> houseCoord,
 															const bool autoUpdatePolicy) const;
 
 		std::string _toAlphanumericString(const std::string& input) const;
@@ -106,30 +106,31 @@ class OSMCitiesHandler : public OSMEntityHandler
 			_env(env)
 		{ }
 
-		void handleCity(const std::string& cityName, const std::string& cityCode, geos::geom::Geometry* boundary);
+		void handleCity(const std::string& cityName, const std::string& cityCode, boost::shared_ptr<geos::geom::Geometry> boundary);
 
 		void handleRoad(const OSMId& roadSourceId, 
-			const std::string& name,
-			const road::RoadType& roadType, geos::geom::Geometry* path);
+						const std::string& name,
+						const road::RoadType& roadType, boost::shared_ptr<geos::geom::Geometry> path);
 
-		void handleCrossing(const OSMId& crossingSourceId, geos::geom::Point* point);
+		void handleCrossing(const OSMId& crossingSourceId, boost::shared_ptr<geos::geom::Point> point);
 
 		void handleRoadChunk(size_t rank, 
-									 graph::MetricOffset metricOffset,
-									 TrafficDirection trafficDirection,
-									 double maxSpeed,
-				                     bool isDrivable,
-				                     bool isBikable,
-				                     bool isWalkable,
-				                     geos::geom::LineString* path);
+							 graph::MetricOffset metricOffset,
+							 TrafficDirection trafficDirection,
+							 double maxSpeed,
+							 bool isDrivable,
+							 bool isBikable,
+							 bool isWalkable,
+							 boost::shared_ptr<geos::geom::LineString> path);
 
 		void handleHouse(const HouseNumber& houseNumber,
-								 const std::string& streetName,
-								 geos::geom::Point* point);
-		
+						 const std::string& streetName,
+						 boost::shared_ptr<geos::geom::Point> point);		
+
 		void handleHouse(const HouseNumber& houseNumber,
-								 const OSMId& roadSourceId,
-								 geos::geom::Point* point);
+						 const OSMId& roadSourceId,
+						 boost::shared_ptr<geos::geom::Point> point);
+
 };
 
 
@@ -139,7 +140,7 @@ void
 OSMCitiesHandler::handleCity(
 	const std::string&    cityName,
 	const std::string&    cityCode,
-	geos::geom::Geometry* boundary)
+	boost::shared_ptr<geos::geom::Geometry> boundary)
 {
 	_importer._logDebug("Processing city " + cityName);
 
@@ -147,7 +148,7 @@ OSMCitiesHandler::handleCity(
 	std::string normalizedCityName = boost::to_upper_copy(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(cityName));
 	geos::geom::Polygon* polygonBoundary = NULL;
 
-	if(NULL != boundary)
+	if(boundary)
 	{
 		// This block converts a geometry object into a polygon
 		// Note : this should be a multi-polygon instead, because some cities consist of multiple disjoint areas
@@ -272,7 +273,7 @@ void
 OSMCitiesHandler::handleRoad(const OSMId& roadSourceId, 
 							 const std::string& name,
 							 const road::RoadType& roadType, 
-							 geos::geom::Geometry* path)
+							 boost::shared_ptr<geos::geom::Geometry> path)
 {
 	boost::shared_ptr<road::Road> road(new road::Road(0, roadType));
 	road->set<Key>(road::RoadTableSync::getId());
@@ -283,7 +284,7 @@ OSMCitiesHandler::handleRoad(const OSMId& roadSourceId,
 	{
 		if (city.second->get<PolygonGeometry>())
 		{
-			if (city.second->get<PolygonGeometry>()->intersects(path))
+			if (city.second->get<PolygonGeometry>()->intersects(path.get()))
 			{
 				boost::shared_ptr<road::RoadPlace> roadPlace = _getOrCreateRoadPlace(roadSourceId, name, city.second);
 				road->get<road::RoadPlace::Vector>().push_back(roadPlace.get());
@@ -296,7 +297,7 @@ OSMCitiesHandler::handleRoad(const OSMId& roadSourceId,
 
 
 void
-OSMCitiesHandler::handleCrossing(const OSMId& crossingSourceId, geos::geom::Point* point)
+OSMCitiesHandler::handleCrossing(const OSMId& crossingSourceId, boost::shared_ptr<geos::geom::Point> point)
 {
 	_CrossingsMap::const_iterator it = _crossingsMap.find(crossingSourceId);
 	if(it != _crossingsMap.end()) {
@@ -307,7 +308,7 @@ OSMCitiesHandler::handleCrossing(const OSMId& crossingSourceId, geos::geom::Poin
 	boost::shared_ptr<road::Crossing> crossing(
 		new road::Crossing(
 			road::CrossingTableSync::getId(),
-			boost::shared_ptr<geos::geom::Point>(point)
+			point
 	)	);
 	impex::Importable::DataSourceLinks links;
 	links.insert(make_pair(&(*_importer.getImport().get<impex::DataSource>()), 
@@ -329,7 +330,7 @@ OSMCitiesHandler::handleRoadChunk(size_t rank,
 			                      bool isDrivable,
 			                      bool isBikable,
 			                      bool isWalkable,
-			                      geos::geom::LineString* path)
+								  boost::shared_ptr<geos::geom::LineString> path)
 {
 	boost::shared_ptr<road::RoadChunk> roadChunk(new road::RoadChunk);
 	roadChunk->setRoad(_currentRoad.get());
@@ -337,9 +338,9 @@ OSMCitiesHandler::handleRoadChunk(size_t rank,
 	roadChunk->setRankInPath(rank);
 	roadChunk->setMetricOffset(metricOffset);
 	roadChunk->setKey(road::RoadChunkTableSync::getId());
-	if (path)
+	if(path)
 	{
-		roadChunk->setGeometry(boost::shared_ptr<geos::geom::LineString>(path));
+		roadChunk->setGeometry(path);
 	}
 	roadChunk->setNonDrivable(!isDrivable);
 	roadChunk->setNonBikable(!isBikable);
@@ -398,7 +399,7 @@ void
 OSMCitiesHandler::_projectHouseAndUpdateChunkHouseNumberBounds(
 	const HouseNumber& houseNumber,
 	const std::vector<road::RoadChunk*>& roadChunks,
-	geos::geom::Point* point,
+	boost::shared_ptr<geos::geom::Point> houseCoord,
 	const bool autoUpdatePolicy) const {
 
 	road::HouseNumber num = boost::lexical_cast<road::HouseNumber>(houseNumber);
@@ -411,7 +412,6 @@ OSMCitiesHandler::_projectHouseAndUpdateChunkHouseNumberBounds(
 		return;
 	}
 
-	boost::shared_ptr<geos::geom::Point> houseCoord(point);
 	try
 	{
 		// Use Projector to get the closest road chunk according to the geometry 
@@ -464,7 +464,7 @@ OSMCitiesHandler::_projectHouseAndUpdateChunkHouseNumberBounds(
 void
 OSMCitiesHandler::handleHouse(const HouseNumber& houseNumber,
 							 const std::string& streetName,
-							 geos::geom::Point* point)
+							 boost::shared_ptr<geos::geom::Point> point)
 {
 	std::vector<boost::shared_ptr<road::RoadPlace> > roadPlaces = _collectRoadPlaces(streetName);
 	std::vector<road::RoadChunk*> roadChunks;
@@ -483,10 +483,11 @@ OSMCitiesHandler::handleHouse(const HouseNumber& houseNumber,
 
 }
 
-void 
+
+void
 OSMCitiesHandler::handleHouse(const HouseNumber& houseNumber,
 							 const OSMId& roadSourceId,
-							 geos::geom::Point* point)
+							 boost::shared_ptr<geos::geom::Point> point)
 {
 	_LinkBetweenWayAndRoadPlaces::iterator itRoadPlace = _linkBetweenWayAndRoadPlaces.find(roadSourceId);
 	if (itRoadPlace == _linkBetweenWayAndRoadPlaces.end()) return;

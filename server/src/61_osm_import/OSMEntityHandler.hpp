@@ -64,14 +64,14 @@ public:
 
 	virtual void handleCity(const std::string& cityName, 
 		                    const std::string& cityCode, 
-		                    geos::geom::Geometry* boundary) = 0;
+							boost::shared_ptr<geos::geom::Geometry> boundary) = 0;
 
 	virtual void handleRoad(const OSMId& roadSourceId, 
 							const std::string& name,
 							const road::RoadType& roadType, 
-							geos::geom::Geometry* path) = 0;
+							boost::shared_ptr<geos::geom::Geometry> path) = 0;
 
-	virtual void handleCrossing(const OSMId& crossingSourceId, geos::geom::Point* point) = 0;
+	virtual void handleCrossing(const OSMId& crossingSourceId, boost::shared_ptr<geos::geom::Point> point) = 0;
 
 	virtual void handleRoadChunk(size_t rank, 
 								 graph::MetricOffset metricOffset,
@@ -80,15 +80,15 @@ public:
 			                     bool isDrivable,
 			                     bool isBikable,
 			                     bool isWalkable,
-			                     geos::geom::LineString* path) = 0;
+								 boost::shared_ptr<geos::geom::LineString> path) = 0;
 
 	virtual void handleHouse(const HouseNumber& houseNumber,
 							 const std::string& streetName,
-							 geos::geom::Point* point) = 0;
+							 boost::shared_ptr<geos::geom::Point> point) = 0;
 
 	virtual void handleHouse(const HouseNumber& houseNumber,
 							 const OSMId& roadSourceId,
-							 geos::geom::Point* point) = 0;
+							 boost::shared_ptr<geos::geom::Point> point) = 0;
 
 
 };

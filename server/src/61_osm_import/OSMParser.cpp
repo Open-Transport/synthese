@@ -263,33 +263,33 @@ private:
 	bool endAssociatedStreetRelation(const XML_Char* name) const;
 	void handleEndAssociatedStreetRelation();
 
-	void handleCity(const std::string& cityName, 
-	                    const std::string& cityCode, 
-	                    geos::geom::Geometry* boundary);
+	void handleCity(const std::string& cityName,
+					const std::string& cityCode,
+					boost::shared_ptr<geos::geom::Geometry> boundary);
 
 	void handleRoad(const OSMId& roadSourceId, 
 					const std::string& name,
 					const road::RoadType& roadType, 
-					geos::geom::Geometry* path);
+					boost::shared_ptr<geos::geom::Geometry> path);
 
-	void handleCrossing(const OSMId& crossingSourceId, geos::geom::Point* point);
+	void handleCrossing(const OSMId& crossingSourceId, boost::shared_ptr<geos::geom::Point> point);
 
-	void handleRoadChunk(size_t rank, 
-								 graph::MetricOffset metricOffset,
-								 TrafficDirection trafficDirection,
-								 double maxSpeed,
-			                     bool isDrivable,
-			                     bool isBikable,
-			                     bool isWalkable,
-			                     geos::geom::LineString* path);
+	void handleRoadChunk(size_t rank,
+						 graph::MetricOffset metricOffset,
+						 TrafficDirection trafficDirection,
+						 double maxSpeed,
+						 bool isDrivable,
+						 bool isBikable,
+						 bool isWalkable,
+						 boost::shared_ptr<geos::geom::LineString> path);
 
 	void handleHouse(const HouseNumber& houseNumber,
-							 const std::string& streetName,
-							 geos::geom::Point* boundary);
+					 const std::string& streetName,
+					 boost::shared_ptr<geos::geom::Point> boundary);
 
 	void handleHouse(const HouseNumber& houseNumber,
 					 const OSMId& roadSourceId,
-					 geos::geom::Point* point);
+					 boost::shared_ptr<geos::geom::Point> point);
 
 	friend void startElement(void* userData, const XML_Char* name, const XML_Char** attrs);
 	friend void endElement(void* userData, const XML_Char* name);
@@ -505,7 +505,8 @@ OSMParserImpl::handleFirstPassEnd()
 	{
 		if (nodeIt->second.hasAddress())
 		{
-			handleHouse(nodeIt->second.houseNumberTag, nodeIt->second.streetNameTag, makeGeometryFrom(&nodeIt->second));
+			boost::shared_ptr<geos::geom::Point> nodeGeometry(makeGeometryFrom(&nodeIt->second));
+			handleHouse(nodeIt->second.houseNumberTag, nodeIt->second.streetNameTag, nodeGeometry);
 		}
 		++nodeIt;
 	}
@@ -1030,7 +1031,8 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 	bool isBikable = _currentWay.computeIsBikable();
 	bool isWalkable = _currentWay.computeIsWalkable();
 
-	handleRoad(_currentWay.id, roadName, roadType, makeGeometryFrom(&_currentWay));
+	boost::shared_ptr<geos::geom::Geometry> roadGeometry(makeGeometryFrom(&_currentWay));
+	handleRoad(_currentWay.id, roadName, roadType, roadGeometry);
 
 	const geos::geom::GeometryFactory* geometryFactory = geos::geom::GeometryFactory::getDefaultInstance();
 	boost::shared_ptr<geos::geom::CoordinateSequence> cs(geometryFactory->getCoordinateSequenceFactory()->create(0, 2));
@@ -1047,7 +1049,7 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 		cs->add(*point->getCoordinate());
 		if(i == 1)
 		{
-			handleCrossing(node.id, point.get());
+			handleCrossing(node.id, point);
 			continue;
 		}
 		bool isLast = i == nodeCount;
@@ -1058,10 +1060,10 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 		}
 		boost::shared_ptr<geos::geom::LineString> roadChunkPath(geometryFactory->createLineString(*cs));
 		handleRoadChunk(rank, metricOffset, 
-			trafficDirection, maxSpeed, !isDrivable, !isBikable, !isWalkable, roadChunkPath.get());
+			trafficDirection, maxSpeed, !isDrivable, !isBikable, !isWalkable, roadChunkPath);
 
 		metricOffset += roadChunkPath->getLength();
-		handleCrossing(node.id, point.get());
+		handleCrossing(node.id, point);
 		if(!isLast)
 		{
 			cs.reset(geometryFactory->getCoordinateSequenceFactory()->create(0, 2));
@@ -1070,7 +1072,7 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 		++rank;
 	}
 	handleRoadChunk(rank, metricOffset, 
-		trafficDirection, maxSpeed, !isDrivable, !isBikable, !isWalkable, 0);
+		trafficDirection, maxSpeed, !isDrivable, !isBikable, !isWalkable, boost::shared_ptr<geos::geom::LineString>());
 
 	_currentWay = OSMWay::EMPTY;
 }
@@ -1153,17 +1155,17 @@ OSMParserImpl::handleEndCityRelation()
 	{
 		try
 		{
-			geos::geom::Geometry* boundary = makeGeometryFrom(outerWays, innerWays);
+			boost::shared_ptr<geos::geom::Geometry> boundary(makeGeometryFrom(outerWays, innerWays));
 			handleCity(cityName, cityCode, boundary);
 		}
 		catch (std::exception& e)
 		{
-			handleCity(cityName, cityCode, 0);
+			handleCity(cityName, cityCode, boost::shared_ptr<geos::geom::Geometry>());
 		}
 	}
 	else
 	{
-		handleCity(cityName, cityCode, 0);
+		handleCity(cityName, cityCode, boost::shared_ptr<geos::geom::Geometry>());
 	}
 }
 
@@ -1183,7 +1185,8 @@ OSMParserImpl::handleEndAssociatedStreetRelation()
 			OSMNode& houseNode = _nodes[nodeMember.ref];
 			BOOST_FOREACH(OSMMember wayMember, _currentRelation.getWayMembers())
 			{
-				handleHouse(houseNode.houseNumberTag, wayMember.ref, makeGeometryFrom(&houseNode));
+				boost::shared_ptr<geos::geom::Point> houseGeometry(makeGeometryFrom(&houseNode));
+				handleHouse(houseNode.houseNumberTag, wayMember.ref, houseGeometry);
 			}
 		}
 	}
@@ -1328,7 +1331,7 @@ OSMParserImpl::makeAttributesMap(const XML_Char **attrs) {
 
 void OSMParserImpl::handleCity(const std::string& cityName, 
                     const std::string& cityCode, 
-                    geos::geom::Geometry* boundary)
+					boost::shared_ptr<geos::geom::Geometry> boundary)
 {
 	_logStream << "Found city with " << ((boundary != 0) ? "complete" : "incomplete") 
 			<< " boundary : name =  " << cityName << " ; code = " << cityCode << std::endl;
@@ -1339,7 +1342,7 @@ void OSMParserImpl::handleCity(const std::string& cityName,
 void OSMParserImpl::handleRoad(const OSMId& roadSourceId, 
 								const std::string& name,
 								const road::RoadType& roadType, 
-								geos::geom::Geometry* path)
+								boost::shared_ptr<geos::geom::Geometry> path)
 {
 	_logStream << "Handling Road { "
 		<< "roadSourceId = " << roadSourceId << ", "
@@ -1350,7 +1353,7 @@ void OSMParserImpl::handleRoad(const OSMId& roadSourceId,
 	_osmEntityHandler.handleRoad(roadSourceId, name, roadType, path);
 }
 
-void OSMParserImpl::handleCrossing(const OSMId& crossingSourceId, geos::geom::Point* point)
+void OSMParserImpl::handleCrossing(const OSMId& crossingSourceId, boost::shared_ptr<geos::geom::Point> point)
 {
 	_logStream << "Handling Crossing { "
 		<< "crossingSourceId = " << crossingSourceId << ", "
@@ -1366,7 +1369,7 @@ void OSMParserImpl::handleRoadChunk(size_t rank,
 		                     bool isDrivable,
 		                     bool isBikable,
 		                     bool isWalkable,
-		                     geos::geom::LineString* path)
+							 boost::shared_ptr<geos::geom::LineString> path)
 {
 	_logStream << "Handling RoadChunk { "
 		<< "metricOffset = " << metricOffset << ", "
@@ -1384,7 +1387,7 @@ void OSMParserImpl::handleRoadChunk(size_t rank,
 void 
 OSMParserImpl::handleHouse(const HouseNumber& houseNumber,
 						 const std::string& streetName,
-						 geos::geom::Point* point)
+						 boost::shared_ptr<geos::geom::Point> point)
 {
 	_logStream << "Handling House { "
 		<< "houseNumber = " << houseNumber << ", "
@@ -1398,7 +1401,7 @@ OSMParserImpl::handleHouse(const HouseNumber& houseNumber,
 void 
 OSMParserImpl::handleHouse(const HouseNumber& houseNumber,
 							 const OSMId& roadSourceId,
-							 geos::geom::Point* point)
+							 boost::shared_ptr<geos::geom::Point> point)
 {
 	_logStream << "Handling House { "
 		<< "houseNumber = " << houseNumber << ", "
