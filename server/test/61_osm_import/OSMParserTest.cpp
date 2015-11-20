@@ -75,12 +75,20 @@ namespace synthese
 			}
 
 
-			virtual void handleHouse(const HouseNumber& houseNumber,
+			void handleHouse(const HouseNumber& houseNumber,
 									 const std::string& streetName,
 									 geos::geom::Point* point)
 			{
 				handledHouses.push_back(boost::make_tuple(houseNumber, streetName, point));
 			}
+
+			void handleHouse(const HouseNumber& houseNumber,
+							 const OSMId& roadSourceId,
+							 geos::geom::Point* point)
+			{
+
+			}
+
 
 		};
 
@@ -225,7 +233,7 @@ namespace synthese
 
 			BOOST_CHECK_EQUAL(649, fakeOSMEntityHandler.handledRoads.size());
 		}
-*/
+		*/
 	}
 }
 	

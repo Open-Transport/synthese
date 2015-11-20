@@ -86,6 +86,10 @@ public:
 							 const std::string& streetName,
 							 geos::geom::Point* point) = 0;
 
+	virtual void handleHouse(const HouseNumber& houseNumber,
+							 const OSMId& roadSourceId,
+							 geos::geom::Point* point) = 0;
+
 
 };
 

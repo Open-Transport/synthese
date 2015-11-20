@@ -123,11 +123,13 @@ class OSMCitiesHandler : public OSMEntityHandler
 				                     bool isWalkable,
 				                     geos::geom::LineString* path);
 
-
 		void handleHouse(const HouseNumber& houseNumber,
 								 const std::string& streetName,
 								 geos::geom::Point* point);
-
+		
+		void handleHouse(const HouseNumber& houseNumber,
+								 const OSMId& roadSourceId,
+								 geos::geom::Point* point);
 };
 
 
@@ -477,6 +479,25 @@ OSMCitiesHandler::handleHouse(const HouseNumber& houseNumber,
 		}
 	}
 	std::cerr << "???????????????????????? waou " << roadChunks.size() << std::endl;
+	_projectHouseAndUpdateChunkHouseNumberBounds(houseNumber, roadChunks, point, true);
+
+}
+
+void 
+OSMCitiesHandler::handleHouse(const HouseNumber& houseNumber,
+							 const OSMId& roadSourceId,
+							 geos::geom::Point* point)
+{
+	_LinkBetweenWayAndRoadPlaces::iterator itRoadPlace = _linkBetweenWayAndRoadPlaces.find(roadSourceId);
+	if (itRoadPlace == _linkBetweenWayAndRoadPlaces.end()) return;
+	std::vector<road::RoadChunk*> roadChunks;
+	BOOST_FOREACH(road::Road* path, itRoadPlace->second->getRoads())
+	{
+		BOOST_FOREACH(graph::Edge* edge, path->getForwardPath().getEdges())
+		{
+			roadChunks.push_back(static_cast<road::RoadChunkEdge*>(edge)->getRoadChunk());
+		}
+	}
 	_projectHouseAndUpdateChunkHouseNumberBounds(houseNumber, roadChunks, point, true);
 
 }

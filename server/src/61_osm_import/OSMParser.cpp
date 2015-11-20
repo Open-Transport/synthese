@@ -146,6 +146,7 @@ private:
 
 		TagsMap _tags;
 		std::vector<OSMMember> _wayMembers;
+		std::vector<OSMMember> _nodeMembers;
 
 	public :
 		static OSMRelation EMPTY;
@@ -157,12 +158,15 @@ private:
 		void addTag(const std::string& key, const std::string& value);
 
 		void addWayMember(OSMId wayMemberId, const std::string& role);
+		void addNodeMember(OSMId nodeMemberId, const std::string& role);
 
 		std::vector<OSMMember> getWayMembers() const;
+		std::vector<OSMMember> getNodeMembers() const;
 
 		std::string getName() const;
 		bool isAdministrativeBoundary() const;
 		bool isCityAdministrativeLevel() const;
+		bool isAssociatedSteet() const;
 
 		std::string getValueOrEmpty(const std::string& tag) const;
 
@@ -256,6 +260,8 @@ private:
 	void handleEndHighway(const XML_Char* name);
 	bool endCityRelation(const XML_Char* name) const;
 	void handleEndCityRelation();
+	bool endAssociatedStreetRelation(const XML_Char* name) const;
+	void handleEndAssociatedStreetRelation();
 
 	void handleCity(const std::string& cityName, 
 	                    const std::string& cityCode, 
@@ -280,6 +286,10 @@ private:
 	void handleHouse(const HouseNumber& houseNumber,
 							 const std::string& streetName,
 							 geos::geom::Point* boundary);
+
+	void handleHouse(const HouseNumber& houseNumber,
+					 const OSMId& roadSourceId,
+					 geos::geom::Point* point);
 
 	friend void startElement(void* userData, const XML_Char* name, const XML_Char** attrs);
 	friend void endElement(void* userData, const XML_Char* name);
@@ -319,11 +329,28 @@ OSMParserImpl::OSMRelation::addWayMember(OSMId wayMemberId, const std::string& r
 	_wayMembers.push_back(member);
 }
 
+void
+OSMParserImpl::OSMRelation::addNodeMember(OSMId nodeMemberId, const std::string& role)
+{
+	OSMMember member;
+	member.ref = nodeMemberId;
+	member.role = role;
+	_nodeMembers.push_back(member);
+}
+
+
 std::vector<OSMParserImpl::OSMMember>
 OSMParserImpl::OSMRelation::getWayMembers() const
 {
 	return _wayMembers;
 }
+
+std::vector<OSMParserImpl::OSMMember>
+OSMParserImpl::OSMRelation::getNodeMembers() const
+{
+	return _nodeMembers;
+}
+
 
 bool
 OSMParserImpl::OSMRelation::isAdministrativeBoundary() const
@@ -335,6 +362,11 @@ bool
 OSMParserImpl::OSMRelation::isCityAdministrativeLevel() const
 {
 	return "8" == getValueOrEmpty("admin_level");
+}
+
+bool
+OSMParserImpl::OSMRelation::isAssociatedSteet() const {
+	return "associatedStreet" == getValueOrEmpty("type");
 }
 
 std::string
@@ -694,6 +726,10 @@ OSMParserImpl::handleStartRelationMember(const XML_Char* name, const XML_Char** 
 	{
 		_currentRelation.addWayMember(ToOSMId(attributes["ref"]), attributes["role"]);
 	}
+	if("node" == attributes["type"])
+	{
+		_currentRelation.addNodeMember(ToOSMId(attributes["ref"]), attributes["role"]);
+	}
 }
 
 
@@ -740,6 +776,10 @@ OSMParserImpl::secondPassEndElement(const XML_Char* name)
 	else if (endCityRelation(name))
 	{
 		handleEndCityRelation();
+	}
+	else if (endAssociatedStreetRelation(name))
+	{
+		handleEndAssociatedStreetRelation();
 	}
 	else if (passEnd(name))
 	{
@@ -1073,6 +1113,15 @@ OSMParserImpl::endCityRelation(const XML_Char* name) const
 			 _currentRelation.isCityAdministrativeLevel();
 }
 
+
+bool
+OSMParserImpl::endAssociatedStreetRelation(const XML_Char* name) const
+{
+	return !std::strcmp(name, "relation") &&
+			 _currentRelation.isAssociatedSteet();
+}
+
+
 void
 OSMParserImpl::handleEndCityRelation()
 {
@@ -1118,6 +1167,27 @@ OSMParserImpl::handleEndCityRelation()
 	}
 }
 
+
+void 
+OSMParserImpl::handleEndAssociatedStreetRelation()
+{
+	BOOST_FOREACH(OSMMember nodeMember, _currentRelation.getNodeMembers())
+	{
+		if (nodeMember.role == "house")
+		{
+			if (_nodes.find(nodeMember.ref) == _nodes.end())
+			{
+				_logStream << "Ignoring unknown house " << nodeMember.ref << " in street association " << _currentRelation.id;
+				continue;
+			} 
+			OSMNode& houseNode = _nodes[nodeMember.ref];
+			BOOST_FOREACH(OSMMember wayMember, _currentRelation.getWayMembers())
+			{
+				handleHouse(houseNode.houseNumberTag, wayMember.ref, makeGeometryFrom(&houseNode));
+			}
+		}
+	}
+}
 
 
 std::vector<geos::geom::Polygon*>*
@@ -1311,7 +1381,8 @@ void OSMParserImpl::handleRoadChunk(size_t rank,
 		trafficDirection, maxSpeed, isDrivable, isBikable, isWalkable, path);
 }
 
-void OSMParserImpl::handleHouse(const HouseNumber& houseNumber,
+void 
+OSMParserImpl::handleHouse(const HouseNumber& houseNumber,
 						 const std::string& streetName,
 						 geos::geom::Point* point)
 {
@@ -1321,6 +1392,21 @@ void OSMParserImpl::handleHouse(const HouseNumber& houseNumber,
 		<< "point = " << ((point != 0) ? "<found>" : "<none>")
 		<< " }" << std::endl;
 	_osmEntityHandler.handleHouse(houseNumber, streetName, point);
+}
+
+
+void 
+OSMParserImpl::handleHouse(const HouseNumber& houseNumber,
+							 const OSMId& roadSourceId,
+							 geos::geom::Point* point)
+{
+	_logStream << "Handling House { "
+		<< "houseNumber = " << houseNumber << ", "
+		<< "roadSourceId = " << roadSourceId << ", "
+		<< "point = " << ((point != 0) ? "<found>" : "<none>")
+		<< " }" << std::endl;
+	_osmEntityHandler.handleHouse(houseNumber, roadSourceId, point);
+
 }
 
 
