@@ -323,7 +323,7 @@ OSMCitiesHandler::handleRoadChunk(size_t rank,
 	{
 		roadChunk->setCarOneWay(-1);
 	}
-	roadChunk->setCarSpeed(maxSpeed);
+	roadChunk->setCarSpeed(maxSpeed / 3.6);
 	roadChunk->link(_env);
 	_env.getEditableRegistry<road::RoadChunk>().add(roadChunk);
 }

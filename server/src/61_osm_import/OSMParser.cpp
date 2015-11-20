@@ -910,6 +910,7 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 	if (!completeWayPath)
 	{
 		_logStream << "Ignoring way with unresolved nodes references : " << _currentWay.id << std::endl;
+		return;
 	}
 
 	std::string roadName = _currentWay.computeName();
