@@ -216,7 +216,8 @@ namespace synthese
 		BOOST_AUTO_TEST_CASE (should_parse_full_swiss)
 		{
 			FakeOSMEntityHandler fakeOSMEntityHandler;
-			std::ifstream osmStream("/home/mjambert/workspace/rcsmobility/gitlab/switzerland-tests/robot/resources/data/swiss.osm");
+			//std::ifstream osmStream("/home/mjambert/workspace/rcsmobility/gitlab/switzerland-tests/robot/resources/data/swiss.osm");
+			std::ifstream osmStream("larger_swiss_tile.osm");
 			OSMParser parser(std::cout, fakeOSMEntityHandler, OSMLocale::OSMLocale_FR);
 			parser.parse(osmStream);
 			osmStream.close();
