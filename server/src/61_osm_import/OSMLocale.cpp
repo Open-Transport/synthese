@@ -22,6 +22,7 @@
 #include "OSMLocale.hpp"
 
 #include <boost/assign/list_of.hpp>
+#include <stdexcept>
 
 namespace synthese
 {
@@ -67,6 +68,16 @@ OSMLocale::OSMLocale(const std::string& cityCodeTag,
 
 OSMLocale::~OSMLocale()
 {
+}
+
+const OSMLocale&
+OSMLocale::getInstance(const std::string& countryCode)
+{
+	if (countryCode == "FR") return OSMLocale_FR;
+	else if (countryCode == "CH") return OSMLocale_CH;
+	else {
+		throw std::invalid_argument("Unknown country code " + countryCode);
+	}
 }
 
 const std::string&

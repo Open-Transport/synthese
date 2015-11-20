@@ -43,6 +43,8 @@ public:
 	const std::map<std::string, unsigned int>& getImplicitSpeeds() const;
 	const std::map<std::string, std::string>& getDefaultRoadNames() const;
 
+	static const OSMLocale& getInstance(const std::string& countryCode);
+
 private:
 
 	OSMLocale(const std::string& cityCodeTag,

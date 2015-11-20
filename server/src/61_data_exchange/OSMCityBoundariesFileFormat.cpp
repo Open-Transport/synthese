@@ -25,6 +25,7 @@
 #include "FrenchPhoneticString.h"
 #include "Import.hpp"
 #include "OSMParser.hpp"
+#include "OSMLocale.hpp"
 #include "OSMEntityHandler.hpp"
 
 #include <boost/algorithm/string/case_conv.hpp>
@@ -52,7 +53,7 @@ namespace synthese
 	namespace data_exchange
 	{
 
-		const string OSMCityBoundariesFileFormat::Importer_::PARAMETER_CITY_CODE_TAG("city_code_tag");
+		const string OSMCityBoundariesFileFormat::Importer_::PARAMETER_COUNTRY_CODE("country_code");
 
 
 		class OSMCitiesHandler : public OSMEntityHandler
@@ -70,88 +71,128 @@ namespace synthese
 					_env(env)
 				{ }
 
+				void handleCity(const std::string& cityName, const std::string& cityCode, geos::geom::Geometry* boundary);
 
-				void handleCity(
-					const std::string&    cityName,
-					const std::string&    cityCode,
-					geos::geom::Geometry* boundary)
-				{
-					_importer._logDebug("Processing city " + cityName);
+				void handleRoad(const std::string& name,
+										TrafficDirection trafficDirection,
+										double maxSpeed,
+										bool isDrivable,
+										bool isBikable,
+										bool isWalkable,
+										geos::geom::Geometry* path);
 
-					boost::shared_ptr<City> city;
-					std::string normalizedCityName = boost::to_upper_copy(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(cityName));
-					geos::geom::Polygon* polygonBoundary = NULL;
+				void handleHouse(const HouseNumber& houseNumber,
+										 const std::string& streetName,
+										 geos::geom::Point* boundary);
 
-					if(NULL != boundary)
-					{
-						// This block converts a geometry object into a polygon
-						// Note : this should be a multi-polygon instead, because some cities consist of multiple disjoint areas
-						geos::geom::CoordinateSequence *cs = boundary->getCoordinates();
-
-						if(0 < cs->size())
-						{
-							if(!cs->back().equals(cs->front()))
-							{
-								cs->add(cs->front());
-							}
-							geos::geom::LinearRing *lr = CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory().createLinearRing(cs);
-							polygonBoundary = CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory().createPolygon(lr, NULL);
-						}
-					}
-
-					bool cityCodeIsSet = !cityCode.empty() && ("0" != cityCode);
-					CityTableSync::SearchResult cities = CityTableSync::Search(
-						_env,
-						boost::optional<std::string>(), // exactname
-						(cityCodeIsSet ? boost::optional<std::string>() : boost::optional<std::string>(normalizedCityName)), // likeName
-						(cityCodeIsSet ? boost::optional<std::string>(cityCode) : boost::optional<std::string>()),
-						0, 0, true, true,
-						util::UP_LINKS_LOAD_LEVEL // code
-					);
-
-					if(cities.empty())
-					{
-						// No matching city was found, create a new one
-						_importer._logCreation("New city " + normalizedCityName + " (" + cityCode + ")");
-
-						city = boost::shared_ptr<City>(new City);
-						city->set<Name>(normalizedCityName);
-						city->set<Code>(cityCode);
-						city->set<Key>(CityTableSync::getId());
-
-						if(NULL != polygonBoundary)
-						{
-							city->set<PolygonGeometry>(boost::shared_ptr<geos::geom::Polygon>(polygonBoundary));
-						}
-						else
-						{
-							_importer._logWarning("City " + normalizedCityName + " has no geometry");
-						}
-
-						// Add the new city to the registry
-						_env.getEditableRegistry<City>().add(city);
-					}
-
-					else
-					{						
-						// At least one matching city found, update the first one
-						city = cities.front();
-
-						_importer._logLoad("Updating city " + city->get<Name>());
-
-
-						if(NULL != polygonBoundary)
-						{
-							city->set<PolygonGeometry>(boost::shared_ptr<geos::geom::Polygon>(polygonBoundary));
-						}
-						else
-						{
-							_importer._logWarning("City " + normalizedCityName + " has no geometry");
-						}
-					}
-				}
 
 		};
+
+
+
+
+		void
+		OSMCitiesHandler::handleCity(
+			const std::string&    cityName,
+			const std::string&    cityCode,
+			geos::geom::Geometry* boundary)
+		{
+			_importer._logDebug("Processing city " + cityName);
+
+			boost::shared_ptr<City> city;
+			std::string normalizedCityName = boost::to_upper_copy(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(cityName));
+			geos::geom::Polygon* polygonBoundary = NULL;
+
+			if(NULL != boundary)
+			{
+				// This block converts a geometry object into a polygon
+				// Note : this should be a multi-polygon instead, because some cities consist of multiple disjoint areas
+				geos::geom::CoordinateSequence *cs = boundary->getCoordinates();
+
+				if(0 < cs->size())
+				{
+					if(!cs->back().equals(cs->front()))
+					{
+						cs->add(cs->front());
+					}
+					geos::geom::LinearRing *lr = CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory().createLinearRing(cs);
+					polygonBoundary = CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory().createPolygon(lr, NULL);
+				}
+			}
+
+			bool cityCodeIsSet = !cityCode.empty() && ("0" != cityCode);
+			CityTableSync::SearchResult cities = CityTableSync::Search(
+				_env,
+				boost::optional<std::string>(), // exactname
+				(cityCodeIsSet ? boost::optional<std::string>() : boost::optional<std::string>(normalizedCityName)), // likeName
+				(cityCodeIsSet ? boost::optional<std::string>(cityCode) : boost::optional<std::string>()),
+				0, 0, true, true,
+				util::UP_LINKS_LOAD_LEVEL // code
+			);
+
+			if(cities.empty())
+			{
+				// No matching city was found, create a new one
+				_importer._logCreation("New city " + normalizedCityName + " (" + cityCode + ")");
+
+				city = boost::shared_ptr<City>(new City);
+				city->set<Name>(normalizedCityName);
+				city->set<Code>(cityCode);
+				city->set<Key>(CityTableSync::getId());
+
+				if(NULL != polygonBoundary)
+				{
+					city->set<PolygonGeometry>(boost::shared_ptr<geos::geom::Polygon>(polygonBoundary));
+				}
+				else
+				{
+					_importer._logWarning("City " + normalizedCityName + " has no geometry");
+				}
+
+				// Add the new city to the registry
+				_env.getEditableRegistry<City>().add(city);
+			}
+
+			else
+			{
+				// At least one matching city found, update the first one
+				city = cities.front();
+
+				_importer._logLoad("Updating city " + city->get<Name>());
+
+
+				if(NULL != polygonBoundary)
+				{
+					city->set<PolygonGeometry>(boost::shared_ptr<geos::geom::Polygon>(polygonBoundary));
+				}
+				else
+				{
+					_importer._logWarning("City " + normalizedCityName + " has no geometry");
+				}
+			}
+		}
+
+		void
+		OSMCitiesHandler::handleRoad(const std::string& name,
+								TrafficDirection trafficDirection,
+								double maxSpeed,
+								bool isDrivable,
+								bool isBikable,
+								bool isWalkable,
+								geos::geom::Geometry* path)
+		{
+
+		}
+
+
+		void
+		OSMCitiesHandler::handleHouse(const HouseNumber& houseNumber,
+								 const std::string& streetName,
+								 geos::geom::Point* boundary)
+		{
+
+		}
+
 
 
 		bool OSMCityBoundariesFileFormat::Importer_::_parse(
@@ -166,7 +207,8 @@ namespace synthese
 			}
 			std::string ext = boost::filesystem::extension(filePath);
 			OSMCitiesHandler handler(*this, _env);
-			OSMParser parser = (_cityCodeTag ? OSMParser(*_fileStream, handler, *_cityCodeTag) : OSMParser(*_fileStream, handler));
+
+			OSMParser parser(*_fileStream, handler, OSMLocale::OSMLocale_CH);
 			if(ext == ".bz2")
 			{
 				in.push(boost::iostreams::bzip2_decompressor());
@@ -203,9 +245,9 @@ namespace synthese
 		{
 			util::ParametersMap result;
 
-			if(_cityCodeTag)
+			if(_countryCode)
 			{
-				result.insert(PARAMETER_CITY_CODE_TAG, *_cityCodeTag);
+				result.insert(PARAMETER_COUNTRY_CODE, *_countryCode);
 			}
 
 			return result;
@@ -215,7 +257,7 @@ namespace synthese
 
 		void OSMCityBoundariesFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
-			_cityCodeTag = map.getOptional<std::string>(PARAMETER_CITY_CODE_TAG);
+			_countryCode = map.getDefault<std::string>(PARAMETER_COUNTRY_CODE, "FR");
 		}
 
 
