@@ -1,22 +1,50 @@
 *** Settings ***
+Library           XML    use_lxml=yes
 Resource          ../../resources/s3-fakeclient/import_services.txt    
 Resource          ../../resources/s3-fakeclient/object_services.txt    
 Test Setup        Start Synthese On Node 0
 Test Teardown     Stop Synthese On Node 0
 
+*** Keywords ***
+
+Count Houses In OSM File ${osm_file_path}
+    ${osm_xml}=   Parse XML   ${osm_file_path}
+    ${osm_houses_count}=   Get Element Count   ${osm_xml}   xpath=node[(tag[@k="addr:housenumber"]) and (tag[@k="addr:street"])]
+    [Return]    ${osm_houses_count}
+
+Count Roads In OSM File ${osm_file_path}
+    ${osm_xml}=   Parse XML   ${osm_file_path}
+    ${osm_roads_count}=   Get Element Count   ${osm_xml}   xpath=way[tag[@k='highway']]
+    [Return]    ${osm_roads_count}
+
+Count Crossing Restrictions In OSM File ${osm_file_path}
+    ${osm_xml}=   Parse XML   ${osm_file_path}
+    ${osm_crossing_restrictions_count}=   Get Element Count   ${osm_xml}   xpath=relation[(tag[@k='type' and @v='restriction']) and (tag[@k='restriction']) and (count(member[@role='from']) > 0) and (count(member[@role='to']) > 0) and (count(member[@role='via']) > 0)]
+    [Return]    ${osm_crossing_restrictions_count}
+
+
 *** Test Cases ***
 
 Import OSM Export (direct OSM web export) Of Small Swiss Tile Should Work
     On node 0
-    Import OSM Export  ${CURDIR}/../../resources/data/small_swiss_tile.osm
+    ${osm_file_path}=  Set Variable   ${CURDIR}/../../resources/data/small_swiss_tile.osm
+    Import OSM Export  ${osm_file_path}
     There are 5 Objects In Table ${CITIES_TABLE_ID}
-    There are 30260 Objects In Table ${ROADS_TABLE_ID}
+    ${expected_road_count}=   Count Roads In OSM File ${osm_file_path}
+    There are ${expected_road_count} Objects In Table ${ROADS_TABLE_ID}
+    ${expected_house_count}=   Count Houses In OSM File ${osm_file_path}
+    There are ${expected_house_count} Objects In Table ${HOUSES_TABLE_ID}
 
 Import OSM Export (direct OSM web export) Of Larger Swiss Tile Should Work
     On node 0
-    Import OSM Export  ${CURDIR}/../../resources/data/larger_swiss_tile.osm
+    ${osm_file_path}=  Set Variable   ${CURDIR}/../../resources/data/larger_swiss_tile.osm
+    Import OSM Export  ${osm_file_path}
     There are 6 Objects In Table ${CITIES_TABLE_ID}
-    There are 1277 Objects In Table ${ROADS_TABLE_ID}
+    ${expected_road_count}=   Count Roads In OSM File ${osm_file_path}
+    There are ${expected_road_count} Objects In Table ${ROADS_TABLE_ID}
+    ${expected_house_count}=   Count Houses In OSM File ${osm_file_path}
+    There are ${expected_house_count} Objects In Table ${HOUSES_TABLE_ID}
+
 
 
 
