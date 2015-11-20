@@ -41,30 +41,45 @@ namespace synthese
 		{
 		public:
 			std::vector<boost::tuple<std::string, std::string, geos::geom::Geometry*> > handledCities;
-			std::vector<boost::tuple<std::string, TrafficDirection, double, bool, bool, bool, geos::geom::Geometry*> > handledRoads;
+			std::vector<boost::tuple<OSMId, std::string, road::RoadType, geos::geom::Geometry*> > handledRoads;
 			std::vector<boost::tuple<HouseNumber, std::string, geos::geom::Point*> > handledHouses;
 
-			virtual void handleCity(const std::string& cityName, const std::string& cityCode, geos::geom::Geometry* boundary)
+			void handleCity(const std::string& cityName, const std::string& cityCode, geos::geom::Geometry* boundary)
 			{
 				handledCities.push_back(boost::make_tuple(cityName, cityCode, boundary));
 			}
 
-			virtual void handleRoad(const std::string& name,
-									TrafficDirection trafficDirection,
-									double maxSpeed,
-									bool isDrivable,
-									bool isBikable,
-									bool isWalkable,
-									geos::geom::Geometry* path)
+			void handleRoad(const OSMId& roadSourceId, 
+					const std::string& name,
+					const road::RoadType& roadType, 
+					geos::geom::Geometry* path)
 			{
-				handledRoads.push_back(boost::make_tuple(name, trafficDirection, maxSpeed, isDrivable, isBikable, isWalkable, path));
+				handledRoads.push_back(boost::make_tuple(roadSourceId, name, roadType, path));
 			}
+
+			void handleCrossing(const OSMId& crossingSourceId, geos::geom::Point* point)
+			{
+
+			}
+
+			void handleRoadChunk(size_t rank, 
+										 graph::MetricOffset metricOffset,
+										 TrafficDirection trafficDirection,
+										 double maxSpeed,
+					                     bool isDrivable,
+					                     bool isBikable,
+					                     bool isWalkable,
+					                     geos::geom::LineString* path)
+			{
+
+			}
+
 
 			virtual void handleHouse(const HouseNumber& houseNumber,
 									 const std::string& streetName,
-									 geos::geom::Point* boundary)
+									 geos::geom::Point* point)
 			{
-				handledHouses.push_back(boost::make_tuple(houseNumber, streetName, boundary));
+				handledHouses.push_back(boost::make_tuple(houseNumber, streetName, point));
 			}
 
 		};
@@ -91,7 +106,6 @@ namespace synthese
 			BOOST_CHECK_MESSAGE(handledCity.get<2>() == 0, "No boundary was expected!");
 		}
 
-/*
 		BOOST_AUTO_TEST_CASE (should_find_five_swiss_cities_without_boundaries_from_osm_file)
 		{
 			std::ifstream osmStream("five_swiss_cities_with_incomplete_boundaries.osm");
@@ -197,8 +211,8 @@ namespace synthese
 
 			BOOST_CHECK_EQUAL(649, fakeOSMEntityHandler.handledRoads.size());
 		}
-*/
 
+/*
 		BOOST_AUTO_TEST_CASE (should_parse_full_swiss)
 		{
 			FakeOSMEntityHandler fakeOSMEntityHandler;
@@ -210,6 +224,7 @@ namespace synthese
 
 			BOOST_CHECK_EQUAL(649, fakeOSMEntityHandler.handledRoads.size());
 		}
+		*/
 
 	}
 }

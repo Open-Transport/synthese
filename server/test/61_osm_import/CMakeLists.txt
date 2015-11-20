@@ -1,5 +1,5 @@
-include_directories(${GEOS_INCLUDE_DIRS})
-
+include_directories("${PROJECT_SOURCE_DIR}/src/18_graph")
+include_directories("${PROJECT_SOURCE_DIR}/src/34_road")
 include_directories("${PROJECT_SOURCE_DIR}/src/61_osm_import")
 include_directories(${GEOS_INCLUDE_DIRS})
 

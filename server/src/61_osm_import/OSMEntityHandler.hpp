@@ -25,6 +25,8 @@
 
 #include <string>
 
+#include "GraphTypes.h"
+#include "RoadTypes.hpp"
 
 namespace geos
 {
@@ -32,6 +34,7 @@ namespace geos
 	{
 		class Geometry;
 		class Point;
+		class LineString;
 	}
 }
 
@@ -40,6 +43,8 @@ namespace synthese
 {
 namespace data_exchange
 {
+
+typedef unsigned long long int OSMId;
 
 typedef enum {
 	TWO_WAYS,
@@ -61,17 +66,25 @@ public:
 		                    const std::string& cityCode, 
 		                    geos::geom::Geometry* boundary) = 0;
 
-	virtual void handleRoad(const std::string& name,
-							TrafficDirection trafficDirection,
-							double maxSpeed,
-							bool isDrivable,
-							bool isBikable,
-							bool isWalkable,
+	virtual void handleRoad(const OSMId& roadSourceId, 
+							const std::string& name,
+							const road::RoadType& roadType, 
 							geos::geom::Geometry* path) = 0;
+
+	virtual void handleCrossing(const OSMId& crossingSourceId, geos::geom::Point* point) = 0;
+
+	virtual void handleRoadChunk(size_t rank, 
+								 graph::MetricOffset metricOffset,
+								 TrafficDirection trafficDirection,
+								 double maxSpeed,
+			                     bool isDrivable,
+			                     bool isBikable,
+			                     bool isWalkable,
+			                     geos::geom::LineString* path) = 0;
 
 	virtual void handleHouse(const HouseNumber& houseNumber,
 							 const std::string& streetName,
-							 geos::geom::Point* boundary) = 0;
+							 geos::geom::Point* point) = 0;
 
 
 };
