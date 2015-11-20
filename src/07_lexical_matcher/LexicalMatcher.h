@@ -7,6 +7,7 @@
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <map>
 #include <vector>
@@ -78,13 +79,15 @@ namespace synthese
 				MatchResult	bestMatches(
 					const std::string& fuzzyKey,
 					size_t nbMatches,
-					double minScore = 0
+					double minScore = 0,
+					bool fuzzy = true
 				) const;
 
 				MatchResult	match(
 					const std::string& fuzzyKey,
 					double minScore,
-					size_t maxNbValues
+					size_t maxNbValues,
+					bool fuzzy = true // If true, use phonetic search, else use a simple text based search
 				) const;
 
 
@@ -124,14 +127,15 @@ namespace synthese
 		typename LexicalMatcher<T>::MatchResult LexicalMatcher<T>::bestMatches(
 			const std::string& fuzzyKey,
 			size_t nbMatches,
-			double minScore
+			double minScore,
+			bool fuzzy
 		) const {
 			if(_map.empty ())
 			{
 				return typename LexicalMatcher<T>::MatchResult();
 			}
 
-			MatchResult result = match(fuzzyKey, minScore, 0);
+			MatchResult result = match(fuzzyKey, minScore, 0, fuzzy);
 
 			if(nbMatches && result.size () > nbMatches)
 			{
@@ -149,33 +153,94 @@ namespace synthese
 		typename LexicalMatcher<T>::MatchResult LexicalMatcher<T>::match(
 			const std::string& fuzzyKey,
 			double minScore,
-			size_t maxNbValues
+			size_t maxNbValues,
+			bool fuzzy
 		) const {
 			MatchResult result;
-			FrenchSentence ppkey(fuzzyKey);
 
-			// Iterate over all candidates
-			BOOST_FOREACH(const typename Map::value_type& value, _map)
+			// Use a french phonetic matching
+			if (fuzzy)
 			{
-				MatchHit hit;
-				hit.score = value.first.compare(ppkey);
 
-				if (hit.score.phoneticScore >= minScore)
+				FrenchSentence ppkey(fuzzyKey);
+
+				// Iterate over all candidates
+				BOOST_FOREACH(const typename Map::value_type& value, _map)
 				{
-					if(value.first.startsWith(ppkey))
+					MatchHit hit;
+					hit.score = value.first.compare(ppkey);
+
+					if (hit.score.phoneticScore >= minScore)
 					{
-						hit.score.phoneticScore += ((1 - hit.score.phoneticScore) * hit.score.phoneticScore ) / 2;
+						if(value.first.startsWith(ppkey))
+						{
+							hit.score.phoneticScore += ((1 - hit.score.phoneticScore) * hit.score.phoneticScore ) / 2;
+						}
+						else
+						{
+							hit.score.phoneticScore *= 0.9;
+						}
+						hit.key = value.first;
+						hit.value = value.second;
+						result.push_back(hit);
 					}
-					else
-					{
-						hit.score.phoneticScore *= 0.9;
-					}
-					hit.key = value.first;
-					hit.value = value.second;
-					result.push_back(hit);
+
+					if (maxNbValues > 0 && result.size() == maxNbValues) break;
 				}
 
-				if (maxNbValues > 0 && result.size() == maxNbValues) break;
+			}
+			else // Simple text based search
+			{
+				// The score is made from the number of characters of the search key mutliplied by a multiplier
+				// In case where the searched key is at the start of the string, the multiplier is higher
+				// The levenstein value is always at 0
+				
+				// Search are case-insensitive
+				std::string key = fuzzyKey;
+				boost::algorithm::to_lower(key);
+
+				// Iterate over all candidates
+				BOOST_FOREACH(const typename Map::value_type& value, _map)
+				{
+					MatchHit hit;
+					hit.score.levenshtein = 0;
+					double multiplier = 0.0;
+
+					// Search are case-insensitive
+					std::string name = value.first.getSource();
+					boost::algorithm::to_lower(name);
+
+					// Idea : use a loop, each time decreasing the size of the key from each side
+					
+					// Search for each word first letters, if found, a higher score is given
+					std::vector<std::string> words;
+					boost::algorithm::split(words, name, boost::algorithm::is_any_of(" -'/"));
+					BOOST_FOREACH(const std::string word, words)
+					{std::string val = word.substr(0,key.size());
+						if ( val== key)
+						{
+							multiplier += 1.5;
+						}
+					}
+					
+					// Do a simple string search
+					if (multiplier == 0.0 && std::search(name.begin(), name.end(), key.begin(), key.end()) != name.end())
+					{
+						multiplier += 1.0;
+					}
+					
+					hit.score.phoneticScore = key.size() * multiplier;
+
+					// Add in the result if good enough
+					if (hit.score.phoneticScore >= minScore)
+					{
+						hit.key = value.first;
+						hit.value = value.second;
+						result.push_back(hit);
+					}
+
+					if (maxNbValues > 0 && result.size() == maxNbValues) break;
+				}
 			}
 
 			// Sort the result by descending score.

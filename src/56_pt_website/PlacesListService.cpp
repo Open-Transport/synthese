@@ -33,12 +33,14 @@
 #include "PublicPlace.h"
 #include "Request.h"
 #include "RequestException.h"
+#include "Road.h"
 #include "RoadPlace.h"
 #include "StopArea.hpp"
 #include "PTServiceConfigTableSync.hpp"
 #include "Webpage.h"
 #include "RoadChunkTableSync.h"
 #include <geos/geom/LineString.h>
+#include <geos/linearref/LengthIndexedLine.h>
 
 #ifndef UNIX
 #include <geos/util/math.h>
@@ -48,6 +50,7 @@ using namespace std;
 using namespace boost;
 using namespace geos::geom;
 using namespace geos::util;
+using namespace geos::linearref;
 
 namespace synthese
 {
@@ -76,6 +79,8 @@ namespace synthese
 		const string PlacesListService::PARAMETER_SORTED = "sorted";
 		const string PlacesListService::PARAMETER_TEXT = "text";
 		const string PlacesListService::PARAMETER_SRID = "srid";
+		const string PlacesListService::PARAMETER_PHONETIC = "phonetic";
+		const string PlacesListService::PARAMETER_RESUME = "resume";
 
 		const string PlacesListService::PARAMETER_COORDINATES_XY = "coordinates_xy";
 		const string PlacesListService::PARAMETER_MAX_DISTANCE = "maxDistance";
@@ -102,6 +107,8 @@ namespace synthese
 		const string PlacesListService::DATA_ORIGIN_X = "origin_x";
 		const string PlacesListService::DATA_ORIGIN_Y = "origin_y";
 		const string PlacesListService::DATA_DISTANCE_TO_ORIGIN = "distance_to_origin";
+		const string PlacesListService::DATA_RESUME = "resume";
+		const string PlacesListService::DATA_RESUMES = "resumes";
 
 
 
@@ -112,35 +119,10 @@ namespace synthese
 			_minScore(0),
 			_coordinatesSystem(NULL),
 			_maxDistance(300),
-			_requiredUserClasses()
-		{
-			 _houseMap = new HouseMapType();
-		}
-
-
-
-		PlacesListService::~PlacesListService()
-		{
-			/*
-				The delete below is needed to fix a leak on _houseMap, which is never destroy.
-				However, having this delete cause a "double free or corruption" crash when loading the admin interface.
-
-				*** glibc detected *** ./s3-server: double free or corruption (fasttop): 0x00007f500c00c560 ***
-				======= Backtrace: =========
-				/lib64/libc.so.6[0x34a4675916]
-				(...)/lib56_pt_website.so(_ZN8synthese10pt_website17PlacesListServiceD2Ev+0x37)[0x7f5021dbc5d7]
-				(...)/lib35_pt.so(_ZN8synthese2pt13PTCitiesAdminD0Ev+0x22)[0x7f5024619102]
-
-				PTCitiesAdmin has a PlacesListService attribute which is allocated by his constructor, PTCitiesAdmin also
-				inherits from AdminInterfaceElementTemplate<PTCitiesAdmin>.
-				PTCitiesAdmin destructor call PlacesListService destructor, which will delete _houseMap. In this case
-				_houseMap has never been allocated, causing this crash.
-
-				This mean that the "PTCitiesAdmin" object we have has never been trully allocated, we have possibly did
-				a static pointer cast like static_cast<PTCitiesAdmin*>(PointerOnInheritedClass), causing this issue.
-			*/
-			//delete _houseMap;
-		}
+			_requiredUserClasses(),
+			_phonetic(true),
+			_resume(false)
+		{}
 
 		ParametersMap PlacesListService::_getParametersMap() const
 		{
@@ -219,6 +201,12 @@ namespace synthese
 			{
 				map.insert(PARAMETER_MAX_DISTANCE, _maxDistance);
 			}
+
+			// Phonetic search
+			map.insert(PARAMETER_PHONETIC, _phonetic);
+			
+			// Resume section
+			map.insert(PARAMETER_RESUME, _resume);
 
 			return map;
 		}
@@ -336,6 +324,10 @@ namespace synthese
 			{
 				throw RequestException("Bad user class code in acList parameter.");
 			}
+
+			_phonetic = map.getDefault<bool>(PARAMETER_PHONETIC, _phonetic);
+			
+			_resume = map.getDefault<bool>(PARAMETER_RESUME, _resume);
 		}
 
 
@@ -535,7 +527,8 @@ namespace synthese
 									_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
 										roadName,
 										_number ? *_number : 0,
-										_minScore
+										_minScore,
+										_phonetic
 								)	);
 
 								// Transformation into house places list
@@ -576,7 +569,8 @@ namespace synthese
 							_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
 								_text,
 								_number ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						result.insert(DATA_ROADS, pm);
 					}
@@ -590,7 +584,8 @@ namespace synthese
 							_city->getLexicalMatcher(PublicPlace::FACTORY_KEY).bestMatches(
 								_text,
 								_number ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						result.insert(DATA_PUBLIC_PLACES, pm);
 					}
@@ -610,7 +605,8 @@ namespace synthese
 							GeographyModule::GetCitiesMatcher().bestMatches(
 								_text,
 								(_number && !_citiesWithAtLeastAStop) ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						result.insert(DATA_CITIES, pm);
 					}
@@ -663,7 +659,8 @@ namespace synthese
 									RoadModule::GetGeneralRoadsMatcher().bestMatches(
 										roadName,
 										_number ? *_number : 0,
-										_minScore
+										_minScore,
+										_phonetic
 								)	);
 
 								// Transformation into house places list
@@ -708,7 +705,8 @@ namespace synthese
 							RoadModule::GetGeneralRoadsMatcher().bestMatches(
 								_text,
 								_number ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						// We add road results to the roadList
 						BOOST_FOREACH(const RoadModule::GeneralRoadsMatcher::MatchResult::value_type& road, roads)
@@ -737,7 +735,8 @@ namespace synthese
 							RoadModule::GetGeneralPublicPlacesMatcher().bestMatches(
 								_text,
 								_number ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						result.insert(DATA_PUBLIC_PLACES, pm);
 					}
@@ -753,7 +752,8 @@ namespace synthese
 						_city->getAllPlacesMatcher().bestMatches(
 							_text,
 							_number ? *_number : 0,
-							_minScore
+							_minScore,
+							_phonetic
 					)	);
 				}
 				else if(_config)
@@ -767,7 +767,8 @@ namespace synthese
 						GeographyModule::GetGeneralAllPlacesMatcher().bestMatches(
 							_text,
 							_number ? *_number : 0,
-							_minScore
+							_minScore,
+							_phonetic
 					)	);
 				}
 				result.insert(DATA_PLACES, pm);
@@ -864,6 +865,53 @@ namespace synthese
 				result.insert(DATA_BEST_PLACE, bestPlace);
 			}
 
+			// Resume
+			// The resume section is shown when asked (PARAMETER_RESUME)
+			// All the content from the result parameter map will be taken, and each entry from each class (except the best places) will be taken
+			// and added to a new multimap, sorted by phonetic score
+			// The class filter does not affect the resume section
+			if (_resume)
+			{
+				typedef boost::shared_ptr<ParametersMap> SharedParametersMap;
+				std::multimap< double, SharedParametersMap> resumes;
+				BOOST_FOREACH(const util::ParametersMap::SubMapsKeys::value_type& submapkey, result.getSubMapsKeys())
+				{
+					// Ignore the "best places", which contains entries found in the others submaps
+					if (submapkey != DATA_BEST_PLACE)
+					{
+						BOOST_FOREACH(const util::ParametersMap::SubParametersMap::mapped_type::value_type& submap, result.getSubMaps(submapkey))
+						{
+							// We have to go through 2 layers (stops->stop)
+							BOOST_FOREACH(const util::ParametersMap::SubMapsKeys::value_type& itemkey, submap->getSubMapsKeys())
+							{
+								BOOST_FOREACH(const util::ParametersMap::SubParametersMap::mapped_type::value_type& item, submap->getSubMaps(itemkey))
+								{
+									// Add it only if not already there
+									if (item->isDefined(DATA_PHONETIC_SCORE))
+									{
+										resumes.insert(std::make_pair(lexical_cast<double>(item->getValue(DATA_PHONETIC_SCORE)), item));
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				// Add the sorted results in ParametersMap, max _number (if defined)
+				boost::shared_ptr<ParametersMap> pm(new ParametersMap());
+				size_t count = 0;
+				for (std::multimap< double,SharedParametersMap >::reverse_iterator i = resumes.rbegin(); i != resumes.rend() && ( _number ? count < *_number : true ); i++ )
+				{
+					pm->insert(DATA_RESUME, (*i).second);
+					count++;
+				}
+				
+				// Add resumes in results, if not empty
+				if ( ! resumes.empty() )
+				{
+					result.insert(DATA_RESUMES, pm);
+				}
+			}
 
 			// Output
 			if(_itemPage.get())
