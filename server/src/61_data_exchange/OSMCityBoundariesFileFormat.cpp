@@ -402,7 +402,7 @@ OSMCitiesHandler::_projectHouseAndUpdateChunkHouseNumberBounds(
 	boost::shared_ptr<geos::geom::Point> houseCoord,
 	const bool autoUpdatePolicy) const {
 
-	road::HouseNumber num = boost::lexical_cast<road::HouseNumber>(houseNumber);
+	road::HouseNumber num;
 	try
 	{
 		num = boost::lexical_cast<road::HouseNumber>(houseNumber);
@@ -688,6 +688,22 @@ db::DBTransaction OSMCityBoundariesFileFormat::Importer_::_save() const
 	BOOST_FOREACH(const util::Registry<geography::City>::value_type& city, _env.getEditableRegistry<geography::City>())
 	{
 		geography::CityTableSync::Save(city.second.get(), transaction);
+	}
+	BOOST_FOREACH(const util::Registry<road::Road>::value_type& road, _env.getEditableRegistry<road::Road>())
+	{
+		road::RoadTableSync::Save(road.second.get(), transaction);
+	}
+	BOOST_FOREACH(const util::Registry<road::RoadPlace>::value_type& roadPlace, _env.getEditableRegistry<road::RoadPlace>())
+	{
+		road::RoadPlaceTableSync::Save(roadPlace.second.get(), transaction);
+	}
+	BOOST_FOREACH(const util::Registry<road::RoadChunk>::value_type& roadChunk, _env.getEditableRegistry<road::RoadChunk>())
+	{
+		road::RoadChunkTableSync::Save(roadChunk.second.get(), transaction);
+	}
+	BOOST_FOREACH(const util::Registry<road::Crossing>::value_type& crossing, _env.getEditableRegistry<road::Crossing>())
+	{
+		road::CrossingTableSync::Save(crossing.second.get(), transaction);
 	}
 
 	return transaction;
