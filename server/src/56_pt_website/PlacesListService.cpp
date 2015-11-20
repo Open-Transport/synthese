@@ -82,6 +82,7 @@ namespace synthese
 		const string PlacesListService::PARAMETER_TEXT = "text";
 		const string PlacesListService::PARAMETER_SRID = "srid";
 		const string PlacesListService::PARAMETER_PHONETIC = "phonetic";
+		const string PlacesListService::PARAMETER_RESUME = "resume";
 
 		const string PlacesListService::PARAMETER_COORDINATES_XY = "coordinates_xy";
 		const string PlacesListService::PARAMETER_MAX_DISTANCE = "maxDistance";
@@ -109,6 +110,8 @@ namespace synthese
 		const string PlacesListService::DATA_ORIGIN_X = "origin_x";
 		const string PlacesListService::DATA_ORIGIN_Y = "origin_y";
 		const string PlacesListService::DATA_DISTANCE_TO_ORIGIN = "distance_to_origin";
+		const string PlacesListService::DATA_RESUME = "resume";
+		const string PlacesListService::DATA_RESUMES = "resumes";
 
 
 
@@ -120,7 +123,8 @@ namespace synthese
 			_coordinatesSystem(NULL),
 			_maxDistance(300),
 			_requiredUserClasses(),
-			_phonetic(true)
+			_phonetic(true),
+			_resume(false)
 		{}
 
 		ParametersMap PlacesListService::_getParametersMap() const
@@ -209,6 +213,9 @@ namespace synthese
 
 			// Phonetic search
 			map.insert(PARAMETER_PHONETIC, _phonetic);
+			
+			// Resume section
+			map.insert(PARAMETER_RESUME, _resume);
 
 			return map;
 		}
@@ -337,6 +344,8 @@ namespace synthese
 			}
 
 			_phonetic = map.getDefault<bool>(PARAMETER_PHONETIC, _phonetic);
+			
+			_resume = map.getDefault<bool>(PARAMETER_RESUME, _resume);
 		}
 
 
@@ -935,6 +944,53 @@ namespace synthese
 				result.insert(DATA_BEST_PLACE, bestPlace);
 			}
 
+			// Resume
+			// The resume section is shown when asked (PARAMETER_RESUME)
+			// All the content from the result parameter map will be taken, and each entry from each class (except the best places) will be taken
+			// and added to a new multimap, sorted by phonetic score
+			// The class filter does not affect the resume section
+			if (_resume)
+			{
+				typedef boost::shared_ptr<ParametersMap> SharedParametersMap;
+				std::multimap< double, SharedParametersMap> resumes;
+				BOOST_FOREACH(const util::ParametersMap::SubMapsKeys::value_type& submapkey, result.getSubMapsKeys())
+				{
+					// Ignore the "best places", which contains entries found in the others submaps
+					if (submapkey != DATA_BEST_PLACE)
+					{
+						BOOST_FOREACH(const util::ParametersMap::SubParametersMap::mapped_type::value_type& submap, result.getSubMaps(submapkey))
+						{
+							// We have to go through 2 layers (stops->stop)
+							BOOST_FOREACH(const util::ParametersMap::SubMapsKeys::value_type& itemkey, submap->getSubMapsKeys())
+							{
+								BOOST_FOREACH(const util::ParametersMap::SubParametersMap::mapped_type::value_type& item, submap->getSubMaps(itemkey))
+								{
+									// Add it only if not already there
+									if (item->isDefined(DATA_PHONETIC_SCORE))
+									{
+										resumes.insert(std::make_pair(lexical_cast<double>(item->getValue(DATA_PHONETIC_SCORE)), item));
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				// Add the sorted results in ParametersMap, max _number (if defined)
+				boost::shared_ptr<ParametersMap> pm(new ParametersMap());
+				size_t count = 0;
+				for (std::multimap< double,SharedParametersMap >::reverse_iterator i = resumes.rbegin(); i != resumes.rend() && ( _number ? count < *_number : true ); i++ )
+				{
+					pm->insert(DATA_RESUME, (*i).second);
+					count++;
+				}
+				
+				// Add resumes in results, if not empty
+				if ( ! resumes.empty() )
+				{
+					result.insert(DATA_RESUMES, pm);
+				}
+			}
 
 			// Output
 			if(_itemPage.get())
