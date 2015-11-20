@@ -106,7 +106,6 @@ namespace synthese
 			BOOST_CHECK_MESSAGE(handledCity.get<2>() == 0, "No boundary was expected!");
 		}
 
-/*
 		BOOST_AUTO_TEST_CASE (should_find_five_swiss_cities_without_boundaries_from_osm_file)
 		{
 			std::ifstream osmStream("five_swiss_cities_with_incomplete_boundaries.osm");
@@ -212,7 +211,8 @@ namespace synthese
 
 			BOOST_CHECK_EQUAL(649, fakeOSMEntityHandler.handledRoads.size());
 		}
-*/
+
+/*
 		BOOST_AUTO_TEST_CASE (should_parse_full_swiss)
 		{
 			FakeOSMEntityHandler fakeOSMEntityHandler;
@@ -224,7 +224,7 @@ namespace synthese
 
 			BOOST_CHECK_EQUAL(649, fakeOSMEntityHandler.handledRoads.size());
 		}
-
+*/
 	}
 }
 	

@@ -475,6 +475,7 @@ OSMParserImpl::handleFirstPassEnd()
 		{
 			handleHouse(nodeIt->second.houseNumberTag, nodeIt->second.streetNameTag, makeGeometryFrom(&nodeIt->second));
 		}
+		++nodeIt;
 	}
 
 	++_passCount;
