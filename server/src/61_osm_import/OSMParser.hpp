@@ -26,9 +26,18 @@
 #include <string>
 #include <map>
 
+namespace geos
+{
+	namespace geom
+	{
+		class GeometryFactory;
+	}
+}
 
 namespace synthese
 {
+
+
 namespace data_exchange
 {
 
@@ -41,6 +50,7 @@ class OSMParser
 public:
 
 	OSMParser(std::ostream& logStream,
+			  const geos::geom::GeometryFactory& geometryFactory,
 			  OSMEntityHandler& osmEntityHandler,
 			  const OSMLocale& osmLocale);
 

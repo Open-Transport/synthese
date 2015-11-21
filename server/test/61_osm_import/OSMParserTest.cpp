@@ -29,7 +29,9 @@
 #include <boost/tuple/tuple.hpp>
 #include <fstream>
 #include <iostream>
+
 #include <geos/geom/Geometry.h>
+#include <geos/geom/GeometryFactory.h>
 
 namespace synthese
 {
@@ -122,7 +124,8 @@ namespace synthese
 		{
 			std::ifstream osmStream("five_swiss_cities_with_incomplete_boundaries.osm");
 			FakeOSMEntityHandler fakeOSMEntityHandler;
-			OSMParser parser(std::cout, fakeOSMEntityHandler, OSMLocale::OSMLocale_CH);
+			OSMParser parser(std::cout, *geos::geom::GeometryFactory::getDefaultInstance(),
+				fakeOSMEntityHandler, OSMLocale::OSMLocale_CH);
 			parser.parse(osmStream);
 			osmStream.close();
 
@@ -141,7 +144,8 @@ namespace synthese
 		{
 			FakeOSMEntityHandler fakeOSMEntityHandler;
 			std::ifstream osmStream("ten_french_cities_only_one_with_complete_boundary.osm");
-			OSMParser parser(std::cout, fakeOSMEntityHandler, OSMLocale::OSMLocale_FR);
+			OSMParser parser(std::cout, *geos::geom::GeometryFactory::getDefaultInstance(),
+				fakeOSMEntityHandler, OSMLocale::OSMLocale_FR);
 			parser.parse(osmStream);
 			osmStream.close();
 
@@ -216,7 +220,8 @@ namespace synthese
 		{
 			FakeOSMEntityHandler fakeOSMEntityHandler;
 			std::ifstream osmStream("ten_french_cities_only_one_with_complete_boundary.osm");
-			OSMParser parser(std::cout, fakeOSMEntityHandler, OSMLocale::OSMLocale_FR);
+			OSMParser parser(std::cout, *geos::geom::GeometryFactory::getDefaultInstance(),
+				fakeOSMEntityHandler, OSMLocale::OSMLocale_FR);
 			parser.parse(osmStream);
 			osmStream.close();
 
@@ -230,7 +235,8 @@ namespace synthese
 			FakeOSMEntityHandler fakeOSMEntityHandler;
 			//std::ifstream osmStream("/home/mjambert/workspace/rcsmobility/gitlab/switzerland-tests/robot/resources/data/swiss.osm");
 			std::ifstream osmStream("larger_swiss_tile.osm");
-			OSMParser parser(std::cout, fakeOSMEntityHandler, OSMLocale::OSMLocale_FR);
+			OSMParser parser(std::cout, *geos::geom::GeometryFactory::getDefaultInstance(), 
+				fakeOSMEntityHandler, OSMLocale::OSMLocale_FR);
 			parser.parse(osmStream);
 			osmStream.close();
 

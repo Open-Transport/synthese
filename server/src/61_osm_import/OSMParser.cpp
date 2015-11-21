@@ -179,6 +179,7 @@ private:
 	geos::io::WKTReader _wktReader;
 
 	std::ostream& _logStream;
+    const geos::geom::GeometryFactory& _geometryFactory;
 	OSMEntityHandler& _osmEntityHandler;
 	const OSMLocale& _osmLocale;
 
@@ -192,6 +193,7 @@ private:
 
 public:
 	OSMParserImpl(std::ostream& logStream,
+			      const geos::geom::GeometryFactory& geometryFactory,
 				  OSMEntityHandler& osmEntityHandler,
 				  const OSMLocale& osmLocale);
 
@@ -384,9 +386,11 @@ OSMParserImpl::OSMRelation::getValueOrEmpty(const std::string& tag) const
 
 
 OSMParserImpl::OSMParserImpl(std::ostream& logStream,
+					         const geos::geom::GeometryFactory& geometryFactory,
 							 OSMEntityHandler& osmEntityHandler,
 							 const OSMLocale& osmLocale)
 	: _logStream(logStream)
+	, _geometryFactory(geometryFactory)
 	, _osmEntityHandler(osmEntityHandler)
 	, _osmLocale(osmLocale)
 	, _currentRelation(OSMRelation::EMPTY)
@@ -1034,8 +1038,8 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 	boost::shared_ptr<geos::geom::Geometry> roadGeometry(makeGeometryFrom(&_currentWay));
 	handleRoad(_currentWay.id, roadName, roadType, roadGeometry);
 
-	const geos::geom::GeometryFactory* geometryFactory = geos::geom::GeometryFactory::getDefaultInstance();
-	boost::shared_ptr<geos::geom::CoordinateSequence> cs(geometryFactory->getCoordinateSequenceFactory()->create(0, 2));
+	boost::shared_ptr<geos::geom::CoordinateSequence> cs(_geometryFactory.
+		getCoordinateSequenceFactory()->create(0, 2));
 	size_t rank(0);
 	graph::MetricOffset metricOffset(0);
 
@@ -1044,7 +1048,7 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 	BOOST_FOREACH(const OSMNode& node, _currentWay.nodes)
 	{
 		i++;
-		boost::shared_ptr<geos::geom::Point> point(geometryFactory->createPoint(
+		boost::shared_ptr<geos::geom::Point> point(_geometryFactory.createPoint(
 			geos::geom::Coordinate(node.longitude, node.latitude)));
 		cs->add(*point->getCoordinate());
 		if(i == 1)
@@ -1058,7 +1062,7 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 			// Just extend the current geometry.
 			continue;
 		}
-		boost::shared_ptr<geos::geom::LineString> roadChunkPath(geometryFactory->createLineString(*cs));
+		boost::shared_ptr<geos::geom::LineString> roadChunkPath(_geometryFactory.createLineString(*cs));
 		handleRoadChunk(rank, metricOffset, 
 			trafficDirection, maxSpeed, !isDrivable, !isBikable, !isWalkable, roadChunkPath);
 
@@ -1066,7 +1070,7 @@ OSMParserImpl::handleEndHighway(const XML_Char* name)
 		handleCrossing(node.id, point);
 		if(!isLast)
 		{
-			cs.reset(geometryFactory->getCoordinateSequenceFactory()->create(0, 2));
+			cs.reset(_geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 			cs->add(*point->getCoordinate());
 		}
 		++rank;
@@ -1198,7 +1202,6 @@ OSMParserImpl::polygonize(const std::vector<OSMWay*>& ways) {
 	geos::geom::Geometry* g = NULL;
 
 	std::vector<geos::geom::Polygon*>* ret = new std::vector<geos::geom::Polygon*>();
-	const geos::geom::GeometryFactory *gf = geos::geom::GeometryFactory::getDefaultInstance();
 	if(ways.size() >= 2) {
 		geos::operation::linemerge::LineMerger lm;
 		BOOST_FOREACH(OSMWay* w, ways) {
@@ -1209,7 +1212,8 @@ OSMParserImpl::polygonize(const std::vector<OSMWay*>& ways) {
 		std::vector< geos::geom::LineString * > *lss = lm.getMergedLineStrings();
 		BOOST_FOREACH(geos::geom::LineString *ls, *lss) {
 			if(ls->getNumPoints()>3 && ls->isClosed()) {
-				geos::geom::Polygon *p = gf->createPolygon(gf->createLinearRing(ls->getCoordinates()),0);
+				geos::geom::Polygon *p = _geometryFactory.createPolygon(
+					_geometryFactory.createLinearRing(ls->getCoordinates()),0);
 				ret->push_back(p);
 			}
 			delete ls;
@@ -1223,10 +1227,8 @@ OSMParserImpl::polygonize(const std::vector<OSMWay*>& ways) {
 			//we have a closed way, return it
 			g = makeGeometryFrom(w);
 			geos::geom::CoordinateSequence *cs = g->getCoordinates();
-			geos::geom::LinearRing *lr = gf->createLinearRing(cs);
-			//std::vector<geos::geom::Geometry*>* holes = new std::vector<geos::geom::Geometry*>();
-
-			geos::geom::Polygon *p = gf->createPolygon(lr,NULL);
+			geos::geom::LinearRing *lr = _geometryFactory.createLinearRing(cs);
+			geos::geom::Polygon *p = _geometryFactory.createPolygon(lr,NULL);
 			ret->push_back(p);
 			delete g;
 		}
@@ -1258,8 +1260,7 @@ OSMParserImpl::makeWKTFrom(OSMWay* way)
 geos::geom::Point*
 OSMParserImpl::makeGeometryFrom(OSMNode* node)
 {
-	const geos::geom::GeometryFactory *geometryFactory = geos::geom::GeometryFactory::getDefaultInstance();
-	return geometryFactory->createPoint(geos::geom::Coordinate(node->longitude, node->latitude));
+	return _geometryFactory.createPoint(geos::geom::Coordinate(node->longitude, node->latitude));
 }
 
 
@@ -1272,7 +1273,6 @@ OSMParserImpl::makeGeometryFrom(OSMWay* way)
 geos::geom::Geometry*
 OSMParserImpl::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std::vector<OSMWay*>& innerWays)
 {
-	const geos::geom::GeometryFactory *geometryFactory = geos::geom::GeometryFactory::getDefaultInstance();
 	std::vector<geos::geom::Polygon*>* polygons, *polygon_enclaves;
 	polygons = polygonize(outerWays);
 
@@ -1281,12 +1281,12 @@ OSMParserImpl::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std
 		return NULL;
 	}
 
-	geos::geom::Geometry* poly = geometryFactory->createMultiPolygon((std::vector<geos::geom::Geometry*>*) polygons);
+	geos::geom::Geometry* poly = _geometryFactory.createMultiPolygon((std::vector<geos::geom::Geometry*>*) polygons);
 	//the geometries stored in *polygons are now owned by the multipolygon
 
 	if (!poly->isValid()) {
 		geos::geom::Geometry *tmp = poly->buffer(0.0);
-		geometryFactory->destroyGeometry(poly);
+		_geometryFactory.destroyGeometry(poly);
 		poly = tmp;
 	}
 
@@ -1296,18 +1296,18 @@ OSMParserImpl::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std
 		{
 			if (!enc->isValid()) {
 				geos::geom::Geometry *tmp = enc->buffer(0.0);
-				geometryFactory->destroyGeometry(enc);
+				_geometryFactory.destroyGeometry(enc);
 				enc = tmp;
 			}
 			if (poly->intersects(enc)) {
 				try {
 					geos::geom::Geometry *tmp = poly->difference(enc);
-					geometryFactory->destroyGeometry(poly);
+					_geometryFactory.destroyGeometry(poly);
 					poly = tmp;
 				} catch (geos::util::TopologyException e) {
 					_logStream << std::endl << e.what() << std::endl;
 				}
-				geometryFactory->destroyGeometry(enc);
+				_geometryFactory.destroyGeometry(enc);
 			}
 		}
 	}
@@ -1496,14 +1496,16 @@ OSMParserImpl::parse(std::istream& osmInput)
 
 	_logStream << "Starting second pass over OSM input..." << std::endl;;
 	parseOnce(osmInput);
+	_nodes.clear();
 	_logStream << "Second pass done" << std::endl;;
 }
 
 
 OSMParser::OSMParser(std::ostream& logStream,
+					 const geos::geom::GeometryFactory& geometryFactory,
 					 OSMEntityHandler& osmEntityHandler,
 					 const OSMLocale& osmLocale)
-	: _pimpl(new OSMParserImpl(logStream, osmEntityHandler, osmLocale))
+	: _pimpl(new OSMParserImpl(logStream, geometryFactory, osmEntityHandler, osmLocale))
 {
 }
 

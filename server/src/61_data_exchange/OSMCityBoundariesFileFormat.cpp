@@ -338,9 +338,11 @@ OSMCitiesHandler::handleRoadChunk(size_t rank,
 	roadChunk->setRankInPath(rank);
 	roadChunk->setMetricOffset(metricOffset);
 	roadChunk->setKey(road::RoadChunkTableSync::getId());
-	if(path)
+
+	if(path.get() != NULL)
 	{
-		roadChunk->setGeometry(path);
+		_importer._logDebug("============================== " + ((path.get() != 0) ? path->toString() : std::string("") ));
+		roadChunk->set<LineStringGeometry>(path);
 	}
 	roadChunk->setNonDrivable(!isDrivable);
 	roadChunk->setNonBikable(!isBikable);
@@ -627,7 +629,8 @@ bool OSMCityBoundariesFileFormat::Importer_::_parse(
 	std::string ext = boost::filesystem::extension(filePath);
 	OSMCitiesHandler handler(*this, _env);
 
-	OSMParser parser(*_fileStream, handler, OSMLocale::OSMLocale_CH);
+	OSMParser parser(*_fileStream, CoordinatesSystem::GetInstanceCoordinatesSystem().GetDefaultGeometryFactory(), 
+		handler, OSMLocale::getInstance(*_countryCode));
 	if(ext == ".bz2")
 	{
 		in.push(boost::iostreams::bzip2_decompressor());
