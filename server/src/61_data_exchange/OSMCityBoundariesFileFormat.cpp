@@ -629,7 +629,7 @@ bool OSMCityBoundariesFileFormat::Importer_::_parse(
 	std::string ext = boost::filesystem::extension(filePath);
 	OSMCitiesHandler handler(*this, _env);
 
-	OSMParser parser(*_fileStream, CoordinatesSystem::GetInstanceCoordinatesSystem().GetDefaultGeometryFactory(), 
+	OSMParser parser(*_fileStream, CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory(), 
 		handler, OSMLocale::getInstance(*_countryCode));
 	if(ext == ".bz2")
 	{
