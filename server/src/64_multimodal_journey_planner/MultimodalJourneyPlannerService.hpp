@@ -61,9 +61,14 @@ namespace synthese
 			static const std::string PARAMETER_DEPARTURE_DAY;
 			static const std::string PARAMETER_DEPARTURE_TIME;
 
+			static const std::string PARAMETER_ASTAR_FOR_WALK; //TODO : remove when algorithm is chosen
+
 			static const std::string DATA_MULTIMODAL_JOURNEY_PLANNER_RESULT;
+			static const std::string DATA_ERROR_MESSAGE;
 
 		private:
+			// TEMP
+			bool _aStarForWalk;
 			//! \name Parameters
 			//@{
 				std::string									_originCityText;
