@@ -45,6 +45,7 @@ namespace synthese
 
 		private:
 			const boost::shared_ptr<InterSYNTHESEConfig> getMyConfig();
+			const boost::shared_ptr<InterSYNTHESESlave> getMySlave();
 			void addTable(InterSYNTHESEConfig &config,
 				const std::string tableCode);
 
