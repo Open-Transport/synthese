@@ -49,6 +49,8 @@ namespace synthese
 	
 		const string SpecificPostInstall::PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID = "post_install_passive_import_id";
 		const string SpecificPostInstall::PARAMETER_POST_INSTALL_SLAVE_ID = "post_install_slave_id";
+		const string SpecificPostInstall::PARAMETER_POST_INSTALL_SLAVE_TO_MASTER_IP = "post_install_slave_to_master_ip";
+		const string SpecificPostInstall::PARAMETER_POST_INSTALL_TABLES = "post_install_tables";
 
 		ParametersMap SpecificPostInstall::getParametersMap() const
 		{
@@ -62,6 +64,8 @@ namespace synthese
 		{
 			_passiveImportId = map.get<RegistryKeyType>(PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID);
 			_slaveId = map.get<RegistryKeyType>(PARAMETER_POST_INSTALL_SLAVE_ID);
+			_slaveToMasterIp = map.get<std::string>(PARAMETER_POST_INSTALL_SLAVE_TO_MASTER_IP);
+			_tables = map.get<std::string>(PARAMETER_POST_INSTALL_TABLES);
 		}
 
 
@@ -100,26 +104,29 @@ namespace synthese
 				newConfig.set<Name>(MASTER_NAME);
 				newConfig.set<Multimaster>(true);
 				InterSYNTHESEConfigTableSync::Save(&newConfig);
-
-				InterSYNTHESESlave slave;
-				slave.set<Name>("__SAE__");
-				slave.set<ServerAddress>("37.187.26.148");
-				slave.set<ServerPort>("80");
-				slave.set<InterSYNTHESEConfig>(newConfig);
-				slave.set<Active>(true);
-				slave.set<PassiveModeImportId>(_passiveImportId);
-				slave.setKey(_slaveId);
-				ptime now(second_clock::local_time());
-				slave.set<LastActivityReport>(now);
-				InterSYNTHESESlaveTableSync::Save(&slave);
-
-				//addTable(newConfig, "44");
-				//addTable(newConfig, "46");
-				addTable(newConfig, "72");
-				addTable(newConfig, "118");
-				addTable(newConfig, "119");
-				Log::GetInstance().info("InterSYNTHESEConfig post install created");
 			}
+
+			shared_ptr<InterSYNTHESEConfig> myConfig(getMyConfig());
+			InterSYNTHESESlave slave;
+			slave.set<Name>("__SAE__");
+			slave.set<ServerAddress>(_slaveToMasterIp);
+			slave.set<ServerPort>("80");
+			slave.set<InterSYNTHESEConfig>(*myConfig);
+			slave.set<Active>(true);
+			slave.set<PassiveModeImportId>(_passiveImportId);
+			slave.setKey(_slaveId);
+			ptime now(second_clock::local_time());
+			slave.set<LastActivityReport>(now);
+			InterSYNTHESESlaveTableSync::Save(&slave);
+
+			vector<string> tablesId;
+			split(tablesId, _tables, is_any_of(", "));
+			for(std::vector<std::string>::iterator it = tablesId.begin(); it != tablesId.end(); ++it)
+			{
+				addTable(*myConfig, *it);
+				Log::GetInstance().info("InterSYNTHESEConfig post install adding table " + *it);
+			}
+			Log::GetInstance().info("InterSYNTHESEConfig post install created");
 		}
 
 
