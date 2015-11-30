@@ -8,9 +8,9 @@ Most test libraries involved in our tests are documented in its excellent [User 
 The following prerequisites must be fulfilled in order to run robot tests.
 * use Python 2 !
 * install [pip](https://pip.pypa.io/en/latest/installing.html)
-* install Robot Framework
+* install Robot Framework 2.8.7 (We don't yet support more recent version)
 ```
-pip2 install robotframework
+pip2 install 'robotframework==2.8.7'
 ```
 * install dependencies and test libraries
 ```
