@@ -1,0 +1,6 @@
+*** Settings ***
+
+*** Variables ***
+${DB}             ${CURDIR}/../../resources/data/multimodal_journey_planner.db3
+
+*** Keywords ***

@@ -9,6 +9,7 @@ message("Using ${S3_SERVER_BINARY}")
 add_subdirectory("cases/inter_synthese")
 add_subdirectory("cases/object_services")
 add_subdirectory("cases/topical_messaging")
+add_subdirectory("cases/multimodal_journey_planner")
 
 if(NOT WITH_INEO_TERMINUS)
   file(APPEND ${CMAKE_BINARY_DIR}/modules.py "WITH_INEO_TERMINUS = False\n")

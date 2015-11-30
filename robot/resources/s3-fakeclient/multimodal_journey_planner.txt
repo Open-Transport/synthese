@@ -1,0 +1,22 @@
+*** Settings ***
+Resource          ../s3-server/multimodal_journey_planner.txt
+Library           Collections
+Library           XML
+
+*** Variables ***
+
+*** Keywords ***
+Walk Journey From ${departure_city} ${departure_place} To ${arrival_city} ${arrival_place} Has No Solution
+    ${response}=    MultimodalJourneyPlanner    departure_city=${departure_city}    departure_place=${departure_place}    arrival_city=${arrival_city}    arrival_place=${arrival_place}
+    Log Many    ${response.content}
+    Element Should Not Exist	${response.content}  xpath=journey
+
+Walk Journey From ${departure_city} ${departure_place} To ${arrival_city} ${arrival_place} Has One Solution
+    ${response}=    MultimodalJourneyPlanner    departure_city=${departure_city}    departure_place=${departure_place}    arrival_city=${arrival_city}    arrival_place=${arrival_place}
+    Log Many    ${response.content}
+    Element Should Exist    ${response.content}  xpath=journey
+
+
+
+
+

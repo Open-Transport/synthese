@@ -54,6 +54,7 @@ namespace synthese
 		private:
 			const geography::Place* const _departurePlace;
 			const geography::Place* const _arrivalPlace;
+			const bool _allowSmallPlanning;
 
 
 		public:
@@ -67,7 +68,8 @@ namespace synthese
 				const boost::optional<std::size_t>	maxSolutionsNumber,
 				const graph::AccessParameters		accessParameters,
 				const algorithm::PlanningOrder		planningOrder,
-				const algorithm::AlgorithmLogger& logger
+				const algorithm::AlgorithmLogger& logger,
+				const bool						allowSmallPlanning = false
 			);
 
 			RoadJourneyPlannerResult run() const;

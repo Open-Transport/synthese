@@ -61,7 +61,8 @@ namespace synthese
 			const boost::optional<std::size_t> maxSolutionsNumber,
 			const graph::AccessParameters accessParameters,
 			const PlanningOrder planningOrder,
-			const AlgorithmLogger& logger
+			const AlgorithmLogger& logger,
+			const bool allowSmallPlanning
 		):	TimeSlotRoutePlanner(
 				origin->getVertexAccessMap(
 					accessParameters, RoadModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
@@ -88,7 +89,8 @@ namespace synthese
 				true
 			),
 			_departurePlace(origin),
-			_arrivalPlace(destination)
+			_arrivalPlace(destination),
+			_allowSmallPlanning(allowSmallPlanning)
 		{
 		}
 
@@ -102,7 +104,7 @@ namespace synthese
 			// or if the departure and arrival places are the same
 			if(	_originVam.getMap().empty() ||
 				_destinationVam.getMap().empty() ||
-				_originVam.intersercts(_destinationVam)
+				(!_allowSmallPlanning && _originVam.intersercts(_destinationVam))
 			){
 				return RoadJourneyPlannerResult(_departurePlace, _arrivalPlace, true, result);
 			}

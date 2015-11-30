@@ -255,30 +255,15 @@ namespace synthese
 
 			graph::AccessParameters pedestrianAccessParameters(graph::USER_PEDESTRIAN, false, false, 72000, boost::posix_time::hours(24), 1.111);
 
-			// Test for same place.
-			// TO-DO : if departure != arrival and VAM instersects, may it be good to display solution anyway ???
-			if(departure->getVertexAccessMap(pedestrianAccessParameters, road::RoadModule::GRAPH_ID, 0).intersercts(arrival->getVertexAccessMap(pedestrianAccessParameters, road::RoadModule::GRAPH_ID, 0)))
+			ptime startDate;
+			if (_departureTime.is_not_a_date_time())
 			{
-				pm.insert(DATA_ERROR_MESSAGE, string("Same place"));
-
-				if(_outputFormat == MimeTypes::XML)
-				{
-					pm.outputXML(
-						stream,
-						DATA_MULTIMODAL_JOURNEY_PLANNER_RESULT,
-						true,
-						"http://schemas.open-transport.org/smile/MultimodalJourneyPlanner.xsd"
-					);
-				}
-				else if(_outputFormat == MimeTypes::JSON)
-				{
-					pm.outputJSON(stream, DATA_MULTIMODAL_JOURNEY_PLANNER_RESULT);
-				}
-
-				return pm;
+				startDate = ptime(boost::posix_time::second_clock::local_time());
 			}
-
-			ptime startDate = ptime(_day, _departureTime);
+			else
+			{
+				startDate = ptime(_day, _departureTime);
+			}
 			ptime endDate = startDate + hours(24);
 			
 			if (_aStarForWalk)
@@ -581,7 +566,8 @@ namespace synthese
 					1,
 					pedestrianAccessParameters,
 					algorithm::DEPARTURE_FIRST,
-					logger
+					logger,
+					true
 				);
 				road_journey_planner::RoadJourneyPlannerResult results = rjp.run();
 				
