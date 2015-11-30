@@ -134,5 +134,10 @@ namespace synthese
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
+
+		bool RoadTableSync::allowList(const server::Session* session) const
+		{
+			return true;
+		}		
 	}
 }

@@ -116,7 +116,7 @@ namespace synthese
 				   const Road* road(dynamic_cast<const RoadPath*>(its->getService()->getPath())->getRoad());
 				   double dst = its->getDistance();
 
-				   std::string roadName = road->get<RoadPlace>()->getName();
+				   std::string roadName = road->getAnyRoadPlace()->getName();
 				   if(roadName.empty()) {
 					  if(	road->get<RoadTypeField>() == ROAD_TYPE_PEDESTRIANPATH ||
 							road->get<RoadTypeField>() == ROAD_TYPE_PEDESTRIANSTREET
@@ -140,7 +140,7 @@ namespace synthese
 				   if(next != it->getServiceUses().end())
 				   {
 					  string nextRoadName(
-						  dynamic_cast<const RoadPath*>(next->getService()->getPath())->getRoad()->get<RoadPlace>()->getName()
+						  dynamic_cast<const RoadPath*>(next->getService()->getPath())->getRoad()->getAnyRoadPlace()->getName()
 					  );
 					  if(!roadName.compare(nextRoadName))
 					  {

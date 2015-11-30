@@ -1,6 +1,7 @@
 *** Settings ***
 Resource          ../s3-server/object_services.txt
 Library           Collections
+Library           String
 Library           XML
 
 *** Variables ***
@@ -35,3 +36,14 @@ There Is Four Objects In Table
     ${response}=  List Synthese Objects  table_id=${table_id}
     ${object_count}=  Get Element Count	 ${response.content}  xpath=object
     Should Be Equal As Numbers  4  ${object_count}
+
+Count Objects In Table ${table_id:\d+}
+    ${response}=  List Synthese Objects  table_id=${table_id}
+    ${utf8_content}   Decode Bytes To String   ${response.content}   UTF-8    strict
+    ${object_count}=  Get Element Count  ${utf8_content}  xpath=object
+    [Return]  ${object_count}
+
+There Are ${expected_object_count:\d+} Objects In Table ${table_id:\d+}
+    ${object_count}=  Count Objects In Table ${table_id:\d+}
+    Should Be Equal As Numbers  ${expected_object_count}  ${object_count}    
+

@@ -33,6 +33,7 @@
 
 #include <assert.h>
 #include <geos/geom/Point.h>
+#include <geos/geom/Polygon.h>
 
 using namespace std;
 using namespace boost;
@@ -67,7 +68,8 @@ namespace synthese
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, key),
 					FIELD_VALUE_CONSTRUCTOR(Name, name),
-					FIELD_VALUE_CONSTRUCTOR(Code, code)
+					FIELD_VALUE_CONSTRUCTOR(Code, code),
+					FIELD_DEFAULT_CONSTRUCTOR(PolygonGeometry)
 			)	),
 			IncludingPlace<NamedPlace>()
 		{

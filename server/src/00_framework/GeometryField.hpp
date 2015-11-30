@@ -38,6 +38,7 @@ namespace geos
 	{
 		class Point;
 		class LineString;
+		class Polygon;
 	}
 }
 
@@ -198,6 +199,7 @@ namespace synthese
 
 	FIELD_GEOM(PointGeometry, geos::geom::Point)
 	FIELD_GEOM(LineStringGeometry, geos::geom::LineString)
+	FIELD_GEOM(PolygonGeometry, geos::geom::Polygon)
 }
 
 #endif

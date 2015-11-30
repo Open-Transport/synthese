@@ -165,7 +165,7 @@ public:
 
    double distance(NodePtr &other);
 
-   std::list<Way*> getWays() { return ways; }
+   //std::list<Way*> getWays() { return ways; }
 
 protected:
    double lon,lat;

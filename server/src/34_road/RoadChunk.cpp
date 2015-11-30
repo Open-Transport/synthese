@@ -568,15 +568,33 @@ namespace synthese
 		HouseNumberBounds
 		RoadChunk::getLeftHouseNumberBounds() const
 		{
-			return boost::make_optional(std::make_pair((HouseNumber) get<LeftStartHouseNumber>(),
-													   (HouseNumber) get<LeftEndHouseNumber>()));
+			if(get<LeftStartHouseNumber>())
+			{
+				return boost::make_optional(
+					std::make_pair(
+						(HouseNumber) get<LeftStartHouseNumber>(),
+						(HouseNumber) get<LeftEndHouseNumber>()
+					)
+				);
+			}
+
+			return HouseNumberBounds();
 		}
 
 		HouseNumberBounds
 		RoadChunk::getRightHouseNumberBounds() const
 		{
-			return std::make_pair((HouseNumber) get<RightStartHouseNumber>(),
-								  (HouseNumber) get<RightEndHouseNumber>());
+			if(get<RightStartHouseNumber>())
+			{
+				return boost::make_optional(
+					std::make_pair(
+						(HouseNumber) get<RightStartHouseNumber>(),
+						(HouseNumber) get<RightEndHouseNumber>()
+					)
+				);
+			}
+
+			return HouseNumberBounds();
 		}
 
 		size_t

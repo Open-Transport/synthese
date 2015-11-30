@@ -1,0 +1,71 @@
+*** Settings ***
+Library           XML    use_lxml=yes
+Resource          ../../resources/s3-fakeclient/import_services.txt    
+Resource          ../../resources/s3-fakeclient/object_services.txt    
+Test Setup        Start Synthese On Node 0
+Test Teardown     Stop Synthese On Node 0
+
+*** Test Cases ***
+
+Import OSM Export (direct OSM web export) Of Small Swiss Tile Should Work
+    On node 0
+    ${osm_file_path}=  Set Variable   ${CURDIR}/../../resources/data/small_swiss_tile.osm
+    ${expected_city_count}=   Count Cities In OSM File ${osm_file_path}
+    ${expected_road_count}=   Count Roads In OSM File ${osm_file_path}
+    # There are 34 incomplete roads in this file (= roads referencing missing nodes)
+    ${expected_road_count}=   Set Variable   ${expected_road_count-34} 
+    Import OSM Export  ${osm_file_path}  CH
+    There are ${expected_city_count} Objects In Table ${CITIES_TABLE_ID}
+    There are ${expected_road_count} Objects In Table ${ROADS_TABLE_ID}
+    There are 0 Objects In Table ${ROAD_PLACES_TABLE_ID}
+    There are 1227 Objects In Table ${ROAD_CHUNKS_TABLE_ID}
+
+Import OSM Export (direct OSM web export) Of Larger Swiss Tile Should Work
+    On node 0
+    ${osm_file_path}=  Set Variable   ${CURDIR}/../../resources/data/larger_swiss_tile.osm
+    ${expected_city_count}=   Count Cities In OSM File ${osm_file_path}
+    ${expected_road_count}=   Count Roads In OSM File ${osm_file_path}
+    Import OSM Export  ${osm_file_path}  CH
+    There are ${expected_city_count} Objects In Table ${CITIES_TABLE_ID}
+    There are ${expected_road_count} Objects In Table ${ROADS_TABLE_ID}
+    There are 196 Objects In Table ${ROAD_PLACES_TABLE_ID}
+    There are 2072 Objects In Table ${ROAD_CHUNKS_TABLE_ID}
+
+Two Imports Of The Same OSM Export Should Work
+    Pass Execution  Incremental imports is not supported
+    On node 0
+    ${osm_file_path}=  Set Variable   ${CURDIR}/../../resources/data/larger_swiss_tile.osm
+    Import OSM Export  ${osm_file_path}  CH
+    ${city_count_after_first_import}=   Count Objects In Table ${CITIES_TABLE_ID}
+    ${road_count_after_first_import}=   Count Objects In Table ${ROADS_TABLE_ID}
+    Import OSM Export  ${osm_file_path}  CH
+    ${city_count_after_second_import}=   Count Objects In Table ${CITIES_TABLE_ID}
+    ${road_count_after_second_import}=   Count Objects In Table ${ROADS_TABLE_ID}
+    Should Be Equal As Numbers  ${city_count_after_first_import}  ${city_count_after_second_import}    
+    Should Be Equal As Numbers  ${road_count_after_first_import}  ${road_count_after_second_import}    
+
+#Import of Whole Switzerland OSM Export Should Work
+#    On node 0
+#    ${osm_file_path}=  Set Variable   /home/mjambert/workspace/rcsmobility/gitlab/switzerland-tests/robot/resources/data/swiss.osm
+#    ${osm_file_path}=  Set Variable   /home/overnhet/Téléchargements/Imports/OSM_Suisse/switzerland-latest.osm
+#    Import OSM Export  ${osm_file_path}  CH
+
+*** Keywords ***
+
+Count Cities In OSM File ${osm_file_path}
+    ${osm_xml}=   Parse XML   ${osm_file_path}
+    ${osm_cities_count}=   Get Element Count   source=${osm_xml}   xpath=relation[(tag[@k='boundary' and @v='administrative']) and (tag[@k='admin_level' and @v='8'])]
+    [Return]    ${osm_cities_count}
+
+Count Roads In OSM File ${osm_file_path}
+    ${osm_xml}=   Parse XML   ${osm_file_path}
+    ${osm_roads_count}=   Get Element Count   source=${osm_xml}   xpath=way/tag[@k='highway' and ((@v='motorway') or (@v='motorway_link') or (@v='trunk') or (@v='trunk_link') or (@v='primary') or (@v='secondary') or (@v='tertiary') or (@v='primary_link') or (@v='secondary_link') or (@v='tertiary_link') or (@v='unclassified') or (@v='road') or (@v='residential') or (@v='living_street') or (@v='pedestrian') or (@v='cycleway') or (@v='footway') or (@v='steps'))]
+    [Return]    ${osm_roads_count}
+
+Count Crossing Restrictions In OSM File ${osm_file_path}
+    ${osm_xml}=   Parse XML   ${osm_file_path}
+    ${osm_crossing_restrictions_count}=   Get Element Count   ${osm_xml}   xpath=relation[(tag[@k='type' and @v='restriction']) and (tag[@k='restriction']) and (count(member[@role='from']) > 0) and (count(member[@role='to']) > 0) and (count(member[@role='via']) > 0)]
+    [Return]    ${osm_crossing_restrictions_count}
+
+
+

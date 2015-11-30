@@ -26,6 +26,7 @@
 #include "Object.hpp"
 
 #include "CoordinatesSystem.hpp"
+#include "GeometryField.hpp"
 #include "IncludingPlace.h"
 #include "LexicalMatcher.h"
 #include "NamedPlace.h"
@@ -52,7 +53,8 @@ namespace synthese
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Name),
-			FIELD(Code)		//!< Unique code identifier for city within its country (france => INSEE code)
+			FIELD(Code),		//!< Unique code identifier for city within its country (france => INSEE code)
+			FIELD(PolygonGeometry)
 		> CitySchema;
 
 		/** City class.

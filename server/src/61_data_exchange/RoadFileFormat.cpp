@@ -341,7 +341,7 @@ namespace synthese
 				else
 				{
 					boost::shared_ptr<Road> roadsp(new Road(0, ROAD_TYPE_UNKNOWN));
-					roadsp->set<RoadPlace>(roadPlace);
+					roadsp->get<RoadPlace::Vector>().push_back(&roadPlace);
 					roadsp->set<Key>(RoadTableSync::getId());
 					_env.getEditableRegistry<Road>().add(roadsp);
 

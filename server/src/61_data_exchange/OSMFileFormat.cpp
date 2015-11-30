@@ -1,4 +1,4 @@
-
+﻿
 /** OSMFileFormat class implementation.
 	@file OSMFileFormat.cpp
 
@@ -20,27 +20,26 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "OSMExpatParser.h"
 #include "OSMFileFormat.hpp"
-
-#include "AdminFunctionRequest.hpp"
-#include "AllowedUseRule.h"
+#include "City.h"
 #include "CityTableSync.h"
 #include "Crossing.h"
 #include "CrossingTableSync.hpp"
+#include "Road.h"
+#include "RoadTableSync.h"
+#include "RoadChunk.h"
+#include "RoadChunkTableSync.h"
+#include "RoadPlace.h"
+#include "RoadPlaceTableSync.h"
+#include "RoadPath.hpp"
 #include "DataSource.h"
-#include "DataSourceAdmin.h"
-#include "EdgeProjector.hpp"
-#include "ForbiddenUseRule.h"
+#include "DataSourceTableSync.h"
+
 #include "FrenchPhoneticString.h"
 #include "Import.hpp"
-#include "PropertiesHTMLTable.h"
-#include "RoadPath.hpp"
-#include "RoadPlaceTableSync.h"
-#include "RoadTableSync.h"
-#include "RoadChunkEdge.hpp"
-#include "RoadChunkTableSync.h"
-#include "StopAreaTableSync.hpp"
+#include "OSMParser.hpp"
+#include "OSMLocale.hpp"
+#include "OSMEntityHandler.hpp"
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
@@ -49,944 +48,746 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <geos/geom/Point.h>
-#include <geos/geom/LineString.h>
-#include <geos/geom/CoordinateSequenceFactory.h>
-#include <geos/geom/prep/PreparedGeometry.h>
-#include <geos/operation/distance/DistanceOp.h>
+#include <geos/geom/Polygon.h>
+#include <geos/geom/MultiPolygon.h>
+#include <geos/geom/LinearRing.h>
+#include <geos/geom/CoordinateSequence.h>
+#include <geos/util/TopologyException.h>
 
-using namespace std;
-using namespace boost;
-using namespace geos::geom;
-using namespace geos::operation;
-using namespace geos::geom::prep;
 
 namespace synthese 
 {
-	using namespace admin;
-	using namespace algorithm;
-	using namespace data_exchange;
-	using namespace db;
 	using namespace geography;
-	using namespace graph;
-	using namespace impex;
-	using namespace osm;
-	using namespace road;
-	using namespace util;
 
 	namespace util
 	{
 		template<>
-		const string FactorableTemplate<FileFormat, OSMFileFormat>::FACTORY_KEY("OpenStreetMap");
+		const string FactorableTemplate<impex::FileFormat, data_exchange::OSMFileFormat>::FACTORY_KEY("OSM");
 	}
 
 	namespace data_exchange
 	{
-		const string OSMFileFormat::Importer_::PARAMETER_ADD_CENTRAL_CHUNK_REFERENCE("add_central_chunk_reference");
-
-
-
-		bool OSMFileFormat::Importer_::_parse(
-			const boost::filesystem::path& filePath
-		) const {
-
-			DataSource& dataSource(*_import.get<DataSource>());
-
-			NetworkPtr network;
-			boost::filesystem::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
-			boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
-			if(!file.good())
-			{
-				_logError("Unable to open file");
-				throw std::runtime_error("unable to open file");
-			}
-			std::string ext = boost::filesystem::extension(filePath);
-			ExpatParser parser;
-			if(ext == ".bz2")
-			{
-				in.push(boost::iostreams::bzip2_decompressor());
-				in.push(file);
-				std::istream data(&in);
-				network = parser.parse(data);
-			}
-			else
-			{
-				network = parser.parse(file);
-			}
-
-			network->consolidate(true);
-
-			_logDebug("finished parsing osm xml");
-
-			// TODO: use a typedef
-			// FIXME: valgrind shows a leak from here.
-			std::map<unsigned long long int, std::pair<RelationPtr, std::map<unsigned long long int, WayPtr> > > waysByBoundaries = network->getWaysByAdminBoundary(8);
-
-			_logDebug("Extracted ways by boundary");
-
-			typedef std::map<unsigned long long int, NodePtr> NodesMap;
-			typedef std::vector<std::pair<osm::NodePtr, Point*> > HousesNodesWithGeom;
-			HousesNodesWithGeom housesNodesWithGeom;
-
-			BOOST_FOREACH(const NodesMap::value_type& nodePair, *network->getNodes())
-			{
-				NodePtr node = nodePair.second;
-
-				if(node->hasTag("addr:housenumber") && node->hasTag("addr:street"))
-				{
-					// Compute the house geometry
-					boost::shared_ptr<Point> houseCoord(
-						dataSource.getActualCoordinateSystem().createPoint(node->getLon(), node->getLat())
-					);
-					housesNodesWithGeom.push_back(make_pair(node, static_cast<Point*>(houseCoord->clone())));
-				}
-			}
-
-			// cities, places and roads
-			// TODO: move to osm module.
-			typedef pair<unsigned long long int, std::pair<RelationPtr, std::map<unsigned long long int, WayPtr> > > BoundaryType;
-			typedef pair<unsigned long long int, double> ClosestWayFromCentroid;
-
-			BOOST_FOREACH(const BoundaryType& boundary_ways, waysByBoundaries)
-			{
-				// insert city
-				// TODO: extract into a _getOrCreateCity method.
-				ClosestWayFromCentroid closestWayFromCentroid;
-				RelationPtr boundary = boundary_ways.second.first;
-				string cityId("0");
-				if(boundary->hasTag("ref:INSEE"))
-					cityId = boundary->getTag("ref:INSEE");
-				Geometry* centroid = boundary->toGeometry()->getCentroid();
-				std::string cityCode = cityId;
-				std::string cityName = to_upper_copy(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(boundary->getTag(Element::TAG_NAME)));
-				_logDebug("treating ways of boundary " + cityName);
-				CityTableSync::SearchResult cities = CityTableSync::Search(
-					_env,
-					boost::optional<std::string>(), // exactname
-					((cityId != "0") ? boost::optional<std::string>() : boost::optional<std::string>(cityName)), // likeName
-					((cityId != "0") ? boost::optional<std::string>(cityId) : boost::optional<std::string>()),
-					0, 0, true, true,
-					util::UP_LINKS_LOAD_LEVEL // code
-				);
-				boost::shared_ptr<City> city;
-
-				if(cities.empty())
-				{
-					city = boost::shared_ptr<City>(new City);
-					city->set<Name>(cityName);
-					city->set<Code>(cityCode);
-					city->set<Key>(CityTableSync::getId());
-					_env.getEditableRegistry<City>().add(city);
-					closestWayFromCentroid = make_pair(0, 9999.9);
-				}
-				else
-				{
-					city = cities.front();
-
-					pt::StopAreaTableSync::SearchResult stopAreas = pt::StopAreaTableSync::Search(
-						_env,
-						optional<RegistryKeyType>(city->getKey()),
-						logic::tribool(true),
-						optional<string>(),
-						optional<string>(),
-						optional<string>(),
-						true,
-						true,
-						0,
-						0,
-						util::UP_LINKS_LOAD_LEVEL
-					);
-
-					if(stopAreas.empty())
-					{
-						closestWayFromCentroid = make_pair(0, 9999.9);
-					}
-					else
-					{
-						closestWayFromCentroid = make_pair(0, 0);
-					}
-				}
-
-				// The Synthese <-> OSM objects mapping is done in the following way:
-				// 1:n OSM ways with the same name and on the same city (case and accents insensitive) -> 1 RoadPlace
-				// OSM way -> 1 Road
-				// 1:n OSM nodes between start/end/intersection node -> 1 RoadChunk
-
-				// insert ways of city
-				// TODO: move to osm module
-				typedef std::pair<unsigned long long int, WayPtr> WayType;
-				BOOST_FOREACH(const WayType& w, boundary_ways.second.second)
-				{
-					WayPtr way = w.second;
-					RoadType wayType = way->getAssociatedRoadType();
-
-					bool nonWalkableWay(!way->isWalkable());
-					bool nonDrivableWay(!way->isDrivable());
-					bool nonBikableWay(!way->isBikable());
-
-					boost::shared_ptr<RoadPlace> roadPlace = _getOrCreateRoadPlace(way, city);
-
-					// Create Road
-					boost::shared_ptr<Road> road(new Road(0, wayType));
-
-					road->set<RoadPlace>(*roadPlace);
-					road->set<Key>(RoadTableSync::getId());
-					_env.getEditableRegistry<Road>().add(road);
-					road->link(_env);
-					_recentlyCreatedRoadParts[way->getId()] = road;
-
-					double maxSpeed = way->getAssociatedSpeed();
-
-					TraficDirection traficDirection = TWO_WAYS;
-					if(way->hasTag("highway"))
-					{
-						if(way->getTag("highway") == "motorway")
-							traficDirection = ONE_WAY;
-						else if(way->getTag("highway") == "motorway_link")
-							traficDirection = ONE_WAY;
-					}
-
-					if(way->hasTag("oneway"))
-					{
-						if(way->getTag("oneway") == "yes")
-							traficDirection = ONE_WAY;
-						else if(way->getTag("oneway") == "true")
-							traficDirection = ONE_WAY;
-						else if(way->getTag("oneway") == "1")
-							traficDirection = ONE_WAY;
-						else if(way->getTag("oneway") == "-1")
-							traficDirection = REVERSED_ONE_WAY;
-						else if(way->getTag("oneway") == "no")
-							traficDirection = TWO_WAYS;
-						else if(way->getTag("oneway") == "0")
-							traficDirection = TWO_WAYS;
-						else if(way->getTag("oneway") == "false")
-							traficDirection = TWO_WAYS;
-					}
-
-					if(way->hasTag("junction") && (way->getTag("junction") == "roundabout"))
-						traficDirection = ONE_WAY;
-
-					// Check if the central chunk is allowed for everybody
-					if(_addCentralChunkReference && !nonWalkableWay && !nonDrivableWay && !nonBikableWay)
-					{
-						Geometry* wayCentroid = way->toGeometry()->getCentroid();
-						double distance = fabs(distance::DistanceOp::distance(*centroid, *wayCentroid));
-						delete wayCentroid;
-						if(closestWayFromCentroid.second > distance)
-						{
-							closestWayFromCentroid = make_pair(way->getId(), distance);
-						}
-					}
-
-					// TODO: move to OSM module
-					typedef std::list<std::pair<unsigned long long int, NodePtr> > NodeList;
-					const NodeList* nodes = way->getNodes();
-
-					if(nodes->size() < 2)
-					{
-						_logWarning("Ignoring way with less than 2 nodes");
-						continue;
-					}
-
-					const GeometryFactory& geometryFactory(CoordinatesSystem::GetDefaultGeometryFactory());
-					boost::shared_ptr<CoordinateSequence> cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
-					boost::shared_ptr<Crossing> startCrossing;
-					size_t rank(0);
-					MetricOffset metricOffset(0);
-
-					int nodeCount(nodes->size());
-					int i(0);
-					BOOST_FOREACH(const NodeList::value_type& idAndNode, *nodes)
-					{
-						NodePtr node = idAndNode.second;
-						i++;
-
-						boost::shared_ptr<Point> point(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-							*dataSource.getActualCoordinateSystem().createPoint(
-								node->getLon(),
-								node->getLat()
-						)	)	);
-
-						cs->add(*point->getCoordinate());
-
-						if(!startCrossing.get())
-						{
-							startCrossing = _getOrCreateCrossing(node, point);
-							continue;
-						}
-
-						bool isLast = i == nodeCount;
-						if(!node->isStop() && node->numConnectedWay() <= 1 && !isLast)
-						{
-							// Just extend the current geometry.
-							continue;
-						}
-
-						boost::shared_ptr<LineString> roadChunkLine(geometryFactory.createLineString(*cs));
-
-						_createRoadChunk(road, startCrossing, roadChunkLine, rank, metricOffset, traficDirection, maxSpeed, nonWalkableWay, nonDrivableWay, nonBikableWay);
-
-						metricOffset += roadChunkLine->getLength();
-						startCrossing = _getOrCreateCrossing(node, point);
-
-						if(!isLast)
-						{
-							cs.reset(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
-							cs->add(*point->getCoordinate());
-						}
-						++rank;
-					}
-
-					// Add last road chunk.
-					_createRoadChunk(road, startCrossing, optional<boost::shared_ptr<LineString> >(), rank, metricOffset, traficDirection, maxSpeed, nonWalkableWay, nonDrivableWay, nonBikableWay);
-				}
-
-				const PreparedGeometry* cityGeom = boundary->toPreparedGeometry().get();
-				BOOST_FOREACH(HousesNodesWithGeom::value_type& nodePair, housesNodesWithGeom)
-				{
-					NodePtr node = nodePair.first;
-					if(!cityGeom->contains(nodePair.second))
-					{
-						continue;
-					}
-
-					_RecentlyCreatedRoadPlaces::iterator it(_recentlyCreatedRoadPlaces.find(cityName + string(" ") + _toAlphanumericString(node->getTag("addr:street"))));
-					if(it != _recentlyCreatedRoadPlaces.end())
-					{
-						boost::shared_ptr<RoadPlace> refRoadPlace;
-						refRoadPlace = it->second;
-						std::vector<RoadChunk*> refRoadChunks;
-
-						// Get every road chunk of the RoadPlace
-						BOOST_FOREACH(Road* path, refRoadPlace->getRoads())
-						{
-							BOOST_FOREACH(Edge* edge, path->getForwardPath().getEdges())
-							{
-								refRoadChunks.push_back(static_cast<RoadChunkEdge*>(edge)->getRoadChunk());
-							}
-						}
-
-						_projectHouseAndUpdateChunkHouseNumberBounds(node, refRoadChunks, true);
-					}
-				}
-
-				if(_addCentralChunkReference && closestWayFromCentroid.first)
-				{
-					_RecentlyCreatedRoadParts::iterator centralRoad = _recentlyCreatedRoadParts.find(closestWayFromCentroid.first);
-
-					if(centralRoad != _recentlyCreatedRoadParts.end())
-					{
-						city->addIncludedPlace(static_cast<NamedPlace&>(*centralRoad->second->get<RoadPlace>()));
-					}
-				}
-				delete centroid;
-			}
-
-			_logDebug("finished inserting road network");
-
-			typedef std::map<unsigned long long int, RelationPtr> ChunkRelations;
-
-			// Loop over relations
-			BOOST_FOREACH(ChunkRelations::value_type rel, *(network->getRelations()))
-			{
-				// If it's a restriction and if it's having a restriction tag
-				if(rel.second->hasTag("type") && (rel.second->getTag("type") == "restriction") && rel.second->hasTag("restriction"))
-				{
-					string tag(rel.second->getTag("restriction"));
-
-					// Get standard from / via / to elements of the restriction
-					string role("via");
-					list<NodePtr> viaList = rel.second->getNodes(role);
-					role = string("from");
-					list<WayPtr> fromList = rel.second->getWays(role);
-					role = string("to");
-					list<WayPtr> toList = rel.second->getWays(role);
-
-					// If we have all three of these
-					if(!(viaList.empty() || fromList.empty() || toList.empty()))
-					{
-						// Trying to find SYNTHESE objects created above
-						_CrossingsMap::iterator via = _crossingsMap.find(viaList.front()->getId());
-						_RecentlyCreatedRoadParts::iterator from = _recentlyCreatedRoadParts.find(fromList.front()->getId());
-						_RecentlyCreatedRoadParts::iterator to = _recentlyCreatedRoadParts.find(toList.front()->getId());
-
-						// If we find them
-						if(via != _crossingsMap.end() && from != _recentlyCreatedRoadParts.end() && to != _recentlyCreatedRoadParts.end())
-						{
-							// If it's a "simple" restriction, mark the road pair as unreachable in the crossing
-							if((tag == "no_left_turn") || (tag == "no_right_turn") || (tag == "no_straight_on") || (tag == "no_u_turn"))
-							{
-								via->second->addNonReachableRoad(make_pair(from->second.get(), to->second.get()));
-							}
-							// If it's a "only" restriction, run through every ways connected to the "via" node.
-							else if((tag == "only_right_turn") || (tag == "only_left_turn") || (tag == "only_straight_on"))
-							{
-								NodePtr intersection = network->getNode(viaList.front()->getId());
-
-								BOOST_FOREACH(Way* curWay, intersection->getWays())
-								{
-									// If it's not the "to" way of the "only" restriction, mark the road pair as unreachable in the crossing
-									if(curWay->getId() != toList.front()->getId())
-									{
-										_RecentlyCreatedRoadParts::iterator toRestrict = _recentlyCreatedRoadParts.find(curWay->getId());
-										if(toRestrict != _recentlyCreatedRoadParts.end())
-										{
-											via->second->addNonReachableRoad(make_pair(from->second.get(), toRestrict->second.get()));	
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				// If it's an associatedStreet (relation between one or many ways and nodes which are house numbers)
-				else if(rel.second->hasTag("type") && (rel.second->getTag("type") == "associatedStreet"))
-				{
-					// Get all the ways of the relation
-					string role("street");
-					list<WayPtr> waysList = rel.second->getWays(role);
-
-					// If there is at least one
-					if(!waysList.empty())
-					{
-						role = string("house");
-						list<NodePtr> housesList = rel.second->getNodes(role);
-
-						if(!housesList.empty())
-						{
-							boost::shared_ptr<RoadPlace> refRoadPlace;
-
-							BOOST_FOREACH(WayPtr curWay, waysList)
-							{
-								// If we find a road place linked to this way
-								_LinkBetweenWayAndRoadPlaces::iterator itWay(_linkBetweenWayAndRoadPlaces.find(curWay->getId()));
-								if(itWay != _linkBetweenWayAndRoadPlaces.end())
-								{
-									refRoadPlace = itWay->second;
-									break;
-								}
-							}
-
-							if(refRoadPlace.get())
-							{
-								std::vector<RoadChunk*> refRoadChunks;
-
-								// Get every road chunk of the RoadPlace
-								BOOST_FOREACH(Road* path, refRoadPlace->getRoads())
-								{
-									BOOST_FOREACH(Edge* edge, path->getForwardPath().getEdges())
-									{
-										refRoadChunks.push_back(static_cast<RoadChunkEdge*>(edge)->getRoadChunk());
-									}
-								}
-
-								// Get all the houses
-								BOOST_FOREACH(NodePtr house, housesList)
-								{
-									if(house->hasTag("addr:housenumber"))
-									{
-										_projectHouseAndUpdateChunkHouseNumberBounds(house, refRoadChunks, false);
-									}
-								}
-
-								BOOST_FOREACH(RoadChunk* chunk, refRoadChunks)
-								{
-									_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(chunk);
-								}
-							}
-						}
-
-						role = string("sidewalk");
-						list<WayPtr> sidewalkList = rel.second->getWays(role);
-
-						if(!sidewalkList.empty())
-						{
-							boost::shared_ptr<RoadPlace> refRoadPlace;
-
-							BOOST_FOREACH(WayPtr curWay, waysList)
-							{
-								// If we find a road place linked to this way with a name
-								_LinkBetweenWayAndRoadPlaces::iterator itWay(_linkBetweenWayAndRoadPlaces.find(curWay->getId()));
-								if(itWay != _linkBetweenWayAndRoadPlaces.end() && !itWay->second->getName().empty())
-								{
-									refRoadPlace = itWay->second;
-									break;
-								}
-							}
-
-							if(refRoadPlace.get())
-							{
-								BOOST_FOREACH(WayPtr curWay, sidewalkList)
-								{
-									if(!curWay->hasTag("name"))
-									{
-										_LinkBetweenWayAndRoadPlaces::iterator itWay(_linkBetweenWayAndRoadPlaces.find(curWay->getId()));
-										if(itWay != _linkBetweenWayAndRoadPlaces.end())
-										{
-											itWay->second->setName(refRoadPlace->getName());
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-
-			_logDebug("finished parsing relation");
-
-			BOOST_FOREACH(const Registry<RoadChunk>::value_type& chunk, _env.getEditableRegistry<RoadChunk>())
-			{
-				_reorderHouseNumberingBounds(chunk.second);
-			}
-
-			BOOST_FOREACH(const Registry<Road>::value_type& road, _env.getEditableRegistry<Road>())
-			{
-				road.second->getForwardPath().validateGeometry();
-			}
-
-			_logDebug("finished validating road geometries");
-
-			BOOST_FOREACH(HousesNodesWithGeom::value_type& nodePair, housesNodesWithGeom)
-			{
-				delete nodePair.second;
-			}
-			housesNodesWithGeom.clear();
-
-			return true;
-		}
-
-
-
-		OSMFileFormat::Importer_::Importer_(
-			util::Env& env,
-			const impex::Import& import,
-			impex::ImportLogLevel minLogLevel,
-			const std::string& logPath,
-			boost::optional<std::ostream&> outputStream,
-			util::ParametersMap& pm
-		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
-			OneFileTypeImporter<OSMFileFormat>(env, import, minLogLevel, logPath, outputStream, pm)
-		{}
-
-
-
-		util::ParametersMap OSMFileFormat::Importer_::_getParametersMap() const
+
+		const string OSMFileFormat::Importer_::PARAMETER_COUNTRY_CODE("country_code");
+
+		const string OSMFileFormat::Importer_::PARAMETER_PROJECT_HOUSES("project_houses");
+
+
+class OSMFileFormatEntityHandler : public OSMEntityHandler
+{
+	private:
+		typedef std::map<std::string, boost::shared_ptr<road::RoadPlace> > _RecentlyCreatedRoadPlaces;
+		typedef std::map<unsigned long long int, boost::shared_ptr<road::RoadPlace> > _LinkBetweenWayAndRoadPlaces;
+		typedef std::map<unsigned long long int, boost::shared_ptr<road::Crossing> > _CrossingsMap;
+		typedef std::map<util::RegistryKeyType, std::vector<road::HouseNumber> > _ChunksAssociatedHouseNumbers;
+
+		const impex::Importer& _importer;
+
+		util::Env& _env;
+
+		bool _projectHouses;
+
+		boost::shared_ptr<road::RoadPlace> _getOrCreateRoadPlace(const OSMId& roadSourceId,
+										const std::string& roadName, 
+										boost::shared_ptr<City> city) const;
+
+		std::vector<boost::shared_ptr<road::RoadPlace> > _collectRoadPlaces(const std::string& roadName);
+		void _updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(road::RoadChunk* chunk) const;
+		void _projectHouseAndUpdateChunkHouseNumberBounds(const HouseNumber& houseNumber,
+														  const std::vector<road::RoadChunk*>& roadChunks,
+															boost::shared_ptr<geos::geom::Point> houseCoord,
+															const bool autoUpdatePolicy) const;
+
+		std::string _toAlphanumericString(const std::string& input) const;
+
+		mutable _CrossingsMap _crossingsMap;
+		mutable _RecentlyCreatedRoadPlaces _recentlyCreatedRoadPlaces;
+		mutable _LinkBetweenWayAndRoadPlaces _linkBetweenWayAndRoadPlaces;
+		mutable _ChunksAssociatedHouseNumbers _chunksAssociatedHouseNumbers;
+
+		boost::shared_ptr<road::Crossing> _currentCrossing;
+		boost::shared_ptr<road::Road> _currentRoad;
+
+	public:
+
+		OSMFileFormatEntityHandler(const impex::Importer& importer, util::Env& env, bool projectHouses):
+			_importer(importer),
+			_env(env),
+			_projectHouses(projectHouses)
+		{ }
+
+		void handleCity(const std::string& cityName, const std::string& cityCode, boost::shared_ptr<geos::geom::Geometry> boundary);
+
+		void handleRoad(const OSMId& roadSourceId, 
+						const std::string& name,
+						const road::RoadType& roadType, boost::shared_ptr<geos::geom::Geometry> path);
+
+		void handleCrossing(const OSMId& crossingSourceId, boost::shared_ptr<geos::geom::Point> point);
+
+		void handleRoadChunk(size_t rank, 
+							 graph::MetricOffset metricOffset,
+							 TrafficDirection trafficDirection,
+							 double maxSpeed,
+							 bool isDrivable,
+							 bool isBikable,
+							 bool isWalkable,
+							 boost::shared_ptr<geos::geom::LineString> path);
+
+		void handleHouse(const HouseNumber& houseNumber,
+						 const std::string& streetName,
+						 boost::shared_ptr<geos::geom::Point> point);		
+
+		void handleHouse(const HouseNumber& houseNumber,
+						 const OSMId& roadSourceId,
+						 boost::shared_ptr<geos::geom::Point> point);
+
+};
+
+
+
+
+void
+OSMFileFormatEntityHandler::handleCity(
+	const std::string&    cityName,
+	const std::string&    cityCode,
+	boost::shared_ptr<geos::geom::Geometry> boundary)
+{
+	_importer._logDebug("Processing city " + cityName);
+
+	boost::shared_ptr<City> city;
+	std::string normalizedCityName = boost::to_upper_copy(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(cityName));
+	geos::geom::Polygon* polygonBoundary = NULL;
+
+	if(boundary)
+	{
+		geos::geom::MultiPolygon* multiPolygonBoundary = dynamic_cast<geos::geom::MultiPolygon*>(boundary.get());
+
+		if(NULL != multiPolygonBoundary)
 		{
-			ParametersMap result;
+			size_t polygonCount = multiPolygonBoundary->getNumGeometries();
+			_importer._logDebug("City geometry is a multipolygon with " + boost::lexical_cast<std::string>(polygonCount) + " polygons");
 
-			result.insert(PARAMETER_ADD_CENTRAL_CHUNK_REFERENCE, _addCentralChunkReference);
+			if(1 == polygonCount)
+			{
+				const geos::geom::Geometry* geometry = multiPolygonBoundary->getGeometryN(0);
 
-			return result;
+				if(NULL != dynamic_cast<const geos::geom::Polygon*>(geometry))
+				{
+					polygonBoundary = dynamic_cast<geos::geom::Polygon*> (geometry->clone());
+				}
+			}
 		}
 
-
-
-		void OSMFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
+		if(NULL == polygonBoundary)
 		{
-			_addCentralChunkReference = map.getDefault<bool>(PARAMETER_ADD_CENTRAL_CHUNK_REFERENCE, false);
-		}
+			// This block converts a geometry object into a polygon
+			// Note : this should be a multi-polygon instead, because some cities consist of multiple disjoint areas
+			geos::geom::CoordinateSequence *cs = boundary->getCoordinates();
 
-
-
-		db::DBTransaction OSMFileFormat::Importer_::_save() const
-		{
-			DBTransaction transaction;
-			BOOST_FOREACH(const Registry<City>::value_type& city, _env.getEditableRegistry<City>())
+			if(0 < cs->size())
 			{
-				CityTableSync::Save(city.second.get(), transaction);
-			}
-			BOOST_FOREACH(const Registry<Crossing>::value_type& crossing, _env.getEditableRegistry<Crossing>())
-			{
-				CrossingTableSync::Save(crossing.second.get(), transaction);
-			}
-			BOOST_FOREACH(const Registry<RoadPlace>::value_type& roadplace, _env.getEditableRegistry<RoadPlace>())
-			{
-				RoadPlaceTableSync::Save(roadplace.second.get(), transaction);
-			}
-			BOOST_FOREACH(const Registry<Road>::value_type& road, _env.getEditableRegistry<Road>())
-			{
-				RoadTableSync::Save(road.second.get(), transaction);
-			}
-			BOOST_FOREACH(const Registry<RoadChunk>::value_type& roadChunk, _env.getEditableRegistry<RoadChunk>())
-			{
-				RoadChunkTableSync::Save(roadChunk.second.get(), transaction);
-			}
-			return transaction;
-		}
-
-
-
-		boost::shared_ptr<RoadPlace> OSMFileFormat::Importer_::_getOrCreateRoadPlace(
-			WayPtr& way,
-			boost::shared_ptr<City> city
-		) const {
-			string roadName;
-			string plainRoadName;
-
-			roadName = way->getName();
-			plainRoadName = _toAlphanumericString(roadName);
-
-			// Search for a recently created road place
-			if(way->hasTag(Element::TAG_NAME) && !roadName.empty())
-			{
-				_RecentlyCreatedRoadPlaces::iterator it(_recentlyCreatedRoadPlaces.find(city->getName() + string(" ") + plainRoadName));
-				if(it != _recentlyCreatedRoadPlaces.end())
+				if(!cs->back().equals(cs->front()))
 				{
-					_linkBetweenWayAndRoadPlaces[way->getId()] = it->second;
-					return it->second;
+					cs->add(cs->front());
 				}
+				geos::geom::LinearRing *lr = CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory().createLinearRing(cs);
+				polygonBoundary = CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory().createPolygon(lr, NULL);
 			}
-
-			boost::shared_ptr<RoadPlace> roadPlace;
-			roadPlace = boost::shared_ptr<RoadPlace>(new RoadPlace);
-			roadPlace->setCity(city.get());
-			roadPlace->setName(roadName);
-			roadPlace->setKey(RoadPlaceTableSync::getId());
-			_env.getEditableRegistry<RoadPlace>().add(roadPlace);
-			if(way->hasTag(Element::TAG_NAME) && !roadName.empty())
-			{
-				_recentlyCreatedRoadPlaces[city->getName() + string(" ") + plainRoadName] = roadPlace;
-			}
-			_linkBetweenWayAndRoadPlaces[way->getId()] = roadPlace;
-			return roadPlace;
-		}
-
-
-
-		/*
-		 * creates or retrieves an existing crossing for a node
-		 */
-		boost::shared_ptr<Crossing> OSMFileFormat::Importer_::_getOrCreateCrossing(
-			NodePtr &node,
-			boost::shared_ptr<Point> position
-		) const {
-			_CrossingsMap::const_iterator it = _crossingsMap.find(node->getId());
-			if(it != _crossingsMap.end())
-			{
-				return it->second;
-			}
-
-			boost::shared_ptr<Crossing> crossing(
-				new Crossing(
-					CrossingTableSync::getId(),
-					position
-			)	);
-			Importable::DataSourceLinks links;
-			links.insert(make_pair(&(*_import.get<DataSource>()), lexical_cast<string>(node->getId())));
-			crossing->setDataSourceLinksWithoutRegistration(links);
-
-			_crossingsMap[node->getId()] = crossing;
-			_env.getEditableRegistry<Crossing>().add(crossing);
-			return crossing;
-		}
-
-
-
-		void OSMFileFormat::Importer_::_createRoadChunk(
-			const boost::shared_ptr<Road> road,
-			const boost::shared_ptr<Crossing> crossing,
-			const optional<boost::shared_ptr<LineString> > geometry,
-			size_t rank,
-			MetricOffset metricOffset,
-			TraficDirection traficDirection,
-			double maxSpeed,
-			bool isNonWalkable,
-			bool isNonDrivable,
-			bool isNonBikable
-		) const {
-			boost::shared_ptr<RoadChunk> roadChunk(new RoadChunk);
-			roadChunk->setRoad(road.get());
-			roadChunk->setFromCrossing(crossing.get());
-			roadChunk->setRankInPath(rank);
-			roadChunk->setMetricOffset(metricOffset);
-			roadChunk->setKey(RoadChunkTableSync::getId());
-			if(geometry)
-			{
-				roadChunk->setGeometry(*geometry);
-			}
-
-			roadChunk->setNonWalkable(isNonWalkable);
-			roadChunk->setNonBikable(isNonBikable);
-			roadChunk->setNonDrivable(isNonDrivable);
-			if(traficDirection == ONE_WAY)
-			{
-				roadChunk->setCarOneWay(1);
-			}
-			else if(traficDirection == REVERSED_ONE_WAY)
-			{
-				roadChunk->setCarOneWay(-1);
-			}
-
-			roadChunk->setCarSpeed(maxSpeed);
-			roadChunk->link(_env);
-			_env.getEditableRegistry<RoadChunk>().add(roadChunk);
-		}
-
-
-
-		void OSMFileFormat::Importer_::_projectHouseAndUpdateChunkHouseNumberBounds(
-			const NodePtr& house,
-			vector<RoadChunk*>& refRoadChunks,
-			const bool autoUpdatePolicy
-		) const {
-			try
-			{
-				HouseNumber num = lexical_cast<HouseNumber>(house->getTag("addr:housenumber"));
-				// Compute the house geometry
-				boost::shared_ptr<Point> houseCoord(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-					*_import.get<DataSource>()->getActualCoordinateSystem().createPoint(
-						house->getLon(),
-						house->getLat()
-					)
-				));
-
-				try
-				{
-					// Use Projector to get the closest road chunk according to the geometry 
-					EdgeProjector<RoadChunk*> projector(refRoadChunks, 200);
-					EdgeProjector<RoadChunk*>::PathNearby projection(projector.projectEdge(*houseCoord->getCoordinate()));
-					RoadChunk* linkedRoadChunk(projection.get<1>());
-
-					_chunksAssociatedHousesList[linkedRoadChunk->getKey()].push_back(house);
-
-					HouseNumberBounds leftBounds = linkedRoadChunk->getLeftHouseNumberBounds();
-
-					// If we haven't set any bounds, we set a default one
-					if(!leftBounds)
-					{
-						HouseNumberBounds bounds(make_pair(num, num));
-						linkedRoadChunk->setLeftHouseNumberBounds(bounds);
-						linkedRoadChunk->setRightHouseNumberBounds(bounds);
-					}
-					else
-					{
-						// If there is one and the lower bounds is higher than the current house number, update
-						if(num < leftBounds->first)
-						{
-							HouseNumberBounds bounds(make_pair(num, leftBounds->second));
-							linkedRoadChunk->setLeftHouseNumberBounds(bounds);
-							linkedRoadChunk->setRightHouseNumberBounds(bounds);
-						}
-						// Or the upper bounds is lower than the current house number, update
-						else if(num > leftBounds->second)
-						{
-							HouseNumberBounds bounds(make_pair(leftBounds->first, num));
-							linkedRoadChunk->setLeftHouseNumberBounds(bounds);
-							linkedRoadChunk->setRightHouseNumberBounds(bounds);
-						}
-					}
-
-					if(autoUpdatePolicy)
-					{
-						_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(linkedRoadChunk);
-					}
-				}
-				catch(EdgeProjector<RoadChunk*>::NotFoundException)
-				{
-				}
-			}
-			catch(bad_lexical_cast)
-			{
-			}
-		}
-
-
-
-		void OSMFileFormat::Importer_::_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(
-			RoadChunk* chunk
-		) const {
-			ChunksAssociatedHousesList::iterator itChunk = _chunksAssociatedHousesList.find(chunk->getKey());
-
-			if(itChunk != _chunksAssociatedHousesList.end())
-			{
-				HouseNumberingPolicy policy(ALL_NUMBERS);
-
-				if(itChunk->second.size() > 2)
-				{
-					unsigned int curMod(lexical_cast<HouseNumber>((*(itChunk->second.begin()))->getTag("addr:housenumber")) % 2);
-					bool multipleMod(false);
-
-					BOOST_FOREACH(NodePtr n, itChunk->second)
-					{
-						if(curMod != (lexical_cast<HouseNumber>(n->getTag("addr:housenumber")) % 2))
-						{
-							multipleMod = true;
-							break;
-						}
-					}
-
-					if(!multipleMod && curMod)
-					{
-						policy = ODD_NUMBERS;
-					}
-					else if(!multipleMod)
-					{
-						policy = EVEN_NUMBERS;
-					}
-				}
-
-				chunk->setLeftHouseNumberingPolicy(policy);
-				chunk->setRightHouseNumberingPolicy(policy);
-			}
-		}
-
-
-		void OSMFileFormat::Importer_::_reorderHouseNumberingBounds(
-			boost::shared_ptr<RoadChunk> chunk
-		) const {
-			const HouseNumberBounds& leftBounds = chunk->getLeftHouseNumberBounds();
-			DataSource& dataSource(*_import.get<DataSource>());
-
-			// Continue if bounds are defined and different, and the chunk has a next chunk
-			if(leftBounds && leftBounds->first != leftBounds->second && chunk->getForwardEdge().getNext())
-			{
-				HouseNumber startBound = leftBounds->first, endBound = leftBounds->second;
-				NodePtr startHouse, endHouse;
-
-				// Check if we have found the house number, we should always find it according to the code above
-				ChunksAssociatedHousesList::iterator housesVector = _chunksAssociatedHousesList.find(chunk->getKey());
-				if(housesVector != _chunksAssociatedHousesList.end())
-				{
-					BOOST_FOREACH(ChunksAssociatedHousesList::mapped_type::value_type& house, housesVector->second)
-					{
-						if(lexical_cast<HouseNumber>(house->getTag("addr:housenumber")) == startBound)
-						{
-							startHouse = house;
-						}
-						if(lexical_cast<HouseNumber>(house->getTag("addr:housenumber")) == endBound)
-						{
-							endHouse = house;
-						}
-					}
-
-					// If we have found our 2 houses and their geometries
-					if(startHouse && endHouse)
-					{
-						boost::shared_ptr<const Geometry> startGeom = chunk->getForwardEdge().getFromVertex()->getGeometry();
-						boost::shared_ptr<const Geometry> endGeom = chunk->getForwardEdge().getNext()->getFromVertex()->getGeometry();
-						boost::shared_ptr<Point> startHouseGeom(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-								*dataSource.getActualCoordinateSystem().createPoint(startHouse->getLon(), startHouse->getLat())
-						)	);
-						boost::shared_ptr<Point> endHouseGeom(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-								*dataSource.getActualCoordinateSystem().createPoint(endHouse->getLon(), endHouse->getLat())
-						)	);
-
-						if(startGeom && endGeom && startHouseGeom && endHouseGeom)
-						{
-							double distanceStartToStartCrossing = fabs(distance::DistanceOp::distance(*startHouseGeom, *startGeom));
-							double distanceEndToStartCrossing = fabs(distance::DistanceOp::distance(*endHouseGeom, *startGeom));
-							double distanceStartToEndCrossing = fabs(distance::DistanceOp::distance(*startHouseGeom, *endGeom));
-							double distanceEndToEndCrossing = fabs(distance::DistanceOp::distance(*endHouseGeom, *endGeom));
-
-							// If the first house is further away from the start than the last one and the last house is further away from the end than the first one
-							if(distanceStartToStartCrossing > distanceEndToStartCrossing && distanceStartToEndCrossing < distanceEndToEndCrossing)
-							{
-								// Switch bounds order
-								HouseNumberBounds newBounds(make_pair(leftBounds->second, leftBounds->first));
-								chunk->setLeftHouseNumberBounds(newBounds);
-								chunk->setRightHouseNumberBounds(newBounds);
-							}
-						}
-					}
-				}
-			}
-		}
-
-
-		std::string OSMFileFormat::Importer_::_toAlphanumericString(
-			const std::string& input
-		) const {
-			string lowerInput(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(input));
-			stringstream output;
-
-			char_separator<char> sep(" :,;.-_|/\\¦'°");
-			tokenizer<char_separator<char> > words(lowerInput, sep);
-			BOOST_FOREACH(string source, words)
-			{
-				string curWord(source);
-
-				if(source == "10")
-					curWord = "dix";
-				else if(source == "11")
-					curWord = "onze";
-				else if(source == "12")
-					curWord = "douze";
-				else if(source == "13")
-					curWord = "treize";
-				else if(source == "14")
-					curWord = "quatorze";
-				else if(source == "15")
-					curWord = "quinze";
-				else if(source == "16")
-					curWord = "seize";
-				else if(source == "17")
-					curWord = "dix sept";
-				else if(source == "18")
-					curWord = "dix huit";
-				else if(source == "19")
-					curWord = "dix neuf";
-				else if(source == "20")
-					curWord = "vingt";
-				else if(source == "st")
-					curWord = "saint";
-				else if(source == "ste")
-					curWord = "sainte";
-				else if(source == "pl")
-					curWord = "place";
-				else if(source == "av")
-					curWord = "avenue";
-				else if(source == "imp")
-					curWord = "impasse";
-				else if(source == "bd")
-					curWord = "boulevard";
-				else if(source == "fg")
-					curWord = "faubourg";
-				else if(source == "che")
-					curWord = "chemin";
-				else if(source == "rte")
-					curWord = "route";
-				else if(source == "rpt")
-					curWord = "rond point";
-				else if(source == "dr")
-					curWord = "docteur";
-				else if(source == "pr")
-					curWord = "professeur";
-				else if(source == "cdt" || source == "cmdt")
-					curWord = "commandant";
-				else if(source == "chu" || source == "chr")
-					curWord = "hopital";
-				else if(source == "fac" || source == "faculte")
-					curWord = "universite";
-				else if(
-					source == "a" ||
-					source == "au" ||
-					source == "d" ||
-					source == "de" ||
-					source == "des" ||
-					source == "du" ||
-					source == "en" ||
-					source == "et" ||
-					source == "l" ||
-					source == "la" ||
-					source == "le" ||
-					source == "les" ||
-					source == "un"
-				)
-					curWord = string();
-
-				if(curWord.empty())
-					continue;
-				else
-				{
-					if(!output.str().empty())
-						output << " ";
-					output << curWord;
-				}
-			}
-
-			return output.str();
 		}
 	}
+
+	bool cityCodeIsSet = !cityCode.empty() && ("0" != cityCode);
+	CityTableSync::SearchResult cities = CityTableSync::Search(
+		_env,
+		boost::optional<std::string>(), // exactname
+		(cityCodeIsSet ? boost::optional<std::string>() : boost::optional<std::string>(normalizedCityName)), // likeName
+		(cityCodeIsSet ? boost::optional<std::string>(cityCode) : boost::optional<std::string>()),
+		0, 0, true, true,
+		util::UP_LINKS_LOAD_LEVEL // code
+	);
+
+	if(cities.empty())
+	{
+		// No matching city was found, create a new one
+		_importer._logCreation("New city " + normalizedCityName + " (" + cityCode + ")");
+
+		city = boost::shared_ptr<City>(new City);
+		city->set<Name>(normalizedCityName);
+		city->set<Code>(cityCode);
+		city->set<Key>(CityTableSync::getId());
+
+		if(NULL != polygonBoundary)
+		{
+			city->set<PolygonGeometry>(boost::shared_ptr<geos::geom::Polygon>(polygonBoundary));
+		}
+		else
+		{
+			_importer._logWarning("City " + normalizedCityName + " has no geometry");
+		}
+
+		// Add the new city to the registry
+		_env.getEditableRegistry<City>().add(city);
+	}
+
+	else
+	{
+		// At least one matching city found, update the first one
+		city = cities.front();
+
+		_importer._logLoad("Updating city " + city->get<Name>());
+
+
+		if(NULL != polygonBoundary)
+		{
+			city->set<PolygonGeometry>(boost::shared_ptr<geos::geom::Polygon>(polygonBoundary));
+		}
+		else
+		{
+			_importer._logWarning("City " + normalizedCityName + " has no geometry");
+		}
+	}
+}
+
+
+
+boost::shared_ptr<road::RoadPlace>
+OSMFileFormatEntityHandler::_getOrCreateRoadPlace(const OSMId& roadSourceId,
+										const std::string& roadName, 
+										boost::shared_ptr<City> city) const {
+	string plainRoadName = _toAlphanumericString(roadName);
+
+	// Search for a recently created road place
+	if(!roadName.empty())
+	{
+		_RecentlyCreatedRoadPlaces::iterator it(
+			_recentlyCreatedRoadPlaces.find(city->getName() + string(" ") + plainRoadName));
+		if(it != _recentlyCreatedRoadPlaces.end())
+		{
+			_importer._logInfo("Found matching road place " + city->getName() + " " + roadName + " for OSM road #" + boost::lexical_cast<std::string>(roadSourceId));
+			_linkBetweenWayAndRoadPlaces[roadSourceId] = it->second;
+			return it->second;
+		}
+	}
+
+	_importer._logCreation("Creating new road place " + city->getName() + "/" + roadName + " for OSM road #" + boost::lexical_cast<std::string>(roadSourceId));
+
+	boost::shared_ptr<road::RoadPlace> roadPlace;
+	roadPlace = boost::shared_ptr<road::RoadPlace>(new road::RoadPlace);
+	roadPlace->setCity(city.get());
+	roadPlace->setName(roadName);
+	roadPlace->setKey(road::RoadPlaceTableSync::getId());
+	_env.getEditableRegistry<road::RoadPlace>().add(roadPlace);
+	if (!roadName.empty())
+	{
+		_recentlyCreatedRoadPlaces[city->getName() + string(" ") + plainRoadName] = roadPlace;
+	}
+	_linkBetweenWayAndRoadPlaces[roadSourceId] = roadPlace;
+	return roadPlace;
+}
+
+
+std::vector<boost::shared_ptr<road::RoadPlace> >
+OSMFileFormatEntityHandler::_collectRoadPlaces(const std::string& roadName)
+{
+	std::vector<boost::shared_ptr<road::RoadPlace> > roadPlaces;
+	std::string plainRoadName = _toAlphanumericString(roadName);
+	BOOST_FOREACH(const road::RoadPlace::Registry::value_type& roadPlace, _env.getEditableRegistry<road::RoadPlace>())
+	{
+		std::string plainRoadPlaceName = _toAlphanumericString(roadPlace.second->getName());
+		if (plainRoadPlaceName == plainRoadName)
+		{
+			roadPlaces.push_back(roadPlace.second);
+		}
+	}
+
+	_importer._logDebug("Found " + boost::lexical_cast<std::string>(roadPlaces.size()) + " road places matching name " + roadName);
+
+	return roadPlaces;
+}
+
+
+void
+OSMFileFormatEntityHandler::handleRoad(const OSMId& roadSourceId,
+							 const std::string& name,
+							 const road::RoadType& roadType, 
+							 boost::shared_ptr<geos::geom::Geometry> path)
+{
+	boost::shared_ptr<road::Road> road(new road::Road(0, roadType));
+	road->set<Key>(road::RoadTableSync::getId());
+	_env.getEditableRegistry<road::Road>().add(road);
+
+	_importer._logCreation("Creating new road " + boost::lexical_cast<std::string>(road->getKey())
+						   + " for OSM road #" + boost::lexical_cast<std::string>(roadSourceId));
+
+	BOOST_FOREACH(const City::Registry::value_type& city, _env.getEditableRegistry<City>())
+	{
+		// Skip cities without geometry
+		if(!city.second->get<PolygonGeometry>()) continue;
+
+		bool roadIntersectsCity = false;
+
+		try
+		{
+			roadIntersectsCity = city.second->get<PolygonGeometry>()->intersects(path.get());
+		}
+
+		catch(const geos::util::TopologyException& te)
+		{
+			_importer._logWarning("Failed to check intersection between road " + name + " and city " + city.second->getName() + ", reason : " + te.what());
+		}
+
+		if (roadIntersectsCity)
+		{
+			boost::shared_ptr<road::RoadPlace> roadPlace = _getOrCreateRoadPlace(roadSourceId, name, city.second);
+			road->get<road::RoadPlace::Vector>().push_back(roadPlace.get());
+		}
+	}
+
+	road->link(_env);
+	_currentRoad = road;
+}
+
+
+
+void
+OSMFileFormatEntityHandler::handleCrossing(const OSMId& crossingSourceId, boost::shared_ptr<geos::geom::Point> point)
+{
+	_CrossingsMap::const_iterator it = _crossingsMap.find(crossingSourceId);
+	if(it != _crossingsMap.end()) {
+		_currentCrossing = it->second;
+		return;
+	}
+
+	boost::shared_ptr<road::Crossing> crossing(
+		new road::Crossing(
+			road::CrossingTableSync::getId(),
+			point
+	)	);
+	impex::Importable::DataSourceLinks links;
+	links.insert(make_pair(&(*_importer.getImport().get<impex::DataSource>()), 
+		boost::lexical_cast<string>(crossingSourceId)));
+	crossing->setDataSourceLinksWithoutRegistration(links);
+
+	_crossingsMap[crossingSourceId] = crossing;
+	_env.getEditableRegistry<road::Crossing>().add(crossing);
+	_currentCrossing = crossing;
+
+	_importer._logCreation("Creating new crossing " + boost::lexical_cast<std::string>(crossing->getKey())
+						   + " for OSM crossing #" + boost::lexical_cast<std::string>(crossingSourceId));
+}
+
+
+
+void
+OSMFileFormatEntityHandler::handleRoadChunk(size_t rank,
+								  graph::MetricOffset metricOffset,
+								  TrafficDirection trafficDirection,
+								  double maxSpeed,
+			                      bool isDrivable,
+			                      bool isBikable,
+			                      bool isWalkable,
+								  boost::shared_ptr<geos::geom::LineString> path)
+{
+	boost::shared_ptr<road::RoadChunk> roadChunk(new road::RoadChunk);
+	roadChunk->setRoad(_currentRoad.get());
+	roadChunk->setFromCrossing(_currentCrossing.get());
+	roadChunk->setRankInPath(rank);
+	roadChunk->setMetricOffset(metricOffset);
+	roadChunk->setKey(road::RoadChunkTableSync::getId());
+
+	if(path.get() != NULL)
+	{
+		roadChunk->set<LineStringGeometry>(path);
+	}
+
+	roadChunk->setNonDrivable(!isDrivable);
+	roadChunk->setNonBikable(!isBikable);
+	roadChunk->setNonWalkable(!isWalkable);
+
+	if (trafficDirection == ONE_WAY)
+	{
+		roadChunk->setCarOneWay(1);
+	}
+	else if (trafficDirection == REVERSED_ONE_WAY)
+	{
+		roadChunk->setCarOneWay(-1);
+	}
+	roadChunk->setCarSpeed(maxSpeed / 3.6);
+	roadChunk->link(_env);
+	_env.getEditableRegistry<road::RoadChunk>().add(roadChunk);
+}
+
+
+void 
+OSMFileFormatEntityHandler::_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(road::RoadChunk* chunk) const {
+	_ChunksAssociatedHouseNumbers::iterator itChunk = _chunksAssociatedHouseNumbers.find(chunk->getKey());
+	if(itChunk == _chunksAssociatedHouseNumbers.end()) return;
+
+	road::HouseNumberingPolicy policy(road::ALL_NUMBERS);
+	if(itChunk->second.size() > 2)
+	{
+		unsigned int curMod(*(itChunk->second.begin()) % 2);
+		bool multipleMod(false);
+
+		BOOST_FOREACH(road::HouseNumber n, itChunk->second)
+		{
+			if(curMod != (n % 2))
+			{
+				multipleMod = true;
+				break;
+			}
+		}
+
+		if(!multipleMod && curMod)
+		{
+			policy = road::ODD_NUMBERS;
+		}
+		else if(!multipleMod)
+		{
+			policy = road::EVEN_NUMBERS;
+		}
+	}
+
+	chunk->setLeftHouseNumberingPolicy(policy);
+	chunk->setRightHouseNumberingPolicy(policy);
+}
+
+
+void 
+OSMFileFormatEntityHandler::_projectHouseAndUpdateChunkHouseNumberBounds(
+	const HouseNumber& houseNumber,
+	const std::vector<road::RoadChunk*>& roadChunks,
+	boost::shared_ptr<geos::geom::Point> houseCoord,
+	const bool autoUpdatePolicy) const {
+	road::HouseNumber num(0);
+
+	if(roadChunks.empty())
+	{
+		_importer._logWarning("No road chunk found to project OSM house number " + houseNumber);
+		return;
+	}
+
+	try
+	{
+		num = boost::lexical_cast<road::HouseNumber>(houseNumber);
+	}
+	catch(boost::bad_lexical_cast)
+	{
+		_importer._logWarning("Cannot convert OSM house number " + houseNumber + " into a valid house number");
+		return;
+	}
+
+	_importer._logDebug("Projecting OSM house number " + houseNumber + " on " + boost::lexical_cast<std::string>(roadChunks.size()) + " road chunks");
+
+	try
+	{
+		// Use Projector to get the closest road chunk according to the geometry 
+		algorithm::EdgeProjector<road::RoadChunk*> projector(roadChunks, 200);
+		algorithm::EdgeProjector<road::RoadChunk*>::PathNearby projection(
+			projector.projectEdge(*houseCoord->getCoordinate()));
+
+		road::RoadChunk* linkedRoadChunk(projection.get<1>());
+		_chunksAssociatedHouseNumbers[linkedRoadChunk->getKey()].push_back(num);
+		road::HouseNumberBounds leftBounds = linkedRoadChunk->getLeftHouseNumberBounds();
+
+		// If we haven't set any bounds, we set a default one
+		if(!leftBounds)
+		{
+			road::HouseNumberBounds bounds(std::make_pair(num, num));
+			linkedRoadChunk->setLeftHouseNumberBounds(bounds);
+			linkedRoadChunk->setRightHouseNumberBounds(bounds);
+		}
+		else
+		{
+			// If there is one and the lower bounds is higher than the current house number, update
+			if(num < leftBounds->first)
+			{
+				road::HouseNumberBounds bounds(std::make_pair(num, leftBounds->second));
+				linkedRoadChunk->setLeftHouseNumberBounds(bounds);
+				linkedRoadChunk->setRightHouseNumberBounds(bounds);
+			}
+			// Or the upper bounds is lower than the current house number, update
+			else if(num > leftBounds->second)
+			{
+				road::HouseNumberBounds bounds(std::make_pair(leftBounds->first, num));
+				linkedRoadChunk->setLeftHouseNumberBounds(bounds);
+				linkedRoadChunk->setRightHouseNumberBounds(bounds);
+			}
+		}
+
+		if (autoUpdatePolicy) 
+		{
+			_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(linkedRoadChunk);
+		}
+	}
+	catch(const algorithm::EdgeProjector<road::RoadChunk*>::NotFoundException& nfe)
+	{
+		_importer._logWarning("Projecting OSM house number " + houseNumber + " failed, reason : " + nfe.what());
+	}
+}
+
+
+void
+OSMFileFormatEntityHandler::handleHouse(const HouseNumber& houseNumber,
+							 const std::string& streetName,
+							 boost::shared_ptr<geos::geom::Point> point)
+{
+	if(false == _projectHouses) return;
+
+	std::vector<boost::shared_ptr<road::RoadPlace> > roadPlaces = _collectRoadPlaces(streetName);
+	std::vector<road::RoadChunk*> roadChunks;
+	BOOST_FOREACH(boost::shared_ptr<road::RoadPlace> roadPlace, roadPlaces)
+	{
+		BOOST_FOREACH(road::Road* path, roadPlace->getRoads())
+		{
+			BOOST_FOREACH(graph::Edge* edge, path->getForwardPath().getEdges())
+			{
+				roadChunks.push_back(static_cast<road::RoadChunkEdge*>(edge)->getRoadChunk());
+			}
+		}
+	}
+
+	_projectHouseAndUpdateChunkHouseNumberBounds(houseNumber, roadChunks, point, true);
+}
+
+
+void
+OSMFileFormatEntityHandler::handleHouse(const HouseNumber& houseNumber,
+							 const OSMId& roadSourceId,
+							 boost::shared_ptr<geos::geom::Point> point)
+{
+	if(false == _projectHouses) return;
+
+	_LinkBetweenWayAndRoadPlaces::iterator itRoadPlace = _linkBetweenWayAndRoadPlaces.find(roadSourceId);
+	if (itRoadPlace == _linkBetweenWayAndRoadPlaces.end())
+	{
+		_importer._logWarning("House " + houseNumber + " is located on OSM road #"
+							  + boost::lexical_cast<std::string>(roadSourceId) + " which does not belong to a road place");
+		return;
+	}
+
+	std::vector<road::RoadChunk*> roadChunks;
+	BOOST_FOREACH(road::Road* path, itRoadPlace->second->getRoads())
+	{
+		BOOST_FOREACH(graph::Edge* edge, path->getForwardPath().getEdges())
+		{
+			roadChunks.push_back(static_cast<road::RoadChunkEdge*>(edge)->getRoadChunk());
+		}
+	}
+
+	_projectHouseAndUpdateChunkHouseNumberBounds(houseNumber, roadChunks, point, true);
+}
+
+
+std::string 
+OSMFileFormatEntityHandler::_toAlphanumericString(
+	const std::string& input
+) const {
+	string lowerInput(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(input));
+	std::stringstream output;
+
+	boost::char_separator<char> sep(" :,;.-_|/\\¦'°");
+	boost::tokenizer<boost::char_separator<char> > words(lowerInput, sep);
+	BOOST_FOREACH(string source, words)
+	{
+		std::string curWord(source);
+
+		if(source == "10")
+			curWord = "dix";
+		else if(source == "11")
+			curWord = "onze";
+		else if(source == "12")
+			curWord = "douze";
+		else if(source == "13")
+			curWord = "treize";
+		else if(source == "14")
+			curWord = "quatorze";
+		else if(source == "15")
+			curWord = "quinze";
+		else if(source == "16")
+			curWord = "seize";
+		else if(source == "17")
+			curWord = "dix sept";
+		else if(source == "18")
+			curWord = "dix huit";
+		else if(source == "19")
+			curWord = "dix neuf";
+		else if(source == "20")
+			curWord = "vingt";
+		else if(source == "st")
+			curWord = "saint";
+		else if(source == "ste")
+			curWord = "sainte";
+		else if(source == "pl")
+			curWord = "place";
+		else if(source == "av")
+			curWord = "avenue";
+		else if(source == "imp")
+			curWord = "impasse";
+		else if(source == "bd")
+			curWord = "boulevard";
+		else if(source == "fg")
+			curWord = "faubourg";
+		else if(source == "che")
+			curWord = "chemin";
+		else if(source == "rte")
+			curWord = "route";
+		else if(source == "rpt")
+			curWord = "rond point";
+		else if(source == "dr")
+			curWord = "docteur";
+		else if(source == "pr")
+			curWord = "professeur";
+		else if(source == "cdt" || source == "cmdt")
+			curWord = "commandant";
+		else if(source == "chu" || source == "chr")
+			curWord = "hopital";
+		else if(source == "fac" || source == "faculte")
+			curWord = "universite";
+		else if(
+			source == "a" ||
+			source == "au" ||
+			source == "d" ||
+			source == "de" ||
+			source == "des" ||
+			source == "du" ||
+			source == "en" ||
+			source == "et" ||
+			source == "l" ||
+			source == "la" ||
+			source == "le" ||
+			source == "les" ||
+			source == "un"
+		)
+			curWord = string();
+
+		if(curWord.empty())
+			continue;
+		else
+		{
+			if(!output.str().empty())
+				output << " ";
+			output << curWord;
+		}
+	}
+
+	return output.str();
+}
+
+
+bool OSMFileFormat::Importer_::_parse(
+	const boost::filesystem::path& filePath
+) const {
+	impex::DataSource& dataSource(*_import.get<impex::DataSource>());
+	boost::filesystem::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+	boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
+	if(!file.good())
+	{
+		_logError("Unable to open file");
+		throw std::runtime_error("Unable to open file");
+	}
+	std::string ext = boost::filesystem::extension(filePath);
+	OSMFileFormatEntityHandler handler(*this, _env, _projectHouses);
+
+	OSMParser parser(
+		*_fileStream,
+		CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory(),
+		dataSource.getActualCoordinateSystem(),
+		handler,
+		OSMLocale::getInstance(*_countryCode)
+	);
+
+	if(ext == ".bz2")
+	{
+		in.push(boost::iostreams::bzip2_decompressor());
+		in.push(file);
+		std::istream data(&in);
+		parser.parse(data);
+	}
+	else
+	{
+		parser.parse(file);
+	}
+
+	_logDebug("Finished work on city boundaries");
+
+	return true;
+}
+
+
+
+OSMFileFormat::Importer_::Importer_(
+	util::Env& env,
+	const impex::Import& import,
+	impex::ImportLogLevel minLogLevel,
+	const std::string& logPath,
+	boost::optional<std::ostream&> outputStream,
+	util::ParametersMap& pm
+):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+	OneFileTypeImporter<OSMFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+	_projectHouses(false)
+{}
+
+
+
+util::ParametersMap OSMFileFormat::Importer_::_getParametersMap() const
+{
+	util::ParametersMap result;
+
+	if(_countryCode)
+	{
+		result.insert(PARAMETER_COUNTRY_CODE, *_countryCode);
+	}
+
+	result.insert(PARAMETER_PROJECT_HOUSES, _projectHouses);
+
+	return result;
+}
+
+
+
+void OSMFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
+{
+	_countryCode = map.getDefault<std::string>(PARAMETER_COUNTRY_CODE, "FR");
+	_projectHouses = map.isTrue(PARAMETER_PROJECT_HOUSES);
+}
+
+
+
+db::DBTransaction OSMFileFormat::Importer_::_save() const
+{
+	db::DBTransaction transaction;
+	BOOST_FOREACH(const util::Registry<geography::City>::value_type& city, _env.getEditableRegistry<geography::City>())
+	{
+		geography::CityTableSync::Save(city.second.get(), transaction);
+	}
+	BOOST_FOREACH(const util::Registry<road::Road>::value_type& road, _env.getEditableRegistry<road::Road>())
+	{
+		road::RoadTableSync::Save(road.second.get(), transaction);
+	}
+	BOOST_FOREACH(const util::Registry<road::RoadPlace>::value_type& roadPlace, _env.getEditableRegistry<road::RoadPlace>())
+	{
+		road::RoadPlaceTableSync::Save(roadPlace.second.get(), transaction);
+	}
+	BOOST_FOREACH(const util::Registry<road::RoadChunk>::value_type& roadChunk, _env.getEditableRegistry<road::RoadChunk>())
+	{
+		road::RoadChunkTableSync::Save(roadChunk.second.get(), transaction);
+	}
+	BOOST_FOREACH(const util::Registry<road::Crossing>::value_type& crossing, _env.getEditableRegistry<road::Crossing>())
+	{
+		road::CrossingTableSync::Save(crossing.second.get(), transaction);
+	}
+
+	_env.getEditableRegistry<geography::City>().clear();
+	_env.getEditableRegistry<road::Road>().clear();
+	_env.getEditableRegistry<road::RoadPlace>().clear();
+	_env.getEditableRegistry<road::RoadChunk>().clear();
+	_env.getEditableRegistry<road::Crossing>().clear();
+
+	return transaction;
+}
+
+
+
+}
 }

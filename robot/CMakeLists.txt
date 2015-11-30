@@ -10,6 +10,7 @@ add_subdirectory("cases/inter_synthese")
 add_subdirectory("cases/object_services")
 add_subdirectory("cases/topical_messaging")
 add_subdirectory("cases/multimodal_journey_planner")
+add_subdirectory("cases/import_services")
 
 if(NOT WITH_INEO_TERMINUS)
   file(APPEND ${CMAKE_BINARY_DIR}/modules.py "WITH_INEO_TERMINUS = False\n")

@@ -1,4 +1,4 @@
-
+﻿
 /** OSMFileFormat class header.
 	@file OSMFileFormat.hpp
 
@@ -20,40 +20,23 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_road_OSMFileFormat_hpp__
-#define SYNTHESE_road_OSMFileFormat_hpp__
+#ifndef SYNTHESE_dataexchange_OSMFileFormat_hpp__
+#define SYNTHESE_dataexchange_OSMFileFormat_hpp__
 
 #include "FileFormatTemplate.h"
 #include "OneFileTypeImporter.hpp"
 #include "NoExportPolicy.hpp"
-#include "OSMElements.h"
 
-#include "GraphTypes.h"
-
-#include <iostream>
-#include <map>
 #include <string>
-#include <vector>
+
 
 namespace synthese
 {
-	namespace geography
-	{
-		class City;
-	}
-
-	namespace road
-	{
-		class Crossing;
-		class Road;
-		class RoadChunk;
-		class RoadPlace;
-	}
 
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// OSM file format.
+		/// OSM CityBoundaries file format.
 		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m34
 		class OSMFileFormat:
@@ -62,27 +45,18 @@ namespace synthese
 		public:
 
 			//////////////////////////////////////////////////////////////////////////
-			class Importer_:
-				public impex::OneFileTypeImporter<OSMFileFormat>
+			class Importer_: public impex::OneFileTypeImporter<OSMFileFormat>
 			{
 			private:
 
-				static const std::string PARAMETER_ADD_CENTRAL_CHUNK_REFERENCE;
+				static const std::string PARAMETER_COUNTRY_CODE;
 
-				typedef std::map<util::RegistryKeyType, std::vector<osm::NodePtr> > ChunksAssociatedHousesList;
-				typedef std::map<unsigned long long int, boost::shared_ptr<road::Crossing> > _CrossingsMap;
-				typedef std::map<unsigned long long int, boost::shared_ptr<geography::City> > _CitiesMap;
-				typedef std::map<std::string, boost::shared_ptr<road::RoadPlace> > _RecentlyCreatedRoadPlaces;
-				typedef std::map<unsigned long long int, boost::shared_ptr<road::RoadPlace> > _LinkBetweenWayAndRoadPlaces;
-				typedef std::map<unsigned long long int, boost::shared_ptr<road::Road> > _RecentlyCreatedRoadParts;
+				static const std::string PARAMETER_PROJECT_HOUSES;
 
-				mutable _CrossingsMap _crossingsMap;
-				mutable _RecentlyCreatedRoadPlaces _recentlyCreatedRoadPlaces;
-				mutable _RecentlyCreatedRoadParts _recentlyCreatedRoadParts;
-				mutable _LinkBetweenWayAndRoadPlaces _linkBetweenWayAndRoadPlaces;
-				mutable ChunksAssociatedHousesList _chunksAssociatedHousesList;
+				boost::optional<std::string> _countryCode;
 
-				bool _addCentralChunkReference;
+				bool _projectHouses;
+
 
 			protected:
 
@@ -90,13 +64,8 @@ namespace synthese
 					const boost::filesystem::path& filePath
 				) const;
 
-			public:
 
-				typedef enum {
-					TWO_WAYS,
-					ONE_WAY,
-					REVERSED_ONE_WAY
-				} TraficDirection;
+			public:
 
 				Importer_(
 					util::Env& env,
@@ -106,7 +75,6 @@ namespace synthese
 					boost::optional<std::ostream&> outputStream,
 					util::ParametersMap& pm
 				);
-
 
 
 				//////////////////////////////////////////////////////////////////////////
@@ -136,49 +104,6 @@ namespace synthese
 				/// @since 3.3.0
 				/// @date 2011
 				virtual db::DBTransaction _save() const;
-
-			private:
-
-				boost::shared_ptr<road::RoadPlace> _getOrCreateRoadPlace(
-					osm::WayPtr &way,
-					boost::shared_ptr<geography::City> city
-				) const;
-
-				boost::shared_ptr<road::Crossing> _getOrCreateCrossing(
-					osm::NodePtr &node,
-					boost::shared_ptr<geos::geom::Point> position
-				) const;
-
-				void _createRoadChunk(
-					const boost::shared_ptr<road::Road> road,
-					const boost::shared_ptr<road::Crossing> crossing,
-					const boost::optional<boost::shared_ptr<geos::geom::LineString> > geometry,
-					std::size_t rank,
-					graph::MetricOffset metricOffset,
-					TraficDirection traficDirection = TWO_WAYS,
-					double maxSpeed = 50 / 3.6,
-					bool isNonWalkable = false,
-					bool isNonDrivable = false,
-					bool isNonBikable = false
-				) const;
-
-				void _projectHouseAndUpdateChunkHouseNumberBounds(
-					const osm::NodePtr& house,
-					std::vector<road::RoadChunk*>& refRoadChunks,
-					const bool autoUpdatePolicy = false
-				) const;
-
-				void _updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(
-					road::RoadChunk* chunk
-				) const;
-
-				void _reorderHouseNumberingBounds(
-					boost::shared_ptr<road::RoadChunk> chunk
-				) const;
-
-				std::string _toAlphanumericString(
-					const std::string& input
-				) const;
 			};
 
 			typedef impex::NoExportPolicy<OSMFileFormat> Exporter_;
@@ -186,4 +111,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_road_OSMFileFormat_hpp__
+#endif // SYNTHESE_dataexchange_OSMFileFormat_hpp__

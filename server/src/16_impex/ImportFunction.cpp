@@ -208,9 +208,9 @@ namespace synthese
 				{
 					_importer->save().run();
 				}
-				catch(...)
+				catch(std::exception& e)
 				{
-
+					throw RequestException("Error while saving import : " + std::string(e.what()));
 				}
 				DBModule::ActivateConditionalTablesUpdate();
 

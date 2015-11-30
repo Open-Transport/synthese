@@ -44,13 +44,13 @@ BOOST_AUTO_TEST_CASE (Edges)
 		RoadPlace p;
 
 		Road r;
-		r.set<RoadPlace>(p);
+		r.get<RoadPlace::Vector>().push_back(&p);
 		r.link(env);
 
 		BOOST_REQUIRE_EQUAL(r.getForwardPath().getRoad(), &r);
 		BOOST_REQUIRE_EQUAL(r.getReversePath().getRoad(), &r);
 
-		BOOST_REQUIRE_EQUAL(r.get<RoadPlace>()->getPaths().size(), 2ULL);
+		BOOST_REQUIRE_EQUAL(r.getAnyRoadPlace()->getPaths().size(), 2ULL);
 		BOOST_CHECK(p.getPaths().find(&r.getForwardPath()) != p.getPaths().end());
 		BOOST_CHECK(p.getPaths().find(&r.getReversePath()) != p.getPaths().end());
 
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE (Edges)
 		RoadPlace p;
 
 		Road r;
-		r.set<RoadPlace>(p);
+		r.get<RoadPlace::Vector>().push_back(&p);
 		r.link(env);
 
 		Crossing cr2;
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE (Edges)
 		RoadPlace p;
 
 		Road r;
-		r.set<RoadPlace>(p);
+		r.get<RoadPlace::Vector>().push_back(&p);
 		r.link(env);
 
 		Crossing cr1;
@@ -274,7 +274,7 @@ BOOST_AUTO_TEST_CASE (Edges)
 		RoadPlace p;
 
 		Road r;
-		r.set<RoadPlace>(p);
+		r.get<RoadPlace::Vector>().push_back(&p);
 		r.link(env);
 
 		Crossing cr2;
