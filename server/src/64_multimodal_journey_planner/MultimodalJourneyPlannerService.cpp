@@ -471,85 +471,68 @@ namespace synthese
 								submapLegDeparturePlace->insert("latitude", wgs84Point->getY());
 							}
 						}
-
-						geos::geom::MultiLineString* multiLineString = CoordinatesSystem::GetCoordinatesSystem(4326).getGeometryFactory().createMultiLineString(curGeom);
-						geometries.push_back(multiLineString->clone());
-
-						BOOST_FOREACH(geos::geom::Geometry* geomToDelete, curGeom)
-						{
-							delete geomToDelete;
-						}
-						curGeom.clear();
-						boost::shared_ptr<ParametersMap> submapLeg(new ParametersMap);
-						submapLeg->insert("departure_date_time", departureTime);
-						submapLeg->insert("departure", submapLegDeparturePlace);
-
-						// Arrival place
-						if(dynamic_cast<const road::Crossing*>(lastChunk->getFromVertex()->getHub()))
-						{
-							submapLegArrivalPlace->insert("name", (string)("Croisement"));
-							submapLegArrivalPlace->insert("type", (string)("crossing"));
-							submapLegArrivalPlace->insert("id", dynamic_cast<const road::Crossing*>(lastChunk->getFromVertex()->getHub())->getKey());
-						}
-
-						if(lastChunk->getFromVertex()->getGeometry().get() &&
-							!lastChunk->getFromVertex()->getGeometry()->isEmpty())
-						{
-							boost::shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-								*(lastChunk->getFromVertex()->getGeometry())
-							)	);
-							submapLegArrivalPlace->insert("longitude", wgs84Point->getX());
-							submapLegArrivalPlace->insert("latitude", wgs84Point->getY());
-						}
-						submapLeg->insert("arrival", submapLegArrivalPlace);
-
-						submapLeg->insert("arrival_date_time", arrivalTime);
-						submapLeg->insert("geometry", multiLineString->toString());
-						submapLeg->insert("length", curDistance);
-
-						boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
-						submapLegRoad->insert("name", curRoadPlace->getName());
-						submapLegRoad->insert("id", curRoadPlace->getKey());
-
-						submapLeg->insert("road", submapLegRoad);
-
-						submapJourney->insert("leg", submapLeg);
-
-						delete multiLineString;
-
-						submapJourney->insert("arrival_date_time", arrivalTime);
-						geos::geom::GeometryCollection* geometryCollection(CoordinatesSystem::GetCoordinatesSystem(4326).getGeometryFactory().createGeometryCollection(geometries));
-						BOOST_FOREACH(geos::geom::Geometry* geomToDelete, geometries)
-						{
-							delete geomToDelete;
-						}
-						geometries.clear();
-						submapJourney->insert("geometry", geometryCollection->toString());
-						delete geometryCollection;
-						pm.insert("journey", submapJourney);
-
 					}
+
+					geos::geom::MultiLineString* multiLineString = CoordinatesSystem::GetCoordinatesSystem(4326).getGeometryFactory().createMultiLineString(curGeom);
+					geometries.push_back(multiLineString->clone());
+
+					BOOST_FOREACH(geos::geom::Geometry* geomToDelete, curGeom)
+					{
+						delete geomToDelete;
+					}
+					curGeom.clear();
+					boost::shared_ptr<ParametersMap> submapLeg(new ParametersMap);
+					submapLeg->insert("departure_date_time", departureTime);
+					submapLeg->insert("departure", submapLegDeparturePlace);
+
+					// Arrival place
+					if(dynamic_cast<const road::Crossing*>(lastChunk->getFromVertex()->getHub()))
+					{
+						submapLegArrivalPlace->insert("name", (string)("Croisement"));
+						submapLegArrivalPlace->insert("type", (string)("crossing"));
+						submapLegArrivalPlace->insert("id", dynamic_cast<const road::Crossing*>(lastChunk->getFromVertex()->getHub())->getKey());
+					}
+
+					if(lastChunk->getFromVertex()->getGeometry().get() &&
+						!lastChunk->getFromVertex()->getGeometry()->isEmpty())
+					{
+						boost::shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+							*(lastChunk->getFromVertex()->getGeometry())
+						)	);
+						submapLegArrivalPlace->insert("longitude", wgs84Point->getX());
+						submapLegArrivalPlace->insert("latitude", wgs84Point->getY());
+					}
+					submapLeg->insert("arrival", submapLegArrivalPlace);
+
+					submapLeg->insert("arrival_date_time", arrivalTime);
+					submapLeg->insert("geometry", multiLineString->toString());
+					submapLeg->insert("length", curDistance);
+
+					boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
+					submapLegRoad->insert("name", curRoadPlace->getName());
+					submapLegRoad->insert("id", curRoadPlace->getKey());
+
+					submapLeg->insert("road", submapLegRoad);
+
+					submapJourney->insert("leg", submapLeg);
+
+					delete multiLineString;
+
+					submapJourney->insert("arrival_date_time", arrivalTime);
+					geos::geom::GeometryCollection* geometryCollection(CoordinatesSystem::GetCoordinatesSystem(4326).getGeometryFactory().createGeometryCollection(geometries));
+					BOOST_FOREACH(geos::geom::Geometry* geomToDelete, geometries)
+					{
+						delete geomToDelete;
+					}
+					geometries.clear();
+					submapJourney->insert("geometry", geometryCollection->toString());
+					delete geometryCollection;
+					pm.insert("journey", submapJourney);
 					
 				}
 				else
 				{
 					pm.insert(DATA_ERROR_MESSAGE, string("No pedestrian solution found"));
-
-					if(_outputFormat == MimeTypes::XML)
-					{
-						pm.outputXML(
-							stream,
-							DATA_MULTIMODAL_JOURNEY_PLANNER_RESULT,
-							true,
-							"http://schemas.open-transport.org/smile/MultimodalJourneyPlanner.xsd"
-						);
-					}
-					else if(_outputFormat == MimeTypes::JSON)
-					{
-						pm.outputJSON(stream, DATA_MULTIMODAL_JOURNEY_PLANNER_RESULT);
-					}
-
-					return pm;
 				}
 			}
 			else
@@ -790,43 +773,25 @@ namespace synthese
 						submapJourney->insert("geometry", multiLineString->toString());
 						pm.insert("journey", submapJourney);
 					}
-
-					if(_outputFormat == MimeTypes::XML)
-					{
-						pm.outputXML(
-							stream,
-							DATA_MULTIMODAL_JOURNEY_PLANNER_RESULT,
-							true,
-							"http://schemas.open-transport.org/smile/MultimodalJourneyPlanner.xsd"
-						);
-					}
-					else if(_outputFormat == MimeTypes::JSON)
-					{
-						pm.outputJSON(stream, DATA_MULTIMODAL_JOURNEY_PLANNER_RESULT);
-					}
-
-					return pm;
 				}
 				else
 				{
 					pm.insert(DATA_ERROR_MESSAGE, string("No pedestrian solution found"));
-
-					if(_outputFormat == MimeTypes::XML)
-					{
-						pm.outputXML(
-							stream,
-							DATA_MULTIMODAL_JOURNEY_PLANNER_RESULT,
-							true,
-							"http://schemas.open-transport.org/smile/MultimodalJourneyPlanner.xsd"
-						);
-					}
-					else if(_outputFormat == MimeTypes::JSON)
-					{
-						pm.outputJSON(stream, DATA_MULTIMODAL_JOURNEY_PLANNER_RESULT);
-					}
-
-					return pm;
 				}
+			}
+
+			if(_outputFormat == MimeTypes::XML)
+			{
+				pm.outputXML(
+					stream,
+					DATA_MULTIMODAL_JOURNEY_PLANNER_RESULT,
+					true,
+					"http://schemas.open-transport.org/smile/MultimodalJourneyPlanner.xsd"
+				);
+			}
+			else if(_outputFormat == MimeTypes::JSON)
+			{
+				pm.outputJSON(stream, DATA_MULTIMODAL_JOURNEY_PLANNER_RESULT);
 			}
 
 			return pm;
