@@ -81,6 +81,8 @@ namespace synthese
 		const string PlacesListService::PARAMETER_SORTED = "sorted";
 		const string PlacesListService::PARAMETER_TEXT = "text";
 		const string PlacesListService::PARAMETER_SRID = "srid";
+		const string PlacesListService::PARAMETER_PHONETIC = "phonetic";
+		const string PlacesListService::PARAMETER_RESUME = "resume";
 
 		const string PlacesListService::PARAMETER_COORDINATES_XY = "coordinates_xy";
 		const string PlacesListService::PARAMETER_MAX_DISTANCE = "maxDistance";
@@ -108,6 +110,8 @@ namespace synthese
 		const string PlacesListService::DATA_ORIGIN_X = "origin_x";
 		const string PlacesListService::DATA_ORIGIN_Y = "origin_y";
 		const string PlacesListService::DATA_DISTANCE_TO_ORIGIN = "distance_to_origin";
+		const string PlacesListService::DATA_RESUME = "resume";
+		const string PlacesListService::DATA_RESUMES = "resumes";
 
 
 
@@ -118,7 +122,9 @@ namespace synthese
 			_minScore(0),
 			_coordinatesSystem(NULL),
 			_maxDistance(300),
-			_requiredUserClasses()
+			_requiredUserClasses(),
+			_phonetic(true),
+			_resume(false)
 		{}
 
 		ParametersMap PlacesListService::_getParametersMap() const
@@ -204,6 +210,12 @@ namespace synthese
 			{
 				map.insert(PARAMETER_DATA_SOURCE_FILTER, _dataSourceFilter->getKey());
 			}
+
+			// Phonetic search
+			map.insert(PARAMETER_PHONETIC, _phonetic);
+			
+			// Resume section
+			map.insert(PARAMETER_RESUME, _resume);
 
 			return map;
 		}
@@ -330,6 +342,10 @@ namespace synthese
 			{
 				throw RequestException("No such data source");
 			}
+
+			_phonetic = map.getDefault<bool>(PARAMETER_PHONETIC, _phonetic);
+			
+			_resume = map.getDefault<bool>(PARAMETER_RESUME, _resume);
 		}
 
 
@@ -502,7 +518,8 @@ namespace synthese
 						stopResult = _city->getLexicalMatcher(StopArea::FACTORY_KEY).bestMatches(
 								_text,
 								0,
-								_minScore
+								_minScore,
+								_phonetic
 						);
 
 						BOOST_FOREACH(const lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit& item, stopResult)
@@ -563,7 +580,8 @@ namespace synthese
 									_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
 										roadName,
 										_number ? *_number : 0,
-										_minScore
+										_minScore,
+										_phonetic
 								)	);
 
 								// Transformation into house places list
@@ -604,7 +622,8 @@ namespace synthese
 							_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
 								_text,
 								_number ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						result.insert(DATA_ROADS, pm);
 					}
@@ -618,7 +637,8 @@ namespace synthese
 							_city->getLexicalMatcher(PublicPlace::FACTORY_KEY).bestMatches(
 								_text,
 								_number ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						result.insert(DATA_PUBLIC_PLACES, pm);
 					}
@@ -638,7 +658,8 @@ namespace synthese
 							GeographyModule::GetCitiesMatcher().bestMatches(
 								_text,
 								(_number && !_citiesWithAtLeastAStop) ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						result.insert(DATA_CITIES, pm);
 					}
@@ -654,7 +675,8 @@ namespace synthese
 						stopResult = PTModule::GetGeneralStopsMatcher().bestMatches(
 								_text,
 								0,
-								_minScore
+								_minScore,
+								_phonetic
 						);
 
 						BOOST_FOREACH(const lexical_matcher::LexicalMatcher<boost::shared_ptr<StopArea> >::MatchHit& item, stopResult)
@@ -716,7 +738,8 @@ namespace synthese
 									RoadModule::GetGeneralRoadsMatcher().bestMatches(
 										roadName,
 										_number ? *_number : 0,
-										_minScore
+										_minScore,
+										_phonetic
 								)	);
 
 								// Transformation into house places list
@@ -761,7 +784,8 @@ namespace synthese
 							RoadModule::GetGeneralRoadsMatcher().bestMatches(
 								_text,
 								_number ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						// We add road results to the roadList
 						BOOST_FOREACH(const RoadModule::GeneralRoadsMatcher::MatchResult::value_type& road, roads)
@@ -790,7 +814,8 @@ namespace synthese
 							RoadModule::GetGeneralPublicPlacesMatcher().bestMatches(
 								_text,
 								_number ? *_number : 0,
-								_minScore
+								_minScore,
+								_phonetic
 						)	);
 						result.insert(DATA_PUBLIC_PLACES, pm);
 					}
@@ -806,7 +831,8 @@ namespace synthese
 						_city->getAllPlacesMatcher().bestMatches(
 							_text,
 							_number ? *_number : 0,
-							_minScore
+							_minScore,
+							_phonetic
 					)	);
 				}
 				else if(_config)
@@ -820,7 +846,8 @@ namespace synthese
 						GeographyModule::GetGeneralAllPlacesMatcher().bestMatches(
 							_text,
 							_number ? *_number : 0,
-							_minScore
+							_minScore,
+							_phonetic
 					)	);
 				}
 				result.insert(DATA_PLACES, pm);
@@ -917,6 +944,53 @@ namespace synthese
 				result.insert(DATA_BEST_PLACE, bestPlace);
 			}
 
+			// Resume
+			// The resume section is shown when asked (PARAMETER_RESUME)
+			// All the content from the result parameter map will be taken, and each entry from each class (except the best places) will be taken
+			// and added to a new multimap, sorted by phonetic score
+			// The class filter does not affect the resume section
+			if (_resume)
+			{
+				typedef boost::shared_ptr<ParametersMap> SharedParametersMap;
+				std::multimap< double, SharedParametersMap> resumes;
+				BOOST_FOREACH(const util::ParametersMap::SubMapsKeys::value_type& submapkey, result.getSubMapsKeys())
+				{
+					// Ignore the "best places", which contains entries found in the others submaps
+					if (submapkey != DATA_BEST_PLACE)
+					{
+						BOOST_FOREACH(const util::ParametersMap::SubParametersMap::mapped_type::value_type& submap, result.getSubMaps(submapkey))
+						{
+							// We have to go through 2 layers (stops->stop)
+							BOOST_FOREACH(const util::ParametersMap::SubMapsKeys::value_type& itemkey, submap->getSubMapsKeys())
+							{
+								BOOST_FOREACH(const util::ParametersMap::SubParametersMap::mapped_type::value_type& item, submap->getSubMaps(itemkey))
+								{
+									// Add it only if not already there
+									if (item->isDefined(DATA_PHONETIC_SCORE))
+									{
+										resumes.insert(std::make_pair(lexical_cast<double>(item->getValue(DATA_PHONETIC_SCORE)), item));
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				// Add the sorted results in ParametersMap, max _number (if defined)
+				boost::shared_ptr<ParametersMap> pm(new ParametersMap());
+				size_t count = 0;
+				for (std::multimap< double,SharedParametersMap >::reverse_iterator i = resumes.rbegin(); i != resumes.rend() && ( _number ? count < *_number : true ); i++ )
+				{
+					pm->insert(DATA_RESUME, (*i).second);
+					count++;
+				}
+				
+				// Add resumes in results, if not empty
+				if ( ! resumes.empty() )
+				{
+					result.insert(DATA_RESUMES, pm);
+				}
+			}
 
 			// Output
 			if(_itemPage.get())

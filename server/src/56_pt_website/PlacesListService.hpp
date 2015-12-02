@@ -75,6 +75,8 @@ namespace synthese
 			static const std::string PARAMETER_MIN_SCORE;
 			static const std::string PARAMETER_CLASS_FILTER;
 			static const std::string PARAMETER_SRID;
+			static const std::string PARAMETER_PHONETIC;
+			static const std::string PARAMETER_RESUME;
 
 			static const std::string PARAMETER_COORDINATES_XY;
 			static const std::string PARAMETER_MAX_DISTANCE;
@@ -103,6 +105,8 @@ namespace synthese
 			static const std::string DATA_ORIGIN_X;
 			static const std::string DATA_ORIGIN_Y;
 			static const std::string DATA_DISTANCE_TO_ORIGIN;
+			static const std::string DATA_RESUMES;
+			static const std::string DATA_RESUME;
 
 		protected:
 			typedef std::set<graph::UserClassCode> CompatibleUserClassesRequired;
@@ -125,6 +129,8 @@ namespace synthese
 				boost::shared_ptr<geos::geom::Point> _originPoint;
 				CompatibleUserClassesRequired _requiredUserClasses;
 				boost::shared_ptr<const impex::DataSource> _dataSourceFilter;
+				bool _phonetic;
+				bool _resume;
 			//@}
 
 		public:
@@ -308,18 +314,18 @@ namespace synthese
 						continue;
 					}
 
-                    // Avoid adresses from empty cities
-                    if (_citiesWithAtLeastAStop &&
-                        dynamic_cast<geography::NamedPlace*>(item.value.get()))
-                    {
-                        const geography::City* city = dynamic_cast<geography::NamedPlace*>(item.value.get())->getCity();
-                        if (city &&
+					// Avoid adresses from empty cities
+					if (_citiesWithAtLeastAStop &&
+						dynamic_cast<geography::NamedPlace*>(item.value.get()))
+					{
+						const geography::City* city = dynamic_cast<geography::NamedPlace*>(item.value.get())->getCity();
+						if (city &&
 							city->getLexicalMatcher(pt::StopArea::FACTORY_KEY).size() == 0
 						)
-                        {
-                            continue;
-                        }
-                    }
+						{
+							continue;
+						}
+					}
 
 
 					// Allocation

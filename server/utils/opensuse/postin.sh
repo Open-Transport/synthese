@@ -17,3 +17,6 @@ cp -v /usr/lib/mysql_udf_plugin/libsynthese_mysql_udf.so /usr/lib64/mysql/plugin
 # Change the systemd file names with a @, this is a workaround for a current bug in CPack
 mv -v /usr/lib/systemd/system/synthese_.service /usr/lib/systemd/system/synthese@.service 2>/dev/null || echo "No synthese@.service found"
 mv -v /usr/lib/systemd/system/synthese-watchdog_.service /usr/lib/systemd/system/synthese-watchdog@.service 2>/dev/null || echo "No synthese-watchdog@.service found"
+
+# Make the watchdog executable
+chmod +x /usr/share/synthese/bin/watchdog.sh
