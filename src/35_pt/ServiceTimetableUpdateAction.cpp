@@ -57,6 +57,7 @@ namespace synthese
 		const string ServiceTimetableUpdateAction::PARAMETER_RANK = Action_PARAMETER_PREFIX + "rk";
 		const string ServiceTimetableUpdateAction::PARAMETER_SHIFTING_DELAY = Action_PARAMETER_PREFIX + "sd";
 		const string ServiceTimetableUpdateAction::PARAMETER_TIME = Action_PARAMETER_PREFIX + "ti";
+		const string ServiceTimetableUpdateAction::PARAMETER_COMMENT = Action_PARAMETER_PREFIX + "co";
 
 
 
@@ -76,6 +77,7 @@ namespace synthese
 				{
 					map.insert(PARAMETER_TIME, _time);
 				}
+				map.insert(PARAMETER_COMMENT, _comment);
 			}
 			return map;
 		}
@@ -117,6 +119,8 @@ namespace synthese
 			{
 				_time = duration_from_string(map.get<string>(PARAMETER_TIME));
 			}
+			
+			_comment = map.getOptional<string>(PARAMETER_COMMENT);
 		}
 
 
@@ -128,6 +132,8 @@ namespace synthese
 			_service->regenerateDataSchedules(); // Useful in case of corrupted data
 			SchedulesBasedService::Schedules departureSchedules(_service->getDataDepartureSchedules());
 			SchedulesBasedService::Schedules arrivalSchedules(_service->getDataArrivalSchedules());
+			SchedulesBasedService::Comments arrivalComments(_service->getArrivalComments());
+			SchedulesBasedService::Comments departureComments(_service->getDepartureComments());
 
 			if(!_shifting_delay.is_not_a_date_time())
 			{
@@ -161,6 +167,28 @@ namespace synthese
 			}
 
 			_service->setDataSchedules(departureSchedules, arrivalSchedules);
+			
+			if(_comment)
+			{
+				if(_updateArrival)
+				{
+					if(rank >= arrivalComments.size())
+					{
+						throw ActionException("Bad arrival comment rank for schedules size");
+					}
+					arrivalComments[rank] = *_comment;
+				}
+				else
+				{
+					if(rank >= departureComments.size())
+					{
+						throw ActionException("Bad departure comment rank for schedules size");
+					}
+					departureComments[rank] = *_comment;
+				}
+			}
+			
+			_service->setDataComments(arrivalComments, departureComments);
 
 			DBModule::SaveObject(*_service);
 

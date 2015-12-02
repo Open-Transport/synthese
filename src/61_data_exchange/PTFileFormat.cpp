@@ -1023,7 +1023,9 @@ namespace synthese
 			boost::optional<const std::string&> team,
 			boost::optional<const graph::RuleUser::Rules&> rules,
 			boost::optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&> servedVertices,
-			boost::optional<const std::string&> id
+			boost::optional<const std::string&> id,
+			boost::optional<const pt::SchedulesBasedService::Comments&> arrivalComments,
+			boost::optional<const pt::SchedulesBasedService::Comments&> departureComments
 		) const {
 			// Comparison of the size of schedules and the size of the route
 			if(	route.getScheduledStopsNumber() != departureSchedules.size() ||
@@ -1125,6 +1127,11 @@ namespace synthese
 						++stopRank;
 					}
 					result->setVertices(vertices);
+				}
+				
+				if(arrivalComments && departureComments)
+				{
+					result->setDataComments(*arrivalComments,*departureComments);
 				}
 
 				route.addService(*result, false);

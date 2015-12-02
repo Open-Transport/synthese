@@ -100,6 +100,18 @@ namespace synthese
 		){
 			// Lock the schedules
 			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+			
+			// Reset the comments if the size changes
+			if(departureSchedules.size() != _dataDepartureSchedules.size())
+			{
+				_departureComments.clear();
+				_departureComments = Comments(departureSchedules.size());
+			}
+			if(arrivalSchedules.size() != _dataArrivalSchedules.size())
+			{
+				_arrivalComments.clear();
+				_arrivalComments = Comments(arrivalSchedules.size());
+			}
 
 			_dataDepartureSchedules = departureSchedules;
 			_dataArrivalSchedules = arrivalSchedules;
@@ -111,6 +123,36 @@ namespace synthese
 			_clearGeneratedSchedules();
 			clearRTData();
 			_computeNextRTUpdate();
+		}
+
+		
+		
+		
+		
+		
+		void SchedulesBasedService::setDataComments(const SchedulesBasedService::Comments& arrivalComments, const SchedulesBasedService::Comments& departureComments)
+		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+			
+			// If the size is wrong, log and quit
+			if (arrivalComments.size() != _dataArrivalSchedules.size())
+			{
+				Log::GetInstance().warn("Inconsistent arrival comments size in service " + lexical_cast<string>(getKey()));
+			}
+			else
+			{
+				_arrivalComments = arrivalComments;
+			}
+			
+			if (departureComments.size() != _dataDepartureSchedules.size())
+			{
+				Log::GetInstance().warn("Inconsistent departure comments size in service " + lexical_cast<string>(getKey()));
+			}
+			else
+			{
+				_departureComments = departureComments;
+			}
 		}
 
 
@@ -484,7 +526,44 @@ namespace synthese
 			return str.str();
 		}
 
-
+		
+		
+		
+		std::string SchedulesBasedService::encodeComments() const
+		{
+			stringstream str;
+			for (size_t i = 0; i < _arrivalComments.size(); i++)
+			{
+				if (i>0)
+				{
+					str <<  ",";
+				}
+				str << escapeComment(_arrivalComments.at(i));
+				str << "#";
+				str << escapeComment(_departureComments.at(i));
+			}
+			return str.str();
+		}
+		
+		
+		
+		std::string SchedulesBasedService::escapeComment ( const std::string value )
+		{
+			std::string str = value;
+			boost::replace_all(str, "\\", "\\\\");
+			boost::replace_all(str, ",", "\\,");
+			boost::replace_all(str, "#", "\\#");
+			return str;
+		}
+		
+		std::string SchedulesBasedService::unescapeComment ( const std::string value )
+		{
+			std::string str = value;
+			boost::replace_all(str, "\\\\", "\\");
+			boost::replace_all(str, "\\,", ",");
+			boost::replace_all(str, "\\#", "#");
+			return str;
+		}
 
 		SchedulesBasedService::SchedulesPair SchedulesBasedService::DecodeSchedules(
 			const std::string value,
@@ -545,6 +624,85 @@ namespace synthese
 			return make_pair(departureSchedules, arrivalSchedules);
 		}
 
+
+		
+		// Simple explode and un-escape
+		SchedulesBasedService::CommentsPair SchedulesBasedService::DecodeComments(const string value)
+		{
+			CommentsPair comments;
+			size_t pos = 0;
+			size_t oldpos = 0;
+			while( oldpos <= value.size() )
+			{
+				pos = value.find(",", pos);
+				
+				// If npos : end of the string
+				if (pos == std::string::npos)
+				{
+					pos = value.size() + 1;
+				}
+				// Ignore the escaped ones
+				else if (pos > 0 && value.at(pos-1) == '\\') // pos == 0 should never happen
+				{
+					pos++;
+					continue;
+				}
+				
+				// Find the departure/arrival separator
+				std::string str = value.substr(oldpos,pos-oldpos);
+				
+				size_t spos = 0;
+				size_t oldspos = 0;
+				while ( oldspos <= str.size() )
+				{
+					spos = str.find("#", spos);
+					
+					// If npos : end of the string
+					if (spos == std::string::npos)
+					{
+						spos = str.size() + 1;
+					}
+					// Ignore the escaped ones
+					else if (spos > 0 && str.at(spos-1) == '\\')
+					{
+						spos++;
+						continue;
+					}
+					
+					// Arrival string
+					if (oldspos == 0)
+					{
+						if (spos == 0)
+						{
+							comments.first.push_back(std::string());
+						}
+						else
+						{
+							comments.first.push_back( unescapeComment(str.substr(0,spos)) );
+						}
+					}
+					else // Departure string
+					{
+						if ( spos - oldspos == 0)
+						{
+							comments.second.push_back(std::string());
+						}
+						else
+						{
+							comments.second.push_back( unescapeComment(str.substr(oldspos,spos-oldspos)) );
+						}
+					}
+					
+					spos++;
+					oldspos = spos;
+				}
+				
+				pos++;
+				oldpos = pos;
+			}
+			
+			return comments;
+		}
 
 
 		void SchedulesBasedService::setSchedulesFromOther(

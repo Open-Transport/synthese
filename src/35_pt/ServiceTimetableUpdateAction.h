@@ -29,6 +29,7 @@
 #include "FactorableTemplate.h"
 
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -82,6 +83,7 @@ namespace synthese
 			static const std::string PARAMETER_RANK;
 			static const std::string PARAMETER_UPDATE_ARRIVAL;
 			static const std::string PARAMETER_TIME;
+			static const std::string PARAMETER_COMMENT;
 			static const std::string PARAMETER_SHIFTING_DELAY;
 
 		private:
@@ -90,6 +92,7 @@ namespace synthese
 			bool _updateArrival;
 			boost::posix_time::time_duration _time;
 			boost::posix_time::time_duration _shifting_delay;
+			boost::optional<std::string> _comment;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

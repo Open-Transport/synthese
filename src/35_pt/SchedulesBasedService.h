@@ -47,6 +47,7 @@ namespace synthese
 		public:
 			typedef std::vector<boost::posix_time::time_duration> Schedules;
 			typedef std::vector<boost::posix_time::ptime> TimestampSchedules;
+			typedef std::vector<std::string> Comments;
 
 			class BadSchedulesException: public synthese::Exception
 			{
@@ -84,6 +85,12 @@ namespace synthese
 			);
 
 		private:
+			//! @name Comments
+			//@{
+				Comments _arrivalComments;
+				Comments _departureComments;
+			//@}
+			
 			//! @name Theoretical data
 			//@{
 				Schedules _dataDepartureSchedules;
@@ -138,12 +145,15 @@ namespace synthese
 				virtual const boost::posix_time::time_duration getDataLastArrivalSchedule(size_t i) const;
 				boost::recursive_mutex& getSchedulesMutex() const { return _schedulesMutex; }
 				boost::recursive_mutex& getVerticesMutex() const { return _verticesMutex; }
+				const Comments& getArrivalComments() const { return _arrivalComments; }
+				const Comments& getDepartureComments() const { return _departureComments; }
 			//@}
 
 			//! @name Setters
 			//@{
 				/** Schedules update.
 					Updates both theoretical and real time data.
+					The comments emptied if the size changes.
 					@param departureSchedules Departure schedules of the service
 					@param arrivalSchedules Arrival schedules of the service
 					@param onlyScheduledEdges Only schedules at scheduled edges are present in the data to load. The missing schedules will be interpolated.
@@ -155,6 +165,16 @@ namespace synthese
 				);
 
 				virtual void setPath(graph::Path* path);
+				
+				/** Comments update.
+					An error will be logued if the comment size doesn't corresponds to the schedules size.
+					@param departureComments Departure comments of the service
+					@param arrivalComments Arrival comments of the service
+				*/
+				void setDataComments(
+					const Comments& arrivalComments,
+					const Comments& departureComments
+				);
 			//@}
 
 			/// @name Services
@@ -282,7 +302,19 @@ namespace synthese
 				std::string encodeSchedules(
 					boost::posix_time::time_duration shiftArrivals = boost::posix_time::minutes(0)
 				) const;
-
+				
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Encode comments into a string.
+				std::string encodeComments() const;
+			
+				///////////////////////////////////////////////////////////////////////////
+				/// Escape the , backslash # char of a string with backslash
+				static std::string escapeComment ( const std::string value );
+				
+				///////////////////////////////////////////////////////////////////////////
+				/// Unescape the , backslash # char of a string
+				static std::string unescapeComment ( const std::string value );
 
 
 				typedef std::pair<Schedules, Schedules> SchedulesPair;
@@ -296,6 +328,18 @@ namespace synthese
 				static SchedulesPair DecodeSchedules(
 					const std::string value,
 					boost::posix_time::time_duration shiftArrivals = boost::posix_time::minutes(0)
+				);
+				
+				
+				
+				
+				typedef std::pair<Comments, Comments> CommentsPair;
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Reads comments from encoded strings.
+				/// @param value encoded strings
+				static CommentsPair DecodeComments(
+					const std::string value
 				);
 
 

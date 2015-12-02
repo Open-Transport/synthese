@@ -105,6 +105,9 @@ namespace synthese
 			static const std::string DATA_IS_REAL_TIME;
 
 			static const std::string DATA_HANDICAPPED_ACCESS;
+			
+			static const std::string DATA_SERVICE_ARRIVAL_COMMENT;
+			static const std::string DATA_SERVICE_DEPARTURE_COMMENT;
 
 			//Direct connection SAE structures :
                         struct ServiceRealTime

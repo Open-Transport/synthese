@@ -199,7 +199,9 @@ namespace synthese
 				vs.push_back("Arrêt");
 				vs.push_back("Quai");
 				vs.push_back("Arrivée");
+				vs.push_back("Commentaire");
 				vs.push_back("Départ");
+				vs.push_back("Commentaire");
 
 				HTMLTable ts(vs, ResultHTMLTable::CSS_CLASS);
 
@@ -330,6 +332,21 @@ namespace synthese
 						stream << suForm.getSubmitButton("Shift");
 						stream << suForm.close();
 					}
+						
+					// Arrival comment
+					stream << ts.col();
+                    if(lineStop.getIsArrival())
+					{
+						timetableUpdateRequest.getAction()->setUpdateArrival(true);
+                        HTMLForm cuForm(timetableUpdateRequest.getHTMLForm("arrivalcomment"+ lexical_cast<string>(lineStop.getRankInPath())));
+						stream << cuForm.open();
+						stream << cuForm.getTextInput(
+							ServiceTimetableUpdateAction::PARAMETER_COMMENT,
+                            _service->getArrivalComments().at(lineStop.getRankInPath())
+						);
+						stream << cuForm.getSubmitButton("Save");
+						stream << cuForm.close();
+					}
 
 					// Departure time
 					stream << ts.col();
@@ -358,6 +375,21 @@ namespace synthese
 						);
 						stream << suForm.getSubmitButton("Shift");
 						stream << suForm.close();
+					}
+					
+					// Departure comment
+					stream << ts.col();
+                    if(lineStop.getIsDeparture())
+					{
+						timetableUpdateRequest.getAction()->setUpdateArrival(false);
+                        HTMLForm cuForm(timetableUpdateRequest.getHTMLForm("departurecomment"+ lexical_cast<string>(lineStop.getRankInPath())));
+						stream << cuForm.open();
+						stream << cuForm.getTextInput(
+							ServiceTimetableUpdateAction::PARAMETER_COMMENT,
+                            _service->getDepartureComments().at(lineStop.getRankInPath())
+						);
+						stream << cuForm.getSubmitButton("Save");
+						stream << cuForm.close();
 					}
 
 					++rank;

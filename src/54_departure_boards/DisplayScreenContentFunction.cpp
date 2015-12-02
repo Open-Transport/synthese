@@ -182,6 +182,9 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_IS_REAL_TIME("realTime");
 
 		const string DisplayScreenContentFunction::DATA_HANDICAPPED_ACCESS("handicapped_access");
+		
+		const string DisplayScreenContentFunction::DATA_SERVICE_ARRIVAL_COMMENT("service_arrival_comment");
+		const string DisplayScreenContentFunction::DATA_SERVICE_DEPARTURE_COMMENT("service_departure_comment");
 
 
 		const string PIPO_KEY("00");
@@ -1659,6 +1662,14 @@ namespace synthese
 					{
 						pm.insert(DATA_IS_REAL_TIME, continuousService->hasRealTimeData());
 					}
+				}
+				
+				// Service comments at this stop
+				if (schedulesBasedService && row.first.getDepartureEdge())
+				{
+					size_t rank = row.first.getDepartureEdge()->getRankInPath();
+					pm.insert(DATA_SERVICE_ARRIVAL_COMMENT, schedulesBasedService->getArrivalComments().at( rank ));
+					pm.insert(DATA_SERVICE_DEPARTURE_COMMENT, schedulesBasedService->getDepartureComments().at( rank ));
 				}
 
 				// Direction

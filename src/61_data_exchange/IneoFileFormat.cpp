@@ -123,6 +123,7 @@ namespace synthese
 		const string IneoFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
 		const string IneoFileFormat::Importer_::PARAMETER_FORBIDDEN_SERVICE_USE_RULE = "forbidden_service_use_rule";
 		const string IneoFileFormat::Importer_::PARAMETER_VEHICLE_SERVICE_SUFFIX = "vehicle_service_suffix";
+		const string IneoFileFormat::Importer_::PARAMETER_COMMENTS = "comments";
 	}
 
 	namespace impex
@@ -182,7 +183,8 @@ namespace synthese
 			_destinations(*import.get<DataSource>(), _env),
 			_stopPoints(*import.get<DataSource>(), _env),
 			_depots(*import.get<DataSource>(), _env),
-			_lines(*import.get<DataSource>(), _env)
+			_lines(*import.get<DataSource>(), _env),
+			_comments(false)
 		{}
 
 
@@ -816,6 +818,8 @@ namespace synthese
 				VehicleService* vehicleService(NULL);
 				ScheduledService::Schedules departureSchedules;
 				ScheduledService::Schedules arrivalSchedules;
+				ScheduledService::Comments arrivalComments;
+				ScheduledService::Comments departureComments;
 				int ph(0);
 				vector<date> dates;
 				time_duration lastTd(minutes(0));
@@ -854,7 +858,11 @@ namespace synthese
 								string(),
 								dataSource,
 								NULL,
-								forbiddenServiceRules
+								forbiddenServiceRules,
+								NULL,
+								NULL,
+								arrivalComments,
+								departureComments
 							);
 						}
 						else if(
@@ -1000,6 +1008,8 @@ namespace synthese
 						// Schedules initialization
 						departureSchedules.clear();
 						arrivalSchedules.clear();
+						arrivalComments.clear();
+						departureComments.clear();
 						dates.clear();
 						lastTd = minutes(0);
 						afterMidnight = (_getValue("APM") == "O");
@@ -1046,6 +1056,14 @@ namespace synthese
 						if(tcou == TCOU_DepotToStop || tcou == TCOU_StopToDepot)
 						{
 							deadRunStops.push_back(_getValue("MNL"));
+						}
+						
+						// Comments
+						if (_comments)
+						{
+							string comment(_getValue("MSG_ARR"));
+							arrivalComments.push_back(comment);
+							departureComments.push_back(comment);
 						}
 					}
 					if(_section.empty())
@@ -1266,6 +1284,8 @@ namespace synthese
 				map.insert(PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD, _journeyPatternLineOverloadField);
 			}
 
+			map.insert(PARAMETER_COMMENTS, _comments);
+
 			return map;
 		}
 
@@ -1389,5 +1409,8 @@ namespace synthese
 					}
 				}
 			}
+			
+			// Comments
+			_comments = map.getDefault<bool>(PARAMETER_COMMENTS, false);
 		}
 }	}

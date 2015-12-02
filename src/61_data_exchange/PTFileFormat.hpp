@@ -312,7 +312,9 @@ namespace synthese
 				boost::optional<const std::string&> team = boost::optional<const std::string&>(),
 				boost::optional<const graph::RuleUser::Rules&> rules = boost::optional<const graph::RuleUser::Rules&>(),
 				boost::optional<const pt::JourneyPattern::StopsWithDepartureArrivalAuthorization&> servedVertices = boost::optional<const pt::JourneyPattern::StopsWithDepartureArrivalAuthorization&>(),
-				boost::optional<const std::string&> id = boost::optional<const std::string&>()
+				boost::optional<const std::string&> id = boost::optional<const std::string&>(),
+				boost::optional<const pt::SchedulesBasedService::Comments&> arrivalComments = boost::optional<const pt::SchedulesBasedService::Comments&>(),
+				boost::optional<const pt::SchedulesBasedService::Comments&> departureComments = boost::optional<const pt::SchedulesBasedService::Comments&>()
 			) const;
 
 

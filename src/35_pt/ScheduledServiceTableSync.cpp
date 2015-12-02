@@ -80,6 +80,7 @@ namespace synthese
 		const string ScheduledServiceTableSync::COL_DATASOURCE_LINKS("datasource_links");
 		const string ScheduledServiceTableSync::COL_DATES_TO_FORCE = "dates_to_force";
 		const string ScheduledServiceTableSync::COL_DATES_TO_BYPASS = "dates_to_bypass";
+		const string ScheduledServiceTableSync::COL_COMMENTS("comments");
 	}
 
 	namespace db
@@ -93,6 +94,7 @@ namespace synthese
 			Field(TABLE_COL_ID, SQL_INTEGER),
 			Field(ScheduledServiceTableSync::COL_SERVICENUMBER, SQL_TEXT),
 			Field(ScheduledServiceTableSync::COL_SCHEDULES, SQL_TEXT),
+			Field(ScheduledServiceTableSync::COL_COMMENTS, SQL_TEXT),
 			Field(ScheduledServiceTableSync::COL_PATHID, SQL_INTEGER),
 			Field(ScheduledServiceTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
 			Field(ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
@@ -153,6 +155,7 @@ namespace synthese
 			ReplaceQuery<ScheduledServiceTableSync> query(*object);
 			query.addField(object->getServiceNumber());
 			query.addField(object->encodeSchedules());
+			query.addField(object->encodeComments());
 			query.addField(object->getPath() ? object->getPath()->getKey() : 0);
 			query.addField(
 				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?

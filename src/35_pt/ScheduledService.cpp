@@ -674,6 +674,28 @@ namespace synthese
 				}
 			}
 
+			
+			
+			// Comments
+			if(record.isDefined(ScheduledServiceTableSync::COL_COMMENTS))
+			{
+				string rawComment(
+					record.get<string>(ScheduledServiceTableSync::COL_COMMENTS)
+				);
+				
+				// Do not load empty comments (useless)
+				if ( ! rawComment.empty() )
+				{
+					SchedulesBasedService::CommentsPair value(
+						SchedulesBasedService::DecodeComments(
+							rawComment
+					)	);
+					
+					setDataComments(value.first, value.second);
+				}
+			}
+			
+			
 			return result;
 		}
 
@@ -701,6 +723,7 @@ namespace synthese
 			map.insert(TABLE_COL_ID, getKey());
 			map.insert(ScheduledServiceTableSync::COL_SERVICENUMBER, getServiceNumber());
 			map.insert(ScheduledServiceTableSync::COL_SCHEDULES, encodeSchedules());
+			map.insert(ScheduledServiceTableSync::COL_COMMENTS, encodeComments());
 			map.insert(
 				ScheduledServiceTableSync::COL_PATHID, 
 				getPath() ? getPath()->getKey() : 0
