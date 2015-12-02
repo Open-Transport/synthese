@@ -67,7 +67,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Key, key),
 					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
 					FIELD_DEFAULT_CONSTRUCTOR(NonReachableRoads),
-					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
+					FIELD_VALUE_CONSTRUCTOR(PointGeometry, geometry)
 			)	)
 		{
 			// Default accessibility
