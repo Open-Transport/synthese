@@ -126,7 +126,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setProjectedPoint(const road::Address& value){ _projectedPoint = value; }
+				void setProjectedPoint(const road::Address& value);
 				void setName(const std::string& value);
 			//@}
 

@@ -168,7 +168,6 @@ private:
 	geos::io::WKTReader _wktReader;
 
 	std::ostream& _logStream;
-    const geos::geom::GeometryFactory& _geometryFactory;
 	const CoordinatesSystem& _sourceCoordinatesSystem;
 	OSMEntityHandler& _osmEntityHandler;
 	const OSMLocale& _osmLocale;
@@ -183,7 +182,6 @@ private:
 
 public:
 	OSMParserImpl(std::ostream& logStream,
-				  const geos::geom::GeometryFactory& geometryFactory,
 				  const CoordinatesSystem& sourceCoordinatesSystem,
 				  OSMEntityHandler& osmEntityHandler,
 				  const OSMLocale& osmLocale);
@@ -381,12 +379,10 @@ OSMParserImpl::OSMRelation::getValueOrEmpty(const std::string& tag) const
 
 
 OSMParserImpl::OSMParserImpl(std::ostream& logStream,
-					         const geos::geom::GeometryFactory& geometryFactory,
 							 const CoordinatesSystem& sourceCoordinatesSystem,
 							 OSMEntityHandler& osmEntityHandler,
 							 const OSMLocale& osmLocale)
 	: _logStream(logStream)
-	, _geometryFactory(geometryFactory)
 	, _sourceCoordinatesSystem(sourceCoordinatesSystem)
 	, _osmEntityHandler(osmEntityHandler)
 	, _osmLocale(osmLocale)
@@ -986,7 +982,7 @@ OSMParserImpl::handleThirdPassEndHighway(const XML_Char* name)
 	boost::shared_ptr<geos::geom::Geometry> roadGeometry(makeGeometryFrom(&_currentWay));
 	handleRoad(_currentWay.id, roadName, roadType, roadGeometry);
 
-	boost::shared_ptr<geos::geom::CoordinateSequence> cs(_geometryFactory.
+	boost::shared_ptr<geos::geom::CoordinateSequence> cs(CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().
 		getCoordinateSequenceFactory()->create(0, 2));
 	size_t rank(0);
 	graph::MetricOffset metricOffset(0);
@@ -1013,7 +1009,7 @@ OSMParserImpl::handleThirdPassEndHighway(const XML_Char* name)
 			// Just extend the current geometry.
 			continue;
 		}
-		boost::shared_ptr<geos::geom::LineString> roadChunkPath(_geometryFactory.createLineString(*cs));
+		boost::shared_ptr<geos::geom::LineString> roadChunkPath(CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().createLineString(*cs));
 		handleRoadChunk(rank, metricOffset, 
 			trafficDirection, maxSpeed, isDrivable, isBikable, isWalkable, roadChunkPath);
 
@@ -1021,7 +1017,7 @@ OSMParserImpl::handleThirdPassEndHighway(const XML_Char* name)
 		handleCrossing(node.id, convertedPoint);
 		if(!isLast)
 		{
-			cs.reset(_geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+			cs.reset(CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().getCoordinateSequenceFactory()->create(0, 2));
 			cs->add(*convertedPoint->getCoordinate());
 		}
 		++rank;
@@ -1163,8 +1159,8 @@ OSMParserImpl::polygonize(const std::vector<OSMWay*>& ways) {
 		std::vector< geos::geom::LineString * > *lss = lm.getMergedLineStrings();
 		BOOST_FOREACH(geos::geom::LineString *ls, *lss) {
 			if(ls->getNumPoints()>3 && ls->isClosed()) {
-				geos::geom::Polygon *p = _geometryFactory.createPolygon(
-					_geometryFactory.createLinearRing(ls->getCoordinates()),0);
+				geos::geom::Polygon *p = CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().createPolygon(
+					CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().createLinearRing(ls->getCoordinates()),0);
 				ret->push_back(p);
 			}
 			delete ls;
@@ -1178,8 +1174,8 @@ OSMParserImpl::polygonize(const std::vector<OSMWay*>& ways) {
 			//we have a closed way, return it
 			g = makeGeometryFrom(w);
 			geos::geom::CoordinateSequence *cs = g->getCoordinates();
-			geos::geom::LinearRing *lr = _geometryFactory.createLinearRing(cs);
-			geos::geom::Polygon *p = _geometryFactory.createPolygon(lr,NULL);
+			geos::geom::LinearRing *lr = CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().createLinearRing(cs);
+			geos::geom::Polygon *p = CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().createPolygon(lr,NULL);
 			ret->push_back(p);
 			delete g;
 		}
@@ -1212,7 +1208,7 @@ OSMParserImpl::makeWKTFrom(OSMWay* way)
 geos::geom::Point*
 OSMParserImpl::makeGeometryFrom(OSMNode* node)
 {
-	return _geometryFactory.createPoint(geos::geom::Coordinate(node->longitude, node->latitude));
+	return _sourceCoordinatesSystem.getGeometryFactory().createPoint(geos::geom::Coordinate(node->longitude, node->latitude));
 }
 
 
@@ -1233,7 +1229,7 @@ OSMParserImpl::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std
 		return NULL;
 	}
 
-	geos::geom::Geometry* poly = _geometryFactory.createMultiPolygon((std::vector<geos::geom::Geometry*>*) polygons);
+	geos::geom::Geometry* poly = CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().createMultiPolygon((std::vector<geos::geom::Geometry*>*) polygons);
 	// The geometries stored in *polygons are now owned by the multipolygon
 
 	geos::operation::valid::IsValidOp outerValidator(poly);
@@ -1246,7 +1242,7 @@ OSMParserImpl::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std
 		_logStream << std::endl;
 
 		geos::geom::Geometry *tmp = poly->buffer(0.0);
-		_geometryFactory.destroyGeometry(poly);
+		CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().destroyGeometry(poly);
 		poly = tmp;
 	}
 
@@ -1258,19 +1254,19 @@ OSMParserImpl::makeGeometryFrom(const std::vector<OSMWay*>& outerWays, const std
 			if (!encValidator.isValid()) {
 				_logStream << "Enclave multipolygon is not valid : " << encValidator.getValidationError()->toString() << std::endl;
 				geos::geom::Geometry *tmp = enc->buffer(0.0);
-				_geometryFactory.destroyGeometry(enc);
+				CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().destroyGeometry(enc);
 				enc = tmp;
 			}
 
 			if (poly->intersects(enc)) {
 				try {
 					geos::geom::Geometry *tmp = poly->difference(enc);
-					_geometryFactory.destroyGeometry(poly);
+					CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().destroyGeometry(poly);
 					poly = tmp;
 				} catch (const geos::util::TopologyException& te) {
 					_logStream << "Failed to subtract enclave polygon : " << te.what() << std::endl;
 				}
-				_geometryFactory.destroyGeometry(enc);
+				CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().destroyGeometry(enc);
 			}
 		}
 	}
@@ -1473,11 +1469,10 @@ OSMParserImpl::parse(std::istream& osmInput)
 
 
 OSMParser::OSMParser(std::ostream& logStream,
-					 const geos::geom::GeometryFactory& geometryFactory,
 					 const CoordinatesSystem& sourceCoordinatesSystem,
 					 OSMEntityHandler& osmEntityHandler,
 					 const OSMLocale& osmLocale)
-	: _pimpl(new OSMParserImpl(logStream, geometryFactory, sourceCoordinatesSystem, osmEntityHandler, osmLocale))
+	: _pimpl(new OSMParserImpl(logStream, sourceCoordinatesSystem, osmEntityHandler, osmLocale))
 {
 }
 

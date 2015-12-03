@@ -51,7 +51,6 @@ class OSMParser
 public:
 
 	OSMParser(std::ostream& logStream,
-			  const geos::geom::GeometryFactory& geometryFactory,
 			  const CoordinatesSystem& sourceCoordinatesSystem,
 			  OSMEntityHandler& osmEntityHandler,
 			  const OSMLocale& osmLocale);

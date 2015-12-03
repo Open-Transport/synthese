@@ -691,7 +691,6 @@ bool OSMFileFormat::Importer_::_parse(
 
 	OSMParser parser(
 		*_fileStream,
-		CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory(),
 		dataSource.getActualCoordinateSystem(),
 		handler,
 		OSMLocale::getInstance(*_countryCode)
