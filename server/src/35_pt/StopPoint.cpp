@@ -541,7 +541,7 @@ namespace synthese
 				if ((_projectedPoint.getRoadChunk() != get<ProjectedRoadChunk>().get_ptr()) ||
 					(_projectedPoint.getMetricOffset() != get<ProjectedMetricOffset>()))
 				{
-					setProjectedPoint(Address(get<ProjectedRoadChunk>().get(), get<ProjectedMetricOffset>()));
+					_projectedPoint = Address(get<ProjectedRoadChunk>().get(), get<ProjectedMetricOffset>());
 				}
 			}
 			else
@@ -607,6 +607,16 @@ namespace synthese
 		void StopPoint::setName(const std::string& value)
 		{
 			set<Name>(value);
+		}
+
+		void StopPoint::setProjectedPoint(const road::Address& value)
+		{
+			_projectedPoint = value;
+			set<ProjectedRoadChunk>(value.getRoadChunk()
+				? boost::optional<road::RoadChunk&>(*const_cast<road::RoadChunk*>(value.getRoadChunk()))
+				: boost::none
+			);
+			set<ProjectedMetricOffset>(value.getMetricOffset());
 		}
 
 
