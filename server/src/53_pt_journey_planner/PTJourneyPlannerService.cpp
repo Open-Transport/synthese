@@ -2043,11 +2043,10 @@ namespace synthese
 						__Couleur,
 						it->getDistance(),
 						multiLineString.get(),
-						static_cast<const RoadPath*>(leg.getService()->getPath())->getRoad(),
+						junction,
 						*leg.getDepartureEdge()->getFromVertex(),
 						*leg.getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
-						false,
 						leg.getUserClassRank()
 					);
 					
@@ -2090,7 +2089,7 @@ namespace synthese
 							geometries
 					)	);
 					
-					_displayJunctionCell(
+					_displayRoadCell(
 						*legPM,
 						__Couleur,
 						distance,
@@ -2199,7 +2198,7 @@ namespace synthese
 							geometries
 					)	);
 					
-					_displayJunctionCell(
+					_displayRoadCell(
 						*legPM,
 						__Couleur,
 						distance,
@@ -2261,11 +2260,10 @@ namespace synthese
 						__Couleur,
 						it->getDistance(),
 						multiLineString.get(),
-						static_cast<const RoadPath*>(leg.getService()->getPath())->getRoad(),
+						junction,
 						*leg.getDepartureEdge()->getFromVertex(),
 						*leg.getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
-						false,
 						leg.getUserClassRank()
 					);
 					__Couleur = !__Couleur;
@@ -2340,7 +2338,7 @@ namespace synthese
 					const Vertex* departureVertex = (*roadServiceUses.begin())->getDepartureEdge()->getFromVertex();
 					const Vertex* arrivalVertex = (*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex();
 
-					_displayJunctionCell(
+					_displayRoadCell(
 						*legPM,
 						__Couleur,
 						distance,
@@ -2400,7 +2398,7 @@ namespace synthese
 						geometries
 				)	);
 				
-				_displayJunctionCell(
+				_displayRoadCell(
 					*legPM,
 					__Couleur,
 					distance,
@@ -2524,6 +2522,63 @@ namespace synthese
 			bool color,
 			double distance,
 			const geos::geom::Geometry* geometry,
+			const pt::Junction* junction,
+			const graph::Vertex& departureVertex,
+			const graph::Vertex& arrivalVertex,
+			bool isFirstFoot,
+			std::size_t userClassRank
+		) const {
+			// Departure point
+			if(	departureVertex.getGeometry().get() &&
+				!departureVertex.getGeometry()->isEmpty()
+			){
+				boost::shared_ptr<Point> point(
+					_coordinatesSystem->convertPoint(
+						*departureVertex.getGeometry()
+				)	);
+				pm.insert(DATA_DEPARTURE_LONGITUDE, point->getX());
+				pm.insert(DATA_DEPARTURE_LATITUDE, point->getY());
+			}
+			// Arrival point
+			if(	arrivalVertex.getGeometry().get() &&
+				!arrivalVertex.getGeometry()->isEmpty()
+			){
+				boost::shared_ptr<Point> point(
+					_coordinatesSystem->convertPoint(
+						*arrivalVertex.getGeometry()
+				)	);
+				pm.insert(DATA_ARRIVAL_LONGITUDE, point->getX());
+				pm.insert(DATA_ARRIVAL_LATITUDE, point->getY());
+			}
+			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(arrivalVertex.getHub()) != NULL);
+
+			pm.insert(DATA_ODD_ROW, color);
+			pm.insert(DATA_LENGTH, static_cast<int>(floor(distance)));
+			pm.insert(DATA_IS_FIRST_FOOT, isFirstFoot);
+			pm.insert(DATA_USER_CLASS_RANK, userClassRank);
+
+			// WKT
+			if(geometry)
+			{
+				boost::shared_ptr<Geometry> geometryProjected(
+					_coordinatesSystem->convertGeometry(
+						*geometry
+				)	);
+
+				boost::shared_ptr<WKTWriter> wktWriter(new WKTWriter);
+				if(geometryProjected.get() && !geometryProjected->isEmpty())
+				{
+					pm.insert(DATA_WKT, wktWriter->write(geometryProjected.get()));
+				}
+			}
+		}
+
+
+		void PTJourneyPlannerService::_displayRoadCell(
+			util::ParametersMap& pm,
+			bool color,
+			double distance,
+			const geos::geom::Geometry* geometry,
 			const road::Road* road,
 			const graph::Vertex& departureVertex,
 			const graph::Vertex& arrivalVertex,
@@ -2579,7 +2634,6 @@ namespace synthese
 				}
 			}
 		}
-
 
 
 		void PTJourneyPlannerService::_displayServiceCell(

@@ -82,6 +82,7 @@ namespace synthese
 		class StopArea;
 		class ReservationContact;
 		class StopPoint;
+		class Junction;
 	}
 
 	namespace server
@@ -593,15 +594,44 @@ namespace synthese
 
 			/** Display of junction cell.
 				See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Journey-pedestrian-chunk
-				@param stream Stream to display on
-				@param page page to use to display
-				@param request current request
-				@param alarm Alarm to display for the road use
+				@param pm Parameters map storing the attributes of the junction
 				@param color Odd or even row in the journey board
 				@param distance Length of the junction
+				@param geometry Geometry of the junction
+				@param junction Junction object
+				@param departureVertex Departure vertex of the junction
+				@param arrivalVertex Arrival vertex of the junction
+				@param isFirstFoot
 				@param userClassRank Class of the user (car, bike, pedestrian)
 			*/
 			void _displayJunctionCell(
+				util::ParametersMap& pm,
+				bool color,
+				double distance,
+				const geos::geom::Geometry* geometry,
+				const pt::Junction* junction,
+				const graph::Vertex& departureVertex,
+				const graph::Vertex& arrivalVertex,
+				bool isFirstFoot,
+				std::size_t userClassRank
+			) const;
+
+
+
+			/** Display of road cell.
+				See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Journey-pedestrian-chunk
+				@param pm Parameters map storing the attributes of the road
+				@param color Odd or even row in the journey board
+				@param distance Length of the road
+				@param geometry Geometry of the road
+				@param road road object
+				@param departureVertex Departure vertex of the road
+				@param arrivalVertex Arrival vertex of the road
+				@param isFirstFoot
+				@param concatenatedFootLegs
+				@param userClassRank Class of the user (car, bike, pedestrian)
+			*/
+			void _displayRoadCell(
 				util::ParametersMap& pm,
 				bool color,
 				double distance,
