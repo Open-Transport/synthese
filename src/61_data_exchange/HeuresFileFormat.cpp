@@ -583,6 +583,7 @@ namespace synthese
 				while(getline(inFile, line))
 				{
 					// Vehicle service
+					util::Log::GetInstance().debug("Troncon ligne " + line);
 					string fullCode(trim_copy(line.substr(23,6)));
 					vector<string> fullCodeVec;
 					split(fullCodeVec, fullCode, is_any_of("/"));
@@ -623,6 +624,7 @@ namespace synthese
 						// Route number
 						string routeNumber(trim_copy(line.substr(i,2)));
 						DriverService::Chunk::Element tronconElement;
+						util::Log::GetInstance().debug("Troncon route " + routeNumber);
 
 						// Case Dead run
 						DeadRunRoutes::iterator it(_deadRunRoutes.find(make_pair(lineNumber, routeNumber)));
