@@ -234,12 +234,7 @@
     <complexType name="PTService">
     	<attribute name="id" type="mjp:ObjectIdentifier">
     		<annotation>
-    			<documentation>
-    				Internal object identifier
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute name="number" type="string"></attribute>
+    			<documentation>Internal object identifier</documentation></annotation></attribute>
     </complexType>
 
 </schema>
