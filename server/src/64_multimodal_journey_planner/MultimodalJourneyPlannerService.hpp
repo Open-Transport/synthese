@@ -60,6 +60,8 @@ namespace synthese
 			static const std::string PARAMETER_ARRIVAL_PLACE_TEXT;
 			static const std::string PARAMETER_DEPARTURE_DAY;
 			static const std::string PARAMETER_DEPARTURE_TIME;
+			static const std::string PARAMETER_USE_WALK;
+			static const std::string PARAMETER_USE_PT;
 
 			static const std::string PARAMETER_ASTAR_FOR_WALK; //TODO : remove when algorithm is chosen
 
@@ -77,6 +79,9 @@ namespace synthese
 				std::string									_destinationPlaceText;
 				boost::gregorian::date						_day;
 				boost::posix_time::time_duration			_departureTime;
+
+				bool										_useWalk;
+				bool										_usePt;
 
 				road::RoadModule::ExtendedFetchPlaceResult	_departure_place;
 				road::RoadModule::ExtendedFetchPlaceResult	_arrival_place;
