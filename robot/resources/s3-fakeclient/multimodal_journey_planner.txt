@@ -55,9 +55,15 @@ There Should Be ${expected_solutions_count:\d+} Solution(s) Using Only Walk
     ${solutions_count}=  Evaluate Xpath  ${xml_solutions}  count(journey[(count(leg/walk_attributes) > 0) and (count(leg/pt_attributes) = 0)])
     Should Be Equal As Numbers  ${expected_solutions_count}  ${solutions_count}
 
-There Should Be ${expected_solutions_count:\d+} Solution(s) Using Only Public Transport
-    ${solutions_count}=  Evaluate Xpath  ${xml_solutions}  count(journey[(count(leg/walk_attributes) = 0) and (count(leg/pt_attributes) > 0)])
-    Should Be Equal As Numbers  ${expected_solutions_count}  ${solutions_count}
+Walk And Public Transport Journey From ${departure_city} ${departure_place} To ${arrival_city} ${arrival_place} Has No Solution
+    ${response}=    MultimodalJourneyPlanner    departure_city=${departure_city}    departure_place=${departure_place}    arrival_city=${arrival_city}    arrival_place=${arrival_place}
+    Log Many    ${response.content}
+    Element Should Not Exist	${response.content}  xpath=journey
+
+Walk And Public Transport Journey From ${departure_city} ${departure_place} To ${arrival_city} ${arrival_place} Has One Solution
+    ${response}=    MultimodalJourneyPlanner    departure_city=${departure_city}    departure_place=${departure_place}    arrival_city=${arrival_city}    arrival_place=${arrival_place}
+    Log Many    ${response.content}
+    Element Should Exist    ${response.content}  xpath=journey
 
 Solution ${solution_index} Should Start From "${departure_city}, ${departure_place}" And Arrive To "${arrival_city}, ${arrival_place}"
     Element Attribute Should Be  ${xml_solutions}  name  ${departure_city} ${departure_place}  xpath=journey[${solution_index}]/departure
