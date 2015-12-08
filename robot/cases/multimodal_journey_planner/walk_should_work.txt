@@ -30,7 +30,7 @@ Searching Walk Journey Should Find No Solution
     Execute Spatialite Script  ${conn}  ../../../resources/data/multimodal_journey_planner/legacy_test_network.sql
 	Disconnect From Spatialite Database  ${conn}
     Start Synthese
-    Walk Journey From city54 rp40 To city20 rp50 Has No Solution
+    Walk Journey From "city54, rp40" To "city20, rp50" Has No Solution
 
 Searching Walk Journey Should Find Proper Solutions
 	[Arguments]  ${departure_city}  ${departure_place}  ${arrival_city}  ${arrival_place}
@@ -40,5 +40,5 @@ Searching Walk Journey Should Find Proper Solutions
     Execute Spatialite Script  ${conn}  ../../../resources/data/multimodal_journey_planner/legacy_test_network.sql
 	Disconnect From Spatialite Database  ${conn}
     Start Synthese
-    Walk Journey From city54 rp40 To city38 rp46 Has One Solution
+    Walk Journey From "city54, rp40" To "city38, rp46" Has One Solution
 
