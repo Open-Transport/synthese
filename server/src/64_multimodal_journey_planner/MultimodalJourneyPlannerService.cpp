@@ -1096,14 +1096,20 @@ namespace synthese
 									line->getCommercialLine()->getNetwork())
 								{
 									boost::shared_ptr<ParametersMap> submapNetwork(new ParametersMap);
-									line->getCommercialLine()->getNetwork()->toParametersMap(*submapNetwork, true);
+									submapNetwork->insert("id", line->getCommercialLine()->getNetwork()->getKey());
+									submapNetwork->insert("name", line->getCommercialLine()->getNetwork()->getName());
+									submapNetwork->insert("image", line->getCommercialLine()->getNetwork()->get<pt::Image>());
 									submapPtAttributes->insert("network", submapNetwork);
 								}
 								if (line &&
 									line->getCommercialLine())
 								{
 									boost::shared_ptr<ParametersMap> submapCommercialLine(new ParametersMap);
-									line->getCommercialLine()->toParametersMap(*submapCommercialLine, true);
+									submapCommercialLine->insert("id", line->getCommercialLine()->getKey());
+									submapCommercialLine->insert("name", line->getCommercialLine()->getName());
+									submapCommercialLine->insert("image", line->getCommercialLine()->getImage());
+									submapCommercialLine->insert("style", line->getCommercialLine()->getStyle());
+									submapCommercialLine->insert("color", line->getCommercialLine()->getColor());
 									submapPtAttributes->insert("line", submapCommercialLine);
 								}
 								const pt::ContinuousService* continuousService(dynamic_cast<const pt::ContinuousService*>(its->getService()));
@@ -1111,13 +1117,15 @@ namespace synthese
 								if (continuousService)
 								{
 									boost::shared_ptr<ParametersMap> submapContinuousService(new ParametersMap);
-									continuousService->toParametersMap(*submapContinuousService, true);
+									submapContinuousService->insert("id", continuousService->getKey());
+									submapContinuousService->insert("number", continuousService->getServiceNumber());
 									submapPtAttributes->insert("service", submapContinuousService);
 								}
 								if (schedulesBasedService)
 								{
 									boost::shared_ptr<ParametersMap> submapSchedulesBasedService(new ParametersMap);
-									schedulesBasedService->toParametersMap(*submapSchedulesBasedService, true);
+									submapSchedulesBasedService->insert("id", schedulesBasedService->getKey());
+									submapSchedulesBasedService->insert("number", schedulesBasedService->getServiceNumber());
 									submapPtAttributes->insert("service", submapSchedulesBasedService);
 								}
 
