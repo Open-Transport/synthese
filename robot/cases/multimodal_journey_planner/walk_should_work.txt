@@ -1,16 +1,26 @@
 *** Settings ***
+Library           spatialite
 Resource          ../../resources/s3-fakeclient/multimodal_journey_planner.txt
-Resource          ../../resources/data/multimodal_journey_planner_data.txt
-Test Setup        Run Keywords  On Node 0  AND  With Test Data  ${DB}  AND  Start Synthese On Node 0
+Test Setup        Start Synthese On Node 0
 Test Teardown     Stop Synthese On Node 0
 
 *** Test Cases ***
 
 No Solution Case Should Work
     On Node 0
+    Stop Synthese
+    ${conn}=  Connect To Spatialite Database  ./${SUITE NAME}/${TEST NAME}/${node.node_dir}/${node.db_file}
+    Execute Spatialite Script  ${conn}  ../../../resources/data/multimodal_journey_planner/legacy_test_network.sql
+	Disconnect From Spatialite Database  ${conn}
+    Start Synthese
     Walk Journey From city54 rp40 To city20 rp50 Has No Solution
 
 One Solution Case Should Work
     On Node 0
+    Stop Synthese
+    ${conn}=  Connect To Spatialite Database  ./${SUITE NAME}/${TEST NAME}/${node.node_dir}/${node.db_file}
+    Execute Spatialite Script  ${conn}  ../../../resources/data/multimodal_journey_planner/legacy_test_network.sql
+	Disconnect From Spatialite Database  ${conn}
+    Start Synthese
     Walk Journey From city54 rp40 To city38 rp46 Has One Solution
 

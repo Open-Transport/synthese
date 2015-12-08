@@ -1,6 +1,4 @@
 *** Settings ***
-Library           Process
-Library           String
 Resource          common.txt
 
 

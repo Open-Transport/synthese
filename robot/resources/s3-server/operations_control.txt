@@ -1,9 +1,4 @@
 *** Settings ***
-Library           Process
-Library           Telnet
-Library           OperatingSystem
-Library           DatabaseLibrary
-Library           DateTime
 Resource          common.txt
 
 *** Variables ***

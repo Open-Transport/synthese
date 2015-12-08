@@ -4,6 +4,7 @@ Library           RequestsLibrary
 Library           Process
 Library           Telnet
 Library           Collections
+Library           DatabaseLibrary
 Variables         variables.py
     
 *** Variables ***
