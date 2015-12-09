@@ -158,6 +158,9 @@ TRIDENT : VertexAccess => AccesPoint
 
 
 		};
+
+		std::ostream& operator<<(std::ostream& os, const VertexAccessMap& vam);
+
 	}
 }
 

@@ -47,7 +47,6 @@ namespace synthese
 		}
 
 
-
 		VertexAccessMap::~VertexAccessMap ()
 		{
 		}
@@ -212,5 +211,17 @@ namespace synthese
 			}
 			return result;
 		}
+
+		std::ostream& operator<< (std::ostream& os, const VertexAccessMap& vam)
+		{
+			for (VertexAccessMap::VamMap::const_iterator it = vam.getMap().begin(); it != vam.getMap().end(); ++it)
+		    {
+      			os << "Vertex " << it->first->getKey() << " : " << 
+      			"approachTime = " << it->second.approachTime << ", " << 
+      			"approachDistance = " <<  it->second.approachDistance << std::endl;
+    		}	
+    		return os;		
+		}
+
 	}
 }
