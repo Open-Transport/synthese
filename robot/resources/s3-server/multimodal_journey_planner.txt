@@ -4,6 +4,7 @@ Resource          common.txt
 *** Variables ***
 
 *** Keywords ***
+
 MultimodalJourneyPlanner
     [Arguments]  ${departure_city}  ${departure_place}  ${arrival_city}  ${arrival_place}  ${departure_date}  ${departure_time}  ${use_walk}=0  ${use_pt}=0
     ${response}=  Call Synthese Service  multimodal_journey_planner  departure_city\=${departure_city}    departure_place\=${arrival_place}  arrival_city\=${arrival_city}  arrival_place\=${arrival_place}  departure_date\=${departure_date}  departure_time\=${departure_time}  use_walk\=${use_walk}  use_pt\=${use_pt}  of\=xml
