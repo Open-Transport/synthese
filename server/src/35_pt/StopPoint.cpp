@@ -536,7 +536,7 @@ namespace synthese
 			}
 
 			// Projected point
-			if(get<ProjectedRoadChunk>() && get<ProjectedMetricOffset>())
+			if(get<ProjectedRoadChunk>())
 			{
 				if ((_projectedPoint.getRoadChunk() != get<ProjectedRoadChunk>().get_ptr()) ||
 					(_projectedPoint.getMetricOffset() != get<ProjectedMetricOffset>()))
