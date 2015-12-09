@@ -59,7 +59,8 @@ set(MODULES
 61_data_exchange
 61_osm_import
 63_settings
-64_multimodal_journey_planner)
+64_multimodal_journey_planner
+65_public_biking)
 
 if(WITH_MYSQL)
   list(APPEND MODULES 10_db/102_mysql)

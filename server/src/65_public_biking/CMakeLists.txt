@@ -1,0 +1,32 @@
+set_source_groups()
+
+set(public_biking_SRCS
+PublicBikeNetwork.cpp
+PublicBikeNetwork.hpp
+PublicBikeNetworkTableSync.cpp
+PublicBikeNetworkTableSync.hpp
+PublicBikeStation.cpp
+PublicBikeStation.hpp
+PublicBikeStationTableSync.cpp
+PublicBikeStationTableSync.hpp
+PublicBikeStationsList.cpp
+PublicBikeStationsList.hpp
+PublicBikeJourneyPlannerService.cpp
+PublicBikeJourneyPlannerService.hpp
+ProjectPublicBikeStations.cpp
+ProjectPublicBikeStations.hpp
+PublicBikingModule.cpp
+PublicBikingModule.gen.cpp
+PublicBikingModuleRegister.cpp
+PublicBikingModule.h
+PublicBikingModule.inc.cpp
+)
+
+set_source_files_properties(PublicBikingModule.gen.cpp PublicBikingModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
+
+add_library(65_public_biking ${public_biking_SRCS})
+
+target_link_libraries(65_public_biking
+)
+
+install(TARGETS 65_public_biking DESTINATION lib)
