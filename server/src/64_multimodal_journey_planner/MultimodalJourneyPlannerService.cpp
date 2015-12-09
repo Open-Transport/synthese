@@ -589,6 +589,10 @@ namespace synthese
 					pm.insert("journey", submapJourney);
 					
 				}
+				else
+				{
+					pm.insert(DATA_ERROR_MESSAGE, string("No pedestrian solution found"));
+				}
 
 				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after A* walk data processing");
 			}
@@ -1217,12 +1221,14 @@ namespace synthese
 					}
 				}
 
-				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after pt data processing");
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after SYNTHESE walk data processing");
 			}
 
 			// TC
 			if (_usePt)
 			{
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : before pt");
+
 				// Initialization
 				graph::AccessParameters approachAccessParameters(graph::USER_PEDESTRIAN, false, false, _useWalk ? 1000 : 0, boost::posix_time::minutes(23), 1.111);
 				boost::shared_ptr<algorithm::AlgorithmLogger> logger(new algorithm::AlgorithmLogger());
@@ -1242,6 +1248,9 @@ namespace synthese
 				);
 				// Computing
 				pt_journey_planner::PTRoutePlannerResult tcResult = r.run();
+
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after pt");
+
 				if(!tcResult.getJourneys().empty())
 				{
 					for (pt_journey_planner::PTRoutePlannerResult::Journeys::const_iterator it(tcResult.getJourneys().begin()); it != tcResult.getJourneys().end(); ++it)
@@ -1583,7 +1592,11 @@ namespace synthese
 				{
 					pm.insert(DATA_ERROR_MESSAGE, string("No public transportation solution found"));
 				}
+
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after pt data processing");
 			}
+
+			Log::GetInstance().debug("MultimodalJourneyPlannerService::run : before output conversion to " + boost::lexical_cast<std::string>(_outputFormat));
 
 			if(_outputFormat == MimeTypes::XML)
 			{

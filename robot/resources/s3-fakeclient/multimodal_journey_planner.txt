@@ -2,29 +2,44 @@
 Resource          ../s3-server/multimodal_journey_planner.txt
 
 
+
 *** Variables ***
 
 
 *** Keywords ***
+
 Walk Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departureDate} At ${departureTime} Has No Solution
     ${response}=  MultimodalJourneyPlanner  departure_city=${departure_city}  departure_place=${departure_place}  arrival_city=${arrival_city}  arrival_place=${arrival_place}  departure_date=${departure_date}  departure_time=${departure_time}  use_walk=1  use_pt=0
     Log Many  ${response.content}
-    Element Should Not Exist	${response.content}  xpath=journey
+    Should Be Equal As Strings    ${response.status_code}    200
+    ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
+    ${xml_response}=   Parse XML   ${utf8_content}
+    Element Should Not Exist	${xml_response}  xpath=journey
 
-Walk Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departureDate} At ${departureTime} Has One Solution
+Walk Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departureDate} At ${departureTime} Has Solutions
     ${response}=  MultimodalJourneyPlanner  departure_city=${departure_city}  departure_place=${departure_place}  arrival_city=${arrival_city}  arrival_place=${arrival_place}  departure_date=${departure_date}  departure_time=${departure_time}  use_walk=1  use_pt=0
     Log Many  ${response.content}
-    Element Should Exist  ${response.content}  xpath=journey
+    Should Be Equal As Strings    ${response.status_code}    200
+    ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
+    ${xml_response}=   Parse XML   ${utf8_content}
+    Element Should Exist	${xml_response}  xpath=journey
 
 Walk And Public Transport Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departureDate} At ${departureTime} Has No Solution
     ${response}=  MultimodalJourneyPlanner  departure_city=${departure_city}  departure_place=${departure_place}  arrival_city=${arrival_city}  arrival_place=${arrival_place}  departure_date=${departure_date}  departure_time=${departure_time}  use_walk=1  use_pt=1
     Log Many  ${response.content}
-    Element Should Not Exist  ${response.content}  xpath=journey
+    Should Be Equal As Strings    ${response.status_code}    200
+    ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
+    ${xml_response}=   Parse XML   ${utf8_content}
+    Element Should Not Exist	${xml_response}  xpath=journey
 
-Walk And Public Transport Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departure_date} At ${departure_time} Has One Solution
+Walk And Public Transport Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departure_date} At ${departure_time} Has Solutions
     ${response}=  MultimodalJourneyPlanner  departure_city=${departure_city}  departure_place=${departure_place}  arrival_city=${arrival_city}  arrival_place=${arrival_place}  departure_date=${departure_date}  departure_time=${departure_time}  use_walk=1  use_pt=1
     Log Many  ${response.content}
-    Element Should Exist  ${response.content}  xpath=journey
+    Should Be Equal As Strings    ${response.status_code}    200
+    ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
+    ${xml_response}=   Parse XML   ${utf8_content}
+    Element Should Exist	${xml_response}  xpath=journey
+
 
 Solution ${solution_index} Should Start From "${departure_city}, ${departure_place}" And Arrive To "${arrival_city}, ${arrival_place}"
     Element Attribute Should Be  ${xml_solutions}  name  ${departure_city} ${departure_place}  xpath=journey[${solution_index}]/departure
