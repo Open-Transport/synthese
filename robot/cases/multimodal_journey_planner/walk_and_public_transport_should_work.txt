@@ -22,5 +22,5 @@ One Solution Case Should Work
     Execute Spatialite Script  ${conn}  ../../../resources/data/multimodal_journey_planner/legacy_test_network.sql
 	Disconnect From Spatialite Database  ${conn}
     Start Synthese
-    Walk And Public Transport Journey From "city54, rp40" To "city38, rp42" On 2015-12-08 At 07:02 Has One Solution
+    Walk And Public Transport Journey From "city54, rp40" To "city38, rp42" On 2015-12-08 At 07:02 Has Solutions
 

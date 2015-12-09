@@ -48,6 +48,7 @@
 #include "Session.h"
 #include "TransportNetwork.h"
 #include "VertexAccessMap.h"
+#include "Log.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
@@ -140,6 +141,8 @@ namespace synthese
 
 		void MultimodalJourneyPlannerService::_setFromParametersMap(const ParametersMap& map)
 		{
+			Log::GetInstance().debug("MultimodalJourneyPlannerService::_setFromParametersMap : start");
+
 			_FunctionWithSite::_setFromParametersMap(map);
 
 			// Departure place
@@ -171,6 +174,8 @@ namespace synthese
 				// TO-DO after smile-1
 			}
 
+			Log::GetInstance().debug("MultimodalJourneyPlannerService::_setFromParametersMap : after matching of departure place");
+
 			// Destination
 			if( // Two fields input
 				map.isDefined(PARAMETER_ARRIVAL_CITY_TEXT) &&
@@ -199,6 +204,8 @@ namespace synthese
 			{
 				// TO-DO after smile-1
 			}
+
+			Log::GetInstance().debug("MultimodalJourneyPlannerService::_setFromParametersMap : after matching of arrival place");
 
 			// Date parameters
 			try
@@ -236,6 +243,8 @@ namespace synthese
 			ostream& stream,
 			const server::Request& request
 		) const	{
+
+			Log::GetInstance().debug("MultimodalJourneyPlannerService::run");
 
 			//////////////////////////////////////////////////////////////////////////
 			// Display
@@ -280,6 +289,7 @@ namespace synthese
 			
 			if (_useWalk && _aStarForWalk)
 			{
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : before A* walk");
 				// Astar algorithm
 				algorithm::AStarShortestPathCalculator r(
 					departure,
@@ -289,6 +299,8 @@ namespace synthese
 				);
 
 				algorithm::AStarShortestPathCalculator::ResultPath path(r.run());
+
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after A* walk");
 				
 				if(!path.empty())
 				{
@@ -552,9 +564,13 @@ namespace synthese
 				{
 					pm.insert(DATA_ERROR_MESSAGE, string("No pedestrian solution found"));
 				}
+
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after A* walk data processing");
 			}
 			else if (_useWalk)
 			{
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : before SYNTHESE walk");
+
 				// Classical synthese algorithm
 				algorithm::AlgorithmLogger logger;
 				road_journey_planner::RoadJourneyPlanner rjp(
@@ -571,6 +587,8 @@ namespace synthese
 					true
 				);
 				road_journey_planner::RoadJourneyPlannerResult results = rjp.run();
+
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after SYNTHESE walk");
 				
 				if(!results.getJourneys().empty())
 				{
@@ -688,7 +706,7 @@ namespace synthese
 								if(	road->get<RoadTypeField>() == road::ROAD_TYPE_PEDESTRIANPATH ||
 									road->get<RoadTypeField>() == road::ROAD_TYPE_PEDESTRIANSTREET
 								){
-									roadName="Chemin Pi&eacute;ton";
+									roadName="Chemin Piéton";
 								}
 								else if(road->get<RoadTypeField>() == road::ROAD_TYPE_STEPS) {
 									roadName="Escaliers";
@@ -799,11 +817,15 @@ namespace synthese
 				{
 					pm.insert(DATA_ERROR_MESSAGE, string("No pedestrian solution found"));
 				}
+
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after SYNTHESE walk data processing");
 			}
 
 			// TC
 			if (_usePt)
 			{
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : before pt");
+
 				// Initialization
 				graph::AccessParameters approachAccessParameters(graph::USER_PEDESTRIAN, false, false, _useWalk ? 1000 : 0, boost::posix_time::minutes(23), 1.111);
 				boost::shared_ptr<algorithm::AlgorithmLogger> logger(new algorithm::AlgorithmLogger());
@@ -823,6 +845,9 @@ namespace synthese
 				);
 				// Computing
 				pt_journey_planner::PTRoutePlannerResult tcResult = r.run();
+
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after pt");
+
 				if(!tcResult.getJourneys().empty())
 				{
 					for (pt_journey_planner::PTRoutePlannerResult::Journeys::const_iterator it(tcResult.getJourneys().begin()); it != tcResult.getJourneys().end(); ++it)
@@ -1164,7 +1189,11 @@ namespace synthese
 				{
 					pm.insert(DATA_ERROR_MESSAGE, string("No public transportation solution found"));
 				}
+
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after pt data processing");
 			}
+
+			Log::GetInstance().debug("MultimodalJourneyPlannerService::run : before output conversion to " + boost::lexical_cast<std::string>(_outputFormat));
 
 			if(_outputFormat == MimeTypes::XML)
 			{
@@ -1179,6 +1208,8 @@ namespace synthese
 			{
 				pm.outputJSON(stream, DATA_MULTIMODAL_JOURNEY_PLANNER_RESULT);
 			}
+
+			Log::GetInstance().debug("MultimodalJourneyPlannerService::run : end");
 
 			return pm;
 		}
