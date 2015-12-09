@@ -5,6 +5,8 @@ Library           Process
 Library           Telnet
 Library           Collections
 Library           DatabaseLibrary
+Library           XML  use_lxml=yes
+Library           String
 Variables         variables.py
 
 
