@@ -13,7 +13,7 @@ No Solution Case Should Work
     Execute Spatialite Script  ${conn}  ../../../resources/data/multimodal_journey_planner/legacy_test_network.sql
 	Disconnect From Spatialite Database  ${conn}
     Start Synthese
-    Search Walk Journey From "city54, rp40" To "city20, rp50" On 2015-12-08 At 07:02
+    Search Walk Journey From "City54, rp40" To "City20, rp50" On 2015-12-08 At 07:02
     There Should Be 0 Solution(s)
 
 One Solution Case Should Work
@@ -23,9 +23,10 @@ One Solution Case Should Work
     Execute Spatialite Script  ${conn}  ../../../resources/data/multimodal_journey_planner/legacy_test_network.sql
 	Disconnect From Spatialite Database  ${conn}
     Start Synthese
-    Search Walk Journey From "city54, rp40" To "city38, rp46" On 2015-12-08 At 07:02
+    Search Walk Journey From "City54, rp40" To "City38, rp46" On 2015-12-08 At 07:02
     There Should Be 1 Solution(s)
     There Should Be 1 Solution(s) Using Only Walk
+    All Solutions Should Start From "City54, rp40" And Arrive To "City38, rp46"
 
 
 
