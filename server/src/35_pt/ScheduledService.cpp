@@ -151,23 +151,25 @@ namespace synthese
 			// Force the use of theorical schedule if date is after today
 			//  - RT data is only available today !
 			//  - day finishes at (day+1,03:00)
-			bool forceTheorical(presenceDateTime.date() > day_clock::local_day());
-			forceTheorical &= presenceDateTime.time_of_day().hours() > 3;
-			forceTheorical |= presenceDateTime.date() > day_clock::local_day() + days(1);
+			boost::posix_time::ptime::date_type presenceDate = presenceDateTime.date();
+			boost::posix_time::ptime::time_duration_type presenceTime = presenceDateTime.time_of_day();
+			bool forceTheorical(presenceDate > day_clock::local_day());
+			forceTheorical &= presenceTime.hours() > 3;
+			forceTheorical |= presenceDate > day_clock::local_day() + days(1);
 
 			// Actual time
 			const time_duration& thSchedule(getDeparture ? getDepartureSchedule(false, edgeIndex) : getArrivalSchedule(false, edgeIndex));
 			const time_duration& rtSchedule(getDeparture ? getDepartureSchedule(true, edgeIndex) : getArrivalSchedule(true, edgeIndex));
 			const time_duration& schedule((RTData && !forceTheorical) ? rtSchedule : thSchedule);
-			if(	(getDeparture && ((presenceDateTime.time_of_day().hours() < 3 && schedule.hours() > 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) > schedule)) ||
-				(!getDeparture && ((presenceDateTime.time_of_day().hours() < 3 && schedule.hours() > 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) < schedule))
+			if(	(getDeparture && ((presenceTime.hours() < 3 && schedule.hours() > 3 ? presenceTime + hours(24) : presenceTime) > schedule)) ||
+				(!getDeparture && ((presenceTime.hours() < 3 && schedule.hours() > 3 ? presenceTime + hours(24) : presenceTime) < schedule))
 			){
 				return ServicePointer();
 			}
 
 			// Initializations
 			const time_duration& departureSchedule(getDepartureSchedule(RTData, 0));
-			ptime actualTime(presenceDateTime.time_of_day().hours() < 3 && schedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), schedule);
+			ptime actualTime(presenceTime.hours() < 3 && schedule.hours() > 3 ? presenceDate - days(1) : presenceDate, schedule);
 			ptime originDateTime(actualTime);
 			originDateTime += (departureSchedule - schedule);
 
@@ -192,7 +194,7 @@ namespace synthese
 					ptr.setDepartureInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), thSchedule)
+						ptime(presenceTime.hours() < 3 && thSchedule.hours() > 3 ? presenceDate - days(1) : presenceDate, thSchedule)
 					);
 				}
 				else
@@ -200,7 +202,7 @@ namespace synthese
 					ptr.setDepartureInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), thSchedule),
+						ptime(presenceTime.hours() < 3 && thSchedule.hours() > 3 ? presenceDate - days(1) : presenceDate, thSchedule),
 						*((RTData && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 					);
 				}
@@ -212,7 +214,7 @@ namespace synthese
 					ptr.setArrivalInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), thSchedule)
+						ptime(presenceTime.hours() < 3 && thSchedule.hours() > 3 ? presenceDate - days(1) : presenceDate, thSchedule)
 					);
 				}
 				else
@@ -220,7 +222,7 @@ namespace synthese
 					ptr.setArrivalInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), thSchedule),
+						ptime(presenceTime.hours() < 3 && thSchedule.hours() > 3 ? presenceDate - days(1) : presenceDate, thSchedule),
 						*((RTData && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 					);
 				}
