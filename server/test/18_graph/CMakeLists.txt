@@ -15,6 +15,7 @@ set(DEPS
   #14_admin # from server
   54_departure_boards
   61_data_exchange
+  65_public_biking
   37_pt_operation
 )
 

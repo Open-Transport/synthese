@@ -17,6 +17,7 @@ set(DEPS
   37_pt_operation
   54_departure_boards
   61_data_exchange
+  65_public_biking
 )
 
 boost_test(LexicalMatcher "${DEPS}")
