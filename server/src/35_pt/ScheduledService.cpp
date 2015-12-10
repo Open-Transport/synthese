@@ -227,11 +227,13 @@ namespace synthese
 			}
 
 			// Reservation check
+			/*
 			if(	checkIfTheServiceIsReachable &&
 				ptr.isUseRuleCompliant(ignoreReservation, reservationRulesDelayType) == UseRule::RUN_NOT_POSSIBLE
 			){
 				return ServicePointer();
 			}
+			*/
 
 			return ptr;
 		}

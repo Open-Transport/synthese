@@ -295,6 +295,7 @@ namespace synthese
 		/// This thread handles every minute the notification events.
 		void MessagesModule::NotificationThread()
 		{
+			/*
 			while (true)
 			{
 				if((true == _messagesActivationRanOnce) && (true == _scenariosActivationRanOnce))
@@ -313,6 +314,7 @@ namespace synthese
 				// Wait 500 ms
 				this_thread::sleep(milliseconds(500));
 			}
+			*/
 
 		}
 		
