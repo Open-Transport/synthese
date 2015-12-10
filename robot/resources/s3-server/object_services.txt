@@ -2,7 +2,9 @@
 Library           Process
 Resource          common.txt
 
+
 *** Variables ***
+
 
 *** Keywords ***
 
@@ -11,7 +13,15 @@ List Synthese Objects
     ${response}=    Call Synthese Service    objectlist    table_id\=${table_id}  of\=xml
     Log Many  ${response.content}
     Should Be Equal As Strings    ${response.status_code}    200
-    [Return]    ${response}
+    ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
+    [Return]    ${utf8_content}
 
+Request Synthese Object
+    [Arguments]  ${object_id}
+    ${response}=    Call Synthese Service    object    roid\=${object_id}  of\=xml
+    Log Many  ${response.content}
+    Should Be Equal As Strings    ${response.status_code}    200
+    ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
+    [Return]    ${utf8_content}
 
 
