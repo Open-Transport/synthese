@@ -152,26 +152,19 @@ namespace synthese
 			){
 				_originCityText = map.getDefault<string>(PARAMETER_DEPARTURE_CITY_TEXT);
 				_originPlaceText = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_TEXT);
-				if(!_originCityText.empty() || !_originPlaceText.empty())
+				if(!_originCityText.empty() && !_originPlaceText.empty())
 				{
-					if(_originCityText.empty())
-					{
-						road::RoadModule::ExtendedFetchPlacesResult results(pt::PTModule::ExtendedFetchPlaces(_originPlaceText, 1));
-						if(!results.empty())
-						{
-							_departure_place = *results.begin();
-						}
-					}
-					else
-					{
-						_departure_place = road::RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText);
-					}
+					_departure_place = road::RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText);
+				}
+				else
+				{
+					throw server::RequestException("Empty departure place or city.");
 				}
 			}
 			// One field input
-			else if(map.isDefined(PARAMETER_DEPARTURE_PLACE_TEXT))
+			else
 			{
-				// TO-DO after smile-1
+				throw server::RequestException("Empty departure place or city.");
 			}
 
 			Log::GetInstance().debug("MultimodalJourneyPlannerService::_setFromParametersMap : after matching of departure place");
@@ -183,26 +176,19 @@ namespace synthese
 			){
 				_destinationCityText = map.getDefault<string>(PARAMETER_ARRIVAL_CITY_TEXT);
 				_destinationPlaceText = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_TEXT);
-				if(!_destinationCityText.empty() || !_destinationPlaceText.empty())
+				if(!_destinationCityText.empty() && !_destinationPlaceText.empty())
 				{
-					if(_destinationCityText.empty())
-					{
-						road::RoadModule::ExtendedFetchPlacesResult results(pt::PTModule::ExtendedFetchPlaces(_destinationPlaceText, 1));
-						if(!results.empty())
-						{
-							_arrival_place = *results.begin();
-						}
-					}
-					else
-					{
-						_arrival_place = road::RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText);
-					}
+					_arrival_place = road::RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText);
+				}
+				else
+				{
+					throw server::RequestException("Empty arrival place or city.");
 				}
 			}
 			// One field input
-			else if(map.isDefined(PARAMETER_ARRIVAL_PLACE_TEXT))
+			else
 			{
-				// TO-DO after smile-1
+				throw server::RequestException("Empty arrival place or city.");
 			}
 
 			Log::GetInstance().debug("MultimodalJourneyPlannerService::_setFromParametersMap : after matching of arrival place");
@@ -560,10 +546,6 @@ namespace synthese
 					pm.insert("journey", submapJourney);
 					
 				}
-				else
-				{
-					pm.insert(DATA_ERROR_MESSAGE, string("No pedestrian solution found"));
-				}
 
 				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after A* walk data processing");
 			}
@@ -812,10 +794,6 @@ namespace synthese
 						submapJourney->insert("geometry", multiLineString->toString());
 						pm.insert("journey", submapJourney);
 					}
-				}
-				else
-				{
-					pm.insert(DATA_ERROR_MESSAGE, string("No pedestrian solution found"));
 				}
 
 				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after SYNTHESE walk data processing");
@@ -1184,10 +1162,6 @@ namespace synthese
 						submapJourney->insert("geometry", multiLineString->toString());
 						pm.insert("journey", submapJourney);
 					}
-				}
-				else
-				{
-					pm.insert(DATA_ERROR_MESSAGE, string("No public transportation solution found"));
 				}
 
 				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after pt data processing");
