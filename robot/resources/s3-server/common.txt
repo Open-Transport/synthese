@@ -27,8 +27,10 @@ Start Synthese
 Start Synthese On Node ${node_id:\d+}
     ${tmp_node}=  Set Variable  ${NODES[${node_id}]}
     Create Directory  ${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}
+    ${status}  ${message}=  Run Keyword And Ignore Error  File Should Exist  ${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}/${tmp_node.db_file}
+    Run Keyword If  "${status}" == "FAIL"  With Empty Test Data  ${node_id}
     ${tmp_node.process_handle}=  Start Process  ${S3_SERVER_BINARY}  --pidfile  -  --dbconn\=sqlite://path\=${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}/${tmp_node.db_file}  --param  port\=${tmp_node.port}  --param  log_level\=0  --param  auto_login_user\=root  --param  ineo_terminus_port\=${tmp_node.ineo_port}  stderr=${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}/${tmp_node.err_file}  stdout=${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}/${tmp_node.out_file}
-    Wait Until Keyword Succeeds    ${S3_SERVER_LAUNCH_TIMEOUT}    5 sec    Open Connection    localhost    ${None}    ${tmp_node.port}
+    Wait Until Keyword Succeeds    ${S3_SERVER_LAUNCH_TIMEOUT}    2 sec    Open Connection    localhost    ${None}    ${tmp_node.port}
     Run Keyword If  ${WITH_INEO_TERMINUS}  Wait Until Keyword Succeeds    1 min    5 sec    Open Connection    localhost    ${None}    ${tmp_node.ineo_port}
 
 Stop Synthese
@@ -38,6 +40,21 @@ Stop Synthese On Node ${node_id}
     ${tmp_node}=  Set Variable  ${NODES[${node_id}]}
     Terminate Process  handle=${tmp_node.process_handle}
     ${tmp_node.process_handle}=  Set Variable  None
+
+
+With Empty Test Data
+    [Arguments]  ${node_id}
+    ${tmp_node}=  Set Variable  ${NODES[${node_id}]}
+    ${status}  ${message}=  Run Keyword And Ignore Error  Variable Should Exist  ${empty_db_file}
+    Run Keyword If  "${status}" != "FAIL"  Copy File    ${empty_db_file}    ${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}/${tmp_node.db_file}
+    Run Keyword If  "${status}" != "FAIL"  Return From Keyword
+    Set Global Variable  ${empty_db_file}  ${TEMPDIR}/empty_config.db3
+    Remove File  ${empty_db_file}
+    ${tmp_handle}=  Start Process  ${S3_SERVER_BINARY}  --pidfile  -  --dbconn\=sqlite://path\=${empty_db_file}  --param  port\=9999  --param  log_level\=0  --param  auto_login_user\=root  stderr=/tmp/s3.err  stdout=/tmp/s3.out
+    Wait Until Keyword Succeeds    ${S3_SERVER_LAUNCH_TIMEOUT}    2 sec    Open Connection    localhost    ${None}    9999
+    Terminate Process  handle=${tmp_handle}
+    File Should Exist  ${empty_db_file}
+    Copy File    ${empty_db_file}    ${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}/${tmp_node.db_file}    
 
 With Test Data
     [Arguments]    ${test_data}
