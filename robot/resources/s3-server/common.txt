@@ -7,6 +7,7 @@ Library           Collections
 Library           DatabaseLibrary
 Library           XML  use_lxml=yes
 Library           String
+Library           spatialite
 Variables         variables.py
 
 
@@ -59,6 +60,13 @@ With Empty Test Data
 With Test Data
     [Arguments]    ${test_data}
     Copy File    ${test_data}    ${SUITE NAME}/${TEST NAME}/${node.node_dir}/${node.db_file}
+
+With SQL Test Data
+    [Arguments]    ${sql_test_data}
+    With Empty Test Data  ${node.node_id}
+    ${conn}=  Connect To Spatialite Database  ./${SUITE NAME}/${TEST NAME}/${node.node_dir}/${node.db_file}
+    Execute Spatialite Script  ${conn}  ${sql_test_data}
+    Disconnect From Spatialite Database  ${conn}
 
 Delete Synthese Objects
     [Arguments]    ${table_name}
