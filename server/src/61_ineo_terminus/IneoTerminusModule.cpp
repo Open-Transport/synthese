@@ -54,7 +54,7 @@ namespace synthese
 			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PORT, "0", &IneoTerminusConnection::ParameterCallback);
 			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_NETWORK, "0", &IneoTerminusConnection::ParameterCallback);
 			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DATASOURCE, "0", &IneoTerminusConnection::ParameterCallback);
-			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL, "0", &IneoTerminusConnection::ParameterCallback);
+			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_TICK_INTERVAL, "1", &IneoTerminusConnection::ParameterCallback);
 			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_XSD_LOCATION, "", &IneoTerminusConnection::ParameterCallback);
 			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_PASSENGER_FAKE_BROADCAST, "0", &IneoTerminusConnection::ParameterCallback);
 			RegisterParameter(IneoTerminusConnection::MODULE_PARAM_INEO_TERMINUS_DRIVER_FAKE_BROADCAST, "0", &IneoTerminusConnection::ParameterCallback);
