@@ -30,7 +30,7 @@ Start Synthese On Node ${node_id:\d+}
     ${status}  ${message}=  Run Keyword And Ignore Error  File Should Exist  ${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}/${tmp_node.db_file}
     Run Keyword If  "${status}" == "FAIL"  With Empty Test Data  ${node_id}
     ${tmp_node.process_handle}=  Start Process  ${S3_SERVER_BINARY}  --pidfile  -  --dbconn\=sqlite://path\=${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}/${tmp_node.db_file}  --param  port\=${tmp_node.port}  --param  log_level\=0  --param  auto_login_user\=root  --param  ineo_terminus_port\=${tmp_node.ineo_port}  stderr=${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}/${tmp_node.err_file}  stdout=${SUITE NAME}/${TEST NAME}/${tmp_node.node_dir}/${tmp_node.out_file}
-    Wait Until Keyword Succeeds    ${S3_SERVER_LAUNCH_TIMEOUT}    5 sec    Open Connection    localhost    ${None}    ${tmp_node.port}
+    Wait Until Keyword Succeeds    ${S3_SERVER_LAUNCH_TIMEOUT}    2 sec    Open Connection    localhost    ${None}    ${tmp_node.port}
     Run Keyword If  ${WITH_INEO_TERMINUS}  Wait Until Keyword Succeeds    1 min    5 sec    Open Connection    localhost    ${None}    ${tmp_node.ineo_port}
 
 Stop Synthese
@@ -60,12 +60,27 @@ With Test Data
     [Arguments]    ${test_data}
     Copy File    ${test_data}    ${SUITE NAME}/${TEST NAME}/${node.node_dir}/${node.db_file}
 
-With SQL Test Data
-    [Arguments]    ${sql_test_data}
-    With Empty Test Data  ${node.node_id}
-    ${conn}=  Connect To Spatialite Database  ./${SUITE NAME}/${TEST NAME}/${node.node_dir}/${node.db_file}
-    Execute Spatialite Script  ${conn}  ${sql_test_data}
-    Disconnect From Spatialite Database  ${conn}
+#With SQL Test Data
+#    [Arguments]    ${sql_test_data}
+#    With Empty Test Data  ${node.node_id}
+#    Copy File    ${test_data}    ${SUITE NAME}/${TEST NAME}/${node.node_dir}/${node.db_file}
+
+
+Create Synthese Object
+    [Arguments]    ${table_id}    @{varargs}
+    ${http_response}=    Call Synthese Service    objectcreate    table_id\=${table_id}  of\=xml  @{varargs}
+    Should Be Equal As Strings    ${http_response.status_code}    200
+    [Return]    ${http_response}
+
+Delete Synthese Object
+    [Arguments]    ${object_id}
+    ${http_response}=    Call Synthese Action    RemoveObjectAction    actionParam_object_id\=${object_id}
+    Should Be Equal As Strings    ${http_response.status_code}    200
+
+Update Synthese Object
+    [Arguments]    ${object_id}   @{varargs}
+    ${http_response}=    Call Synthese Action    ObjectUpdate    actionParam_object_id\=${object_id}    @{varargs}
+    Should Be Equal As Strings    ${http_response.status_code}    200
 
 Delete Synthese Objects
     [Arguments]    ${table_name}
