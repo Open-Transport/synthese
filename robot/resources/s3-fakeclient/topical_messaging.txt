@@ -52,15 +52,15 @@ Name Of Scenario ${scenario_xml} Is ${scenario_name}
 
 
 Title Of The Message Of Scenario ${scenario_xml} Is ${message_title}
-    Element Attribute Should Be  ${scenario_xml}  title  ${message_title}  xpath=calendar[1].message[1]
+    Element Attribute Should Be  ${scenario_xml}  title  ${message_title}  xpath=calendar[1]/message[1]
 
 
 Content Of The Message Of Scenario ${scenario_xml} Is ${message_content}
-    Element Attribute Should Be  ${scenario_xml}  content  ${message_content}  xpath=calendar[1].message[1]
+    Element Attribute Should Be  ${scenario_xml}  content  ${message_content}  xpath=calendar[1]/message[1]
 
 
 Level Of The Message Of Scenario ${scenario_xml} Is ${message_level}
-    Element Attribute Should Be  ${scenario_xml}  level  ${message_level}  xpath=calendar[1].message[1]
+    Element Attribute Should Be  ${scenario_xml}  level  ${message_level}  xpath=calendar[1]/message[1]
 
 
 Name Of The Template Of Scenario ${scenario_xml} Is ${scenario_name}
@@ -68,15 +68,15 @@ Name Of The Template Of Scenario ${scenario_xml} Is ${scenario_name}
 
 
 Title Of The Message Of The Template Of Scenario ${scenario_xml} Is ${message_title}
-    Element Attribute Should Be  ${scenario_xml}  title  ${message_title}  xpath=template_scenario[1].calendar[1].message[1]
+    Element Attribute Should Be  ${scenario_xml}  title  ${message_title}  xpath=template_scenario[1]/calendar[1]/message[1]
 
 
 Content Of The Message Of The Template Of Scenario ${scenario_xml} Is ${message_content}
-    Element Attribute Should Be  ${scenario_xml}  content  ${message_content}  xpath=template_scenario[1].calendar[1].message[1]
+    Element Attribute Should Be  ${scenario_xml}  content  ${message_content}  xpath=template_scenario[1]/calendar[1]/message[1]
 
 
 Level Of The Message Of The Template Of Scenario ${scenario_xml} Template Is ${message_level}
-    Element Attribute Should Be  ${scenario_xml}  level  ${message_level}  xpath=template_scenario[1].calendar[1].message[1]
+    Element Attribute Should Be  ${scenario_xml}  level  ${message_level}  xpath=template_scenario[1]/calendar[1]/message[1]
 
 
 #################################################
