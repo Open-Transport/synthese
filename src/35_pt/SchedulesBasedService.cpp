@@ -153,6 +153,38 @@ namespace synthese
 			{
 				_departureComments = departureComments;
 			}
+
+			// Regenerate the comments
+			_generateComments();
+		}
+
+
+		void SchedulesBasedService::setComments(const SchedulesBasedService::Comments& arrivalComments, const SchedulesBasedService::Comments& departureComments)
+		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
+			// If the size is wrong, log and quit
+			if (arrivalComments.size() != _generatedArrivalComments.size())
+			{
+				Log::GetInstance().warn("Inconsistent arrival comments size in service " + lexical_cast<string>(getKey()));
+			}
+			else
+			{
+				_generatedArrivalComments = arrivalComments;
+			}
+
+			if (departureComments.size() != _generatedDepartureComments.size())
+			{
+				Log::GetInstance().warn("Inconsistent departure comments size in service " + lexical_cast<string>(getKey()));
+			}
+			else
+			{
+				_generatedDepartureComments = departureComments;
+			}
+
+			// Re-generate the schedules data comments
+			regenerateDataSchedules();
 		}
 
 
@@ -327,6 +359,7 @@ namespace synthese
 			if(_generatedArrivalSchedules.empty())
 			{
 				_generateSchedules();
+				_generateComments();
 			}
 			if(_RTArrivalSchedules.empty())
 			{
@@ -1309,6 +1342,63 @@ namespace synthese
 
 
 
+		void SchedulesBasedService::_generateComments() const
+		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
+			// Clear existing data
+			_generatedArrivalComments.clear();
+			_generatedDepartureComments.clear();
+
+			// Iterator following the comments data
+			Comments::const_iterator itCommentDeparture(_departureComments.begin());
+			Comments::const_iterator itCommentArrival(_arrivalComments.begin());
+
+			// Go through each stop in the path
+			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
+			{
+				// Add the comment if the stop has a schedule, else insert a blank one
+				const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
+				if(	lineStop && lineStop->getScheduleInput() )
+				{
+					// If the schedule comment are at an end, then something is wrong
+					if (itCommentDeparture == _departureComments.end() || itCommentArrival == _arrivalComments.end())
+					{
+						Log::GetInstance().warn("Inconsistent comment size in service "+ lexical_cast<string>(getKey()) +" (missing comments)");
+						break;
+					}
+					else
+					{
+						// Insert the comment
+						_generatedDepartureComments.push_back(*itCommentDeparture);
+						_generatedArrivalComments.push_back(*itCommentArrival);
+
+						// Go to the next comment
+						++itCommentArrival;
+						++itCommentDeparture;
+					}
+				}
+				else
+				{
+					// Insert a blank comment
+					_generatedDepartureComments.push_back(std::string());
+					_generatedArrivalComments.push_back(std::string());
+				}
+			}
+
+			// We should be at the last comment
+			if (itCommentDeparture != _departureComments.end() || itCommentArrival != _arrivalComments.end())
+			{
+				Log::GetInstance().warn("Inconsistent comment size in service "+ lexical_cast<string>(getKey()) +" (to much comments)");
+			}
+
+			// Check if the method did the job properly in debug mode
+			assert(_generatedDepartureComments.size() == _path->getEdges().size());
+			assert(_generatedArrivalComments.size() == _path->getEdges().size());
+		}
+
+
 		void SchedulesBasedService::_generateSchedules() const
 		{
 			// Lock the schedules
@@ -1755,6 +1845,8 @@ namespace synthese
 
 			Schedules newDepartureSchedules;
 			Schedules newArrivalSchedules;
+			Comments newCommentDepartureSchedules;
+			Comments newCommentArrivalSchedules;
 			
 			size_t rank(0);
 			BOOST_FOREACH(const Path::Edges::value_type& itEdge, _path->getEdges())
@@ -1768,11 +1860,14 @@ namespace synthese
 
 				newDepartureSchedules.push_back(getDepartureSchedule(false, rank));
 				newArrivalSchedules.push_back(getArrivalSchedule(false, rank));
+				newCommentDepartureSchedules.push_back(getDepartureComment(rank));
+				newCommentArrivalSchedules.push_back(getArrivalComment(rank));
 
 				++rank;
 			}
 
 			setDataSchedules(newDepartureSchedules, newArrivalSchedules);
+			setDataComments(newCommentArrivalSchedules,newCommentDepartureSchedules);
 		}
 
 
@@ -1788,6 +1883,78 @@ namespace synthese
 				first.getServiceNumber() == second.getServiceNumber() &&
 				first.getDepartureSchedules(true, false) == second.getDepartureSchedules(true, false) &&
 				first.getArrivalSchedules(true, false) == second.getArrivalSchedules(true, false)
-			;
+					;
+		}
+
+
+
+		const SchedulesBasedService::Comments &SchedulesBasedService::getArrivalComments() const
+		{
+			// Re-generate the comments data if empty
+			if (_generatedArrivalComments.empty())
+			{
+				_generateComments();
+			}
+
+			return _generatedArrivalComments;
+		}
+
+
+
+		const std::string &SchedulesBasedService::getArrivalComment(size_t i) const
+		{
+			// Re-generate the comments data if empty
+			if (_generatedArrivalComments.empty())
+			{
+				_generateComments();
+			}
+
+			// If in range, give the specified comments, else an empty one
+			try
+			{
+				return _generatedArrivalComments.at(i);
+			}
+			catch (const std::out_of_range& oor)
+			{
+				Log::GetInstance().warn("Invalid arrival comment asked at rank " + lexical_cast<std::string>(i) + " in service " + lexical_cast<std::string>(getKey()));
+			}
+
+			return std::string();
+		}
+
+
+
+		const SchedulesBasedService::Comments &SchedulesBasedService::getDepartureComments() const
+		{
+			// Re-generate the comments data if empty
+			if (_generatedDepartureComments.empty())
+			{
+				_generateComments();
+			}
+
+			return _generatedDepartureComments;
+		}
+
+
+
+		const std::string &SchedulesBasedService::getDepartureComment(size_t i) const
+		{
+			// Re-generate the comments data if empty
+			if (_generatedDepartureComments.empty())
+			{
+				_generateComments();
+			}
+
+			// If in range, give the specified comments, else an empty one
+			try
+			{
+				return _generatedDepartureComments.at(i);
+			}
+			catch (const std::out_of_range& oor)
+			{
+				Log::GetInstance().warn("Invalid departure comment asked at rank " + lexical_cast<std::string>(i) + " in service " + lexical_cast<std::string>(getKey()));
+			}
+
+			return std::string();
 		}
 }	}

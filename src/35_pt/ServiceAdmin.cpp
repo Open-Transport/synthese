@@ -335,14 +335,14 @@ namespace synthese
 						
 					// Arrival comment
 					stream << ts.col();
-                    if(lineStop.getIsArrival())
+					if(lineStop.getIsArrival())
 					{
 						timetableUpdateRequest.getAction()->setUpdateArrival(true);
-                        HTMLForm cuForm(timetableUpdateRequest.getHTMLForm("arrivalcomment"+ lexical_cast<string>(lineStop.getRankInPath())));
+						HTMLForm cuForm(timetableUpdateRequest.getHTMLForm("arrivalcomment"+ lexical_cast<string>(lineStop.getRankInPath())));
 						stream << cuForm.open();
 						stream << cuForm.getTextInput(
 							ServiceTimetableUpdateAction::PARAMETER_COMMENT,
-                            _service->getArrivalComments().at(lineStop.getRankInPath())
+							_service->getArrivalComment(lineStop.getRankInPath())
 						);
 						stream << cuForm.getSubmitButton("Save");
 						stream << cuForm.close();
@@ -379,14 +379,14 @@ namespace synthese
 					
 					// Departure comment
 					stream << ts.col();
-                    if(lineStop.getIsDeparture())
+					if(lineStop.getIsDeparture())
 					{
 						timetableUpdateRequest.getAction()->setUpdateArrival(false);
-                        HTMLForm cuForm(timetableUpdateRequest.getHTMLForm("departurecomment"+ lexical_cast<string>(lineStop.getRankInPath())));
+						HTMLForm cuForm(timetableUpdateRequest.getHTMLForm("departurecomment"+ lexical_cast<string>(lineStop.getRankInPath())));
 						stream << cuForm.open();
 						stream << cuForm.getTextInput(
 							ServiceTimetableUpdateAction::PARAMETER_COMMENT,
-                            _service->getDepartureComments().at(lineStop.getRankInPath())
+							_service->getDepartureComment(lineStop.getRankInPath())
 						);
 						stream << cuForm.getSubmitButton("Save");
 						stream << cuForm.close();

@@ -73,7 +73,7 @@ namespace synthese
 					std::size_t,
 					boost::gregorian::date
 				>,
-			    std::vector<boost::posix_time::time_period>
+				std::vector<boost::posix_time::time_period>
 			> _NonConcurrencyCache;
 
 			mutable _NonConcurrencyCache _nonConcurrencyCache;
@@ -89,6 +89,8 @@ namespace synthese
 			//@{
 				Comments _arrivalComments;
 				Comments _departureComments;
+				mutable Comments _generatedArrivalComments;
+				mutable Comments _generatedDepartureComments;
 			//@}
 			
 			//! @name Theoretical data
@@ -97,7 +99,7 @@ namespace synthese
 				Schedules _dataArrivalSchedules;
 				mutable Schedules	_generatedDepartureSchedules;	//!< Departure schedules
 				mutable Schedules	_generatedArrivalSchedules;		//!< Arrival schedules
-				mutable boost::recursive_mutex _schedulesMutex; //!< Covers the generated schedules, the RT schedules, the empty schedules, and the data schedules
+				mutable boost::recursive_mutex _schedulesMutex; //!< Covers the generated schedules, the RT schedules, the empty schedules, the comments, and the data schedules
 				
 		protected:
 				ServedVertices	_vertices;			//!< Edges
@@ -122,6 +124,7 @@ namespace synthese
 			);
 
 			void _generateSchedules() const;
+			void _generateComments() const;
 			void _initRTSchedulesFromPlanned();
 
 		public:
@@ -145,8 +148,8 @@ namespace synthese
 				virtual const boost::posix_time::time_duration getDataLastArrivalSchedule(size_t i) const;
 				boost::recursive_mutex& getSchedulesMutex() const { return _schedulesMutex; }
 				boost::recursive_mutex& getVerticesMutex() const { return _verticesMutex; }
-				const Comments& getArrivalComments() const { return _arrivalComments; }
-				const Comments& getDepartureComments() const { return _departureComments; }
+				const Comments& getDataArrivalComments() const { return _arrivalComments; }
+				const Comments& getDataDepartureComments() const { return _departureComments; }
 			//@}
 
 			//! @name Setters
@@ -167,11 +170,23 @@ namespace synthese
 				virtual void setPath(graph::Path* path);
 				
 				/** Comments update.
+					Also updates the generated comments.
+					An error will be logued if the comment size doesn't corresponds to the schedules size.
+					@param departureComments Departure comments data of the service
+					@param arrivalComments Arrival comments data of the service
+				*/
+				void setDataComments(
+					const Comments& arrivalComments,
+					const Comments& departureComments
+				);
+
+				/** Generated comments update.
+					Also updates the comments data.
 					An error will be logued if the comment size doesn't corresponds to the schedules size.
 					@param departureComments Departure comments of the service
 					@param arrivalComments Arrival comments of the service
 				*/
-				void setDataComments(
+				void setComments(
 					const Comments& arrivalComments,
 					const Comments& departureComments
 				);
@@ -185,6 +200,12 @@ namespace synthese
 
 				const Schedules& getDepartureSchedules(bool THData, bool RTData) const;
 				const Schedules& getArrivalSchedules(bool THData, bool RTData) const;
+
+				const Comments& getDepartureComments() const;
+				const Comments& getArrivalComments() const;
+
+				const std::string& getDepartureComment(size_t i) const;
+				const std::string& getArrivalComment(size_t i) const;
 			
 
 				const graph::Vertex* getRealTimeVertex(

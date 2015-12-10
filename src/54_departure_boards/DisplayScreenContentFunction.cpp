@@ -1668,8 +1668,8 @@ namespace synthese
 				if (schedulesBasedService && row.first.getDepartureEdge())
 				{
 					size_t rank = row.first.getDepartureEdge()->getRankInPath();
-					pm.insert(DATA_SERVICE_ARRIVAL_COMMENT, schedulesBasedService->getArrivalComments().at( rank ));
-					pm.insert(DATA_SERVICE_DEPARTURE_COMMENT, schedulesBasedService->getDepartureComments().at( rank ));
+					pm.insert(DATA_SERVICE_ARRIVAL_COMMENT, schedulesBasedService->getArrivalComment(rank));
+					pm.insert(DATA_SERVICE_DEPARTURE_COMMENT, schedulesBasedService->getDepartureComment(rank));
 				}
 
 				// Direction

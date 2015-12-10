@@ -115,7 +115,8 @@ namespace synthese
 			{
 				_shifting_delay = minutes(map.get<int>(PARAMETER_SHIFTING_DELAY));
 			}
-			else
+
+			if(map.getOptional<string>(PARAMETER_TIME))
 			{
 				_time = duration_from_string(map.get<string>(PARAMETER_TIME));
 			}
@@ -188,7 +189,7 @@ namespace synthese
 				}
 			}
 			
-			_service->setDataComments(arrivalComments, departureComments);
+			_service->setComments(arrivalComments, departureComments);
 
 			DBModule::SaveObject(*_service);
 
