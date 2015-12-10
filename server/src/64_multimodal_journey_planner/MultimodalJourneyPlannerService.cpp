@@ -1160,7 +1160,7 @@ namespace synthese
 									submapPtAttributes->insert("line", submapCommercialLine);
 								}
 								const pt::ContinuousService* continuousService(dynamic_cast<const pt::ContinuousService*>(its->getService()));
-								const pt::SchedulesBasedService* schedulesBasedService(dynamic_cast<const pt::SchedulesBasedService*>(its->getService()));
+								const pt::ScheduledService* scheduledService(dynamic_cast<const pt::ScheduledService*>(its->getService()));
 								if (continuousService)
 								{
 									boost::shared_ptr<ParametersMap> submapContinuousService(new ParametersMap);
@@ -1168,11 +1168,11 @@ namespace synthese
 									submapContinuousService->insert("number", continuousService->getServiceNumber());
 									submapPtAttributes->insert("service", submapContinuousService);
 								}
-								if (schedulesBasedService)
+								if (scheduledService)
 								{
 									boost::shared_ptr<ParametersMap> submapSchedulesBasedService(new ParametersMap);
-									submapSchedulesBasedService->insert("id", schedulesBasedService->getKey());
-									submapSchedulesBasedService->insert("number", schedulesBasedService->getServiceNumber());
+									submapSchedulesBasedService->insert("id", scheduledService->getKey());
+									submapSchedulesBasedService->insert("number", scheduledService->getServiceNumber());
 									submapPtAttributes->insert("service", submapSchedulesBasedService);
 								}
 
