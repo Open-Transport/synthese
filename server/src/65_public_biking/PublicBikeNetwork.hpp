@@ -53,7 +53,8 @@ namespace synthese
 		///	@ingroup m65
 		//////////////////////////////////////////////////////////////////////////
 		class PublicBikeNetwork:
-			public virtual Object<PublicBikeNetwork, PublicBikeNetworkSchema>
+			public virtual Object<PublicBikeNetwork, PublicBikeNetworkSchema>,
+			public impex::ImportableTemplate<PublicBikeNetwork>
 		{
 		public:
 
