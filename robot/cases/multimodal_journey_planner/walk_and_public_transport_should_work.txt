@@ -22,3 +22,10 @@ One Solution Case Should Work
     Solution 1 Should Start From "City54, rp40" And Arrive To "City38, rp42"
     Solution 2 Should Start From "City54, 93" And Arrive To "City54, 94"
 
+One Solution With One Connection Should Work
+    On Node 0
+    Search Walk And Public Transport Journey From "City54, rp40" To "City54, 07" On 2015-12-08 At 07:02
+    There Should Be 1 Solution(s)
+    There Should Be 1 Solution(s) Using Only Public Transport
+    Solution 1 Should Start From "City54, 93" And Arrive To "City54, 07"
+
