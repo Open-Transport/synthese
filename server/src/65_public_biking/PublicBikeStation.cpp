@@ -22,6 +22,7 @@
 
 #include "PublicBikeStation.hpp"
 
+#include "City.h"
 #include "Hub.h"
 #include "Profile.h"
 #include "PublicBikingModule.h"
