@@ -70,5 +70,10 @@ namespace synthese
 		) const {
 			return true;
 		}
+
+		std::string PublicBikeJourneyPlannerService::getOutputMimeType() const
+		{
+			return _outputFormat;
+		}
 	}
 }

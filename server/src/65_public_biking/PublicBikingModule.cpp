@@ -29,6 +29,11 @@ namespace synthese
 	using namespace server;
 	using namespace public_biking;
 
+	namespace graph
+	{
+		template<> const GraphIdType GraphModuleTemplate<PublicBikingModule>::GRAPH_ID(4);
+	}
+
 	namespace util
 	{
 		template<>

@@ -65,6 +65,7 @@ namespace synthese
 			//! @name Services
 			//@{
 				virtual std::string getName() const { return get<Name>(); }
+				void setName(const std::string value) { set<Name>(value); }
 			//@}
 		};
 	}

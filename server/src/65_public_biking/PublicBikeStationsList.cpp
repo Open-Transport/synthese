@@ -303,4 +303,9 @@ namespace synthese
 			//return value
 			return static_cast<int>(round(distanceToBboxCenter));
 		}
+
+		std::string PublicBikeStationsListFunction::getOutputMimeType() const
+		{
+			return _outputFormat;
+		}
 }	}

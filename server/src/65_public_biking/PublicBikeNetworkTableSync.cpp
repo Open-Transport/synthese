@@ -95,4 +95,17 @@ namespace synthese
 
 	namespace public_biking
 	{
+		bool PublicBikeNetworkTableSync::allowList(const server::Session* session) const
+		{
+			return true;
+		}
+
+		PublicBikeNetworkTableSync::SearchResult PublicBikeNetworkTableSync::Search(
+			util::Env& env,
+			util::LinkLevel linkLevel
+		){
+			db::SelectQuery<PublicBikeNetworkTableSync> query;
+
+			return LoadFromQuery(query, env, linkLevel);
+        }
 }	}

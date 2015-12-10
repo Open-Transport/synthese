@@ -179,6 +179,48 @@ namespace synthese
 			return geography::NamedPlace::getName();
 		}
 
+		void PublicBikeStation::setName(const std::string& value)
+		{
+			geography::NamedPlace::setName(value);
+			set<Name>(value);
+		}
+
+		void PublicBikeStation::setCity(geography::City* value)
+		{
+			geography::NamedPlace::setCity(value);
+			if (value)
+			{
+				set<CityId>(value->getKey());
+			}
+		}
+
+		void PublicBikeStation::setNetwork(PublicBikeNetwork* value)
+		{
+			set<PublicBikeNetwork>(value
+				? boost::optional<PublicBikeNetwork&>(*const_cast<PublicBikeNetwork*>(value))
+				: boost::none);
+		}
+
+		void PublicBikeStation::setProjectedPoint(const road::Address& value)
+		{
+			_projectedPoint = value;
+			set<ProjectedRoadChunk>(value.getRoadChunk()
+				? boost::optional<road::RoadChunk&>(*const_cast<road::RoadChunk*>(value.getRoadChunk()))
+				: boost::none
+			);
+			set<ProjectedMetricOffset>(value.getMetricOffset());
+		}
+
+		PublicBikeNetwork* PublicBikeStation::getPublicBikeNetwork() const
+		{
+			if (get<PublicBikeNetwork>())
+			{
+				return get<PublicBikeNetwork>().get_ptr();
+			}
+
+			return NULL;
+		}
+
 		bool PublicBikeStation::allowUpdate(const server::Session* session) const
 		{
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);

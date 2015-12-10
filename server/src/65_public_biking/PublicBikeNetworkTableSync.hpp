@@ -48,6 +48,11 @@ namespace synthese
 		{
 		 public:
 			virtual bool allowList( const server::Session* session ) const;
+
+			static SearchResult Search(
+				util::Env& env,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
 		};
 	}
 }

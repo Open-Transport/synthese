@@ -68,6 +68,8 @@ set(data_exchange_SRCS
   PhysicalStopsCSVExportFunction.h
   POICSVFileFormat.cpp
   POICSVFileFormat.hpp
+  PubliBikeCSVFileFormat.cpp
+  PubliBikeCSVFileFormat.hpp
   PTDataCleanerFileFormat.cpp
   PTDataCleanerFileFormat.hpp
   PTFileFormat.cpp

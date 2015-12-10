@@ -167,7 +167,6 @@ namespace synthese
 			//! @name Services
 			//@{
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
-				virtual void unlink();
 
 				void toParametersMap(
 					util::ParametersMap& pm,
