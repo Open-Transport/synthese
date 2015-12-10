@@ -151,11 +151,12 @@ namespace synthese
 			// Force the use of theorical schedule if date is after today
 			//  - RT data is only available today !
 			//  - day finishes at (day+1,03:00)
-			boost::posix_time::ptime::date_type presenceDate = presenceDateTime.date();
-			boost::posix_time::ptime::time_duration_type presenceTime = presenceDateTime.time_of_day();
-			bool forceTheorical(presenceDate > day_clock::local_day());
+			boost::gregorian::date presenceDate = presenceDateTime.date();
+			boost::posix_time::time_duration presenceTime = presenceDateTime.time_of_day();
+			boost::gregorian::date currentDate = boost::gregorian::day_clock::local_day();
+			bool forceTheorical(presenceDate > currentDate);
 			forceTheorical &= presenceTime.hours() > 3;
-			forceTheorical |= presenceDate > day_clock::local_day() + days(1);
+			forceTheorical |= presenceDate > currentDate + days(1);
 
 			// Actual time
 			const time_duration& thSchedule(getDeparture ? getDepartureSchedule(false, edgeIndex) : getArrivalSchedule(false, edgeIndex));

@@ -40,6 +40,10 @@ namespace synthese
 {
 	namespace graph
 	{
+
+		const boost::posix_time::time_duration ServicePointer::__nullDuration__ = boost::posix_time::seconds(0);
+		const boost::posix_time::ptime ServicePointer::__nullDate__ = boost::posix_time::ptime();
+
 		ServicePointer::ServicePointer(
 			bool THData,
 			bool RTData,
@@ -55,7 +59,8 @@ namespace synthese
 			_RTData(RTData),
 			_service(&service),
 			_originDateTime(originDateTime),
-			_range(posix_time::seconds(0)),
+			//_range(posix_time::seconds(0)),
+			_range(__nullDuration__),
 			_canceled(false)
 		{}
 
@@ -78,7 +83,8 @@ namespace synthese
 			_RTData(RTData),
 			_service(&service),
 			_originDateTime(ptime(date, service.getDepartureSchedule(RTData, 0))),
-			_range(posix_time::seconds(0)),
+			//_range(posix_time::seconds(0)),
+			_range(__nullDuration__),
 			_canceled(false)
 		{
 			AccessParameters ap(userClassRank+ USER_CLASS_CODE_OFFSET);
@@ -97,7 +103,9 @@ namespace synthese
 			_THData(true),
 			_RTData(false),
 			_service(NULL),
-			_range(posix_time::seconds(0)),
+			_originDateTime(__nullDate__),
+			//_range(posix_time::seconds(0)),
+			_range(__nullDuration__),
 			_canceled(false)
 		{}
 

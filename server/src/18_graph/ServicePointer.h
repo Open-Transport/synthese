@@ -60,6 +60,10 @@ namespace synthese
 		*/
 		class ServicePointer
 		{
+		private:
+				static const boost::posix_time::time_duration __nullDuration__;
+				static const boost::posix_time::ptime __nullDate__;
+
 		protected:
 			//! @name Departure informations
 			//@{
