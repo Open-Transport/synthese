@@ -516,20 +516,10 @@ namespace synthese
 			BOOST_FOREACH(Registry<ScheduledService>::value_type itsrv, _env.getRegistry<ScheduledService>())
 			{
 				const ScheduledService* srv(itsrv.second.get());
-				if (_excludeHLP)
+				if (_excludeHLP && _isSServiceHLP(srv))
 				{
-					const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
-						&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-					);
-					if (pedestrianUseRule &&
-						pedestrianUseRule->getForbiddenInTimetables() &&
-						pedestrianUseRule->getForbiddenInDepartureBoards() &&
-						pedestrianUseRule->getForbiddenInJourneyPlanning())
-					{
-						// Exclude this service
 						continue;
 					}
-				}
 
 				os << "<Timetable>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "Timetable", *srv) << "</objectId>" << "\n";
@@ -549,20 +539,11 @@ namespace synthese
 			BOOST_FOREACH(Registry<ContinuousService>::value_type itsrv, _env.getRegistry<ContinuousService>())
 			{
 				const ContinuousService* srv(itsrv.second.get());
-				if (_excludeHLP)
+				if (_excludeHLP && _isCServiceHLP(srv))
 				{
-					const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
-						&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-					);
-					if (pedestrianUseRule &&
-						pedestrianUseRule->getForbiddenInTimetables() &&
-						pedestrianUseRule->getForbiddenInDepartureBoards() &&
-						pedestrianUseRule->getForbiddenInJourneyPlanning())
-					{
 						// Exclude this service
 						continue;
 					}
-				}
 				os << "<Timetable>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "Timetable", *srv) << "</objectId>" << "\n";
 
@@ -584,20 +565,11 @@ namespace synthese
 			BOOST_FOREACH(Registry<ContinuousService>::value_type itsrv, _env.getRegistry<ContinuousService>())
 			{
 				const ContinuousService* csrv(itsrv.second.get());
-				if (_excludeHLP)
+				if (_excludeHLP && _isCServiceHLP(csrv))
 				{
-					const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
-						&csrv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-					);
-					if (pedestrianUseRule &&
-						pedestrianUseRule->getForbiddenInTimetables() &&
-						pedestrianUseRule->getForbiddenInDepartureBoards() &&
-						pedestrianUseRule->getForbiddenInJourneyPlanning())
-					{
 						// Exclude this service
 						continue;
 					}
-				}
 				string timeSlotId;
 				timeSlotId = TridentId(peerid, "TimeSlot", *csrv);
 
@@ -645,34 +617,10 @@ namespace synthese
 			{
 				const JourneyPattern* line(itline.second.get());
 
-				if (_excludeHLP)
+				if (_excludeHLP && _hasJPOnlyHLP(line))
 				{
-					bool displayAtLeastAService(false);
-					ScheduledServiceTableSync::SearchResult services(
-						ScheduledServiceTableSync::Search(
-							_env,
-							line->getKey()
-					)	);
-					BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, services)
-					{
-						const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
-							&service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-						);
-						if (!pedestrianUseRule ||
-							!pedestrianUseRule->getForbiddenInTimetables() ||
-							!pedestrianUseRule->getForbiddenInDepartureBoards() ||
-							!pedestrianUseRule->getForbiddenInJourneyPlanning())
-						{
-							displayAtLeastAService = true;
-							break;
-						}
-					}
-
-					if (!displayAtLeastAService)
-					{
 						continue;
 					}
-				}
 
 				os << "<ChouetteRoute>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</objectId>" << "\n";
@@ -785,37 +733,14 @@ namespace synthese
 			// --------------------------------------------------- PtLink
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env.getRegistry<JourneyPattern>())
 			{
-				if (_excludeHLP)
+				if (_excludeHLP && _hasJPOnlyHLP(line.second.get()))
 				{
-					bool displayAtLeastAService(false);
-					ScheduledServiceTableSync::SearchResult services(
-						ScheduledServiceTableSync::Search(
-							_env,
-							line.second->getKey()
-					)	);
-					BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, services)
-					{
-						const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
-							&service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-						);
-						if (!pedestrianUseRule ||
-							!pedestrianUseRule->getForbiddenInTimetables() ||
-							!pedestrianUseRule->getForbiddenInDepartureBoards() ||
-							!pedestrianUseRule->getForbiddenInJourneyPlanning())
-						{
-							displayAtLeastAService = true;
-							break;
-						}
-					}
-
-					if (!displayAtLeastAService)
-					{
 						continue;
 					}
-				}				const LinePhysicalStop* from(NULL);				BOOST_FOREACH(const Edge* toEdge, line.second->getEdges())				{
-					const LinePhysicalStop* to = static_cast<const LinePhysicalStop*>(toEdge);
-
-					if (from != NULL)
+				const LinePhysicalStop* from(NULL);
+				BOOST_FOREACH(const Edge* toEdge, line.second->getEdges())
+				{
+					const LinePhysicalStop* to = static_cast<const LinePhysicalStop*>(toEdge);					if (from != NULL)
 					{
 						os << "<PtLink>" << "\n";
 						os << "<objectId>" << TridentId (peerid, "PtLink", *from) << "</objectId>" << "\n";
@@ -836,34 +761,10 @@ namespace synthese
 				if (line->getEdges().empty())
 					continue;
 
-				if (_excludeHLP)
+				if (_excludeHLP && _hasJPOnlyHLP(line))
 				{
-					bool displayAtLeastAService(false);
-					ScheduledServiceTableSync::SearchResult services(
-						ScheduledServiceTableSync::Search(
-							_env,
-							line->getKey()
-					)	);
-					BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, services)
-					{
-						const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
-							&service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-						);
-						if (!pedestrianUseRule ||
-							!pedestrianUseRule->getForbiddenInTimetables() ||
-							!pedestrianUseRule->getForbiddenInDepartureBoards() ||
-							!pedestrianUseRule->getForbiddenInJourneyPlanning())
-						{
-							displayAtLeastAService = true;
-							break;
-						}
-					}
-
-					if (!displayAtLeastAService)
-					{
 						continue;
 					}
-				}
 
 				os << "<JourneyPattern>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "JourneyPattern", *line) << "</objectId>" << "\n";
@@ -894,20 +795,11 @@ namespace synthese
 			BOOST_FOREACH(Registry<ScheduledService>::value_type itsrv, _env.getRegistry<ScheduledService>())
 			{
 				const ScheduledService* srv(itsrv.second.get());
-				if (_excludeHLP)
+				if (_excludeHLP && _isSServiceHLP(srv))
 				{
-					const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
-						&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-					);
-					if (pedestrianUseRule &&
-						pedestrianUseRule->getForbiddenInTimetables() &&
-						pedestrianUseRule->getForbiddenInDepartureBoards() &&
-						pedestrianUseRule->getForbiddenInJourneyPlanning())
-					{
 						// Exclude this service
 						continue;
 					}
-				}
 				bool isDRT(
 					dynamic_cast<const PTUseRule*>(&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)) != NULL &&
 					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
@@ -1031,20 +923,11 @@ namespace synthese
 			BOOST_FOREACH(Registry<ContinuousService>::value_type itsrv, _env.getRegistry<ContinuousService>())
 			{
 				const ContinuousService* srv(itsrv.second.get());
-				if (_excludeHLP)
+				if (_excludeHLP && _isCServiceHLP(srv))
 				{
-					const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
-						&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-					);
-					if (pedestrianUseRule &&
-						pedestrianUseRule->getForbiddenInTimetables() &&
-						pedestrianUseRule->getForbiddenInDepartureBoards() &&
-						pedestrianUseRule->getForbiddenInJourneyPlanning())
-					{
 						// Exclude this service
 						continue;
 					}
-				}
 				bool isDRT(
 					dynamic_cast<const PTUseRule*>(&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)) &&
 					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
@@ -2613,5 +2496,68 @@ namespace synthese
 				throw Exception("Trident SRID not found");
 			}
 			return it->second;
+		}
+
+		bool TridentFileFormat::Exporter_::_isSServiceHLP(const pt::ScheduledService* srv) const
+		{
+			const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
+				&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+			);
+			if (pedestrianUseRule &&
+				pedestrianUseRule->getForbiddenInTimetables() &&
+				pedestrianUseRule->getForbiddenInDepartureBoards() &&
+				pedestrianUseRule->getForbiddenInJourneyPlanning())
+			{
+				// Exclude this service
+				return true;
+			}
+			return false;
+		}
+
+		bool TridentFileFormat::Exporter_::_isCServiceHLP(const pt::ContinuousService* srv) const
+		{
+			const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
+				&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+			);
+			if (pedestrianUseRule &&
+				pedestrianUseRule->getForbiddenInTimetables() &&
+				pedestrianUseRule->getForbiddenInDepartureBoards() &&
+				pedestrianUseRule->getForbiddenInJourneyPlanning())
+			{
+				// Exclude this service
+				return true;
+			}
+			return false;
+		}
+
+		bool TridentFileFormat::Exporter_::_hasJPOnlyHLP(const pt::JourneyPattern* jp) const
+		{
+			bool displayAtLeastAService(false);
+			ScheduledServiceTableSync::SearchResult services(
+				ScheduledServiceTableSync::Search(
+					_env,
+					jp->getKey()
+			)	);
+			BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, services)
+			{
+				const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
+					&service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+				);
+				if (!pedestrianUseRule ||
+					!pedestrianUseRule->getForbiddenInTimetables() ||
+					!pedestrianUseRule->getForbiddenInDepartureBoards() ||
+					!pedestrianUseRule->getForbiddenInJourneyPlanning())
+				{
+					displayAtLeastAService = true;
+					break;
+				}
+			}
+
+			if (!displayAtLeastAService)
+			{
+				return true;
+			}
+
+			return false;
 		}
 }	}
