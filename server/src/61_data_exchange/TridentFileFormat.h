@@ -270,6 +270,10 @@ namespace synthese
 				static std::string TridentId (const std::string& peer, const std::string clazz, const std::string& s);
 				static std::string TridentId (const std::string& peer, const std::string clazz, const util::Registrable& obj);
 
+				bool _isSServiceHLP(const pt::ScheduledService* srv) const;
+				bool _isCServiceHLP(const pt::ContinuousService* srv) const;
+				bool _hasJPOnlyHLP(const pt::JourneyPattern* jp) const;
+
 			public:
 				Exporter_(const impex::Export& export_);
 
