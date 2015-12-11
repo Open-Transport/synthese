@@ -54,7 +54,9 @@ namespace synthese
 				>, bool
 			> BroadcastPointsCache;
 
-			mutable BroadcastPointsCache _broadcastPointsCache;
+            mutable BroadcastPointsCache _broadcastPointsCache;
+            mutable boost::mutex _broadcastPointsCacheMutex;
+
 
 		public:
 			/** Copy constructor.

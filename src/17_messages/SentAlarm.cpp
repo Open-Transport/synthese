@@ -172,6 +172,8 @@ namespace synthese
 			const util::ParametersMap& parameters
 		) const	{
 
+            boost::lock_guard<boost::mutex> lock(_broadcastPointsCacheMutex);
+
 			BroadcastPointsCache::key_type pp(
 				make_pair(&point, parameters)
 			);
