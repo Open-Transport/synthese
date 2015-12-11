@@ -312,7 +312,7 @@ namespace synthese
 			{
 				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.row();
 				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() <<
-					"<a href=\"" << _getCurrentFilePath().filename() << "\">" << _timeSlotJourneyPlannerStepNumber << "</a>";
+					"<a href=\"" << _getCurrentFilePath().filename().string() << "\">" << _timeSlotJourneyPlannerStepNumber << "</a>";
 				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() << (planningPhase == DEPARTURE_TO_ARRIVAL ? "DA" : "AD");
 				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() << originDateTime;
 			}
@@ -346,7 +346,7 @@ namespace synthese
 
 			*_journeyPlannerFile << _journeyPlannerTable.row();
 			*_journeyPlannerFile << _journeyPlannerTable.col() <<
-				"<a href=\"" << _getCurrentFilePath().filename() << "\">" <<
+				"<a href=\"" << _getCurrentFilePath().filename().string() << "\">" <<
 				_journeyPlannerSearchNumber <<
 				"</a>";
 
