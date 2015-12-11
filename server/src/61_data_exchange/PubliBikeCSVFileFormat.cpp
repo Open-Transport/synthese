@@ -104,8 +104,8 @@ namespace synthese
 				string stationNumber(_getValue(3));
 				string cityName(_getValue(4));
 				string stationName(_getValue(5));
-				string x(_getValue(12));
-				string y(_getValue(13));
+				string x(_getValue(13));
+				string y(_getValue(14));
 
 				// City
 				geography::City* cityForStation(NULL);
@@ -115,9 +115,10 @@ namespace synthese
 
 				if(cities.empty())
 				{
-					_logWarning(
+					_logError(
 						"City " + cityName + " not found"
 					);
+					return false;
 				}
 				else
 				{
