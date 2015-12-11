@@ -62,6 +62,7 @@ namespace synthese
 			static const std::string PARAMETER_DEPARTURE_TIME;
 			static const std::string PARAMETER_USE_WALK;
 			static const std::string PARAMETER_USE_PT;
+			static const std::string PARAMETER_LOGGER_PATH;
 
 			static const std::string PARAMETER_ASTAR_FOR_WALK; //TODO : remove when algorithm is chosen
 

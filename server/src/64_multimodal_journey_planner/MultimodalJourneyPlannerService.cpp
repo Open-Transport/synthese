@@ -79,6 +79,7 @@ namespace synthese
 		const string MultimodalJourneyPlannerService::PARAMETER_DEPARTURE_TIME = "departure_time";
 		const string MultimodalJourneyPlannerService::PARAMETER_USE_WALK = "use_walk";
 		const string MultimodalJourneyPlannerService::PARAMETER_USE_PT = "use_pt";
+		const string MultimodalJourneyPlannerService::PARAMETER_LOGGER_PATH = "logger_path";
 
 		const string MultimodalJourneyPlannerService::PARAMETER_ASTAR_FOR_WALK = "astar_for_walk"; //TODO : remove when algorithm is chosen
 
@@ -87,7 +88,7 @@ namespace synthese
 
 
 		MultimodalJourneyPlannerService::MultimodalJourneyPlannerService(
-		):	_departureDay(boost::gregorian::day_clock::local_day()),
+		):	_day(boost::gregorian::day_clock::local_day()),
 			_departureTime(not_a_date_time),
 			_loggerPath()
 		{}
@@ -850,7 +851,8 @@ namespace synthese
 
 				// Initialization
 				graph::AccessParameters approachAccessParameters(graph::USER_PEDESTRIAN, false, false, _useWalk ? 1000 : 0, boost::posix_time::minutes(23), 1.111);
-				boost::shared_ptr<algorithm::AlgorithmLogger> logger(new algorithm::AlgorithmLogger());
+
+				boost::shared_ptr<algorithm::AlgorithmLogger> logger(new algorithm::AlgorithmLogger(_loggerPath));
 
 				pt_journey_planner::PTTimeSlotRoutePlanner r(
 					_departure_place.placeResult.value.get(),
