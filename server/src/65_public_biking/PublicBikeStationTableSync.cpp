@@ -49,8 +49,7 @@ namespace synthese
 		template<>
 		DBTableSync::Indexes DBTableSyncTemplate<public_biking::PublicBikeStationTableSync>::GetIndexes()
 		{
-			DBTableSync::Indexes r;
-			return r;
+			return DBTableSync::Indexes();
 		}
 
 
