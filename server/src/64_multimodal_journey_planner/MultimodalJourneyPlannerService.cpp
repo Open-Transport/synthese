@@ -79,6 +79,7 @@ namespace synthese
 		const string MultimodalJourneyPlannerService::PARAMETER_DEPARTURE_TIME = "departure_time";
 		const string MultimodalJourneyPlannerService::PARAMETER_USE_WALK = "use_walk";
 		const string MultimodalJourneyPlannerService::PARAMETER_USE_PT = "use_pt";
+		const string MultimodalJourneyPlannerService::PARAMETER_LOGGER_PATH = "logger_path";
 
 		const string MultimodalJourneyPlannerService::PARAMETER_ASTAR_FOR_WALK = "astar_for_walk"; //TODO : remove when algorithm is chosen
 
@@ -88,7 +89,8 @@ namespace synthese
 
 		MultimodalJourneyPlannerService::MultimodalJourneyPlannerService(
 		):	_day(boost::gregorian::day_clock::local_day()),
-			_departureTime(not_a_date_time)
+			_departureTime(not_a_date_time),
+			_loggerPath()
 		{}
 
 
@@ -221,6 +223,11 @@ namespace synthese
 			_useWalk = map.getDefault<bool>(PARAMETER_USE_WALK, false);
 			_usePt = map.getDefault<bool>(PARAMETER_USE_PT, false);
 
+			std::string pathString(map.getDefault<string>(PARAMETER_LOGGER_PATH, ""));
+			if (!pathString.empty())
+			{
+				_loggerPath = boost::filesystem::path(pathString);
+			}
 			Function::setOutputFormatFromMap(map,string());
 		}
 
@@ -555,6 +562,7 @@ namespace synthese
 				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : before SYNTHESE walk");
 
 				// Classical synthese algorithm
+				// TODO : Note we cannot really use AlgorithmLogger right now since not targetted for pure walk journey search 
 				algorithm::AlgorithmLogger logger;
 				road_journey_planner::RoadJourneyPlanner rjp(
 					departure,
@@ -807,7 +815,8 @@ namespace synthese
 
 				// Initialization
 				graph::AccessParameters approachAccessParameters(graph::USER_PEDESTRIAN, false, false, _useWalk ? 1000 : 0, boost::posix_time::minutes(23), 1.111);
-				boost::shared_ptr<algorithm::AlgorithmLogger> logger(new algorithm::AlgorithmLogger());
+
+				boost::shared_ptr<algorithm::AlgorithmLogger> logger(new algorithm::AlgorithmLogger(_loggerPath));
 
 				pt_journey_planner::PTTimeSlotRoutePlanner r(
 					_departure_place.placeResult.value.get(),
