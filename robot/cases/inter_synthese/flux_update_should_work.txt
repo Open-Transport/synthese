@@ -8,16 +8,16 @@ Test Teardown     Run Keywords    Stop Synthese On Node 1     Stop Synthese On N
 
 First Update Of An InterSynthese Slave Should Work
     On Node 0
-    ${http_response}=    Create Synthese Object    table_id=${ALARMS_TABLE_ID}
-    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    ${xml_object}=    Create Synthese Object    table_id=${ALARMS_TABLE_ID}
+    ${created_object_id}=  Get Element Attribute  source=${xml_object}  name=id
     ${config_id}=    Config "config1" Containing Object ${ALARMS_TABLE_ID} Is Created
     ${slave_id}=    Slave "slave1" Is Created On Config "${config_id}"
     On Node 1
     ${tmp_node}=  Set Variable  ${NODES[0]}
-    ${http_response}=    Create Synthese Object    ${DATA_SOURCES_TABLE_ID}  field_name\=InterSynthese
-    ${created_datasource_id}=  Get Element Attribute  source=${http_response.content}  name=id
-    ${http_response}=    Create Synthese Object    ${IMPORTS_TABLE_ID}  field_name\=Import  field_file_format\=inter_synthese  field_data_source_id=${created_datasource_id}  field_active=0
-    ${created_import_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    ${xml_object}=    Create Synthese Object    ${DATA_SOURCES_TABLE_ID}  field_name\=InterSynthese
+    ${created_datasource_id}=  Get Element Attribute  source=${xml_object}  name=id
+    ${xml_object}=    Create Synthese Object    ${IMPORTS_TABLE_ID}  field_name\=Import  field_file_format\=inter_synthese  field_data_source_id=${created_datasource_id}  field_active=0
+    ${created_import_id}=  Get Element Attribute  source=${xml_object}  name=id
     Import ${created_import_id} Is Executed With Parameters ${slave_id} 127.0.0.1 ${tmp_node.port}
     Sleep  5s
     Import ${created_import_id} Is Executed With Parameters ${slave_id} 127.0.0.1 ${tmp_node.port}

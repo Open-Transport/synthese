@@ -37,22 +37,6 @@ With Test Data
     [Arguments]    ${test_data}
     Copy File    ${test_data}    ${SUITE NAME}/${TEST NAME}/${node.node_dir}/${node.db_file}
 
-Create Synthese Object
-    [Arguments]    ${table_id}    @{varargs}
-    ${http_response}=    Call Synthese Service    objectcreate    table_id\=${table_id}  of\=xml  @{varargs}
-    Should Be Equal As Strings    ${http_response.status_code}    200
-    [Return]    ${http_response}
-
-Delete Synthese Object
-    [Arguments]    ${object_id}
-    ${http_response}=    Call Synthese Action    RemoveObjectAction    actionParam_object_id\=${object_id}
-    Should Be Equal As Strings    ${http_response.status_code}    200
-
-Update Synthese Object
-    [Arguments]    ${object_id}   @{varargs}
-    ${http_response}=    Call Synthese Action    ObjectUpdate    actionParam_object_id\=${object_id}    @{varargs}
-    Should Be Equal As Strings    ${http_response.status_code}    200
-
 Delete Synthese Objects
     [Arguments]    ${table_name}
     Connect To Database Using Custom Params    sqlite3   database="./${SUITE NAME}/${TEST NAME}/${node.node_dir}/${node.db_file}"
@@ -60,24 +44,6 @@ Delete Synthese Objects
     :FOR   ${id}   in    @{query_results}    
     \   Delete Synthese Object   ${id[0]}
     Disconnect From Database
-
-View Synthese Object
-    [Arguments]    ${object_id}
-    ${http_response}=    Call Synthese Service    object    roid\=${object_id}  of\=xml
-    Should Be Equal As Strings    ${http_response.status_code}    200
-    [Return]    ${http_response.content}    
-
-Check Synthese Object Exists
-    [Arguments]    ${object_id}
-    ${http_response}=    Call Synthese Service    object    roid\=${object_id}  of\=xml
-    Run Keyword Unless  ${http_response.status_code} == 200  Fail
-
-Check Synthese Object Field Equals
-    [Arguments]    ${object_id}  ${field_name}  ${value}
-    ${http_response}=    Call Synthese Service    object    roid\=${object_id}  of\=xml
-    ${field_value}=  Get Element Attribute  source=${http_response.content}  name=${field_name}
-    Should Be Equal As Strings    ${field_value}    ${value}
-
 
 Process Alerts
     ${http_response}=    Call Synthese Action    ProcessAlertsAction

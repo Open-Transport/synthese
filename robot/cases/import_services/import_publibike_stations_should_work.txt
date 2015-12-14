@@ -9,6 +9,12 @@ Test Teardown     Stop Synthese On Node 0
 Import PubliBike Stations Of Lausanne-Morges Should Work
     On node 0
     ${publibike_stations_file_path}=  Set Variable   ${CURDIR}/../../resources/data/2015_publibike_lausanne_morges.csv
+    Create City  name=Lausanne
+    Create City  name=Paudex
+    Create City  name=Renens
+    Create City  name=Morges
+    Create City  name=Préverenges
+    Create City  name=Ecublens
     ${expected_public_bike_network_count}=   Set Variable  1
     ${expected_public_bike_station_count}=   Set Variable  26
     Import PubliBike Stations  ${publibike_stations_file_path}
@@ -19,3 +25,6 @@ Import PubliBike Stations Of Lausanne-Morges Should Work
 
 *** Keywords ***
 
+Create City
+    [Arguments]    ${name}    ${code}=
+    ${http_response}=  Create Synthese Object    ${CITIES_TABLE_ID}    field_name\=${name}    field_code\=${code}

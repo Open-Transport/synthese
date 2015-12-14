@@ -1,6 +1,7 @@
 *** Settings ***
 Library           Process
 Resource          common.txt
+Resource          object_services.txt
 
 *** Variables ***
 
@@ -8,9 +9,8 @@ Resource          common.txt
 
 Create InterSynthese Package
     [Arguments]  ${package_name}  ${object_ids}=
-    ${http_response}=  Create Synthese Object    ${INTER_SYNTHESE_PACKAGES_TABLE_ID}  field_name\=${package_name}  field_object_ids\=${object_ids}  field_code\=${package_name}
-    Should Be Equal As Strings  ${http_response.status_code}  200
-    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    ${xml_object}=  Create Synthese Object    ${INTER_SYNTHESE_PACKAGES_TABLE_ID}  field_name\=${package_name}  field_object_ids\=${object_ids}  field_code\=${package_name}
+    ${created_object_id}=  Get Element Attribute  source=${xml_object}  name=id
     [Return]  ${created_object_id}
 
 Delete InterSynthese Package
@@ -34,16 +34,14 @@ Update InterSynthese Package
 
 Create InterSynthese Config
     [Arguments]  ${config_name}
-    ${http_response}=  Create Synthese Object    ${INTER_SYNTHESE_CONFIGS_TABLE_ID}  field_name\=${config_name}  field_link_break_minutes\=40000  field_max_queries_number\=5000  field_force_dump\=0  field_multimaster\=0
-    Should Be Equal As Strings  ${http_response.status_code}  200
-    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    ${xml_object}=  Create Synthese Object    ${INTER_SYNTHESE_CONFIGS_TABLE_ID}  field_name\=${config_name}  field_link_break_minutes\=40000  field_max_queries_number\=5000  field_force_dump\=0  field_multimaster\=0
+    ${created_object_id}=  Get Element Attribute  source=${xml_object}  name=id
     [Return]  ${created_object_id}
 
 Create InterSynthese Config Item
     [Arguments]  ${config_id}  ${sync_perimeter}
-    ${http_response}=  Create Synthese Object    ${INTER_SYNTHESE_CONFIG_ITEMS_TABLE_ID}  field_config_id\=${config_id}  field_sync_type\=db  field_perimeter\=${sync_perimeter}  field_non_persistent\=0
-    Should Be Equal As Strings  ${http_response.status_code}  200
-    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    ${xml_object}=  Create Synthese Object    ${INTER_SYNTHESE_CONFIG_ITEMS_TABLE_ID}  field_config_id\=${config_id}  field_sync_type\=db  field_perimeter\=${sync_perimeter}  field_non_persistent\=0
+    ${created_object_id}=  Get Element Attribute  source=${xml_object}  name=id
     [Return]  ${created_object_id}
 
 List InterSynthese Configs
@@ -56,9 +54,8 @@ List InterSynthese Configs
 
 Create InterSynthese Slave
     [Arguments]  ${config_id}  ${slave_name}
-    ${http_response}=  Create Synthese Object    ${INTER_SYNTHESE_SLAVES_TABLE_ID}  field_name\=${slave_name}  field_config_id\=${config_id}  field_active\=1
-    Should Be Equal As Strings  ${http_response.status_code}  200
-    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    ${xml_object}=  Create Synthese Object    ${INTER_SYNTHESE_SLAVES_TABLE_ID}  field_name\=${slave_name}  field_config_id\=${config_id}  field_active\=1
+    ${created_object_id}=  Get Element Attribute  source=${xml_object}  name=id
     [Return]  ${created_object_id}
 
 List InterSynthese Slaves
