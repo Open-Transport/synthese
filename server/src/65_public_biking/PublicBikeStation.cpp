@@ -170,7 +170,7 @@ namespace synthese
 
 		void PublicBikeStation::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
-
+			setGeometry(get<PointGeometry>());
 		}
 
 

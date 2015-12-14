@@ -104,8 +104,8 @@ namespace synthese
 				string stationNumber(_getValue(3));
 				string cityName(_getValue(4));
 				string stationName(_getValue(5));
-				string x(_getValue(13));
-				string y(_getValue(14));
+				string x(_getValue(14));
+				string y(_getValue(13));
 
 				// City
 				geography::City* cityForStation(NULL);
@@ -160,13 +160,17 @@ namespace synthese
 					networkName
 				);
 
+				// Creates the point in the instance coordinate system (instead of datasource coordinates system)
+				boost::shared_ptr<geos::geom::Point> convertedPoint =
+					CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*point);
+
 				// Public Place creation
 				_createOrUpdatePublicBikeStation(
 					_stations,
 					*network,
 					stationNumber,
 					stationName,
-					point,
+					convertedPoint,
 					*cityForStation
 				);
 			}
@@ -184,11 +188,11 @@ namespace synthese
 			{
 				BOOST_FOREACH(const util::Registry<public_biking::PublicBikeStation>::value_type& publicBikeStation, _env.getEditableRegistry<public_biking::PublicBikeStation>())
 				{
-					if (publicBikeStation.second.get()->getPoint())
+					if (publicBikeStation.second.get()->hasGeometry())
 					{
 						road::Address address;
 						road::RoadChunkTableSync::ProjectAddress(
-							*publicBikeStation.second.get()->getPoint(),
+							*publicBikeStation.second.get()->getGeometry(),
 							100,
 							address
 						);
@@ -346,7 +350,7 @@ namespace synthese
 			station->setNetwork(const_cast<public_biking::PublicBikeNetwork*>(&network));
 			if(geometry)
 			{
-				station->set<PointGeometry>(*geometry);
+				station->setGeometry(*geometry);
 			}
 
 			return station;
