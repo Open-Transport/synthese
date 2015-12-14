@@ -108,7 +108,7 @@ namespace synthese
 			_integralSearchPlanningPhase = planningPhase;
 			_integralSearchDesiredTime = desiredTime;
 			_integralSearchFile = _openNewFile();
-			*_integralSearchFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
+			*_integralSearchFile << "<html><head><title>Integral Search File</title></head><body>";
 			*_integralSearchFile << "<table class=\"adminresults\">";
 			_startChrono();
 		}
@@ -305,7 +305,7 @@ namespace synthese
 			_journeyPlannerStepStartChrono = _chrono;
 
 			_journeyPlannerFile = _openNewFile();
-			*_journeyPlannerFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
+			*_journeyPlannerFile << "<html><head><title>Journey Planner File</title></head><body>";
 			*_journeyPlannerFile << _journeyPlannerTable.open();
 
 			if(_timeSlotJourneyPlannerFile)
@@ -341,7 +341,7 @@ namespace synthese
 				_journeyPlannerStepFile->close();
 			}
 			_journeyPlannerStepFile = _openNewFile();
-			*_journeyPlannerStepFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
+			*_journeyPlannerStepFile << "<html><head><title>Journey Planner Step File</title></head><body>";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.open();
 
 			*_journeyPlannerFile << _journeyPlannerTable.row();
@@ -409,89 +409,6 @@ namespace synthese
 				return;
 			}
 			_stopChrono();
-
-/*							// Departure time
-							Journey::ServiceUses::const_iterator its(journey->getServiceUses().begin());
-
-												if (journey->getContinuousServiceRange() > 1)
-							{
-							ptime endRange(its->getDepartureDateTime());
-							endRange += journey->getContinuousServiceRange();
-							stream << " - Service continu jusqu'à " << endRange.;
-							}
-							if (journey->getReservationCompliance() == true)
-							{
-							stream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine();
-							}
-							if (journey->getReservationCompliance() == boost::logic::indeterminate)
-							{
-							stream << " - Réservation facultative avant le " << journey->getReservationDeadLine();
-							}
-
-							stream << "<tr>";
-							stream << "<td>" << its->getDepartureDateTime() << "</td>";
-
-							// JourneyPattern
-							const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-							const RoadPath* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-							stream << "<td";
-							if (ls)
-								stream << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
-							stream << ">";
-							stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
-
-							// Transfers
-							if (its == journey->getServiceUses().end() -1)
-							{
-								stream << "<td colspan=\"4\">(trajet direct)</td>";
-							}
-							else
-							{
-								while(true)
-								{
-									// Arrival
-									stream << "<td>" << its->getArrivalDateTime() << "</td>";
-
-									// Place
-									stream <<
-										"<td>" <<
-										dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub())->getFullName() <<
-										"</td>"
-										;
-
-									// Next service use
-									++its;
-
-									// Departure
-									stream << "<td>" << its->getDepartureDateTime() << "</td>";
-
-									// JourneyPattern
-									const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-									const RoadPath* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-									stream << "<td";
-									if (ls)
-										stream << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";
-									stream << ">";
-									stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
-
-									// Exit if last service use
-									if (its == journey->getServiceUses().end() -1)
-										break;
-
-									// Empty final arrival col
-									stream << "<td></td>";
-
-									// New row and empty origin departure cols;
-									stream << "</tr><tr>";
-									stream << "<td></td>";
-									stream << "<td></td>";
-								}
-							}
-
-							// Final arrival
-							stream << "<td>" << its->getArrivalDateTime() << "</td>";
-*/
-
 
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.row();
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "rk";
@@ -626,7 +543,7 @@ namespace synthese
 			if(!_timeSlotJourneyPlannerFile.get())
 			{
 				_timeSlotJourneyPlannerFile = _openNewFile();
-				*_timeSlotJourneyPlannerFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
+				*_timeSlotJourneyPlannerFile << "<html><head><title>TimeSlot Journey Planner File</title></head><body>";
 			}
 			_timeSlotJourneyPlannerStepNumber = 0;
 
@@ -644,11 +561,6 @@ namespace synthese
 			}
 
 			_stopChrono();
-
-			if (_timeSlotJourneyPlannerStepNumber > 0)
-			{
-				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.close();
-			}
 
 			*_timeSlotJourneyPlannerFile << "<h1>Journey plannings</h1>";
 			*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.open();
