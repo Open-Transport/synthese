@@ -1,0 +1,29 @@
+*** Settings ***
+Resource          ../../resources/s3-fakeclient/multimodal_journey_planner.txt
+Test Setup        Run Keywords  On Node 0  AND  With SQL Test Data  ../../../resources/data/multimodal_journey_planner/legacy_test_network.sql  AND  Start Synthese On Node 0
+Test Teardown     Stop Synthese On Node 0
+
+*** Test Cases ***
+
+No Solution Case Should Work
+    On Node 0
+    Search Public Transport Journey From "City54, 05" To "City38, 96" On 2015-12-08 At 07:02
+    There Should Be 0 Solution(s)
+
+One Solution Case Should Work
+    [Documentation]    In this test case, on Solution 2, departure and arrival are different than what is requested.
+    ...                This is because departure StopArea resp arrival StopArea are considered to be in the very close
+    ...                neighborhood of departure place resp arrival place. This behavior is considered as normal (for now).
+    On Node 0
+    Search Public Transport Journey From "City54, 93" To "City38, 99" On 2015-12-08 At 07:02
+    There Should Be 3 Solution(s)
+    There Should Be 3 Solution(s) Using Only Public Transport
+    All Solutions Should Start From "City54, 93" And Arrive To "City38, 99"
+
+One Solution With One Connection Should Work
+    On Node 0
+    Search Public Transport Journey From "City54, 93" To "City54, 07" On 2015-12-08 At 07:02
+    There Should Be 1 Solution(s)
+    There Should Be 1 Solution(s) Using Only Public Transport
+    All Solutions Should Start From "City54, 93" And Arrive To "City54, 07"
+
