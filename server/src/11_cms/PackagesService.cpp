@@ -102,7 +102,7 @@ namespace synthese
 			)	);
 			_interSYNTHESERepoURL = map.getDefault<string>(
 				PARAMETER_REPO_URL,
-				"www.rcsmobility.com:8088"
+				"packages.open-transport.org:80"
 			);
 			_user = map.getDefault<string>(PARAMETER_USER);
 			_password = map.getDefault<string>(PARAMETER_PASSWORD);
