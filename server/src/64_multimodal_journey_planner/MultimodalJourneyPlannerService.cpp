@@ -77,6 +77,7 @@ namespace synthese
 		const string MultimodalJourneyPlannerService::PARAMETER_ARRIVAL_PLACE_TEXT = "arrival_place";
 		const string MultimodalJourneyPlannerService::PARAMETER_DEPARTURE_DAY = "departure_date";
 		const string MultimodalJourneyPlannerService::PARAMETER_DEPARTURE_TIME = "departure_time";
+		const string MultimodalJourneyPlannerService::PARAMETER_MAX_TRANSPORT_CONNECTION_COUNT = "max_transport_connection_count";
 		const string MultimodalJourneyPlannerService::PARAMETER_USE_WALK = "use_walk";
 		const string MultimodalJourneyPlannerService::PARAMETER_USE_PT = "use_pt";
 		const string MultimodalJourneyPlannerService::PARAMETER_LOGGER_PATH = "logger_path";
@@ -88,7 +89,7 @@ namespace synthese
 
 
 		MultimodalJourneyPlannerService::MultimodalJourneyPlannerService(
-		):	_day(boost::gregorian::day_clock::local_day()),
+		):	_departureDay(boost::gregorian::day_clock::local_day()),
 			_departureTime(not_a_date_time),
 			_loggerPath()
 		{}
@@ -112,7 +113,7 @@ namespace synthese
 				else if(dynamic_cast<City*>(_departure_place.placeResult.value.get()))
 				{
 					map.insert(
-						PARAMETER_DEPARTURE_PLACE_TEXT,
+						PARAMETER_DEPARTURE_CITY_TEXT,
 						dynamic_cast<City*>(_departure_place.placeResult.value.get())->getName()
 					);
 				}
@@ -131,10 +132,43 @@ namespace synthese
 				else if(dynamic_cast<City*>(_arrival_place.placeResult.value.get()))
 				{
 					map.insert(
-						PARAMETER_ARRIVAL_PLACE_TEXT,
+						PARAMETER_ARRIVAL_CITY_TEXT,
 						dynamic_cast<City*>(_arrival_place.placeResult.value.get())->getName()
 					);
 				}
+			}
+
+			// Departure day
+			if(!_departureDay.is_not_a_date())
+			{
+				map.insert(PARAMETER_DEPARTURE_DAY, _departureDay);
+			}
+
+			// Departure time
+			if(!_departureTime.is_not_a_date_time())
+			{
+				map.insert(PARAMETER_DEPARTURE_TIME, _departureTime);
+			}
+
+			// Max transport connection count
+			if(_maxTransportConnectionCount)
+			{
+				map.insert(
+					PARAMETER_MAX_TRANSPORT_CONNECTION_COUNT,
+					_maxTransportConnectionCount.get()
+				);
+			}
+
+			// Use walk
+			map.insert(PARAMETER_USE_WALK, _useWalk);
+
+			// Use pt
+			map.insert(PARAMETER_USE_PT, _useWalk);
+
+			// Logger path
+			if(!_loggerPath.empty())
+			{
+				map.insert(PARAMETER_LOGGER_PATH, _loggerPath.string());
 			}
 
 			return map;
@@ -203,7 +237,7 @@ namespace synthese
 				if(!map.getDefault<string>(PARAMETER_DEPARTURE_DAY).empty())
 				{
 					// Day
-					_day = from_string(map.get<string>(PARAMETER_DEPARTURE_DAY));
+					_departureDay = from_string(map.get<string>(PARAMETER_DEPARTURE_DAY));
 
 					// Time
 					if(!map.getDefault<string>(PARAMETER_DEPARTURE_TIME).empty())
@@ -216,6 +250,9 @@ namespace synthese
 			{
 				throw server::RequestException(e.what());
 			}
+
+			// Maximum allowed transport connections
+			_maxTransportConnectionCount= map.getOptional<size_t>(PARAMETER_MAX_TRANSPORT_CONNECTION_COUNT);
 
 			// TEMP
 			_aStarForWalk = map.getDefault<bool>(PARAMETER_ASTAR_FOR_WALK, false);
@@ -277,7 +314,7 @@ namespace synthese
 			}
 			else
 			{
-				startDate = ptime(_day, _departureTime);
+				startDate = ptime(_departureDay, _departureTime);
 			}
 			ptime endDate = startDate + hours(24);
 			
@@ -814,7 +851,15 @@ namespace synthese
 				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : before pt");
 
 				// Initialization
-				graph::AccessParameters approachAccessParameters(graph::USER_PEDESTRIAN, false, false, _useWalk ? 1000 : 0, boost::posix_time::minutes(23), 1.111);
+				graph::AccessParameters approachAccessParameters(
+					graph::USER_PEDESTRIAN,			// user class code
+					false,							// DRT only
+					false,							// without DRT
+					_useWalk ? 1000 : 0,			// max approach distance
+					boost::posix_time::minutes(23),	// max approach time
+					1.111,							// approach speed
+					_maxTransportConnectionCount	// max transport connection count (ie : max number of used transport services - 1)
+				);
 
 				boost::shared_ptr<algorithm::AlgorithmLogger> logger(new algorithm::AlgorithmLogger(_loggerPath));
 
