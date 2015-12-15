@@ -264,8 +264,14 @@ namespace synthese
 							string packageName(
 								packageNode.second.get(Name::FIELD.name, string())
 							);
-
-
+							RegistryKeyType importId(
+								packageNode.second.get(impex::Import::FIELD.name, RegistryKeyType(0))
+							);
+							// Skip remote exporters
+							if(importId)
+							{
+								continue;
+							}
 							p << t.row();
 
 							p << t.col() << packageName;
