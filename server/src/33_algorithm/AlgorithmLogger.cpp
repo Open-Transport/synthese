@@ -582,6 +582,11 @@ namespace synthese
 
 			_stopChrono();
 
+			if (_timeSlotJourneyPlannerStepNumber > 0)
+			{
+				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.close();
+			}
+
 			*_timeSlotJourneyPlannerFile << "<h1>Journey plannings</h1>";
 			*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.open();
 
