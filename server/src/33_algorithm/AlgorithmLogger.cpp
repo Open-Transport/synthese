@@ -424,6 +424,8 @@ namespace synthese
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "rk";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "status";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "place";
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "com line";
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "service";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "time";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "jyscore";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "dist";
@@ -476,6 +478,12 @@ namespace synthese
 				{
 					*_journeyPlannerStepFile << dynamic_cast<const geography::NamedPlace*>(journey->getEndEdge().getHub())->getFullName();
 				}
+
+				pt::CommercialLine* commercialLine = dynamic_cast<pt::CommercialLine*>(journey->getEndServiceUse().getService()->getPath()->getPathGroup());
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << ((commercialLine != 0) ? commercialLine->getShortName() : "");
+
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getEndServiceUse().getService()->getKey();
+
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getEndTime(false);
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getScore();
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << *journey->getDistanceToEnd();
