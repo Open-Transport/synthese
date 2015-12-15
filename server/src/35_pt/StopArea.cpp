@@ -210,7 +210,7 @@ namespace synthese
 						BOOST_FOREACH(const Vertex::Edges::value_type& edge, its.second->getDepartureEdges())
 						{
 							// Jump over junctions
-							if(!dynamic_cast<const JourneyPattern*>(edge.second))
+							if(!dynamic_cast<const JourneyPattern*>(edge.first))
 							{
 								continue;
 							}
