@@ -308,7 +308,8 @@ namespace synthese
 			*_journeyPlannerFile << _journeyPlannerTable.open();
 			*_journeyPlannerFile << _journeyPlannerTable.row();
 			*_journeyPlannerFile << _journeyPlannerTable.col() << "rank" << _journeyPlannerTable.col() << "place" << _journeyPlannerTable.col()
-				<< "time" << _journeyPlannerTable.col() << "jyscore" << _journeyPlannerTable.col() << "dist" 
+				<< "time" << _journeyPlannerTable.col() << "jyscore" << _journeyPlannerTable.col() << "connections"
+				<< _journeyPlannerTable.col() << "dist"
 				<< _journeyPlannerTable.col() << "minsp / dst" << _journeyPlannerTable.col() << "plscore" << _journeyPlannerTable.col() 
 				<< "size" << _journeyPlannerTable.col() << "cleaned" << _journeyPlannerTable.col() << "updated" << _journeyPlannerTable.col()
 				<< "new" << _journeyPlannerTable.col() << "result" << _journeyPlannerTable.col() << "duration";
