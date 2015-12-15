@@ -133,8 +133,8 @@ namespace synthese
 			_service->regenerateDataSchedules(); // Useful in case of corrupted data
 			SchedulesBasedService::Schedules departureSchedules(_service->getDataDepartureSchedules());
 			SchedulesBasedService::Schedules arrivalSchedules(_service->getDataArrivalSchedules());
-			SchedulesBasedService::Comments arrivalComments(_service->getArrivalComments());
-			SchedulesBasedService::Comments departureComments(_service->getDepartureComments());
+			SchedulesBasedService::Comments arrivalComments(_service->getDataArrivalComments());
+			SchedulesBasedService::Comments departureComments(_service->getDataDepartureComments());
 
 			if(!_shifting_delay.is_not_a_date_time())
 			{
@@ -189,7 +189,7 @@ namespace synthese
 				}
 			}
 			
-			_service->setComments(arrivalComments, departureComments);
+			_service->setDataComments(arrivalComments, departureComments);
 
 			DBModule::SaveObject(*_service);
 
