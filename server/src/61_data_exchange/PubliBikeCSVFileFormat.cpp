@@ -108,9 +108,10 @@ namespace synthese
 				string y(_getValue(13));
 
 				// City
+				std::string normalizedCityName = boost::to_upper_copy(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(cityName));
 				geography::City* cityForStation(NULL);
 				geography::CityTableSync::SearchResult cities(
-					geography::CityTableSync::Search(_env, optional<string>(), cityName, optional<string>(), 0, 1)
+					geography::CityTableSync::Search(_env, optional<string>(), normalizedCityName, optional<string>(), 0, 1)
 				);
 
 				if(cities.empty())
