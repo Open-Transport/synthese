@@ -310,6 +310,11 @@ namespace synthese
 			if(_timeSlotJourneyPlannerFile)
 			{
 				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.row();
+				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() << "rank" << _timeSlotJourneyPlannerTable.col() 
+				  << "direction" << _timeSlotJourneyPlannerTable.col() << "start_time" << _timeSlotJourneyPlannerTable.col() 
+				  << "steps" << _timeSlotJourneyPlannerTable.col() << "duration";
+				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.row();
+
 				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() <<
 					"<a href=\"" << _getCurrentFilePath().filename().string() << "\">" << _timeSlotJourneyPlannerStepNumber << "</a>";
 				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() << (planningPhase == DEPARTURE_TO_ARRIVAL ? "DA" : "AD");
