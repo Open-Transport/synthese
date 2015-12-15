@@ -7,7 +7,7 @@ Resource          ../s3-server/multimodal_journey_planner.txt
 
 *** Keywords ***
 
-Search Walk Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departure_date} At ${departure_time}
+Search Walk Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departure_date:[\d-]+} At ${departure_time:[\d:]+}
     ${response}=  MultimodalJourneyPlanner  departure_city=${departure_city}  departure_place=${departure_place}  arrival_city=${arrival_city}  arrival_place=${arrival_place}  departure_date=${departure_date}  departure_time=${departure_time}  use_walk=1  use_pt=0
     Log Many  ${response.content}
     Should Be Equal As Strings  ${response.status_code}  200
@@ -15,7 +15,7 @@ Search Walk Journey From "${departure_city}, ${departure_place}" To "${arrival_c
     ${xml_response}=  Parse XML  ${utf8_content}
     Set Test Variable  ${xml_solutions}  ${xml_response}
 
-Search Walk And Public Transport Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departure_date} At ${departure_time}
+Search Walk And Public Transport Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departure_date:[\d-]+} At ${departure_time:[\d:]+}
     ${response}=  MultimodalJourneyPlanner  departure_city=${departure_city}  departure_place=${departure_place}  arrival_city=${arrival_city}  arrival_place=${arrival_place}  departure_date=${departure_date}  departure_time=${departure_time}  use_walk=1  use_pt=1
     Log Many  ${response.content}
     Should Be Equal As Strings  ${response.status_code}    200
@@ -23,8 +23,24 @@ Search Walk And Public Transport Journey From "${departure_city}, ${departure_pl
     ${xml_response}=   Parse XML   ${utf8_content}
     Set Test Variable  ${xml_solutions}  ${xml_response}
 
-Search Public Transport Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departure_date} At ${departure_time}
+Search Walk And Public Transport Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departure_date:[\d-]+} At ${departure_time:[\d:]+} With At Most ${max_transport_connection_count:\d+} Transport Connections
+    ${response}=  MultimodalJourneyPlanner  departure_city=${departure_city}  departure_place=${departure_place}  arrival_city=${arrival_city}  arrival_place=${arrival_place}  departure_date=${departure_date}  departure_time=${departure_time}  max_transport_connection_count=${max_transport_connection_count}  use_walk=1  use_pt=1
+    Log Many  ${response.content}
+    Should Be Equal As Strings  ${response.status_code}    200
+    ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
+    ${xml_response}=   Parse XML   ${utf8_content}
+    Set Test Variable  ${xml_solutions}  ${xml_response}
+
+Search Public Transport Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departure_date:[\d-]+} At ${departure_time:[\d:]+}
     ${response}=  MultimodalJourneyPlanner  departure_city=${departure_city}  departure_place=${departure_place}  arrival_city=${arrival_city}  arrival_place=${arrival_place}  departure_date=${departure_date}  departure_time=${departure_time}  use_walk=0  use_pt=1
+    Log Many  ${response.content}
+    Should Be Equal As Strings  ${response.status_code}    200
+    ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict
+    ${xml_response}=   Parse XML   ${utf8_content}
+    Set Test Variable  ${xml_solutions}  ${xml_response}
+
+Search Public Transport Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departure_date:[\d-]+} At ${departure_time:[\d:]+} With At Most ${max_transport_connection_count:\d+} Transport Connections
+    ${response}=  MultimodalJourneyPlanner  departure_city=${departure_city}  departure_place=${departure_place}  arrival_city=${arrival_city}  arrival_place=${arrival_place}  departure_date=${departure_date}  departure_time=${departure_time}  max_transport_connection_count=${max_transport_connection_count}  use_walk=0  use_pt=1
     Log Many  ${response.content}
     Should Be Equal As Strings  ${response.status_code}    200
     ${utf8_content}=   Decode Bytes To String   ${response.content}   UTF-8    strict

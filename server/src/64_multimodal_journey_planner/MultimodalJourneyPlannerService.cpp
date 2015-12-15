@@ -77,6 +77,7 @@ namespace synthese
 		const string MultimodalJourneyPlannerService::PARAMETER_ARRIVAL_PLACE_TEXT = "arrival_place";
 		const string MultimodalJourneyPlannerService::PARAMETER_DEPARTURE_DAY = "departure_date";
 		const string MultimodalJourneyPlannerService::PARAMETER_DEPARTURE_TIME = "departure_time";
+		const string MultimodalJourneyPlannerService::PARAMETER_MAX_TRANSPORT_CONNECTION_COUNT = "max_transport_connection_count";
 		const string MultimodalJourneyPlannerService::PARAMETER_USE_WALK = "use_walk";
 		const string MultimodalJourneyPlannerService::PARAMETER_USE_PT = "use_pt";
 		const string MultimodalJourneyPlannerService::PARAMETER_LOGGER_PATH = "logger_path";
@@ -88,7 +89,7 @@ namespace synthese
 
 
 		MultimodalJourneyPlannerService::MultimodalJourneyPlannerService(
-		):	_day(boost::gregorian::day_clock::local_day()),
+		):	_departureDay(boost::gregorian::day_clock::local_day()),
 			_departureTime(not_a_date_time),
 			_loggerPath()
 		{}
@@ -850,7 +851,15 @@ namespace synthese
 				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : before pt");
 
 				// Initialization
-				graph::AccessParameters approachAccessParameters(graph::USER_PEDESTRIAN, false, false, _useWalk ? 1000 : 0, boost::posix_time::minutes(23), 1.111);
+				graph::AccessParameters approachAccessParameters(
+					graph::USER_PEDESTRIAN,			// user class code
+					false,							// DRT only
+					false,							// without DRT
+					_useWalk ? 1000 : 0,			// max approach distance
+					boost::posix_time::minutes(23),	// max approach time
+					1.111,							// approach speed
+					_maxTransportConnectionCount	// max transport connection count (ie : max number of used transport services - 1)
+				);
 
 				boost::shared_ptr<algorithm::AlgorithmLogger> logger(new algorithm::AlgorithmLogger(_loggerPath));
 

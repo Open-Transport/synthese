@@ -29,3 +29,8 @@ One Solution With One Connection Should Work
     There Should Be 1 Solution(s) Using Only Public Transport
     Solution 1 Should Start From "City54, 93" And Arrive To "City54, 07"
 
+One Solution With One Connection When Connections Are Forbidden Should Work
+    On Node 0
+    Search Walk And Public Transport Journey From "City54, rp40" To "City54, 07" On 2015-12-08 At 07:02 With At Most 0 Transport Connections
+    There Should Be 0 Solution(s)
+

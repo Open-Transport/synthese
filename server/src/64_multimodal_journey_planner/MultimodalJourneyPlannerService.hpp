@@ -60,6 +60,7 @@ namespace synthese
 			static const std::string PARAMETER_ARRIVAL_PLACE_TEXT;
 			static const std::string PARAMETER_DEPARTURE_DAY;
 			static const std::string PARAMETER_DEPARTURE_TIME;
+			static const std::string PARAMETER_MAX_TRANSPORT_CONNECTION_COUNT;
 			static const std::string PARAMETER_USE_WALK;
 			static const std::string PARAMETER_USE_PT;
 			static const std::string PARAMETER_LOGGER_PATH;
@@ -81,9 +82,6 @@ namespace synthese
 				boost::gregorian::date						_departureDay;
 				boost::posix_time::time_duration			_departureTime;
 				boost::optional<size_t>						_maxTransportConnectionCount;
-
-				bool										_useWalk;
-				bool										_usePt;
 
 				bool										_useWalk;
 				bool										_usePt;
