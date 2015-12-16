@@ -58,10 +58,10 @@ There Should Be No Orphan Road
     Should Be Equal As Numbers  0  ${orphan_roads_count}
 
 Create Default RoadPlace
-    ${http_response}=  Create Synthese Object  ${CITIES_TABLE_ID}  field_name\=UnknownCity
-    ${default_city_id}=  Get Element Attribute  source=${http_response.content}  name=id
-    ${http_response}=  Create Synthese Object  ${ROAD_PLACES_TABLE_ID}  field_name\=UnknownRoadPlace  field_city_id\=${default_city_id}
-    ${default_road_place__id}  Get Element Attribute  source=${http_response.content}  name=id
+    ${content}=  Create Synthese Object  ${CITIES_TABLE_ID}  field_name\=UnknownCity
+    ${default_city_id}=  Get Element Attribute  source=${content}  name=id
+    ${content}=  Create Synthese Object  ${ROAD_PLACES_TABLE_ID}  field_name\=UnknownRoadPlace  field_city_id\=${default_city_id}
+    ${default_road_place__id}  Get Element Attribute  source=${content}  name=id
     [Return]  ${default_road_place__id}
 
 Import OSM Export Should Create All Synthese Objects
