@@ -37,6 +37,7 @@ set(DEPS
   37_pt_operation
   54_departure_boards
   61_data_exchange
+  65_public_biking
 )
 
 add_definitions(-DPEGASE_TEST_SQL="${CMAKE_CURRENT_SOURCE_DIR}/test_data/pegase_test.sql")

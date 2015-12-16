@@ -1,0 +1,14 @@
+<h3>Emplacement du fichier de données</h3>
+
+<#forms/text_input&
+  label=Fichiers Publibike (csv)&
+  name=pa&
+#>
+
+
+<h3>Options d'import</h3>
+
+<#forms/yes_no_input&
+  label=Réaliser la projection des lieux publics&
+  name=project&
+#>

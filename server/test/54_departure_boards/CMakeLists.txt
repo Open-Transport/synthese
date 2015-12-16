@@ -27,6 +27,7 @@ set(DEPS
   56_pt_website # from 54_departure_boards > 36_cms
   54_departure_boards
   61_data_exchange
+  65_public_biking
   37_pt_operation
 )
 

@@ -36,6 +36,7 @@ set(DEPS
   11_cms # from 53_pt_journey_planner > 35_pt
   54_departure_boards
   61_data_exchange
+  65_public_biking
   37_pt_operation
   38_vehicle
   55_timetables

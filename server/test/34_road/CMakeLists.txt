@@ -15,6 +15,7 @@ set(DEPS
   34_road
   54_departure_boards
   61_data_exchange
+  65_public_biking
   37_pt_operation
   38_vehicle
   56_pt_website

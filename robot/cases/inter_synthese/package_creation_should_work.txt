@@ -13,8 +13,8 @@ Creating An Empty InterSynthese Package Should Work
 
 Creating An InterSynthese Package With Single Object Content Should Work
     On node 0
-    ${http_response}=    Create Synthese Object    table_id=${ALARMS_TABLE_ID}  
-    ${created_object_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    ${xml_object}=    Create Synthese Object    table_id=${ALARMS_TABLE_ID}  
+    ${created_object_id}=  Get Element Attribute  source=${xml_object}  name=id
     Package "package2" Containing Object ${created_object_id} Is Created
     Package "package2" Is Visible In Package List
 
