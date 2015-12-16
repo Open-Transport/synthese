@@ -72,6 +72,7 @@ namespace synthese
 
 		const string OSMFileFormat::Importer_::PARAMETER_PROJECT_HOUSES("project_houses");
 
+		const string OSMFileFormat::Importer_::PARAMETER_DEFAULT_ROAD_PLACE_ID("default_road_place_id");
 
 class OSMFileFormatEntityHandler : public OSMEntityHandler
 {
@@ -724,7 +725,8 @@ OSMFileFormat::Importer_::Importer_(
 	util::ParametersMap& pm
 ):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
 	OneFileTypeImporter<OSMFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
-	_projectHouses(false)
+	_projectHouses(false),
+	_defaultRoadPlaceId(0)
 {}
 
 
@@ -749,6 +751,7 @@ void OSMFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap&
 {
 	_countryCode = map.getDefault<std::string>(PARAMETER_COUNTRY_CODE, "FR");
 	_projectHouses = map.isTrue(PARAMETER_PROJECT_HOUSES);
+	_defaultRoadPlaceId = map.getDefault<util::RegistryKeyType>(PARAMETER_COUNTRY_CODE, 0);
 }
 
 
