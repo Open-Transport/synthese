@@ -53,11 +53,14 @@ namespace synthese
 
 				static const std::string PARAMETER_PROJECT_HOUSES;
 
+				static const std::string PARAMETER_DEFAULT_ROAD_PLACE_ID;
+
 				boost::optional<std::string> _countryCode;
 
 				bool _projectHouses;
 
-
+				util::RegistryKeyType _defaultRoadPlaceId;
+				
 			protected:
 
 				virtual bool _parse(

@@ -76,6 +76,11 @@
   is_password=1&
 #>
 
+<#forms/text_input&
+  label=Chemin du fichier&
+  name=file_path&
+#>
+
 <#forms/yes_no_input&
   label=Ne pas supprimer les objets de premier niveau&
   name=no_suppress_top_level&

@@ -108,7 +108,7 @@ namespace synthese
 			_integralSearchPlanningPhase = planningPhase;
 			_integralSearchDesiredTime = desiredTime;
 			_integralSearchFile = _openNewFile();
-			*_integralSearchFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
+			*_integralSearchFile << "<html><head><title>Integral Search File</title></head><body>";
 			*_integralSearchFile << "<table class=\"adminresults\">";
 			_startChrono();
 		}
@@ -118,7 +118,6 @@ namespace synthese
 		void AlgorithmLogger::logIntegralSearchJourney(
 			const RoutePlanningIntermediateJourney& journey
 		) const {
-
 			if(!_active)
 			{
 				return;
@@ -305,14 +304,26 @@ namespace synthese
 			_journeyPlannerStepStartChrono = _chrono;
 
 			_journeyPlannerFile = _openNewFile();
-			*_journeyPlannerFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
+			*_journeyPlannerFile << "<html><head><title>Journey Planner File</title></head><body>";
 			*_journeyPlannerFile << _journeyPlannerTable.open();
+			*_journeyPlannerFile << _journeyPlannerTable.row();
+			*_journeyPlannerFile << _journeyPlannerTable.col() << "rank" << _journeyPlannerTable.col() << "place" << _journeyPlannerTable.col()
+				<< "time" << _journeyPlannerTable.col() << "jyscore" << _journeyPlannerTable.col() << "connections"
+				<< _journeyPlannerTable.col() << "dist"
+				<< _journeyPlannerTable.col() << "minsp / dst" << _journeyPlannerTable.col() << "plscore" << _journeyPlannerTable.col() 
+				<< "size" << _journeyPlannerTable.col() << "cleaned" << _journeyPlannerTable.col() << "updated" << _journeyPlannerTable.col()
+				<< "new" << _journeyPlannerTable.col() << "result" << _journeyPlannerTable.col() << "duration";
 
 			if(_timeSlotJourneyPlannerFile)
 			{
 				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.row();
+				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() << "rank" << _timeSlotJourneyPlannerTable.col() 
+				  << "direction" << _timeSlotJourneyPlannerTable.col() << "start_time" << _timeSlotJourneyPlannerTable.col() 
+				  << "steps" << _timeSlotJourneyPlannerTable.col() << "duration";
+				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.row();
+
 				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() <<
-					"<a href=\"" << _getCurrentFilePath().filename() << "\">" << _timeSlotJourneyPlannerStepNumber << "</a>";
+					"<a href=\"" << _getCurrentFilePath().filename().string() << "\">" << _timeSlotJourneyPlannerStepNumber << "</a>";
 				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() << (planningPhase == DEPARTURE_TO_ARRIVAL ? "DA" : "AD");
 				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() << originDateTime;
 			}
@@ -341,12 +352,12 @@ namespace synthese
 				_journeyPlannerStepFile->close();
 			}
 			_journeyPlannerStepFile = _openNewFile();
-			*_journeyPlannerStepFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
+			*_journeyPlannerStepFile << "<html><head><title>Journey Planner Step File</title></head><body>";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.open();
 
 			*_journeyPlannerFile << _journeyPlannerTable.row();
 			*_journeyPlannerFile << _journeyPlannerTable.col() <<
-				"<a href=\"" << _getCurrentFilePath().filename() << "\">" <<
+				"<a href=\"" << _getCurrentFilePath().filename().string() << "\">" <<
 				_journeyPlannerSearchNumber <<
 				"</a>";
 
@@ -359,6 +370,7 @@ namespace synthese
 				}
 				*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getEndTime(false);
 				*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getScore();
+				*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getTransportConnectionsCount();
 				*_journeyPlannerFile << _journeyPlannerTable.col() << *journey->getDistanceToEnd();
 				*_journeyPlannerFile << _journeyPlannerTable.col();
 				if(_journeyPlanningPhase == DEPARTURE_TO_ARRIVAL)
@@ -410,93 +422,12 @@ namespace synthese
 			}
 			_stopChrono();
 
-/*							// Departure time
-							Journey::ServiceUses::const_iterator its(journey->getServiceUses().begin());
-
-												if (journey->getContinuousServiceRange() > 1)
-							{
-							ptime endRange(its->getDepartureDateTime());
-							endRange += journey->getContinuousServiceRange();
-							stream << " - Service continu jusqu'à " << endRange.;
-							}
-							if (journey->getReservationCompliance() == true)
-							{
-							stream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine();
-							}
-							if (journey->getReservationCompliance() == boost::logic::indeterminate)
-							{
-							stream << " - Réservation facultative avant le " << journey->getReservationDeadLine();
-							}
-
-							stream << "<tr>";
-							stream << "<td>" << its->getDepartureDateTime() << "</td>";
-
-							// JourneyPattern
-							const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-							const RoadPath* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-							stream << "<td";
-							if (ls)
-								stream << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
-							stream << ">";
-							stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
-
-							// Transfers
-							if (its == journey->getServiceUses().end() -1)
-							{
-								stream << "<td colspan=\"4\">(trajet direct)</td>";
-							}
-							else
-							{
-								while(true)
-								{
-									// Arrival
-									stream << "<td>" << its->getArrivalDateTime() << "</td>";
-
-									// Place
-									stream <<
-										"<td>" <<
-										dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub())->getFullName() <<
-										"</td>"
-										;
-
-									// Next service use
-									++its;
-
-									// Departure
-									stream << "<td>" << its->getDepartureDateTime() << "</td>";
-
-									// JourneyPattern
-									const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-									const RoadPath* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-									stream << "<td";
-									if (ls)
-										stream << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";
-									stream << ">";
-									stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
-
-									// Exit if last service use
-									if (its == journey->getServiceUses().end() -1)
-										break;
-
-									// Empty final arrival col
-									stream << "<td></td>";
-
-									// New row and empty origin departure cols;
-									stream << "</tr><tr>";
-									stream << "<td></td>";
-									stream << "<td></td>";
-								}
-							}
-
-							// Final arrival
-							stream << "<td>" << its->getArrivalDateTime() << "</td>";
-*/
-
-
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.row();
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "rk";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "status";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "place";
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "com line";
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "service";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "time";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "jyscore";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "dist";
@@ -549,6 +480,12 @@ namespace synthese
 				{
 					*_journeyPlannerStepFile << dynamic_cast<const geography::NamedPlace*>(journey->getEndEdge().getHub())->getFullName();
 				}
+
+				pt::CommercialLine* commercialLine = dynamic_cast<pt::CommercialLine*>(journey->getEndServiceUse().getService()->getPath()->getPathGroup());
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << ((commercialLine != 0) ? commercialLine->getShortName() : "");
+
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getEndServiceUse().getService()->getKey();
+
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getEndTime(false);
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getScore();
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << *journey->getDistanceToEnd();
@@ -626,7 +563,7 @@ namespace synthese
 			if(!_timeSlotJourneyPlannerFile.get())
 			{
 				_timeSlotJourneyPlannerFile = _openNewFile();
-				*_timeSlotJourneyPlannerFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
+				*_timeSlotJourneyPlannerFile << "<html><head><title>TimeSlot Journey Planner File</title></head><body>";
 			}
 			_timeSlotJourneyPlannerStepNumber = 0;
 
@@ -644,6 +581,11 @@ namespace synthese
 			}
 
 			_stopChrono();
+
+			if (_timeSlotJourneyPlannerStepNumber > 0)
+			{
+				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.close();
+			}
 
 			*_timeSlotJourneyPlannerFile << "<h1>Journey plannings</h1>";
 			*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.open();

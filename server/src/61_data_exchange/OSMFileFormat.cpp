@@ -72,6 +72,7 @@ namespace synthese
 
 		const string OSMFileFormat::Importer_::PARAMETER_PROJECT_HOUSES("project_houses");
 
+		const string OSMFileFormat::Importer_::PARAMETER_DEFAULT_ROAD_PLACE_ID("default_road_place_id");
 
 class OSMFileFormatEntityHandler : public OSMEntityHandler
 {
@@ -86,6 +87,7 @@ class OSMFileFormatEntityHandler : public OSMEntityHandler
 		util::Env& _env;
 
 		bool _projectHouses;
+		util::RegistryKeyType _defaultRoadPlaceId;
 
 		boost::shared_ptr<road::RoadPlace> _getOrCreateRoadPlace(const OSMId& roadSourceId,
 										const std::string& roadName, 
@@ -110,10 +112,11 @@ class OSMFileFormatEntityHandler : public OSMEntityHandler
 
 	public:
 
-		OSMFileFormatEntityHandler(const impex::Importer& importer, util::Env& env, bool projectHouses):
+		OSMFileFormatEntityHandler(const impex::Importer& importer, util::Env& env, bool projectHouses, util::RegistryKeyType defaultRoadPlaceId):
 			_importer(importer),
 			_env(env),
-			_projectHouses(projectHouses)
+			_projectHouses(projectHouses),
+			_defaultRoadPlaceId(defaultRoadPlaceId)
 		{ }
 
 		void handleCity(const std::string& cityName, const std::string& cityCode, boost::shared_ptr<geos::geom::Geometry> boundary);
@@ -314,11 +317,8 @@ OSMFileFormatEntityHandler::handleRoad(const OSMId& roadSourceId,
 {
 	boost::shared_ptr<road::Road> road(new road::Road(0, roadType));
 	road->set<Key>(road::RoadTableSync::getId());
-	_env.getEditableRegistry<road::Road>().add(road);
 
-	_importer._logCreation("Creating new road " + boost::lexical_cast<std::string>(road->getKey())
-						   + " for OSM road #" + boost::lexical_cast<std::string>(roadSourceId));
-
+	bool intersectsAnyCity = false;
 	BOOST_FOREACH(const City::Registry::value_type& city, _env.getEditableRegistry<City>())
 	{
 		// Skip cities without geometry
@@ -338,11 +338,31 @@ OSMFileFormatEntityHandler::handleRoad(const OSMId& roadSourceId,
 
 		if (roadIntersectsCity)
 		{
+			intersectsAnyCity = true;
 			boost::shared_ptr<road::RoadPlace> roadPlace = _getOrCreateRoadPlace(roadSourceId, name, city.second);
 			road->get<road::RoadPlace::Vector>().push_back(roadPlace.get());
 		}
 	}
+	// do not consider orphan roads (ie without any road place)
+	if (!intersectsAnyCity && (_defaultRoadPlaceId == 0)) 
+	{
+		_importer._logCreation("Road " + boost::lexical_cast<std::string>(road->getKey())
+						   + " is not imported because it does not intersect any city boundary");
+		_currentRoad.reset();
+		return;
+	}
 
+	if (!intersectsAnyCity)
+	{
+		boost::shared_ptr<road::RoadPlace> defaultRoadPlace(
+			util::Env::GetOfficialEnv().getEditable<road::RoadPlace>(_defaultRoadPlaceId));
+		road->get<road::RoadPlace::Vector>().push_back(defaultRoadPlace.get());
+	}
+
+	_importer._logCreation("Creating new road " + boost::lexical_cast<std::string>(road->getKey())
+						   + " for OSM road #" + boost::lexical_cast<std::string>(roadSourceId));
+
+	_env.getEditableRegistry<road::Road>().add(road);
 	road->link(_env);
 	_currentRoad = road;
 }
@@ -388,6 +408,8 @@ OSMFileFormatEntityHandler::handleRoadChunk(size_t rank,
 			                      bool isWalkable,
 								  boost::shared_ptr<geos::geom::LineString> path)
 {
+	if (!_currentRoad.get()) return;
+
 	boost::shared_ptr<road::RoadChunk> roadChunk(new road::RoadChunk);
 	roadChunk->setRoad(_currentRoad.get());
 	roadChunk->setFromCrossing(_currentCrossing.get());
@@ -687,11 +709,10 @@ bool OSMFileFormat::Importer_::_parse(
 		throw std::runtime_error("Unable to open file");
 	}
 	std::string ext = boost::filesystem::extension(filePath);
-	OSMFileFormatEntityHandler handler(*this, _env, _projectHouses);
+	OSMFileFormatEntityHandler handler(*this, _env, _projectHouses, _defaultRoadPlaceId);
 
 	OSMParser parser(
 		*_fileStream,
-		CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory(),
 		dataSource.getActualCoordinateSystem(),
 		handler,
 		OSMLocale::getInstance(*_countryCode)
@@ -725,7 +746,8 @@ OSMFileFormat::Importer_::Importer_(
 	util::ParametersMap& pm
 ):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
 	OneFileTypeImporter<OSMFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
-	_projectHouses(false)
+	_projectHouses(false),
+	_defaultRoadPlaceId(0)
 {}
 
 
@@ -750,6 +772,7 @@ void OSMFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap&
 {
 	_countryCode = map.getDefault<std::string>(PARAMETER_COUNTRY_CODE, "FR");
 	_projectHouses = map.isTrue(PARAMETER_PROJECT_HOUSES);
+	_defaultRoadPlaceId = map.getDefault<util::RegistryKeyType>(PARAMETER_DEFAULT_ROAD_PLACE_ID, 0);
 }
 
 

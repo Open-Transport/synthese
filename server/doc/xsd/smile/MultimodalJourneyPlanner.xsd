@@ -27,72 +27,107 @@
 	</simpleType>
 
 	<complexType name="Place">
-        <annotation>
-        	<documentation></documentation>
-        </annotation>
-        <attribute name="name" type="string">
+		<annotation>
+			<documentation>A geolocalized place (e.g. stop point, address, point of interest)</documentation>
+		</annotation>
+		<attribute name="city" type="string">
 			<annotation>
-				<documentation>Name of the place (e.g. stop point name, address, name of the point of interest)</documentation>
-			</annotation></attribute>
+				<documentation>
+					Name of the city this place belongs to
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="name" type="string">
+			<annotation>
+				<documentation>
+					Name of the place (e.g. stop point name, address, name of the point of interest)
+				</documentation>
+			</annotation>
+		</attribute>
 		<attribute name="type" type="mjp:PlaceType">
 			<annotation>
 				<documentation>Type of the place</documentation>
-			</annotation></attribute>
+			</annotation>
+		</attribute>
 		<attribute name="id" type="mjp:ObjectIdentifier">
 			<annotation>
-				<documentation>Internal object identifier</documentation>
-			</annotation></attribute>
+				<documentation>
+					Internal object identifier
+				</documentation>
+			</annotation>
+		</attribute>
 		<attribute name="latitude" type="double">
 			<annotation>
 				<documentation>Latitude</documentation>
-			</annotation></attribute>
+			</annotation>
+		</attribute>
 		<attribute name="longitude" type="double">
 			<annotation>
 				<documentation>Longitude</documentation>
-			</annotation></attribute>
+			</annotation>
+		</attribute>
 	</complexType>
 
 	<complexType name="Road">
 		<attribute name="name" type="string">
 			<annotation>
 				<documentation>Name of the road</documentation>
-			</annotation></attribute>
+			</annotation>
+		</attribute>
 		<attribute name="id" type="mjp:ObjectIdentifier">
 			<annotation>
 				<documentation>Internal object identifier</documentation>
-			</annotation></attribute>
+			</annotation>
+		</attribute>
 	</complexType>
 
 	<complexType name="Leg">
-        <annotation>
-        	<documentation></documentation>
-        </annotation>
-        <sequence>
+		<annotation>
+			<documentation>Leg of a journey</documentation>
+		</annotation>
+		<sequence>
 			<element name="departure" type="mjp:Place" maxOccurs="1"
 				minOccurs="1">
-                <annotation>
-                	<documentation>Place of departure</documentation>
-                </annotation>
+				<annotation>
+					<documentation>Place of departure</documentation>
+				</annotation>
 			</element>
 			<element name="arrival" type="mjp:Place" maxOccurs="1"
 				minOccurs="1">
-                <annotation>
-                	<documentation>Place of arrival</documentation>
-                </annotation>
+				<annotation>
+					<documentation>Place of arrival</documentation>
+				</annotation>
 			</element>
+			<choice minOccurs="1" maxOccurs="1">
+				<element name="walk_attributes" type="mjp:WalkLegAttributes">
+					<annotation>
+						<documentation>Additional data for a walk leg</documentation>
+					</annotation>
+				</element>
+				<element name="pt_attributes" type="mjp:PTLegAttributes">
+					<annotation>
+						<documentation>Additional data for a public transportation leg</documentation>
+					</annotation>
+				</element>
+			</choice>
 		</sequence>
 		<attribute name="departure_date_time" type="dateTime">
 			<annotation>
 				<documentation>Timestamp of departure</documentation>
-			</annotation></attribute>
+			</annotation>
+		</attribute>
 		<attribute name="arrival_date_time" type="dateTime">
 			<annotation>
 				<documentation>Timestamp of arrival</documentation>
-			</annotation></attribute>
+			</annotation>
+		</attribute>
 		<attribute name="geometry" type="mjp:WKTString">
 			<annotation>
-				<documentation>Geometry of this leg, expressed in Well-Known Text format</documentation>
-			</annotation></attribute>
+				<documentation>
+					Geometry of this leg, expressed in Well-Known Text format
+				</documentation>
+			</annotation>
+		</attribute>
 	</complexType>
 
 	<complexType name="Journey">
@@ -100,47 +135,29 @@
 			<element name="departure" type="mjp:Place">
 				<annotation>
 					<documentation>Place of departure</documentation>
-				</annotation></element>
+				</annotation>
+			</element>
 			<element name="leg" type="mjp:Leg" minOccurs="0" maxOccurs="unbounded">
 				<annotation>
 					<documentation>Element of the journey</documentation>
-				</annotation></element>
+				</annotation>
+			</element>
 			<element name="arrival" type="mjp:Place">
 				<annotation>
 					<documentation>Place of arrival</documentation>
-				</annotation></element>
+				</annotation>
+			</element>
 		</sequence>	
    		<attribute name="departure_date_time" type="dateTime">
    			<annotation>
    				<documentation>Timestamp of departure</documentation>
-   			</annotation></attribute>
+   			</annotation>
+   		</attribute>
    		<attribute name="arrival_date_time" type="dateTime">
    			<annotation>
    				<documentation>Timestamp of arrival</documentation>
-   			</annotation></attribute>
-	</complexType>
-
-	<complexType name="WalkJourney">
-		<complexContent>
-			<extension base="mjp:Journey"></extension>  		
-		</complexContent>
-	</complexType>
-
-	<complexType name="WalkLeg">
-		<complexContent>
-			<extension base="mjp:Leg">
-				<sequence>
-					<element name="road" type="mjp:Road" maxOccurs="1" minOccurs="1">
-						<annotation>
-							<documentation>Road treaded by this leg</documentation>
-						</annotation></element>
-				</sequence>
-				<attribute name="length" type="int">
-					<annotation>
-						<documentation>Length of this leg in meters</documentation>
-					</annotation></attribute>
-			</extension>
-		</complexContent>
+   			</annotation>
+   		</attribute>
 	</complexType>
 
 	<complexType name="MultimodalJourneyPlannerResult">
@@ -150,4 +167,79 @@
 	</complexType>
 
     <element name="journeys" type="mjp:MultimodalJourneyPlannerResult"></element>
+
+	<complexType name="WalkLegAttributes">
+		<sequence>
+			<element name="road" type="mjp:Road" maxOccurs="1" minOccurs="1">
+				<annotation>
+					<documentation>Road treaded by this leg</documentation>
+				</annotation>
+			</element>
+		</sequence>
+		<attribute name="length" type="int">
+			<annotation>
+				<documentation>Length of this leg in meters</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+
+    <complexType name="PTLegAttributes">
+		<sequence>
+			<element name="network"	type="mjp:PTNetwork">
+				<annotation>
+					<documentation>The transportation network operating the line used by this leg</documentation>
+				</annotation>
+			</element>
+			<element name="line" type="mjp:PTLine">
+				<annotation>
+					<documentation>The line used by this leg</documentation>
+				</annotation>
+			</element>
+			<element name="service" type="mjp:PTService">
+				<annotation>
+					<documentation>The specific service of the line used by this leg</documentation>
+				</annotation>
+			</element>
+		</sequence>
+    </complexType>
+
+    <complexType name="PTNetwork">
+    	<attribute name="id" type="mjp:ObjectIdentifier">
+    		<annotation>
+    			<documentation>Internal object identifier</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="name" type="string">
+    		<annotation>
+    			<documentation>Name of this public transportation network</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="image" type="string">
+    		<annotation>
+    			<documentation>Path to the logo of this transportation network</documentation>
+    		</annotation>
+    	</attribute>
+    </complexType>
+
+    <complexType name="PTLine">
+    	<attribute name="id" type="mjp:ObjectIdentifier">
+    		<annotation>
+    			<documentation>Internal object identifier</documentation></annotation></attribute>
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="image" type="string"></attribute>
+    	<attribute name="style" type="string"></attribute>
+    	<attribute name="color" type="string"></attribute>
+    </complexType>
+
+    <complexType name="PTService">
+    	<attribute name="id" type="mjp:ObjectIdentifier">
+    		<annotation>
+    			<documentation>
+    				Internal object identifier
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="number" type="string"></attribute>
+    </complexType>
+
 </schema>

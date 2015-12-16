@@ -150,7 +150,6 @@ namespace synthese
 			FakeOSMEntityHandler fakeOSMEntityHandler;
 			OSMParser parser(
 				std::cout,
-				*geos::geom::GeometryFactory::getDefaultInstance(),
 				CoordinatesSystem::GetCoordinatesSystem(4326),
 				fakeOSMEntityHandler,
 				OSMLocale::OSMLocale_CH
@@ -176,7 +175,6 @@ namespace synthese
 			FakeOSMEntityHandler fakeOSMEntityHandler;
 			OSMParser parser(
 				std::cout,
-				*geos::geom::GeometryFactory::getDefaultInstance(),
 				CoordinatesSystem::GetCoordinatesSystem(4326),
 				fakeOSMEntityHandler,
 				OSMLocale::OSMLocale_FR);
@@ -258,7 +256,6 @@ namespace synthese
 			FakeOSMEntityHandler fakeOSMEntityHandler;
 			OSMParser parser(
 				std::cout,
-				*geos::geom::GeometryFactory::getDefaultInstance(),
 				CoordinatesSystem::GetCoordinatesSystem(4326),
 				fakeOSMEntityHandler,
 				OSMLocale::OSMLocale_FR
@@ -278,8 +275,7 @@ namespace synthese
 			FakeOSMEntityHandler fakeOSMEntityHandler;
 			//std::ifstream osmStream("/home/mjambert/workspace/rcsmobility/gitlab/switzerland-tests/robot/resources/data/swiss.osm");
 			std::ifstream osmStream("larger_swiss_tile.osm");
-			OSMParser parser(std::cout, *geos::geom::GeometryFactory::getDefaultInstance(), 
-				fakeOSMEntityHandler, OSMLocale::OSMLocale_FR);
+			OSMParser parser(std::cout, fakeOSMEntityHandler, OSMLocale::OSMLocale_FR);
 			parser.parse(osmStream);
 			osmStream.close();
 

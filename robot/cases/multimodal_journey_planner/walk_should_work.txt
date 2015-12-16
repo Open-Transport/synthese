@@ -1,16 +1,41 @@
 *** Settings ***
 Resource          ../../resources/s3-fakeclient/multimodal_journey_planner.txt
-Resource          ../../resources/data/multimodal_journey_planner_data.txt
-Test Setup        Run Keywords  On Node 0  AND  With Test Data  ${DB}  AND  Start Synthese On Node 0
+Test Setup        Run Keywords  On Node 0  AND  With SQL Test Data  ../../../resources/data/multimodal_journey_planner/legacy_test_network.sql  AND  Start Synthese On Node 0
 Test Teardown     Stop Synthese On Node 0
 
 *** Test Cases ***
 
-No Solution Case Should Work
-    On Node 0
-    Walk Journey From city54 rp40 To city20 rp50 Has No Solution
+Searching All Walk Journeys Should Find No Solution
+    [Template]    Searching Walk Journey Should Find No Solution
+    City54  rp40  City20  rp50
+    City38  rp42  City20  rp50
 
-One Solution Case Should Work
+Searching All Walk Journeys Should Find Proper Solutions
+    [Template]    Searching Walk Journey Should Find Proper Solutions
+    City38  rp41  City38  rp46
+    City54  rp40  City38  rp46
+    City54  rp47  City38  rp46
+    City54  rp45  City38  rp46
+    # Abnormal behaviour. Test is skipped right now as HR stated we had not time to treat it for now.
+    # City38  rp46  City54  rp40
+
+*** Keywords ***
+
+Searching Walk Journey Should Find No Solution
+	[Arguments]  ${departure_city}  ${departure_place}  ${arrival_city}  ${arrival_place}
     On Node 0
-    Walk Journey From city54 rp40 To city38 rp46 Has One Solution
+    Search Walk Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On 2015-12-08 At 07:02
+    There Should Be 0 Solution(s)
+
+Searching Walk Journey Should Find Proper Solutions
+	[Arguments]  ${departure_city}  ${departure_place}  ${arrival_city}  ${arrival_place}
+    On Node 0
+    Search Walk Journey From "${departure_city}, ${departure_place}" To "City38, rp46" On 2015-12-08 At 07:02
+    There Should Be 1 Solution(s)
+    There Should Be 1 Solution(s) Using Only Walk
+    All Solutions Should Start From "${departure_city}, ${departure_place}" And Arrive To "${arrival_city}, ${arrival_place}"
+
+
+
+
 

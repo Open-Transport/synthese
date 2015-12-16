@@ -125,7 +125,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
 			)	),
 			NamedPlaceTemplate<StopArea>(),
-			_defaultTransferDelay(defaultTransferDelay)
+			_defaultTransferDelay(defaultTransferDelay),
+			_score(0)
 		{
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
@@ -209,7 +210,7 @@ namespace synthese
 						BOOST_FOREACH(const Vertex::Edges::value_type& edge, its.second->getDepartureEdges())
 						{
 							// Jump over junctions
-							if(!dynamic_cast<const JourneyPattern*>(edge.second))
+							if(!dynamic_cast<const JourneyPattern*>(edge.first))
 							{
 								continue;
 							}
@@ -233,21 +234,21 @@ namespace synthese
 					{
 						if (itc.second <= 10)
 						{
-							*_score += 1;
+							_score += 1;
 						}
 						else if (itc.second <= 50)
 						{
-							*_score += 2;
+							_score += 2;
 						}
 						else if (itc.second <= 100)
 						{
-							*_score += 3;
+							_score += 3;
 						}
 						else
 						{
-							*_score += 4;
+							_score += 4;
 						}
-						if (*_score > MAX_HUB_SCORE)
+						if (_score > MAX_HUB_SCORE)
 						{
 							_score = MAX_HUB_SCORE;
 							break;
@@ -255,7 +256,7 @@ namespace synthese
 					}
 				}
 			}
-			return *_score;
+			return _score;
 		}
 
 

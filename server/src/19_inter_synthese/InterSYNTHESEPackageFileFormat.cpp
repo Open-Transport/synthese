@@ -53,6 +53,7 @@ namespace synthese
 		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_PASSWORD = "password";
 		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_URL = "url";
 		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_USER = "user";
+		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_FILE_PATH = "file_path";
 		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_NO_SUPPRESS_TOP_LEVEL = "no_suppress_top_level";
 		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_NO_SUPPRESS_ANYTHING = "no_suppress_anything";
 
@@ -62,25 +63,40 @@ namespace synthese
 		) const	{
 			try
 			{
-				// Log for debugging purpose
-				_logDebug(
-					"Inter-SYNTHESE Package : Attempt to sync with "+ _address +":"+ _port +" for package "+ _smartURL
-				);
-				
-				// Repository function call
-				StaticFunctionRequest<InterSYNTHESEPackageGetContentService> r;
-				r.getFunction()->setUser(_user);
-				r.getFunction()->setPassword(_password);
-				r.getFunction()->setSmartURL(_smartURL);
-				r.getFunction()->setLock(_lock);
-				r.getFunction()->setLockServerName(_lockServerName);
-				BasicClient c(
-					_address,
-					_port
-				);
-				string result(
-					c.get(r.getURL())
-				);
+				string result;
+				if (_filePath.empty())
+				{
+					// Log for debugging purpose
+					_logDebug(
+						"Inter-SYNTHESE Package : Attempt to sync with "+ _address +":"+ _port +" for package "+ _smartURL
+					);
+					// Repository function call
+					StaticFunctionRequest<InterSYNTHESEPackageGetContentService> r;
+					r.getFunction()->setUser(_user);
+					r.getFunction()->setPassword(_password);
+					r.getFunction()->setSmartURL(_smartURL);
+					r.getFunction()->setLock(_lock);
+					r.getFunction()->setLockServerName(_lockServerName);
+					BasicClient c(
+						_address,
+						_port
+					);
+					result = c.get(r.getURL());
+				}
+				else
+				{
+					// Log for debugging purpose
+					_logDebug(
+						"Inter-SYNTHESE Package : Attempt to sync with "+ _filePath +" (file)"
+					);
+					ifstream inFile;
+					inFile.open(_filePath.c_str());
+					if(!inFile)
+					{
+						throw Exception("Could no open the file " + _filePath);
+					}
+					result = string(std::istreambuf_iterator<char>(inFile), std::istreambuf_iterator<char>());
+				}
 				_content.reset(
 					new InterSYNTHESEPackageContent(
 						_env,
@@ -105,11 +121,21 @@ namespace synthese
 
 		void InterSYNTHESEPackageFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
-			// URL
-			InterSYNTHESEPackage::PackageAddress address(map.getDefault<string>(PARAMETER_URL));
-			_address = address.host;
-			_port = address.port;
-			_smartURL = address.smartURL;
+			// File Path (to use instead of a connection)
+			_filePath = map.getDefault<string>(PARAMETER_FILE_PATH);
+
+			if (_filePath.empty())
+			{
+				// URL
+				InterSYNTHESEPackage::PackageAddress address(map.getDefault<string>(PARAMETER_URL));
+				_address = address.host;
+				_port = address.port;
+				_smartURL = address.smartURL;
+			}
+			else
+			{
+				_address = map.getDefault<string>(PARAMETER_URL);
+			}
 
 			// User
 			_user = map.getDefault<string>(PARAMETER_USER);

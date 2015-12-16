@@ -59,6 +59,7 @@ namespace synthese
 				static const std::string PARAMETER_PASSWORD;
 				static const std::string PARAMETER_LOCK;
 				static const std::string PARAMETER_LOCK_SERVER_NAME;
+				static const std::string PARAMETER_FILE_PATH;
 				static const std::string PARAMETER_NO_SUPPRESS_TOP_LEVEL;
 				static const std::string PARAMETER_NO_SUPPRESS_ANYTHING;
 
@@ -68,6 +69,7 @@ namespace synthese
 				std::string _password;
 				bool _lock;
 				std::string _lockServerName;
+				std::string _filePath;
 				mutable std::auto_ptr<InterSYNTHESEPackageContent> _content;
 				bool _noSuppressTopLevel;
 				bool _noSuppressAnything;

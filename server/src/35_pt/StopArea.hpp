@@ -241,7 +241,7 @@ namespace synthese
 
 			//! @name Caching
 			//@{
-				mutable boost::optional<graph::HubScore> _score;
+				mutable graph::HubScore _score;
 				mutable boost::posix_time::time_duration _minTransferDelay;
 				mutable DRTAreas _drtAreas;
 			//@}

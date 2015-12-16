@@ -176,12 +176,14 @@ namespace synthese
 			if(_originVam.getMap().empty() ||
 				_destinationVam.getMap().empty()
 			){
+				_logger.closeTimeSlotJourneyPlannerLog();
 				return PTRoutePlannerResult(_departurePlace, _arrivalPlace, false, result);
 			}
 
 			// Check if the departure and arrival places are the same
 			if(_originVam.intersercts(_destinationVam))
 			{
+				_logger.closeTimeSlotJourneyPlannerLog();
 				return PTRoutePlannerResult(_departurePlace, _arrivalPlace, true, result);
 			}
 
@@ -290,17 +292,21 @@ namespace synthese
 						_reservationRulesDelayType
 					);
 
-					return PTRoutePlannerResult(
+					PTRoutePlannerResult result(
 						_departurePlace,
 						_arrivalPlace,
 						false,
 						r.run()
 					);
+					_logger.closeTimeSlotJourneyPlannerLog();
+					return result;
 				}
 				else
 				{
 					// mixed mode journey (car + public transportation)
-					return _computeCarPTJourney();
+					PTRoutePlannerResult result(_computeCarPTJourney());
+					_logger.closeTimeSlotJourneyPlannerLog();
+					return result;
 				}
 			}
 			else
@@ -324,12 +330,14 @@ namespace synthese
 					_enableRealTime,
 					_reservationRulesDelayType
 				);
-				return PTRoutePlannerResult(
+				PTRoutePlannerResult result(
 					_departurePlace,
 					_arrivalPlace,
 					false,
 					r.run()
 				);
+				_logger.closeTimeSlotJourneyPlannerLog();
+				return result;				
 			}
 		}
 

@@ -14,22 +14,14 @@ Import OSM Export (direct OSM web export) Of Small Swiss Tile Should Work
     ${expected_road_count}=   Count Roads In OSM File ${osm_file_path}
     # There are 34 incomplete roads in this file (= roads referencing missing nodes)
     ${expected_road_count}=   Set Variable   ${expected_road_count-34} 
-    Import OSM Export  ${osm_file_path}  CH
-    There are ${expected_city_count} Objects In Table ${CITIES_TABLE_ID}
-    There are ${expected_road_count} Objects In Table ${ROADS_TABLE_ID}
-    There are 0 Objects In Table ${ROAD_PLACES_TABLE_ID}
-    There are 1227 Objects In Table ${ROAD_CHUNKS_TABLE_ID}
+    Import OSM Export Should Create All Synthese Objects  ${osm_file_path}  ${expected_city_count}  ${expected_road_count}  0  1227
 
 Import OSM Export (direct OSM web export) Of Larger Swiss Tile Should Work
     On node 0
     ${osm_file_path}=  Set Variable   ${CURDIR}/../../resources/data/larger_swiss_tile.osm
     ${expected_city_count}=   Count Cities In OSM File ${osm_file_path}
     ${expected_road_count}=   Count Roads In OSM File ${osm_file_path}
-    Import OSM Export  ${osm_file_path}  CH
-    There are ${expected_city_count} Objects In Table ${CITIES_TABLE_ID}
-    There are ${expected_road_count} Objects In Table ${ROADS_TABLE_ID}
-    There are 196 Objects In Table ${ROAD_PLACES_TABLE_ID}
-    There are 2072 Objects In Table ${ROAD_CHUNKS_TABLE_ID}
+    Import OSM Export Should Create All Synthese Objects  ${osm_file_path}  ${expected_city_count}  ${expected_road_count}  196  2072
 
 Two Imports Of The Same OSM Export Should Work
     Pass Execution  Incremental imports is not supported
@@ -43,12 +35,6 @@ Two Imports Of The Same OSM Export Should Work
     ${road_count_after_second_import}=   Count Objects In Table ${ROADS_TABLE_ID}
     Should Be Equal As Numbers  ${city_count_after_first_import}  ${city_count_after_second_import}    
     Should Be Equal As Numbers  ${road_count_after_first_import}  ${road_count_after_second_import}    
-
-#Import of Whole Switzerland OSM Export Should Work
-#    On node 0
-#    ${osm_file_path}=  Set Variable   /home/mjambert/workspace/rcsmobility/gitlab/switzerland-tests/robot/resources/data/swiss.osm
-#    ${osm_file_path}=  Set Variable   /home/overnhet/Téléchargements/Imports/OSM_Suisse/switzerland-latest.osm
-#    Import OSM Export  ${osm_file_path}  CH
 
 *** Keywords ***
 
@@ -67,5 +53,25 @@ Count Crossing Restrictions In OSM File ${osm_file_path}
     ${osm_crossing_restrictions_count}=   Get Element Count   ${osm_xml}   xpath=relation[(tag[@k='type' and @v='restriction']) and (tag[@k='restriction']) and (count(member[@role='from']) > 0) and (count(member[@role='to']) > 0) and (count(member[@role='via']) > 0)]
     [Return]    ${osm_crossing_restrictions_count}
 
+There Should Be No Orphan Road
+    ${orphan_roads_count}=  Count Objects In Table ${ROADS_TABLE_ID} Where Column "road_place_ids" Is Empty
+    Should Be Equal As Numbers  0  ${orphan_roads_count}
 
+Create Default RoadPlace
+    ${content}=  Create Synthese Object  ${CITIES_TABLE_ID}  field_name\=UnknownCity
+    ${default_city_id}=  Get Element Attribute  source=${content}  name=id
+    ${content}=  Create Synthese Object  ${ROAD_PLACES_TABLE_ID}  field_name\=UnknownRoadPlace  field_city_id\=${default_city_id}
+    ${default_road_place__id}  Get Element Attribute  source=${content}  name=id
+    [Return]  ${default_road_place__id}
+
+Import OSM Export Should Create All Synthese Objects
+  [Arguments]   ${osm_file_path}  ${expected_city_count}  ${expected_road_count}  ${expected_road_places_count}  ${expected_road_chunks_count}  
+  ${expected_road_places_count}=  Convert To Integer  ${expected_road_places_count}
+  ${default_road_place_id}=  Create Default RoadPlace
+  Import OSM Export  ${osm_file_path}  CH  ${default_road_place_id}
+  There Should Be No Orphan Road
+  There are ${expected_city_count+1} Objects In Table ${CITIES_TABLE_ID}
+  There are ${expected_road_count} Objects In Table ${ROADS_TABLE_ID}
+  There are ${expected_road_places_count+1} Objects In Table ${ROAD_PLACES_TABLE_ID}
+  There are ${expected_road_chunks_count} Objects In Table ${ROAD_CHUNKS_TABLE_ID}
 
