@@ -304,6 +304,9 @@ namespace synthese
 								continue;
 							}
 
+							// TODO : règle métier qui "bave" sur l'algo et crée une dépendance vers module road, à supprimer ???
+							// si règle utile, design avec méthode virtuelle dans l'objet Path pour meilleure architecture (<=> autorisation de correspondance)
+
 							// Specific car user class verification (turn restriction)
 							if(_accessParameters.getUserClass() == USER_CAR)
 							{
@@ -372,6 +375,9 @@ namespace synthese
 								(&Edge::getPreviousConnectionDeparture)
 						)	);
 
+						// TODO : règle métier qui "bave" sur l'algo et crée une dépendance vers module road, à supprimer ???
+						// si règle utile, design avec méthode virtuelle dans l'objet Path pour meilleure architecture
+
 						// If path is a junction, we verify that the origin vertex is the same
 						const Junction* junction(dynamic_cast<const Junction*> (&path));
 						if (junction != NULL)
@@ -394,6 +400,10 @@ namespace synthese
 								(((_accessDirection == DEPARTURE_TO_ARRIVAL) ? currentJunction->getEnd()->getKey() : currentJunction->getStart()->getKey()) != origin->getKey()))
 								continue;
 						}
+
+						// TODO : règle métier qui "bave" sur l'algo et crée une dépendance vers module road, à supprimer ???
+						// si règle utile, design avec méthode virtuelle pour meilleure architecture
+
 						const RoadPath* roadApproach(dynamic_cast<const RoadPath*> (&path));
 						if (roadApproach != NULL && !currentJourney.empty())
 						{
@@ -520,6 +530,8 @@ namespace synthese
 										(!_accessParameters.getMaxtransportConnectionsCount() ||
 										 fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount() + 1)
 								);
+								// TODO : verifier que le nb max de correspondances est déjà vérifié en amont, et supprimer ces 2 tests de isGoalReached
+
 								bool isReturnedVertex(
 									(	reachedVertex->getHub()->containsAnyVertex(_whatToSearch) &&
 										(	!_searchOnlyNodes ||
@@ -527,6 +539,10 @@ namespace synthese
 												(	!_accessParameters.getMaxtransportConnectionsCount() ||
 													fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount() + 1
 								)	)	)	)	);
+
+								// TODO : verifier que isReturnedVertex == true && isARecursionNode == true n'arrive jamais
+
+								// TODO : verifier que dans une RI maxDepth == 0 donc isARecursionNode == false
 								bool isARecursionNode(
 									reachedVertex->getHub()->isUsefulTransfer(_graphToUse) &&
 									(	!maxDepth || journey->size() < *maxDepth)
@@ -584,6 +600,19 @@ sqrt(
 											*reachedVertex->getHub()
 										)
 								)	);
+
+								// TODO : trop de new, resultJourney et todoJourney redondants (update : peut être pas, todoJourney ne serait pas créé dans une RI)
+								// il faudrait refactoriser evaluateJourney pour utiliser directement les variables plutôt qu'un journey
+								// |!| actuellement le journey est inséré dans la TimeMap, il faudrait extraire cette insertion
+								// hors de evaluateJourney (à insérer en ligne 636, insérer le todoJourney ???)
+
+								// TODO plus tard : ne pas mettre les infos de VAM dans les journey de result,
+								// ils seront ajoutés plus tard au moment de la constitution des résultats
+
+								// TODO plus tard : merger RoutePlanner et IntegralSearcher
+
+								// De plus les journey stockés dans BestVertexReachesMap sont différents de ceux de todo, il faudrait
+								// que ce soit les mêmes
 
 
 								// Analyze of the utility of the edge
