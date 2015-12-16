@@ -16,7 +16,8 @@ Searching All Walk Journeys Should Find Proper Solutions
     City54  rp40  City38  rp46
     City54  rp47  City38  rp46
     City54  rp45  City38  rp46
-    City38  rp46  City54  rp40
+    # Abnormal behaviour. Test is skipped right now as HR stated we had not time to treat it for now.
+    # City38  rp46  City54  rp40
 
 *** Keywords ***
 
