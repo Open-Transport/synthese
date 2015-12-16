@@ -34,7 +34,7 @@ Count Objects In Table ${table_id:\d+}
     [Return]  ${object_count}
 
 There Are ${expected_object_count:\d+} Objects In Table ${table_id:\d+}
-    ${object_count}=  Count Objects In Table ${table_id:\d+}
+    ${object_count}=  Count Objects In Table ${table_id}
     Should Be Equal As Numbers  ${expected_object_count}  ${object_count}    
 
 Get Attribute ${attribute_name:\S+} Of Object ${object_index:\d+} In Table ${table_id:\d+}
@@ -50,7 +50,7 @@ Every Object In Table ${table_id:\d+} Should Have Attribute ${attribute_name:\S+
 
 Count Objects In Table ${table_id:\d+} Where Column "${column_name}" Is Empty
     ${response}=  List Synthese Objects  table_id=${table_id}
-    ${utf8_content}   Decode Bytes To String   ${response.content}   UTF-8    strict
+    ${utf8_content}   Decode Bytes To String   ${response}   UTF-8    strict
     Log Many  ${utf8_content}
     ${object_count}=  Get Element Count  ${utf8_content}  xpath=object[@${column_name} = ""]
     [Return]  ${object_count}
