@@ -48,3 +48,11 @@ Every Object In Table ${table_id:\d+} Should Have Attribute ${attribute_name:\S+
     ${matching_object_count}=  Get Element Count  ${response_content}  xpath=object[@${attribute_name}='${attribute_value}']
     Should Be Equal  ${total_object_count}  ${matching_object_count}
 
+Count Objects In Table ${table_id:\d+} Where Column "${column_name}" Is Not Empty
+    ${response}=  List Synthese Objects  table_id=${table_id}
+    ${utf8_content}   Decode Bytes To String   ${response.content}   UTF-8    strict
+    Log Many  ${utf8_content}
+    ${object_count}=  Get Element Count  ${utf8_content}  xpath=object[@${column_name} != ""]
+    [Return]  ${object_count}
+
+
