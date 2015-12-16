@@ -14,9 +14,13 @@ Import OSM Export (direct OSM web export) Of Small Swiss Tile Should Work
     ${expected_road_count}=   Count Roads In OSM File ${osm_file_path}
     # There are 34 incomplete roads in this file (= roads referencing missing nodes)
     ${expected_road_count}=   Set Variable   ${expected_road_count-34} 
-    Import OSM Export  ${osm_file_path}  CH
+    ${http_response}=  Create Synthese Object  ${CITIES_TABLE_ID}  field_name\=UnknownCity
+    ${default_city_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    ${http_response}=  Create Synthese Object  ${ROAD_PLACES_TABLE_ID}  field_name\=UnknownRoadPlace  field_city_id\=${default_city_id}
+    ${default_road_place_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    Import OSM Export  ${osm_file_path}  CH  ${default_road_place_id}
     There Should Be No Orphan Road
-    There are ${expected_city_count} Objects In Table ${CITIES_TABLE_ID}
+    There are ${expected_city_count+1} Objects In Table ${CITIES_TABLE_ID}
     There are ${expected_road_count} Objects In Table ${ROADS_TABLE_ID}
     There are 1 Objects In Table ${ROAD_PLACES_TABLE_ID}
     There are 1227 Objects In Table ${ROAD_CHUNKS_TABLE_ID}
@@ -26,9 +30,13 @@ Import OSM Export (direct OSM web export) Of Larger Swiss Tile Should Work
     ${osm_file_path}=  Set Variable   ${CURDIR}/../../resources/data/larger_swiss_tile.osm
     ${expected_city_count}=   Count Cities In OSM File ${osm_file_path}
     ${expected_road_count}=   Count Roads In OSM File ${osm_file_path}
-    Import OSM Export  ${osm_file_path}  CH
+    ${http_response}=  Create Synthese Object  ${CITIES_TABLE_ID}  field_name\=UnknownCity
+    ${default_city_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    ${http_response}=  Create Synthese Object  ${ROAD_PLACES_TABLE_ID}  field_name\=UnknownRoadPlace  field_city_id\=${default_city_id}
+    ${default_road_place_id}=  Get Element Attribute  source=${http_response.content}  name=id
+    Import OSM Export  ${osm_file_path}  CH  ${default_road_place_id}
     There Should Be No Orphan Road
-    There are ${expected_city_count} Objects In Table ${CITIES_TABLE_ID}
+    There are ${expected_city_count+1} Objects In Table ${CITIES_TABLE_ID}
     There are ${expected_road_count} Objects In Table ${ROADS_TABLE_ID}
     There are 197 Objects In Table ${ROAD_PLACES_TABLE_ID}
     There are 2072 Objects In Table ${ROAD_CHUNKS_TABLE_ID}
@@ -64,7 +72,7 @@ Count Crossing Restrictions In OSM File ${osm_file_path}
     [Return]    ${osm_crossing_restrictions_count}
 
 There Should Be No Orphan Road
-    ${orphan_roads_count}=  Count Objects In Table ${ROADS_TABLE_ID} Where Column "road_place_ids" Is Not Empty
+    ${orphan_roads_count}=  Count Objects In Table ${ROADS_TABLE_ID} Where Column "road_place_ids" Is Empty
     Should Be Equal As Numbers  0  ${orphan_roads_count}
 
 
