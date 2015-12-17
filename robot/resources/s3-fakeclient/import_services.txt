@@ -37,4 +37,21 @@ Import PubliBike Stations
 
 
 
+Import inter_synthese_package file
+    [Arguments]  ${inter_synthese_package_file}
+    ${http_response}=  Create Synthese Object    ${DATA_SOURCES_TABLE_ID}  field_name\=inter_synthese_package
+    ${data_source_id}=  Get Element Attribute  source=${http_response.content}  name=id
+
+    ${http_response}=  Create Synthese Object    ${IMPORTS_TABLE_ID}  ${IMPORTS_TABLE_ID}  field_name\=ISP_Import  field_file_format\=inter_synthese_package  field_data_source_id\=${data_source_id}  field_log_path\=${SUITE NAME}/${TEST NAME}/${node.node_dir}/import_logs  field_min_log_level\=10
+    ${import_id}=  Get Element Attribute  source=${http_response.content}  name=id
+
+    ${response}=  Call Synthese Service    ImportFunction    ds\=${data_source_id}  di\=1  file_path\=${inter_synthese_package_file}  import_id\=${import_id}  url\=inutile
+    Log Many  ${response.content}
+    Should Be Equal As Strings    ${response.status_code}    200
+    [Return]    ${response}
+
+
+Project StopPoints
+    ${response}=  Call Synthese Service    action    action_name=\ProjectAllStopPointsAction
+
 
