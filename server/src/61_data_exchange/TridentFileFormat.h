@@ -272,8 +272,7 @@ namespace synthese
 				static std::string TridentId (const std::string& peer, const std::string clazz, const util::Registrable& obj);
 				static std::string TridentId (const std::string& peer, const std::string clazz, const pt::LinePhysicalStop& linePhysicalStop);
 
-				bool _isSServiceHLP(const pt::ScheduledService* srv) const;
-				bool _isCServiceHLP(const pt::ContinuousService* srv) const;
+				bool _isUseRuleHLP(const pt::PTUseRule* pedestrianUseRule) const;
 				bool _hasJPOnlyHLP(const pt::JourneyPattern* jp) const;
 
 			public:
