@@ -843,19 +843,19 @@ sqrt(
 			{
 				if(_totalDistance && (_totalDistance > distanceToEnd))
 				{
-					// Part 1 : 25% projected speed
-					score = ((_totalDistance - distanceToEnd) * 250) / (_vmax * journeyDuration.total_seconds());
-					if(score > 250)
+					// Part 1 : 55% projected speed
+					score = ((_totalDistance - distanceToEnd) * 550) / (_vmax * journeyDuration.total_seconds());
+					if(score > 550)
 					{
-						score = 250;
+						score = 550;
 					}
 					else
 					{
-						score = 250 - score;
+						score = 550 - score;
 					}
 
 					// Part 2 : 50% projected distance
-					score += ((500 * distanceToEnd) / _totalDistance);
+					score += ((200 * distanceToEnd) / _totalDistance);
 				}
 			}
 
