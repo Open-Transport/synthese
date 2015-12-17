@@ -521,8 +521,8 @@ namespace synthese
 				);
 				if (_excludeHLP && _isUseRuleHLP(pedestrianUseRule))
 				{
-						continue;
-					}
+					continue;
+				}
 
 				os << "<Timetable>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "Timetable", *srv) << "</objectId>" << "\n";
@@ -547,9 +547,9 @@ namespace synthese
 				);
 				if (_excludeHLP && _isUseRuleHLP(pedestrianUseRule))
 				{
-						// Exclude this service
-						continue;
-					}
+					// Exclude this service
+					continue;
+				}
 				os << "<Timetable>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "Timetable", *srv) << "</objectId>" << "\n";
 
@@ -576,9 +576,9 @@ namespace synthese
 				);
 				if (_excludeHLP && _isUseRuleHLP(pedestrianUseRule))
 				{
-						// Exclude this service
-						continue;
-					}
+					// Exclude this service
+					continue;
+				}
 				string timeSlotId;
 				timeSlotId = TridentId(peerid, "TimeSlot", *csrv);
 
@@ -628,8 +628,8 @@ namespace synthese
 
 				if (_excludeHLP && _hasJPOnlyHLP(line))
 				{
-						continue;
-					}
+					continue;
+				}
 
 				os << "<ChouetteRoute>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</objectId>" << "\n";
@@ -744,12 +744,13 @@ namespace synthese
 			{
 				if (_excludeHLP && _hasJPOnlyHLP(line.second.get()))
 				{
-						continue;
-					}
+					continue;
+				}
 				const LinePhysicalStop* from(NULL);
 				BOOST_FOREACH(const Edge* toEdge, line.second->getEdges())
 				{
-					const LinePhysicalStop* to = static_cast<const LinePhysicalStop*>(toEdge);					if (from != NULL)
+					const LinePhysicalStop* to = static_cast<const LinePhysicalStop*>(toEdge);
+					if (from != NULL)
 					{
 						os << "<PtLink>" << "\n";
 						os << "<objectId>" << TridentId (peerid, "PtLink", *from) << "</objectId>" << "\n";
@@ -772,8 +773,8 @@ namespace synthese
 
 				if (_excludeHLP && _hasJPOnlyHLP(line))
 				{
-						continue;
-					}
+					continue;
+				}
 
 				os << "<JourneyPattern>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "JourneyPattern", *line) << "</objectId>" << "\n";
@@ -809,9 +810,9 @@ namespace synthese
 				);
 				if (_excludeHLP && _isUseRuleHLP(pedestrianUseRule))
 				{
-						// Exclude this service
-						continue;
-					}
+					// Exclude this service
+					continue;
+				}
 				bool isDRT(
 					dynamic_cast<const PTUseRule*>(&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)) != NULL &&
 					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
@@ -940,9 +941,9 @@ namespace synthese
 				);
 				if (_excludeHLP && _isUseRuleHLP(pedestrianUseRule))
 				{
-						// Exclude this service
-						continue;
-					}
+					// Exclude this service
+					continue;
+				}
 				bool isDRT(
 					dynamic_cast<const PTUseRule*>(&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)) &&
 					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
