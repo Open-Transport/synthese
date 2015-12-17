@@ -206,8 +206,21 @@ OSMFileFormatEntityHandler::handleCity(
 		(cityCodeIsSet ? boost::optional<std::string>() : boost::optional<std::string>(normalizedCityName)), // likeName
 		(cityCodeIsSet ? boost::optional<std::string>(cityCode) : boost::optional<std::string>()),
 		0, 0, true, true,
-		util::UP_LINKS_LOAD_LEVEL // code
+		util::UP_LINKS_LOAD_LEVEL
 	);
+
+	if(cities.empty() && cityCodeIsSet)
+	{
+		// No matching city was found by code, try to find one by name
+		cities = CityTableSync::Search(
+			_env,
+			boost::optional<std::string>(), // exactname
+			boost::optional<std::string>(normalizedCityName), // likeName
+			boost::optional<std::string>(),
+			0, 0, true, true,
+			util::UP_LINKS_LOAD_LEVEL
+		);
+	}
 
 	if(cities.empty())
 	{
@@ -236,6 +249,12 @@ OSMFileFormatEntityHandler::handleCity(
 	{
 		// At least one matching city found, update the first one
 		city = cities.front();
+
+		// Throw a warning if more than one city found
+		if (cities.size() > 1)
+		{
+			_importer._logWarning("More than one existing city " + city->get<Name>());
+		}
 
 		_importer._logLoad("Updating city " + city->get<Name>());
 

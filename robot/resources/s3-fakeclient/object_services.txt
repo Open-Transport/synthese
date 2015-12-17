@@ -50,9 +50,7 @@ Every Object In Table ${table_id:\d+} Should Have Attribute ${attribute_name:\S+
 
 Count Objects In Table ${table_id:\d+} Where Column "${column_name}" Is Empty
     ${response}=  List Synthese Objects  table_id=${table_id}
-    ${utf8_content}   Decode Bytes To String   ${response}   UTF-8    strict
-    Log Many  ${utf8_content}
-    ${object_count}=  Get Element Count  ${utf8_content}  xpath=object[@${column_name} = ""]
+    ${object_count}=  Get Element Count  ${response}  xpath=object[@${column_name} = ""]
     [Return]  ${object_count}
 
 
