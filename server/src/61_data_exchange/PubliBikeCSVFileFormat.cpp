@@ -352,6 +352,7 @@ namespace synthese
 			if(geometry)
 			{
 				station->setGeometry(*geometry);
+				station->set<PointGeometry>(*geometry);
 			}
 
 			return station;
