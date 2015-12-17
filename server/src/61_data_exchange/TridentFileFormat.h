@@ -252,6 +252,8 @@ namespace synthese
 				static const std::string PARAMETER_LINE_ID;	//!< Commercial line id parameter
 				static const std::string PARAMETER_WITH_TISSEO_EXTENSION;	//!< With tisseo extension parameter
 				static const std::string PARAMETER_WITH_OLD_DATES;
+				static const std::string PARAMETER_WRITE_ONLY_DEPARTURE_TIMES;  //!< Display with arrival_time = departure_time
+				static const std::string PARAMETER_EXCLUDE_HLP;
 
 			private:
 				//! @name Export parameters
@@ -259,12 +261,17 @@ namespace synthese
 					boost::gregorian::date	_startDate;
 					boost::shared_ptr<const pt::CommercialLine> _line; //!< Commercial line to export
 					bool										_withTisseoExtension;
+					bool					_writeOnlyDepartureTimes;
+					bool					_excludeHLP;
 					mutable util::Env _env;
 				//@}
 
 				static std::string TridentId (const std::string& peer, const std::string clazz, const util::RegistryKeyType& id);
 				static std::string TridentId (const std::string& peer, const std::string clazz, const std::string& s);
 				static std::string TridentId (const std::string& peer, const std::string clazz, const util::Registrable& obj);
+
+				bool _isUseRuleHLP(const pt::PTUseRule* pedestrianUseRule) const;
+				bool _hasJPOnlyHLP(const pt::JourneyPattern* jp) const;
 
 			public:
 				Exporter_(const impex::Export& export_);
