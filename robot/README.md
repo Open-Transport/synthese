@@ -17,6 +17,7 @@ pip2 install robotframework
 pip2 install requests
 pip2 install robotframework-requests
 pip2 install robotframework-databaselibrary
+pip2 install pyspatialite
 ```
 
 ## Running tests
