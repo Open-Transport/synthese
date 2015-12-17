@@ -516,7 +516,10 @@ namespace synthese
 			BOOST_FOREACH(Registry<ScheduledService>::value_type itsrv, _env.getRegistry<ScheduledService>())
 			{
 				const ScheduledService* srv(itsrv.second.get());
-				if (_excludeHLP && _isSServiceHLP(srv))
+				const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
+					&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+				);
+				if (_excludeHLP && _isUseRuleHLP(pedestrianUseRule))
 				{
 					continue;
 				}
@@ -539,7 +542,10 @@ namespace synthese
 			BOOST_FOREACH(Registry<ContinuousService>::value_type itsrv, _env.getRegistry<ContinuousService>())
 			{
 				const ContinuousService* srv(itsrv.second.get());
-				if (_excludeHLP && _isCServiceHLP(srv))
+				const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
+					&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+				);
+				if (_excludeHLP && _isUseRuleHLP(pedestrianUseRule))
 				{
 					// Exclude this service
 					continue;
@@ -565,7 +571,10 @@ namespace synthese
 			BOOST_FOREACH(Registry<ContinuousService>::value_type itsrv, _env.getRegistry<ContinuousService>())
 			{
 				const ContinuousService* csrv(itsrv.second.get());
-				if (_excludeHLP && _isCServiceHLP(csrv))
+				const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
+					&csrv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+				);
+				if (_excludeHLP && _isUseRuleHLP(pedestrianUseRule))
 				{
 					// Exclude this service
 					continue;
@@ -793,7 +802,10 @@ namespace synthese
 			BOOST_FOREACH(Registry<ScheduledService>::value_type itsrv, _env.getRegistry<ScheduledService>())
 			{
 				const ScheduledService* srv(itsrv.second.get());
-				if (_excludeHLP && _isSServiceHLP(srv))
+				const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
+					&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+				);
+				if (_excludeHLP && _isUseRuleHLP(pedestrianUseRule))
 				{
 					// Exclude this service
 					continue;
@@ -921,7 +933,10 @@ namespace synthese
 			BOOST_FOREACH(Registry<ContinuousService>::value_type itsrv, _env.getRegistry<ContinuousService>())
 			{
 				const ContinuousService* srv(itsrv.second.get());
-				if (_excludeHLP && _isCServiceHLP(srv))
+				const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
+					&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+				);
+				if (_excludeHLP && _isUseRuleHLP(pedestrianUseRule))
 				{
 					// Exclude this service
 					continue;
@@ -2485,27 +2500,8 @@ namespace synthese
 			return it->second;
 		}
 
-		bool TridentFileFormat::Exporter_::_isSServiceHLP(const pt::ScheduledService* srv) const
+		bool TridentFileFormat::Exporter_::_isUseRuleHLP(const PTUseRule* pedestrianUseRule) const
 		{
-			const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
-				&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-			);
-			if (pedestrianUseRule &&
-				pedestrianUseRule->getForbiddenInTimetables() &&
-				pedestrianUseRule->getForbiddenInDepartureBoards() &&
-				pedestrianUseRule->getForbiddenInJourneyPlanning())
-			{
-				// Exclude this service
-				return true;
-			}
-			return false;
-		}
-
-		bool TridentFileFormat::Exporter_::_isCServiceHLP(const pt::ContinuousService* srv) const
-		{
-			const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
-				&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-			);
 			if (pedestrianUseRule &&
 				pedestrianUseRule->getForbiddenInTimetables() &&
 				pedestrianUseRule->getForbiddenInDepartureBoards() &&
@@ -2530,10 +2526,7 @@ namespace synthese
 				const PTUseRule* pedestrianUseRule = dynamic_cast<const PTUseRule*>(
 					&service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
 				);
-				if (!pedestrianUseRule ||
-					!pedestrianUseRule->getForbiddenInTimetables() ||
-					!pedestrianUseRule->getForbiddenInDepartureBoards() ||
-					!pedestrianUseRule->getForbiddenInJourneyPlanning())
+				if (!_isUseRuleHLP(pedestrianUseRule))
 				{
 					displayAtLeastAService = true;
 					break;
