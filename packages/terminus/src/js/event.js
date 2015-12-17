@@ -93,6 +93,55 @@ function update_start_end_stop_points(message)
   }
 }
 
+function update_form_fields_visibility(message)
+{
+  var displayScreens = message['displayscreen_recipient'];
+  var optionalFieldNames = [ "repeat_interval", "with_ack", "multiple_stops", "play_tts", "light", "direction_sign_code", "start_stop_point", "end_stop_point" ];
+  var activatedFields = new Set();
+  var deactivatedFields = new Set(optionalFieldNames);
+  
+  for(var i=0; i<displayScreens.length; ++i)
+  {
+    // Read the optional field names relevant to this display screen
+    var displayScreenParams = displayScreens[i]['parameter'];
+    if(undefined != displayScreenParams)
+    {
+      var fields = displayScreenParams.split(";");
+      // Update the activated/deactivate field sets
+      fields.forEach(function(field) {
+        activatedFields.add(field);
+        deactivatedFields.delete(field);
+      });
+    }
+  }
+
+  // Note : update_form_fields_visibility can be invoked both from the modal recipient selector and from the main page
+
+  // Hide deactivated fields
+  deactivatedFields.forEach(function(field) {
+    if(parent.document)
+    {
+      $('[field="' + field + '"]', parent.document).parent().hide();
+    }
+    else
+    {
+      $('[field="' + field + '"]').parent().hide();
+    }
+  });
+
+  // Show activated fields
+  activatedFields.forEach(function(field) {
+    if(parent.document)
+    {
+      $('[field="' + field + '"]', parent.document).parent().show();
+    }
+    else
+    {
+      $('[field="' + field + '"]').parent().show();
+    }
+  });
+}
+
 function show_recipients_click()
 {
   var recipient = $(this).attr('factory');
@@ -168,7 +217,6 @@ function show_tags(message)
 
 function update_object_preview(recipient, message)
 {
-  var available_recipients = $('input[factory="'+ recipient +'"]');
   var links = message[recipient +'_recipient'];
   var s='';
   if(links.length)
@@ -201,6 +249,11 @@ function update_object_preview(recipient, message)
   {
     // if line recipients changed, update stop point selects
     update_start_end_stop_points(message);
+  }
+
+  if("displayscreen" == recipient)
+  {
+    update_form_fields_visibility(message);
   }
 }
 
@@ -307,8 +360,7 @@ function generate_alternative_click()
     for(var i=0; i<textAreas.length; ++i)
     {
       var field = tinyMCE.get(textAreas.eq(i).attr('id'));
-      var limitedTxt = txt.substring(0, textAreas.eq(i).attr('limit')).replace(/\n/ig,"<br>");
-      field.setContent(limitedTxt);
+      field.setContent(txt);
     }
     $('#alternatives textarea.mceEditor').each(update_chars_alternative);
     activateForm();
@@ -326,7 +378,6 @@ function generate_alternative_click()
       }
     }
     var txt = tinyMCE.get('tinymce').getContent({format: 'text'});
-    txt = txt.substring(0, limit).replace(/\n/ig,"<br>");
     field.setContent(txt);
     $('#alternatives textarea.mceEditor').each(update_chars_alternative);
     activateForm();
@@ -337,12 +388,21 @@ function generate_alternative_click()
 function update_chars_alternative(alternativeEditor)
 {
   if (typeof(alternativeEditor)==='undefined') {
-    alternativeEditor = tinyMCE.activeEditor;  
+    alternativeEditor = tinyMCE.activeEditor;
   } else {
     alternativeEditor = tinyMCE.get($(this).attr('id'));
   }
   var size = alternativeEditor.getContent({format: 'text'}).length;
-  $('#' + alternativeEditor.id).nextAll('[field=counter]').html(size + ' caractère' + (size > 1 ? 's' : ''));
+  var limit = $('#' + alternativeEditor.id).attr('limit');
+  var counter = $('#' + alternativeEditor.id).nextAll('[field=counter]');
+  var counterText  = '' + size + ' caractère' + (size > 1 ? 's' : '') + ' sur ' + limit;
+  counter.html(size + ' caractère' + (size > 1 ? 's' : '') + ' sur ' + limit);
+  if(size > limit) {
+    counter.html(counterText.fontcolor('red').bold());
+  }
+  else {
+    counter.html(counterText);
+  }
 }
 
 function update_chars()
@@ -571,8 +631,6 @@ function open_message(message)
   $('#message [field=direction_sign_code]').val(message.direction_sign_code);
   $('#message [field=start_stop_point]').val(message.start_stop_point);
   $('#message [field=end_stop_point]').val(message.end_stop_point);
-
-  console.log("open_message : start_stop_point=" + message.start_stop_point + ", end_stop_point=" + message.end_stop_point);
 
   if (message.digitized_version != "")
   {
