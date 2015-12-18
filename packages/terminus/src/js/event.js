@@ -165,16 +165,22 @@ function show_objects(recipient, message)
     if(link.parameter)
     {
       var input = $('input[factory="'+recipient+'"][value="'+ link.recipient_id +'"][parameter="'+ link.parameter +'"]');
-      input.get(0).checked=true;
-      input.attr('link_id', link.id);
-      input.parentsUntil('.modal_body').each(function(){activate_node($(this).children('.openclose'),true);});
+      if(undefined != input.get(0))
+      {
+        input.get(0).checked=true;
+        input.attr('link_id', link.id);
+        input.parentsUntil('.modal_body').each(function(){activate_node($(this).children('.openclose'),true);});
+      }
     }
     else
     {
       var input = $('input[factory="'+recipient+'"][value="'+ link.recipient_id +'"][noparam]');
-      input.get(0).checked=true;
-      input.attr('link_id', link.id);
-      input.parentsUntil('.modal_body').each(function(){activate_node($(this).children('.openclose'),true);});
+      if(undefined != input.get(0))
+      {
+        input.get(0).checked=true;
+        input.attr('link_id', link.id);
+        input.parentsUntil('.modal_body').each(function(){activate_node($(this).children('.openclose'),true);});
+      }
     }
   }
   $('#m_'+ recipient).modal();

@@ -1,3 +1,4 @@
+<#ineoterminus|documentation#>
 <@scenario_id=<@roid@>@>
 <?if&cond=<@scenario_id@>&then=
 	<?scenario&
@@ -505,44 +506,44 @@
         
           <h4><span class="badge badge-inverse" style="vertical-align:middle" id="properties_panel_id">3</span> Paramètres</h4>
           <div class="well">
-            <label>Niveau
+            <label title="<@message_level_tooltip@>">Niveau
               <select class="input-medium" field="level" onkeyup="activateForm()" onchange="activateForm()">
                 <option value="10">Complémentaire</option>
                 <option value="30">Alterné</option>
                 <option value="50">Prioritaire</option>
               </select>
             </label>
-            <label>Durée d'affichage
-              <input class="input-mini" value="" type="number" maxlength="3" field="displayDuration" min="1" max="100" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()"> secondes<span class="inline-help"> (nombre entre 1 et 100)</span>
+            <label title="<@message_displayDuration_tooltip@>">Durée d'affichage
+              <input class="input-mini" type="number" maxlength="3" field="displayDuration" value="" min="0" max="100" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()"> secondes
             </label>
-            <label>Durée entre chaque répétition du message
-              <input class="input-mini" value="" type="number" maxlength="3" field="repeat_interval" min="0" max="3600" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()"> secondes<span class="inline-help"> (nombre entre 0 et 3600)</span>
+            <label title="<@message_repeat_interval_tooltip@>">Durée entre chaque répétition du message
+              <input class="input-mini" type="number" maxlength="3" field="repeat_interval" value="" min="0" max="14400" onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()"> secondes
             </label>
-            <label>Accusé de réception requis
+            <label title="<@message_with_ack_tooltip@>">Accusé de réception requis
               <select class="input-medium" field="with_ack" onkeyup="activateForm()" onchange="activateForm()">
                 <option value="0">Non</option>
                 <option value="1">Oui</option>
               </select>
             </label>
-            <label>Message à chaque passage
+            <label title="<@message_multiple_stops_tooltip@>">Message à chaque passage
               <select class="input-medium" field="multiple_stops" onkeyup="activateForm()" onchange="activateForm()">
                 <option value="0">Non</option>
                 <option value="1">Oui</option>
               </select>
             </label>
-            <label>Lecture TTS pendant l'affichage
+            <label title="<@message_play_tts_tooltip@>">Lecture TTS pendant l'affichage
               <select class="input-medium" field="play_tts" onkeyup="activateForm()" onchange="activateForm()">
                 <option value="0">Non</option>
                 <option value="1">Oui</option>
               </select>
             </label>
-            <label>Allumage LED clignotantes
+            <label title="<@message_light_tooltip@>">Allumage LED clignotantes
               <select class="input-medium" field="light" onkeyup="activateForm()" onchange="activateForm()">
                 <option value="0">Non</option>
                 <option value="1">Oui</option>
               </select>
             </label>
-            <label>Girouette pré-encodée
+            <label title="<@message_direction_sign_code_tooltip@>">Girouette pré-encodée
               <select class="input-medium" field="direction_sign_code" onkeyup="activateForm()" onchange="activateForm()">
                 <option value="-1">Aucune</option>
 		<?objectlist&
@@ -556,7 +557,7 @@
 		?>
               </select>
             </label>
-            <label>Depuis l'arrêt
+            <label title="<@message_start_stop_point_tooltip@>">Depuis l'arrêt
               <select class="input-large" field="start_stop_point" onkeyup="activateForm()" onchange="activateForm()">
                 <option value="0">Aucun</option>
 		<?StopAreasListFunction&group_by_cities=1&output_stops=1&stops_directions=3&output_lines_in_stops=1&template=
@@ -588,7 +589,7 @@
 		?>
               </select>
             </label>
-            <label>Jusque l'arrêt
+            <label title="<@message_end_stop_point_tooltip@>">Jusque l'arrêt
               <select class="input-large" field="end_stop_point" onkeyup="activateForm()" onchange="activateForm()">
                 <option value="0">Aucun</option>
 		<?StopAreasListFunction&group_by_cities=1&output_stops=1&stops_directions=3&output_lines_in_stops=1&template=

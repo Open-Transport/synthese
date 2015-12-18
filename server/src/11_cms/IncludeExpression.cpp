@@ -24,6 +24,8 @@
 
 #include "ParametersMap.h"
 #include "Webpage.h"
+#include "Website.hpp"
+#include "CMSModule.hpp"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -57,10 +59,21 @@ namespace synthese
 			}
 			pm.merge(additionalParametersMap);
 
-			Webpage* includedPage(
-				page.getRoot()->getPageBySmartURL(
-					_pageName.eval(request, additionalParametersMap, page, variables)
-			)	);
+			Webpage* includedPage = NULL;
+
+			if(true == _siteURL.empty())
+			{
+				includedPage = page.getRoot()->getPageBySmartURL(
+						_pageName.eval(request, additionalParametersMap, page, variables)
+				);
+			}
+
+			else
+			{
+				const Website* site = CMSModule::GetSiteByURL("", _siteURL);
+				includedPage = (NULL != site) ? site->getPageBySmartURL(_pageName.eval(request, additionalParametersMap, page, variables)) : NULL;
+			}
+
 			if(includedPage)
 			{
 				includedPage->get<WebpageContent>().getCMSScript().display(
@@ -96,7 +109,16 @@ namespace synthese
 			string pageName("!");
 			for(;it != end && *it != '&' && *it != '#'; ++it)
 			{
-				pageName.push_back(*it);
+				if('|' == *it)
+				{
+					_siteURL = "/" + pageName.substr(1);
+					pageName  = "!";
+				}
+
+				else
+				{
+					pageName.push_back(*it);
+				}
 			}
 			_pageName.setCode(pageName);
 
