@@ -836,7 +836,9 @@ sqrt(
 				// Part 1+2 : 75% needed speed to reach the goal shorter
 				if(totalDuration != journeyDuration)
 				{
-					score = (distanceToEnd * 750) / (_vmax * (*totalDuration - journeyDuration).total_seconds());
+					// Temporary test : replace _vmax by 14m/s ~= 50km/h
+					//score = (distanceToEnd * 750) / (_vmax * (*totalDuration - journeyDuration).total_seconds());
+					score = (distanceToEnd * 750) / (14.0 * (*totalDuration - journeyDuration).total_seconds());
 				}
 			}
 			else
@@ -844,7 +846,9 @@ sqrt(
 				if(_totalDistance && (_totalDistance > distanceToEnd))
 				{
 					// Part 1 : 55% projected speed
-					score = ((_totalDistance - distanceToEnd) * 550) / (_vmax * journeyDuration.total_seconds());
+					// Temporary test : replace _vmax by 14m/s ~= 50km/h
+					//score = ((_totalDistance - distanceToEnd) * 550) / (_vmax * journeyDuration.total_seconds());
+					score = ((_totalDistance - distanceToEnd) * 550) / (14.0 * journeyDuration.total_seconds());
 					if(score > 550)
 					{
 						score = 550;
