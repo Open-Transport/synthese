@@ -32,6 +32,7 @@ namespace synthese
 {
 	template<> const string util::FactorableTemplate<db::DBTableSync, public_biking::PublicBikeStationTableSync>::FACTORY_KEY("65.10.01 Public bike stations");
 	template<> const string util::FactorableTemplate<db::Fetcher<graph::Vertex>, public_biking::PublicBikeStationTableSync>::FACTORY_KEY("124");
+	template<> const string util::FactorableTemplate<db::Fetcher<geography::NamedPlace>, public_biking::PublicBikeStationTableSync>::FACTORY_KEY("124");
 
 	namespace db
 	{

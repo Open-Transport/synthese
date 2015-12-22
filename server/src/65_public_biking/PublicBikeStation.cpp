@@ -23,6 +23,7 @@
 #include "PublicBikeStation.hpp"
 
 #include "City.h"
+#include "CityTableSync.h"
 #include "Hub.h"
 #include "Profile.h"
 #include "PublicBikingModule.h"
@@ -171,6 +172,58 @@ namespace synthese
 		void PublicBikeStation::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			setGeometry(get<PointGeometry>());
+			geography::NamedPlace::setName(get<Name>());
+
+			// City
+			if(get<CityId>() != 0)
+			{
+				geography::City* value(NULL);
+				util::RegistryKeyType cityId(
+					get<CityId>()
+				);
+				try
+				{
+					value = geography::CityTableSync::GetEditable(cityId, env).get();
+				}
+				catch(util::ObjectNotFoundException<geography::City>&)
+				{
+					util::Log::GetInstance().warn("Bad value " + lexical_cast<string>(cityId) + " for city in public bike station " + lexical_cast<string>(getKey()));
+				}
+				geography::NamedPlace::setCity(value);
+			}
+
+			// Registration to city matcher
+			if(getCity())
+			{
+				const_cast<geography::City*>(getCity())->addPlaceToMatcher(env.getEditableSPtr(this));
+			}
+
+			// Registration to public places matcher
+			if(	&env == &util::Env::GetOfficialEnv() &&
+				withAlgorithmOptimizations
+			){
+				PublicBikingModule::GetGeneralPublicBikeStationsMatcher().add(
+					getFullName(),
+					env.getEditableSPtr(this)
+				);
+			}
+		}
+
+		void PublicBikeStation::unlink()
+		{
+			geography::City* city(const_cast<geography::City*>(getCity()));
+			if (city != NULL)
+			{
+				city->removePlaceFromMatcher(*this);
+				city->removeIncludedPlace(*this);
+			}
+			if(util::Env::GetOfficialEnv().contains(*this))
+			{
+				// General public places
+				PublicBikingModule::GetGeneralPublicBikeStationsMatcher().remove(
+					getFullName()
+				);
+			}
 		}
 
 
@@ -239,9 +292,8 @@ namespace synthese
 
 		void PublicBikeStation::toParametersMap(
 			util::ParametersMap& pm,
-			bool withAdditionalParameters /*= true*/,
-			const CoordinatesSystem& coordinatesSystem /*= CoordinatesSystem::GetInstanceCoordinatesSystem()*/,
-			std::string prefix /*= std::string() */
+			const CoordinatesSystem* coordinatesSystem,
+			const std::string& prefix
 		) const	{
 
 			pm.insert(prefix + Key::FIELD.name, getKey());
@@ -292,10 +344,10 @@ namespace synthese
 			if(hasGeometry())
 			{
 				boost::shared_ptr<geos::geom::Geometry> projected(getGeometry());
-				if(	CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() !=
+				if(	coordinatesSystem->getSRID() !=
 					static_cast<CoordinatesSystem::SRID>(getGeometry()->getSRID())
 				){
-					projected = CoordinatesSystem::GetStorageCoordinatesSystem().convertGeometry(*getGeometry());
+					projected = coordinatesSystem->convertGeometry(*getGeometry());
 				}
 
 				geos::io::WKTWriter writer;

@@ -39,7 +39,8 @@ namespace synthese
 			public db::DBDirectTableSyncTemplate<
 				PublicBikeStationTableSync,
 				PublicBikeStation>,
-			public db::FetcherTemplate<graph::Vertex, PublicBikeStationTableSync>
+			public db::FetcherTemplate<graph::Vertex, PublicBikeStationTableSync>,
+			public db::FetcherTemplate<geography::NamedPlace, PublicBikeStationTableSync>
 		{
 		public:
 			virtual bool allowList( const server::Session* session ) const;

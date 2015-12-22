@@ -167,12 +167,12 @@ namespace synthese
 			//! @name Services
 			//@{
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 
 				void toParametersMap(
 					util::ParametersMap& pm,
-					bool withAdditionalParameters,
-					const CoordinatesSystem& coordinatesSystem,
-					std::string prefix = std::string()
+					const CoordinatesSystem* coordinatesSystem,
+					const std::string& prefix = std::string()
 				) const;
 			//@}
 

@@ -200,8 +200,7 @@ namespace synthese
 				// Main attributes
 				pbs.getPublicBikeStation()->toParametersMap(
 					*publicBikeStationPM,
-					true,
-					*_coordinatesSystem
+					_coordinatesSystem
 				);
 
 				// Distance to bbox center
