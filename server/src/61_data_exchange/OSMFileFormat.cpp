@@ -257,6 +257,7 @@ OSMFileFormatEntityHandler::handleCity(
 		}
 
 		_importer._logLoad("Updating city " + city->get<Name>());
+		city->set<Code>(cityCode);
 
 
 		if(NULL != polygonBoundary)
