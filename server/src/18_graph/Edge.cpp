@@ -182,10 +182,17 @@ namespace synthese
 					departureMoment.time_of_day().hours()
 			)	);
 
-			if(	minNextServiceIndex &&
-				(*minNextServiceIndex == services.end() || services.value_comp()(*next, **minNextServiceIndex))
-			){
-				next = *minNextServiceIndex;
+			if(minNextServiceIndex)
+			{
+				if(*minNextServiceIndex == services.end())
+				{
+					next = *minNextServiceIndex;
+				}
+
+				else if((next != services.end()) && services.value_comp()(*next, **minNextServiceIndex))
+				{
+					next = *minNextServiceIndex;
+				}
 			}
 
 			DepartureServiceIndices::mapped_type& departureIndex(getDepartureIndex(collection));
