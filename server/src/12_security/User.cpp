@@ -106,7 +106,8 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(BirthDate, not_a_date_time),
 					FIELD_DEFAULT_CONSTRUCTOR(security::Language),
 					FIELD_DEFAULT_CONSTRUCTOR(DataSourceLinksWithoutUnderscore)
-			)	)
+			)	),
+			_language(NULL)
 		{
 		}
 
