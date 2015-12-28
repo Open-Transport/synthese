@@ -11,6 +11,10 @@ PublicBikeStationTableSync.cpp
 PublicBikeStationTableSync.hpp
 PublicBikeStationsList.cpp
 PublicBikeStationsList.hpp
+PublicBikeJourneyPlanner.cpp
+PublicBikeJourneyPlanner.hpp
+PublicBikeJourneyPlannerResult.cpp
+PublicBikeJourneyPlannerResult.hpp
 PublicBikeJourneyPlannerService.cpp
 PublicBikeJourneyPlannerService.hpp
 ProjectPublicBikeStations.cpp

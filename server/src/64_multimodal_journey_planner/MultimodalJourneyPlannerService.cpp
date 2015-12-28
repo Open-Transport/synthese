@@ -37,6 +37,7 @@
 #include "PTModule.h"
 #include "PTRoutePlannerResult.h"
 #include "PTTimeSlotRoutePlanner.h"
+#include "PublicBikeJourneyPlanner.hpp"
 #include "Request.h"
 #include "RequestException.h"
 #include "RoadChunk.h"
@@ -80,6 +81,7 @@ namespace synthese
 		const string MultimodalJourneyPlannerService::PARAMETER_MAX_TRANSPORT_CONNECTION_COUNT = "max_transport_connection_count";
 		const string MultimodalJourneyPlannerService::PARAMETER_USE_WALK = "use_walk";
 		const string MultimodalJourneyPlannerService::PARAMETER_USE_PT = "use_pt";
+		const string MultimodalJourneyPlannerService::PARAMETER_USE_PUBLICBIKE = "use_public_bike";
 		const string MultimodalJourneyPlannerService::PARAMETER_LOGGER_PATH = "logger_path";
 
 		const string MultimodalJourneyPlannerService::PARAMETER_ASTAR_FOR_WALK = "astar_for_walk"; //TODO : remove when algorithm is chosen
@@ -164,6 +166,9 @@ namespace synthese
 
 			// Use pt
 			map.insert(PARAMETER_USE_PT, _useWalk);
+
+			// Use public_bike
+			map.insert(PARAMETER_USE_PUBLICBIKE, _usePublicBike);
 
 			// Logger path
 			if(!_loggerPath.empty())
@@ -259,6 +264,7 @@ namespace synthese
 			
 			_useWalk = map.getDefault<bool>(PARAMETER_USE_WALK, false);
 			_usePt = map.getDefault<bool>(PARAMETER_USE_PT, false);
+			_usePublicBike = map.getDefault<bool>(PARAMETER_USE_PUBLICBIKE, false);
 
 			std::string pathString(map.getDefault<string>(PARAMETER_LOGGER_PATH, ""));
 			if (!pathString.empty())
@@ -1220,6 +1226,36 @@ namespace synthese
 				}
 
 				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after pt data processing");
+			}
+
+			if (_usePublicBike)
+			{
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : before SYNTHESE bike");
+
+				// Classical synthese algorithm
+				algorithm::AlgorithmLogger logger;
+				graph::AccessParameters bikeAccessParameters(graph::USER_BIKE, false, false, 72000, boost::posix_time::hours(24), 4.167);
+				public_biking::PublicBikeJourneyPlanner pbjp(
+					departure,
+					arrival,
+					startDate,
+					startDate,
+					endDate,
+					endDate,
+					1,
+					pedestrianAccessParameters,
+					bikeAccessParameters,
+					algorithm::DEPARTURE_FIRST,
+					logger
+				);
+				public_biking::PublicBikeJourneyPlannerResult results = pbjp.run();
+
+				if(!results.getJourneys().empty())
+				{
+					Log::GetInstance().debug("MultimodalJourneyPlannerService::run : it exists bike solutions");
+				}
+
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after SYNTHESE bike");
 			}
 
 			Log::GetInstance().debug("MultimodalJourneyPlannerService::run : before output conversion to " + boost::lexical_cast<std::string>(_outputFormat));

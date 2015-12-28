@@ -63,6 +63,7 @@ namespace synthese
 			static const std::string PARAMETER_MAX_TRANSPORT_CONNECTION_COUNT;
 			static const std::string PARAMETER_USE_WALK;
 			static const std::string PARAMETER_USE_PT;
+			static const std::string PARAMETER_USE_PUBLICBIKE;
 			static const std::string PARAMETER_LOGGER_PATH;
 
 			static const std::string PARAMETER_ASTAR_FOR_WALK; //TODO : remove when algorithm is chosen
@@ -85,6 +86,7 @@ namespace synthese
 
 				bool										_useWalk;
 				bool										_usePt;
+				bool										_usePublicBike;
 
 				road::RoadModule::ExtendedFetchPlaceResult	_departure_place;
 				road::RoadModule::ExtendedFetchPlaceResult	_arrival_place;
