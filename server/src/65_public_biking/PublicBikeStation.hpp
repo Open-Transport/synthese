@@ -33,6 +33,7 @@
 #include "NamedPlaceTemplate.h"
 #include "PointerField.hpp"
 #include "PublicBikeNetwork.hpp"
+#include "ReachableFromCrossing.hpp"
 #include "Vertex.h"
 
 namespace synthese
@@ -77,7 +78,8 @@ namespace synthese
 			public graph::Vertex,
 			public Object<PublicBikeStation, PublicBikeStationSchema>,
 			public geography::NamedPlaceTemplate<PublicBikeStation>,
-			public impex::ImportableTemplate<PublicBikeStation>
+			public impex::ImportableTemplate<PublicBikeStation>,
+			public road::ReachableFromCrossing
 		{
 		private:
 			road::Address _projectedPoint;
@@ -161,6 +163,8 @@ namespace synthese
 				virtual std::string getRuleUserName() const;
 
 				virtual graph::GraphIdType getGraphType() const;
+
+				virtual graph::VertexAccess getVertexAccess(const road::Crossing& crossing) const;
 			//@}
 
 

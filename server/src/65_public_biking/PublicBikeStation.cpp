@@ -24,9 +24,11 @@
 
 #include "City.h"
 #include "CityTableSync.h"
+#include "Crossing.h"
 #include "Hub.h"
 #include "Profile.h"
 #include "PublicBikingModule.h"
+#include "RoadChunkEdge.hpp"
 #include "Session.h"
 #include "User.h"
 #include "VertexAccessMap.h"
@@ -169,6 +171,40 @@ namespace synthese
 			}
 		}
 
+		graph::VertexAccess PublicBikeStation::getVertexAccess( const road::Crossing& crossing ) const
+		{
+			if(_projectedPoint.getRoadChunk())
+			{
+				if(_projectedPoint.getRoadChunk()->getFromCrossing() == &crossing)
+				{
+					return graph::VertexAccess(
+						boost::posix_time::minutes(static_cast<long>(_projectedPoint.getMetricOffset() / 50)),
+						_projectedPoint.getMetricOffset()
+					);
+				}
+
+				if(_projectedPoint.getRoadChunk()->getForwardEdge().getNext() &&
+					static_cast<const road::Crossing*>(_projectedPoint.getRoadChunk()->getForwardEdge().getNext()->getFromVertex()) == &crossing
+				){
+					// road chunk metric offsets are expressed from the start of the road
+					graph::MetricOffset chunkStartOffset = _projectedPoint.getRoadChunk()->getMetricOffset();
+					graph::MetricOffset chunkEndOffset   = _projectedPoint.getRoadChunk()->getForwardEdge().getEndMetricOffset();
+
+					// the metric offset of the projected point is expressed from the start of the chunk
+					graph::MetricOffset distanceFromChunkStart = _projectedPoint.getMetricOffset();
+
+					// the distance from the projected point to the chunk end is : chunk size - offset of projected point
+					graph::MetricOffset distanceFromChunkEnd   = (chunkStartOffset - chunkEndOffset) - distanceFromChunkStart;
+
+					return graph::VertexAccess(
+						boost::posix_time::minutes(static_cast<long>(distanceFromChunkEnd / 50)),
+						distanceFromChunkEnd
+					);
+				}
+			}
+			return graph::VertexAccess();
+		}
+
 		void PublicBikeStation::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			setGeometry(get<PointGeometry>());
@@ -207,6 +243,16 @@ namespace synthese
 					env.getEditableSPtr(this)
 				);
 			}
+
+			if(getProjectedPoint().getRoadChunk() &&
+				getProjectedPoint().getRoadChunk()->getFromCrossing())
+			{
+				getProjectedPoint().getRoadChunk()->getFromCrossing()->addReachableVertex(this);
+				if(getProjectedPoint().getRoadChunk()->getForwardEdge().getNext())
+				{
+					static_cast<road::Crossing*>(getProjectedPoint().getRoadChunk()->getForwardEdge().getNext()->getFromVertex())->addReachableVertex(this);
+				}
+			}
 		}
 
 		void PublicBikeStation::unlink()
@@ -223,6 +269,16 @@ namespace synthese
 				PublicBikingModule::GetGeneralPublicBikeStationsMatcher().remove(
 					getFullName()
 				);
+			}
+			if(	getProjectedPoint().getRoadChunk() &&
+				getProjectedPoint().getRoadChunk()->getFromCrossing()
+			){
+				getProjectedPoint().getRoadChunk()->getFromCrossing()->removeReachableVertex(this);
+			}
+			else if(getProjectedPoint().getRoadChunk() &&
+				getProjectedPoint().getRoadChunk()->getForwardEdge().getFromVertex()
+			){
+				static_cast<road::Crossing*>(getProjectedPoint().getRoadChunk()->getForwardEdge().getFromVertex())->removeReachableVertex(this);
 			}
 		}
 
