@@ -34,6 +34,7 @@
 #include "MultimodalJourneyPlannerResult.h"
 #include "NamedPlace.h"
 #include "ParametersMap.h"
+#include "PlacesListService.hpp"
 #include "PTModule.h"
 #include "PTRoutePlannerResult.h"
 #include "PTTimeSlotRoutePlanner.h"
@@ -193,15 +194,37 @@ namespace synthese
 				{
 					_departure_place = road::RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText);
 				}
+				else if (!_originPlaceText.empty())
+				{
+					// One field input
+					pt_website::PlacesListService placesListService;
+					placesListService.setNumber(1);
+					placesListService.setCoordinatesSystem(&CoordinatesSystem::GetInstanceCoordinatesSystem());
+
+					placesListService.setText(_originPlaceText);
+					_departure_place.placeResult = placesListService.getPlaceFromBestResult(
+						placesListService.runWithoutOutput()
+					);
+				}
 				else
 				{
-					throw server::RequestException("Empty departure place or city.");
+					throw server::RequestException("Empty departure place.");
 				}
 			}
-			// One field input
+			else if(map.isDefined(PARAMETER_DEPARTURE_PLACE_TEXT))
+			{ // One field input
+				pt_website::PlacesListService placesListService;
+				placesListService.setNumber(1);
+				placesListService.setCoordinatesSystem(&CoordinatesSystem::GetInstanceCoordinatesSystem());
+
+				placesListService.setText(map.get<string>(PARAMETER_DEPARTURE_PLACE_TEXT));
+				_departure_place.placeResult = placesListService.getPlaceFromBestResult(
+					placesListService.runWithoutOutput()
+				);
+			}
 			else
 			{
-				throw server::RequestException("Empty departure place or city.");
+				throw server::RequestException("Empty departure place.");
 			}
 
 			Log::GetInstance().debug("MultimodalJourneyPlannerService::_setFromParametersMap : after matching of departure place");
@@ -217,15 +240,37 @@ namespace synthese
 				{
 					_arrival_place = road::RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText);
 				}
+				else if (!_destinationPlaceText.empty())
+				{
+					// One field input
+					pt_website::PlacesListService placesListService;
+					placesListService.setNumber(1);
+					placesListService.setCoordinatesSystem(&CoordinatesSystem::GetInstanceCoordinatesSystem());
+
+					placesListService.setText(_destinationPlaceText);
+					_arrival_place.placeResult = placesListService.getPlaceFromBestResult(
+						placesListService.runWithoutOutput()
+					);
+				}
 				else
 				{
-					throw server::RequestException("Empty arrival place or city.");
+					throw server::RequestException("Empty arrival place.");
 				}
 			}
-			// One field input
+			else if(map.isDefined(PARAMETER_ARRIVAL_PLACE_TEXT))
+			{ // One field input
+				pt_website::PlacesListService placesListService;
+				placesListService.setNumber(1);
+				placesListService.setCoordinatesSystem(&CoordinatesSystem::GetInstanceCoordinatesSystem());
+
+				placesListService.setText(map.get<string>(PARAMETER_ARRIVAL_PLACE_TEXT));
+				_arrival_place.placeResult = placesListService.getPlaceFromBestResult(
+					placesListService.runWithoutOutput()
+				);
+			}
 			else
 			{
-				throw server::RequestException("Empty arrival place or city.");
+				throw server::RequestException("Empty arrival place.");
 			}
 
 			Log::GetInstance().debug("MultimodalJourneyPlannerService::_setFromParametersMap : after matching of arrival place");
