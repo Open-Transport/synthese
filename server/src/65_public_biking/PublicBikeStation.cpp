@@ -244,6 +244,20 @@ namespace synthese
 				);
 			}
 
+			// Projected point
+			if(get<ProjectedRoadChunk>())
+			{
+				if ((_projectedPoint.getRoadChunk() != get<ProjectedRoadChunk>().get_ptr()) ||
+					(_projectedPoint.getMetricOffset() != get<ProjectedMetricOffset>()))
+				{
+					_projectedPoint = road::Address(get<ProjectedRoadChunk>().get(), get<ProjectedMetricOffset>());
+				}
+			}
+			else
+			{
+				setProjectedPoint(road::Address());
+			}
+
 			if(getProjectedPoint().getRoadChunk() &&
 				getProjectedPoint().getRoadChunk()->getFromCrossing())
 			{
