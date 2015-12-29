@@ -145,7 +145,8 @@ namespace synthese
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itps, _originVam.getMap())
 				{
 					const graph::Vertex* vertex(itps.first);
-					if(vertex->getGraphType() == PublicBikingModule::GRAPH_ID)
+					if(vertex->getGraphType() == PublicBikingModule::GRAPH_ID ||
+						vertex->getGraphType() == road::RoadModule::GRAPH_ID)
 					{
 						ovam.insert(vertex, itps.second);
 					}
@@ -153,7 +154,8 @@ namespace synthese
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itps, _destinationVam.getMap())
 				{
 					const graph::Vertex* vertex(itps.first);
-					if(vertex->getGraphType() == PublicBikingModule::GRAPH_ID)
+					if(vertex->getGraphType() == PublicBikingModule::GRAPH_ID ||
+						vertex->getGraphType() == road::RoadModule::GRAPH_ID)
 					{
 						dvam.insert(vertex, itps.second);
 					}
