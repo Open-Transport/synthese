@@ -164,96 +164,34 @@ namespace synthese
 			_logger.logTimeSlotJourneyPlannerApproachMap(true, ovam);
 			_logger.logTimeSlotJourneyPlannerApproachMap(false, dvam);
 
-			typedef std::map<const PublicBikeNetwork*, graph::VertexAccessMap> ByNetworksMap;
-			ByNetworksMap stationsByNetworkAtOrigin;
-			ByNetworksMap stationsByNetworkAtDestination;
-
-			BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& it, ovam.getMap())
-			{
-				ByNetworksMap::iterator itStationsByNetworkAtOrigin(stationsByNetworkAtOrigin.find(static_cast<const PublicBikeStation*>(it.first)->getPublicBikeNetwork()));
-				if(itStationsByNetworkAtOrigin == stationsByNetworkAtOrigin.end())
-				{
-					graph::VertexAccessMap newVam;
-					stationsByNetworkAtOrigin.insert(
-						std::make_pair(
-							static_cast<const PublicBikeStation*>(it.first)->getPublicBikeNetwork(),
-							newVam
-					)   );
-					itStationsByNetworkAtOrigin = stationsByNetworkAtOrigin.find(static_cast<const PublicBikeStation*>(it.first)->getPublicBikeNetwork());
-				}
-
-				itStationsByNetworkAtOrigin->second.insert(it.first, it.second);
-			}
-			BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& it, dvam.getMap())
-			{
-				ByNetworksMap::iterator itStationsByNetworkAtDestination(stationsByNetworkAtDestination.find(static_cast<const PublicBikeStation*>(it.first)->getPublicBikeNetwork()));
-				if(itStationsByNetworkAtDestination == stationsByNetworkAtDestination.end())
-				{
-					graph::VertexAccessMap newVam;
-					stationsByNetworkAtDestination.insert(
-						std::make_pair(
-							static_cast<const PublicBikeStation*>(it.first)->getPublicBikeNetwork(),
-							newVam
-					)   );
-					itStationsByNetworkAtDestination = stationsByNetworkAtDestination.find(static_cast<const PublicBikeStation*>(it.first)->getPublicBikeNetwork());
-				}
-
-				itStationsByNetworkAtDestination->second.insert(it.first, it.second);
-			}
-
-			PublicBikeJourneyPlannerResult allResults = PublicBikeJourneyPlannerResult(
+			TimeSlotRoutePlanner r(
+				ovam,
+				dvam,
+				getLowestDepartureTime(),
+				getHighestDepartureTime(),
+				getLowestArrivalTime(),
+				getHighestArrivalTime(),
+				_whatToSearch,
+				_graphToUse,
+				_maxDuration,
+				_maxSolutionsNumber,
+				_journeyParameters,
+				_planningOrder,
+				_vmax,
+				true,
+				_logger,
+				boost::optional<boost::posix_time::time_duration>(),
+				boost::optional<double>(),
+				true,
+				true,
+				graph::UseRule::RESERVATION_INTERNAL_DELAY,
+				true
+			);
+			return PublicBikeJourneyPlannerResult(
 				_departurePlace,
 				_arrivalPlace,
 				false,
-				result);
-
-			BOOST_FOREACH(ByNetworksMap::value_type& itStationsAtOrigin, stationsByNetworkAtOrigin)
-			{
-				ByNetworksMap::const_iterator itStationsAtDestination(stationsByNetworkAtDestination.find(itStationsAtOrigin.first));
-				if (itStationsAtDestination != stationsByNetworkAtDestination.end())
-				{
-					// There are stations of the same network at the beginning and at the end
-					TimeSlotRoutePlanner r(
-						itStationsAtOrigin.second,
-						itStationsAtDestination->second,
-						getLowestDepartureTime(),
-						getHighestDepartureTime(),
-						getLowestArrivalTime(),
-						getHighestArrivalTime(),
-						_whatToSearch,
-						_graphToUse,
-						_maxDuration,
-						_maxSolutionsNumber,
-						_journeyParameters,
-						_planningOrder,
-						_vmax,
-						true,
-						_logger,
-						boost::optional<boost::posix_time::time_duration>(),
-						boost::optional<double>(),
-						true,
-						true,
-						graph::UseRule::RESERVATION_INTERNAL_DELAY,
-						true
-					);
-					PublicBikeJourneyPlannerResult subResult = PublicBikeJourneyPlannerResult(
-						_departurePlace,
-						_arrivalPlace,
-						false,
-						r.run()
-					);
-
-					if (!subResult.getJourneys().empty())
-					{
-						BOOST_FOREACH(const PublicBikeJourneyPlannerResult::Journeys::value_type& sr, subResult.getJourneys())
-						{
-							allResults.addJourney(sr);
-						}
-					}
-				}
-			}
-
-
-			return allResults;
+				r.run()
+			);
 		}
 }	}
