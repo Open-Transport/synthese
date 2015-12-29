@@ -29,6 +29,7 @@
 #include "Profile.h"
 #include "PublicBikingModule.h"
 #include "RoadChunkEdge.hpp"
+#include "RoadModule.h"
 #include "Session.h"
 #include "User.h"
 #include "VertexAccessMap.h"
@@ -168,6 +169,42 @@ namespace synthese
 					this,
 					graph::VertexAccess()
 				);
+			}
+
+			if(whatToSearch.find(road::RoadModule::GRAPH_ID) != whatToSearch.end())
+			{
+				if(getProjectedPoint().getRoadChunk())
+				{
+					// The metric offset of the projected point is expressed from the start of its road chunk
+					graph::MetricOffset distanceFromChunkStart = getProjectedPoint().getMetricOffset();
+
+					// Insert the crossing of the road chunk (= starting point of the road chunk) into the VAM
+					result.insert(
+						getProjectedPoint().getRoadChunk()->getFromCrossing(),
+						graph::VertexAccess(
+							boost::posix_time::minutes(static_cast<long>(ceil(distanceFromChunkStart / 50.0))),
+							distanceFromChunkStart
+					)	);
+
+					// If the next edge exist add the next crossing to the VAM (see issue #23315)
+					if(getProjectedPoint().getRoadChunk()->getForwardEdge().getNext())
+					{
+						// The metric offset of the road chunk start and end are expressed from the start of the road
+						graph::MetricOffset chunkStartOffset     = getProjectedPoint().getRoadChunk()->getMetricOffset();
+						graph::MetricOffset chunkEndOffset       = getProjectedPoint().getRoadChunk()->getForwardEdge().getEndMetricOffset();
+
+						// The distance between the chunk end and the stop projection is : chunk size - offset of projected point
+						graph::MetricOffset distanceFromChunkEnd = (chunkEndOffset - chunkStartOffset) - distanceFromChunkStart;
+
+						// Insert the next crossing (= ending point of the road chunk) into the VAM
+						result.insert(
+							getProjectedPoint().getRoadChunk()->getForwardEdge().getNext()->getFromVertex(),
+							graph::VertexAccess(
+								boost::posix_time::minutes(static_cast<long>(ceil(distanceFromChunkEnd / 50.0))),
+								distanceFromChunkEnd
+						)	);
+					}
+				}
 			}
 		}
 
