@@ -142,11 +142,11 @@ namespace synthese
 			}
 			else
 			{
+				// No approach possible, so we expect only bike stations
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itps, _originVam.getMap())
 				{
 					const graph::Vertex* vertex(itps.first);
-					if(vertex->getGraphType() == PublicBikingModule::GRAPH_ID ||
-						vertex->getGraphType() == road::RoadModule::GRAPH_ID)
+					if(vertex->getGraphType() == PublicBikingModule::GRAPH_ID)
 					{
 						ovam.insert(vertex, itps.second);
 					}
@@ -154,11 +154,35 @@ namespace synthese
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itps, _destinationVam.getMap())
 				{
 					const graph::Vertex* vertex(itps.first);
-					if(vertex->getGraphType() == PublicBikingModule::GRAPH_ID ||
-						vertex->getGraphType() == road::RoadModule::GRAPH_ID)
+					if(vertex->getGraphType() == PublicBikingModule::GRAPH_ID)
 					{
 						dvam.insert(vertex, itps.second);
 					}
+				}
+			}
+
+			// In ovam and dvam we only have bike stations, journey planner starts from road next to a bike station
+			graph::VertexAccessMap roadOvam, roadDvam;
+			BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itps, ovam.getMap())
+			{
+				const graph::Vertex* vertex(itps.first);
+				graph::VertexAccessMap hubVam;
+				vertex->getHub()->getVertexAccessMap(hubVam, PublicBikingModule::GRAPH_ID, *vertex, true);
+				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& roadItps, hubVam.getMap())
+				{
+					const graph::Vertex* roadVertex(roadItps.first);
+					roadOvam.insert(roadVertex, roadItps.second);
+				}
+			}
+			BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itps, dvam.getMap())
+			{
+				const graph::Vertex* vertex(itps.first);
+				graph::VertexAccessMap hubVam;
+				vertex->getHub()->getVertexAccessMap(hubVam, PublicBikingModule::GRAPH_ID, *vertex, true);
+				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& roadItps, hubVam.getMap())
+				{
+					const graph::Vertex* roadVertex(roadItps.first);
+					roadDvam.insert(roadVertex, roadItps.second);
 				}
 			}
 
@@ -167,8 +191,8 @@ namespace synthese
 			_logger.logTimeSlotJourneyPlannerApproachMap(false, dvam);
 
 			TimeSlotRoutePlanner r(
-				ovam,
-				dvam,
+				roadOvam,
+				roadDvam,
 				getLowestDepartureTime(),
 				getHighestDepartureTime(),
 				getLowestArrivalTime(),
