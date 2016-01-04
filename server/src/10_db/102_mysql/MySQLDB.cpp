@@ -81,7 +81,6 @@ namespace synthese
 		void cleanupThread(bool* initialized)
 		{
 			Log::GetInstance().debug("Cleaning up MySQL thread");
-			print_stacktrace();
 			mysql_thread_end();
 		}
 	}
