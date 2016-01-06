@@ -109,6 +109,16 @@
 						<documentation>Additional data for a public transportation leg</documentation>
 					</annotation>
 				</element>
+				<element name="bike_attributes" type="mjp:BikeLegAttributes">
+					<annotation>
+						<documentation>Additional data for a bike leg</documentation>
+					</annotation>
+				</element>
+				<element name="car_attributes" type="mjp:CarLegAttributes">
+					<annotation>
+						<documentation>Additional data for a car leg</documentation>
+					</annotation>
+				</element>
 			</choice>
 		</sequence>
 		<attribute name="departure_date_time" type="dateTime">
@@ -202,6 +212,46 @@
 			</element>
 		</sequence>
     </complexType>
+    
+	<complexType name="BikeLegAttributes">
+		<sequence>
+			<element name="road" type="mjp:Road" maxOccurs="1" minOccurs="1">
+				<annotation>
+					<documentation>Road treaded by this leg</documentation>
+				</annotation>
+			</element>
+			<element name="network" type="mjp:PublicBikeNetwork" maxOccurs="1" minOccurs="1">
+				<annotation>
+					<documentation>The public bike network providing the bicycle used by this leg</documentation>
+				</annotation>
+			</element>
+		</sequence>
+		<attribute name="length" type="int">
+			<annotation>
+				<documentation>Length of this leg in meters</documentation>
+			</annotation>
+		</attribute>
+	</complexType>    
+
+	<complexType name="CarLegAttributes">
+		<sequence>
+			<element name="road" type="mjp:Road" maxOccurs="1" minOccurs="1">
+				<annotation>
+					<documentation>Road treaded by this leg</documentation>
+				</annotation>
+			</element>
+			<element name="network" type="mjp:CarNetwork" maxOccurs="1" minOccurs="1">
+				<annotation>
+					<documentation>The network providing the car used by this leg (can be car rental, car-sharing, taxi)</documentation>
+				</annotation>
+			</element>
+		</sequence>
+		<attribute name="length" type="int">
+			<annotation>
+				<documentation>Length of this leg in meters</documentation>
+			</annotation>
+		</attribute>
+	</complexType>    
 
     <complexType name="PTNetwork">
     	<attribute name="id" type="mjp:ObjectIdentifier">
@@ -224,22 +274,66 @@
     <complexType name="PTLine">
     	<attribute name="id" type="mjp:ObjectIdentifier">
     		<annotation>
-    			<documentation>Internal object identifier</documentation></annotation></attribute>
+    			<documentation>Internal object identifier</documentation>
+    		</annotation>
+    	</attribute>
     	<attribute name="name" type="string"></attribute>
     	<attribute name="image" type="string"></attribute>
     	<attribute name="style" type="string"></attribute>
     	<attribute name="color" type="string"></attribute>
     </complexType>
 
-    <complexType name="PTService">
+	<complexType name="PTService">
+    	<attribute name="id" type="mjp:ObjectIdentifier">
+			<annotation>
+				<documentation>
+					Internal object identifier
+				</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="number" type="string">
+			<annotation>
+				<documentation>
+					Identifier of this service in its transportation network					
+				</documentation>
+			</annotation>    	
+		</attribute>
+	</complexType>
+	
+    <complexType name="PublicBikeNetwork">
     	<attribute name="id" type="mjp:ObjectIdentifier">
     		<annotation>
-    			<documentation>
-    				Internal object identifier
-    			</documentation>
+    			<documentation>Internal object identifier</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="number" type="string"></attribute>
-    </complexType>
+    	<attribute name="name" type="string">
+    		<annotation>
+    			<documentation>Name of this public bike network</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="image" type="string">
+    		<annotation>
+    			<documentation>Path to the logo of this public bike network</documentation>
+    		</annotation>
+    	</attribute>
+    </complexType>	
+
+    <complexType name="CarNetwork">
+    	<attribute name="id" type="mjp:ObjectIdentifier">
+    		<annotation>
+    			<documentation>Internal object identifier</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="name" type="string">
+    		<annotation>
+    			<documentation>Name of this car network</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="image" type="string">
+    		<annotation>
+    			<documentation>Path to the logo of this car network</documentation>
+    		</annotation>
+    	</attribute>
+    </complexType>	
 
 </schema>
