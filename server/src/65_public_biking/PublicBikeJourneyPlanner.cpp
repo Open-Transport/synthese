@@ -153,7 +153,6 @@ namespace synthese
 						roadDVam,
 						algorithm::DEPARTURE_FIRST,
 						_journeyParameters,
-						_logger,
 						boost::optional<boost::posix_time::time_duration>(),
 						_departureTime,
 						_departureTime,
