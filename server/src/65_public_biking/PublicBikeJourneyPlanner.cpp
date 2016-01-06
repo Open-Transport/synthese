@@ -147,6 +147,10 @@ namespace synthese
 							continue;
 						}
 					}
+					else
+					{
+						continue;
+					}
 
 					algorithm::RoutePlanner r(
 						roadOVam,
@@ -172,6 +176,10 @@ namespace synthese
 							lexical_cast<string>(destinationVertex->getKey()));
 						continue;
 					}
+
+					// Approach legs
+					journey.prepend(itobs.second.approachJourney);
+					journey.append(itdbs.second.approachJourney);
 
 					result.push_back(journey);
 				}
