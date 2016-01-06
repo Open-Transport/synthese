@@ -329,6 +329,10 @@ int main( int argc, char **argv )
 
 
 
+			Log::GetInstance ().info ("SYNTHESE Version " + lexical_cast<string>(SYNTHESE_VERSION) + " " +
+									  lexical_cast<string>(SYNTHESE_REVISION) + " " +
+									  lexical_cast<string>(SYNTHESE_BRANCH) + " " +
+									  lexical_cast<string>(SYNTHESE_BUILD_DATE));
 #ifndef WIN32
 			if (daemonMode)
 			{
