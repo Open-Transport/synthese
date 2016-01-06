@@ -1232,6 +1232,17 @@ namespace synthese
 			{
 				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : before SYNTHESE bike");
 
+				// Initialization
+				graph::AccessParameters approachAccessParameters(
+					graph::USER_PEDESTRIAN,			// user class code
+					false,							// DRT only
+					false,							// without DRT
+					_useWalk ? 1000 : 0,			// max approach distance
+					boost::posix_time::minutes(23),	// max approach time
+					_useWalk ? 1.111 : 0.0,			// approach speed
+					_maxTransportConnectionCount	// max transport connection count (ie : max number of used transport services - 1)
+				);
+
 				// Classical synthese algorithm
 				algorithm::AlgorithmLogger logger;
 				graph::AccessParameters bikeAccessParameters(graph::USER_BIKE, false, false, 72000, boost::posix_time::hours(24), 4.167);
@@ -1239,13 +1250,9 @@ namespace synthese
 					departure,
 					arrival,
 					startDate,
-					startDate,
 					endDate,
-					endDate,
-					1,
-					pedestrianAccessParameters,
+					approachAccessParameters,
 					bikeAccessParameters,
-					algorithm::DEPARTURE_FIRST,
 					logger
 				);
 				public_biking::PublicBikeJourneyPlannerResult results = pbjp.run();

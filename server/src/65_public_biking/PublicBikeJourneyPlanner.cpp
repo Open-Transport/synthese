@@ -24,19 +24,20 @@
 
 #include "AlgorithmLogger.hpp"
 #include "Hub.h"
-#include "PTModule.h"
-#include "RoadModule.h"
+#include "IntegralSearcher.h"
+#include "NamedPlace.h"
+#include "Log.h"
 #include "Place.h"
+#include "PTModule.h"
 #include "PublicBikingModule.h"
 #include "PublicBikeNetwork.hpp"
 #include "PublicBikeStation.hpp"
-#include "Log.h"
+#include "RoadModule.h"
+#include "RoutePlanner.h"
 #include "JourneysResult.h"
-#include "VertexAccessMap.h"
-#include "IntegralSearcher.h"
-#include "NamedPlace.h"
 #include "VAMConverter.hpp"
 #include "Vertex.h"
+#include "VertexAccessMap.h"
 
 #include <sstream>
 
@@ -51,43 +52,18 @@ namespace synthese
 		PublicBikeJourneyPlanner::PublicBikeJourneyPlanner(
 			const geography::Place* origin,
 			const geography::Place* destination,
-			const ptime& lowerDepartureTime,
-			const ptime& higherDepartureTime,
-			const ptime& lowerArrivalTime,
+			const ptime& departureTime,
 			const ptime& higherArrivalTime,
-			const boost::optional<std::size_t> maxSolutionsNumber,
 			const graph::AccessParameters accessParameters,
 			const graph::AccessParameters journeyParameters,
-			const algorithm::PlanningOrder planningOrder,
 			const algorithm::AlgorithmLogger& logger
-		):	TimeSlotRoutePlanner(
-				origin->getVertexAccessMap(
-					accessParameters, PublicBikingModule::GRAPH_ID, road::RoadModule::GRAPH_ID, 0
-				),
-				destination->getVertexAccessMap(
-					accessParameters, PublicBikingModule::GRAPH_ID, road::RoadModule::GRAPH_ID, 0
-				),
-				lowerDepartureTime, higherDepartureTime,
-				lowerArrivalTime, higherArrivalTime,
-				PublicBikingModule::GRAPH_ID,
-				road::RoadModule::GRAPH_ID,
-				optional<posix_time::time_duration>(),
-				maxSolutionsNumber,
-				accessParameters,
-				planningOrder,
-				accessParameters.getApproachSpeed(),
-				true,
-				logger,
-				boost::optional<boost::posix_time::time_duration>(),
-				boost::optional<double>(),
-				true,
-				true,
-				graph::UseRule::RESERVATION_INTERNAL_DELAY,
-				true
-			),
-			_departurePlace(origin),
+		):	_departurePlace(origin),
 			_arrivalPlace(destination),
-			_journeyParameters(journeyParameters)
+			_journeyParameters(journeyParameters),
+			_departureTime(departureTime),
+			_higherArrivalTime(higherArrivalTime),
+			_accessParameters(accessParameters),
+			_logger(logger)
 		{
 		}
 
@@ -95,25 +71,9 @@ namespace synthese
 
 		PublicBikeJourneyPlannerResult PublicBikeJourneyPlanner::run() const
 		{
-			TimeSlotRoutePlanner::Result result;
-
-			// Check if departure and arrival VAMs has contains at least one vertex
-			if(_originVam.getMap().empty() ||
-				_destinationVam.getMap().empty()
-			){
-				_logger.closeTimeSlotJourneyPlannerLog();
-				return PublicBikeJourneyPlannerResult(_departurePlace, _arrivalPlace, false, result);
-			}
-
-			// Check if the departure and arrival places are the same
-			if(_originVam.intersercts(_destinationVam))
-			{
-				_logger.closeTimeSlotJourneyPlannerLog();
-				return PublicBikeJourneyPlannerResult(_departurePlace, _arrivalPlace, true, result);
-			}
+			algorithm::TimeSlotRoutePlanner::Result result;
 
 			// Search bike stations around the departure and arrival places using the road network
-			// FIXME: Need to handle approcahSpeed = 0 in IntegralSearcher himself
 			graph::VertexAccessMap ovam, dvam;
 			if(_accessParameters.getApproachSpeed() != 0)
 			{
@@ -122,28 +82,31 @@ namespace synthese
 					_logger,
 					PublicBikingModule::GRAPH_ID,
 					road::RoadModule::GRAPH_ID,
-					getLowestDepartureTime(),
-					getHighestDepartureTime(),
-					getLowestArrivalTime(),
-					getHighestArrivalTime(),
+					_departureTime,
+					_departureTime,
+					_departureTime,
+					_higherArrivalTime,
 					_departurePlace,
 					_arrivalPlace
 				);
 				ovam = extenderToBikeStations.run(
-					_originVam,
-					_destinationVam,
+					_departurePlace->getVertexAccessMap(_accessParameters, PublicBikingModule::GRAPH_ID, road::RoadModule::GRAPH_ID, 0),
+					_arrivalPlace->getVertexAccessMap(_accessParameters, PublicBikingModule::GRAPH_ID, road::RoadModule::GRAPH_ID, 0),
 					algorithm::DEPARTURE_TO_ARRIVAL
 				);
 				dvam = extenderToBikeStations.run(
-					_destinationVam,
-					_originVam,
+					_arrivalPlace->getVertexAccessMap(_accessParameters, PublicBikingModule::GRAPH_ID, road::RoadModule::GRAPH_ID, 0),
+					_departurePlace->getVertexAccessMap(_accessParameters, PublicBikingModule::GRAPH_ID, road::RoadModule::GRAPH_ID, 0),
 					algorithm::ARRIVAL_TO_DEPARTURE
 				);
 			}
 			else
 			{
-				// No approach possible, so we expect only bike stations
-				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itps, _originVam.getMap())
+				// No approach possible, so we expect departure and arrival places are bike stations
+				graph::VertexAccessMap originVam, destinationVam;
+				originVam = _departurePlace->getVertexAccessMap(_accessParameters, PublicBikingModule::GRAPH_ID, road::RoadModule::GRAPH_ID, 0);
+				destinationVam = _arrivalPlace->getVertexAccessMap(_accessParameters, PublicBikingModule::GRAPH_ID, road::RoadModule::GRAPH_ID, 0);
+				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itps, originVam.getMap())
 				{
 					const graph::Vertex* vertex(itps.first);
 					if(vertex->getGraphType() == PublicBikingModule::GRAPH_ID)
@@ -151,7 +114,7 @@ namespace synthese
 						ovam.insert(vertex, itps.second);
 					}
 				}
-				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itps, _destinationVam.getMap())
+				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itps,destinationVam.getMap())
 				{
 					const graph::Vertex* vertex(itps.first);
 					if(vertex->getGraphType() == PublicBikingModule::GRAPH_ID)
@@ -161,63 +124,60 @@ namespace synthese
 				}
 			}
 
-			// In ovam and dvam we only have bike stations, journey planner starts from road next to a bike station
-			graph::VertexAccessMap roadOvam, roadDvam;
-			BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itps, ovam.getMap())
+			BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itobs, ovam.getMap())
 			{
-				const graph::Vertex* vertex(itps.first);
-				graph::VertexAccessMap hubVam;
-				vertex->getHub()->getVertexAccessMap(hubVam, PublicBikingModule::GRAPH_ID, *vertex, true);
-				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& roadItps, hubVam.getMap())
+				// For each bike station around the origin position
+				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itdbs, dvam.getMap())
 				{
-					const graph::Vertex* roadVertex(roadItps.first);
-					roadOvam.insert(roadVertex, roadItps.second);
-				}
-			}
-			BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itps, dvam.getMap())
-			{
-				const graph::Vertex* vertex(itps.first);
-				graph::VertexAccessMap hubVam;
-				vertex->getHub()->getVertexAccessMap(hubVam, PublicBikingModule::GRAPH_ID, *vertex, true);
-				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& roadItps, hubVam.getMap())
-				{
-					const graph::Vertex* roadVertex(roadItps.first);
-					roadDvam.insert(roadVertex, roadItps.second);
+					// For each bike station around the destination position
+					// Road journey planner between origin bike station to destination bike station
+					const graph::Vertex* originVertex(itobs.first);
+					graph::VertexAccessMap roadOVam;
+					originVertex->getHub()->getVertexAccessMap(roadOVam, PublicBikingModule::GRAPH_ID, *originVertex, true);
+					const graph::Vertex* destinationVertex(itdbs.first);
+					graph::VertexAccessMap roadDVam;
+					destinationVertex->getHub()->getVertexAccessMap(roadDVam, PublicBikingModule::GRAPH_ID, *destinationVertex, true);
+
+					if (dynamic_cast<const PublicBikeStation*>(originVertex) &&
+						dynamic_cast<const PublicBikeStation*>(destinationVertex))
+					{
+						if (dynamic_cast<const PublicBikeStation*>(originVertex)->getPublicBikeNetwork() !=
+							dynamic_cast<const PublicBikeStation*>(destinationVertex)->getPublicBikeNetwork())
+						{
+							continue;
+						}
+					}
+
+					algorithm::RoutePlanner r(
+						roadOVam,
+						roadDVam,
+						algorithm::DEPARTURE_FIRST,
+						_journeyParameters,
+						_logger,
+						boost::optional<boost::posix_time::time_duration>(),
+						_departureTime,
+						_departureTime,
+						_higherArrivalTime,
+						road::RoadModule::GRAPH_ID,
+						road::RoadModule::GRAPH_ID,
+						_journeyParameters.getApproachSpeed(),
+						true,
+						_logger
+					);
+
+					graph::Journey journey(r.run());
+					if(journey.empty())
+					{
+						util::Log::GetInstance().debug("PublicBikeJourneyPlanner::run no solution from " +
+							lexical_cast<string>(originVertex->getKey()) + " to " +
+							lexical_cast<string>(destinationVertex->getKey()));
+						continue;
+					}
+
+					result.push_back(journey);
 				}
 			}
 
-			// Log the vams
-			_logger.logTimeSlotJourneyPlannerApproachMap(true, ovam);
-			_logger.logTimeSlotJourneyPlannerApproachMap(false, dvam);
-
-			TimeSlotRoutePlanner r(
-				roadOvam,
-				roadDvam,
-				getLowestDepartureTime(),
-				getHighestDepartureTime(),
-				getLowestArrivalTime(),
-				getHighestArrivalTime(),
-				_whatToSearch,
-				_graphToUse,
-				_maxDuration,
-				_maxSolutionsNumber,
-				_journeyParameters,
-				_planningOrder,
-				_vmax,
-				true,
-				_logger,
-				boost::optional<boost::posix_time::time_duration>(),
-				boost::optional<double>(),
-				true,
-				true,
-				graph::UseRule::RESERVATION_INTERNAL_DELAY,
-				true
-			);
-			return PublicBikeJourneyPlannerResult(
-				_departurePlace,
-				_arrivalPlace,
-				false,
-				r.run()
-			);
+			return PublicBikeJourneyPlannerResult(_departurePlace, _arrivalPlace, true, result);
 		}
 }	}

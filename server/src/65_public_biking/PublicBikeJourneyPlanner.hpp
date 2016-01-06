@@ -23,11 +23,10 @@
 #ifndef SYNTHESE_publicbiking_PublicBikeJourneyPlanner_h__
 #define SYNTHESE_publicbiking_PublicBikeJourneyPlanner_h__
 
-#include "TimeSlotRoutePlanner.h"
-#include "PublicBikeJourneyPlannerResult.hpp"
 #include "AlgorithmTypes.h"
 #include "AccessParameters.h"
 #include "GraphTypes.h"
+#include "PublicBikeJourneyPlannerResult.hpp"
 
 #include <boost/optional.hpp>
 
@@ -42,27 +41,26 @@ namespace synthese
 		/** Public Bike journey planner.
 			@ingroup m65
 		*/
-		class PublicBikeJourneyPlanner:
-			public algorithm::TimeSlotRoutePlanner
+		class PublicBikeJourneyPlanner
 		{
 		private:
 			const geography::Place* const _departurePlace;
 			const geography::Place* const _arrivalPlace;
 			const graph::AccessParameters _journeyParameters;
+			const boost::posix_time::ptime& _departureTime;
+			const boost::posix_time::ptime& _higherArrivalTime;
+			const graph::AccessParameters _accessParameters;
+			const algorithm::AlgorithmLogger& _logger;
 
 
 		public:
 			PublicBikeJourneyPlanner(
 				const geography::Place* origin,
 				const geography::Place* destination,
-				const boost::posix_time::ptime& lowerDepartureTime,
-				const boost::posix_time::ptime& higherDepartureTime,
-				const boost::posix_time::ptime& lowerArrivalTime,
+				const boost::posix_time::ptime& departureTime,
 				const boost::posix_time::ptime& higherArrivalTime,
-				const boost::optional<std::size_t>	maxSolutionsNumber,
 				const graph::AccessParameters		accessParameters,
 				const graph::AccessParameters		journeyParameters,
-				const algorithm::PlanningOrder		planningOrder,
 				const algorithm::AlgorithmLogger& logger
 			);
 
