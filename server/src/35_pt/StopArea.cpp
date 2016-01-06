@@ -267,6 +267,7 @@ namespace synthese
 			const Vertex& origin,
 			bool vertexIsOrigin
 		) const {
+			// RULE-205
 
 			if (whatToSearch != PTModule::GRAPH_ID) return;
 
@@ -307,6 +308,7 @@ namespace synthese
 			const AccessParameters& accessParameters,
 			const geography::Place::GraphTypes& whatToSearch
 		) const {
+			// RULE-105 (init of the VAM - physical stops of the stop area and crossings next to each physical stop)
 			// If the VAM uses road, append the crossings around each physical stops of the StopArea
 			if(whatToSearch.find(RoadModule::GRAPH_ID) != whatToSearch.end())
 			{

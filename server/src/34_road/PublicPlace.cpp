@@ -109,6 +109,7 @@ namespace synthese
 			const graph::AccessParameters& accessParameters,
 			const geography::Place::GraphTypes& whatToSearch
 		) const	{
+			// RULE-107
 
 			// Return results only if road graph is searched
 			if(whatToSearch.find(RoadModule::GRAPH_ID) == whatToSearch.end())

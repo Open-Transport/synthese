@@ -92,7 +92,7 @@ namespace synthese
 			_enableRealTime(enableRealTime),
 			_reservationRulesDelayType(reservationRulesDelayType),
 			_logger(logger),
-			_totalDistance(
+			_totalDistance(		// RULE-402
 				(destinationVam.getCentroid().get() && originVam.getCentroid().get()) ?
 				int(destinationVam.getCentroid()->distance(originVam.getCentroid().get())) :
 				numeric_limits<int>::max()
@@ -109,7 +109,7 @@ namespace synthese
 
 			Result result(_planningOrder == DEPARTURE_FIRST ? DEPARTURE_TO_ARRIVAL : ARRIVAL_TO_DEPARTURE);
 
-			// Look for best time
+			// Look for best arrival time from the departure time (in DEPARTURE_TO_ARRIVAL mode)
 			_findBestJourney(
 				result,
 				_planningOrder == DEPARTURE_FIRST ? _originVam : _destinationVam,
@@ -128,7 +128,7 @@ namespace synthese
 			// but result is not empty without duration filters it could be empty with duration filters
 			if(result.empty()) return result;
 
-			Result result2(result, _planningOrder == DEPARTURE_FIRST ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL);
+			Result result2(result, _planningOrder == DEPARTURE_FIRST ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL); // RULE-403
 
 			ptime beginBound(result2.getBeginTime());
 			ptime endBound(result2.getEndTime());
@@ -146,7 +146,7 @@ namespace synthese
 				beginBound = _maxBeginTime;
 			}
 
-			// Check if the found result is compliant with the duration filters
+			// Check if the found result is compliant with the duration filters RULE-113
 			if(ignoreDurationFilterFirstRun)
 			{
 				bool ok(true);
@@ -188,7 +188,7 @@ namespace synthese
 
 			if(!result2.empty())
 			{
-				// Inclusion of approach journeys in the result
+				// Inclusion of approach journeys in the result RULE-404
 				Journey finalResult;
 
 				if (result2.getStartApproachDuration().total_seconds())
@@ -300,9 +300,11 @@ namespace synthese
 				_reservationRulesDelayType
 			);
 
+			// Fill todo  with a first integral search on startVAM
+			// After this call, todo is filled with all the places which are acecssible with no connection
 			is.integralSearch(
 				startVam,
-				optional<size_t>(0),
+				optional<size_t>(0),	// To have only direct legs
 				result.empty() ?
 					optional<posix_time::time_duration>() :
 					optional<posix_time::time_duration>(
@@ -344,6 +346,9 @@ namespace synthese
 
 					if (va.approachTime.total_seconds() == 0)
 					{
+						// Remove if no approach possible but do not remove if approach is possible
+						// because a PT solution from this end vertex can be better to another vertex of endVAM than a pedestrian one
+						// RULE-305
 						todo.remove(*it->first);
 					}
 
@@ -353,6 +358,7 @@ namespace synthese
 				if(resultFound)
 				{
 					// Removes useless branches according to the new result
+					// RULE-406
 					todo.cleanup(
 						lastBestEndTime != bestEndTime,
 						bestEndTime,

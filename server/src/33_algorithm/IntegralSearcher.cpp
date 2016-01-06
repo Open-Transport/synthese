@@ -373,6 +373,7 @@ namespace synthese
 						)	);
 
 						// If path is a junction, we verify that the origin vertex is the same
+						// RULE-204
 						const Junction* junction(dynamic_cast<const Junction*> (&path));
 						if (junction != NULL)
 						{

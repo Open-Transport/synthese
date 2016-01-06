@@ -102,6 +102,7 @@ namespace synthese
 			const AccessParameters& accessParameters,
 			const GraphTypes& whatToSearch
 		) const {
+			// RULE-106
 
 			IncludingPlace<NamedPlace>::getVertexAccessMap(
 				result,

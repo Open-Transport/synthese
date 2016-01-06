@@ -140,6 +140,7 @@ namespace synthese
 			const graph::AccessParameters& accessParameters,
 			const GraphTypes& whatToSearch
 		) const	{
+			// RULE-108
 			if(whatToSearch.find(RoadModule::GRAPH_ID) == whatToSearch.end()) return;
 
 			BOOST_FOREACH(const Path* road, _paths)

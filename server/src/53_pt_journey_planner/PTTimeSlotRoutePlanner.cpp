@@ -110,6 +110,7 @@ namespace synthese
 			_startWithCar(false),
 			_endWithCar(false)
 		{
+			// RULE-104
 		}
 
 		PTTimeSlotRoutePlanner::PTTimeSlotRoutePlanner(
@@ -164,6 +165,7 @@ namespace synthese
 			_startWithCar(startWithCar),
 			_endWithCar(endWithCar)
 		{
+			// To use for road + PT (park personal car)
 		}
 
 
@@ -173,6 +175,7 @@ namespace synthese
 			_logger.openTimeSlotJourneyPlannerLog();
 
 			// Check if departure and arrival VAMs has contains at least one vertex
+			// RULE-104 should be verified before
 			if(_originVam.getMap().empty() ||
 				_destinationVam.getMap().empty()
 			){
@@ -181,6 +184,7 @@ namespace synthese
 			}
 
 			// Check if the departure and arrival places are the same
+			// RULE-304
 			if(_originVam.intersercts(_destinationVam))
 			{
 				_logger.closeTimeSlotJourneyPlannerLog();
@@ -241,6 +245,7 @@ namespace synthese
 			_logger.logTimeSlotJourneyPlannerApproachMap(false, dvam);
 
 			// Handle of the case of possible full road approach
+			// RULE-304
 			if(	ovam.intersercts(dvam)
 			){
 				Journey resultJourney(ovam.getBestIntersection(dvam));

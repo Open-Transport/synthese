@@ -83,7 +83,7 @@ namespace synthese
 		///
 		/// The _showFullRoadJourney has no effect on the route planning algorithm. It
 		/// controls only the output.
-		///
+		/// RULE-104
 		class PTTimeSlotRoutePlanner:
 			public algorithm::TimeSlotRoutePlanner
 		{

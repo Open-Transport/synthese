@@ -575,6 +575,7 @@ namespace synthese
 				// XY input
 				else if(map.isDefined(PARAMETER_DEPARTURE_PLACE_XY))
 				{
+					// RULE-111
 					PlacesListService placesListService;
 					placesListService.setNumber(1);
 					placesListService.setCoordinatesSystem(_coordinatesSystem);

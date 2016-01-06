@@ -91,6 +91,8 @@ namespace synthese
 
 
 
+		// TODO : set private this constructor
+		// RULE-303
 		TimeSlotRoutePlanner::TimeSlotRoutePlanner(
 			const graph::VertexAccessMap& originVam,
 			const graph::VertexAccessMap& destinationVam,
@@ -178,6 +180,7 @@ namespace synthese
 			// because after each pass originDateTime is corrected with the result of the pass
 			// ex: if the search starts at H0 and the first pass returns a service S starting at H0+t then
 			// the second pass will start at H0+t+1 minute because the best solution from H0+1 to H0+t-1 would always be S
+			// RULE-101 RULE-302 RULE-301
 			for(ptime originDateTime(_planningOrder == DEPARTURE_FIRST ? _lowestDepartureTime : _highestArrivalTime);
 				_planningOrder == DEPARTURE_FIRST ? originDateTime <= _highestDepartureTime : originDateTime >= _lowestArrivalTime;
 				_planningOrder == DEPARTURE_FIRST ? originDateTime += minutes(1) : originDateTime -= minutes(1)
@@ -204,13 +207,15 @@ namespace synthese
 					_enableRealTime,
 					_reservationRulesDelayType
 				);
-				Journey journey(r.run());
+				Journey journey(r.run()); // either next unique solution or next continuous solution with its range
 
 				// if RoutePlanner returns no solution then there is no solution for the time interval [originDateTime, highestDepartureTime]
 				// (or [lowestArrivalTime, originDateTime if the search is inverted) => break the time loop
 				if(journey.empty()) break;
 
 				//! <li> If the journey is continuous, attempt to break it. </li>
+				// because continous solution is the best at _lowestDepartureTime but maybe not at _lowestDepartureTime + 1 minute
+				// RULE-201
 				if(	journey.getContinuousServiceRange ().total_seconds() > 60 &&
 					!_keepContinuousJourneys)
 				{
@@ -236,6 +241,7 @@ namespace synthese
 						true,						// Enable real time
 						_reservationRulesDelayType	// RESERVATION_INTERNAL_DELAY
 					);
+					// RULE-201
 					Result subResult(_MergeSubResultAndParentContinuousService(journey, tsr.run()));
 
 					if(_planningOrder == DEPARTURE_FIRST)
@@ -243,7 +249,8 @@ namespace synthese
 						BOOST_FOREACH(const Result::value_type& sj, subResult)
 						{
 							result.push_back(sj);
-							_journeyTemplates.addResult(journey);
+							// Remember the traversed stop of the solution // RULE-401
+							_journeyTemplates.addResult(sj);
 						}
 					}
 					else
@@ -251,7 +258,8 @@ namespace synthese
 						for(Result::const_reverse_iterator it(subResult.rbegin()); it != subResult.rend(); ++it)
 						{
 							result.push_front(*it);
-							_journeyTemplates.addResult(journey);
+							// Remember the traversed stop of the solution // RULE-401
+							_journeyTemplates.addResult(*it);
 						}
 					}
 				}
@@ -259,29 +267,28 @@ namespace synthese
 				{
 					if(_planningOrder == DEPARTURE_FIRST)
 					{
-						// Verify that the journey is not the same continuous service than the last one.
-						// If yes, enlarge the time slot of the existing continuous service
 						result.push_back(journey);
+						// Remember the traversed stop of the solution // RULE-401
 						_journeyTemplates.addResult(journey);
 					}
 					else
 					{
-						// Verify that the journey is not the same continuous service than the first one.
-						// If yes, enlarge the time slot of the existing continuous service and shift it
 						result.push_front(journey);
+						// Remember the traversed stop of the solution // RULE-401
 						_journeyTemplates.addResult(journey);
 					}
 
 				}
 
-				// Replace 1 minute wide continous service by two scheduled services
+				// Replace 1 minute wide continous service by two scheduled services // RULE-303
 				if(!result.empty() && result.back().getContinuousServiceRange().total_seconds() == 60)
 				{
-					// TODO
+					// TODO (/!\ condition is false here !)
 				}
 
 				if(_minMaxDurationRatioFilter)
 				{
+					// RULE-102
 					if(lowestDuration.is_not_a_date_time() || lowestDuration > journey.getDuration())
 					{
 						lowestDuration = journey.getDuration();
@@ -306,6 +313,7 @@ namespace synthese
 
 							if(newOriginDateTime < originDateTime)
 							{
+								// RULE-301 RULE-203 : TODO this should not happen, throw an assert
 								// There is a time inconsistency, log an error and clear the result set
 								util::Log::GetInstance().error("Route planning found a journey breaking time consistency : "
 															   + boost::posix_time::to_simple_string(newOriginDateTime) + " < "
@@ -323,6 +331,7 @@ namespace synthese
 
 							if(newOriginDateTime > originDateTime)
 							{
+								// RULE-301 RULE-203 : TODO this should not happen, throw an assert
 								// There is a time inconsistency, log an error and clear the result set
 								util::Log::GetInstance().error("Route planning found a journey breaking time consistency : "
 															   + boost::posix_time::to_simple_string(newOriginDateTime) + " > "
@@ -341,6 +350,7 @@ namespace synthese
 
 				if(_maxSolutionsNumber && result.size() >= *_maxSolutionsNumber)
 				{
+					// RULE-103
 					while(result.size() > *_maxSolutionsNumber)
 					{
 						if(_planningOrder == DEPARTURE_FIRST)
@@ -364,6 +374,7 @@ namespace synthese
 
 						if(newOriginDateTime < originDateTime)
 						{
+							// RULE-301 RULE-203 : TODO this should not happen, throw an assert
 							// There is a time inconsistency, log an error and clear the result set
 							util::Log::GetInstance().error("Route planning found a journey breaking time consistency : "
 														   + boost::posix_time::to_simple_string(newOriginDateTime) + " < "
@@ -381,6 +392,7 @@ namespace synthese
 
 						if(newOriginDateTime > originDateTime)
 						{
+							// RULE-301 RULE-203 : TODO this should not happen, throw an assert
 							// There is a time inconsistency, log an error and clear the result set
 							util::Log::GetInstance().error("Route planning found a journey breaking time consistency : "
 														   + boost::posix_time::to_simple_string(newOriginDateTime) + " > "

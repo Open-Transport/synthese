@@ -78,6 +78,7 @@ namespace synthese
 			const graph::AccessParameters& accessParameters,
 			const Place::GraphTypes& whatToSearch
 		) const	{
+			// RULE-109
 			if(whatToSearch.find(RoadModule::GRAPH_ID) != whatToSearch.end())
 			{
 				// Chunk linked with the house
