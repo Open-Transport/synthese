@@ -29,7 +29,7 @@ Import PubliBike Stations
     ${data_source_id}=  Create Data Source    name=PubliBikeCSV
     ${xml_content}=  Create Synthese Object    ${IMPORTS_TABLE_ID}  ${IMPORTS_TABLE_ID}  field_name\=Stations_PubliBike  field_file_format\=PubliBikeCSV  field_data_source_id\=${data_source_id}  field_log_path\=${SUITE NAME}/${TEST NAME}/${node.node_dir}/import_logs  field_min_log_level\=10
     ${import_id}=  Get Element Attribute  source=${xml_content}  name=id
-    ${response}=  Call Synthese Service    ImportFunction    ds\=${data_source_id}  di\=1  pa\=${publibike_stations_file}  import_id\=${import_id}
+    ${response}=  Call Synthese Service    ImportFunction    ds\=${data_source_id}  di\=1  pa\=${publibike_stations_file}  import_id\=${import_id}  project\=1
     Log Many  ${response.content}
     Should Be Equal As Strings    ${response.status_code}    200
     [Return]    ${response}
