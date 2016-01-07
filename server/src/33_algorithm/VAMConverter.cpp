@@ -143,17 +143,21 @@ namespace synthese
 					);
 					BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam2.getMap())
 					{
-						result.insert(
-							it.first,
-							VertexAccess(
-		                        itps.second.approachTime +
-								(	direction == DEPARTURE_TO_ARRIVAL ?
-									vertex->getHub()->getTransferDelay(*vertex, *it.first) :
-									vertex->getHub()->getTransferDelay(*it.first, *vertex)
-								),
-		                        itps.second.approachDistance,
-		                        itps.second.approachJourney
-						)	);
+						if (it.second.approachDistance + itps.second.approachDistance <=
+							_accessParameters.getMaxApproachDistance())
+						{
+							result.insert(
+								it.first,
+								VertexAccess(
+									itps.second.approachTime +
+									(	direction == DEPARTURE_TO_ARRIVAL ?
+										vertex->getHub()->getTransferDelay(*vertex, *it.first) :
+										vertex->getHub()->getTransferDelay(*it.first, *vertex)
+									),
+									itps.second.approachDistance,
+									itps.second.approachJourney
+							)	);
+						}
 					}
 				}
 
@@ -202,20 +206,24 @@ namespace synthese
 					);
 					BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam2.getMap())
 					{
-						result.insert(
-							it.first,
-							VertexAccess(
-								commonApproachTime + (
-									(&v == it.first) ?
-									seconds(0) :
-									(
-										direction == DEPARTURE_TO_ARRIVAL ?
-										cp->getTransferDelay(v, *it.first) :
-										cp->getTransferDelay(*it.first, v)
-								)	),
-								commonApproachDistance,
-								*oj
-						)	);
+						if (it.second.approachDistance + commonApproachDistance <=
+							_accessParameters.getMaxApproachDistance())
+						{
+							result.insert(
+								it.first,
+								VertexAccess(
+									commonApproachTime + (
+										(&v == it.first) ?
+										seconds(0) :
+										(
+											direction == DEPARTURE_TO_ARRIVAL ?
+											cp->getTransferDelay(v, *it.first) :
+											cp->getTransferDelay(*it.first, v)
+									)	),
+									commonApproachDistance + it.second.approachDistance,
+									*oj
+							)	);
+						}
 					}
 				}
 			}

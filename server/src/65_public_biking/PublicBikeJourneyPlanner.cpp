@@ -152,6 +152,11 @@ namespace synthese
 						continue;
 					}
 
+					if (originVertex == destinationVertex)
+					{
+						continue;
+					}
+
 					algorithm::RoutePlanner r(
 						roadOVam,
 						roadDVam,

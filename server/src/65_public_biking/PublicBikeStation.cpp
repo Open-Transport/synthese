@@ -266,7 +266,7 @@ namespace synthese
 					graph::MetricOffset distanceFromChunkStart = _projectedPoint.getMetricOffset();
 
 					// the distance from the projected point to the chunk end is : chunk size - offset of projected point
-					graph::MetricOffset distanceFromChunkEnd   = (chunkStartOffset - chunkEndOffset) - distanceFromChunkStart;
+					graph::MetricOffset distanceFromChunkEnd   = (chunkEndOffset - chunkStartOffset) - distanceFromChunkStart;
 
 					return graph::VertexAccess(
 						boost::posix_time::minutes(static_cast<long>(distanceFromChunkEnd / 50)),
