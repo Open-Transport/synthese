@@ -127,7 +127,7 @@ namespace synthese
 			UseRule::ReservationDelayType reservationRulesDelayType
 		) const {
 
-			// Check of access parameters
+			// Check of access parameters // RULE-116
 			if(!isCompatibleWith(accessParameters))
 			{
 				return ServicePointer();
@@ -142,7 +142,7 @@ namespace synthese
 			// Initializations
 			size_t edgeIndex(edge.getRankInPath());
 
-			// Check of real time vertex
+			// Check of real time vertex (RULE-209)
 			if(	RTData && !allowCanceled && edgeIndex < _RTVertices.size() && !_RTVertices[edgeIndex])
 			{
 				return ServicePointer();
@@ -155,7 +155,7 @@ namespace synthese
 			forceTheorical &= presenceDateTime.time_of_day().hours() > 3;
 			forceTheorical |= presenceDateTime.date() > day_clock::local_day() + days(1);
 
-			// Actual time
+			// Actual time RULE-211
 			const time_duration& thSchedule(getDeparture ? getDepartureSchedule(false, edgeIndex) : getArrivalSchedule(false, edgeIndex));
 			const time_duration& rtSchedule(getDeparture ? getDepartureSchedule(true, edgeIndex) : getArrivalSchedule(true, edgeIndex));
 			const time_duration& schedule((RTData && !forceTheorical) ? rtSchedule : thSchedule);
@@ -171,7 +171,7 @@ namespace synthese
 			ptime originDateTime(actualTime);
 			originDateTime += (departureSchedule - schedule);
 
-			// Check of date
+			// Check of date RULE-211
 			ptime calendarDateTime(originDateTime);
 			if(departureSchedule >= hours(24))
 			{
@@ -226,7 +226,7 @@ namespace synthese
 				}
 			}
 
-			// Reservation check
+			// Reservation check // RULE-212
 			if(	checkIfTheServiceIsReachable &&
 				ptr.isUseRuleCompliant(ignoreReservation, reservationRulesDelayType) == UseRule::RUN_NOT_POSSIBLE
 			){

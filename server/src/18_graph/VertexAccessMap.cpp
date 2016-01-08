@@ -73,6 +73,7 @@ namespace synthese
 		bool
 		VertexAccessMap::needFineSteppingForArrival (const Path* path) const
 		{
+			// Returns true if path is in the VAM
 			return _pathOnWhichFineSteppingForArrival.find(path) != _pathOnWhichFineSteppingForArrival.end();
 		}
 

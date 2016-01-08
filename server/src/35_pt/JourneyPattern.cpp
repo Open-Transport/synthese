@@ -351,6 +351,7 @@ namespace synthese
 
 		bool JourneyPattern::isActive( const boost::gregorian::date& date ) const
 		{
+			// RULE-410
 			return getCalendarCache().isActive(date);
 		}
 

@@ -172,9 +172,9 @@ namespace synthese
 				return ServicePointer();
 			}
 
-			bool RTData(enableRealTime && departureMoment < posix_time::second_clock().local_time() + posix_time::hours(23));
+			bool RTData(enableRealTime && departureMoment < posix_time::second_clock().local_time() + posix_time::hours(23)); // RULE-210
 
-			// Search schedule
+			// Search schedule // RULE-409
 			DepartureServiceIndex::Value next(
 				getDepartureFromIndex(
 					collection,
@@ -191,7 +191,7 @@ namespace synthese
 			DepartureServiceIndices::mapped_type& departureIndex(getDepartureIndex(collection));
 			while ( departureMoment <= maxDepartureMoment )  // boucle sur les dates
 			{
-				// Look in schedule for when the line is in service
+				// Look in schedule for when the line is in service // RULE-410
 				if(	getParentPath()->isActive(departureMoment.date()) ||
 					(departureMoment.time_of_day() < hours(3) && getParentPath()->isActive(departureMoment.date() - days(1)))
 				)

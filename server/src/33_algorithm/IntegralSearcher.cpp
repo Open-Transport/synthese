@@ -191,7 +191,7 @@ namespace synthese
 			boost::optional<boost::posix_time::time_duration> totalDuration
 		){
 			// Recursions to do
-			JourneysResult todo(_originDateTime, _accessDirection);
+			JourneysResult todo(_originDateTime, _accessDirection); // Local todo, stays empty if maxDepth==0
 			todo.addEmptyJourney();
 
 			_logger.openIntegralSearchLog(
@@ -246,18 +246,18 @@ namespace synthese
 					// Initialization of loop local variables
 					const Vertex* origin(itVertex->first);
 
-					// Read only the vertices of the current graph
+					// Read only the vertices of the current graph (RULE-104 in PT)
 					if(origin->getGraphType() != _graphToUse)
 						continue;
 
-					// Checks if the vertex use rules are compliant with current user profile
+					// Checks if the vertex use rules are compliant with current user profile RULE-114
 					const UseRule& vertexUseRule(origin->getUseRule(_accessParameters.getUserClassRank()));
 					if(	!vertexUseRule.isCompatibleWith(_accessParameters)
 					){
 						continue;
 					}
 
-					// Approach to the vertex
+					// Approach to the vertex (RULE-305)
 					RoutePlanningIntermediateJourney fullApproachJourney(currentJourney);
 					if(fullApproachJourney.empty())
 					{
@@ -286,7 +286,7 @@ namespace synthese
 					// Goal edges loop
 					const Vertex::Edges& edges((_accessDirection == DEPARTURE_TO_ARRIVAL) ? origin->getDepartureEdges() : origin->getArrivalEdges());
 
-					BOOST_FOREACH(const Vertex::Edges::value_type& itEdge, edges)
+					BOOST_FOREACH(const Vertex::Edges::value_type& itEdge, edges) // RULE-407
 					{
 						// Getting the current path
 						const Path& path(*itEdge.first);
@@ -295,10 +295,10 @@ namespace synthese
 						assert(itEdge.second);
 						const Edge& edge(*itEdge.second);
 
-						// If we are on a road journey planning
+						// If we are on a road journey planning RULE-207
 						if(_graphToUse == RoadModule::GRAPH_ID)
 						{
-							// Check if the edge is authorized for the user class
+							// Check if the edge is authorized for the user class // RULE-115
 							if(!edge.isCompatibleWith(_accessParameters))
 							{
 								continue;
@@ -325,6 +325,7 @@ namespace synthese
 							}
 						}
 
+						// RULE-408 : skip edge study if not useful
 						PtrEdgeStep fineStep(
 							(_accessDirection == DEPARTURE_TO_ARRIVAL) ?
 							(&Edge::getFollowingArrivalForFineSteppingOnly) :
@@ -335,7 +336,7 @@ namespace synthese
 							continue;
 						}
 
-						// Checks if the path properties are compliant with current filters
+						// Checks if the path properties are compliant with current filters // RULE-115
 						if(	!path.isCompatibleWith(_accessParameters) ||
 							!_accessParameters.isAllowedPathClass
 							(
@@ -346,7 +347,7 @@ namespace synthese
 							continue;
 						}
 
-						// Checks if the path use rules are compliant with current user profile
+						// Checks if the path use rules are compliant with current user profile // RULE-208
 						const UseRule& useRule(path.getUseRule(_accessParameters.getUserClassRank()));
 						if(	dynamic_cast<const PTUseRule*>(&useRule) &&
 							static_cast<const PTUseRule&>(useRule).getForbiddenInJourneyPlanning()
@@ -359,7 +360,7 @@ namespace synthese
 							!_searchOnlyNodes ||
 							(	_accessDirection == DEPARTURE_TO_ARRIVAL ?
 								_destinationVam.needFineSteppingForArrival(&path) :
-								_destinationVam.needFineSteppingForDeparture(&path) // TODO Is it not originVAM ???
+								_destinationVam.needFineSteppingForDeparture(&path)
 							)
 						);
 						PtrEdgeStep step(
@@ -404,252 +405,252 @@ namespace synthese
 								continue;
 						}
 
-						// Loop on services collections
+						// Loop on services collections RULE-407 (useful when a service on the same path passes forward another one - the second one is in another collection)
 						BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, path.getServiceCollections())
 						{
-							set<const Edge*> nonServedEdges;
+							set<const Edge*> nonServedEdges; // For RULE-209
 							optional<Edge::DepartureServiceIndex::Value> departureServiceNumber;
 							optional<Edge::ArrivalServiceIndex::Value> arrivalServiceNumber;
 							ptime departureMoment(correctedDesiredTime);
 
 							// Loop on services
-						while(true)
-						{
-							this_thread::interruption_point();
-
-							// Reach of the next/previous service serving the edge
-							ServicePointer serviceInstance(
-								(_accessDirection == DEPARTURE_TO_ARRIVAL) ?
-								edge.getNextService(
-										*itCollection,
-									_accessParameters,
-									departureMoment,
-									correctedMinMaxDateTimeAtOrigin,
-									true,
-									departureServiceNumber,
-									_inverted,
-									_ignoreReservation,
-									false, // allowCanceledService
-									_enableTheoretical,
-									_enableRealTime,
-									_reservationRulesDelayType
-								):
-								edge.getPreviousService(
-										*itCollection,
-									_accessParameters,
-									departureMoment,
-									correctedMinMaxDateTimeAtOrigin,
-									true,
-									arrivalServiceNumber,
-									_inverted,
-									_ignoreReservation,
-									false, // allowCanceledService
-									_enableTheoretical,
-									_enableRealTime,
-									_reservationRulesDelayType
-							)	);
-
-							// If no service, advance to the next edge
-							if (!serviceInstance.getService())
+							while(true)
 							{
-								break;
-							}
-
-							if(_accessDirection == DEPARTURE_TO_ARRIVAL)
-							{
-								++*departureServiceNumber; // To the next service
-								departureMoment = serviceInstance.getDepartureDateTime();
-								if(_inverted)
-								{
-									departureMoment += serviceInstance.getServiceRange();
-								}
-							}
-							else
-							{
-								++*arrivalServiceNumber; // To the previous service (reverse iterator increment)
-								departureMoment = serviceInstance.getArrivalDateTime();
-								if(_inverted)
-								{
-									departureMoment -= serviceInstance.getServiceRange();
-								}
-							}
-
-							// Check for service compliance rules.
-							if (!serviceInstance.getService()->isCompatibleWith(_accessParameters))
-							{
-								continue;
-							}
-
-							bool nonServedEdgesSearch(!nonServedEdges.empty());
-
-							// The path is traversed
-							for(const Edge* curEdge = (edge.*step)();
-								curEdge != NULL;
-								curEdge = (curEdge->*step)()
-							){
 								this_thread::interruption_point();
 
-								// If the path traversal is only to find non served edges, analyze it only if
-								// it belongs to the list
-								if(nonServedEdgesSearch)
-								{
-									set<const Edge*>::iterator it(nonServedEdges.find(curEdge));
-									if(it == nonServedEdges.end())
-										continue;
-									nonServedEdges.erase(it);
-								}
-
-								const Vertex* reachedVertex(curEdge->getFromVertex());
-
-								// Checks if the vertex use rules are compliant with current user profile
-								const UseRule& vertexUseRule(
-									reachedVertex->getUseRule(_accessParameters.getUserClassRank())
-								);
-								if(	!vertexUseRule.isCompatibleWith(_accessParameters)
-								){
-									continue;
-								}
-
-								// The reached vertex is analyzed only in 3 cases :
-								//  - if the vertex belongs to the goal
-								//  - if the type of the vertex corresponds to the searched one (if
-								//		the _searchOnlyNodes parameter is activated, the vertex must
-								//		also belong to a connection place)
-								//  - if the vertex belongs to a connection place
-								bool isGoalReached(
-									_destinationVam.contains(reachedVertex) &&
-										(!_accessParameters.getMaxtransportConnectionsCount() ||
-										 fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount() + 1)
-								);
-								bool isReturnedVertex(
-									(	reachedVertex->getHub()->containsAnyVertex(_whatToSearch) &&
-										(	!_searchOnlyNodes ||
-											(	reachedVertex->getHub()->isUsefulTransfer(_graphToUse) &&
-												(	!_accessParameters.getMaxtransportConnectionsCount() ||
-													fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount() + 1
-								)	)	)	)	);
-								bool isARecursionNode(
-									reachedVertex->getHub()->isUsefulTransfer(_graphToUse) &&
-									(	!maxDepth || journey->size() < *maxDepth)
-								);
-								if(	!isGoalReached &&
-									!isReturnedVertex &&
-									!isARecursionNode
-								){
-									continue;
-								}
-
-								// Storage of the useful solution
-								ServicePointer serviceUse(serviceInstance, *curEdge, _accessParameters);
-								if (serviceUse.isUseRuleCompliant(_ignoreReservation, _reservationRulesDelayType) == UseRule::RUN_NOT_POSSIBLE)
-								{
-									nonServedEdges.insert(curEdge);
-									continue;
-								}
-
-
-								// Result journey writing
-								graph::Journey::Distance distanceToEnd(
-									isGoalReached ?
-									0 :
-									(
-										(_destinationVam.getCentroid().get() && reachedVertex->getHub()->getPoint().get()) ?
-//										_destinationVam.getCentroid()->distance(
-//											reachedVertex->getHub()->getPoint().get()
-sqrt(
-(_destinationVam.getCentroid()->getX() - reachedVertex->getHub()->getPoint()->getX()) *
-(_destinationVam.getCentroid()->getX() - reachedVertex->getHub()->getPoint()->getX()) +
-(_destinationVam.getCentroid()->getY() - reachedVertex->getHub()->getPoint()->getY()) *
-(_destinationVam.getCentroid()->getY() - reachedVertex->getHub()->getPoint()->getY())
-										):
-										numeric_limits<graph::Journey::Distance>::max()
-									)
-								);
-
-								boost::shared_ptr<RoutePlanningIntermediateJourney> resultJourney(
-									new RoutePlanningIntermediateJourney(
-										fullApproachJourney,
-										serviceUse,
-										isGoalReached,
-										_destinationVam,
-										distanceToEnd,
-										_journeyTemplates ?
-											_journeyTemplates->testSimilarity(fullApproachJourney, *reachedVertex->getHub(), _accessDirection) :
-											false,
-										_getScore(
-											totalDuration,
-											distanceToEnd,
-											_accessDirection == DEPARTURE_TO_ARRIVAL ?
-												serviceUse.getArrivalDateTime() - _originDateTime :
-												_originDateTime - serviceUse.getDepartureDateTime(),
-											*reachedVertex->getHub()
-										)
+								// Reach of the next/previous service serving the edge
+								ServicePointer serviceInstance(
+									(_accessDirection == DEPARTURE_TO_ARRIVAL) ?
+									edge.getNextService(
+											*itCollection,
+										_accessParameters,
+										departureMoment,
+										correctedMinMaxDateTimeAtOrigin,
+										true,
+										departureServiceNumber,
+										_inverted,
+										_ignoreReservation,
+										false, // allowCanceledService
+										_enableTheoretical,
+										_enableRealTime,
+										_reservationRulesDelayType
+									):
+									edge.getPreviousService(
+											*itCollection,
+										_accessParameters,
+										departureMoment,
+										correctedMinMaxDateTimeAtOrigin,
+										true,
+										arrivalServiceNumber,
+										_inverted,
+										_ignoreReservation,
+										false, // allowCanceledService
+										_enableTheoretical,
+										_enableRealTime,
+										_reservationRulesDelayType
 								)	);
 
-
-								// Analyze of the utility of the edge
-								// If the edge is useless, the path is not traversed anymore
-								_JourneyUsefulness evaluationResult(evaluateJourney(resultJourney,isGoalReached));
-								if (!evaluationResult.canBeAResultPart)
+								// If no service, advance to the next edge
+								if (!serviceInstance.getService())
 								{
-									if (!evaluationResult.continueToTraverseThePath)
-										break;
-									else
+									break;
+								}
+
+								if(_accessDirection == DEPARTURE_TO_ARRIVAL)
+								{
+									++*departureServiceNumber; // To the next service
+									departureMoment = serviceInstance.getDepartureDateTime();
+									if(_inverted)
+									{
+										departureMoment += serviceInstance.getServiceRange();
+									}
+								}
+								else
+								{
+									++*arrivalServiceNumber; // To the previous service (reverse iterator increment)
+									departureMoment = serviceInstance.getArrivalDateTime();
+									if(_inverted)
+									{
+										departureMoment -= serviceInstance.getServiceRange();
+									}
+								}
+
+								// Check for service compliance rules.
+								if (!serviceInstance.getService()->isCompatibleWith(_accessParameters))
+								{
+									continue;
+								}
+
+								bool nonServedEdgesSearch(!nonServedEdges.empty());
+
+								// The path is traversed
+								for(const Edge* curEdge = (edge.*step)();
+									curEdge != NULL;
+									curEdge = (curEdge->*step)()
+								){
+									this_thread::interruption_point();
+
+									// If the path traversal is only to find non served edges, analyze it only if
+									// it belongs to the list
+									if(nonServedEdgesSearch)
+									{
+										set<const Edge*>::iterator it(nonServedEdges.find(curEdge));
+										if(it == nonServedEdges.end())
+											continue;
+										nonServedEdges.erase(it);
+									}
+
+									const Vertex* reachedVertex(curEdge->getFromVertex());
+
+									// Checks if the vertex use rules are compliant with current user profile
+									const UseRule& vertexUseRule(
+										reachedVertex->getUseRule(_accessParameters.getUserClassRank())
+									);
+									if(	!vertexUseRule.isCompatibleWith(_accessParameters)
+									){
 										continue;
-								}
+									}
 
-								// Storage of the journey as a result :
-								//	- if goal reached
-								//	- if useful for a transfer
-								if(	isGoalReached ||
-									isReturnedVertex
-								){
-									_result.add(resultJourney);
-								}
+									// The reached vertex is analyzed only in 3 cases :
+									//  - if the vertex belongs to the goal
+									//  - if the type of the vertex corresponds to the searched one (if
+									//		the _searchOnlyNodes parameter is activated, the vertex must
+									//		also belong to a connection place)
+									//  - if the vertex belongs to a connection place
+									bool isGoalReached(
+										_destinationVam.contains(reachedVertex) &&
+											(!_accessParameters.getMaxtransportConnectionsCount() ||
+											 fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount() + 1)
+									);
+									bool isReturnedVertex(
+										(	reachedVertex->getHub()->containsAnyVertex(_whatToSearch) &&
+											(	!_searchOnlyNodes ||
+												(	reachedVertex->getHub()->isUsefulTransfer(_graphToUse) &&
+													(	!_accessParameters.getMaxtransportConnectionsCount() ||
+														fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount() + 1
+									)	)	)	)	);
+									bool isARecursionNode(
+										reachedVertex->getHub()->isUsefulTransfer(_graphToUse) &&
+										(	!maxDepth || journey->size() < *maxDepth)
+									);
+									if(	!isGoalReached &&
+										!isReturnedVertex &&
+										!isARecursionNode
+									){
+										continue;
+									}
 
-								// Storage of the journey for recursion
-								if(	isARecursionNode
-								){
-									boost::shared_ptr<RoutePlanningIntermediateJourney> todoJourney(
+									// Storage of the useful solution
+									ServicePointer serviceUse(serviceInstance, *curEdge, _accessParameters);
+									if (serviceUse.isUseRuleCompliant(_ignoreReservation, _reservationRulesDelayType) == UseRule::RUN_NOT_POSSIBLE)
+									{
+										nonServedEdges.insert(curEdge);
+										continue;
+									}
+
+
+									// Result journey writing
+									graph::Journey::Distance distanceToEnd(
+										isGoalReached ?
+										0 :
+										(
+											(_destinationVam.getCentroid().get() && reachedVertex->getHub()->getPoint().get()) ?
+	//										_destinationVam.getCentroid()->distance(
+	//											reachedVertex->getHub()->getPoint().get()
+	sqrt(
+	(_destinationVam.getCentroid()->getX() - reachedVertex->getHub()->getPoint()->getX()) *
+	(_destinationVam.getCentroid()->getX() - reachedVertex->getHub()->getPoint()->getX()) +
+	(_destinationVam.getCentroid()->getY() - reachedVertex->getHub()->getPoint()->getY()) *
+	(_destinationVam.getCentroid()->getY() - reachedVertex->getHub()->getPoint()->getY())
+											):
+											numeric_limits<graph::Journey::Distance>::max()
+										)
+									);
+
+									boost::shared_ptr<RoutePlanningIntermediateJourney> resultJourney(
 										new RoutePlanningIntermediateJourney(
-											*journey,
+											fullApproachJourney,
 											serviceUse,
-											false,
+											isGoalReached,
 											_destinationVam,
 											distanceToEnd,
-											_journeyTemplates ? _journeyTemplates->testSimilarity(*journey, *reachedVertex->getHub(), _accessDirection) : false,
-											resultJourney->getScore()
+											_journeyTemplates ?
+												_journeyTemplates->testSimilarity(fullApproachJourney, *reachedVertex->getHub(), _accessDirection) :
+												false,
+											_getScore(
+												totalDuration,
+												distanceToEnd,
+												_accessDirection == DEPARTURE_TO_ARRIVAL ?
+													serviceUse.getArrivalDateTime() - _originDateTime :
+													_originDateTime - serviceUse.getDepartureDateTime(),
+												*reachedVertex->getHub()
+											)
 									)	);
-									todo.add(todoJourney);
-								}
 
-								// Storage of the reach time at the goal if applicable
-								if (isGoalReached)
-								{
-									if (_accessDirection == DEPARTURE_TO_ARRIVAL)
+
+									// Analyze of the utility of the edge
+									// If the edge is useless, the path is not traversed anymore
+									_JourneyUsefulness evaluationResult(evaluateJourney(resultJourney,isGoalReached));
+									if (!evaluationResult.canBeAResultPart)
 									{
-										ptime newMinMaxDateTimeAtDestination(serviceUse.getArrivalDateTime());
-										newMinMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime;
-										if(newMinMaxDateTimeAtDestination < _minMaxDateTimeAtDestination)
+										if (!evaluationResult.continueToTraverseThePath)
+											break;
+										else
+											continue;
+									}
+
+									// Storage of the journey as a result :
+									//	- if goal reached
+									//	- if useful for a transfer
+									if(	isGoalReached ||
+										isReturnedVertex
+									){
+										_result.add(resultJourney);
+									}
+
+									// Storage of the journey for recursion
+									if(	isARecursionNode
+									){
+										boost::shared_ptr<RoutePlanningIntermediateJourney> todoJourney(
+											new RoutePlanningIntermediateJourney(
+												*journey,
+												serviceUse,
+												false,
+												_destinationVam,
+												distanceToEnd,
+												_journeyTemplates ? _journeyTemplates->testSimilarity(*journey, *reachedVertex->getHub(), _accessDirection) : false,
+												resultJourney->getScore()
+										)	);
+										todo.add(todoJourney);
+									}
+
+									// Storage of the reach time at the goal if applicable
+									if (isGoalReached)
+									{
+										if (_accessDirection == DEPARTURE_TO_ARRIVAL)
 										{
-											_minMaxDateTimeAtDestination = newMinMaxDateTimeAtDestination;
+											ptime newMinMaxDateTimeAtDestination(serviceUse.getArrivalDateTime());
+											newMinMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime;
+											if(newMinMaxDateTimeAtDestination < _minMaxDateTimeAtDestination)
+											{
+												_minMaxDateTimeAtDestination = newMinMaxDateTimeAtDestination;
+											}
+										}
+										else
+										{
+											ptime newMinMaxDateTimeAtDestination(serviceUse.getDepartureDateTime());
+											newMinMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime;
+											if(newMinMaxDateTimeAtDestination > _minMaxDateTimeAtDestination)
+											{
+												_minMaxDateTimeAtDestination = newMinMaxDateTimeAtDestination;
+											}
 										}
 									}
-									else
-									{
-										ptime newMinMaxDateTimeAtDestination(serviceUse.getDepartureDateTime());
-										newMinMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime;
-										if(newMinMaxDateTimeAtDestination > _minMaxDateTimeAtDestination)
-										{
-											_minMaxDateTimeAtDestination = newMinMaxDateTimeAtDestination;
-										}
-									}
-								}
-							} // next arrival edge
+								} // next arrival edge
 
-							if(nonServedEdges.empty())
-								break;
-						} // next service
+								if(nonServedEdges.empty())
+									break;
+							} // next service
 						} // next service collection
 					} // next departure edge
 				} // next vertex in vam
