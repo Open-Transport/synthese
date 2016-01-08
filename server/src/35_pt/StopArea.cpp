@@ -195,6 +195,7 @@ namespace synthese
 
 		HubScore StopArea::getScore() const
 		{
+			// RULE-411
 			typedef map<const CommercialLine*, int> ScoresMap;
 
 			if(	!_score)

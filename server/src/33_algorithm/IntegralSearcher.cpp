@@ -462,7 +462,7 @@ namespace synthese
 									departureMoment = serviceInstance.getDepartureDateTime();
 									if(_inverted)
 									{
-										departureMoment += serviceInstance.getServiceRange();
+										departureMoment += serviceInstance.getServiceRange(); //Maybe useless
 									}
 								}
 								else
@@ -471,11 +471,11 @@ namespace synthese
 									departureMoment = serviceInstance.getArrivalDateTime();
 									if(_inverted)
 									{
-										departureMoment -= serviceInstance.getServiceRange();
+										departureMoment -= serviceInstance.getServiceRange(); //Maybe useless
 									}
 								}
 
-								// Check for service compliance rules.
+								// Check for service compliance rules. RULE-116
 								if (!serviceInstance.getService()->isCompatibleWith(_accessParameters))
 								{
 									continue;
@@ -491,7 +491,7 @@ namespace synthese
 									this_thread::interruption_point();
 
 									// If the path traversal is only to find non served edges, analyze it only if
-									// it belongs to the list
+									// it belongs to the list // RULE-209
 									if(nonServedEdgesSearch)
 									{
 										set<const Edge*>::iterator it(nonServedEdges.find(curEdge));
@@ -502,7 +502,7 @@ namespace synthese
 
 									const Vertex* reachedVertex(curEdge->getFromVertex());
 
-									// Checks if the vertex use rules are compliant with current user profile
+									// Checks if the vertex use rules are compliant with current user profile // RULE-114
 									const UseRule& vertexUseRule(
 										reachedVertex->getUseRule(_accessParameters.getUserClassRank())
 									);
@@ -540,7 +540,7 @@ namespace synthese
 										continue;
 									}
 
-									// Storage of the useful solution
+									// Storage of the useful solution // RULE-117
 									ServicePointer serviceUse(serviceInstance, *curEdge, _accessParameters);
 									if (serviceUse.isUseRuleCompliant(_ignoreReservation, _reservationRulesDelayType) == UseRule::RUN_NOT_POSSIBLE)
 									{
@@ -801,6 +801,7 @@ namespace synthese
 			time_duration journeyDuration,
 			const Hub& hub
 		) const	{
+			// RULE-411
 			RoutePlanningIntermediateJourney::Score score(1000);
 
 			// Case a journey was already found

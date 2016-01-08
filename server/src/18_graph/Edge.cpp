@@ -219,13 +219,14 @@ namespace synthese
 							continue;
 
 						// Check of validity of departure date time
+						// maxDepartureMomentConcernsTheorical is set to true to avoid sending departures to departure screens
 						if ((!maxDepartureMomentConcernsTheorical && servicePointer.getDepartureDateTime() > maxDepartureMoment ) ||
 							(maxDepartureMomentConcernsTheorical && servicePointer.getTheoreticalDepartureDateTime() > maxDepartureMoment))
 						{
 							return ServicePointer();
 						}
 
-						// Limitation of the continuous service range at the specified bounds
+						// Limitation of the continuous service range at the specified bounds // RULE-101
 						if(servicePointer.getDepartureDateTime() + servicePointer.getServiceRange() > maxDepartureMoment)
 						{
 							servicePointer.setServiceRange(maxDepartureMoment - servicePointer.getDepartureDateTime());

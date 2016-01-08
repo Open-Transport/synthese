@@ -1270,7 +1270,7 @@ namespace synthese
 							arrivalSchedule = departureSchedule;
 						}
 
-						// Interpolation of preceding departure schedules
+						// Interpolation of preceding departure schedules // RULE-214
 						if(atLeastOneDepartureUnscheduledLineStop)
 						{
 							if(lastDepartureScheduledLineStop == static_cast<JourneyPattern*>(_path)->getLineStops().end())

@@ -163,7 +163,7 @@ namespace synthese
 					return UseRule::RUN_NOT_POSSIBLE;
 				}
 
-				// Check of non concurrency rules
+				// Check of non concurrency rules // RULE-213
 				if(!_service->nonConcurrencyRuleOK(
 						originDateTimeRef,
 						_range,

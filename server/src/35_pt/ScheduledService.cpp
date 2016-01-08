@@ -226,7 +226,7 @@ namespace synthese
 				}
 			}
 
-			// Reservation check // RULE-212
+			// Reservation check // RULE-117
 			if(	checkIfTheServiceIsReachable &&
 				ptr.isUseRuleCompliant(ignoreReservation, reservationRulesDelayType) == UseRule::RUN_NOT_POSSIBLE
 			){

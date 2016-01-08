@@ -124,6 +124,7 @@ namespace synthese
 			const ptime& departureTime,
 			const ReservationDelayType reservationRulesDelayType
 		) const {
+			// RULE-212
 
 			const ptime& referenceTime(
 				get<OriginIsReference>() ?
@@ -135,6 +136,7 @@ namespace synthese
 			ptime minutesMoment(referenceTime);
 			time_duration minDelayMinutes(minutes(0));
 
+			// RULE-119
 			if (reservationRulesDelayType == RESERVATION_INTERNAL_DELAY)
 			{
 				minDelayMinutes = get<MinDelayMinutes>();
@@ -207,12 +209,12 @@ namespace synthese
 
 			if(_accessCapacity && *_accessCapacity == 0)
 			{
-				return RUN_NOT_POSSIBLE;
+				return RUN_NOT_POSSIBLE; // RULE-215
 			}
 
 			if(ignoreReservation)
 			{
-				return RUN_POSSIBLE;
+				return RUN_POSSIBLE; // RUN-117
 			}
 
 			switch(get<ReservationType>())
