@@ -81,11 +81,22 @@ namespace synthese
 			const boost::posix_time::ptime& _departureTime;
 			const graph::AccessParameters _accessParameters;
 			const algorithm::PlanningPhase _direction;
+			const graph::VertexAccessMap& _startingVertices;
+			const graph::VertexAccessMap& _endingVertices;
 
 		public:
 			AStarShortestPathCalculator(
 				const geography::Place* origin,
 				const geography::Place* destination,
+				const boost::posix_time::ptime& departureTime,
+				const graph::AccessParameters accessParameters,
+				const algorithm::PlanningPhase direction = algorithm::DEPARTURE_TO_ARRIVAL
+			);
+
+
+			AStarShortestPathCalculator(
+				const graph::VertexAccessMap& startingVertices,
+				const graph::VertexAccessMap& endingVertices,
 				const boost::posix_time::ptime& departureTime,
 				const graph::AccessParameters accessParameters,
 				const algorithm::PlanningPhase direction = algorithm::DEPARTURE_TO_ARRIVAL

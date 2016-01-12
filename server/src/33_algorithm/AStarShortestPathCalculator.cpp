@@ -70,7 +70,26 @@ namespace synthese
 			_arrivalPlace(destination),
 			_departureTime(departureTime),
 			_accessParameters(accessParameters),
-			_direction(direction)
+			_direction(direction),
+			_startingVertices(VertexAccessMap()),
+			_endingVertices(VertexAccessMap())
+		{
+		}
+
+
+		AStarShortestPathCalculator::AStarShortestPathCalculator(
+			const VertexAccessMap& startingVertices,
+			const VertexAccessMap& endingVertices,
+			const posix_time::ptime& departureTime,
+			const AccessParameters accessParameters,
+			const algorithm::PlanningPhase direction
+		):	_departurePlace(NULL),
+			_arrivalPlace(NULL),
+			_departureTime(departureTime),
+			_accessParameters(accessParameters),
+			_direction(direction),
+			_startingVertices(startingVertices),
+			_endingVertices(endingVertices)
 		{
 		}
 
@@ -84,7 +103,9 @@ namespace synthese
 			_arrivalPlace(NULL),
 			_departureTime(departureTime),
 			_accessParameters(accessParameters),
-			_direction(direction)
+			_direction(direction),
+			_startingVertices(VertexAccessMap()),
+			_endingVertices(VertexAccessMap())
 		{
 		}
 
@@ -118,13 +139,30 @@ namespace synthese
 		{
 			ResultPath result;
 
-			if(!_departurePlace || !_arrivalPlace)
+			if((!_departurePlace || !_arrivalPlace) &&
+				(_startingVertices.getMap().empty() || _endingVertices.getMap().empty()))
 			{
 				return result;
 			}
 
-			VertexAccessMap startingVertices = _departurePlace->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID, 0);
-			VertexAccessMap endingVertices = _arrivalPlace->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID, 0);
+			VertexAccessMap startingVertices, endingVertices;
+
+			if (_departurePlace)
+			{
+				startingVertices = _departurePlace->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID, 0);
+			}
+			else
+			{
+				startingVertices = _startingVertices;
+			}
+			if (_arrivalPlace)
+			{
+				endingVertices = _arrivalPlace->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID, 0);
+			}
+			else
+			{
+				endingVertices= _endingVertices;
+			}
 
 			if(startingVertices.getMap().empty() || endingVertices.getMap().empty())
 			{

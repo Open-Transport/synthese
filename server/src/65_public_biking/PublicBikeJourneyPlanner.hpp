@@ -25,10 +25,12 @@
 
 #include "AlgorithmTypes.h"
 #include "AccessParameters.h"
+#include "AStarShortestPathCalculator.hpp"
 #include "GraphTypes.h"
 #include "PublicBikeJourneyPlannerResult.hpp"
 
 #include <boost/optional.hpp>
+#include <boost/tuple/tuple.hpp>
 
 namespace synthese
 {
@@ -65,6 +67,13 @@ namespace synthese
 			);
 
 			PublicBikeJourneyPlannerResult run() const;
+
+			typedef boost::tuple<
+				graph::Journey, // Approach journey at the departure (walk to bike station)
+				algorithm::AStarShortestPathCalculator::ResultPath, //A* result (bike)
+				graph::Journey // Approach journey at the arrival (walk from bike station)
+			> PublicBikeJourneyPlannerAStarResult;
+			std::vector<PublicBikeJourneyPlannerAStarResult> runAStar() const;
 		};
 }	}
 
