@@ -39,6 +39,8 @@
 #include "TransportNetworkTableSync.h"
 #include "RollingStockTableSync.hpp"
 #include "ContinuousServiceTableSync.h"
+#include "OneFileExporter.hpp"
+#include "RequestException.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -102,6 +104,12 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_READ_WAYBACK = "read_way_back";
 		const string HafasFileFormat::Importer_::PARAMETER_CALENDAR_DEFAULT_CODE = "calendar_default_code";
 		const string HafasFileFormat::Importer_::PARAMETER_2015_CARPOSTAL_FORMAT = "format_carpostal_2015";
+
+		const string HafasFileFormat::Exporter_::PARAMETER_DEBUG = "debug";
+		const string HafasFileFormat::Exporter_::PARAMETER_FTP_HOST = "ftp_host";
+		const string HafasFileFormat::Exporter_::PARAMETER_FTP_PORT = "ftp_port";
+		const string HafasFileFormat::Exporter_::PARAMETER_FTP_USER = "ftp_user";
+		const string HafasFileFormat::Exporter_::PARAMETER_FTP_PASS = "ftp_pass";
 	}
 
 	namespace impex
@@ -1779,4 +1787,65 @@ namespace synthese
 				"UTF-8"
 			)
 		{}
+
+		// **** HAFAS EXPORTER ****
+
+		// e.g. : http://synthese:8080/export/?SERVICE=ExportFunction&ff=Hafas&debug=1&ftp_host=ftp.elca.ch&ftp_port=21&ftp_user=admin&ftp_pass=foobar
+
+		HafasFileFormat::Exporter_::Exporter_(const impex::Export& export_): OneFileExporter<HafasFileFormat>(export_) {
+		}
+
+		void HafasFileFormat::Exporter_::build(ostream& os) const {
+
+			// TODO : Remove this and/or escape HTML entities to prevent XSS attacks
+
+			if (_debug) {
+				os << "<html><body><ul>"
+					<< "<li><b>FTP Host:</b> " << _ftpHost << "</li>"
+					<< "<li><b>FTP Port:</b> " << _ftpPort << "</li>"
+					<< "<li><b>FTP User:</b> " << _ftpUser << "</li>"
+					<< "<li><b>FTP Pass:</b> " << _ftpPass << "</li>"
+					<< "</ul></body></html>"
+					<< "\n" << flush;
+			}
+
+			// TODO : Export data to files
+			// TODO : Zip files to archive
+			// TODO : Send archive to FTP server
+
+		}
+
+		util::ParametersMap HafasFileFormat::Exporter_::getParametersMap() const
+		{
+			ParametersMap result;
+			// TODO : Is this really needed?
+			return result;
+		}
+
+		void HafasFileFormat::Exporter_::setFromParametersMap(const ParametersMap& map)
+		{
+			_debug = map.getDefault<bool>(PARAMETER_DEBUG, false);
+
+			_ftpHost = getMandatoryString(map, PARAMETER_FTP_HOST);
+			_ftpPort = map.getDefault<int>(PARAMETER_FTP_PORT, 21);
+			_ftpUser = getMandatoryString(map, PARAMETER_FTP_USER);
+			_ftpPass = getMandatoryString(map, PARAMETER_FTP_PASS);
+
+
+			// TODO : Add more parameters
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		// HELPERS
+
+		std::string HafasFileFormat::Exporter_::getMandatoryString(const ParametersMap& map, std::string parameterName) {
+			std::string result = map.getDefault<std::string>(parameterName, "");
+			if (result.empty()) {
+				throw RequestException("Missing parameter " + parameterName);
+			}
+			return result;
+		}
+
+		// **** /HAFAS EXPORTER ****
+
 }	}

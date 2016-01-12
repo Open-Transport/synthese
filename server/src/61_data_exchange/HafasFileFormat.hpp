@@ -33,6 +33,7 @@
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkTableSync.h"
 #include "IConv.hpp"
+#include "OneFileExporter.hpp"
 
 #include <iostream>
 #include <map>
@@ -345,7 +346,39 @@ namespace synthese
 				virtual db::DBTransaction _save() const;
 			};
 
-			typedef impex::NoExportPolicy<HafasFileFormat> Exporter_;
+			// **** HAFAS EXPORTER ****
+
+			class Exporter_: public impex::OneFileExporter<HafasFileFormat> {
+
+				public:
+					static const std::string PARAMETER_DEBUG;
+
+					static const std::string PARAMETER_FTP_HOST;
+					static const std::string PARAMETER_FTP_PORT;
+					static const std::string PARAMETER_FTP_USER;
+					static const std::string PARAMETER_FTP_PASS;
+
+				private:
+					bool _debug;
+					std::string _ftpHost;
+					int _ftpPort;
+					std::string _ftpUser;
+					std::string _ftpPass;
+
+					static std::string getMandatoryString(const util::ParametersMap& map, std::string parameterName);
+
+
+				public:
+					Exporter_(const impex::Export& export_);
+
+					virtual void build(std::ostream& os) const;
+					virtual util::ParametersMap getParametersMap() const;
+					virtual void setFromParametersMap(const util::ParametersMap& map);
+					virtual std::string getOutputMimeType() const { return "text/html"; }
+			};
+
+			// **** /HAFAS EXPORTER ****
+
 		};
 	}
 }
