@@ -271,6 +271,7 @@ namespace synthese
 		bool RoutePlanningIntermediateJourney::operator>(
 			const RoutePlanningIntermediateJourney& other
 		) const	{
+			// RULE-301 RULE-411
 			assert(_phase == other._phase);
 
 			// Priority 1 : end is reached

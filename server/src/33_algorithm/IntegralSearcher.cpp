@@ -683,9 +683,9 @@ namespace synthese
 
 			assert(!journey.empty());
 
-			/// <h2>Check of the compliance with the maximal duration</h2>
+			/// <h2>Check of the compliance with the maximal duration</h2> // RULE-120
 			if(_maxDuration && journey.getDuration() > *_maxDuration)
-			{ /// TODO do the same think to all false,false returns
+			{ /// TODO do the same thing to all false,false returns
 				return _JourneyUsefulness(false, journey.getDuration() - (_accessDirection == DEPARTURE_TO_ARRIVAL ? journey.getEndApproachDuration() : journey.getStartApproachDuration()) <= *_maxDuration );
 			}
 
@@ -702,6 +702,7 @@ namespace synthese
 				/** - If the edge is an address, the currentJourney necessarily contains
 					only road legs, filter approach (= walk distance and duration).
 				*/
+				// /!\ Useless test ?
 				if(!_accessParameters.isCompatibleWithApproach(journey.getDistance(), journey.getDuration()))
 					return _JourneyUsefulness(false,false);
 			}
@@ -714,29 +715,15 @@ namespace synthese
 				serviceUse.getArrivalDateTime() :
 				serviceUse.getDepartureDateTime()
 			);
-			/* TODO : solve memory errors that makes _destinationVam.getVertexAccess(reachedVertex).approachTime having a wrong vaule (40000 hours !)
-			 * See https://extranet.rcsmobility.com/issues/19961
-			 * When solved, this code cold be uncommented
-			if(isGoalReached)
-			{
-				if(	(	(_accessDirection == ARRIVAL_TO_DEPARTURE)
-					&&	(reachDateTime - _destinationVam.getVertexAccess(reachedVertex).approachTime < _minMaxDateTimeAtDestination)
-					)
-				||	(	(_accessDirection == DEPARTURE_TO_ARRIVAL)
-					&&	(reachDateTime + _destinationVam.getVertexAccess(reachedVertex).approachTime > _minMaxDateTimeAtDestination)
-					)
-				)	return _JourneyUsefulness(false, false);
-			}
-			else
-			{*/
-				if(	(	(_accessDirection == ARRIVAL_TO_DEPARTURE)
-					&&	(reachDateTime < _minMaxDateTimeAtDestination)
-					)
-				||	(	(_accessDirection == DEPARTURE_TO_ARRIVAL)
-					&&	(reachDateTime > _minMaxDateTimeAtDestination)
-					)
-				)	return _JourneyUsefulness(false, false);
-			//}
+
+			// RULE-101
+			if(	(	(_accessDirection == ARRIVAL_TO_DEPARTURE)
+				&&	(reachDateTime < _minMaxDateTimeAtDestination)
+				)
+			||	(	(_accessDirection == DEPARTURE_TO_ARRIVAL)
+				&&	(reachDateTime > _minMaxDateTimeAtDestination)
+				)
+			)	return _JourneyUsefulness(false, false);
 
 			/** - If the reached vertex does not belong to the goal, comparison with the known best time at the goal, to determinate
 				if there is any chance to reach the goal more efficiently by using this path
@@ -751,6 +738,7 @@ namespace synthese
 				reachedVertex->getHub()->isUsefulTransfer(_graphToUse) &&
 				*journey.getDistanceToEnd() > 2000
 			){
+				// RULE-412
 				ptime bestHopedGoalAccessDateTime (reachDateTime);
 				posix_time::time_duration minimalGoalReachDuration(
 					reachedVertex->getHub()->getMinTransferDelay()	// Minimal time to transfer

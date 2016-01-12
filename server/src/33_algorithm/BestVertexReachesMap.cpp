@@ -110,14 +110,14 @@ namespace synthese
 				if(item.first < transferNumber)
 				{
 					if(item.second.first <= duration)
-						return true;
+						return true; // Useless if more transfers and longer
 				}
 				else if(item.first == transferNumber)
 				{
 					if(	item.second.first < duration ||
 						(item.second.first == duration && (strict || *item.second.second > *journeysptr))
 					){
-						return true;
+						return true; // Useless if same transfers number and longer or same time but not better
 					}
 					else
 					{
@@ -129,7 +129,7 @@ namespace synthese
 						{
 							_insert(vertexItem, transferNumber, duration, journeysptr);
 						}
-						return false;
+						return false; // Useful
 					}
 				}
 				else
@@ -148,7 +148,7 @@ namespace synthese
 						{
 							_removeDurationsForMoreTransfers(vertexItem, item.first);
 						}
-						return false;
+						return false; // Useful
 					}
 				}
 			}
@@ -160,7 +160,7 @@ namespace synthese
 			{
 				_insert(vertexItem, transferNumber, duration, journeysptr);
 			}
-			return false;
+			return false; // Useful
 		}
 
 

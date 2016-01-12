@@ -57,6 +57,7 @@ namespace synthese
 		///		<li>numeric parameters : speeds, maximums, etc.</li>
 		///		<li>filters</li>
 		/// </ul>
+		// RULE-121
 		class AccessParameters
 		{
 		public:
