@@ -1347,6 +1347,7 @@ namespace synthese
 					vector<geos::geom::Geometry*> allGeometries;
 					while(true)
 					{
+						if(its == (subResult.get<0>().getServiceUses().end())) break;
 						boost::shared_ptr<ParametersMap> submapLeg(new ParametersMap);
 						submapLeg->insert("departure_date_time", its->getDepartureDateTime());
 						// Departure place
