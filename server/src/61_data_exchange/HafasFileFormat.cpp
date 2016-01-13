@@ -852,8 +852,8 @@ namespace synthese
 							// OR a set of file where gleis file has one stop per line and
 							// and departure time is on #34 and arrival on 29
 							// then it will be needed another parameter to manage it independantly
-						    departureTimeStr = _getField(38, 4);
-						    arrivalTimeStr = _getField(31, 4);
+							departureTimeStr = _getField(38, 4);
+							arrivalTimeStr = _getField(31, 4);
 						}
 						
 						bool isDeparture(departureTimeStr != "9999" && !departureTimeStr.empty());
