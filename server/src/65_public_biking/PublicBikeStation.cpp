@@ -145,7 +145,10 @@ namespace synthese
 					this,
 					graph::VertexAccess()
 				);
+			}
 
+			if (whatToSearch == road::RoadModule::GRAPH_ID)
+			{
 				// This is used to begin a road journey planner (with bike)
 				// so insert crossings
 				if(getProjectedPoint().getRoadChunk())

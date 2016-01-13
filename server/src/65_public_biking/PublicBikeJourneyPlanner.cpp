@@ -158,7 +158,7 @@ namespace synthese
 				// Road journey planner between origin bike station to destination bike stationS
 				const graph::Vertex* originVertex(itobs.first);
 				graph::VertexAccessMap roadOvam;
-				originVertex->getHub()->getVertexAccessMap(roadOvam, PublicBikingModule::GRAPH_ID, *originVertex, true);
+				originVertex->getHub()->getVertexAccessMap(roadOvam, road::RoadModule::GRAPH_ID, *originVertex, true);
 				if (!dynamic_cast<const PublicBikeStation*>(originVertex))
 				{
 					continue;
@@ -182,7 +182,7 @@ namespace synthese
 				{
 					graph::VertexAccessMap roadItDVam;
 					const graph::Vertex* destinationVertex(itdbs.first);
-					destinationVertex->getHub()->getVertexAccessMap(roadItDVam, PublicBikingModule::GRAPH_ID, *destinationVertex, true);
+					destinationVertex->getHub()->getVertexAccessMap(roadItDVam, road::RoadModule::GRAPH_ID, *destinationVertex, true);
 					// Complete with approach to bike station
 					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itc, roadItDVam.getMap())
 					{
@@ -315,7 +315,7 @@ namespace synthese
 				// Road journey planner between origin bike station to destination bike stationS
 				const graph::Vertex* originVertex(itobs.first);
 				graph::VertexAccessMap roadOvam;
-				originVertex->getHub()->getVertexAccessMap(roadOvam, PublicBikingModule::GRAPH_ID, *originVertex, true);
+				originVertex->getHub()->getVertexAccessMap(roadOvam, road::RoadModule::GRAPH_ID, *originVertex, true);
 				if (!dynamic_cast<const PublicBikeStation*>(originVertex))
 				{
 					continue;
@@ -335,7 +335,7 @@ namespace synthese
 				{
 					graph::VertexAccessMap roadItDVam;
 					const graph::Vertex* destinationVertex(itdbs.first);
-					destinationVertex->getHub()->getVertexAccessMap(roadItDVam, PublicBikingModule::GRAPH_ID, *destinationVertex, true);
+					destinationVertex->getHub()->getVertexAccessMap(roadItDVam, road::RoadModule::GRAPH_ID, *destinationVertex, true);
 					// Complete with approach to bike station
 					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itc, roadItDVam.getMap())
 					{
