@@ -1824,17 +1824,34 @@ namespace synthese
 				throw RequestException("No such network with name " + _networkName + " !");
 			}
 			TransportNetwork* network = (*(networksRes.begin())).get();
-			os << "<h1>Network " << network->getName() << " (key: " << network->getKey() << ")</h1>\n";
+			os << "<h1>Network " << network->getName() << " <small>(key: " << network->getKey() << ")</small></h1>\n";
 
 			// ** Lines **
 			CommercialLineTableSync::SearchResult linesRes =
 					CommercialLineTableSync::Search(_env, network->getKey());
 			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, linesRes) {
-				os << "<h2>Line [" << line->getShortName() << "] " << line->getName()
-						<< " (key: " << line->getKey() << ")</h2>\n";
+				os << "<h2>Line " << line->getShortName() << " : " << line->getName()
+						<< " <small>(key: " << line->getKey() << ")</small></h2>\n";
 
-				// ** Journey **
-				// TODO
+				// ** Journeys **
+				JourneyPatternTableSync::SearchResult journeysRes = JourneyPatternTableSync::Search(_env, line->getKey());
+				BOOST_FOREACH(const boost::shared_ptr<JourneyPattern>& journey, journeysRes) {
+
+					// We force the loading of the rest of the data (because lazy-loading)
+					ScheduledServiceTableSync::Search(_env, optional<RegistryKeyType>(), line->getKey());
+					ContinuousServiceTableSync::Search(_env, optional<RegistryKeyType>(), line->getKey());
+					BOOST_FOREACH(const Path* route, line->getPaths())
+					{
+						LineStopTableSync::Search(_env, route->getKey());
+					}
+
+					os << "<h3>Journey " << journey->getName()
+							<< " [" << (journey->getWayBack() ? "back" : "to") << "] :"
+							<< " From " << journey->getOrigin()->getName()
+							<< " to " << journey->getDestination()->getName()
+							<< " <small>(key: " << journey->getKey() << ")</small></h3>\n";
+
+				}
 
 			}
 
