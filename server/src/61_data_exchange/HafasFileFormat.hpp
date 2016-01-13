@@ -352,7 +352,7 @@ namespace synthese
 
 				public:
 					static const std::string PARAMETER_DEBUG;
-
+					static const std::string PARAMETER_NETWORK_NAME;
 					static const std::string PARAMETER_FTP_HOST;
 					static const std::string PARAMETER_FTP_PORT;
 					static const std::string PARAMETER_FTP_USER;
@@ -360,10 +360,12 @@ namespace synthese
 
 				private:
 					bool _debug;
+					std::string _networkName;
 					std::string _ftpHost;
 					int _ftpPort;
 					std::string _ftpUser;
 					std::string _ftpPass;
+					mutable util::Env _env;
 
 					static std::string getMandatoryString(const util::ParametersMap& map, std::string parameterName);
 

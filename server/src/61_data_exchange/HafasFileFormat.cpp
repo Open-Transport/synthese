@@ -106,6 +106,7 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_2015_CARPOSTAL_FORMAT = "format_carpostal_2015";
 
 		const string HafasFileFormat::Exporter_::PARAMETER_DEBUG = "debug";
+		const string HafasFileFormat::Exporter_::PARAMETER_NETWORK_NAME = "network";
 		const string HafasFileFormat::Exporter_::PARAMETER_FTP_HOST = "ftp_host";
 		const string HafasFileFormat::Exporter_::PARAMETER_FTP_PORT = "ftp_port";
 		const string HafasFileFormat::Exporter_::PARAMETER_FTP_USER = "ftp_user";
@@ -1793,7 +1794,7 @@ namespace synthese
 
 		// **** HAFAS EXPORTER ****
 
-		// e.g. : http://synthese:8080/export/?SERVICE=ExportFunction&ff=Hafas&debug=1&ftp_host=ftp.elca.ch&ftp_port=21&ftp_user=admin&ftp_pass=foobar
+		// e.g. : http://synthese:8080/export/?SERVICE=ExportFunction&ff=Hafas&debug=1&ftp_host=ftp.elca.ch&ftp_port=21&ftp_user=admin&ftp_pass=foobar&network=tl
 
 		HafasFileFormat::Exporter_::Exporter_(const impex::Export& export_): OneFileExporter<HafasFileFormat>(export_) {
 		}
@@ -1802,19 +1803,46 @@ namespace synthese
 
 			// TODO : Remove this and/or escape HTML entities to prevent XSS attacks
 
+			os << "<html><body>\n";
 			if (_debug) {
-				os << "<html><body><ul>"
-					<< "<li><b>FTP Host:</b> " << _ftpHost << "</li>"
-					<< "<li><b>FTP Port:</b> " << _ftpPort << "</li>"
-					<< "<li><b>FTP User:</b> " << _ftpUser << "</li>"
-					<< "<li><b>FTP Pass:</b> " << _ftpPass << "</li>"
-					<< "</ul></body></html>"
-					<< "\n" << flush;
+				os << "<h1>Export parameters</h1><ul>\n"
+					<< "<li><b>Network name:</b> " << _networkName << "</li>\n"
+					<< "<li><b>FTP Host:</b> " << _ftpHost << "</li>\n"
+					<< "<li><b>FTP Port:</b> " << _ftpPort << "</li>\n"
+					<< "<li><b>FTP User:</b> " << _ftpUser << "</li>\n"
+					<< "<li><b>FTP Pass:</b> " << _ftpPass << "</li>\n"
+					<< "</ul>\n";
 			}
 
 			// TODO : Export data to files
+
+			// ** Network **
+			TransportNetworkTableSync::SearchResult networksRes =
+					TransportNetworkTableSync::Search(_env, _networkName, "", 0, boost::optional<std::size_t>(),
+							true, true, util::UP_LINKS_LOAD_LEVEL);
+			if(networksRes.empty()) {
+				throw RequestException("No such network with name " + _networkName + " !");
+			}
+			TransportNetwork* network = (*(networksRes.begin())).get();
+			os << "<h1>Network " << network->getName() << " (key: " << network->getKey() << ")</h1>\n";
+
+			// ** Lines **
+			CommercialLineTableSync::SearchResult linesRes =
+					CommercialLineTableSync::Search(_env, network->getKey());
+			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, linesRes) {
+				os << "<h2>Line [" << line->getShortName() << "] " << line->getName()
+						<< " (key: " << line->getKey() << ")</h2>\n";
+
+				// ** Journey **
+				// TODO
+
+			}
+
 			// TODO : Zip files to archive
 			// TODO : Send archive to FTP server
+
+
+			os << "</body></html>\n" << flush;
 
 		}
 
@@ -1828,6 +1856,8 @@ namespace synthese
 		void HafasFileFormat::Exporter_::setFromParametersMap(const ParametersMap& map)
 		{
 			_debug = map.getDefault<bool>(PARAMETER_DEBUG, false);
+
+			_networkName = getMandatoryString(map, PARAMETER_NETWORK_NAME);
 
 			_ftpHost = getMandatoryString(map, PARAMETER_FTP_HOST);
 			_ftpPort = map.getDefault<int>(PARAMETER_FTP_PORT, 21);
