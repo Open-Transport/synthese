@@ -838,20 +838,23 @@ namespace synthese
 							continue;
 						}
 
-						// Departure times
-						string departureTimeStr(_getField(34, 4));
-						string arrivalTimeStr(_getField(29, 4));
-						if (_gleisHasOneStopPerLine || _formatCarpostal2015)
-						{
+                        // Departure times
+                        string departureTimeStr;
+                        string arrivalTimeStr;
+                        if (!_gleisHasOneStopPerLine && !_formatCarpostal2015)
+                        {
+                            departureTimeStr = _getField(34, 4);
+                            arrivalTimeStr = _getField(29, 4);
+                        } else {
 							// Format is different when gleis file has one stop per line
 							// If it is found a set of file where gleis file is by section
 							// and departure time is on #38 and arrival on 31
 							// OR a set of file where gleis file has one stop per line and
 							// and departure time is on #34 and arrival on 29
 							// then it will be needed another parameter to manage it independantly
-							departureTimeStr = _getField(38, 4);
-							arrivalTimeStr = _getField(31, 4);
-						}
+                            departureTimeStr = _getField(38, 4);
+                            arrivalTimeStr = _getField(31, 4);
+                        }
 						
 						bool isDeparture(departureTimeStr != "9999" && !departureTimeStr.empty());
 						bool isArrival(arrivalTimeStr != "9999" && !arrivalTimeStr.empty());
