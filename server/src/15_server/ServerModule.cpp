@@ -372,6 +372,8 @@ namespace synthese
 				rep.status = HTTPReply::ok;
 				rep.headers.insert(make_pair("Content-Length", lexical_cast<string>(rep.content.size())));
 				rep.headers.insert(make_pair("Content-Type", request.getOutputMimeType() + "; charset=utf-8"));
+				// This header enables CORS requests (mandatory for Ajax cross-domain requests)
+				rep.headers.insert(make_pair("Access-Control-Allow-Origin", "*"));
 				if(request.getFunction().get() && !request.getFunction()->getFileName().empty())
 				{
 					rep.headers.insert(make_pair("Content-Disposition", "attachement; filename="+ request.getFunction()->getFileName()));
