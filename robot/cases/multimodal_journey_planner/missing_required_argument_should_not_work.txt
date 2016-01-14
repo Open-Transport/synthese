@@ -5,15 +5,15 @@ Test Teardown     Stop Synthese On Node 0
 
 *** Test Cases ***
 
-Missing "departure_city" Argument Should Not Work
+Missing "departure_city" Argument Should Work
     On Node 0
-    ${response}=  Call Synthese Service  multimodal_journey_planner  departure_place\=rp40  arrival_city\=City20  arrival_place\=rp50  departure_date\=2015-12-08  departure_time\=07:02  use_walk\=1  use_pt\=0  of\=xml
-    Should Be Equal As Strings  ${response.status_code}  400
+    ${response}=  Call Synthese Service  multimodal_journey_planner  departure_place\=rp40  arrival_city\=City20  arrival_place\=City54 rp50  departure_date\=2015-12-08  departure_time\=07:02  use_walk\=1  use_pt\=0  of\=xml
+    Should Be Equal As Strings  ${response.status_code}  200
 
-Missing "arrival_city" Argument Should Not Work
+Missing "arrival_city" Argument Should Work
     On Node 0
-    ${response}=  Call Synthese Service  multimodal_journey_planner  departure_place\=rp40  departure_city\=City54  arrival_place\=rp50  departure_date\=2015-12-08  departure_time\=07:02  use_walk\=1  use_pt\=0  of\=xml
-    Should Be Equal As Strings  ${response.status_code}  400
+    ${response}=  Call Synthese Service  multimodal_journey_planner  departure_place\=City20 rp40  departure_city\=City54  arrival_place\=rp50  departure_date\=2015-12-08  departure_time\=07:02  use_walk\=1  use_pt\=0  of\=xml
+    Should Be Equal As Strings  ${response.status_code}  200
 
 Missing "departure_place" Argument Should Not Work
     On Node 0
