@@ -744,7 +744,8 @@ namespace synthese
 				}
 			}
 
-			return subscriptionFound;		}
+			return subscriptionFound;
+		}
 
 		bool VDVServer::_checkStop(VDVServerSubscription* subscription, std::string stopCode) const
 		{
@@ -754,7 +755,8 @@ namespace synthese
 				if ((stopAreaCode.size() == 7 && stopAreaCode == stopCode.substr(1)) ||
 					((stopAreaCode.size() == 8 && stopAreaCode == stopCode)))
 				{
-					return true;				}
+					return true;
+				}
 			}
 
 			return false;
@@ -771,7 +773,8 @@ namespace synthese
 				split(vectServiceCode, serviceCode, is_any_of("-"));
 				if (vectServiceCode.size() != 3)
 				{
-					return NULL;				}
+					return NULL;
+				}
 				localServiceCode = vectServiceCode[1];
 			}
 			else
@@ -792,7 +795,7 @@ namespace synthese
 			// - one already activated for today (theorical calendar OK)
 			if (service)
 			{
-							Log::GetInstance().debug("VDVServer : Service par defaut : " + lexical_cast<string>(service->getKey()));
+				Log::GetInstance().debug("VDVServer : Service par defaut : " + lexical_cast<string>(service->getKey()));
 			}
 			vector<ScheduledService*> services;
 			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*plannedDataSource, Env::GetOfficialEnv());
@@ -840,11 +843,11 @@ namespace synthese
 
 			if (numTheoricalActivatedServices != 1)
 			{
-							Log::GetInstance().debug("VDVServer : " + lexical_cast<string>(numTheoricalActivatedServices) + " services candidats sont theoriquement actives aujourd'hui");
+				Log::GetInstance().debug("VDVServer : " + lexical_cast<string>(numTheoricalActivatedServices) + " services candidats sont theoriquement actives aujourd'hui");
 			}
 			else
 			{
-							Log::GetInstance().debug("VDVServer : un seul service candidat est theoriquement active aujourd'hui");
+				Log::GetInstance().debug("VDVServer : un seul service candidat est theoriquement active aujourd'hui");
 			}
 
 			return service;
@@ -893,7 +896,7 @@ namespace synthese
 				arrivalSchedules[rank] = rtArrivalTime;
 			}
 
-							Log::GetInstance().debug("VDVServer : Mise a jour TR du service");
+			Log::GetInstance().debug("VDVServer : Mise a jour TR du service");
 
 			// Link the service to the RT datasource
 			Importable::DataSourceLinks links(service->getDataSourceLinks());
@@ -912,7 +915,6 @@ namespace synthese
 			ScheduledServiceTableSync::Save(service);
 		}
 
-				}
 		bool VDVServer::allowUpdate(const server::Session* session) const
 		{
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<security::GlobalRight>(security::WRITE);
