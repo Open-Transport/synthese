@@ -1824,32 +1824,75 @@ namespace synthese
 				throw RequestException("No such network with name " + _networkName + " !");
 			}
 			TransportNetwork* network = (*(networksRes.begin())).get();
-			os << "<h1>Network " << network->getName() << " <small>(key: " << network->getKey() << ")</small></h1>\n";
+			os << "<h1>Réseau " << network->getName() << " <small>(key: " << network->getKey() << ")</small></h1>\n";
 
-			// ** Lines **
+			// ** Lines for this network **
 			CommercialLineTableSync::SearchResult linesRes =
 					CommercialLineTableSync::Search(_env, network->getKey());
 			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, linesRes) {
-				os << "<h2>Line " << line->getShortName() << " : " << line->getName()
+				os << "<h2>Ligne " << line->getShortName() << " : " << line->getName()
 						<< " <small>(key: " << line->getKey() << ")</small></h2>\n";
 
-				// ** Journeys **
+				// ** Journeys for this line **
 				JourneyPatternTableSync::SearchResult journeysRes = JourneyPatternTableSync::Search(_env, line->getKey());
 				BOOST_FOREACH(const boost::shared_ptr<JourneyPattern>& journey, journeysRes) {
 
-					// We force the loading of the rest of the data (because lazy-loading)
-					ScheduledServiceTableSync::Search(_env, optional<RegistryKeyType>(), line->getKey());
-					ContinuousServiceTableSync::Search(_env, optional<RegistryKeyType>(), line->getKey());
-					BOOST_FOREACH(const Path* route, line->getPaths())
-					{
-						LineStopTableSync::Search(_env, route->getKey());
+
+					ScheduledServiceTableSync::SearchResult schServiceRes =
+							ScheduledServiceTableSync::Search(_env, journey->getKey(), line->getKey());
+					ContinuousServiceTableSync::SearchResult conServiceRes =
+							ContinuousServiceTableSync::Search(_env, journey->getKey(), line->getKey());
+					LineStopTableSync::SearchResult lineStopRes = LineStopTableSync::Search(_env, journey->getKey());
+
+					const StopPoint* from = journey->getOrigin();
+					const StopPoint* to = journey->getDestination();
+
+					os << "<h3>Parcours " << (journey->getWayBack() ? "retour" : "aller")
+							<< " \"" << journey->getName() << "\" :"
+							<< " Origine " << (from != 0 ? from->getName() : "?") << ", "
+							<< " Destination " << (to != 0 ? to->getName() : "?")
+							<< " <small>(key: " << journey->getKey() << ")</small></h3>\n";
+
+					// ** Routes for this journey **
+					os << "<h4>Desserte</h4>\n";
+					os << "<ul>\n";
+					BOOST_FOREACH(const boost::shared_ptr<LineStop>& lineStop, lineStopRes) {
+						BOOST_FOREACH(const boost::shared_ptr<synthese::pt::LinePhysicalStop>& ls, lineStop->getGeneratedLineStops()) {
+							StopPoint* stop = ls->getPhysicalStop();
+							os << "<li>" << stop->getName() << " <small>(key: " << stop->getKey() << ")</small></li>\n";
+						}
+					}
+					os << "</ul>\n";
+
+					// ** Scheduled service for this journey **
+					bool title = false;
+					BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& schService, schServiceRes) {
+						if (!title) {
+							os << "<h4>Services à horaire</h4>\n";
+							os << "<ul>\n";
+							title = true;
+						}
+						os << "<li>" << schService->getDepartureSchedule(false, 0) << " - "
+								<< schService->getLastArrivalSchedule(false) << "</li>\n";
+					}
+					if (title) {
+						os << "</ul>\n";
 					}
 
-					os << "<h3>Journey " << journey->getName()
-							<< " [" << (journey->getWayBack() ? "back" : "to") << "] :"
-							<< " From " << journey->getOrigin()->getName()
-							<< " to " << journey->getDestination()->getName()
-							<< " <small>(key: " << journey->getKey() << ")</small></h3>\n";
+					// ** Continuous services for this journey **
+					title = false;
+					BOOST_FOREACH(const boost::shared_ptr<ContinuousService>& conService, conServiceRes) {
+						if (!title) {
+							os << "<h4>Services continus</h4>\n";
+							os << "<ul>\n";
+							title = true;
+						}
+						os << "<li>" << conService->getDepartureSchedule(false, 0) << " - "
+								<< conService->getLastArrivalSchedule(false) << "</li>\n";
+					}
+					if (title) {
+						os << "</ul>\n";
+					}
 
 				}
 
