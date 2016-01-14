@@ -107,10 +107,10 @@ namespace synthese
 			if (!name.empty())
 			{
 				query.addWhereField(SimpleObjectFieldDefinition<Name>::FIELD.name, name, ComposedExpression::OP_LIKE);
-			}
-			if (orderByName)
-			{
-				query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
+				if (orderByName)
+				{
+					query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
+				}
 			}
 			if (number)
 			{
