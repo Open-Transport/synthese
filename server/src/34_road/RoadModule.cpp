@@ -26,6 +26,7 @@
 #include "RoadModule.h"
 #include "RoadPlace.h"
 #include "StopArea.hpp"
+#include "PublicBikeStation.hpp"
 #include "PublicPlace.h"
 
 #include <boost/algorithm/string.hpp>
@@ -292,6 +293,17 @@ namespace synthese
 			);
 
 			BOOST_FOREACH(City::PlacesMatcher::MatchResult::value_type& place, public_places)
+			{
+				stopsAndRoadsVector.push_back(place);
+			}
+
+			// Text points to a public bike station
+			City::PlacesMatcher::MatchResult public_bike_stations = cityResult.value->getLexicalMatcher(public_biking::PublicBikeStation::FACTORY_KEY).bestMatches(
+				placeName,
+				resultsNumber
+			);
+
+			BOOST_FOREACH(City::PlacesMatcher::MatchResult::value_type& place, public_bike_stations)
 			{
 				stopsAndRoadsVector.push_back(place);
 			}

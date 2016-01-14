@@ -48,6 +48,11 @@ namespace synthese
 		class RoadPlace;
 	}
 
+	namespace public_biking
+	{
+		class PublicBikeStation;
+	}
+
 	namespace pt_website
 	{
 		class PTServiceConfig;
@@ -107,6 +112,8 @@ namespace synthese
 			static const std::string DATA_DISTANCE_TO_ORIGIN;
 			static const std::string DATA_RESUMES;
 			static const std::string DATA_RESUME;
+			static const std::string DATA_PUBLIC_BIKE_STATIONS;
+			static const std::string DATA_PUBLIC_BIKE_STATION;
 
 		protected:
 			typedef std::set<graph::UserClassCode> CompatibleUserClassesRequired;
@@ -356,6 +363,7 @@ namespace synthese
 					_attemptToRead<T, road::RoadPlace>(*item.value, pm, map, DATA_ROAD);
 					_attemptToRead<T, road::House>(*item.value, pm, map, DATA_ADDRESS);
 					_attemptToRead<T, road::PublicPlace>(*item.value, pm, map, DATA_PUBLIC_PLACE);
+					_attemptToRead<T, public_biking::PublicBikeStation>(*item.value, pm, map, DATA_PUBLIC_BIKE_STATION);
 
 					if(_number)
 					{

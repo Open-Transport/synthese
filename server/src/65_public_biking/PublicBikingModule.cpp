@@ -73,6 +73,6 @@ namespace synthese
 
 	namespace public_biking
 	{
-
+		PublicBikingModule::GeneralPublicBikeStationsMatcher PublicBikingModule::_generalPublicBikeStationsMatcher;
 	}
 }

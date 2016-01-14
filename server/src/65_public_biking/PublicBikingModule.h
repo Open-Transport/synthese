@@ -25,6 +25,7 @@
 #ifndef SYNTHESE_PublicBikingModule_H__
 #define SYNTHESE_PublicBikingModule_H__
 
+#include "GeographyModule.h"
 #include "GraphModuleTemplate.h"
 
 namespace synthese
@@ -36,6 +37,8 @@ namespace synthese
 	/// @ingroup m64
 	namespace public_biking
 	{
+		class PublicBikeStation;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// 65 public_biking Module class.
 		///	@author Camille Hue
@@ -43,6 +46,15 @@ namespace synthese
 		class PublicBikingModule:
 			public graph::GraphModuleTemplate<PublicBikingModule>
 		{
+		public:
+			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<PublicBikeStation> > GeneralPublicBikeStationsMatcher;
+
+		private:
+			static GeneralPublicBikeStationsMatcher _generalPublicBikeStationsMatcher;
+
+		public:
+			static GeneralPublicBikeStationsMatcher& GetGeneralPublicBikeStationsMatcher(){ return _generalPublicBikeStationsMatcher; }
+
 		private:
 
 

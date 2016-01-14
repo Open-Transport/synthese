@@ -38,6 +38,8 @@
 #include "RoadPlace.h"
 #include "StopArea.hpp"
 #include "PTServiceConfigTableSync.hpp"
+#include "PublicBikeStation.hpp"
+#include "PublicBikingModule.h"
 #include "Webpage.h"
 #include "RoadChunkTableSync.h"
 #include "Crossing.h"
@@ -112,6 +114,8 @@ namespace synthese
 		const string PlacesListService::DATA_DISTANCE_TO_ORIGIN = "distance_to_origin";
 		const string PlacesListService::DATA_RESUME = "resume";
 		const string PlacesListService::DATA_RESUMES = "resumes";
+		const string PlacesListService::DATA_PUBLIC_BIKE_STATION = "public_bike_station";
+		const string PlacesListService::DATA_PUBLIC_BIKE_STATIONS = "public_bike_stations";
 
 
 
@@ -642,6 +646,21 @@ namespace synthese
 						)	);
 						result.insert(DATA_PUBLIC_PLACES, pm);
 					}
+
+					// Public bike stations
+					if(_classFilter.empty() || _classFilter == DATA_PUBLIC_BIKE_STATION)
+					{
+						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
+						_registerItems<NamedPlace>(
+							*pm,
+							_city->getLexicalMatcher(public_biking::PublicBikeStation::FACTORY_KEY).bestMatches(
+								_text,
+								_number ? *_number : 0,
+								_minScore,
+								_phonetic
+						)	);
+						result.insert(DATA_PUBLIC_BIKE_STATIONS, pm);
+					}
 				}
 				else if(_config)
 				{
@@ -819,6 +838,21 @@ namespace synthese
 						)	);
 						result.insert(DATA_PUBLIC_PLACES, pm);
 					}
+
+					// Public bike stations
+					if(_classFilter.empty() || _classFilter == DATA_PUBLIC_BIKE_STATION)
+					{
+						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
+						_registerItems<public_biking::PublicBikeStation>(
+							*pm,
+							public_biking::PublicBikingModule::GetGeneralPublicBikeStationsMatcher().bestMatches(
+								_text,
+								_number ? *_number : 0,
+								_minScore,
+								_phonetic
+						)	);
+						result.insert(DATA_PUBLIC_BIKE_STATIONS, pm);
+					}
 				}
 			}
 			else
@@ -899,6 +933,23 @@ namespace synthese
 					){
 						bestMap = ppBestMap;
 						className = DATA_PUBLIC_PLACE;
+					}
+				}
+
+				// Public bike stations
+				if(result.hasSubMaps(DATA_PUBLIC_BIKE_STATIONS) &&
+					(*result.getSubMaps(DATA_PUBLIC_BIKE_STATIONS).begin())->hasSubMaps(DATA_PUBLIC_BIKE_STATION)
+				){
+					boost::shared_ptr<ParametersMap> ppBestMap(
+						*(*result.getSubMaps(DATA_PUBLIC_BIKE_STATIONS).begin())->getSubMaps(DATA_PUBLIC_BIKE_STATION).begin()
+					);
+					if(!bestMap.get() ||
+						ppBestMap->get<double>(DATA_PHONETIC_SCORE) > bestMap->get<double>(DATA_PHONETIC_SCORE) ||
+						(ppBestMap->get<double>(DATA_PHONETIC_SCORE) == bestMap->get<double>(DATA_PHONETIC_SCORE) &&
+						ppBestMap->get<double>(DATA_LEVENSHTEIN) < bestMap->get<double>(DATA_LEVENSHTEIN))
+					){
+						bestMap = ppBestMap;
+						className = DATA_PUBLIC_BIKE_STATION;
 					}
 				}
 
@@ -1056,12 +1107,23 @@ namespace synthese
 							);
 						}
 						if(result.hasSubMaps(DATA_PUBLIC_PLACES) &&
-							(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->hasSubMaps(DATA_ADDRESS)
+							(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->hasSubMaps(DATA_PUBLIC_PLACE)
 						){
 							_displayItems(
 								stream,
 								DATA_PUBLIC_PLACE,
 								(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->getSubMaps(DATA_PUBLIC_PLACE),
+								request,
+								rank
+							);
+						}
+						if(result.hasSubMaps(DATA_PUBLIC_BIKE_STATIONS) &&
+							(*result.getSubMaps(DATA_PUBLIC_BIKE_STATIONS).begin())->hasSubMaps(DATA_PUBLIC_BIKE_STATION)
+						){
+							_displayItems(
+								stream,
+								DATA_PUBLIC_BIKE_STATION,
+								(*result.getSubMaps(DATA_PUBLIC_BIKE_STATIONS).begin())->getSubMaps(DATA_PUBLIC_BIKE_STATION),
 								request,
 								rank
 							);
@@ -1120,6 +1182,16 @@ namespace synthese
 							stream,
 							DATA_PUBLIC_PLACE,
 							pm.getSubMaps(DATA_PUBLIC_PLACE),
+							request,
+							rank
+						);
+					}
+					if(pm.hasSubMaps(DATA_PUBLIC_BIKE_STATION))
+					{
+						_displayItems(
+							stream,
+							DATA_PUBLIC_BIKE_STATION,
+							pm.getSubMaps(DATA_PUBLIC_BIKE_STATION),
 							request,
 							rank
 						);
@@ -1296,6 +1368,19 @@ namespace synthese
 				);
 				classMap.insert(DATA_PUBLIC_PLACES, publicPlaces.str());
 			}
+			if(result.hasSubMaps(DATA_PUBLIC_BIKE_STATIONS) &&
+				(*result.getSubMaps(DATA_PUBLIC_BIKE_STATIONS).begin())->hasSubMaps(DATA_PUBLIC_BIKE_STATION)
+			){
+				stringstream publicBikeStations;
+				_displayItems(
+					publicBikeStations,
+					DATA_PUBLIC_BIKE_STATION,
+					(*result.getSubMaps(DATA_PUBLIC_BIKE_STATIONS).begin())->getSubMaps(DATA_PUBLIC_BIKE_STATION),
+					request,
+					rank
+				);
+				classMap.insert(DATA_PUBLIC_BIKE_STATIONS, publicBikeStations.str());
+			}
 
 			// Display
 			_classPage->display(stream, request, classMap);
@@ -1357,6 +1442,14 @@ namespace synthese
 						Env::GetOfficialEnv().getEditable<PublicPlace>(
 							itemMap->get<RegistryKeyType>(
 								PublicPlace::DATA_ID
+					)	)	);
+				}
+				else if(className == DATA_PUBLIC_BIKE_STATION)
+				{
+					placeResult.value = static_pointer_cast<Place, public_biking::PublicBikeStation>(
+						Env::GetOfficialEnv().getEditable<public_biking::PublicBikeStation>(
+							itemMap->get<RegistryKeyType>(
+								Key::FIELD.name
 					)	)	);
 				}
 				else if(className == DATA_ADDRESS)

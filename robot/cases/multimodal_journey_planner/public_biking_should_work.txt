@@ -1,0 +1,50 @@
+*** Settings ***
+Resource          ../../resources/s3-fakeclient/multimodal_journey_planner.txt
+Test Setup        Run Keywords  On Node 0  AND  With SQL Test Data  ../../../resources/data/multimodal_journey_planner/legacy_test_network.sql  AND  Start Synthese On Node 0
+Test Teardown     Stop Synthese On Node 0
+
+*** Test Cases ***
+
+Searching Bike Journeys From Places Requiring Pedestrian Approach Should Find No Solution
+    [Template]    Searching Bike Journey Should Find No Solution
+    City54  rp47  City54  bs86
+    City54  rp47  City54  bs74
+    City54  rp47  City38  bs93
+    City38  rp42  City54  bs86
+    City38  rp42  City54  bs74
+    City38  rp42  City38  bs93
+
+Searching Bike Journeys Between Bike Stations Of Different Networks Should Find No Solution
+    [Template]    Searching Bike Journey Should Find No Solution
+    City54  bs86  City38  bs94
+    City54  bs74  City38  bs94
+    City38  bs93  City38  bs94
+    City38  bs94  City54  bs86
+    City38  bs94  City54  bs74
+    City38  bs94  City38  bs93
+
+Searching Bike Journeys Between Bike Stations Of The Same Network Should Find Proper Solutions
+    [Template]    Searching Bike Journey Should Find Proper Solutions
+    City54  bs86  City54  bs74
+    City54  bs86  City38  bs93
+    City54  bs74  City54  bs86
+    City54  bs74  City38  bs93
+    City38  bs93  City54  bs86
+    City38  bs93  City54  bs74
+
+*** Keywords ***
+
+Searching Bike Journey Should Find No Solution
+	[Arguments]  ${departure_city}  ${departure_place}  ${arrival_city}  ${arrival_place}
+    On Node 0
+    Search Bike Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On 2015-12-08 At 07:02
+    There Should Be 0 Solution(s)
+
+Searching Bike Journey Should Find Proper Solutions
+	[Arguments]  ${departure_city}  ${departure_place}  ${arrival_city}  ${arrival_place}
+    On Node 0
+    Search Bike Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On 2015-12-08 At 07:02
+    There Should Be 1 Solution(s)
+    There Should Be 1 Solution(s) Using Only Bike
+    All Solutions Should Start From "${departure_city}, ${departure_place}" And Arrive To "${arrival_city}, ${arrival_place}"
+
