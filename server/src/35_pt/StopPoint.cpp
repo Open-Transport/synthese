@@ -156,7 +156,7 @@ namespace synthese
 					MetricOffset distanceFromChunkStart = _projectedPoint.getMetricOffset();
 
 					// the distance from the projected point to the chunk end is : chunk size - offset of projected point
-					MetricOffset distanceFromChunkEnd   = (chunkStartOffset - chunkEndOffset) - distanceFromChunkStart;
+					MetricOffset distanceFromChunkEnd = (chunkEndOffset - chunkStartOffset) - distanceFromChunkStart;
 
 					return VertexAccess(
 						minutes(static_cast<long>(distanceFromChunkEnd / 50)),
