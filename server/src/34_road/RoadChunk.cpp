@@ -500,6 +500,8 @@ namespace synthese
 		{
 			_updateEdges();
 
+			setGeometry(get<LineStringGeometry>());
+
 			_forwardEdge->link();
 			_reverseEdge->link();
 		}
