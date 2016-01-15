@@ -1801,20 +1801,37 @@ namespace synthese
 
 		void HafasFileFormat::Exporter_::build(ostream& os) const {
 
-			// TODO : Remove this and/or escape HTML entities to prevent XSS attacks
-
 			os << "<html><body>\n";
-			if (_debug) {
-				os << "<h1>Export parameters</h1><ul>\n"
-					<< "<li><b>Network name:</b> " << _networkName << "</li>\n"
-					<< "<li><b>FTP Host:</b> " << _ftpHost << "</li>\n"
-					<< "<li><b>FTP Port:</b> " << _ftpPort << "</li>\n"
-					<< "<li><b>FTP User:</b> " << _ftpUser << "</li>\n"
-					<< "<li><b>FTP Pass:</b> " << _ftpPass << "</li>\n"
-					<< "</ul>\n";
-			}
 
-			// TODO : Export data to files
+			// TODO : Export data to HAFAS files
+
+			// ** Stop area **
+			os << "<h1>Lieux</h1>\n";
+			os << "<ul>\n";
+			StopPointTableSync::Search(_env); // lazy-loading
+			StopAreaTableSync::SearchResult stopsRes = StopAreaTableSync::Search(_env);
+			BOOST_FOREACH(const boost::shared_ptr<StopArea>& stopArea, stopsRes) {
+				os << "<li>" << stopArea->getFullName() << " <small>(key: " << stopArea->getKey() << ")</small></li>\n";
+				os << "<ul>\n";
+
+				// ** Stop points for this stop area **
+				std::map<util::RegistryKeyType,const pt::StopPoint*> stopPoints = stopArea->getPhysicalStops();
+				for (std::map<util::RegistryKeyType,const pt::StopPoint*>::const_iterator it = stopPoints.begin(); it != stopPoints.end(); ++it)
+				{
+					const StopPoint* stopPoint = it->second;
+					ParametersMap pm;
+					// 21781 = Swiss format (CH1903), 4326 = GPS format (WGS84)
+					stopPoint->toParametersMap(pm, false, CoordinatesSystem::GetCoordinatesSystem(4326));
+					if (pm.isDefined("x") && pm.isDefined("y")) {
+						// TODO : Support for Z
+						os << "<li>- (Est,Nord,Z) = (" << pm.getValue("x") << "," << pm.getValue("y") << ",0)</li>\n";
+					} else {
+						os << "<li>- Arrêt sans coordonnées</li>\n";
+					}
+				}
+				os << "</ul>\n";
+			}
+			os << "</ul>\n";
 
 			// ** Network **
 			TransportNetworkTableSync::SearchResult networksRes =
