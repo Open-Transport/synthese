@@ -43,6 +43,7 @@
 #include "RequestException.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <map>
 #include <fstream>
@@ -1803,19 +1804,24 @@ namespace synthese
 
 			os << "<html><body>\n";
 
-			// TODO : Export data to HAFAS files
+			// We store the data we crawled in those objects
+			Bahnhofs _bahnhofs;
 
 			// ** Stop area **
 			os << "<h1>Lieux</h1>\n";
 			os << "<ul>\n";
 			StopPointTableSync::Search(_env); // lazy-loading
 			StopAreaTableSync::SearchResult stopsRes = StopAreaTableSync::Search(_env);
+			int fakeDidok = 0;
 			BOOST_FOREACH(const boost::shared_ptr<StopArea>& stopArea, stopsRes) {
 				os << "<li>" << stopArea->getFullName() << " <small>(key: " << stopArea->getKey() << ")</small></li>\n";
 				os << "<ul>\n";
 
 				// ** Stop points for this stop area **
 				std::map<util::RegistryKeyType,const pt::StopPoint*> stopPoints = stopArea->getPhysicalStops();
+
+				double minX = std::numeric_limits<double>::max(), minY = std::numeric_limits<double>::max();
+				double maxX = std::numeric_limits<double>::min(), maxY = std::numeric_limits<double>::min();
 				for (std::map<util::RegistryKeyType,const pt::StopPoint*>::const_iterator it = stopPoints.begin(); it != stopPoints.end(); ++it)
 				{
 					const StopPoint* stopPoint = it->second;
@@ -1824,12 +1830,49 @@ namespace synthese
 					stopPoint->toParametersMap(pm, false, CoordinatesSystem::GetCoordinatesSystem(4326));
 					if (pm.isDefined("x") && pm.isDefined("y")) {
 						// TODO : Support for Z
-						os << "<li>- (Est,Nord,Z) = (" << pm.getValue("x") << "," << pm.getValue("y") << ",0)</li>\n";
+						// TODO : Use something more accurate than double, because precision matters a lot.
+						string xStr = pm.getValue("x");
+						string yStr = pm.getValue("y");
+						double x = atof(xStr.c_str());
+						double y = atof(yStr.c_str());
+						if (x > maxX) {
+							maxX = x;
+						}
+						if (x < minX) {
+							minX = x;
+						}
+						if (y > maxY) {
+							maxY = y;
+						}
+						if (y < minY) {
+							minY = y;
+						}
+						os << "<li>(Est,Nord,Z) = (" << xStr << "," << yStr << ",0)</li>\n";
 					} else {
-						os << "<li>- Arrêt sans coordonnées</li>\n";
+						os << "<li>Arrêt sans coordonnées</li>\n";
 					}
 				}
+				os << "<li><b>Point central </b> : (Est,Nord,Z) = (" << ((maxX - minX)/2 + minX) << "," << ((maxY - minY)/2 + minY) << ",0)</li>\n";
 				os << "</ul>\n";
+
+				// TODO : Get the actual Didok code
+				char fakeDidokBuffer[7];
+				sprintf(fakeDidokBuffer, "%07d", fakeDidok++);
+				std::string codeDidok(fakeDidokBuffer);
+				Bahnhof bahnhof;
+				bahnhof.operatorCode = codeDidok;
+				// TODO : Use the same coordinate system as earlier
+				// TODO : Don't forget the case when there was no coordinates available!
+				// TODO : Generate point!
+//				bahnhof.point = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+//						CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(((maxX - minX)/2 + minX), ((maxY - minY)/2 + minY))
+//					);
+				bahnhof.main = true; // TODO : What is this ?
+				bahnhof.name = stopArea->getFullName();
+				_bahnhofs.insert(make_pair(
+									codeDidok,
+									bahnhof
+								));
 			}
 			os << "</ul>\n";
 
@@ -1915,12 +1958,64 @@ namespace synthese
 
 			}
 
-			// TODO : Zip files to archive
-			// TODO : Send archive to FTP server
-
-
 			os << "</body></html>\n" << flush;
 
+			boost::filesystem::path hafasExportFolder = exportToHafasFormat(_bahnhofs);
+
+			// TODO : Zip folder to archive
+			// TODO : Send archive to FTP server
+			// TODO : Delete folder
+
+		}
+
+		boost::filesystem::path HafasFileFormat::Exporter_::exportToHafasFormat(Bahnhofs _bahnhofs) const
+		{
+			// We create a temporary folder in which the HAFAS files will be created
+			boost::filesystem::path dir = createRandomFolder();
+			// TODO : Pull out the filenames into constants
+			// TODO : Deal with runtime_error (e.g. delete folder)
+			exportToBahnhofFile(dir, "BAHNHOF", _bahnhofs);
+			// TODO : Export data to other HAFAS files
+			return dir;
+		}
+
+		void HafasFileFormat::Exporter_::exportToBahnhofFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const
+		{
+			ofstream fileStream;
+			fileStream.open((dir.native() + file).c_str());
+			if (!fileStream.is_open()) {
+				// TODO
+			}
+			int pos = 0;
+			BOOST_FOREACH(Bahnhofs::value_type &bahnhof, _bahnhofs) {
+				// DIDOK Code
+				printColumn(fileStream, pos, bahnhof.first, 0, 12);
+				// Stop name
+				printColumn(fileStream, pos, bahnhof.second.name, 12);
+				newLine(fileStream, pos);
+			}
+			fileStream.close();
+		}
+
+		void HafasFileFormat::Exporter_::printColumn(ofstream& fileStream, int& pos, std::string value, int position, unsigned int maxLength) {
+
+			if (position < pos) {
+				// Throw an error : The previous column was too long!
+				std::stringstream error;
+				error << "Impossible to print value \"" << value << "\" at position " << position << " because we're already at position " << pos << "!";
+				throw std::runtime_error(error.str());
+			} else if (position > pos) {
+				// We need to add some padding...
+				fileStream << std::string(position - pos, ' ');
+			}
+			std::string toPrint = (maxLength != -1u && value.size() > maxLength) ? value.substr(0, maxLength) : value;
+			fileStream << toPrint;
+			pos += toPrint.length();
+		}
+
+		void HafasFileFormat::Exporter_::newLine(ofstream& fileStream, int& pos) {
+			fileStream << endl;
+			pos = 0;
 		}
 
 		util::ParametersMap HafasFileFormat::Exporter_::getParametersMap() const
@@ -1954,6 +2049,18 @@ namespace synthese
 				throw RequestException("Missing parameter " + parameterName);
 			}
 			return result;
+		}
+
+		boost::filesystem::path HafasFileFormat::Exporter_::createRandomFolder() {
+			// TODO : Use GUID instead of timestamps in order to avoid concurrent calls to use the same folder...
+			std::stringstream ss;
+			ss << std::time(0) << '/';
+			boost::filesystem::path dir(ss.str());
+			if (boost::filesystem::create_directory(dir)) {
+				return dir;
+			} else {
+				throw RequestException("Unable to create folder " + dir.native() + " !");
+			}
 		}
 
 		// **** /HAFAS EXPORTER ****

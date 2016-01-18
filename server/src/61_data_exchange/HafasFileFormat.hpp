@@ -34,6 +34,7 @@
 #include "TransportNetworkTableSync.h"
 #include "IConv.hpp"
 #include "OneFileExporter.hpp"
+#include "exception"
 
 #include <iostream>
 #include <map>
@@ -113,6 +114,29 @@ namespace synthese
 		public:
 
 			//////////////////////////////////////////////////////////////////////////
+			/*        Shared between Importer and Exporter        */
+
+			struct Bahnhof
+			{
+				std::string operatorCode;
+				std::string cityName;
+				std::string name;
+				bool main;
+				boost::shared_ptr<geos::geom::Point> point;
+				mutable std::set<pt::StopPoint*> stops;
+				boost::posix_time::time_duration defaultTransferDuration;
+				std::set<std::string> gleisSet;
+				bool used;
+
+				Bahnhof():
+					main(false),
+					used(false)
+				{}
+			};
+			typedef std::map<std::string, Bahnhof> Bahnhofs;
+
+
+			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
 				public impex::MultipleFileTypesImporter<HafasFileFormat>,
 				public PTDataCleanerFileFormat,
@@ -186,24 +210,7 @@ namespace synthese
 				const LineFilter* _lineIsIncluded(const std::string& lineNumber) const;
 
 				typedef std::map<size_t, calendar::Calendar> CalendarMap;
-				struct Bahnhof
-				{
-					std::string operatorCode;
-					std::string cityName;
-					std::string name;
-					bool main;
-					boost::shared_ptr<geos::geom::Point> point;
-					mutable std::set<pt::StopPoint*> stops;
-					boost::posix_time::time_duration defaultTransferDuration;
-					std::set<std::string> gleisSet;
-					bool used;
 
-					Bahnhof():
-						main(false),
-						used(false)
-					{}
-				};
-				typedef std::map<std::string, Bahnhof> Bahnhofs;
 				mutable Bahnhofs _bahnhofs;
 
 				struct Zug
@@ -346,6 +353,8 @@ namespace synthese
 				virtual db::DBTransaction _save() const;
 			};
 
+			//////////////////////////////////////////////////////////////////////////
+
 			// **** HAFAS EXPORTER ****
 
 			class Exporter_: public impex::OneFileExporter<HafasFileFormat> {
@@ -368,7 +377,9 @@ namespace synthese
 					mutable util::Env _env;
 
 					static std::string getMandatoryString(const util::ParametersMap& map, std::string parameterName);
-
+					static boost::filesystem::path createRandomFolder();
+					static void printColumn(std::ofstream& fileStream, int& pos, std::string value, int position, unsigned int maxLength = -1u);
+					static void newLine(std::ofstream& fileStream, int& pos);
 
 				public:
 					Exporter_(const impex::Export& export_);
@@ -377,6 +388,8 @@ namespace synthese
 					virtual util::ParametersMap getParametersMap() const;
 					virtual void setFromParametersMap(const util::ParametersMap& map);
 					virtual std::string getOutputMimeType() const { return "text/html"; }
+					boost::filesystem::path exportToHafasFormat(Bahnhofs _bahnhofs) const;
+					virtual void exportToBahnhofFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const;
 			};
 
 			// **** /HAFAS EXPORTER ****
