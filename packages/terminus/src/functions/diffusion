@@ -65,7 +65,7 @@
     ?> <span class=\"divider\">/</span>
   </li>
   <li>
-  <li class="active"><@name@></li>
+  <li class="active event_title"><@name@></li>
 		?>
 		<?if&
 		cond=<@in_archive@>&
@@ -101,7 +101,7 @@
   <div class="span3">
     <ul class="nav nav-list well" id="menu">
       <li id="mi_properties">
-        <a href="#">Accueil évènement
+        <a href="#"><span class="event_title"><@name@></span>
           <div class="pull-right" action="add_calendar" title="Nouveau calendrier"><i class="icon-plus"></i></div>
         </a>
       </li>

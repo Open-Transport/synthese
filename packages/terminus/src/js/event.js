@@ -1149,6 +1149,7 @@ function change_event_title() {
   var title = $(this).val();
   if(!title) title = "(sans titre)";
   $('#the_form').find('input[name=' + $(this).attr('name') + ']').val(title);
+  $('.event_title').each(function(index, element) { $(element).text(title) });
   activateForm();
 }
 
