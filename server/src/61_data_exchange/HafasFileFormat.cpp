@@ -44,6 +44,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 #include <map>
 #include <fstream>
@@ -1852,7 +1853,10 @@ namespace synthese
 						os << "<li>Arrêt sans coordonnées</li>\n";
 					}
 				}
-				os << "<li><b>Point central </b> : (Est,Nord,Z) = (" << ((maxX - minX)/2 + minX) << "," << ((maxY - minY)/2 + minY) << ",0)</li>\n";
+				double x = (maxX - minX)/2 + minX;
+				double y = (maxY - minY)/2 + minY;
+
+				os << "<li><b>Point central </b> : (Est,Nord,Z) = (" << x << "," << y << ",0)</li>\n";
 				os << "</ul>\n";
 
 				// TODO : Get the actual Didok code
@@ -1863,12 +1867,10 @@ namespace synthese
 				bahnhof.operatorCode = codeDidok;
 				// TODO : Use the same coordinate system as earlier
 				// TODO : Don't forget the case when there was no coordinates available!
-				// TODO : Generate point!
-//				bahnhof.point = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-//						CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(((maxX - minX)/2 + minX), ((maxY - minY)/2 + minY))
-//					);
-				bahnhof.main = true; // TODO : What is this ?
+				bahnhof.point = CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(x, y);
+				// Note : Name contains the city name too! To only get the stop name, use getName() instead.
 				bahnhof.name = stopArea->getFullName();
+				bahnhof.cityName = stopArea->getCity()->getName();
 				_bahnhofs.insert(make_pair(
 									codeDidok,
 									bahnhof
@@ -1975,6 +1977,7 @@ namespace synthese
 			// TODO : Pull out the filenames into constants
 			// TODO : Deal with runtime_error (e.g. delete folder)
 			exportToBahnhofFile(dir, "BAHNHOF", _bahnhofs);
+			exportToKoordFile(dir, "BFKOORD_GEO", _bahnhofs);
 			// TODO : Export data to other HAFAS files
 			return dir;
 		}
@@ -1989,7 +1992,7 @@ namespace synthese
 			int pos = 0;
 			BOOST_FOREACH(Bahnhofs::value_type &bahnhof, _bahnhofs) {
 				// DIDOK Code
-				printColumn(fileStream, pos, bahnhof.first, 0, 12);
+				printColumn(fileStream, pos, bahnhof.first, 0, 7);
 				// Stop name
 				printColumn(fileStream, pos, bahnhof.second.name, 12);
 				newLine(fileStream, pos);
@@ -1997,7 +2000,31 @@ namespace synthese
 			fileStream.close();
 		}
 
-		void HafasFileFormat::Exporter_::printColumn(ofstream& fileStream, int& pos, std::string value, int position, unsigned int maxLength) {
+		void HafasFileFormat::Exporter_::exportToKoordFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const
+		{
+			ofstream fileStream;
+			fileStream.open((dir.native() + file).c_str());
+			if (!fileStream.is_open()) {
+				// TODO
+			}
+			int pos = 0;
+			BOOST_FOREACH(Bahnhofs::value_type &bahnhof, _bahnhofs) {
+				// DIDOK Code
+				printColumn(fileStream, pos, bahnhof.first, 0, 7);
+				// X coordinate
+				printColumn(fileStream, pos, (boost::format("%10.6f") % bahnhof.second.point->getX()).str(), 8, 10);
+				// Y coordinate
+				printColumn(fileStream, pos, (boost::format("%10.6f") % bahnhof.second.point->getY()).str(), 19, 10);
+				// TODO : Z coordinate
+				printColumn(fileStream, pos, "0", 30, 6);
+				// Stop name
+				printColumn(fileStream, pos, "% " + bahnhof.second.name, 37);
+				newLine(fileStream, pos);
+			}
+			fileStream.close();
+		}
+
+		void HafasFileFormat::Exporter_::printColumn(ofstream& fileStream, int &pos, std::string value, int position, unsigned int maxLength) {
 
 			if (position < pos) {
 				// Throw an error : The previous column was too long!
@@ -2010,7 +2037,7 @@ namespace synthese
 			}
 			std::string toPrint = (maxLength != -1u && value.size() > maxLength) ? value.substr(0, maxLength) : value;
 			fileStream << toPrint;
-			pos += toPrint.length();
+			pos = position + toPrint.length();
 		}
 
 		void HafasFileFormat::Exporter_::newLine(ofstream& fileStream, int& pos) {

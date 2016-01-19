@@ -390,6 +390,7 @@ namespace synthese
 					virtual std::string getOutputMimeType() const { return "text/html"; }
 					boost::filesystem::path exportToHafasFormat(Bahnhofs _bahnhofs) const;
 					virtual void exportToBahnhofFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const;
+					virtual void exportToKoordFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const;
 			};
 
 			// **** /HAFAS EXPORTER ****
