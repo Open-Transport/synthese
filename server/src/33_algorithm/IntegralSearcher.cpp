@@ -27,6 +27,10 @@
 #include "Junction.hpp"
 #include "RoadPath.hpp"
 #include "RoadPlace.h"
+
+#include "RoadChunk.h"
+#include "RoadChunkEdge.hpp"
+
 #include "VertexAccessMap.h"
 #include "Vertex.h"
 #include "Edge.h"

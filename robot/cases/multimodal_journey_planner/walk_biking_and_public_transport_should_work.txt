@@ -12,12 +12,12 @@ No Solution Case Should Work
 
 Multiple Solutions Case Should Work
     On Node 0
-    Search Walk And Bike And Public Transport Journey From "City54, rp41" To "City38, rp42" On 2015-12-08 At 07:05
-    There Should Be 6 Solution(s)
+    Search Walk And Bike And Public Transport Journey From "City54, rp47" To "City38, 99" On 2015-12-08 At 07:05
+    There Should Be 8 Solution(s)
     There Should Be 1 Solution(s) Using Only Walk
     # 1 solution marche seult
-    # 1 solution marche + pt
+    # 3 solution marche + pt
     # n solutions marche + velo (n = 2, départs de 86 et 74)
     # 2 solutions marche + pt + velo (velo avant OU après pt)
-    All Solutions Should Start From "City54, rp41" And Arrive To "City38, rp42"
+    All Solutions Should Start From "City54, rp47" And Arrive To "City38, 99"
 

@@ -41,6 +41,22 @@ namespace synthese
 		class Request;
 	}
 
+	namespace graph
+	{
+		class Hub;
+		class Service;
+	}
+
+	namespace geography
+	{
+		class Place;
+	}
+
+	namespace road
+	{
+		class Road;
+	}
+
 	namespace multimodal_journey_planner
 	{
 		////////////////////////////////////////////////////////////////////
@@ -102,6 +118,17 @@ namespace synthese
 			//@{
 				//mutable boost::shared_ptr<PTRoutePlannerResult> _result;
 			//@}
+
+			void _serializePlace(const geography::Place* place, boost::shared_ptr<util::ParametersMap> parametersMap) const;
+
+			void _serializeHub(const graph::Hub* hub, boost::shared_ptr<util::ParametersMap> parametersMap) const;
+
+			void _serializeLatLong(boost::shared_ptr<geos::geom::Point> point, boost::shared_ptr<util::ParametersMap> parametersMap) const;
+
+			void _serializePTService(const graph::Service* service,	boost::shared_ptr<util::ParametersMap> parametersMap) const;
+
+			std::string _getRoadName(const road::Road* road) const;
+
 
 		public:
 			//! @name Getters
