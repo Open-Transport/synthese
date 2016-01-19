@@ -119,6 +119,8 @@ namespace synthese
 				//mutable boost::shared_ptr<PTRoutePlannerResult> _result;
 			//@}
 
+			graph::VertexAccessMap _buildCrossingVAMFromBikeStationVAM(const graph::VertexAccessMap& bikeStationVam, const graph::AccessParameters& accessParameters) const;
+
 			void _serializePlace(const geography::Place* place, boost::shared_ptr<util::ParametersMap> parametersMap) const;
 
 			void _serializeHub(const graph::Hub* hub, boost::shared_ptr<util::ParametersMap> parametersMap) const;

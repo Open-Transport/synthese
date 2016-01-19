@@ -1925,73 +1925,27 @@ namespace synthese
 
 						// Departure place
 						boost::shared_ptr<ParametersMap> submapDeparturePlace(new ParametersMap);
-						if(dynamic_cast<const road::Crossing*>(it->getOrigin()->getHub()))
+						if(NULL != dynamic_cast<const road::Crossing*>(it->getOrigin()->getHub()))
 						{
-							if(dynamic_cast<const NamedPlace*>(departure))
-							{
-								submapDeparturePlace->insert("name", dynamic_cast<const NamedPlace*>(departure)->getFullName());
-								submapDeparturePlace->insert("type", dynamic_cast<const NamedPlace*>(departure)->getFactoryKey());
-								submapDeparturePlace->insert("id", dynamic_cast<const NamedPlace*>(departure)->getKey());
-							}
-							else
-							{
-								submapDeparturePlace->insert("name", dynamic_cast<const City*>(departure)->getName());
-								string strCityType("City");
-								submapDeparturePlace->insert("type", strCityType);
-								submapDeparturePlace->insert("id", dynamic_cast<const City*>(departure)->getKey());
-							}
+							_serializePlace(departure, submapDeparturePlace);
 						}
-						else
+						else if(NULL != dynamic_cast<const NamedPlace*>(it->getOrigin()->getHub()))
 						{
-							submapDeparturePlace->insert("name", dynamic_cast<const NamedPlace*>(it->getOrigin()->getHub())->getFullName());
-							submapDeparturePlace->insert("type", dynamic_cast<const NamedPlace*>(it->getOrigin()->getHub())->getFactoryKey());
-							submapDeparturePlace->insert("id", dynamic_cast<const NamedPlace*>(it->getOrigin()->getHub())->getKey());
+							_serializePlace(dynamic_cast<const NamedPlace*>(it->getOrigin()->getHub()), submapDeparturePlace);
 						}
-
-						if(it->getOrigin()->getFromVertex()->getGeometry().get() &&
-							!it->getOrigin()->getFromVertex()->getGeometry()->isEmpty())
-						{
-							boost::shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-								*(it->getOrigin()->getFromVertex()->getGeometry())
-							)	);
-							submapDeparturePlace->insert("longitude", wgs84Point->getX());
-							submapDeparturePlace->insert("latitude", wgs84Point->getY());
-						}
+						_serializeLatLong(it->getOrigin()->getFromVertex()->getGeometry(), submapDeparturePlace);
 
 						// Arrival place
 						boost::shared_ptr<ParametersMap> submapArrivalPlace(new ParametersMap);
-						if(dynamic_cast<const road::Crossing*>(it->getDestination()->getHub()))
+						if(NULL != dynamic_cast<const road::Crossing*>(it->getDestination()->getHub()))
 						{
-							if(dynamic_cast<const NamedPlace*>(arrival))
-							{
-								submapArrivalPlace->insert("name", dynamic_cast<const NamedPlace*>(arrival)->getFullName());
-								submapArrivalPlace->insert("type", dynamic_cast<const NamedPlace*>(arrival)->getFactoryKey());
-								submapArrivalPlace->insert("id", dynamic_cast<const NamedPlace*>(arrival)->getKey());
-							}
-							else
-							{
-								submapArrivalPlace->insert("name", dynamic_cast<const City*>(arrival)->getName());
-								string strCityType("City");
-								submapArrivalPlace->insert("type", strCityType);
-								submapArrivalPlace->insert("id", dynamic_cast<const City*>(arrival)->getKey());
-							}
+							_serializePlace(arrival, submapArrivalPlace);
 						}
-						else
+						else if(NULL != dynamic_cast<const NamedPlace*>(it->getDestination()->getHub()))
 						{
-							submapArrivalPlace->insert("name", dynamic_cast<const NamedPlace*>(it->getDestination()->getHub())->getFullName());
-							submapArrivalPlace->insert("type", dynamic_cast<const NamedPlace*>(it->getDestination()->getHub())->getFactoryKey());
-							submapArrivalPlace->insert("id", dynamic_cast<const NamedPlace*>(it->getDestination()->getHub())->getKey());
+							_serializePlace(dynamic_cast<const NamedPlace*>(it->getDestination()->getHub()), submapArrivalPlace);
 						}
-
-						if(it->getDestination()->getFromVertex()->getGeometry().get() &&
-							!it->getDestination()->getFromVertex()->getGeometry()->isEmpty())
-						{
-							boost::shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-								*(it->getDestination()->getFromVertex()->getGeometry())
-							)	);
-							submapArrivalPlace->insert("longitude", wgs84Point->getX());
-							submapArrivalPlace->insert("latitude", wgs84Point->getY());
-						}
+						_serializeLatLong(it->getDestination()->getFromVertex()->getGeometry(), submapArrivalPlace);
 
 						submapJourney->insert("departure", submapDeparturePlace);
 						submapJourney->insert("arrival", submapArrivalPlace);
@@ -1999,54 +1953,20 @@ namespace synthese
 						graph::Journey::ServiceUses::const_iterator its(it->getServiceUses().begin());
 						vector<boost::shared_ptr<geos::geom::Geometry> > geometriesSPtr; // To keep shared_ptr's in scope !
 						vector<geos::geom::Geometry*> allGeometries;
-						while(true)
+						while(its != it->getServiceUses().end())
 						{
 							boost::shared_ptr<ParametersMap> submapLeg(new ParametersMap);
 							submapLeg->insert("departure_date_time", its->getDepartureDateTime());
+
 							// Departure place
 							boost::shared_ptr<ParametersMap> submapDeparturePlace(new ParametersMap);
-							if(dynamic_cast<const road::Crossing*>(its->getRealTimeDepartureVertex()->getHub()))
-							{
-								submapDeparturePlace->insert("name", (string)("Croisement"));
-								submapDeparturePlace->insert("type", (string)("crossing"));
-								submapDeparturePlace->insert("id", dynamic_cast<const road::Crossing*>(its->getRealTimeDepartureVertex()->getHub())->getKey());
-							}
-
-							if(its->getRealTimeDepartureVertex()->getGeometry().get() &&
-								!its->getRealTimeDepartureVertex()->getGeometry()->isEmpty())
-							{
-								boost::shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-									*(its->getRealTimeDepartureVertex()->getGeometry())
-								)	);
-								submapDeparturePlace->insert("longitude", wgs84Point->getX());
-								submapDeparturePlace->insert("latitude", wgs84Point->getY());
-							}
-
+							_serializeHub(its->getRealTimeDepartureVertex()->getHub(), submapDeparturePlace);
+							_serializeLatLong(its->getRealTimeDepartureVertex()->getGeometry(), submapDeparturePlace);
 							submapLeg->insert("departure", submapDeparturePlace);
 
 							const road::Road* road(dynamic_cast<const road::RoadPath*>(its->getService()->getPath())->getRoad());
-
-							std::string roadName = road->getAnyRoadPlace()->getName();
+							std::string roadName = _getRoadName(road);
 							std::size_t userClassRank = its->getUserClassRank();
-							if(roadName.empty()) {
-								if(	road->get<RoadTypeField>() == road::ROAD_TYPE_PEDESTRIANPATH ||
-									road->get<RoadTypeField>() == road::ROAD_TYPE_PEDESTRIANSTREET
-								){
-									roadName="Chemin Piéton";
-								}
-								else if(road->get<RoadTypeField>() == road::ROAD_TYPE_STEPS) {
-									roadName="Escaliers";
-								}
-								else if(road->get<RoadTypeField>() == road::ROAD_TYPE_BRIDGE) {
-									roadName="Pont / Passerelle";
-								}
-								else if(road->get<RoadTypeField>() == road::ROAD_TYPE_TUNNEL) {
-									roadName="Tunnel";
-								}
-								else {
-									roadName="Route sans nom";
-								}
-							}
 							double dst = its->getDistance();
 							vector<geos::geom::Geometry*> geometries;
 							graph::Journey::ServiceUses::const_iterator next = its+1;
@@ -2062,31 +1982,31 @@ namespace synthese
 							}
 							while (next != it->getServiceUses().end())
 							{
-								string nextRoadName(
-									dynamic_cast<const road::RoadPath*>(next->getService()->getPath())->getRoad()->getAnyRoadPlace()->getName()
+								std::string nextRoadName(
+									_getRoadName(
+										dynamic_cast<const road::RoadPath*>(next->getService()->getPath())->getRoad()
+									)
 								);
 								std::size_t nextUserClassRank = next->getUserClassRank();
-								if(!roadName.compare(nextRoadName) &&
-									userClassRank == nextUserClassRank)
-								{
-									++its;
-									dst += its->getDistance();
-									boost::shared_ptr<geos::geom::LineString> geometry(its->getGeometry());
-									if(geometry.get())
-									{
-										boost::shared_ptr<geos::geom::Geometry> wgs84LineString(CoordinatesSystem::GetCoordinatesSystem(4326).convertGeometry(
-											*geometry
-										)	);
-										geometries.push_back(wgs84LineString.get());
-										allGeometries.push_back(wgs84LineString.get());
-										geometriesSPtr.push_back(wgs84LineString);
-									}
-									next = its+1;
-								}
-								else
+
+								if((roadName != nextRoadName) || (userClassRank != nextUserClassRank))
 								{
 									break;
 								}
+
+								++its;
+								dst += its->getDistance();
+								boost::shared_ptr<geos::geom::LineString> geometry(its->getGeometry());
+								if(geometry.get())
+								{
+									boost::shared_ptr<geos::geom::Geometry> wgs84LineString(CoordinatesSystem::GetCoordinatesSystem(4326).convertGeometry(
+										*geometry
+									)	);
+									geometries.push_back(wgs84LineString.get());
+									allGeometries.push_back(wgs84LineString.get());
+									geometriesSPtr.push_back(wgs84LineString);
+								}
+								next = its+1;
 							}
 							boost::shared_ptr<geos::geom::MultiLineString> multiLineString(
 								CoordinatesSystem::GetCoordinatesSystem(4326).getGeometryFactory().createMultiLineString(
@@ -2094,58 +2014,40 @@ namespace synthese
 							)	);
 							submapLeg->insert("arrival_date_time", its->getArrivalDateTime());
 							submapLeg->insert("geometry", multiLineString->toString());
-							if (graph::USER_CLASS_CODE_OFFSET + its->getUserClassRank() == graph::USER_BIKE)
+
+
+							// Road
+							boost::shared_ptr<ParametersMap> submapRoadDetails(new ParametersMap);
+							submapRoadDetails->insert("name", roadName);
+							submapRoadDetails->insert("id", road->getAnyRoadPlace()->getKey());
+
+							// Specific leg attributes
+							boost::shared_ptr<ParametersMap> submapRoadLegAttributes(new ParametersMap);
+							submapRoadLegAttributes->insert("length", dst);
+							submapRoadLegAttributes->insert("road", submapRoadDetails);
+
+							if(graph::USER_CLASS_CODE_OFFSET + its->getUserClassRank() == graph::USER_PEDESTRIAN)
 							{
-								boost::shared_ptr<ParametersMap> submapBikeAttributes(new ParametersMap);
-								submapBikeAttributes->insert("length", dst);
-
-								boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
-								submapLegRoad->insert("name", roadName);
-								submapLegRoad->insert("id", road->getAnyRoadPlace()->getKey());
-
-								submapBikeAttributes->insert("road", submapLegRoad);
-
-								submapLeg->insert("bike_attributes", submapBikeAttributes);
+								submapLeg->insert("walk_attributes", submapRoadLegAttributes);
 							}
-							else if (graph::USER_CLASS_CODE_OFFSET + its->getUserClassRank() == graph::USER_PEDESTRIAN)
+							if(graph::USER_CLASS_CODE_OFFSET + its->getUserClassRank() == graph::USER_BIKE)
 							{
-								boost::shared_ptr<ParametersMap> submapWalkAttributes(new ParametersMap);
-								submapWalkAttributes->insert("length", dst);
-
-								boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
-								submapLegRoad->insert("name", roadName);
-								submapLegRoad->insert("id", road->getAnyRoadPlace()->getKey());
-
-								submapWalkAttributes->insert("road", submapLegRoad);
-
-								submapLeg->insert("walk_attributes", submapWalkAttributes);
+								submapLeg->insert("bike_attributes", submapRoadLegAttributes);
+							}
+							if(graph::USER_CLASS_CODE_OFFSET + its->getUserClassRank() == graph::USER_CAR)
+							{
+								submapLeg->insert("car_attributes", submapRoadLegAttributes);
 							}
 
 							// Arrival place
 							boost::shared_ptr<ParametersMap> submapArrivalPlace(new ParametersMap);
-							if(dynamic_cast<const road::Crossing*>(its->getRealTimeArrivalVertex()->getHub()))
-							{
-								submapArrivalPlace->insert("name", (string)("Croisement"));
-								submapArrivalPlace->insert("type", (string)("crossing"));
-								submapArrivalPlace->insert("id", dynamic_cast<const road::Crossing*>(its->getRealTimeArrivalVertex()->getHub())->getKey());
-							}
-
-							if(its->getRealTimeArrivalVertex()->getGeometry().get() &&
-								!its->getRealTimeArrivalVertex()->getGeometry()->isEmpty())
-							{
-								boost::shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-									*(its->getRealTimeArrivalVertex()->getGeometry())
-								)	);
-								submapArrivalPlace->insert("longitude", wgs84Point->getX());
-								submapArrivalPlace->insert("latitude", wgs84Point->getY());
-							}
-
+							_serializeHub(its->getRealTimeArrivalVertex()->getHub(), submapArrivalPlace);
+							_serializeLatLong(its->getRealTimeArrivalVertex()->getGeometry(), submapArrivalPlace);
 							submapLeg->insert("arrival", submapArrivalPlace);
 
 							submapJourney->insert("leg", submapLeg);
 
 							// Next service use
-							if(its == (it->getServiceUses().end()-1)) break;
 							++its;
 						}
 
@@ -2213,6 +2115,7 @@ namespace synthese
 				// This VAM will contain bike stations reachable from arrival using walk and/or bike
 				graph::VertexAccessMap arrivalBikeStationsUsingBikeVam = arrivalBikeStationsUsingWalkVam;
 
+				/*
 				std::cout << "---------------------------" << std::endl;
 				std::cout << "BEFORE VAM EXTENSION : " << std::endl;
 				std::cout << "departurePTStopsUsingWalkVam has " << departurePTStopsUsingWalkVam.getMap().size() << " elements" << std::endl;
@@ -2235,6 +2138,7 @@ namespace synthese
 				{
 					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
 				}
+				*/
 
 				// If walk is allowed, gather the stop points and the bike stations reachable from departure and arrival
 				if(0 < pedestrianAccessParameters.getApproachSpeed())
@@ -2253,7 +2157,7 @@ namespace synthese
 						arrival
 					);
 
-					std::cout << "fullDeparturePTStopsUsingWalkVam" << std::endl;
+					//std::cout << "fullDeparturePTStopsUsingWalkVam" << std::endl;
 
 					// Gather all reachable stop points from departure using walk only
 					graph::VertexAccessMap fullDeparturePTStopsUsingWalkVam = extenderToPhysicalStops.run(
@@ -2262,7 +2166,7 @@ namespace synthese
 						algorithm::DEPARTURE_TO_ARRIVAL
 					);
 
-					std::cout << "fullArrivalPTStopsUsingWalkVam" << std::endl;
+					//std::cout << "fullArrivalPTStopsUsingWalkVam" << std::endl;
 
 					// Gather all reachable stop points from arrival using walk only
 					graph::VertexAccessMap fullArrivalPTStopsUsingWalkVam = extenderToPhysicalStops.run(
@@ -2275,7 +2179,6 @@ namespace synthese
 					departurePTStopsUsingWalkVam = fullDeparturePTStopsUsingWalkVam;
 					arrivalPTStopsUsingWalkVam = fullArrivalPTStopsUsingWalkVam;
 
-					// OVE!!! : TODO extend bike station VAMs only if bikeAccessParameters.getSpeed() > 0
 					// Bike stations
 					algorithm::VAMConverter extenderToBikeStations(
 						pedestrianAccessParameters,
@@ -2290,7 +2193,7 @@ namespace synthese
 						arrival
 					);
 
-					std::cout << "fullDepartureBikeStationsUsingWalkVam" << std::endl;
+					//std::cout << "fullDepartureBikeStationsUsingWalkVam" << std::endl;
 
 					// Gather all reachable bike stations from departure using walk only
 					graph::VertexAccessMap fullDepartureBikeStationsUsingWalkVam = extenderToBikeStations.run(
@@ -2299,7 +2202,7 @@ namespace synthese
 						algorithm::DEPARTURE_TO_ARRIVAL
 					);
 
-					std::cout << "fullArrivalBikeStationsUsingWalkVam" << std::endl;
+					//std::cout << "fullArrivalBikeStationsUsingWalkVam" << std::endl;
 
 					// Gather all reachable bike stations from arrival using walk only
 					graph::VertexAccessMap fullArrivalBikeStationsUsingWalkVam = extenderToBikeStations.run(
@@ -2313,6 +2216,7 @@ namespace synthese
 					arrivalBikeStationsUsingWalkVam = fullArrivalBikeStationsUsingWalkVam;
 				}
 
+				/*
 				std::cout << "AFTER PEDESTRIAN VAM EXTENSION : " << std::endl;
 				std::cout << "departurePTStopsUsingWalkVam has " << departurePTStopsUsingWalkVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, departurePTStopsUsingWalkVam.getMap())
@@ -2334,6 +2238,7 @@ namespace synthese
 				{
 					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
 				}
+				*/
 
 				// If bike is allowed, compute the list of bike stations reachable from departure and arrival then gather the stop points reachable from those bike stations
 				if(0 < bikeAccessParameters.getApproachSpeed())
@@ -2356,29 +2261,8 @@ namespace synthese
 					);
 
 					// OVE!!! : bike stations VAM contain only bike stations, which do not belong to road::RoadModule::GRAPH_ID and are discarded
-					graph::VertexAccessMap crossingsAroundDepartureBikeStationsVam2;
-
-					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& bikeVamElement, departureBikeStationsUsingWalkVam.getMap())
-					{
-						const public_biking::PublicBikeStation* bikeStation = dynamic_cast<const public_biking::PublicBikeStation*>(bikeVamElement.first);
-						const graph::VertexAccess& bikeAccess = bikeVamElement.second;
-						graph::VertexAccessMap bikeStationCrossings;
-						if(NULL == bikeStation) continue;
-
-						geography::Place::GraphTypes graphTypes; graphTypes.insert(road::RoadModule::GRAPH_ID);
-						bikeStation->getVertexAccessMap(bikeStationCrossings, pedestrianAccessParameters, graphTypes);
-
-						BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& crossingVamElement, bikeStationCrossings.getMap())
-						{
-							const graph::VertexAccess& crossingAccess = crossingVamElement.second;
-							graph::VertexAccess fullCrossingAccess(
-								bikeAccess.approachTime + crossingAccess.approachTime,
-								bikeAccess.approachDistance + crossingAccess.approachDistance,
-								bikeAccess.approachJourney
-							);
-							crossingsAroundDepartureBikeStationsVam2.insert(crossingVamElement.first, fullCrossingAccess);
-						}
-					}
+					graph::VertexAccessMap crossingsAroundDepartureBikeStationsVam2 =
+						_buildCrossingVAMFromBikeStationVAM(departureBikeStationsUsingWalkVam, pedestrianAccessParameters);
 
 					// Gather the bike stations reachable using bike from the bike stations previously reached from departure
 					departureBikeStationsUsingBikeVam = extenderToBikeStations.run(
@@ -2389,29 +2273,8 @@ namespace synthese
 					);
 
 					// OVE!!! : bike stations VAM contain only bike stations, which do not belong to road::RoadModule::GRAPH_ID and are discarded
-					graph::VertexAccessMap crossingsAroundArrivalBikeStationsVam2;
-
-					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& bikeVamElement, arrivalBikeStationsUsingWalkVam.getMap())
-					{
-						const public_biking::PublicBikeStation* bikeStation = dynamic_cast<const public_biking::PublicBikeStation*>(bikeVamElement.first);
-						const graph::VertexAccess& bikeAccess = bikeVamElement.second;
-						graph::VertexAccessMap bikeStationCrossings;
-						if(NULL == bikeStation) continue;
-
-						geography::Place::GraphTypes graphTypes; graphTypes.insert(road::RoadModule::GRAPH_ID);
-						bikeStation->getVertexAccessMap(bikeStationCrossings, pedestrianAccessParameters, graphTypes);
-
-						BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& crossingVamElement, bikeStationCrossings.getMap())
-						{
-							const graph::VertexAccess& crossingAccess = crossingVamElement.second;
-							graph::VertexAccess fullCrossingAccess(
-								bikeAccess.approachTime + crossingAccess.approachTime,
-								bikeAccess.approachDistance + crossingAccess.approachDistance,
-								bikeAccess.approachJourney
-							);
-							crossingsAroundArrivalBikeStationsVam2.insert(crossingVamElement.first, fullCrossingAccess);
-						}
-					}
+					graph::VertexAccessMap crossingsAroundArrivalBikeStationsVam2 =
+						_buildCrossingVAMFromBikeStationVAM(arrivalBikeStationsUsingWalkVam, pedestrianAccessParameters);
 
 					// Gather the bike stations reachable using bike from the bike stations previously reached from arrival
 					arrivalBikeStationsUsingBikeVam = extenderToBikeStations.run(
@@ -2436,53 +2299,11 @@ namespace synthese
 					);
 
 					// OVE!!! : bike stations VAM contain only bike stations, which do not belong to road::RoadModule::GRAPH_ID and are discarded
-					graph::VertexAccessMap crossingsAroundDepartureBikeStationsVam;
+					graph::VertexAccessMap crossingsAroundDepartureBikeStationsVam =
+						_buildCrossingVAMFromBikeStationVAM(departureBikeStationsUsingBikeVam, pedestrianAccessParameters);
 
-					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& bikeVamElement, departureBikeStationsUsingBikeVam.getMap())
-					{
-						const public_biking::PublicBikeStation* bikeStation = dynamic_cast<const public_biking::PublicBikeStation*>(bikeVamElement.first);
-						const graph::VertexAccess& bikeAccess = bikeVamElement.second;
-						graph::VertexAccessMap bikeStationCrossings;
-						if(NULL == bikeStation) continue;
-
-						geography::Place::GraphTypes graphTypes; graphTypes.insert(road::RoadModule::GRAPH_ID);
-						bikeStation->getVertexAccessMap(bikeStationCrossings, pedestrianAccessParameters, graphTypes);
-
-						BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& crossingVamElement, bikeStationCrossings.getMap())
-						{
-							const graph::VertexAccess& crossingAccess = crossingVamElement.second;
-							graph::VertexAccess fullCrossingAccess(
-								bikeAccess.approachTime + crossingAccess.approachTime,
-								bikeAccess.approachDistance + crossingAccess.approachDistance,
-								bikeAccess.approachJourney
-							);
-							crossingsAroundDepartureBikeStationsVam.insert(crossingVamElement.first, fullCrossingAccess);
-						}
-					}
-
-					graph::VertexAccessMap crossingsAroundArrivalBikeStationsVam;
-
-					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& bikeVamElement, arrivalBikeStationsUsingBikeVam.getMap())
-					{
-						const public_biking::PublicBikeStation* bikeStation = dynamic_cast<const public_biking::PublicBikeStation*>(bikeVamElement.first);
-						const graph::VertexAccess& bikeAccess = bikeVamElement.second;
-						graph::VertexAccessMap bikeStationCrossings;
-						if(NULL == bikeStation) continue;
-
-						geography::Place::GraphTypes graphTypes; graphTypes.insert(road::RoadModule::GRAPH_ID);
-						bikeStation->getVertexAccessMap(bikeStationCrossings, pedestrianAccessParameters, graphTypes);
-
-						BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& crossingVamElement, bikeStationCrossings.getMap())
-						{
-							const graph::VertexAccess& crossingAccess = crossingVamElement.second;
-							graph::VertexAccess fullCrossingAccess(
-								bikeAccess.approachTime + crossingAccess.approachTime,
-								bikeAccess.approachDistance + crossingAccess.approachDistance,
-								bikeAccess.approachJourney
-							);
-							crossingsAroundArrivalBikeStationsVam.insert(crossingVamElement.first, fullCrossingAccess);
-						}
-					}
+					graph::VertexAccessMap crossingsAroundArrivalBikeStationsVam =
+						_buildCrossingVAMFromBikeStationVAM(arrivalBikeStationsUsingBikeVam, pedestrianAccessParameters);
 
 					// Gather all reachable stop points from departure using walk only
 					departureVam = extenderToPhysicalStops.run(
@@ -2500,18 +2321,20 @@ namespace synthese
 						algorithm::ARRIVAL_TO_DEPARTURE
 					);
 
-					// OVE!!! : TODO departureVam + departurePTStopsUsingWalkVam ; arrivalVam + arrivalPTStopsUsingWalkVam
+					// Merge departurePTStopsUsingWalkVam into departureVam
 					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& pedestrianVamElement, departurePTStopsUsingWalkVam.getMap())
 					{
 						departureVam.insert(pedestrianVamElement.first, pedestrianVamElement.second);
 					}
 
+					// Merge arrivalPTStopsUsingWalkVam into arrivalVam
 					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& pedestrianVamElement, arrivalPTStopsUsingWalkVam.getMap())
 					{
 						arrivalVam.insert(pedestrianVamElement.first, pedestrianVamElement.second);
 					}
 				}
 
+				/*
 				std::cout << "AFTER BIKE VAM EXTENSION : " << std::endl;
 				std::cout << "departureBikeStationsUsingBikeVam has " << departureBikeStationsUsingBikeVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, departureBikeStationsUsingBikeVam.getMap())
@@ -2533,6 +2356,7 @@ namespace synthese
 				{
 					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
 				}
+				*/
 
 				algorithm::TimeSlotRoutePlanner::Result ptResults;
 				// OVE!!! : copied from PTTimeSlotRoutePlanner::run()
@@ -2850,6 +2674,41 @@ namespace synthese
 
 
 
+		graph::VertexAccessMap MultimodalJourneyPlannerService::_buildCrossingVAMFromBikeStationVAM(
+			const graph::VertexAccessMap& bikeStationVam,
+			const graph::AccessParameters& accessParameters
+		) const
+		{
+			graph::VertexAccessMap crossingVam;
+
+			BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& bikeStationVamElement, bikeStationVam.getMap())
+			{
+				const public_biking::PublicBikeStation* bikeStation = dynamic_cast<const public_biking::PublicBikeStation*>(bikeStationVamElement.first);
+				const graph::VertexAccess& bikeAccess = bikeStationVamElement.second;
+				graph::VertexAccessMap bikeStationCrossings;
+				if(NULL == bikeStation) continue;
+
+				geography::Place::GraphTypes graphTypes;
+				graphTypes.insert(road::RoadModule::GRAPH_ID);
+				bikeStation->getVertexAccessMap(bikeStationCrossings, accessParameters, graphTypes);
+
+				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& crossingVamElement, bikeStationCrossings.getMap())
+				{
+					const graph::VertexAccess& crossingAccess = crossingVamElement.second;
+					graph::VertexAccess fullCrossingAccess(
+						bikeAccess.approachTime + crossingAccess.approachTime,
+						bikeAccess.approachDistance + crossingAccess.approachDistance,
+						bikeAccess.approachJourney
+					);
+					crossingVam.insert(crossingVamElement.first, fullCrossingAccess);
+				}
+			}
+
+			return crossingVam;
+		}
+
+
+
 		void MultimodalJourneyPlannerService::_serializePlace(
 			const geography::Place* place,
 			boost::shared_ptr<util::ParametersMap> parametersMap
@@ -2895,6 +2754,7 @@ namespace synthese
 				parametersMap->insert("name", namedPlace->getFullName());
 				parametersMap->insert("type", namedPlace->getFactoryKey());
 				parametersMap->insert("id", namedPlace->getKey());
+				parametersMap->insert("city", namedPlace->getCity()->getName());
 			}
 
 			else if(NULL != crossing)
@@ -2902,6 +2762,8 @@ namespace synthese
 				parametersMap->insert("name", std::string("Croisement"));
 				parametersMap->insert("type", std::string("Crossing"));
 				parametersMap->insert("id", crossing->getKey());
+				// TODO : Can we identify which city a crossing belongs to ?
+				parametersMap->insert("city", std::string(""));
 			}
 
 			else
