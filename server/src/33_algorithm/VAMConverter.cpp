@@ -30,6 +30,8 @@
 #include "JourneysResult.h"
 #include "Vertex.h"
 
+#include <boost/foreach.hpp>
+
 using namespace boost;
 using namespace boost::posix_time;
 
@@ -123,6 +125,12 @@ namespace synthese
 				);
 				iso.integralSearch(vam, optional<size_t>(), optional<time_duration>());
 
+				std::cout << "VAMConverter::run : intermediate results " << std::endl;
+				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, vam.getMap())
+				{
+					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+				}
+
 				// Include physical stops from originVam into result of integral search
 				// (cos not taken into account in returned journey vector).
 				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, vam.getMap())
@@ -149,12 +157,12 @@ namespace synthese
 							result.insert(
 								it.first,
 								VertexAccess(
-									itps.second.approachTime +
+									it.second.approachTime + itps.second.approachTime +
 									(	direction == DEPARTURE_TO_ARRIVAL ?
 										vertex->getHub()->getTransferDelay(*vertex, *it.first) :
 										vertex->getHub()->getTransferDelay(*it.first, *vertex)
 									),
-									itps.second.approachDistance,
+									it.second.approachDistance+ itps.second.approachDistance,
 									itps.second.approachJourney
 							)	);
 						}
