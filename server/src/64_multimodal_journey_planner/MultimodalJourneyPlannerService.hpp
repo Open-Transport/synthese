@@ -28,6 +28,7 @@
 #include "FactorableTemplate.h"
 #include "FunctionWithSite.h"
 #include "RoadModule.h"
+#include "Journey.h"
 
 #include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
@@ -120,6 +121,8 @@ namespace synthese
 			//@}
 
 			graph::VertexAccessMap _buildCrossingVAMFromBikeStationVAM(const graph::VertexAccessMap& bikeStationVam, const graph::AccessParameters& accessParameters) const;
+
+			void _serializeJourney(const graph::Journey& journey, const geography::Place* departure, const geography::Place* arrival, boost::shared_ptr<util::ParametersMap> parametersMap) const;
 
 			void _serializePlace(const geography::Place* place, boost::shared_ptr<util::ParametersMap> parametersMap) const;
 
