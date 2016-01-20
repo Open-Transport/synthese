@@ -63,7 +63,7 @@
       <p>Etes-vous sûr de vouloir supprimer le répertoire ?</p>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-danger">Oui</button>
+      <button class="btn btn-danger" data-form-default="true">Oui</button>
       <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Non</button>
     </div>
     </form>
@@ -116,7 +116,7 @@
         <p>Etes-vous sûr de vouloir supprimer le fichier ?</p>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-danger">Oui</button>
+        <button class="btn btn-danger" data-form-default="true">Oui</button>
         <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Non</button>
       </div>
     </form>
