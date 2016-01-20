@@ -40,6 +40,8 @@ namespace synthese
 	}
 	namespace public_biking
 	{
+		class PublicBikeStation;
+
 		/** Public Bike journey planner.
 			@ingroup m65
 		*/
@@ -53,6 +55,24 @@ namespace synthese
 			const boost::posix_time::ptime& _higherArrivalTime;
 			const graph::AccessParameters _accessParameters;
 			const algorithm::AlgorithmLogger& _logger;
+
+			graph::ServicePointer _constructStartJourney(
+				const PublicBikeStation* origin,
+				const graph::ServicePointer firstSP,
+				graph::VertexAccess va
+			) const;
+			graph::ServicePointer _constructEndJourney(
+				const graph::Vertex* lastVertex,
+				const PublicBikeStation* destination,
+				const boost::posix_time::time_duration& timeShiftCrossing,
+				graph::VertexAccess va
+			) const;
+			graph::ServicePointer _constructAStarStartJourney(
+				const PublicBikeStation* origin,
+				const road::RoadChunkEdge* firstRoadChunkEdge,
+				const boost::posix_time::time_duration& timeToReachBikeStation,
+				const graph::VertexAccess va
+			) const;
 
 
 		public:

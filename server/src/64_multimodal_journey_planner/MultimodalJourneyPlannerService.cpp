@@ -39,6 +39,8 @@
 #include "PTRoutePlannerResult.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "PublicBikeJourneyPlanner.hpp"
+#include "PublicBikeNetwork.hpp"
+#include "PublicBikeStation.hpp"
 #include "Request.h"
 #include "RequestException.h"
 #include "RoadChunk.h"
@@ -1300,6 +1302,8 @@ namespace synthese
 				);
 				std::vector<public_biking::PublicBikeJourneyPlanner::PublicBikeJourneyPlannerAStarResult> result(pbjp.runAStar());
 
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after A* bike");
+
 				BOOST_FOREACH(public_biking::PublicBikeJourneyPlanner::PublicBikeJourneyPlannerAStarResult subResult, result)
 				{
 					boost::shared_ptr<ParametersMap> submapJourney(new ParametersMap);
@@ -1390,6 +1394,7 @@ namespace synthese
 					graph::Journey::ServiceUses::const_iterator its(subResult.get<0>().getServiceUses().begin());
 					vector<boost::shared_ptr<geos::geom::Geometry> > geometriesSPtr; // To keep shared_ptr's in scope !
 					vector<geos::geom::Geometry*> allGeometries;
+					public_biking::PublicBikeNetwork* publicBikeNetwork(NULL);
 					while(true)
 					{
 						if(its == (subResult.get<0>().getServiceUses().end())) break;
@@ -1402,6 +1407,13 @@ namespace synthese
 							submapDeparturePlace->insert("name", (string)("Croisement"));
 							submapDeparturePlace->insert("type", (string)("crossing"));
 							submapDeparturePlace->insert("id", dynamic_cast<const road::Crossing*>(its->getRealTimeDepartureVertex()->getHub())->getKey());
+						}
+						else if (dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex()))
+						{
+							submapDeparturePlace->insert("name", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex())->getName());
+							submapDeparturePlace->insert("type", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex())->getFactoryKey());
+							submapDeparturePlace->insert("id", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex())->getKey());
+							publicBikeNetwork = dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex())->getPublicBikeNetwork();
 						}
 
 						if(its->getRealTimeDepartureVertex()->getGeometry().get() &&
@@ -1416,10 +1428,14 @@ namespace synthese
 
 						submapLeg->insert("departure", submapDeparturePlace);
 
-						const road::Road* road(dynamic_cast<const road::RoadPath*>(its->getService()->getPath())->getRoad());
+						const road::Road* road(NULL);
+						if (its->getService())
+						{
+							road = dynamic_cast<const road::RoadPath*>(its->getService()->getPath())->getRoad();
+						}
 
-						std::string roadName = road->getAnyRoadPlace()->getName();
-						if(roadName.empty()) {
+						std::string roadName = road ? road->getAnyRoadPlace()->getName() : "";
+						if(roadName.empty() && road) {
 							if(	road->get<RoadTypeField>() == road::ROAD_TYPE_PEDESTRIANPATH ||
 								road->get<RoadTypeField>() == road::ROAD_TYPE_PEDESTRIANSTREET
 							){
@@ -1454,7 +1470,9 @@ namespace synthese
 						while (next != subResult.get<0>().getServiceUses().end())
 						{
 							string nextRoadName(
-								dynamic_cast<const road::RoadPath*>(next->getService()->getPath())->getRoad()->getAnyRoadPlace()->getName()
+								next->getService() ?
+								dynamic_cast<const road::RoadPath*>(next->getService()->getPath())->getRoad()->getAnyRoadPlace()->getName() :
+								""
 							);
 							if(!roadName.compare(nextRoadName))
 							{
@@ -1483,16 +1501,39 @@ namespace synthese
 						)	);
 						submapLeg->insert("arrival_date_time", its->getArrivalDateTime());
 						submapLeg->insert("geometry", multiLineString->toString());
-						boost::shared_ptr<ParametersMap> submapWalkAttributes(new ParametersMap);
-						submapWalkAttributes->insert("length", dst);
+						if (publicBikeNetwork)
+						{
+							boost::shared_ptr<ParametersMap> submapBikeAttributes(new ParametersMap);
+							submapBikeAttributes->insert("length", dst);
 
-						boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
-						submapLegRoad->insert("name", roadName);
-						submapLegRoad->insert("id", road->getAnyRoadPlace()->getKey());
+							boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
+							submapLegRoad->insert("name", roadName);
+							submapLegRoad->insert("id", road ? road->getAnyRoadPlace()->getKey() : 0);
 
-						submapWalkAttributes->insert("road", submapLegRoad);
+							submapBikeAttributes->insert("road", submapLegRoad);
 
-						submapLeg->insert("walk_attributes", submapWalkAttributes);
+							boost::shared_ptr<ParametersMap> submapNetwork(new ParametersMap);
+							submapNetwork->insert("name", publicBikeNetwork->getName());
+							submapNetwork->insert("id", publicBikeNetwork->getKey());
+							submapNetwork->insert("image", publicBikeNetwork->getName());
+
+							submapBikeAttributes->insert("network", submapNetwork);
+
+							submapLeg->insert("bike_attributes", submapBikeAttributes);
+						}
+						else
+						{
+							boost::shared_ptr<ParametersMap> submapWalkAttributes(new ParametersMap);
+							submapWalkAttributes->insert("length", dst);
+
+							boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
+							submapLegRoad->insert("name", roadName);
+							submapLegRoad->insert("id", road ? road->getAnyRoadPlace()->getKey() : 0);
+
+							submapWalkAttributes->insert("road", submapLegRoad);
+
+							submapLeg->insert("walk_attributes", submapWalkAttributes);
+						}
 
 						// Arrival place
 						boost::shared_ptr<ParametersMap> submapArrivalPlace(new ParametersMap);
@@ -1555,7 +1596,7 @@ namespace synthese
 							if(first)
 							{
 								curDistance = static_cast<int>(distance);
-								arrivalTime = startDate + boost::posix_time::seconds(static_cast<int>(distance / speed));
+								arrivalTime = departureTime + boost::posix_time::seconds(static_cast<int>(distance / speed));
 								curRoadPlace = &*road->getAnyRoadPlace();
 								curGeom.push_back(geometryProjected.get()->clone());
 								first = false;
@@ -1617,16 +1658,26 @@ namespace synthese
 
 								submapLeg->insert("arrival_date_time", arrivalTime);
 								submapLeg->insert("geometry", multiLineString->toString());
-								boost::shared_ptr<ParametersMap> submapWalkAttributes(new ParametersMap);
-								submapWalkAttributes->insert("length", curDistance);
+								boost::shared_ptr<ParametersMap> submapBikeAttributes(new ParametersMap);
+								submapBikeAttributes->insert("length", curDistance);
 
 								boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
 								submapLegRoad->insert("name", curRoadPlace->getName());
 								submapLegRoad->insert("id", curRoadPlace->getKey());
 
-								submapWalkAttributes->insert("road", submapLegRoad);
+								submapBikeAttributes->insert("road", submapLegRoad);
 
-								submapLeg->insert("bike_attributes", submapWalkAttributes);
+								if (publicBikeNetwork)
+								{
+									boost::shared_ptr<ParametersMap> submapNetwork(new ParametersMap);
+									submapNetwork->insert("name", publicBikeNetwork->getName());
+									submapNetwork->insert("id", publicBikeNetwork->getKey());
+									submapNetwork->insert("image", publicBikeNetwork->getName());
+
+									submapBikeAttributes->insert("network", submapNetwork);
+								}
+
+								submapLeg->insert("bike_attributes", submapBikeAttributes);
 
 								submapJourney->insert("leg", submapLeg);
 
@@ -1697,16 +1748,26 @@ namespace synthese
 
 						submapLeg->insert("arrival_date_time", arrivalTime);
 						submapLeg->insert("geometry", multiLineString->toString());
-						boost::shared_ptr<ParametersMap> submapWalkAttributes(new ParametersMap);
-						submapWalkAttributes->insert("length", curDistance);
+						boost::shared_ptr<ParametersMap> submapBikeAttributes(new ParametersMap);
+						submapBikeAttributes->insert("length", curDistance);
 
 						boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
 						submapLegRoad->insert("name", curRoadPlace->getName());
 						submapLegRoad->insert("id", curRoadPlace->getKey());
 
-						submapWalkAttributes->insert("road", submapLegRoad);
+						submapBikeAttributes->insert("road", submapLegRoad);
 
-						submapLeg->insert("bike_attributes", submapWalkAttributes);
+						if (publicBikeNetwork)
+						{
+							boost::shared_ptr<ParametersMap> submapNetwork(new ParametersMap);
+							submapNetwork->insert("name", publicBikeNetwork->getName());
+							submapNetwork->insert("id", publicBikeNetwork->getKey());
+							submapNetwork->insert("image", publicBikeNetwork->getName());
+
+							submapBikeAttributes->insert("network", submapNetwork);
+						}
+
+						submapLeg->insert("bike_attributes", submapBikeAttributes);
 
 						submapJourney->insert("leg", submapLeg);
 
@@ -1736,6 +1797,12 @@ namespace synthese
 							submapDeparturePlace->insert("type", (string)("crossing"));
 							submapDeparturePlace->insert("id", dynamic_cast<const road::Crossing*>(its->getRealTimeDepartureVertex()->getHub())->getKey());
 						}
+						else if (dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex()))
+						{
+							submapDeparturePlace->insert("name", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex())->getName());
+							submapDeparturePlace->insert("type", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex())->getFactoryKey());
+							submapDeparturePlace->insert("id", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex())->getKey());
+						}
 
 						if(its->getRealTimeDepartureVertex()->getGeometry().get() &&
 							!its->getRealTimeDepartureVertex()->getGeometry()->isEmpty())
@@ -1749,10 +1816,14 @@ namespace synthese
 
 						submapLeg->insert("departure", submapDeparturePlace);
 
-						const road::Road* road(dynamic_cast<const road::RoadPath*>(its->getService()->getPath())->getRoad());
+						const road::Road* road(NULL);
+						if (its->getService())
+						{
+							road = dynamic_cast<const road::RoadPath*>(its->getService()->getPath())->getRoad();
+						}
 
-						std::string roadName = road->getAnyRoadPlace()->getName();
-						if(roadName.empty()) {
+						std::string roadName = road ? road->getAnyRoadPlace()->getName() : "";
+						if(roadName.empty() && road) {
 							if(	road->get<RoadTypeField>() == road::ROAD_TYPE_PEDESTRIANPATH ||
 								road->get<RoadTypeField>() == road::ROAD_TYPE_PEDESTRIANSTREET
 							){
@@ -1816,16 +1887,39 @@ namespace synthese
 						)	);
 						submapLeg->insert("arrival_date_time", its->getArrivalDateTime() + timeShift);
 						submapLeg->insert("geometry", multiLineString->toString());
-						boost::shared_ptr<ParametersMap> submapWalkAttributes(new ParametersMap);
-						submapWalkAttributes->insert("length", dst);
+						if (publicBikeNetwork)
+						{
+							boost::shared_ptr<ParametersMap> submapBikeAttributes(new ParametersMap);
+							submapBikeAttributes->insert("length", dst);
 
-						boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
-						submapLegRoad->insert("name", roadName);
-						submapLegRoad->insert("id", road->getAnyRoadPlace()->getKey());
+							boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
+							submapLegRoad->insert("name", roadName);
+							submapLegRoad->insert("id", road ? road->getAnyRoadPlace()->getKey() : 0);
 
-						submapWalkAttributes->insert("road", submapLegRoad);
+							submapBikeAttributes->insert("road", submapLegRoad);
 
-						submapLeg->insert("walk_attributes", submapWalkAttributes);
+							boost::shared_ptr<ParametersMap> submapNetwork(new ParametersMap);
+							submapNetwork->insert("name", publicBikeNetwork->getName());
+							submapNetwork->insert("id", publicBikeNetwork->getKey());
+							submapNetwork->insert("image", publicBikeNetwork->getName());
+
+							submapBikeAttributes->insert("network", submapNetwork);
+
+							submapLeg->insert("bike_attributes", submapBikeAttributes);
+						}
+						else
+						{
+							boost::shared_ptr<ParametersMap> submapWalkAttributes(new ParametersMap);
+							submapWalkAttributes->insert("length", dst);
+
+							boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
+							submapLegRoad->insert("name", roadName);
+							submapLegRoad->insert("id", road->getAnyRoadPlace()->getKey());
+
+							submapWalkAttributes->insert("road", submapLegRoad);
+
+							submapLeg->insert("walk_attributes", submapWalkAttributes);
+						}
 
 						// Arrival place
 						boost::shared_ptr<ParametersMap> submapArrivalPlace(new ParametersMap);
@@ -1834,6 +1928,13 @@ namespace synthese
 							submapArrivalPlace->insert("name", (string)("Croisement"));
 							submapArrivalPlace->insert("type", (string)("crossing"));
 							submapArrivalPlace->insert("id", dynamic_cast<const road::Crossing*>(its->getRealTimeArrivalVertex()->getHub())->getKey());
+						}
+						else if (dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeArrivalVertex()))
+						{
+							submapArrivalPlace->insert("name", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeArrivalVertex())->getName());
+							submapArrivalPlace->insert("type", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeArrivalVertex())->getFactoryKey());
+							submapArrivalPlace->insert("id", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeArrivalVertex())->getKey());
+							publicBikeNetwork = NULL;
 						}
 
 						if(its->getRealTimeArrivalVertex()->getGeometry().get() &&
@@ -1904,6 +2005,8 @@ namespace synthese
 					logger
 				);
 				public_biking::PublicBikeJourneyPlannerResult results = pbjp.run();
+
+				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after SYNTHESE bike");
 
 				if(!results.getJourneys().empty())
 				{
@@ -1989,6 +2092,7 @@ namespace synthese
 						graph::Journey::ServiceUses::const_iterator its(it->getServiceUses().begin());
 						vector<boost::shared_ptr<geos::geom::Geometry> > geometriesSPtr; // To keep shared_ptr's in scope !
 						vector<geos::geom::Geometry*> allGeometries;
+						public_biking::PublicBikeNetwork* publicBikeNetwork(NULL);
 						while(true)
 						{
 							boost::shared_ptr<ParametersMap> submapLeg(new ParametersMap);
@@ -2000,6 +2104,13 @@ namespace synthese
 								submapDeparturePlace->insert("name", (string)("Croisement"));
 								submapDeparturePlace->insert("type", (string)("crossing"));
 								submapDeparturePlace->insert("id", dynamic_cast<const road::Crossing*>(its->getRealTimeDepartureVertex()->getHub())->getKey());
+							}
+							else if (dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex()))
+							{
+								submapDeparturePlace->insert("name", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex())->getFullName());
+								submapDeparturePlace->insert("type", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex())->getFactoryKey());
+								submapDeparturePlace->insert("id", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex())->getKey());
+								publicBikeNetwork = dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex())->getPublicBikeNetwork();
 							}
 
 							if(its->getRealTimeDepartureVertex()->getGeometry().get() &&
@@ -2014,11 +2125,14 @@ namespace synthese
 
 							submapLeg->insert("departure", submapDeparturePlace);
 
-							const road::Road* road(dynamic_cast<const road::RoadPath*>(its->getService()->getPath())->getRoad());
+							const road::Road* road(its->getService() ?
+								dynamic_cast<const road::RoadPath*>(its->getService()->getPath())->getRoad() :
+								NULL
+							);
 
-							std::string roadName = road->getAnyRoadPlace()->getName();
+							std::string roadName = road ? road->getAnyRoadPlace()->getName() : "";
 							std::size_t userClassRank = its->getUserClassRank();
-							if(roadName.empty()) {
+							if(roadName.empty() && road) {
 								if(	road->get<RoadTypeField>() == road::ROAD_TYPE_PEDESTRIANPATH ||
 									road->get<RoadTypeField>() == road::ROAD_TYPE_PEDESTRIANSTREET
 								){
@@ -2052,9 +2166,11 @@ namespace synthese
 							}
 							while (next != it->getServiceUses().end())
 							{
-								string nextRoadName(
-									dynamic_cast<const road::RoadPath*>(next->getService()->getPath())->getRoad()->getAnyRoadPlace()->getName()
-								);
+								string nextRoadName;
+								if (next->getService())
+								{
+									nextRoadName = dynamic_cast<const road::RoadPath*>(next->getService()->getPath())->getRoad()->getAnyRoadPlace()->getName();
+								}
 								std::size_t nextUserClassRank = next->getUserClassRank();
 								if(!roadName.compare(nextRoadName) &&
 									userClassRank == nextUserClassRank)
@@ -2091,9 +2207,16 @@ namespace synthese
 
 								boost::shared_ptr<ParametersMap> submapLegRoad(new ParametersMap);
 								submapLegRoad->insert("name", roadName);
-								submapLegRoad->insert("id", road->getAnyRoadPlace()->getKey());
+								submapLegRoad->insert("id", road ? road->getAnyRoadPlace()->getKey() : 0);
 
 								submapBikeAttributes->insert("road", submapLegRoad);
+
+								boost::shared_ptr<ParametersMap> submapLegNetwork(new ParametersMap);
+								submapLegNetwork->insert("name", publicBikeNetwork ? publicBikeNetwork->getName() : "");
+								submapLegNetwork->insert("id", publicBikeNetwork ? publicBikeNetwork->getKey() : 0);
+								submapLegNetwork->insert("image", publicBikeNetwork ? publicBikeNetwork->getName() : ""); // Image is not an attribute of publicBikeNetwork
+
+								submapBikeAttributes->insert("network", submapLegNetwork);
 
 								submapLeg->insert("bike_attributes", submapBikeAttributes);
 							}
@@ -2118,6 +2241,12 @@ namespace synthese
 								submapArrivalPlace->insert("name", (string)("Croisement"));
 								submapArrivalPlace->insert("type", (string)("crossing"));
 								submapArrivalPlace->insert("id", dynamic_cast<const road::Crossing*>(its->getRealTimeArrivalVertex()->getHub())->getKey());
+							}
+							else if (dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeArrivalVertex()))
+							{
+								submapArrivalPlace->insert("name", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeArrivalVertex())->getFullName());
+								submapArrivalPlace->insert("type", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeArrivalVertex())->getFactoryKey());
+								submapArrivalPlace->insert("id", dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeArrivalVertex())->getKey());
 							}
 
 							if(its->getRealTimeArrivalVertex()->getGeometry().get() &&

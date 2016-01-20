@@ -113,7 +113,8 @@ namespace synthese
 
 		void Journey::_updateInternalData( const ServicePointer& leg )
 		{
-			if(!leg.getService()->getPath()->isRoad())
+			if(leg.getService() &&
+				!leg.getService()->getPath()->isRoad())
 			{
 				++_transportConnectionCount;
 			}

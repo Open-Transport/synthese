@@ -345,6 +345,10 @@ namespace synthese
 			previousCoordinates.setNull();
 			for(const Edge* edge(_departureEdge); edge != _arrivalEdge; edge = edge->getNext())
 			{
+				if (!edge)
+				{
+					edge = _arrivalEdge;
+				}
 				if(dynamic_cast<const pt::AreaGeneratedLineStop*>(edge))
 				{
 					hasDRTArea = true;	
@@ -383,6 +387,10 @@ namespace synthese
 				for(size_t i(0); i<geometry->getNumPoints(); ++i)
 				{
 					cs->add(geometry->getCoordinateN(i));
+				}
+				if (edge == _arrivalEdge)
+				{
+					break;
 				}
 			}
 			if(drtAreaSequence) // Service end by DRTAreas
