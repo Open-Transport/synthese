@@ -24,6 +24,7 @@
 
 #include "AlgorithmLogger.hpp"
 #include "AStarShortestPathCalculator.hpp"
+#include "Crossing.h"
 #include "Edge.h"
 #include "Hub.h"
 #include "IntegralSearcher.h"
@@ -186,12 +187,21 @@ namespace synthese
 					// Complete with approach to bike station
 					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itc, roadItDVam.getMap())
 					{
+						graph::Journey journeyToBikeStation = itdbs.second.approachJourney;
+						journeyToBikeStation.prepend(
+							_constructEndJourney(
+								itc.first,
+								dynamic_cast<const PublicBikeStation*>(destinationVertex),
+								itc.second.approachTime + itdbs.second.approachTime,
+								itc.second
+							)
+						);
 						roadDvam.insert(
 							itc.first,
 							graph::VertexAccess(
 								itc.second.approachTime + itdbs.second.approachTime,
 								itc.second.approachDistance + itdbs.second.approachDistance,
-								itdbs.second.approachJourney
+								journeyToBikeStation
 						)	);
 					}
 				}
@@ -202,8 +212,8 @@ namespace synthese
 					algorithm::DEPARTURE_FIRST,
 					_journeyParameters,
 					boost::optional<boost::posix_time::time_duration>(),
-					_departureTime,
-					_departureTime,
+					_departureTime + itobs.second.approachTime,
+					_departureTime + itobs.second.approachTime,
 					_higherArrivalTime,
 					road::RoadModule::GRAPH_ID,
 					road::RoadModule::GRAPH_ID,
@@ -221,6 +231,12 @@ namespace synthese
 				}
 
 				// Approach legs at the origin
+				journey.prepend(
+					_constructStartJourney(
+						dynamic_cast<const PublicBikeStation*>(originVertex),
+						journey.getFirstJourneyLeg(),
+						roadOvam.getVertexAccess(journey.getFirstJourneyLeg().getRealTimeDepartureVertex())
+				)	);
 				journey.prepend(itobs.second.approachJourney);
 
 				result.push_back(journey);
@@ -339,12 +355,20 @@ namespace synthese
 					// Complete with approach to bike station
 					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& itc, roadItDVam.getMap())
 					{
+						graph::Journey journeyToBikeStation = itdbs.second.approachJourney;
+						journeyToBikeStation.prepend(
+							_constructEndJourney(
+								itc.first,
+								dynamic_cast<const PublicBikeStation*>(destinationVertex),
+								itc.second.approachTime + itdbs.second.approachTime,
+								itc.second
+						)	);
 						roadDvam.insert(
 							itc.first,
 							graph::VertexAccess(
 								itc.second.approachTime + itdbs.second.approachTime,
 								itc.second.approachDistance + itdbs.second.approachDistance,
-								itdbs.second.approachJourney
+								journeyToBikeStation
 						)	);
 					}
 				}
@@ -364,16 +388,36 @@ namespace synthese
 					PublicBikeJourneyPlannerAStarResult subResult;
 					if (roadDvam.contains((*(path.rbegin()))->getFromVertex()))
 					{
+						graph::Journey startJourney(itobs.second.approachJourney);
+						startJourney.append(
+							_constructAStarStartJourney(
+								dynamic_cast<const PublicBikeStation*>(originVertex),
+								*(path.begin()),
+								itobs.second.approachTime,
+								roadOvam.contains((*(path.begin()))->getFromVertex()) ?
+									roadOvam.getVertexAccess((*(path.begin()))->getFromVertex()) :
+									roadOvam.getVertexAccess((*(path.begin()))->getNext()->getFromVertex())
+						)	);
 						subResult = boost::make_tuple(
-							itobs.second.approachJourney,
+							startJourney,
 							path,
 							roadDvam.getVertexAccess((*(path.rbegin()))->getFromVertex()).approachJourney
 						);
 					}
 					else if (roadDvam.contains((*(path.rbegin()))->getNext()->getFromVertex()))
 					{
+						graph::Journey startJourney(itobs.second.approachJourney);
+						startJourney.append(
+							_constructAStarStartJourney(
+								dynamic_cast<const PublicBikeStation*>(originVertex),
+								*(path.begin()),
+								itobs.second.approachTime,
+								roadOvam.contains((*(path.begin()))->getFromVertex()) ?
+									roadOvam.getVertexAccess((*(path.begin()))->getFromVertex()) :
+									roadOvam.getVertexAccess((*(path.begin()))->getNext()->getFromVertex())
+						)	);
 						subResult = boost::make_tuple(
-							itobs.second.approachJourney,
+							startJourney,
 							path,
 							roadDvam.getVertexAccess((*(path.rbegin()))->getNext()->getFromVertex()).approachJourney
 						);
@@ -384,5 +428,79 @@ namespace synthese
 			}
 
 			return result;
+		}
+
+		graph::ServicePointer PublicBikeJourneyPlanner::_constructStartJourney(
+			const PublicBikeStation* origin,
+			const graph::ServicePointer firstSP,
+			graph::VertexAccess va
+		) const
+		{
+			graph::ServicePointer startSP;
+			startSP.setDepartureInformations(
+				origin->getProjectedPoint().getRoadChunk()->getForwardEdge(),
+				firstSP.getDepartureDateTime() - va.approachTime,
+				firstSP.getDepartureDateTime() - va.approachTime,
+				*origin
+			);
+			startSP.setArrivalInformations(
+				*(firstSP.getDepartureEdge()),
+				firstSP.getDepartureDateTime(),
+				firstSP.getDepartureDateTime(),
+				*(firstSP.getDepartureEdge()->getFromVertex())
+			);
+			startSP.setUserClassRank(_journeyParameters.getUserClassRank());
+
+			return startSP;
+		}
+
+		graph::ServicePointer PublicBikeJourneyPlanner::_constructEndJourney(
+			const graph::Vertex* lastVertex,
+			const PublicBikeStation* destination,
+			const boost::posix_time::time_duration& timeShiftCrossing,
+			graph::VertexAccess va
+		) const
+		{
+			graph::ServicePointer endSP;
+			endSP.setDepartureInformations(
+				*((*(lastVertex->getDepartureEdges().begin())).second),
+				_departureTime - timeShiftCrossing,
+				_departureTime - timeShiftCrossing,
+				*(lastVertex)
+			);
+			endSP.setArrivalInformations(
+				destination->getProjectedPoint().getRoadChunk()->getForwardEdge(),
+				_departureTime - timeShiftCrossing + va.approachTime,
+				_departureTime - timeShiftCrossing + va.approachTime,
+				*destination
+			);
+			endSP.setUserClassRank(_journeyParameters.getUserClassRank());
+
+			return endSP;
+		}
+
+		graph::ServicePointer PublicBikeJourneyPlanner::_constructAStarStartJourney(
+			const PublicBikeStation* origin,
+			const road::RoadChunkEdge* firstRoadChunkEdge,
+			const boost::posix_time::time_duration& timeToReachBikeStation,
+			const graph::VertexAccess va
+		) const
+		{
+			graph::ServicePointer startSP;
+			startSP.setDepartureInformations(
+				origin->getProjectedPoint().getRoadChunk()->getForwardEdge(),
+				_departureTime + timeToReachBikeStation,
+				_departureTime + timeToReachBikeStation,
+				*origin
+			);
+			startSP.setArrivalInformations(
+				*firstRoadChunkEdge,
+				_departureTime + timeToReachBikeStation + va.approachTime,
+				_departureTime + timeToReachBikeStation + va.approachTime,
+				*(firstRoadChunkEdge->getFromVertex())
+			);
+			startSP.setUserClassRank(_journeyParameters.getUserClassRank());
+
+			return startSP;
 		}
 }	}

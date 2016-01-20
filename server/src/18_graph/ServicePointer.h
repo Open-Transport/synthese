@@ -134,6 +134,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void	setServiceRange(boost::posix_time::time_duration duration){ _range = duration; }
+				void setUserClassRank( std::size_t value) { _userClassRank = value; }
 			//@}
 
 			//! @name Getters
