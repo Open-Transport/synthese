@@ -1915,12 +1915,13 @@ namespace synthese
 
 			while(journey.getServiceUses().end() != its)
 			{
-				const graph::Path* path = its->getService()->getPath();
-				const road::RoadPath* road(dynamic_cast<const road::RoadPath*>(path));
+				const graph::Service* service = its->getService();
+				const graph::Path* path = (NULL != service) ? service->getPath() : NULL;
+				const road::RoadPath* roadPath(dynamic_cast<const road::RoadPath*>(path));
 				const pt::Junction* junction(dynamic_cast<const pt::Junction*>(path));
 				const pt::JourneyPattern* ptLine(dynamic_cast<const pt::JourneyPattern*>(path));
 
-				if (NULL != road)
+				if((NULL != roadPath) || (NULL == service))
 				{
 					// Approach leg
 					boost::shared_ptr<ParametersMap> submapRoadLeg(new ParametersMap);
@@ -1938,8 +1939,7 @@ namespace synthese
 						publicBikeNetwork = dynamic_cast<const public_biking::PublicBikeStation*>(its->getRealTimeDepartureVertex())->getPublicBikeNetwork();
 					}
 
-					const road::Road* road(dynamic_cast<const road::RoadPath*>(its->getService()->getPath())->getRoad());
-
+					const road::Road* road = (NULL != roadPath) ? roadPath->getRoad() : NULL;
 					std::string roadName = _getRoadName(road);
 					std::size_t userClassRank = its->getUserClassRank();
 					double dst = its->getDistance();
@@ -1958,8 +1958,9 @@ namespace synthese
 
 					// Concatenate road legs on the same road and using the same transportation mean
 					while(
-						next != journey.getServiceUses().end() &&
-						dynamic_cast<const road::RoadPath*> (next->getService()->getPath())
+						(next != journey.getServiceUses().end()) &&
+						(NULL != next->getService()) &&
+						(NULL != dynamic_cast<const road::RoadPath*> (next->getService()->getPath()))
 					)
 					{
 						std::string nextRoadName(
@@ -2006,7 +2007,7 @@ namespace synthese
 					// Road
 					boost::shared_ptr<ParametersMap> submapRoadDetails(new ParametersMap);
 					submapRoadDetails->insert("name", roadName);
-					submapRoadDetails->insert("id", road->getAnyRoadPlace()->getKey());
+					submapRoadDetails->insert("id", road ? road->getAnyRoadPlace()->getKey() : 0);
 
 					// Specific leg attributes
 					boost::shared_ptr<ParametersMap> submapRoadLegAttributes(new ParametersMap);
@@ -2034,11 +2035,11 @@ namespace synthese
 
 					parametersMap->insert("leg", submapRoadLeg);
 				}
-				else if (NULL != junction)
+				else if(NULL != junction)
 				{
 					// TODO (junction is a walk_leg between 2 pt_leg)
 				}
-				else if (NULL != ptLine)
+				else if(NULL != ptLine)
 				{
 					//pt_leg
 					boost::shared_ptr<ParametersMap> submapPtLeg(new ParametersMap);
@@ -2221,39 +2222,44 @@ namespace synthese
 
 		std::string MultimodalJourneyPlannerService::_getRoadName(const road::Road* road) const
 		{
-			std::string roadName = road->getAnyRoadPlace()->getName();
+			std::string roadName("");
 
-			if(roadName.empty())
+			if(NULL != road)
 			{
-				switch(road->get<RoadTypeField>())
+				roadName = road->getAnyRoadPlace()->getName();
+
+				if(roadName.empty())
 				{
-					case road::ROAD_TYPE_PEDESTRIANPATH :
-					case road::ROAD_TYPE_PEDESTRIANSTREET :
+					switch(road->get<RoadTypeField>())
 					{
-						roadName = "Chemin Piéton";
-						break;
-					}
+						case road::ROAD_TYPE_PEDESTRIANPATH :
+						case road::ROAD_TYPE_PEDESTRIANSTREET :
+						{
+							roadName = "Chemin Piéton";
+							break;
+						}
 
-					case road::ROAD_TYPE_STEPS :
-					{
-						roadName = "Escaliers";
-						break;
-					}
+						case road::ROAD_TYPE_STEPS :
+						{
+							roadName = "Escaliers";
+							break;
+						}
 
-					case road::ROAD_TYPE_BRIDGE :
-					{
-						roadName = "Pont / Passerelle";
-						break;
-					}
+						case road::ROAD_TYPE_BRIDGE :
+						{
+							roadName = "Pont / Passerelle";
+							break;
+						}
 
-					case road::ROAD_TYPE_TUNNEL :
-					{
-						roadName = "Tunnel";
-						break;
-					}
+						case road::ROAD_TYPE_TUNNEL :
+						{
+							roadName = "Tunnel";
+							break;
+						}
 
-					default :
-						roadName = "Route sans nom";
+						default :
+							roadName = "Route sans nom";
+					}
 				}
 			}
 
