@@ -132,20 +132,20 @@ namespace synthese
 
 	namespace data_exchange
 	{
-		const string HafasFileFormat::Importer_::LineFilter::SEP_MAIN = ",";
-		const string HafasFileFormat::Importer_::LineFilter::SEP_FIELD = ":";
-		const string HafasFileFormat::Importer_::LineFilter::JOCKER = "*";
-		const string HafasFileFormat::Importer_::LineFilter::VALUE_LINES_BY_STOPS_PAIRS = "SP";
+		const string HafasFileFormat::LineFilter::SEP_MAIN = ",";
+		const string HafasFileFormat::LineFilter::SEP_FIELD = ":";
+		const string HafasFileFormat::LineFilter::JOCKER = "*";
+		const string HafasFileFormat::LineFilter::VALUE_LINES_BY_STOPS_PAIRS = "SP";
 
 
 
-		HafasFileFormat::Importer_::LineFilter::LineFilter():
+		HafasFileFormat::LineFilter::LineFilter():
 			linesByStopsPair(false)
 		{}
 
 
 
-		HafasFileFormat::Importer_::LinesFilter HafasFileFormat::Importer_::getLinesFilter( const std::string& s )
+		HafasFileFormat::LinesFilter HafasFileFormat::Importer_::getLinesFilter( const std::string& s )
 		{
 			LinesFilter result;
 			vector<string> filters;
@@ -1725,7 +1725,7 @@ namespace synthese
 
 
 
-		const HafasFileFormat::Importer_::LineFilter* HafasFileFormat::Importer_::_lineIsIncluded(
+		const HafasFileFormat::LineFilter* HafasFileFormat::Importer_::_lineIsIncluded(
 			const std::string& lineNumber
 		) const {
 
@@ -1798,6 +1798,9 @@ namespace synthese
 
 		// e.g. : http://synthese:8080/export/?SERVICE=ExportFunction&ff=Hafas&debug=1&ftp_host=ftp.elca.ch&ftp_port=21&ftp_user=admin&ftp_pass=foobar&network=tl
 
+		const std::string HafasFileFormat::Exporter_::DIDOK_DATA_SOURCE_NAME = "DIDOK";
+		const std::string HafasFileFormat::Exporter_::TL_DATA_SOURCE_NAME = "TL";
+
 		HafasFileFormat::Exporter_::Exporter_(const impex::Export& export_): OneFileExporter<HafasFileFormat>(export_) {
 		}
 
@@ -1805,8 +1808,12 @@ namespace synthese
 
 			os << "<html><body>\n";
 
+			// Force loading of some entities in order to be able to access their fields
+			DataSourceTableSync::Search(_env);
+
 			// We store the data we crawled in those objects
 			Bahnhofs _bahnhofs;
+			Zugs _zugs;
 
 			// ** Stop area **
 			os << "<h1>Lieux</h1>\n";
@@ -1886,9 +1893,17 @@ namespace synthese
 				throw RequestException("No such network with name " + _networkName + " !");
 			}
 			TransportNetwork* network = (*(networksRes.begin())).get();
-			os << "<h1>Réseau " << network->getName() << " <small>(key: " << network->getKey() << ")</small></h1>\n";
+
+			// We obtain the code of this network
+			std::string networkCode = getCodesForDataSource(network, TL_DATA_SOURCE_NAME);
+			if (networkCode.empty()) {
+				throw RequestException("Network " + _networkName + " doesn't have a code for data source " + TL_DATA_SOURCE_NAME);
+			}
+
+			os << "<h1>Réseau " << network->getName() << " <small>(code:" << networkCode << ", key: " << network->getKey() << ")</small></h1>\n";
 
 			// ** Lines for this network **
+			int trainNumber = 0;
 			CommercialLineTableSync::SearchResult linesRes =
 					CommercialLineTableSync::Search(_env, network->getKey());
 			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, linesRes) {
@@ -1899,6 +1914,10 @@ namespace synthese
 				JourneyPatternTableSync::SearchResult journeysRes = JourneyPatternTableSync::Search(_env, line->getKey());
 				BOOST_FOREACH(const boost::shared_ptr<JourneyPattern>& journey, journeysRes) {
 
+					// We get the code of this transport mode
+					// TODO : Mention in the documentation that the rolling stock must have a code for the data source !!!
+					RollingStock* rs = journey->getRollingStock();
+					std::string transportModeCode = getCodesForDataSource(rs, TL_DATA_SOURCE_NAME);
 
 					ScheduledServiceTableSync::SearchResult schServiceRes =
 							ScheduledServiceTableSync::Search(_env, journey->getKey(), line->getKey());
@@ -1912,7 +1931,8 @@ namespace synthese
 					os << "<h3>Parcours " << (journey->getWayBack() ? "retour" : "aller")
 							<< " \"" << journey->getName() << "\" :"
 							<< " Origine " << (from != 0 ? from->getName() : "?") << ", "
-							<< " Destination " << (to != 0 ? to->getName() : "?")
+							<< " Destination " << (to != 0 ? to->getName() : "?") << ", "
+							<< " Mode de transport: " << transportModeCode
 							<< " <small>(key: " << journey->getKey() << ")</small></h3>\n";
 
 					// ** Routes for this journey **
@@ -1936,6 +1956,21 @@ namespace synthese
 						}
 						os << "<li>" << schService->getDepartureSchedule(false, 0) << " - "
 								<< schService->getLastArrivalSchedule(false) << "</li>\n";
+
+						Zug zug;
+
+						// We compute the train number
+						char trainNumberBuffer[5];
+						sprintf(trainNumberBuffer, "%05d", trainNumber++);
+						std::string trainNumberStr(trainNumberBuffer);
+						zug.number = trainNumberStr;
+
+						// We set the other known fields
+						zug.lineNumber = networkCode;
+						zug.transportModeCode = transportModeCode;
+
+						_zugs.push_back(zug);
+
 					}
 					if (title) {
 						os << "</ul>\n";
@@ -1962,7 +1997,7 @@ namespace synthese
 
 			os << "</body></html>\n" << flush;
 
-			boost::filesystem::path hafasExportFolder = exportToHafasFormat(_bahnhofs);
+			boost::filesystem::path hafasExportFolder = exportToHafasFormat(_bahnhofs, _zugs);
 
 			// TODO : Zip folder to archive
 			// TODO : Send archive to FTP server
@@ -1970,7 +2005,7 @@ namespace synthese
 
 		}
 
-		boost::filesystem::path HafasFileFormat::Exporter_::exportToHafasFormat(Bahnhofs _bahnhofs) const
+		boost::filesystem::path HafasFileFormat::Exporter_::exportToHafasFormat(Bahnhofs _bahnhofs, Zugs _zugs) const
 		{
 			// We create a temporary folder in which the HAFAS files will be created
 			boost::filesystem::path dir = createRandomFolder();
@@ -1978,6 +2013,7 @@ namespace synthese
 			// TODO : Deal with runtime_error (e.g. delete folder)
 			exportToBahnhofFile(dir, "BAHNHOF", _bahnhofs);
 			exportToKoordFile(dir, "BFKOORD_GEO", _bahnhofs);
+			exportToZugdatFile(dir, "FPLAN", _zugs);
 			// TODO : Export data to other HAFAS files
 			return dir;
 		}
@@ -1985,16 +2021,13 @@ namespace synthese
 		void HafasFileFormat::Exporter_::exportToBahnhofFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const
 		{
 			ofstream fileStream;
-			fileStream.open((dir.native() + file).c_str());
-			if (!fileStream.is_open()) {
-				// TODO
-			}
-			int pos = 0;
+			createFile(fileStream, dir, file);
+			int pos = 1;
 			BOOST_FOREACH(Bahnhofs::value_type &bahnhof, _bahnhofs) {
-				// DIDOK Code
-				printColumn(fileStream, pos, bahnhof.first, 0, 7);
-				// Stop name
-				printColumn(fileStream, pos, bahnhof.second.name, 12);
+				// "Die Nummer der Haltestelle" (DIDOK Code)
+				printColumn(fileStream, pos, bahnhof.first, 1, 7);
+				// "Haltestellenname"
+				printColumn(fileStream, pos, bahnhof.second.name, 13, 513);
 				newLine(fileStream, pos);
 			}
 			fileStream.close();
@@ -2003,46 +2036,150 @@ namespace synthese
 		void HafasFileFormat::Exporter_::exportToKoordFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const
 		{
 			ofstream fileStream;
-			fileStream.open((dir.native() + file).c_str());
-			if (!fileStream.is_open()) {
-				// TODO
-			}
-			int pos = 0;
+			createFile(fileStream, dir, file);
+			int pos = 1;
 			BOOST_FOREACH(Bahnhofs::value_type &bahnhof, _bahnhofs) {
-				// DIDOK Code
-				printColumn(fileStream, pos, bahnhof.first, 0, 7);
-				// X coordinate
-				printColumn(fileStream, pos, (boost::format("%10.6f") % bahnhof.second.point->getX()).str(), 8, 10);
-				// Y coordinate
-				printColumn(fileStream, pos, (boost::format("%10.6f") % bahnhof.second.point->getY()).str(), 19, 10);
-				// TODO : Z coordinate
-				printColumn(fileStream, pos, "0", 30, 6);
-				// Stop name
-				printColumn(fileStream, pos, "% " + bahnhof.second.name, 37);
+				// "Die Nummer der Haltestelle" (DIDOK Code)
+				printColumn(fileStream, pos, bahnhof.first, 1, 7);
+				// "X-Koordinate"
+				printColumn(fileStream, pos, (boost::format("%10.6f") % bahnhof.second.point->getX()).str(), 9, 18);
+				// "Y-Koordinate"
+				printColumn(fileStream, pos, (boost::format("%10.6f") % bahnhof.second.point->getY()).str(), 20, 29);
+				// TODO : "Z-Koordinate"
+				printColumn(fileStream, pos, "0", 31, 36);
+				// "Haltestellenname"
+				printColumn(fileStream, pos, "% " + bahnhof.second.name, 38);
 				newLine(fileStream, pos);
 			}
 			fileStream.close();
 		}
 
-		void HafasFileFormat::Exporter_::printColumn(ofstream& fileStream, int &pos, std::string value, int position, unsigned int maxLength) {
+		void HafasFileFormat::Exporter_::exportToZugdatFile(boost::filesystem::path dir, string file, Zugs _zugs) const
+		{
+			ofstream fileStream;
+			createFile(fileStream, dir, file);
+			int pos = 1;
 
-			if (position < pos) {
+			BOOST_FOREACH(Zug &zug, _zugs) {
+
+				// *** *Z row ***
+				printColumn(fileStream, pos, "*Z", 1, 2);
+				// "Fahrtnummer"
+				printColumn(fileStream, pos, zug.number, 4, 8);
+				// "Verwaltung"
+				printColumn(fileStream, pos, zug.lineNumber, 10, 15);
+				// "Leer" (TODO : In the sample HAFAS export, the columns (19,21) are filled, why ?)
+				printColumn(fileStream, pos, "", 17, 21);
+				// "(optional) Taktanzhalt"
+				printColumn(fileStream, pos, "", 23, 25);
+				// "(optional) Taktzeit in Minuten"
+				printColumn(fileStream, pos, "", 27, 29);
+				newLine(fileStream, pos);
+
+				//  *** *G row ***
+				printColumn(fileStream, pos, "*G", 1, 2);
+				// "Verkehrsmittel bzw. Gattung"
+				printColumn(fileStream, pos, zug.transportModeCode, 4, 6);
+				// "(optional) Laufwegsindex oder Haltestellennummber, ab der die Gattung gilt."
+				printColumn(fileStream, pos, "", 8, 14);
+				// "(optional) Laufwegsindex oder Haltestellennummber, bis zu der die Gattung gilt."
+				printColumn(fileStream, pos, "", 16, 22);
+				// "(optional) Index für das x. Auftreten oder Abfahrtszeitpunkt."
+				printColumn(fileStream, pos, "", 24, 29);
+				// "(optional) Index für das x. Auftreten oder Ankunftszeitpunkt."
+				printColumn(fileStream, pos, "", 31, 36);
+				newLine(fileStream, pos);
+
+				// *** *A VE row ***
+				printColumn(fileStream, pos, "*A", 1, 2);
+				printColumn(fileStream, pos, "VE", 4, 5);
+				// "(optional) Laufwegsindex oder Haltestellennummer, ab der die Verkehrstage im Laufweg gelten."
+				printColumn(fileStream, pos, "", 7, 13);
+				// "(optional) Laufwegsindex oder Haltestellennummer, bis zu der die Verkehrstage im Laufweg gelten."
+				printColumn(fileStream, pos, "", 15, 21);
+				// "(optional) Verkehrstagenummer für die Tage, an denen die Fahrt stattfindet. Fehlt diese Angabe, so verkehrt diese Fahrt täglich (entspricht dann 000000)."
+				printColumn(fileStream, pos, "", 23, 28);
+				// "(optional) Index für das x. Auftreten oder Abfahrtszeitpunkt."
+				printColumn(fileStream, pos, "", 30, 35);
+				// "(optional) Index für das x. Auftreten oder Ankunftszeitpunkt."
+				printColumn(fileStream, pos, "", 37, 42);
+				newLine(fileStream, pos);
+
+				// *** *L row ***
+				printColumn(fileStream, pos, "*L", 1, 2);
+				// "Liniennummer"
+				printColumn(fileStream, pos, "", 4, 11);
+				// "(optional) Laufwegsindex oder Haltestellennummer, ab der die Liniennummer gilt."
+				printColumn(fileStream, pos, "", 13, 19);
+				// "(optional) Laufwegsindex oder Haltestellennummer, bis zu der die Liniennummer gilt."
+				printColumn(fileStream, pos, "", 21, 27);
+				// "(optional) Index für das x. Auftreten oder Abfahrtszeitpunkt."
+				printColumn(fileStream, pos, "", 29, 34);
+				// "(optional) Index für das x. Auftreten oder Ankunftszeitpunkt."
+				printColumn(fileStream, pos, "", 36, 41);
+				newLine(fileStream, pos);
+
+				// *** *R row ***
+				printColumn(fileStream, pos, "*R", 1, 2);
+				// (optional) Kennung für Richtung (0 = Hin, 1= Rück). Diese Kennung wird für zusätzliche Angaben wie z.B. linien- und richtungsbezogene Umsteigezeiten benutzt.
+				printColumn(fileStream, pos, "", 4, 4);
+				// (optional) Richtungscode. Wird kein Code vermerkt, so wird der Bahnhofsname als Richtungscode verwendet.
+				printColumn(fileStream, pos, "", 6, 12);
+				// (optional) Laufwegsindex oder Haltestellennummer, ab der die Richtungsangabe im Laufweg gilt.
+				printColumn(fileStream, pos, "", 14, 20);
+				// (optional) Laufwegsindex oder Haltestellennummer, bis zu der die Richtungsangabe im Laufweg gilt.
+				printColumn(fileStream, pos, "", 22, 28);
+				// (optional) Index für das x. Auftreten oder Abfahrtszeitpunkt.
+				printColumn(fileStream, pos, "", 30, 35);
+				// (optional) Index für das x. Auftreten oder Ankunftszeitpunkt.
+				printColumn(fileStream, pos, "", 37, 42);
+				newLine(fileStream, pos);
+
+				// TODO : *** Timetable rows ***
+				{
+					// "Haltestellennummer"
+					printColumn(fileStream, pos, "TODO", 1, 7);
+					// "(optional) Haltestellenname"
+					printColumn(fileStream, pos, "", 9, 29);
+					// "Ankunftszeit an der Haltestelle (lt. Ortszeit der Haltestelle)."
+					printColumn(fileStream, pos, "TODO", 30, 35);
+					// "Abfahrtszeit an der Haltestelle (lt. Ortszeit der Haltestelle)."
+					printColumn(fileStream, pos, "TODO", 37, 42);
+					// "(optional) Ab dem Halt gültige Fahrtnummer."
+					printColumn(fileStream, pos, "", 44, 48);
+					// "(optional) Ab dem Halt gültige Verwaltung."
+					printColumn(fileStream, pos, "", 50, 55);
+					// "(optional) „X“, falls diese Haltestelle auf dem Laufschild der Fahrt aufgeführt wird."
+					printColumn(fileStream, pos, "", 57, 57);
+					// "Kommentar"
+					printColumn(fileStream, pos, "% TODO", 59);
+					newLine(fileStream, pos);
+				}
+			}
+
+			fileStream.close();
+		}
+
+		void HafasFileFormat::Exporter_::printColumn(std::ofstream& fileStream, int& pos, std::string value, int firstColumn, int lastColumn) {
+			if (firstColumn < pos) {
 				// Throw an error : The previous column was too long!
 				std::stringstream error;
-				error << "Impossible to print value \"" << value << "\" at position " << position << " because we're already at position " << pos << "!";
+				error << "Impossible to print value \"" << value << "\" at position " << firstColumn << " because we're already at position " << pos << "!";
 				throw std::runtime_error(error.str());
-			} else if (position > pos) {
+			} else if (firstColumn > pos) {
 				// We need to add some padding...
-				fileStream << std::string(position - pos, ' ');
+				fileStream << std::string(firstColumn - pos, ' ');
 			}
-			std::string toPrint = (maxLength != -1u && value.size() > maxLength) ? value.substr(0, maxLength) : value;
+			int maxLength = lastColumn - firstColumn + 1;
+			std::string toPrint = (lastColumn > 0 && (int) (value.size()) > maxLength) ? value.substr(0, maxLength) : value;
 			fileStream << toPrint;
-			pos = position + toPrint.length();
+			pos = firstColumn + toPrint.length();
+
 		}
 
 		void HafasFileFormat::Exporter_::newLine(ofstream& fileStream, int& pos) {
 			fileStream << endl;
-			pos = 0;
+			pos = 1;
 		}
 
 		util::ParametersMap HafasFileFormat::Exporter_::getParametersMap() const
@@ -2070,6 +2207,13 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		// HELPERS
 
+		void HafasFileFormat::Exporter_::createFile(std::ofstream& fileStream, boost::filesystem::path dir, string file) {
+			fileStream.open((dir.native() + file).c_str());
+			if (!fileStream.is_open()) {
+				// TODO : Throw an exception
+			}
+		}
+
 		std::string HafasFileFormat::Exporter_::getMandatoryString(const ParametersMap& map, std::string parameterName) {
 			std::string result = map.getDefault<std::string>(parameterName, "");
 			if (result.empty()) {
@@ -2088,6 +2232,36 @@ namespace synthese
 			} else {
 				throw RequestException("Unable to create folder " + dir.native() + " !");
 			}
+		}
+
+		std::string HafasFileFormat::Exporter_::getCodesForDataSource(impex::Importable* object, std::string dataSourceName) {
+
+			stringstream codes;
+
+			if (object) {
+
+				std::multimap<const synthese::impex::DataSource*, std::basic_string<char> > dataSourceLinks = object->getDataSourceLinks();
+
+				for (std::multimap<const synthese::impex::DataSource*, std::basic_string<char> >::iterator it=dataSourceLinks.begin(); it!=dataSourceLinks.end(); ++it) {
+
+					if (!codes.str().empty()) {
+						codes << ",";
+					}
+
+					if (((*it).first)->get<Name>() == dataSourceName) {
+						codes << (*it).second;
+					}
+
+				}
+
+				if (codes.str().empty()) {
+					// TODO : Set a logger in the Exporter class... it only exists in the Importer class.
+					cout << "Could't find code in data source " << dataSourceName << " for object with key  " << object->getKey()  << " !" << endl;
+				}
+
+			}
+
+			return codes.str();
 		}
 
 		// **** /HAFAS EXPORTER ****

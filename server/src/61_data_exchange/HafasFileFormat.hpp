@@ -34,6 +34,7 @@
 #include "TransportNetworkTableSync.h"
 #include "IConv.hpp"
 #include "OneFileExporter.hpp"
+#include "Importable.h"
 #include "exception"
 
 #include <iostream>
@@ -135,6 +136,60 @@ namespace synthese
 			};
 			typedef std::map<std::string, Bahnhof> Bahnhofs;
 
+			struct LineFilter
+			{
+				static const std::string SEP_MAIN;
+				static const std::string SEP_FIELD;
+				static const std::string JOCKER;
+				static const std::string VALUE_LINES_BY_STOPS_PAIRS;
+
+				pt::TransportNetwork* network;
+				boost::optional<size_t> lineNumberStart;
+				boost::optional<size_t> lineNumberEnd;
+				bool linesByStopsPair;
+
+				LineFilter();
+			};
+			typedef std::map<std::string, LineFilter> LinesFilter;
+
+			struct Zug
+			{
+				struct CalendarUse
+				{
+					size_t calendarNumber;
+					std::string startStopCode;
+					std::string endStopCode;
+				};
+
+				std::string number;
+				std::string lineNumber;
+				std::string lineShortName;
+				bool readWayback;
+				size_t version;
+				std::vector<CalendarUse> calendars;
+				std::string transportModeCode;
+				boost::posix_time::time_duration continuousServiceRange;
+				boost::posix_time::time_duration continuousServiceWaitingTime;
+				const LineFilter* lineFilter;
+
+				// Served stops
+				struct Stop
+				{
+					std::string stopCode;
+					std::string gleisCode;
+					boost::posix_time::time_duration departureTime;
+					boost::posix_time::time_duration arrivalTime;
+
+					Stop():
+						departureTime(boost::posix_time::not_a_date_time),
+						arrivalTime(boost::posix_time::not_a_date_time)
+					{}
+				};
+				typedef std::vector<Stop> Stops;
+				Stops stops;
+			};
+			typedef std::vector<Zug> Zugs;
+
 
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
@@ -169,21 +224,6 @@ namespace synthese
 				static const std::string PARAMETER_2015_CARPOSTAL_FORMAT;
 
 			private:
-				struct LineFilter
-				{
-					static const std::string SEP_MAIN;
-					static const std::string SEP_FIELD;
-					static const std::string JOCKER;
-					static const std::string VALUE_LINES_BY_STOPS_PAIRS;
-					
-					pt::TransportNetwork* network;
-					boost::optional<size_t> lineNumberStart;
-					boost::optional<size_t> lineNumberEnd;
-					bool linesByStopsPair;
-
-					LineFilter();
-				};
-				typedef std::map<std::string, LineFilter> LinesFilter;
 
 				LinesFilter getLinesFilter(const std::string& s);
 				static std::string LinesFilterToString(const LinesFilter& value);
@@ -213,43 +253,6 @@ namespace synthese
 
 				mutable Bahnhofs _bahnhofs;
 
-				struct Zug
-				{
-					struct CalendarUse
-					{
-						size_t calendarNumber;
-						std::string startStopCode;
-						std::string endStopCode;
-					};
-
-					std::string number;
-					std::string lineNumber;
-					std::string lineShortName;
-					bool readWayback;
-					size_t version;
-					std::vector<CalendarUse> calendars;
-					std::string transportModeCode;
-					boost::posix_time::time_duration continuousServiceRange;
-					boost::posix_time::time_duration continuousServiceWaitingTime;
-					const LineFilter* lineFilter;
-
-					// Served stops
-					struct Stop
-					{
-						std::string stopCode;
-						std::string gleisCode;
-						boost::posix_time::time_duration departureTime;
-						boost::posix_time::time_duration arrivalTime;
-
-						Stop():
-							departureTime(boost::posix_time::not_a_date_time),
-							arrivalTime(boost::posix_time::not_a_date_time)
-						{}
-					};
-					typedef std::vector<Stop> Stops;
-					Stops stops;
-				};
-				typedef std::vector<Zug> Zugs;
 				mutable Zugs _zugs;
 
 				mutable Bahnhofs _nonLinkedBahnhofs;
@@ -376,9 +379,16 @@ namespace synthese
 					std::string _ftpPass;
 					mutable util::Env _env;
 
+					// TODO : Turn these into export parameters !
+					static const std::string DIDOK_DATA_SOURCE_NAME;
+					static const std::string TL_DATA_SOURCE_NAME;
+
 					static std::string getMandatoryString(const util::ParametersMap& map, std::string parameterName);
 					static boost::filesystem::path createRandomFolder();
-					static void printColumn(std::ofstream& fileStream, int& pos, std::string value, int position, unsigned int maxLength = -1u);
+					static void createFile(std::ofstream& fileStream, boost::filesystem::path dir, string file);
+					static std::string getCodesForDataSource(impex::Importable* object, std::string dataSourceName);
+
+					static void printColumn(std::ofstream& fileStream, int& pos, std::string value, int firstColumn, int lastColumn = -1);
 					static void newLine(std::ofstream& fileStream, int& pos);
 
 				public:
@@ -388,9 +398,10 @@ namespace synthese
 					virtual util::ParametersMap getParametersMap() const;
 					virtual void setFromParametersMap(const util::ParametersMap& map);
 					virtual std::string getOutputMimeType() const { return "text/html"; }
-					boost::filesystem::path exportToHafasFormat(Bahnhofs _bahnhofs) const;
+					boost::filesystem::path exportToHafasFormat(Bahnhofs _bahnhofs, Zugs _zugs) const;
 					virtual void exportToBahnhofFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const;
 					virtual void exportToKoordFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const;
+					virtual void exportToZugdatFile(boost::filesystem::path dir, string file, Zugs _zugs) const;
 			};
 
 			// **** /HAFAS EXPORTER ****
