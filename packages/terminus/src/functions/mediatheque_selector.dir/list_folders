@@ -14,7 +14,8 @@
   <li class="tree_<@depth+1@><?if&cond=<@id==folder_id@>&then= active?>" file_id="<@id@>" file_type="<@mime_type@>" file_path="<@smart_url_path@>">
     <a href="#" data-id="<@id@>" data-file-action="reloadFilesList" data-title="<@title@>"><@title@><?if&cond=<@smart_url_path@>&then= - <@smart_url_path@>?>
     <?if&cond=<@admin_mediatheque@>&then=<span class="folder-actions"<?if&cond=<@id==folder_id@>&else= style="display: none"?>><span class="pull-right" data-form-action="addFolder" data-parent="pi" data-toggle="tooltip" data-placement="top" title="Ajouter un répertoire"><i class="icon-plus icon-white"></i></span><span class="pull-right" data-form-action="renameFolder" data-toggle="tooltip" data-placement="top" title="Renommer le répertoire"><i class="icon-edit icon-white"></i></span>
-      <?if&cond=<@recursive_content@>&else=<span class="pull-right" data-form-action="removeFolder" data-toggle="tooltip" data-placement="top" title="Supprimer le répertoire"><i class="icon-remove icon-white"></i></span>?>
+      <span class="pull-right<?if&cond=<@smart_url_default_parameter_name=="removable"@>&else= hide?>" data-action="lockFolder" data-toggle="tooltip" data-placement="top" title="Verrouiller le répertoire"><i class="icon-lock"></i></span><span class="pull-right<?if&cond=<@smart_url_default_parameter_name=="removable"@>&then= hide?>" data-action="unlockFolder" data-toggle="tooltip" data-placement="top" title="Déverrouiller le répertoire"><i class="icon-lock icon-white"></i></span>
+      <?if&cond=<@recursive_content@>&else=<span class="pull-right<?if&cond=<@smart_url_default_parameter_name=="removable"@>&else= hide?>" data-form-action="removeFolder" data-toggle="tooltip" data-placement="top" title="Supprimer le répertoire"><i class="icon-remove icon-white"></i></span>?>
     </span>?></a>
   </li>
   ?>

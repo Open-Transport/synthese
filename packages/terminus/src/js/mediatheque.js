@@ -62,7 +62,31 @@ function uploadFileForm(elem, folderid, modal) {
   modal.find('[name="actionParam_content"]').attr('accept', $('#selectMediaLibrary').children('option:selected').attr('data-accepted-types'));
 }
 
+function unlockFolder() {
+  var elem = $(this).parents('[data-id]');
+  var folderId = elem.attr('data-id');
+  $.post('/terminus/ajax/set_folder_lock_removal?roid=' + folderId,
+         'value=removable').done(function() {
+           elem.find('[data-action="unlockFolder"]:first').hide()
+           elem.find('[data-action="lockFolder"]:first').show()
+           elem.find('[data-form-action="removeFolder"]:first').show()
+         });
+}
+
+function lockFolder() {
+  var elem = $(this).parents('[data-id]');
+  var folderId = elem.attr('data-id');
+  $.post('/terminus/ajax/set_folder_lock_removal?roid=' + folderId,
+         'value=').done(function() {
+           elem.find('[data-action="unlockFolder"]:first').show()
+           elem.find('[data-action="lockFolder"]:first').hide()
+           elem.find('[data-form-action="removeFolder"]:first').hide()
+         });
+}
+
 $(function(){
   $(document).on('click', '[data-form-action]', openModal);
+  $(document).on('click', '[data-action="unlockFolder"]', unlockFolder);
+  $(document).on('click', '[data-action="lockFolder"]', lockFolder);
   $('[name="addFolder"]').validate();
 });
