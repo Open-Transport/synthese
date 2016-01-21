@@ -402,55 +402,13 @@ namespace synthese
 
 					// Departure place
 					boost::shared_ptr<ParametersMap> submapDeparturePlace(new ParametersMap);
-					if(dynamic_cast<const NamedPlace*>(departure))
-					{
-						submapDeparturePlace->insert("name", dynamic_cast<const NamedPlace*>(departure)->getFullName());
-						submapDeparturePlace->insert("type", dynamic_cast<const NamedPlace*>(departure)->getFactoryKey());
-						submapDeparturePlace->insert("id", dynamic_cast<const NamedPlace*>(departure)->getKey());
-					}
-					else
-					{
-						submapDeparturePlace->insert("name", dynamic_cast<const City*>(departure)->getName());
-						string strCityType("City");
-						submapDeparturePlace->insert("type", strCityType);
-						submapDeparturePlace->insert("id", dynamic_cast<const City*>(departure)->getKey());
-					}
-
-					if(departure->getPoint().get() &&
-						!departure->getPoint()->isEmpty())
-					{
-						boost::shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-							*(departure->getPoint())
-						)	);
-						submapDeparturePlace->insert("longitude", wgs84Point->getX());
-						submapDeparturePlace->insert("latitude", wgs84Point->getY());
-					}
+					_serializePlace(departure, submapDeparturePlace);
+					_serializeLatLong(departure->getPoint(), submapDeparturePlace);
 
 					// Arrival place
 					boost::shared_ptr<ParametersMap> submapArrivalPlace(new ParametersMap);
-					if(dynamic_cast<const NamedPlace*>(arrival))
-					{
-						submapArrivalPlace->insert("name", dynamic_cast<const NamedPlace*>(arrival)->getFullName());
-						submapArrivalPlace->insert("type", dynamic_cast<const NamedPlace*>(arrival)->getFactoryKey());
-						submapArrivalPlace->insert("id", dynamic_cast<const NamedPlace*>(arrival)->getKey());
-					}
-					else
-					{
-						submapArrivalPlace->insert("name", dynamic_cast<const City*>(arrival)->getName());
-						string strCityType("City");
-						submapArrivalPlace->insert("type", strCityType);
-						submapArrivalPlace->insert("id", dynamic_cast<const City*>(arrival)->getKey());
-					}
-
-					if(arrival->getPoint().get() &&
-						!arrival->getPoint()->isEmpty())
-					{
-						boost::shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-							*(arrival->getPoint())
-						)	);
-						submapArrivalPlace->insert("longitude", wgs84Point->getX());
-						submapArrivalPlace->insert("latitude", wgs84Point->getY());
-					}
+					_serializePlace(arrival, submapArrivalPlace);
+					_serializeLatLong(arrival->getPoint(), submapArrivalPlace);
 
 					submapJourney->insert("departure", submapDeparturePlace);
 					submapJourney->insert("arrival", submapArrivalPlace);
@@ -490,23 +448,11 @@ namespace synthese
 							first = false;
 
 							// Departure place
-							if(dynamic_cast<const road::Crossing*>(chunk->getFromVertex()->getHub()))
-							{
-								submapLegDeparturePlace->insert("name", (string)("Croisement"));
-								submapLegDeparturePlace->insert("type", (string)("crossing"));
-								submapLegDeparturePlace->insert("id", dynamic_cast<const road::Crossing*>(chunk->getFromVertex()->getHub())->getKey());
-							}
-
-							if(chunk->getFromVertex()->getGeometry().get() &&
-								!chunk->getFromVertex()->getGeometry()->isEmpty())
-							{
-								boost::shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-									*(chunk->getFromVertex()->getGeometry())
-								)	);
-								submapLegDeparturePlace->insert("longitude", wgs84Point->getX());
-								submapLegDeparturePlace->insert("latitude", wgs84Point->getY());
-							}
+							_serializeHub(chunk->getFromVertex()->getHub(), submapLegDeparturePlace);
+							_serializeLatLong(chunk->getFromVertex()->getGeometry(), submapLegDeparturePlace);
 						}
+
+						// OVE!!! : _getRoadName()
 						else if(curRoadPlace->getName() == road->getAnyRoadPlace()->getName())
 						{
 							curDistance += static_cast<int>(distance);
@@ -523,22 +469,8 @@ namespace synthese
 							submapLeg->insert("departure", submapLegDeparturePlace);
 
 							// Arrival place
-							if(dynamic_cast<const road::Crossing*>(chunk->getFromVertex()->getHub()))
-							{
-								submapLegArrivalPlace->insert("name", (string)("Croisement"));
-								submapLegArrivalPlace->insert("type", (string)("crossing"));
-								submapLegArrivalPlace->insert("id", dynamic_cast<const road::Crossing*>(chunk->getFromVertex()->getHub())->getKey());
-							}
-
-							if(chunk->getFromVertex()->getGeometry().get() &&
-								!chunk->getFromVertex()->getGeometry()->isEmpty())
-							{
-								boost::shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-									*(chunk->getFromVertex()->getGeometry())
-								)	);
-								submapLegArrivalPlace->insert("longitude", wgs84Point->getX());
-								submapLegArrivalPlace->insert("latitude", wgs84Point->getY());
-							}
+							_serializeHub(dynamic_cast<const road::Crossing*>(chunk->getFromVertex()->getHub()), submapLegArrivalPlace);
+							_serializeLatLong(chunk->getFromVertex()->getGeometry(), submapLegArrivalPlace);
 							submapLeg->insert("arrival", submapLegArrivalPlace);
 
 							submapLegDeparturePlace.reset(new ParametersMap);
@@ -574,22 +506,8 @@ namespace synthese
 							curGeom.push_back(geometryProjected.get()->clone());
 
 							// New departure place
-							if(dynamic_cast<const road::Crossing*>(chunk->getFromVertex()->getHub()))
-							{
-								submapLegDeparturePlace->insert("name", (string)("Croisement"));
-								submapLegDeparturePlace->insert("type", (string)("crossing"));
-								submapLegDeparturePlace->insert("id", dynamic_cast<const road::Crossing*>(chunk->getFromVertex()->getHub())->getKey());
-							}
-
-							if(chunk->getFromVertex()->getGeometry().get() &&
-								!chunk->getFromVertex()->getGeometry()->isEmpty())
-							{
-								boost::shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-									*(chunk->getFromVertex()->getGeometry())
-								)	);
-								submapLegDeparturePlace->insert("longitude", wgs84Point->getX());
-								submapLegDeparturePlace->insert("latitude", wgs84Point->getY());
-							}
+							_serializeHub(chunk->getFromVertex()->getHub(), submapLegDeparturePlace);
+							_serializeLatLong(chunk->getFromVertex()->getGeometry(), submapLegDeparturePlace);
 						}
 					}
 
@@ -606,22 +524,8 @@ namespace synthese
 					submapLeg->insert("departure", submapLegDeparturePlace);
 
 					// Arrival place
-					if(dynamic_cast<const road::Crossing*>(lastChunk->getFromVertex()->getHub()))
-					{
-						submapLegArrivalPlace->insert("name", (string)("Croisement"));
-						submapLegArrivalPlace->insert("type", (string)("crossing"));
-						submapLegArrivalPlace->insert("id", dynamic_cast<const road::Crossing*>(lastChunk->getFromVertex()->getHub())->getKey());
-					}
-
-					if(lastChunk->getFromVertex()->getGeometry().get() &&
-						!lastChunk->getFromVertex()->getGeometry()->isEmpty())
-					{
-						boost::shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-							*(lastChunk->getFromVertex()->getGeometry())
-						)	);
-						submapLegArrivalPlace->insert("longitude", wgs84Point->getX());
-						submapLegArrivalPlace->insert("latitude", wgs84Point->getY());
-					}
+					_serializeHub(dynamic_cast<const road::Crossing*>(lastChunk->getFromVertex()->getHub()), submapLegArrivalPlace);
+					_serializeLatLong(lastChunk->getFromVertex()->getGeometry(), submapLegArrivalPlace);
 					submapLeg->insert("arrival", submapLegArrivalPlace);
 
 					submapLeg->insert("arrival_date_time", arrivalTime);
@@ -1495,14 +1399,13 @@ namespace synthese
 				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : public transport + bike, computations of VAMs");
 
 				// Initializations
-				graph::AccessParameters pedestrianAccessParameters(
+				graph::AccessParameters initialPedestrianAccessParameters(
 					graph::USER_PEDESTRIAN,			// user class code
 					false,							// DRT only
 					false,							// without DRT
-					_useWalk ? 1000 : 0,			// max approach distance
-					boost::posix_time::minutes(23),	// max approach time
-					_useWalk ? 1.111 : 0.0,			// approach speed
-					_maxTransportConnectionCount	// max transport connection count (ie : max number of used transport services - 1)
+					_useWalk ? 700 : 0,				// max approach distance
+					boost::posix_time::minutes(10),	// max approach time
+					_useWalk ? 1.111 : 0.0			// approach speed
 				);
 
 				graph::AccessParameters bikeAccessParameters(
@@ -1510,8 +1413,18 @@ namespace synthese
 					false,							// DRT only
 					false,							// without DRT
 					4000,							// max approach distance
-					boost::posix_time::minutes(16),	// max approach time
+					boost::posix_time::minutes(25),	// max approach time
 					4.167							// approach speed
+				);
+
+				graph::AccessParameters finalPedestrianAccessParameters(
+					graph::USER_PEDESTRIAN,			// user class code
+					false,							// DRT only
+					false,							// without DRT
+					_useWalk ? 4700 : 0,			// max approach distance
+					boost::posix_time::minutes(35),	// max approach time
+					_useWalk ? 1.111 : 0.0,			// approach speed
+					_maxTransportConnectionCount	// max transport connection count (ie : max number of used transport services - 1)
 				);
 
 				// AlgorithmLogger is still broken when performing non PT journey planning
@@ -1541,7 +1454,6 @@ namespace synthese
 				// This VAM will contain bike stations reachable from arrival using walk and/or bike
 				graph::VertexAccessMap arrivalBikeStationsUsingBikeVam = arrivalBikeStationsUsingWalkVam;
 
-				/*
 				std::cout << "---------------------------" << std::endl;
 				std::cout << "BEFORE VAM EXTENSION : " << std::endl;
 				std::cout << "departurePTStopsUsingWalkVam has " << departurePTStopsUsingWalkVam.getMap().size() << " elements" << std::endl;
@@ -1564,14 +1476,13 @@ namespace synthese
 				{
 					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
 				}
-				*/
 
 				// If walk is allowed, gather the stop points and the bike stations reachable from departure and arrival
-				if(0 < pedestrianAccessParameters.getApproachSpeed())
+				if(0 < initialPedestrianAccessParameters.getApproachSpeed())
 				{
 					// Stop points
 					algorithm::VAMConverter extenderToPhysicalStops(
-						pedestrianAccessParameters,
+						initialPedestrianAccessParameters,
 						inactiveLogger,
 						pt::PTModule::GRAPH_ID,
 						road::RoadModule::GRAPH_ID,
@@ -1583,7 +1494,7 @@ namespace synthese
 						arrival
 					);
 
-					//std::cout << "fullDeparturePTStopsUsingWalkVam" << std::endl;
+					std::cout << "fullDeparturePTStopsUsingWalkVam" << std::endl;
 
 					// Gather all reachable stop points from departure using walk only
 					graph::VertexAccessMap fullDeparturePTStopsUsingWalkVam = extenderToPhysicalStops.run(
@@ -1592,7 +1503,7 @@ namespace synthese
 						algorithm::DEPARTURE_TO_ARRIVAL
 					);
 
-					//std::cout << "fullArrivalPTStopsUsingWalkVam" << std::endl;
+					std::cout << "fullArrivalPTStopsUsingWalkVam" << std::endl;
 
 					// Gather all reachable stop points from arrival using walk only
 					graph::VertexAccessMap fullArrivalPTStopsUsingWalkVam = extenderToPhysicalStops.run(
@@ -1607,7 +1518,7 @@ namespace synthese
 
 					// Bike stations
 					algorithm::VAMConverter extenderToBikeStations(
-						pedestrianAccessParameters,
+						initialPedestrianAccessParameters,
 						inactiveLogger,
 						public_biking::PublicBikingModule::GRAPH_ID,
 						road::RoadModule::GRAPH_ID,
@@ -1619,7 +1530,7 @@ namespace synthese
 						arrival
 					);
 
-					//std::cout << "fullDepartureBikeStationsUsingWalkVam" << std::endl;
+					std::cout << "fullDepartureBikeStationsUsingWalkVam" << std::endl;
 
 					// Gather all reachable bike stations from departure using walk only
 					graph::VertexAccessMap fullDepartureBikeStationsUsingWalkVam = extenderToBikeStations.run(
@@ -1628,7 +1539,8 @@ namespace synthese
 						algorithm::DEPARTURE_TO_ARRIVAL
 					);
 
-					//std::cout << "fullArrivalBikeStationsUsingWalkVam" << std::endl;
+					/*
+					std::cout << "fullArrivalBikeStationsUsingWalkVam" << std::endl;
 
 					// Gather all reachable bike stations from arrival using walk only
 					graph::VertexAccessMap fullArrivalBikeStationsUsingWalkVam = extenderToBikeStations.run(
@@ -1636,13 +1548,13 @@ namespace synthese
 						departureBikeStationsUsingWalkVam,
 						algorithm::ARRIVAL_TO_DEPARTURE
 					);
+					*/
 
 					// Update VAMs
 					departureBikeStationsUsingWalkVam = fullDepartureBikeStationsUsingWalkVam;
-					arrivalBikeStationsUsingWalkVam = fullArrivalBikeStationsUsingWalkVam;
+					//arrivalBikeStationsUsingWalkVam = fullArrivalBikeStationsUsingWalkVam;
 				}
 
-				/*
 				std::cout << "AFTER PEDESTRIAN VAM EXTENSION : " << std::endl;
 				std::cout << "departurePTStopsUsingWalkVam has " << departurePTStopsUsingWalkVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, departurePTStopsUsingWalkVam.getMap())
@@ -1659,6 +1571,7 @@ namespace synthese
 				{
 					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
 				}
+				/*
 				std::cout << "arrivalBikeStationsUsingWalkVam has " << arrivalBikeStationsUsingWalkVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, arrivalBikeStationsUsingWalkVam.getMap())
 				{
@@ -1698,6 +1611,7 @@ namespace synthese
 						algorithm::DEPARTURE_TO_ARRIVAL
 					);
 
+					/*
 					// OVE!!! : bike stations VAM contain only bike stations, which do not belong to road::RoadModule::GRAPH_ID and are discarded
 					graph::VertexAccessMap crossingsAroundArrivalBikeStationsVam2 =
 						_buildCrossingVAMFromBikeStationVAM(arrivalBikeStationsUsingWalkVam, pedestrianAccessParameters);
@@ -1709,10 +1623,11 @@ namespace synthese
 						departureBikeStationsUsingWalkVam,
 						algorithm::ARRIVAL_TO_DEPARTURE
 					);
+					*/
 
 					// Stop points
 					algorithm::VAMConverter extenderToPhysicalStops(
-						pedestrianAccessParameters,
+						finalPedestrianAccessParameters,
 						inactiveLogger,
 						pt::PTModule::GRAPH_ID,
 						road::RoadModule::GRAPH_ID,
@@ -1728,8 +1643,16 @@ namespace synthese
 					graph::VertexAccessMap crossingsAroundDepartureBikeStationsVam =
 						_buildCrossingVAMFromBikeStationVAM(departureBikeStationsUsingBikeVam, pedestrianAccessParameters);
 
+					std::cout << "crossingsAroundDepartureBikeStationsVam has " << crossingsAroundDepartureBikeStationsVam.getMap().size() << " elements" << std::endl;
+					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, crossingsAroundDepartureBikeStationsVam.getMap())
+					{
+						std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+					}
+
+					/*
 					graph::VertexAccessMap crossingsAroundArrivalBikeStationsVam =
 						_buildCrossingVAMFromBikeStationVAM(arrivalBikeStationsUsingBikeVam, pedestrianAccessParameters);
+					*/
 
 					// Gather all reachable stop points from departure using walk only
 					departureVam = extenderToPhysicalStops.run(
@@ -1739,6 +1662,7 @@ namespace synthese
 						algorithm::DEPARTURE_TO_ARRIVAL
 					);
 
+					/*
 					// Gather all reachable stop points from arrival using walk only
 					arrivalVam = extenderToPhysicalStops.run(
 						//arrivalBikeStationsUsingBikeVam,
@@ -1746,6 +1670,7 @@ namespace synthese
 						departurePTStopsUsingWalkVam,  // OVE!!!
 						algorithm::ARRIVAL_TO_DEPARTURE
 					);
+					*/
 
 					// Merge departurePTStopsUsingWalkVam into departureVam
 					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& pedestrianVamElement, departurePTStopsUsingWalkVam.getMap())
@@ -1753,25 +1678,29 @@ namespace synthese
 						departureVam.insert(pedestrianVamElement.first, pedestrianVamElement.second);
 					}
 
+					/*
 					// Merge arrivalPTStopsUsingWalkVam into arrivalVam
 					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& pedestrianVamElement, arrivalPTStopsUsingWalkVam.getMap())
 					{
 						arrivalVam.insert(pedestrianVamElement.first, pedestrianVamElement.second);
 					}
+					*/
+					arrivalVam = arrivalPTStopsUsingWalkVam;
 				}
 
-				/*
 				std::cout << "AFTER BIKE VAM EXTENSION : " << std::endl;
 				std::cout << "departureBikeStationsUsingBikeVam has " << departureBikeStationsUsingBikeVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, departureBikeStationsUsingBikeVam.getMap())
 				{
 					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
 				}
+				/*
 				std::cout << "arrivalBikeStationsUsingBikeVam has " << arrivalBikeStationsUsingBikeVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, arrivalBikeStationsUsingBikeVam.getMap())
 				{
 					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
 				}
+				*/
 				std::cout << "departureVam has " << departureVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, departureVam.getMap())
 				{
@@ -1782,7 +1711,6 @@ namespace synthese
 				{
 					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
 				}
-				*/
 
 				algorithm::TimeSlotRoutePlanner::Result ptResults;
 				// OVE!!! : copied from PTTimeSlotRoutePlanner::run()
@@ -1790,6 +1718,7 @@ namespace synthese
 				// Handle of the case of possible full road approach
 				if(departureVam.intersercts(arrivalVam))
 				{
+					std::cout << "VAM intersection !!!" << std::endl;
 					graph::Journey resultJourney(departureVam.getBestIntersection(arrivalVam));
 					ptime departureTime(resultJourney.getFirstDepartureTime());
 					if(departureTime.time_of_day().seconds())
@@ -1820,7 +1749,7 @@ namespace synthese
 						pt::PTModule::GRAPH_ID,
 						optional<posix_time::time_duration>(),
 						2,
-						pedestrianAccessParameters,
+						finalPedestrianAccessParameters,
 						algorithm::DEPARTURE_FIRST,
 						70, // 252 km/h TODO take it configurable
 						false,
@@ -1840,7 +1769,7 @@ namespace synthese
 						pt::PTModule::GRAPH_ID,
 						optional<posix_time::time_duration>(),
 						2,
-						pedestrianAccessParameters,
+						finalPedestrianAccessParameters,
 						algorithm::DEPARTURE_FIRST,
 						100,
 						false,

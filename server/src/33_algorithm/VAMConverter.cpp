@@ -125,11 +125,13 @@ namespace synthese
 				);
 				iso.integralSearch(vam, optional<size_t>(), optional<time_duration>());
 
+				/*
 				std::cout << "VAMConverter::run : intermediate results " << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, vam.getMap())
 				{
 					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
 				}
+				*/
 
 				// Include physical stops from originVam into result of integral search
 				// (cos not taken into account in returned journey vector).
