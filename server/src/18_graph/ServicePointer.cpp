@@ -378,10 +378,18 @@ namespace synthese
 				}
 				catch (...)
 				{
+					if (edge == _arrivalEdge)
+					{
+						break;
+					}
 					continue;
 				}
 				if(!geometry.get() || geometry->isEmpty())
 				{
+					if (edge == _arrivalEdge)
+					{
+						break;
+					}
 					continue;
 				}
 				for(size_t i(0); i<geometry->getNumPoints(); ++i)
