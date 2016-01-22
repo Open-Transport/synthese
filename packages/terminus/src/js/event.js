@@ -1450,6 +1450,20 @@ function select_file() {
   elem.addClass('active');
 }
 
+function append_img_tag() {
+  if (current_message.tags == '') {
+    current_message.tags = 'img';
+  } else {
+    // only append if not present
+    if (! (current_message.tags.indexOf(',img') > 0
+           || current_message.tags.indexOf('img,') >= 0
+           || current_message.tags == 'img')) {
+      current_message.tags += ',img';
+    }
+  }
+  update_tags_preview(current_message);
+}
+
 function submit_image() {
   var pictureLink = $('.thumbnail-selectable.active');
   if (pictureLink.length > 0) {
@@ -1458,6 +1472,7 @@ function submit_image() {
     var newNode = ed.getDoc().createElement("img");
     newNode.src = pictureLink.children('img').attr('src');
     range.insertNode(newNode);
+    append_img_tag();
   }
 }
 
@@ -1465,6 +1480,7 @@ function submit_digitized_version() {
   var selection = $('.thumbnail-selectable.active');
   if (selection.length > 0) {
     $('[field="digitized_version"]').val(selection.attr('data-smart-url'));
+    append_img_tag();
   }
 }
 
