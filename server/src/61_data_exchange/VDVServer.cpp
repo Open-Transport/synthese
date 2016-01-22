@@ -387,6 +387,14 @@ namespace synthese
 						{
 							stopAreaCode = "Z" + stopAreaCode;
 						}
+						aboAnfrage << 
+							"<" << stopAreaCodeTag << ">" <<
+							stopAreaCode <<
+							"</" << stopAreaCodeTag << ">" <<
+							"<Vorschauzeit>" << (subscription->get<TimeSpan>().total_seconds() / 60)  << "</Vorschauzeit>" <<
+							"<Hysterese>60</Hysterese>" <<
+							"</" << aboTag << ">"
+						;
 					}
 					else if (subscription->get<VDVSubscriptionType>() == Ans)
 					{
@@ -395,15 +403,15 @@ namespace synthese
 						{
 							stopAreaCode = "S" + stopAreaCode;
 						}
+						aboAnfrage << 
+							"<" << stopAreaCodeTag << ">" <<
+							stopAreaCode <<
+							"</" << stopAreaCodeTag << ">" <<
+							"<Hysterese>60</Hysterese>" <<
+							"</" << aboTag << ">"
+						;
 					}
-					aboAnfrage << 
-						"<" << stopAreaCodeTag << ">" <<
-						stopAreaCode <<
-						"</" << stopAreaCodeTag << ">" <<
-						"<Vorschauzeit>" << (subscription->get<TimeSpan>().total_seconds() / 60)  << "</Vorschauzeit>" <<
-						"<Hysterese>60</Hysterese>" <<
-						"</" << aboTag << ">"
-					;
+					
 				}
 				else
 				{
