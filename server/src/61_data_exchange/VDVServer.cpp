@@ -407,7 +407,16 @@ namespace synthese
 							"<" << stopAreaCodeTag << ">" <<
 							stopAreaCode <<
 							"</" << stopAreaCodeTag << ">" <<
-							"<ZeitFilter>" << (subscription->get<TimeSpan>().total_seconds() / 60)  << "</ZeitFilter>" <<
+							"<ZeitFilter>" << 
+							"<FruehesteAnkunftszeit>";
+						ToXsdDateTime(aboAnfrage, now);
+						aboAnfrage <<
+							"</FruehesteAnkunftszeit>" <<
+							"<SpaetesteAnkunftszeit>";
+						ToXsdDateTime(aboAnfrage, expirationTime);
+						aboAnfrage <<
+							"</SpaetesteAnkunftszeit>" <<
+							"</ZeitFilter>" << 
 							"<Hysterese>60</Hysterese>" <<
 							"</" << aboTag << ">"
 						;
