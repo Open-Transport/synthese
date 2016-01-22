@@ -1820,9 +1820,9 @@ namespace synthese
 			os << "<ul>\n";
 			StopPointTableSync::Search(_env); // lazy-loading
 			StopAreaTableSync::SearchResult stopsRes = StopAreaTableSync::Search(_env);
-			int fakeDidok = 0;
 			BOOST_FOREACH(const boost::shared_ptr<StopArea>& stopArea, stopsRes) {
-				os << "<li>" << stopArea->getFullName() << " <small>(key: " << stopArea->getKey() << ")</small></li>\n";
+				std::string didokCode = getCodesForDataSource(stopArea.get(), DIDOK_DATA_SOURCE_NAME, "NO_DIDOK");
+				os << "<li>" << stopArea->getFullName() << " <small>(DIDOK: " + didokCode + ", key: " << stopArea->getKey() << ")</small></li>\n";
 				os << "<ul>\n";
 
 				// ** Stop points for this stop area **
@@ -1866,12 +1866,8 @@ namespace synthese
 				os << "<li><b>Point central </b> : (Est,Nord,Z) = (" << x << "," << y << ",0)</li>\n";
 				os << "</ul>\n";
 
-				// TODO : Get the actual Didok code
-				char fakeDidokBuffer[7];
-				sprintf(fakeDidokBuffer, "%07d", fakeDidok++);
-				std::string codeDidok(fakeDidokBuffer);
 				Bahnhof bahnhof;
-				bahnhof.operatorCode = codeDidok;
+				bahnhof.operatorCode = didokCode;
 				// TODO : Use the same coordinate system as earlier
 				// TODO : Don't forget the case when there was no coordinates available!
 				bahnhof.point = CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(x, y);
@@ -1879,7 +1875,7 @@ namespace synthese
 				bahnhof.name = stopArea->getFullName();
 				bahnhof.cityName = stopArea->getCity()->getName();
 				_bahnhofs.insert(make_pair(
-									codeDidok,
+									didokCode,
 									bahnhof
 								));
 			}
@@ -1903,7 +1899,7 @@ namespace synthese
 			os << "<h1>Réseau " << network->getName() << " <small>(code:" << networkCode << ", key: " << network->getKey() << ")</small></h1>\n";
 
 			// ** Lines for this network **
-			int trainNumber = 0;
+			int trainNumber = 1;
 			CommercialLineTableSync::SearchResult linesRes =
 					CommercialLineTableSync::Search(_env, network->getKey());
 			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, linesRes) {
@@ -1928,20 +1924,27 @@ namespace synthese
 					const StopPoint* from = journey->getOrigin();
 					const StopPoint* to = journey->getDestination();
 
+					// We read the DIDOK code of the StopArea containing this StopPoint
+					std::string fromCode = getCodesForDataSource(from->getConnectionPlace(), DIDOK_DATA_SOURCE_NAME, "NO_DIDOK");
+					std::string toCode = getCodesForDataSource(to->getConnectionPlace(), DIDOK_DATA_SOURCE_NAME, "NO_DIDOK");
+
 					os << "<h3>Parcours " << (journey->getWayBack() ? "retour" : "aller")
 							<< " \"" << journey->getName() << "\" :"
-							<< " Origine " << (from != 0 ? from->getName() : "?") << ", "
-							<< " Destination " << (to != 0 ? to->getName() : "?") << ", "
+							<< " Origine " << (from != 0 ? from->getName() + " (DIDOK: " + fromCode + ")" : "?") << ", "
+							<< " Destination " << (to != 0 ? to->getName() + " (DIDOK: " + toCode + ")": "?") << ", "
 							<< " Mode de transport: " << transportModeCode
 							<< " <small>(key: " << journey->getKey() << ")</small></h3>\n";
 
 					// ** Routes for this journey **
 					os << "<h4>Desserte</h4>\n";
 					os << "<ul>\n";
+					vector<std::pair<std::string, std::string> > lineStops;
 					BOOST_FOREACH(const boost::shared_ptr<LineStop>& lineStop, lineStopRes) {
 						BOOST_FOREACH(const boost::shared_ptr<synthese::pt::LinePhysicalStop>& ls, lineStop->getGeneratedLineStops()) {
 							StopPoint* stop = ls->getPhysicalStop();
-							os << "<li>" << stop->getName() << " <small>(key: " << stop->getKey() << ")</small></li>\n";
+							std::string didok = getCodesForDataSource(stop->getConnectionPlace(), DIDOK_DATA_SOURCE_NAME, "NO_DIDOK");
+							os << "<li>" << stop->getName() << " <small>(didok: " << didok << ", key: " << stop->getKey() << ")</small></li>\n";
+							lineStops.push_back(std::make_pair(stop->getConnectionPlace()->getFullName(), didok));
 						}
 					}
 					os << "</ul>\n";
@@ -1949,6 +1952,12 @@ namespace synthese
 					// ** Scheduled service for this journey **
 					bool title = false;
 					BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& schService, schServiceRes) {
+
+						// We compute the train number
+						char trainNumberBuffer[5];
+						sprintf(trainNumberBuffer, "%05d", trainNumber++);
+						std::string trainNumberStr(trainNumberBuffer);
+
 						if (!title) {
 							os << "<h4>Services à horaire</h4>\n";
 							os << "<ul>\n";
@@ -1957,17 +1966,36 @@ namespace synthese
 						os << "<li>" << schService->getDepartureSchedule(false, 0) << " - "
 								<< schService->getLastArrivalSchedule(false) << "</li>\n";
 
+						// We grab the schedule for each stops
+						Zug::Stops stops;
+						os << "<ul>\n";
+						for (unsigned int i=0; i<lineStops.size(); i++) {
+							Zug::Stop stop;
+							stop.stopCode = lineStops[i].second;
+							stop.stopName = lineStops[i].first;
+							// true --> real time (generated) schedule!
+							if (i > 0) {
+								stop.arrivalTime = schService->getArrivalSchedule(true, i);
+							}
+							if (i < lineStops.size() - 1) {
+								stop.departureTime = schService->getDepartureSchedule(true, i);
+							}
+							stops.push_back(stop);
+
+							os << "<li>" << lineStops[i].first << " <small>(didok: " << stop.stopCode << ")</small> : "
+									<< stop.arrivalTime << " -> "
+									<< stop.departureTime << "</li>\n";
+						}
+						os << "</ul>\n";
+
+
+						// We set the fields
 						Zug zug;
-
-						// We compute the train number
-						char trainNumberBuffer[5];
-						sprintf(trainNumberBuffer, "%05d", trainNumber++);
-						std::string trainNumberStr(trainNumberBuffer);
 						zug.number = trainNumberStr;
-
-						// We set the other known fields
 						zug.lineNumber = networkCode;
 						zug.transportModeCode = transportModeCode;
+						zug.stops = stops;
+						zug.lineShortName = line->getShortName();
 
 						_zugs.push_back(zug);
 
@@ -1976,7 +2004,7 @@ namespace synthese
 						os << "</ul>\n";
 					}
 
-					// ** Continuous services for this journey **
+					// ** Continuous services for this journey (not currently supported by export!) **
 					title = false;
 					BOOST_FOREACH(const boost::shared_ptr<ContinuousService>& conService, conServiceRes) {
 						if (!title) {
@@ -2074,6 +2102,8 @@ namespace synthese
 				printColumn(fileStream, pos, "", 23, 25);
 				// "(optional) Taktzeit in Minuten"
 				printColumn(fileStream, pos, "", 27, 29);
+				// "Kommentar"
+				printColumn(fileStream, pos, "% TODO", 59);
 				newLine(fileStream, pos);
 
 				//  *** *G row ***
@@ -2081,70 +2111,78 @@ namespace synthese
 				// "Verkehrsmittel bzw. Gattung"
 				printColumn(fileStream, pos, zug.transportModeCode, 4, 6);
 				// "(optional) Laufwegsindex oder Haltestellennummber, ab der die Gattung gilt."
-				printColumn(fileStream, pos, "", 8, 14);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.front().stopCode, 8, 14);
 				// "(optional) Laufwegsindex oder Haltestellennummber, bis zu der die Gattung gilt."
-				printColumn(fileStream, pos, "", 16, 22);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.back().stopCode, 16, 22);
 				// "(optional) Index für das x. Auftreten oder Abfahrtszeitpunkt."
-				printColumn(fileStream, pos, "", 24, 29);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.front().departureTime), 24, 29);
 				// "(optional) Index für das x. Auftreten oder Ankunftszeitpunkt."
-				printColumn(fileStream, pos, "", 31, 36);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.back().arrivalTime), 31, 36);
+				// "Kommentar"
+				printColumn(fileStream, pos, "% TODO", 59);
 				newLine(fileStream, pos);
 
 				// *** *A VE row ***
 				printColumn(fileStream, pos, "*A", 1, 2);
 				printColumn(fileStream, pos, "VE", 4, 5);
 				// "(optional) Laufwegsindex oder Haltestellennummer, ab der die Verkehrstage im Laufweg gelten."
-				printColumn(fileStream, pos, "", 7, 13);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.front().stopCode, 7, 13);
 				// "(optional) Laufwegsindex oder Haltestellennummer, bis zu der die Verkehrstage im Laufweg gelten."
-				printColumn(fileStream, pos, "", 15, 21);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.back().stopCode, 15, 21);
 				// "(optional) Verkehrstagenummer für die Tage, an denen die Fahrt stattfindet. Fehlt diese Angabe, so verkehrt diese Fahrt täglich (entspricht dann 000000)."
-				printColumn(fileStream, pos, "", 23, 28);
+				printColumn(fileStream, pos, "TODO", 23, 28);
 				// "(optional) Index für das x. Auftreten oder Abfahrtszeitpunkt."
-				printColumn(fileStream, pos, "", 30, 35);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.front().departureTime), 30, 35);
 				// "(optional) Index für das x. Auftreten oder Ankunftszeitpunkt."
-				printColumn(fileStream, pos, "", 37, 42);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.back().arrivalTime), 37, 42);
+				// "Kommentar"
+				printColumn(fileStream, pos, "% TODO", 59);
 				newLine(fileStream, pos);
 
 				// *** *L row ***
 				printColumn(fileStream, pos, "*L", 1, 2);
 				// "Liniennummer"
-				printColumn(fileStream, pos, "", 4, 11);
+				printColumn(fileStream, pos, zug.lineShortName, 4, 11);
 				// "(optional) Laufwegsindex oder Haltestellennummer, ab der die Liniennummer gilt."
-				printColumn(fileStream, pos, "", 13, 19);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.front().stopCode, 13, 19);
 				// "(optional) Laufwegsindex oder Haltestellennummer, bis zu der die Liniennummer gilt."
-				printColumn(fileStream, pos, "", 21, 27);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.back().stopCode, 21, 27);
 				// "(optional) Index für das x. Auftreten oder Abfahrtszeitpunkt."
-				printColumn(fileStream, pos, "", 29, 34);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.front().departureTime), 29, 34);
 				// "(optional) Index für das x. Auftreten oder Ankunftszeitpunkt."
-				printColumn(fileStream, pos, "", 36, 41);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.back().arrivalTime), 36, 41);
+				// "Kommentar"
+				printColumn(fileStream, pos, "% TODO", 59);
 				newLine(fileStream, pos);
 
 				// *** *R row ***
 				printColumn(fileStream, pos, "*R", 1, 2);
 				// (optional) Kennung für Richtung (0 = Hin, 1= Rück). Diese Kennung wird für zusätzliche Angaben wie z.B. linien- und richtungsbezogene Umsteigezeiten benutzt.
-				printColumn(fileStream, pos, "", 4, 4);
+				printColumn(fileStream, pos, zug.readWayback ? "TODO" : "TODO", 4, 4);
 				// (optional) Richtungscode. Wird kein Code vermerkt, so wird der Bahnhofsname als Richtungscode verwendet.
-				printColumn(fileStream, pos, "", 6, 12);
+				printColumn(fileStream, pos, "TODO", 6, 12);
 				// (optional) Laufwegsindex oder Haltestellennummer, ab der die Richtungsangabe im Laufweg gilt.
-				printColumn(fileStream, pos, "", 14, 20);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.front().stopCode, 14, 20);
 				// (optional) Laufwegsindex oder Haltestellennummer, bis zu der die Richtungsangabe im Laufweg gilt.
-				printColumn(fileStream, pos, "", 22, 28);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.back().stopCode, 22, 28);
 				// (optional) Index für das x. Auftreten oder Abfahrtszeitpunkt.
-				printColumn(fileStream, pos, "", 30, 35);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.front().departureTime), 30, 35);
 				// (optional) Index für das x. Auftreten oder Ankunftszeitpunkt.
-				printColumn(fileStream, pos, "", 37, 42);
+				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.back().arrivalTime), 37, 42);
+				// "Kommentar"
+				printColumn(fileStream, pos, "% TODO", 59);
 				newLine(fileStream, pos);
 
 				// TODO : *** Timetable rows ***
-				{
+				BOOST_FOREACH(Zug::Stop &stop, zug.stops) {
 					// "Haltestellennummer"
-					printColumn(fileStream, pos, "TODO", 1, 7);
+					printColumn(fileStream, pos, stop.stopCode, 1, 7);
 					// "(optional) Haltestellenname"
-					printColumn(fileStream, pos, "", 9, 29);
+					printColumn(fileStream, pos, stop.stopName, 9, 29);
 					// "Ankunftszeit an der Haltestelle (lt. Ortszeit der Haltestelle)."
-					printColumn(fileStream, pos, "TODO", 30, 35);
+					printColumn(fileStream, pos, formatTime(stop.arrivalTime), 30, 35);
 					// "Abfahrtszeit an der Haltestelle (lt. Ortszeit der Haltestelle)."
-					printColumn(fileStream, pos, "TODO", 37, 42);
+					printColumn(fileStream, pos, formatTime(stop.departureTime), 37, 42);
 					// "(optional) Ab dem Halt gültige Fahrtnummer."
 					printColumn(fileStream, pos, "", 44, 48);
 					// "(optional) Ab dem Halt gültige Verwaltung."
@@ -2234,34 +2272,43 @@ namespace synthese
 			}
 		}
 
-		std::string HafasFileFormat::Exporter_::getCodesForDataSource(impex::Importable* object, std::string dataSourceName) {
+		std::string HafasFileFormat::Exporter_::getCodesForDataSource(const impex::Importable* object, std::string dataSourceName, std::string defaultValue) {
+
+			if (!object) {
+				return defaultValue;
+			}
 
 			stringstream codes;
 
-			if (object) {
+			std::multimap<const synthese::impex::DataSource*, std::basic_string<char> > dataSourceLinks = object->getDataSourceLinks();
 
-				std::multimap<const synthese::impex::DataSource*, std::basic_string<char> > dataSourceLinks = object->getDataSourceLinks();
+			for (std::multimap<const synthese::impex::DataSource*, std::basic_string<char> >::iterator it=dataSourceLinks.begin(); it!=dataSourceLinks.end(); ++it) {
 
-				for (std::multimap<const synthese::impex::DataSource*, std::basic_string<char> >::iterator it=dataSourceLinks.begin(); it!=dataSourceLinks.end(); ++it) {
-
+				if (((*it).first)->get<Name>() == dataSourceName) {
 					if (!codes.str().empty()) {
 						codes << ",";
 					}
-
-					if (((*it).first)->get<Name>() == dataSourceName) {
-						codes << (*it).second;
-					}
-
-				}
-
-				if (codes.str().empty()) {
-					// TODO : Set a logger in the Exporter class... it only exists in the Importer class.
-					cout << "Could't find code in data source " << dataSourceName << " for object with key  " << object->getKey()  << " !" << endl;
+					codes << (*it).second;
 				}
 
 			}
 
+			if (codes.str().empty()) {
+				// TODO : Set a logger in the Exporter class... it only exists in the Importer class.
+				cout << "Could't find code in data source " << dataSourceName << " for object with key " << object->getKey()  << " (table: " << object->getTableName() << ") !" << endl;
+				codes << defaultValue;
+			}
+
 			return codes.str();
+
+		}
+
+		std::string HafasFileFormat::Exporter_::formatTime(boost::posix_time::time_duration time) {
+			if (time == boost::posix_time::not_a_date_time) {
+				return std::string();
+			}
+			// We want that 01:02 is printed " 00102"
+			return (boost::format(" 0%02d%02d") % time.hours() % time.minutes()).str();
 		}
 
 		// **** /HAFAS EXPORTER ****

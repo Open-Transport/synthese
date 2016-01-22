@@ -176,6 +176,7 @@ namespace synthese
 				struct Stop
 				{
 					std::string stopCode;
+					std::string stopName;
 					std::string gleisCode;
 					boost::posix_time::time_duration departureTime;
 					boost::posix_time::time_duration arrivalTime;
@@ -386,7 +387,8 @@ namespace synthese
 					static std::string getMandatoryString(const util::ParametersMap& map, std::string parameterName);
 					static boost::filesystem::path createRandomFolder();
 					static void createFile(std::ofstream& fileStream, boost::filesystem::path dir, string file);
-					static std::string getCodesForDataSource(impex::Importable* object, std::string dataSourceName);
+					static std::string getCodesForDataSource(const impex::Importable* object, std::string dataSourceName, std::string defaultValue = std::string());
+					static std::string formatTime(boost::posix_time::time_duration time);
 
 					static void printColumn(std::ofstream& fileStream, int& pos, std::string value, int firstColumn, int lastColumn = -1);
 					static void newLine(std::ofstream& fileStream, int& pos);
