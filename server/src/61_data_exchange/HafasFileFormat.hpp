@@ -384,6 +384,11 @@ namespace synthese
 					static const std::string DIDOK_DATA_SOURCE_NAME;
 					static const std::string TL_DATA_SOURCE_NAME;
 
+					static const std::string OUTWARD_TRIP_CODE;
+					static const std::string RETURN_TRIP_CODE;
+
+					static const unsigned int COORDINATES_SYSTEM;
+
 					static std::string getMandatoryString(const util::ParametersMap& map, std::string parameterName);
 					static boost::filesystem::path createRandomFolder();
 					static void createFile(std::ofstream& fileStream, boost::filesystem::path dir, string file);
@@ -392,6 +397,9 @@ namespace synthese
 
 					static void printColumn(std::ofstream& fileStream, int& pos, std::string value, int firstColumn, int lastColumn = -1);
 					static void newLine(std::ofstream& fileStream, int& pos);
+					static void printZugdatComment(std::ofstream& fileStream, int& pos, int& commentLine, std::string value);
+					static unsigned int strlenUtf8(std::string str);
+					static std::string firstChars(std::string str, unsigned int maxLen);
 
 				public:
 					Exporter_(const impex::Export& export_);
@@ -404,6 +412,7 @@ namespace synthese
 					virtual void exportToBahnhofFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const;
 					virtual void exportToKoordFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const;
 					virtual void exportToZugdatFile(boost::filesystem::path dir, string file, Zugs _zugs) const;
+					virtual void exportToBitfieldFile(boost::filesystem::path dir, string file) const;
 			};
 
 			// **** /HAFAS EXPORTER ****

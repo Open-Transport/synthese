@@ -46,8 +46,12 @@
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <map>
 #include <fstream>
+#include <cstdlib>
 #include <geos/geom/Point.h>
 #include <geos/opDistance.h>
 
@@ -1800,11 +1804,18 @@ namespace synthese
 
 		const std::string HafasFileFormat::Exporter_::DIDOK_DATA_SOURCE_NAME = "DIDOK";
 		const std::string HafasFileFormat::Exporter_::TL_DATA_SOURCE_NAME = "TL";
+		const std::string HafasFileFormat::Exporter_::OUTWARD_TRIP_CODE = "H";
+		const std::string HafasFileFormat::Exporter_::RETURN_TRIP_CODE = "R";
+		// 21781 = Swiss format (CH1903), 4326 = GPS format (WGS84)
+		const unsigned int HafasFileFormat::Exporter_::COORDINATES_SYSTEM = 4326;
+
 
 		HafasFileFormat::Exporter_::Exporter_(const impex::Export& export_): OneFileExporter<HafasFileFormat>(export_) {
 		}
 
 		void HafasFileFormat::Exporter_::build(ostream& os) const {
+
+			const CoordinatesSystem& coordinatesSytem = CoordinatesSystem::GetCoordinatesSystem(COORDINATES_SYSTEM);
 
 			os << "<html><body>\n";
 
@@ -1816,6 +1827,7 @@ namespace synthese
 			Zugs _zugs;
 
 			// ** Stop area **
+			// TODO : Only output HTML if debug = 1
 			os << "<h1>Lieux</h1>\n";
 			os << "<ul>\n";
 			StopPointTableSync::Search(_env); // lazy-loading
@@ -1834,11 +1846,8 @@ namespace synthese
 				{
 					const StopPoint* stopPoint = it->second;
 					ParametersMap pm;
-					// 21781 = Swiss format (CH1903), 4326 = GPS format (WGS84)
-					stopPoint->toParametersMap(pm, false, CoordinatesSystem::GetCoordinatesSystem(4326));
+					stopPoint->toParametersMap(pm, false, coordinatesSytem);
 					if (pm.isDefined("x") && pm.isDefined("y")) {
-						// TODO : Support for Z
-						// TODO : Use something more accurate than double, because precision matters a lot.
 						string xStr = pm.getValue("x");
 						string yStr = pm.getValue("y");
 						double x = atof(xStr.c_str());
@@ -1855,22 +1864,30 @@ namespace synthese
 						if (y < minY) {
 							minY = y;
 						}
+						// TODO : Support for Z
 						os << "<li>(Est,Nord,Z) = (" << xStr << "," << yStr << ",0)</li>\n";
-					} else {
-						os << "<li>Arrêt sans coordonnées</li>\n";
 					}
 				}
-				double x = (maxX - minX)/2 + minX;
-				double y = (maxY - minY)/2 + minY;
+
+				// TODO : Document that if no coordinates, (0,0,0) will be set.
+
+				double x = 0;
+				double y = 0;
+
+				if (minX != std::numeric_limits<double>::max() &&
+					minY != std::numeric_limits<double>::max() &&
+					maxX != std::numeric_limits<double>::min() &&
+					maxY != std::numeric_limits<double>::min()) {
+					x = (maxX - minX)/2 + minX;
+					y = (maxY - minY)/2 + minY;
+				}
 
 				os << "<li><b>Point central </b> : (Est,Nord,Z) = (" << x << "," << y << ",0)</li>\n";
 				os << "</ul>\n";
 
 				Bahnhof bahnhof;
 				bahnhof.operatorCode = didokCode;
-				// TODO : Use the same coordinate system as earlier
-				// TODO : Don't forget the case when there was no coordinates available!
-				bahnhof.point = CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(x, y);
+				bahnhof.point = coordinatesSytem.createPoint(x, y);
 				// Note : Name contains the city name too! To only get the stop name, use getName() instead.
 				bahnhof.name = stopArea->getFullName();
 				bahnhof.cityName = stopArea->getCity()->getName();
@@ -1903,7 +1920,8 @@ namespace synthese
 			CommercialLineTableSync::SearchResult linesRes =
 					CommercialLineTableSync::Search(_env, network->getKey());
 			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, linesRes) {
-				os << "<h2>Ligne " << line->getShortName() << " : " << line->getName()
+				std::string lineShortName = line->getShortName();
+				os << "<h2>Ligne " << lineShortName << " : " << line->getName()
 						<< " <small>(key: " << line->getKey() << ")</small></h2>\n";
 
 				// ** Journeys for this line **
@@ -1928,7 +1946,8 @@ namespace synthese
 					std::string fromCode = getCodesForDataSource(from->getConnectionPlace(), DIDOK_DATA_SOURCE_NAME, "NO_DIDOK");
 					std::string toCode = getCodesForDataSource(to->getConnectionPlace(), DIDOK_DATA_SOURCE_NAME, "NO_DIDOK");
 
-					os << "<h3>Parcours " << (journey->getWayBack() ? "retour" : "aller")
+					bool wayBack = journey->getWayBack();
+					os << "<h3>Parcours " << (wayBack ? "retour" : "aller")
 							<< " \"" << journey->getName() << "\" :"
 							<< " Origine " << (from != 0 ? from->getName() + " (DIDOK: " + fromCode + ")" : "?") << ", "
 							<< " Destination " << (to != 0 ? to->getName() + " (DIDOK: " + toCode + ")": "?") << ", "
@@ -1995,7 +2014,8 @@ namespace synthese
 						zug.lineNumber = networkCode;
 						zug.transportModeCode = transportModeCode;
 						zug.stops = stops;
-						zug.lineShortName = line->getShortName();
+						zug.lineShortName = lineShortName;
+						zug.readWayback = wayBack;
 
 						_zugs.push_back(zug);
 
@@ -2042,6 +2062,7 @@ namespace synthese
 			exportToBahnhofFile(dir, "BAHNHOF", _bahnhofs);
 			exportToKoordFile(dir, "BFKOORD_GEO", _bahnhofs);
 			exportToZugdatFile(dir, "FPLAN", _zugs);
+			exportToBitfieldFile(dir, "BITFELD");
 			// TODO : Export data to other HAFAS files
 			return dir;
 		}
@@ -2090,20 +2111,24 @@ namespace synthese
 
 			BOOST_FOREACH(Zug &zug, _zugs) {
 
+				int commentLine = 1;
+				stringstream comment;
+				comment << zug.number << " " << zug.lineNumber << "   " << "TODO";
+
 				// *** *Z row ***
 				printColumn(fileStream, pos, "*Z", 1, 2);
 				// "Fahrtnummer"
 				printColumn(fileStream, pos, zug.number, 4, 8);
 				// "Verwaltung"
 				printColumn(fileStream, pos, zug.lineNumber, 10, 15);
-				// "Leer" (TODO : In the sample HAFAS export, the columns (19,21) are filled, why ?)
+				// "Leer"
 				printColumn(fileStream, pos, "", 17, 21);
 				// "(optional) Taktanzhalt"
 				printColumn(fileStream, pos, "", 23, 25);
 				// "(optional) Taktzeit in Minuten"
 				printColumn(fileStream, pos, "", 27, 29);
 				// "Kommentar"
-				printColumn(fileStream, pos, "% TODO", 59);
+				printZugdatComment(fileStream, pos, commentLine, comment.str());
 				newLine(fileStream, pos);
 
 				//  *** *G row ***
@@ -2119,7 +2144,7 @@ namespace synthese
 				// "(optional) Index für das x. Auftreten oder Ankunftszeitpunkt."
 				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.back().arrivalTime), 31, 36);
 				// "Kommentar"
-				printColumn(fileStream, pos, "% TODO", 59);
+				printZugdatComment(fileStream, pos, commentLine, comment.str());
 				newLine(fileStream, pos);
 
 				// *** *A VE row ***
@@ -2130,13 +2155,14 @@ namespace synthese
 				// "(optional) Laufwegsindex oder Haltestellennummer, bis zu der die Verkehrstage im Laufweg gelten."
 				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.back().stopCode, 15, 21);
 				// "(optional) Verkehrstagenummer für die Tage, an denen die Fahrt stattfindet. Fehlt diese Angabe, so verkehrt diese Fahrt täglich (entspricht dann 000000)."
-				printColumn(fileStream, pos, "TODO", 23, 28);
+				// TODO : This points to a line in the "BITFELD" file.
+				printColumn(fileStream, pos, "000000", 23, 28);
 				// "(optional) Index für das x. Auftreten oder Abfahrtszeitpunkt."
 				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.front().departureTime), 30, 35);
 				// "(optional) Index für das x. Auftreten oder Ankunftszeitpunkt."
 				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.back().arrivalTime), 37, 42);
 				// "Kommentar"
-				printColumn(fileStream, pos, "% TODO", 59);
+				printZugdatComment(fileStream, pos, commentLine, comment.str());
 				newLine(fileStream, pos);
 
 				// *** *L row ***
@@ -2152,15 +2178,15 @@ namespace synthese
 				// "(optional) Index für das x. Auftreten oder Ankunftszeitpunkt."
 				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.back().arrivalTime), 36, 41);
 				// "Kommentar"
-				printColumn(fileStream, pos, "% TODO", 59);
+				printZugdatComment(fileStream, pos, commentLine, comment.str());
 				newLine(fileStream, pos);
 
 				// *** *R row ***
 				printColumn(fileStream, pos, "*R", 1, 2);
 				// (optional) Kennung für Richtung (0 = Hin, 1= Rück). Diese Kennung wird für zusätzliche Angaben wie z.B. linien- und richtungsbezogene Umsteigezeiten benutzt.
-				printColumn(fileStream, pos, zug.readWayback ? "TODO" : "TODO", 4, 4);
+				printColumn(fileStream, pos, zug.readWayback ? RETURN_TRIP_CODE : OUTWARD_TRIP_CODE, 4, 4);
 				// (optional) Richtungscode. Wird kein Code vermerkt, so wird der Bahnhofsname als Richtungscode verwendet.
-				printColumn(fileStream, pos, "TODO", 6, 12);
+				printColumn(fileStream, pos, "", 6, 12);
 				// (optional) Laufwegsindex oder Haltestellennummer, ab der die Richtungsangabe im Laufweg gilt.
 				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.front().stopCode, 14, 20);
 				// (optional) Laufwegsindex oder Haltestellennummer, bis zu der die Richtungsangabe im Laufweg gilt.
@@ -2170,7 +2196,7 @@ namespace synthese
 				// (optional) Index für das x. Auftreten oder Ankunftszeitpunkt.
 				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.back().arrivalTime), 37, 42);
 				// "Kommentar"
-				printColumn(fileStream, pos, "% TODO", 59);
+				printZugdatComment(fileStream, pos, commentLine, comment.str());
 				newLine(fileStream, pos);
 
 				// TODO : *** Timetable rows ***
@@ -2190,7 +2216,7 @@ namespace synthese
 					// "(optional) „X“, falls diese Haltestelle auf dem Laufschild der Fahrt aufgeführt wird."
 					printColumn(fileStream, pos, "", 57, 57);
 					// "Kommentar"
-					printColumn(fileStream, pos, "% TODO", 59);
+					printZugdatComment(fileStream, pos, commentLine, comment.str());
 					newLine(fileStream, pos);
 				}
 			}
@@ -2198,9 +2224,23 @@ namespace synthese
 			fileStream.close();
 		}
 
+		void HafasFileFormat::Exporter_::exportToBitfieldFile(boost::filesystem::path dir, string file) const
+		{
+			ofstream fileStream;
+			createFile(fileStream, dir, file);
+			int pos = 1;
+			// TODO
+			fileStream.close();
+		}
+
+		void HafasFileFormat::Exporter_::printZugdatComment(std::ofstream& fileStream, int& pos, int& commentLine, std::string value) {
+			stringstream ss;
+			ss << "% " << value << " (" << (boost::format("%03d") % commentLine++) << ")";
+			printColumn(fileStream, pos, ss.str(), 59);
+		}
+
 		void HafasFileFormat::Exporter_::printColumn(std::ofstream& fileStream, int& pos, std::string value, int firstColumn, int lastColumn) {
 			if (firstColumn < pos) {
-				// Throw an error : The previous column was too long!
 				std::stringstream error;
 				error << "Impossible to print value \"" << value << "\" at position " << firstColumn << " because we're already at position " << pos << "!";
 				throw std::runtime_error(error.str());
@@ -2209,9 +2249,9 @@ namespace synthese
 				fileStream << std::string(firstColumn - pos, ' ');
 			}
 			int maxLength = lastColumn - firstColumn + 1;
-			std::string toPrint = (lastColumn > 0 && (int) (value.size()) > maxLength) ? value.substr(0, maxLength) : value;
+			std::string toPrint = (lastColumn > 0 && (int) (strlenUtf8(value)) > maxLength) ? firstChars(value, maxLength) : value;
 			fileStream << toPrint;
-			pos = firstColumn + toPrint.length();
+			pos = firstColumn + strlenUtf8(toPrint);
 
 		}
 
@@ -2238,8 +2278,6 @@ namespace synthese
 			_ftpUser = getMandatoryString(map, PARAMETER_FTP_USER);
 			_ftpPass = getMandatoryString(map, PARAMETER_FTP_PASS);
 
-
-			// TODO : Add more parameters
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -2261,9 +2299,8 @@ namespace synthese
 		}
 
 		boost::filesystem::path HafasFileFormat::Exporter_::createRandomFolder() {
-			// TODO : Use GUID instead of timestamps in order to avoid concurrent calls to use the same folder...
 			std::stringstream ss;
-			ss << std::time(0) << '/';
+			ss << boost::uuids::random_generator()() << '/';
 			boost::filesystem::path dir(ss.str());
 			if (boost::filesystem::create_directory(dir)) {
 				return dir;
@@ -2294,8 +2331,9 @@ namespace synthese
 			}
 
 			if (codes.str().empty()) {
-				// TODO : Set a logger in the Exporter class... it only exists in the Importer class.
-				cout << "Could't find code in data source " << dataSourceName << " for object with key " << object->getKey()  << " (table: " << object->getTableName() << ") !" << endl;
+				stringstream warn;
+				warn << "Could't find code in data source " << dataSourceName << " for object with key " << object->getKey()  << " (table: " << object->getTableName() << ") !" << endl;
+				util::Log::GetInstance().warn(warn.str());
 				codes << defaultValue;
 			}
 
@@ -2307,8 +2345,30 @@ namespace synthese
 			if (time == boost::posix_time::not_a_date_time) {
 				return std::string();
 			}
-			// We want that 01:02 is printed " 00102"
+			// We want 01:02 to be printed " 00102"
 			return (boost::format(" 0%02d%02d") % time.hours() % time.minutes()).str();
+		}
+
+		// http://stackoverflow.com/a/4063229
+		unsigned int HafasFileFormat::Exporter_::strlenUtf8(std::string str) {
+			const char* s = str.c_str();
+			unsigned int len = 0;
+			while (*s) len += (*s++ & 0xc0) != 0x80;
+			return len;
+		}
+
+		std::string HafasFileFormat::Exporter_::firstChars(std::string str, unsigned int maxLen) {
+			const char* s = str.c_str();
+			stringstream ss;
+			unsigned int len = 0;
+			while (*s) {
+				len += (*s & 0xc0) != 0x80;
+				if (len > maxLen) {
+					return ss.str();
+				}
+				ss << *s++;
+			}
+			return ss.str();
 		}
 
 		// **** /HAFAS EXPORTER ****
