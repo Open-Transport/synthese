@@ -407,6 +407,7 @@ namespace synthese
 							"<" << stopAreaCodeTag << ">" <<
 							stopAreaCode <<
 							"</" << stopAreaCodeTag << ">" <<
+							"<Zeitfilter>" << (subscription->get<TimeSpan>().total_seconds() / 60)  << "</Zeitfilter>" <<
 							"<Hysterese>60</Hysterese>" <<
 							"</" << aboTag << ">"
 						;
