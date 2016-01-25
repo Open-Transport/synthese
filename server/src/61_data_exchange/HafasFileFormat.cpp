@@ -52,6 +52,7 @@
 #include <map>
 #include <fstream>
 #include <cstdlib>
+#include <string>
 #include <geos/geom/Point.h>
 #include <geos/opDistance.h>
 
@@ -117,6 +118,8 @@ namespace synthese
 		const string HafasFileFormat::Exporter_::PARAMETER_FTP_PORT = "ftp_port";
 		const string HafasFileFormat::Exporter_::PARAMETER_FTP_USER = "ftp_user";
 		const string HafasFileFormat::Exporter_::PARAMETER_FTP_PASS = "ftp_pass";
+		const string HafasFileFormat::Exporter_::PARAMETER_BITFIELD_START_DATE = "bitfield_start_date";
+		const string HafasFileFormat::Exporter_::PARAMETER_BITFIELD_END_DATE = "bitfield_end_date";
 	}
 
 	namespace impex
@@ -1800,12 +1803,19 @@ namespace synthese
 
 		// **** HAFAS EXPORTER ****
 
-		// e.g. : http://synthese:8080/export/?SERVICE=ExportFunction&ff=Hafas&debug=1&ftp_host=ftp.elca.ch&ftp_port=21&ftp_user=admin&ftp_pass=foobar&network=tl
+		// e.g. : http://synthese:8080/export/?SERVICE=ExportFunction&ff=Hafas&debug=1&ftp_host=ftp.elca.ch&ftp_port=21&ftp_user=admin&ftp_pass=foobar&network=tl&bitfield_start_date=2014-12-14&bitfield_end_date=2015-12-12
 
 		const std::string HafasFileFormat::Exporter_::DIDOK_DATA_SOURCE_NAME = "DIDOK";
 		const std::string HafasFileFormat::Exporter_::TL_DATA_SOURCE_NAME = "TL";
+
 		const std::string HafasFileFormat::Exporter_::OUTWARD_TRIP_CODE = "H";
 		const std::string HafasFileFormat::Exporter_::RETURN_TRIP_CODE = "R";
+		const std::string HafasFileFormat::Exporter_::DAILY_SERVICE_CODE = "000000";
+
+		// TODO : One of those two should be computed from the other one to avoid mistakes
+		const int HafasFileFormat::Exporter_::DAYS_PER_BITFIELD = 380;
+		const unsigned int HafasFileFormat::Exporter_::BITFIELD_SIZE = 48;
+
 		// 21781 = Swiss format (CH1903), 4326 = GPS format (WGS84)
 		const unsigned int HafasFileFormat::Exporter_::COORDINATES_SYSTEM = 4326;
 
@@ -1825,6 +1835,7 @@ namespace synthese
 			// We store the data we crawled in those objects
 			Bahnhofs _bahnhofs;
 			Zugs _zugs;
+			BitFields _bitfields;
 
 			// ** Stop area **
 			// TODO : Only output HTML if debug = 1
@@ -1968,6 +1979,37 @@ namespace synthese
 					}
 					os << "</ul>\n";
 
+					// ** Calendar **
+					os << "<h4>Calendrier</h4>\n";
+					calendar::Calendar& calendar = journey->getCalendarCache();
+					Calendar::DatesVector activeDates = calendar.getActiveDates();
+					os << "<p>\n";
+					BOOST_FOREACH(const boost::gregorian::date date, activeDates) {
+						os << date << " ";
+					}
+					os << "</p>\n";
+
+					// We compute the active days in the year we're interested in
+					std::vector<Zug::CalendarUse> calendars;
+					boost::gregorian::date currentDate(from_simple_string(_bitfieldStartDate));
+					boost::gregorian::date lastDate(from_simple_string(_bitfieldEndDate));
+					// TODO : Validation than currentDate <= lastDate
+					boost::gregorian::date_duration dd(1);
+					size_t bitfieldDaysCounter = 0;
+					while (currentDate != lastDate) {
+						// If this day is one of the active days...
+						if (std::find(activeDates.begin(), activeDates.end(), currentDate) != activeDates.end()) {
+							// We add it
+							Zug::CalendarUse calendarUse;
+							calendarUse.calendarNumber = bitfieldDaysCounter;
+							calendars.push_back(calendarUse);
+						}
+
+						// We increment the day and the counter
+						currentDate += dd;
+						bitfieldDaysCounter++;
+					}
+
 					// ** Scheduled service for this journey **
 					bool title = false;
 					BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& schService, schServiceRes) {
@@ -2016,6 +2058,8 @@ namespace synthese
 						zug.stops = stops;
 						zug.lineShortName = lineShortName;
 						zug.readWayback = wayBack;
+						zug.calendars = calendars;
+						zug.bitfieldCode = getBitfieldCode(calendars, bitfieldDaysCounter, _bitfields);
 
 						_zugs.push_back(zug);
 
@@ -2045,7 +2089,7 @@ namespace synthese
 
 			os << "</body></html>\n" << flush;
 
-			boost::filesystem::path hafasExportFolder = exportToHafasFormat(_bahnhofs, _zugs);
+			boost::filesystem::path hafasExportFolder = exportToHafasFormat(_bahnhofs, _zugs, _bitfields);
 
 			// TODO : Zip folder to archive
 			// TODO : Send archive to FTP server
@@ -2053,7 +2097,7 @@ namespace synthese
 
 		}
 
-		boost::filesystem::path HafasFileFormat::Exporter_::exportToHafasFormat(Bahnhofs _bahnhofs, Zugs _zugs) const
+		boost::filesystem::path HafasFileFormat::Exporter_::exportToHafasFormat(Bahnhofs _bahnhofs, Zugs _zugs, BitFields _bitfields) const
 		{
 			// We create a temporary folder in which the HAFAS files will be created
 			boost::filesystem::path dir = createRandomFolder();
@@ -2062,7 +2106,7 @@ namespace synthese
 			exportToBahnhofFile(dir, "BAHNHOF", _bahnhofs);
 			exportToKoordFile(dir, "BFKOORD_GEO", _bahnhofs);
 			exportToZugdatFile(dir, "FPLAN", _zugs);
-			exportToBitfieldFile(dir, "BITFELD");
+			exportToBitfieldFile(dir, "BITFELD", _bitfields);
 			// TODO : Export data to other HAFAS files
 			return dir;
 		}
@@ -2155,8 +2199,7 @@ namespace synthese
 				// "(optional) Laufwegsindex oder Haltestellennummer, bis zu der die Verkehrstage im Laufweg gelten."
 				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.back().stopCode, 15, 21);
 				// "(optional) Verkehrstagenummer für die Tage, an denen die Fahrt stattfindet. Fehlt diese Angabe, so verkehrt diese Fahrt täglich (entspricht dann 000000)."
-				// TODO : This points to a line in the "BITFELD" file.
-				printColumn(fileStream, pos, "000000", 23, 28);
+				printColumn(fileStream, pos, zug.bitfieldCode, 23, 28);
 				// "(optional) Index für das x. Auftreten oder Abfahrtszeitpunkt."
 				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.front().departureTime), 30, 35);
 				// "(optional) Index für das x. Auftreten oder Ankunftszeitpunkt."
@@ -2224,12 +2267,18 @@ namespace synthese
 			fileStream.close();
 		}
 
-		void HafasFileFormat::Exporter_::exportToBitfieldFile(boost::filesystem::path dir, string file) const
+		void HafasFileFormat::Exporter_::exportToBitfieldFile(boost::filesystem::path dir, string file, BitFields _bitfields) const
 		{
 			ofstream fileStream;
 			createFile(fileStream, dir, file);
 			int pos = 1;
-			// TODO
+			BOOST_FOREACH(BitFields::value_type &row, _bitfields) {
+				// Bit field number
+				printColumn(fileStream, pos, row.first, 1, 6);
+				// Bit field
+				printColumn(fileStream, pos, row.second, 8/*, 103*/);
+				newLine(fileStream, pos);
+			}
 			fileStream.close();
 		}
 
@@ -2277,6 +2326,9 @@ namespace synthese
 			_ftpPort = map.getDefault<int>(PARAMETER_FTP_PORT, 21);
 			_ftpUser = getMandatoryString(map, PARAMETER_FTP_USER);
 			_ftpPass = getMandatoryString(map, PARAMETER_FTP_PASS);
+
+			_bitfieldStartDate = getMandatoryString(map, PARAMETER_BITFIELD_START_DATE);
+			_bitfieldEndDate = getMandatoryString(map, PARAMETER_BITFIELD_END_DATE);
 
 		}
 
@@ -2369,6 +2421,71 @@ namespace synthese
 				ss << *s++;
 			}
 			return ss.str();
+		}
+
+
+		std::string HafasFileFormat::Exporter_::getBitfieldCode(std::vector<Zug::CalendarUse> calendars, unsigned int bitfieldSize, BitFields& _bitfields) {
+			// If this service runs daily, we return the special code 000000
+			// TODO : What if the service runs every day of the interval, but not daily?
+			if (calendars.size() == bitfieldSize) {
+				return DAILY_SERVICE_CODE;
+			}
+
+			std::string bitfield = computeBitfield(calendars, bitfieldSize);
+
+			// If this bitfield was already in the map, we reuse its code
+			BOOST_FOREACH(BitFields::value_type &row, _bitfields) {
+				if (row.second == bitfield) {
+					return row.first;
+				}
+			}
+
+			// If not, we compute its code, insert the bitfield into the map and return the code
+			stringstream ss;
+			ss << boost::format("%06d") % (_bitfields.size() + 1);
+			_bitfields.insert(std::make_pair(ss.str(), bitfield));
+			return ss.str();
+		}
+
+		std::string HafasFileFormat::Exporter_::computeBitfield(std::vector<Zug::CalendarUse> calendars, unsigned int bitfieldSize) {
+
+			// Beginning and end bits are ones
+			unsigned short bitfield [BITFIELD_SIZE] = {};
+			setBit(bitfield, 0);
+			setBit(bitfield, 1);
+			setBit(bitfield, bitfieldSize + 2);
+			setBit(bitfield, bitfieldSize + 3);
+
+			// We mark the bits of the active days
+			BOOST_FOREACH(Zug::CalendarUse& entry, calendars) {
+				setBit(bitfield, entry.calendarNumber + 2);
+			}
+
+			// We print the bitfield
+			stringstream test;
+			for (unsigned int i=0; i<BITFIELD_SIZE; i++) {
+				test << boost::format("%02X") % bitfield[i];
+			}
+			return test.str();
+		}
+
+		void HafasFileFormat::Exporter_::setBit(unsigned short bitfield [], int bit) {
+
+			// bit  |  bit / 8  | 7 - bit % 8 | 1u << (7 - bit % 8)
+			// -----+-----------+-------------+--------------------
+			// 0    |  0        | 7           | 10000000
+			// 1    |  0        | 6           | 01000000
+			// 2    |  0        | 5           | 00100000
+			// 3    |  0        | 4           | 00010000
+			// 4    |  0        | 3           | 00001000
+			// 5    |  0        | 2           | 00000100
+			// 6    |  0        | 1           | 00000010
+			// 7    |  0        | 0           | 00000001
+			// 8    |  1        | 7           | 10000000
+			// 9    |  1        | 6           | 01000000
+			// 10   |  1        | 5           | 00100000
+
+			bitfield[bit / 8] |= (1u << (7 - bit % 8));
 		}
 
 		// **** /HAFAS EXPORTER ****

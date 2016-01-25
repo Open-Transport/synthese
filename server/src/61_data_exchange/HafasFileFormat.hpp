@@ -167,6 +167,7 @@ namespace synthese
 				bool readWayback;
 				size_t version;
 				std::vector<CalendarUse> calendars;
+				std::string bitfieldCode;
 				std::string transportModeCode;
 				boost::posix_time::time_duration continuousServiceRange;
 				boost::posix_time::time_duration continuousServiceWaitingTime;
@@ -370,6 +371,8 @@ namespace synthese
 					static const std::string PARAMETER_FTP_PORT;
 					static const std::string PARAMETER_FTP_USER;
 					static const std::string PARAMETER_FTP_PASS;
+					static const std::string PARAMETER_BITFIELD_START_DATE;
+					static const std::string PARAMETER_BITFIELD_END_DATE;
 
 				private:
 					bool _debug;
@@ -378,6 +381,9 @@ namespace synthese
 					int _ftpPort;
 					std::string _ftpUser;
 					std::string _ftpPass;
+					std::string _bitfieldStartDate;
+					std::string _bitfieldEndDate;
+
 					mutable util::Env _env;
 
 					// TODO : Turn these into export parameters !
@@ -386,20 +392,32 @@ namespace synthese
 
 					static const std::string OUTWARD_TRIP_CODE;
 					static const std::string RETURN_TRIP_CODE;
+					static const std::string DAILY_SERVICE_CODE;
+					static const int DAYS_PER_BITFIELD;
+					static const unsigned int BITFIELD_SIZE;
 
 					static const unsigned int COORDINATES_SYSTEM;
 
-					static std::string getMandatoryString(const util::ParametersMap& map, std::string parameterName);
+					// File generation helpers
 					static boost::filesystem::path createRandomFolder();
 					static void createFile(std::ofstream& fileStream, boost::filesystem::path dir, string file);
-					static std::string getCodesForDataSource(const impex::Importable* object, std::string dataSourceName, std::string defaultValue = std::string());
-					static std::string formatTime(boost::posix_time::time_duration time);
-
 					static void printColumn(std::ofstream& fileStream, int& pos, std::string value, int firstColumn, int lastColumn = -1);
 					static void newLine(std::ofstream& fileStream, int& pos);
 					static void printZugdatComment(std::ofstream& fileStream, int& pos, int& commentLine, std::string value);
+
+					// General helpers
+					static std::string getMandatoryString(const util::ParametersMap& map, std::string parameterName);
+					static std::string getCodesForDataSource(const impex::Importable* object, std::string dataSourceName, std::string defaultValue = std::string());
+					static std::string formatTime(boost::posix_time::time_duration time);
 					static unsigned int strlenUtf8(std::string str);
 					static std::string firstChars(std::string str, unsigned int maxLen);
+
+					// Bit field helpers
+					typedef std::map<std::string, std::string> BitFields;
+					static std::string getBitfieldCode(std::vector<Zug::CalendarUse> calendars, unsigned int bitfieldSize, BitFields& _bitfields);
+					static std::string computeBitfield(std::vector<Zug::CalendarUse> calendars, unsigned int bitfieldSize);
+					static void setBit(unsigned short bitfield [], int bit);
+
 
 				public:
 					Exporter_(const impex::Export& export_);
@@ -408,11 +426,11 @@ namespace synthese
 					virtual util::ParametersMap getParametersMap() const;
 					virtual void setFromParametersMap(const util::ParametersMap& map);
 					virtual std::string getOutputMimeType() const { return "text/html"; }
-					boost::filesystem::path exportToHafasFormat(Bahnhofs _bahnhofs, Zugs _zugs) const;
+					boost::filesystem::path exportToHafasFormat(Bahnhofs _bahnhofs, Zugs _zugs, BitFields _bitfields) const;
 					virtual void exportToBahnhofFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const;
 					virtual void exportToKoordFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const;
 					virtual void exportToZugdatFile(boost::filesystem::path dir, string file, Zugs _zugs) const;
-					virtual void exportToBitfieldFile(boost::filesystem::path dir, string file) const;
+					virtual void exportToBitfieldFile(boost::filesystem::path dir, string file, BitFields _bitfields) const;
 			};
 
 			// **** /HAFAS EXPORTER ****
