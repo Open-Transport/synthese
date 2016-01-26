@@ -17,6 +17,14 @@ Creating A Synthese Client API Broadcast Point Should Work
   Create New Broadcast Point  bp_client_api  Client API SYNTHESE
   Broadcast Point Configuration Should Be Visible  bp_client_api  Client API SYNTHESE
 
+Creating An Email Broadcast Point Should Work
+  Maximize Browser Window
+  Login As Root
+  Go To Administration Tab
+  Go To Broadcast Points Tab
+  Create New Broadcast Point  bp_email  Email
+  Broadcast Point Configuration Should Be Visible  bp_email  Email
+
 *** Keywords ***
 Login As Root
   Input Text  actionParamlogin  root
