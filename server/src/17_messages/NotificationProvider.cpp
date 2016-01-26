@@ -80,6 +80,12 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(RetryAttemptDelay, "retry_attempt_delay", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(MaximumRetryAttempts, "maximum_retry_attempts", SQL_INTEGER)
 
+	template<> const Field ComplexObjectFieldDefinition<NotificationProviderTreeNode>::FIELDS[] = {
+		Field("root_id", SQL_INTEGER),
+		Field("up_id", SQL_INTEGER),
+		Field("rank", SQL_INTEGER),
+	Field() };
+
 	template<> const Field SimpleObjectFieldDefinition<MessageTypeBegin>::FIELD = Field("begin_message_type_id", SQL_INTEGER);
 	template<> const Field SimpleObjectFieldDefinition<MessageTypeEnd>::FIELD = Field("end_message_type_id", SQL_INTEGER);
 
@@ -127,7 +133,8 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(SetEventsHold, false),
 					FIELD_DEFAULT_CONSTRUCTOR(RetryAttemptDelay),
 					FIELD_DEFAULT_CONSTRUCTOR(MaximumRetryAttempts),
-					FIELD_DEFAULT_CONSTRUCTOR(Parameters)
+					FIELD_DEFAULT_CONSTRUCTOR(Parameters),
+					FIELD_DEFAULT_CONSTRUCTOR(NotificationProviderTreeNode)
 			)	)
 		{}
 

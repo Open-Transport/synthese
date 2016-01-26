@@ -23,15 +23,19 @@
 #ifndef SYNTHESE_messages_NotificationProvider_hpp__
 #define SYNTHESE_messages_NotificationProvider_hpp__
 
-#include <BroadcastPoint.hpp>
-#include <FactorableTemplate.h>
-#include <MessageType.hpp>
-#include <NumericField.hpp>
-#include <Object.hpp>
-#include <ParametersMapField.hpp>
-#include <PointerField.hpp>
-#include <SchemaMacros.hpp>
-#include <StringField.hpp>
+#include "BroadcastPoint.hpp"
+#include "FactorableTemplate.h"
+#include "MessageType.hpp"
+#include "NumericField.hpp"
+#include "Object.hpp"
+#include "ParametersMapField.hpp"
+#include "PointerField.hpp"
+#include "SchemaMacros.hpp"
+#include "StringField.hpp"
+#include "TreeNode.hpp"
+#include "TreeNodeField.hpp"
+#include "TreeRankOrderingPolicy.hpp"
+#include "TreeUniqueRootPolicy.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/fusion/container/map.hpp>
@@ -50,10 +54,10 @@ namespace synthese
 {
 	namespace messages
 	{
-		// Forward declarations
 		class NotificationChannel;
 		class NotificationEvent;
 		class AlarmObjectLink;
+		class NotificationProvider;
 
 		FIELD_STRING(NotificationChannelKey)
 		FIELD_POINTER(MessageTypeBegin, MessageType)
@@ -65,6 +69,8 @@ namespace synthese
 		FIELD_BOOL(SetEventsHold)
 		FIELD_INT(RetryAttemptDelay)
 		FIELD_INT(MaximumRetryAttempts)
+
+		FIELD_TREE_NODE(NotificationProviderTreeNode, NotificationProvider)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -98,7 +104,11 @@ namespace synthese
 			FIELD(MaximumRetryAttempts),
 
 			// Implementation specific parameters
-			FIELD(Parameters)
+			FIELD(Parameters),
+
+			// up and root broadcast point links
+			FIELD(NotificationProviderTreeNode)
+
 		> NotificationProviderRecord;
 
 /**
@@ -129,6 +139,13 @@ namespace synthese
 	for all notification providers.
  */
 		class NotificationProvider:
+				public tree::TreeNode<
+					NotificationProvider,
+					tree::TreeRankOrderingPolicy,
+					tree::TreeUniqueRootPolicy<
+						tree::TreeRankOrderingPolicy,
+						NotificationProvider
+				>	>,
 				public Object<NotificationProvider, NotificationProviderRecord>,
 				public util::FactorableTemplate<BroadcastPoint, NotificationProvider>
 		{
