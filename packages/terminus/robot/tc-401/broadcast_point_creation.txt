@@ -1,0 +1,47 @@
+*** Settings ***
+Library  Selenium2Library
+
+Resource  settings.txt
+
+Suite Setup    Set Selenium Speed  0.5 seconds
+Test Setup     Open Browser  ${BASE_URL}
+Test Teardown  Close All Browsers
+
+*** Test Cases ***
+
+Creating A Synthese Client API Broadcast Point Should Work
+  Maximize Browser Window
+  Login As Root
+  Go To Administration Tab
+  Go To Broadcast Points Tab
+  Create New Broadcast Point  bp_client_api  Client API SYNTHESE
+  Broadcast Point Configuration Should Be Visible  bp_client_api  Client API SYNTHESE
+
+*** Keywords ***
+Login As Root
+  Input Text  actionParamlogin  root
+  Input Text  actionParampwd  root
+  Submit Form
+
+Go To Administration Tab
+  Click Element  //ul[@class = 'nav']/li[last()]/a  
+
+Go To Broadcast Points Tab
+  Click Element  tab_broadcast_points
+
+Create New Broadcast Point
+  [Arguments]  ${name}  ${type}
+  Click Element  bp_new_link
+  Wait Until Page Contains Element  bp_new_modal
+  Input Text  field_name  ${name}
+  Select From List By Value  field_type  ${type}
+  Click Button  //form[@id='bp_new_form']//button[@type='submit']
+  Wait Until Element Is Visible  //div[@id='tree']//div[@element_name='${name}']
+  
+Broadcast Point Configuration Should Be Visible
+  [Arguments]  ${name}  ${type}
+  Textfield Value Should Be  actionParam_field_name  ${name}
+  Textfield Value Should Be  field_broadcast_point_type  Client API SYNTHESE
+
+
+

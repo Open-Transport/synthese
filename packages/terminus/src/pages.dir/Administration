@@ -7,7 +7,7 @@
   <#tab_title&id=message_tags&title=Mots clefs (tags de messages)#>
   <#tab_title&id=display_types&title=Types de bornes#>
   <#tab_title&id=notification_providers&title=Fournisseurs de notifications#>
-  <#tab_title&id=broadcast_points&title=Autres diffuseurs#>
+  <#tab_title&id=broadcast_points&title=Diffuseurs#>
   <#tab_title&id=sections&title=Sections#>
   <#tab_title&id=log&title=Journal#>
   <#tab_title&id=media_libraries&title=Médiathèques#>
@@ -284,7 +284,7 @@ then=
             </div>
           </div>
           <div class="control-group">
-            <label class="control-label">Type de notification</label>
+            <label class="control-label">Type de diffuseur</label>
             <div class="controls">
               <input type="text" name="channel_type" value="<@channel@>" readonly="true"/>
             </div>
@@ -419,7 +419,7 @@ then=
             <?link&
             target=<@p@>&
             tab=broadcast_points&
-            text=Autres diffuseurs<@bp_id?"":"<div class=\"pull-right\" id=\"bp_new_link\"><i class=\"icon-plus icon-white\"></i></div>"@>
+            text=Diffuseurs<@bp_id?"":"<div class=\"pull-right\" id=\"bp_new_link\"><i class=\"icon-plus icon-white\"></i></div>"@>
             ?>
           </li>
 <?custom_broadcast_points&
@@ -460,6 +460,12 @@ then=
             <label class="control-label">Nom</label>
             <div class="controls">
               <input type="text" name="actionParam_field_name" value="<@name@>" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Type de diffuseur</label>
+            <div class="controls">
+              <input type="text" name="field_broadcast_point_type" value="Client API SYNTHESE" disabled="true"/>
             </div>
           </div>
           <div class="control-group">
@@ -1428,21 +1434,24 @@ template=<{entry&template=
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
       <h3>Nouveau diffuseur</h3>
     </div>
-    <?form&
-    name=bp_newdir&
-    a=ObjectCreate&
-    actionParam_table_id=106&
-    target=<@p@>&
-    tab=broadcast_points&
-    co=1&
-    class=form-horizontal&
-    actionParam_field_up_id=<@bp_id@>
-    ?>
+    <form id="bp_new_form" class="form-horizontal" onsubmit="return false;">
       <div class="modal-body">
         <div class="control-group">
           <label class="control-label">Nom</label>
           <div class="controls">
-            <input type="text" name="actionParam_field_name" />
+            <input type="text" name="field_name" />
+          </div>
+          <br/>
+          <label class="control-label">Type de diffuseur</label>
+          <div class="controls">
+            <select name="field_type">
+              <option value="Client API SYNTHESE">Client API SYNTHESE (pull)</option>
+              <optgroup label="Fournisseurs de notification (push)">
+<?notification_providers&list_channels=1&template=<{channel&template=
+                <option value="<@key@>"><@key@></option>
+}>?>
+              </optgroup>
+            </select>
           </div>
         </div>
       </div>

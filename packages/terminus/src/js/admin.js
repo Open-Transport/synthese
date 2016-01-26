@@ -162,6 +162,59 @@ function np_generate_fields()
   });
 }
 
+function create_synthese_object(table_id, object_data, done) {
+  var service_parameters = {
+    "table_id" : table_id
+  };
+  for (var key in object_data) {
+    if (object_data.hasOwnProperty(key)) {
+      service_parameters["field_" + key] = object_data[key];
+    }
+  }
+  call_synthese_service("objectcreate", service_parameters, function(response) {
+    done(response.object.id);
+  });
+}
+
+
+function call_synthese_service(service_name, service_parameters, done) {
+  var service_parameters_str = "";
+  for (var key in service_parameters) {
+    if (service_parameters.hasOwnProperty(key)) {
+      service_parameters_str += "&" + key + "=" + service_parameters[key];
+    }
+  }
+  var service_url = "/?SERVICE=" + service_name + "&of=json" + service_parameters_str;
+  console.log(service_url);
+  $.ajax({
+    type: "GET",
+    async: "false",
+    url: service_url
+  })
+  .done(function(response) {
+    done(response);
+  })
+  .fail(function() {
+    alert("Unexpected server error");
+  });
+}
+
+function bp_modal_create_click()
+{
+  var bp_name = $('#bp_new_form').find('input[name=field_name]').val();
+  var bp_type = $('#bp_new_form').find('select[name=field_type]').val();
+  if (bp_type == 'Client API SYNTHESE') {
+    create_synthese_object(106, { "name" : bp_name }, function(object_id) {
+      window.location.href = "/terminus/admin?tab=broadcast_points&roid=" + object_id;
+    });
+  } else {
+    create_synthese_object(107, { "name" : bp_name, "channel" : bp_type }, function() {
+      window.location.href = "/terminus/admin?tab=broadcast_points&roid=" + object_id;
+    });
+  }
+}
+
+
 $(function(){
   // Generic
   $('.modal[show_modal=1]').removeClass('fade');
@@ -184,7 +237,7 @@ $(function(){
   $('.np_template_element').click(np_select_template_click);
   $('#np_generate').click(np_generate_fields);
 
-  // Custom broadcast point tab
+  // broadcast point tab
   $('#bp_remove_link').click(bp_remove_click);
   $('#bp_new_link').click(bp_new_click);
   $('div[action=s_new_link]').click(s_new_click);
@@ -195,6 +248,7 @@ $(function(){
   $('#mlib_remove_link').click(mlib_remove_click);
   $('#mlib_star_link').click(mlib_star_click);
   $('[name=selectWebsiteId]').on("change", changeWebsiteId);
+  $('#bp_new_form').find('button[type=submit]').click(bp_modal_create_click);
   
   // Log tab
   $(".logFilterField").keypress(function(event) {

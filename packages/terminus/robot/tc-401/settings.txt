@@ -1,0 +1,10 @@
+*** Variables ***
+
+${CLIENT_HOST}  localhost
+${CLIENT_PORT}  8080
+#${CLIENT_HOST}  demo-terminus.rcsmobility.com
+#${CLIENT_PORT}  80
+${BASE_URL}     http://${CLIENT_HOST}:${CLIENT_PORT}/terminus
+
+#${LAST_CREATED_NOTE_LOCATOR}  //div[@id = 'board']/div[@class = 'note'][last()]
+#${ALL_NOTES_LOCATOR}  //div[@id = 'board']/div[@class = 'note']
