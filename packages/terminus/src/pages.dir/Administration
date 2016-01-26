@@ -575,6 +575,15 @@ then=
             </div>
           </div>
           <div class="control-group">
+            <label class="control-label">Marquage de messages (dés)activé manuellement ?</label>
+            <div class="controls">
+              <select name="actionParam_field_set_manual_override">
+                <option value="0" <?if&cond=<@set_manual_override@>&else=selected="true"?>>Non</option>
+                <option value="1" <?if&cond=<@set_manual_override@>&then=selected="true"?>>Oui</option>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
             <div class="controls">
               <button type="submit" class="btn btn-warning">Enregistrer</button>
             </div>

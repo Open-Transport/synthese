@@ -178,6 +178,12 @@ namespace synthese
 				bool belongsToAnAutomaticSection() const;
 
 				//////////////////////////////////////////////////////////////////////////
+				/// Checks if this scenario belongs to an automatic section but none with no manual
+				/// override attribute set
+				/// @return true if this belongs to automatic sections none of them with NoManualOverride flag set
+				bool belongsToAnAutomaticSectionWithSetManualOverride() const;
+
+				//////////////////////////////////////////////////////////////////////////
 				/// Checks if this scenario should be enabled.
 				/// @param time Time at which we should check if scenario should be enabled
 				/// @return true if time inside this scenario calendar

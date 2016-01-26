@@ -35,6 +35,7 @@ namespace synthese
 
 	FIELD_DEFINITION_OF_TYPE(Color, "color", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(AutoActivation, "auto_activation", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(SetManualOverride, "set_manual_override", SQL_BOOLEAN)
 
 	using namespace db;
 	
@@ -50,7 +51,8 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Rank, 0),
 					FIELD_DEFAULT_CONSTRUCTOR(Code),
 					FIELD_DEFAULT_CONSTRUCTOR(Color),
-					FIELD_VALUE_CONSTRUCTOR(AutoActivation, false)
+					FIELD_VALUE_CONSTRUCTOR(AutoActivation, false),
+					FIELD_VALUE_CONSTRUCTOR(SetManualOverride, true)
 			)	)
 		{}
 

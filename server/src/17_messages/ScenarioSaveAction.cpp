@@ -777,7 +777,7 @@ namespace synthese
 					if (_sscenario->getIsEnabled() != *_enabled)
 					{
 						_sscenario->setIsEnabled(*_enabled);
-						if (_sscenario->belongsToAnAutomaticSection())
+						if (_sscenario->belongsToAnAutomaticSectionWithSetManualOverride())
 						{
 							_sscenario->setManualOverride(true);
 						}

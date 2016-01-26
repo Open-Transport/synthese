@@ -324,6 +324,17 @@ namespace synthese
 			return false;
 		}
 
+		bool SentScenario::belongsToAnAutomaticSectionWithSetManualOverride() const
+		{
+			BOOST_FOREACH(const MessagesSection* section, get<Sections>())
+			{
+				if (section->get<AutoActivation>() && section->get<SetManualOverride>())
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 
 		bool SentScenario::shouldBeEnabled(const boost::posix_time::ptime& time) const
 		{
