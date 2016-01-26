@@ -112,14 +112,6 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_CALENDAR_DEFAULT_CODE = "calendar_default_code";
 		const string HafasFileFormat::Importer_::PARAMETER_2015_CARPOSTAL_FORMAT = "format_carpostal_2015";
 
-		const string HafasFileFormat::Exporter_::PARAMETER_DEBUG = "debug";
-		const string HafasFileFormat::Exporter_::PARAMETER_NETWORK_NAME = "network";
-		const string HafasFileFormat::Exporter_::PARAMETER_FTP_HOST = "ftp_host";
-		const string HafasFileFormat::Exporter_::PARAMETER_FTP_PORT = "ftp_port";
-		const string HafasFileFormat::Exporter_::PARAMETER_FTP_USER = "ftp_user";
-		const string HafasFileFormat::Exporter_::PARAMETER_FTP_PASS = "ftp_pass";
-		const string HafasFileFormat::Exporter_::PARAMETER_BITFIELD_START_DATE = "bitfield_start_date";
-		const string HafasFileFormat::Exporter_::PARAMETER_BITFIELD_END_DATE = "bitfield_end_date";
 	}
 
 	namespace impex
@@ -1801,59 +1793,123 @@ namespace synthese
 			)
 		{}
 
+		//////////////////////////////////////////////////////////////////////////
+
 		// **** HAFAS EXPORTER ****
 
-		// e.g. : http://synthese:8080/export/?SERVICE=ExportFunction&ff=Hafas&debug=1&ftp_host=ftp.elca.ch&ftp_port=21&ftp_user=admin&ftp_pass=foobar&network=tl&bitfield_start_date=2014-12-14&bitfield_end_date=2015-12-12
+		const string HafasFileFormat::Exporter_::FILE_BAHNHOF = "BAHNHOF";
+		const string HafasFileFormat::Exporter_::FILE_KOORD = "BFKOORD";
+		const string HafasFileFormat::Exporter_::FILE_ZUGDAT = "FPLAN";
+		const string HafasFileFormat::Exporter_::FILE_BITFIELD = "BITFELD";
+		const string HafasFileFormat::Exporter_::FILE_ECKDATEN = "ECKDATEN";
+		const string HafasFileFormat::Exporter_::FILE_ZUGART = "ZUGART";
+		const string HafasFileFormat::Exporter_::FILE_UMSTEIGB = "UMSTEIGB";
 
-		const std::string HafasFileFormat::Exporter_::DIDOK_DATA_SOURCE_NAME = "DIDOK";
-		const std::string HafasFileFormat::Exporter_::TL_DATA_SOURCE_NAME = "TL";
+		const string HafasFileFormat::Exporter_::PARAMETER_DEBUG = "debug";
+		const string HafasFileFormat::Exporter_::PARAMETER_NETWORK_NAME = "network";
+		const string HafasFileFormat::Exporter_::PARAMETER_MAIN_DATA_SOURCE = "main_ds";
+		const string HafasFileFormat::Exporter_::PARAMETER_STOPS_DATA_SOURCE = "stops_ds";
+		const string HafasFileFormat::Exporter_::PARAMETER_BITFIELD_START_DATE = "bitfield_start_date";
+		const string HafasFileFormat::Exporter_::PARAMETER_BITFIELD_END_DATE = "bitfield_end_date";
+		const string HafasFileFormat::Exporter_::PARAMETER_TIMETABLE_NAME = "timetable_name";
+		const string HafasFileFormat::Exporter_::PARAMETER_FTP_HOST = "ftp_host";
+		const string HafasFileFormat::Exporter_::PARAMETER_FTP_PORT = "ftp_port";
+		const string HafasFileFormat::Exporter_::PARAMETER_FTP_USER = "ftp_user";
+		const string HafasFileFormat::Exporter_::PARAMETER_FTP_PASS = "ftp_pass";
 
-		const std::string HafasFileFormat::Exporter_::OUTWARD_TRIP_CODE = "H";
-		const std::string HafasFileFormat::Exporter_::RETURN_TRIP_CODE = "R";
-		const std::string HafasFileFormat::Exporter_::DAILY_SERVICE_CODE = "000000";
-
-		// TODO : One of those two should be computed from the other one to avoid mistakes
-		const int HafasFileFormat::Exporter_::DAYS_PER_BITFIELD = 380;
-		const unsigned int HafasFileFormat::Exporter_::BITFIELD_SIZE = 48;
-
+		const string HafasFileFormat::Exporter_::OUTWARD_TRIP_CODE = "H";
+		const string HafasFileFormat::Exporter_::RETURN_TRIP_CODE = "R";
+		const string HafasFileFormat::Exporter_::DAILY_SERVICE_CODE = "000000";
+		const string HafasFileFormat::Exporter_::NO_DIDOK = "NODIDOK";
+		const unsigned int HafasFileFormat::Exporter_::MAX_BITFIELD_SIZE = 48;
 		// 21781 = Swiss format (CH1903), 4326 = GPS format (WGS84)
 		const unsigned int HafasFileFormat::Exporter_::COORDINATES_SYSTEM = 4326;
 
 
-		HafasFileFormat::Exporter_::Exporter_(const impex::Export& export_): OneFileExporter<HafasFileFormat>(export_) {
+		HafasFileFormat::Exporter_::Exporter_(const impex::Export& export_): OneFileExporter<HafasFileFormat>(export_), _debug(false), _ftpPort(21) {
+		}
+
+		void HafasFileFormat::Exporter_::setFromParametersMap(const ParametersMap& map)
+		{
+			_debug = map.getDefault<bool>(PARAMETER_DEBUG, false);
+
+			_networkName = getMandatoryString(map, PARAMETER_NETWORK_NAME);
+
+			_mainDataSource = getMandatoryString(map, PARAMETER_MAIN_DATA_SOURCE);
+			_stopsDataSource = getMandatoryString(map, PARAMETER_STOPS_DATA_SOURCE);
+
+			_ftpHost = getMandatoryString(map, PARAMETER_FTP_HOST);
+			_ftpPort = map.getDefault<int>(PARAMETER_FTP_PORT, 21);
+			_ftpUser = getMandatoryString(map, PARAMETER_FTP_USER);
+			_ftpPass = getMandatoryString(map, PARAMETER_FTP_PASS);
+
+			_bitfieldStartDate = getMandatoryString(map, PARAMETER_BITFIELD_START_DATE);
+			_bitfieldEndDate = getMandatoryString(map, PARAMETER_BITFIELD_END_DATE);
+
+			_timetableName = getMandatoryString(map, PARAMETER_TIMETABLE_NAME);
+
 		}
 
 		void HafasFileFormat::Exporter_::build(ostream& os) const {
 
-			const CoordinatesSystem& coordinatesSytem = CoordinatesSystem::GetCoordinatesSystem(COORDINATES_SYSTEM);
+			// TODO : Only store HTML in the stream when _debug = true to improve performances!
+			stringstream html;
+			html << "<html><body>\n";
 
-			os << "<html><body>\n";
+			const CoordinatesSystem& coordinatesSytem = CoordinatesSystem::GetCoordinatesSystem(COORDINATES_SYSTEM);
 
 			// Force loading of some entities in order to be able to access their fields
 			DataSourceTableSync::Search(_env);
+
+			// We validate the dates
+			boost::gregorian::date startDate(from_simple_string(_bitfieldStartDate));
+			boost::gregorian::date endDate(from_simple_string(_bitfieldEndDate));
+			if (startDate > endDate) {
+				os << "bitfield_start_date cannot be more recent than bitfield_end_date!" << flush;
+				return;
+			}
+			int maxDaysPerBitfield = (MAX_BITFIELD_SIZE * 2 - 1) * 4;
+			if ((endDate - startDate).days() > maxDaysPerBitfield) {
+				os << (boost::format("Cannot store more than %1% days in a bitfield!") % maxDaysPerBitfield).str() << flush;
+				return;
+			}
 
 			// We store the data we crawled in those objects
 			Bahnhofs _bahnhofs;
 			Zugs _zugs;
 			BitFields _bitfields;
+			Zugarts _zugarts;
+
+			// ** Rolling stocks **
+			RollingStockTableSync::SearchResult rsRes = RollingStockTableSync::Search(_env);
+			html << "<h1>Modes de transport</h1>\n";
+			html << "<ul>\n";
+			BOOST_FOREACH(const boost::shared_ptr<RollingStock>& rs, rsRes) {
+				// Note : We only list the rolling stock who have a code for the data source to avoid unused cluterring !
+				string transportModeCode = getCodesForDataSource(rs.get(), _mainDataSource, string(), false);
+				if (!transportModeCode.empty()) {
+					html << "<li>" << transportModeCode << "</li>\n";
+					_zugarts.insert(transportModeCode);
+				}
+			}
+			html << "</ul>\n";
 
 			// ** Stop area **
-			// TODO : Only output HTML if debug = 1
-			os << "<h1>Lieux</h1>\n";
-			os << "<ul>\n";
+			html << "<h1>Lieux</h1>\n";
+			html << "<ul>\n";
 			StopPointTableSync::Search(_env); // lazy-loading
 			StopAreaTableSync::SearchResult stopsRes = StopAreaTableSync::Search(_env);
 			BOOST_FOREACH(const boost::shared_ptr<StopArea>& stopArea, stopsRes) {
-				std::string didokCode = getCodesForDataSource(stopArea.get(), DIDOK_DATA_SOURCE_NAME, "NO_DIDOK");
-				os << "<li>" << stopArea->getFullName() << " <small>(DIDOK: " + didokCode + ", key: " << stopArea->getKey() << ")</small></li>\n";
-				os << "<ul>\n";
+				string didokCode = getCodesForDataSource(stopArea.get(), _stopsDataSource, NO_DIDOK);
+				html << "<li>" << stopArea->getFullName() << " <small>(DIDOK: " + didokCode + ", key: " << stopArea->getKey() << ")</small></li>\n";
+				html << "<ul>\n";
 
 				// ** Stop points for this stop area **
-				std::map<util::RegistryKeyType,const pt::StopPoint*> stopPoints = stopArea->getPhysicalStops();
+				map<util::RegistryKeyType,const pt::StopPoint*> stopPoints = stopArea->getPhysicalStops();
 
-				double minX = std::numeric_limits<double>::max(), minY = std::numeric_limits<double>::max();
-				double maxX = std::numeric_limits<double>::min(), maxY = std::numeric_limits<double>::min();
-				for (std::map<util::RegistryKeyType,const pt::StopPoint*>::const_iterator it = stopPoints.begin(); it != stopPoints.end(); ++it)
+				double minX = numeric_limits<double>::max(), minY = numeric_limits<double>::max();
+				double maxX = numeric_limits<double>::min(), maxY = numeric_limits<double>::min();
+				for (map<util::RegistryKeyType,const pt::StopPoint*>::const_iterator it = stopPoints.begin(); it != stopPoints.end(); ++it)
 				{
 					const StopPoint* stopPoint = it->second;
 					ParametersMap pm;
@@ -1876,25 +1932,23 @@ namespace synthese
 							minY = y;
 						}
 						// TODO : Support for Z
-						os << "<li>(Est,Nord,Z) = (" << xStr << "," << yStr << ",0)</li>\n";
+						html << "<li>(Est,Nord,Z) = (" << xStr << "," << yStr << ",0)</li>\n";
 					}
 				}
 
 				// TODO : Document that if no coordinates, (0,0,0) will be set.
-
 				double x = 0;
 				double y = 0;
-
-				if (minX != std::numeric_limits<double>::max() &&
-					minY != std::numeric_limits<double>::max() &&
-					maxX != std::numeric_limits<double>::min() &&
-					maxY != std::numeric_limits<double>::min()) {
+				if (minX != numeric_limits<double>::max() &&
+					minY != numeric_limits<double>::max() &&
+					maxX != numeric_limits<double>::min() &&
+					maxY != numeric_limits<double>::min()) {
 					x = (maxX - minX)/2 + minX;
 					y = (maxY - minY)/2 + minY;
 				}
 
-				os << "<li><b>Point central </b> : (Est,Nord,Z) = (" << x << "," << y << ",0)</li>\n";
-				os << "</ul>\n";
+				html << "<li><b>Point central </b> : (Est,Nord,Z) = (" << x << "," << y << ",0)</li>\n";
+				html << "</ul>\n";
 
 				Bahnhof bahnhof;
 				bahnhof.operatorCode = didokCode;
@@ -1907,32 +1961,34 @@ namespace synthese
 									bahnhof
 								));
 			}
-			os << "</ul>\n";
+			html << "</ul>\n";
 
 			// ** Network **
 			TransportNetworkTableSync::SearchResult networksRes =
-					TransportNetworkTableSync::Search(_env, _networkName, "", 0, boost::optional<std::size_t>(),
+					TransportNetworkTableSync::Search(_env, _networkName, "", 0, boost::optional<size_t>(),
 							true, true, util::UP_LINKS_LOAD_LEVEL);
 			if(networksRes.empty()) {
-				throw RequestException("No such network with name " + _networkName + " !");
+				os << "No such network with name " << _networkName << flush;
+				return;
 			}
 			TransportNetwork* network = (*(networksRes.begin())).get();
 
 			// We obtain the code of this network
-			std::string networkCode = getCodesForDataSource(network, TL_DATA_SOURCE_NAME);
+			string networkCode = getCodesForDataSource(network, _mainDataSource);
 			if (networkCode.empty()) {
-				throw RequestException("Network " + _networkName + " doesn't have a code for data source " + TL_DATA_SOURCE_NAME);
+				os << "Network " << _networkName << " doesn't have a code for data source " << _mainDataSource << flush;
+				return;
 			}
 
-			os << "<h1>Réseau " << network->getName() << " <small>(code:" << networkCode << ", key: " << network->getKey() << ")</small></h1>\n";
+			html << "<h1>Réseau " << network->getName() << " <small>(code:" << networkCode << ", key: " << network->getKey() << ")</small></h1>\n";
 
 			// ** Lines for this network **
 			int trainNumber = 1;
 			CommercialLineTableSync::SearchResult linesRes =
 					CommercialLineTableSync::Search(_env, network->getKey());
 			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, linesRes) {
-				std::string lineShortName = line->getShortName();
-				os << "<h2>Ligne " << lineShortName << " : " << line->getName()
+				string lineShortName = line->getShortName();
+				html << "<h2>Ligne " << lineShortName << " : " << line->getName()
 						<< " <small>(key: " << line->getKey() << ")</small></h2>\n";
 
 				// ** Journeys for this line **
@@ -1942,7 +1998,7 @@ namespace synthese
 					// We get the code of this transport mode
 					// TODO : Mention in the documentation that the rolling stock must have a code for the data source !!!
 					RollingStock* rs = journey->getRollingStock();
-					std::string transportModeCode = getCodesForDataSource(rs, TL_DATA_SOURCE_NAME);
+					string transportModeCode = getCodesForDataSource(rs, _mainDataSource);
 
 					ScheduledServiceTableSync::SearchResult schServiceRes =
 							ScheduledServiceTableSync::Search(_env, journey->getKey(), line->getKey());
@@ -1954,11 +2010,11 @@ namespace synthese
 					const StopPoint* to = journey->getDestination();
 
 					// We read the DIDOK code of the StopArea containing this StopPoint
-					std::string fromCode = getCodesForDataSource(from->getConnectionPlace(), DIDOK_DATA_SOURCE_NAME, "NO_DIDOK");
-					std::string toCode = getCodesForDataSource(to->getConnectionPlace(), DIDOK_DATA_SOURCE_NAME, "NO_DIDOK");
+					string fromCode = getCodesForDataSource(from->getConnectionPlace(), _stopsDataSource, NO_DIDOK);
+					string toCode = getCodesForDataSource(to->getConnectionPlace(), _stopsDataSource, NO_DIDOK);
 
 					bool wayBack = journey->getWayBack();
-					os << "<h3>Parcours " << (wayBack ? "retour" : "aller")
+					html << "<h3>Parcours " << (wayBack ? "retour" : "aller")
 							<< " \"" << journey->getName() << "\" :"
 							<< " Origine " << (from != 0 ? from->getName() + " (DIDOK: " + fromCode + ")" : "?") << ", "
 							<< " Destination " << (to != 0 ? to->getName() + " (DIDOK: " + toCode + ")": "?") << ", "
@@ -1966,45 +2022,43 @@ namespace synthese
 							<< " <small>(key: " << journey->getKey() << ")</small></h3>\n";
 
 					// ** Routes for this journey **
-					os << "<h4>Desserte</h4>\n";
-					os << "<ul>\n";
-					vector<std::pair<std::string, std::string> > lineStops;
+					html << "<h4>Desserte</h4>\n";
+					html << "<ul>\n";
+					vector<pair<string, string> > lineStops;
 					BOOST_FOREACH(const boost::shared_ptr<LineStop>& lineStop, lineStopRes) {
 						BOOST_FOREACH(const boost::shared_ptr<synthese::pt::LinePhysicalStop>& ls, lineStop->getGeneratedLineStops()) {
 							StopPoint* stop = ls->getPhysicalStop();
-							std::string didok = getCodesForDataSource(stop->getConnectionPlace(), DIDOK_DATA_SOURCE_NAME, "NO_DIDOK");
-							os << "<li>" << stop->getName() << " <small>(didok: " << didok << ", key: " << stop->getKey() << ")</small></li>\n";
-							lineStops.push_back(std::make_pair(stop->getConnectionPlace()->getFullName(), didok));
+							string didok = getCodesForDataSource(stop->getConnectionPlace(), _stopsDataSource, NO_DIDOK);
+							html << "<li>" << stop->getName() << " <small>(didok: " << didok << ", key: " << stop->getKey() << ")</small></li>\n";
+							lineStops.push_back(make_pair(stop->getConnectionPlace()->getFullName(), didok));
 						}
 					}
-					os << "</ul>\n";
+					html << "</ul>\n";
 
 					// ** Calendar **
-					os << "<h4>Calendrier</h4>\n";
+					html << "<h4>Calendrier</h4>\n";
 					calendar::Calendar& calendar = journey->getCalendarCache();
 					Calendar::DatesVector activeDates = calendar.getActiveDates();
-					os << "<p>\n";
+					html << "<p>\n";
 					BOOST_FOREACH(const boost::gregorian::date date, activeDates) {
-						os << date << " ";
+						html << date << " ";
 					}
-					os << "</p>\n";
+					html << "</p>\n";
 
 					// We compute the active days in the year we're interested in
-					std::vector<Zug::CalendarUse> calendars;
-					boost::gregorian::date currentDate(from_simple_string(_bitfieldStartDate));
-					boost::gregorian::date lastDate(from_simple_string(_bitfieldEndDate));
-					// TODO : Validation than currentDate <= lastDate
+					vector<Zug::CalendarUse> calendars;
 					boost::gregorian::date_duration dd(1);
 					size_t bitfieldDaysCounter = 0;
+					date currentDate = startDate;
+					date lastDate = endDate;
 					while (currentDate != lastDate) {
 						// If this day is one of the active days...
-						if (std::find(activeDates.begin(), activeDates.end(), currentDate) != activeDates.end()) {
+						if (find(activeDates.begin(), activeDates.end(), currentDate) != activeDates.end()) {
 							// We add it
 							Zug::CalendarUse calendarUse;
 							calendarUse.calendarNumber = bitfieldDaysCounter;
 							calendars.push_back(calendarUse);
 						}
-
 						// We increment the day and the counter
 						currentDate += dd;
 						bitfieldDaysCounter++;
@@ -2017,19 +2071,19 @@ namespace synthese
 						// We compute the train number
 						char trainNumberBuffer[5];
 						sprintf(trainNumberBuffer, "%05d", trainNumber++);
-						std::string trainNumberStr(trainNumberBuffer);
+						string trainNumberStr(trainNumberBuffer);
 
 						if (!title) {
-							os << "<h4>Services à horaire</h4>\n";
-							os << "<ul>\n";
+							html << "<h4>Services à horaire</h4>\n";
+							html << "<ul>\n";
 							title = true;
 						}
-						os << "<li>" << schService->getDepartureSchedule(false, 0) << " - "
+						html << "<li>" << schService->getDepartureSchedule(false, 0) << " - "
 								<< schService->getLastArrivalSchedule(false) << "</li>\n";
 
 						// We grab the schedule for each stops
 						Zug::Stops stops;
-						os << "<ul>\n";
+						html << "<ul>\n";
 						for (unsigned int i=0; i<lineStops.size(); i++) {
 							Zug::Stop stop;
 							stop.stopCode = lineStops[i].second;
@@ -2043,11 +2097,11 @@ namespace synthese
 							}
 							stops.push_back(stop);
 
-							os << "<li>" << lineStops[i].first << " <small>(didok: " << stop.stopCode << ")</small> : "
+							html << "<li>" << lineStops[i].first << " <small>(didok: " << stop.stopCode << ")</small> : "
 									<< stop.arrivalTime << " -> "
 									<< stop.departureTime << "</li>\n";
 						}
-						os << "</ul>\n";
+						html << "</ul>\n";
 
 
 						// We set the fields
@@ -2065,49 +2119,77 @@ namespace synthese
 
 					}
 					if (title) {
-						os << "</ul>\n";
+						html << "</ul>\n";
 					}
 
 					// ** Continuous services for this journey (not currently supported by export!) **
 					title = false;
 					BOOST_FOREACH(const boost::shared_ptr<ContinuousService>& conService, conServiceRes) {
 						if (!title) {
-							os << "<h4>Services continus</h4>\n";
-							os << "<ul>\n";
+							html << "<h4>Services continus</h4>\n";
+							html << "<ul>\n";
 							title = true;
 						}
-						os << "<li>" << conService->getDepartureSchedule(false, 0) << " - "
+						html << "<li>" << conService->getDepartureSchedule(false, 0) << " - "
 								<< conService->getLastArrivalSchedule(false) << "</li>\n";
 					}
 					if (title) {
-						os << "</ul>\n";
+						html << "</ul>\n";
 					}
 
 				}
 
 			}
 
-			os << "</body></html>\n" << flush;
+			html << "</body></html>\n" << flush;
 
-			boost::filesystem::path hafasExportFolder = exportToHafasFormat(_bahnhofs, _zugs, _bitfields);
+			if (_debug) {
+				// In debug mode, we don't export anything
+				os << html.str();
 
-			// TODO : Zip folder to archive
-			// TODO : Send archive to FTP server
-			// TODO : Delete folder
+			} else {
 
+				// In production mode, we run the actual export
+				ExportConfiguration config;
+				config.zugs = _zugs;
+				config.bahnhofs = _bahnhofs;
+				config.bitfields = _bitfields;
+				config.zugarts = _zugarts;
+				config.startDate = from_simple_string(_bitfieldStartDate);
+				config.endDate = from_simple_string(_bitfieldEndDate);
+				config.timetableName = _timetableName;
+
+				try {
+
+					boost::filesystem::path hafasExportFolder = exportToHafasFormat(config);
+
+					// TODO : Zip folder to archive
+					// TODO : Send archive to FTP server
+					// TODO : Delete temporary folder
+
+					os << "OK (" << hafasExportFolder.native() << ")";
+
+				} catch (std::exception& e) {
+					// TODO : Remove temporary files
+					os << e.what() << flush;
+					return;
+				}
+
+			}
+
+			os << flush;
 		}
 
-		boost::filesystem::path HafasFileFormat::Exporter_::exportToHafasFormat(Bahnhofs _bahnhofs, Zugs _zugs, BitFields _bitfields) const
+		boost::filesystem::path HafasFileFormat::Exporter_::exportToHafasFormat(ExportConfiguration config) const
 		{
-			// We create a temporary folder in which the HAFAS files will be created
 			boost::filesystem::path dir = createRandomFolder();
-			// TODO : Pull out the filenames into constants
-			// TODO : Deal with runtime_error (e.g. delete folder)
-			exportToBahnhofFile(dir, "BAHNHOF", _bahnhofs);
-			exportToKoordFile(dir, "BFKOORD_GEO", _bahnhofs);
-			exportToZugdatFile(dir, "FPLAN", _zugs);
-			exportToBitfieldFile(dir, "BITFELD", _bitfields);
-			// TODO : Export data to other HAFAS files
+			exportToBahnhofFile(dir, FILE_BAHNHOF, config.bahnhofs);
+			exportToKoordFile(dir, FILE_KOORD, config.bahnhofs); // a.k.a. BFKOORD
+			exportToZugdatFile(dir, FILE_ZUGDAT, config.zugs); // a.k.a. FPLAN
+			exportToBitfieldFile(dir, FILE_BITFIELD, config.bitfields); // a.k.a. BITFELD
+			exportToEckdatenFile(dir, FILE_ECKDATEN, config.startDate, config.endDate, config.timetableName);
+			exportToZugartFile(dir, FILE_ZUGART, config.zugarts);
+			exportToUmsteigbFile(dir, FILE_UMSTEIGB);
 			return dir;
 		}
 
@@ -2157,7 +2239,7 @@ namespace synthese
 
 				int commentLine = 1;
 				stringstream comment;
-				comment << zug.number << " " << zug.lineNumber << "   " << "TODO";
+				comment << zug.number << " " << zug.lineNumber;
 
 				// *** *Z row ***
 				printColumn(fileStream, pos, "*Z", 1, 2);
@@ -2180,13 +2262,13 @@ namespace synthese
 				// "Verkehrsmittel bzw. Gattung"
 				printColumn(fileStream, pos, zug.transportModeCode, 4, 6);
 				// "(optional) Laufwegsindex oder Haltestellennummber, ab der die Gattung gilt."
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.front().stopCode, 8, 14);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : zug.stops.front().stopCode, 8, 14);
 				// "(optional) Laufwegsindex oder Haltestellennummber, bis zu der die Gattung gilt."
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.back().stopCode, 16, 22);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : zug.stops.back().stopCode, 16, 22);
 				// "(optional) Index für das x. Auftreten oder Abfahrtszeitpunkt."
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.front().departureTime), 24, 29);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : formatTime(zug.stops.front().departureTime), 24, 29);
 				// "(optional) Index für das x. Auftreten oder Ankunftszeitpunkt."
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.back().arrivalTime), 31, 36);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : formatTime(zug.stops.back().arrivalTime), 31, 36);
 				// "Kommentar"
 				printZugdatComment(fileStream, pos, commentLine, comment.str());
 				newLine(fileStream, pos);
@@ -2195,15 +2277,15 @@ namespace synthese
 				printColumn(fileStream, pos, "*A", 1, 2);
 				printColumn(fileStream, pos, "VE", 4, 5);
 				// "(optional) Laufwegsindex oder Haltestellennummer, ab der die Verkehrstage im Laufweg gelten."
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.front().stopCode, 7, 13);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : zug.stops.front().stopCode, 7, 13);
 				// "(optional) Laufwegsindex oder Haltestellennummer, bis zu der die Verkehrstage im Laufweg gelten."
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.back().stopCode, 15, 21);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : zug.stops.back().stopCode, 15, 21);
 				// "(optional) Verkehrstagenummer für die Tage, an denen die Fahrt stattfindet. Fehlt diese Angabe, so verkehrt diese Fahrt täglich (entspricht dann 000000)."
 				printColumn(fileStream, pos, zug.bitfieldCode, 23, 28);
 				// "(optional) Index für das x. Auftreten oder Abfahrtszeitpunkt."
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.front().departureTime), 30, 35);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : formatTime(zug.stops.front().departureTime), 30, 35);
 				// "(optional) Index für das x. Auftreten oder Ankunftszeitpunkt."
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.back().arrivalTime), 37, 42);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : formatTime(zug.stops.back().arrivalTime), 37, 42);
 				// "Kommentar"
 				printZugdatComment(fileStream, pos, commentLine, comment.str());
 				newLine(fileStream, pos);
@@ -2213,13 +2295,13 @@ namespace synthese
 				// "Liniennummer"
 				printColumn(fileStream, pos, zug.lineShortName, 4, 11);
 				// "(optional) Laufwegsindex oder Haltestellennummer, ab der die Liniennummer gilt."
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.front().stopCode, 13, 19);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : zug.stops.front().stopCode, 13, 19);
 				// "(optional) Laufwegsindex oder Haltestellennummer, bis zu der die Liniennummer gilt."
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.back().stopCode, 21, 27);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : zug.stops.back().stopCode, 21, 27);
 				// "(optional) Index für das x. Auftreten oder Abfahrtszeitpunkt."
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.front().departureTime), 29, 34);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : formatTime(zug.stops.front().departureTime), 29, 34);
 				// "(optional) Index für das x. Auftreten oder Ankunftszeitpunkt."
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.back().arrivalTime), 36, 41);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : formatTime(zug.stops.back().arrivalTime), 36, 41);
 				// "Kommentar"
 				printZugdatComment(fileStream, pos, commentLine, comment.str());
 				newLine(fileStream, pos);
@@ -2231,18 +2313,18 @@ namespace synthese
 				// (optional) Richtungscode. Wird kein Code vermerkt, so wird der Bahnhofsname als Richtungscode verwendet.
 				printColumn(fileStream, pos, "", 6, 12);
 				// (optional) Laufwegsindex oder Haltestellennummer, ab der die Richtungsangabe im Laufweg gilt.
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.front().stopCode, 14, 20);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : zug.stops.front().stopCode, 14, 20);
 				// (optional) Laufwegsindex oder Haltestellennummer, bis zu der die Richtungsangabe im Laufweg gilt.
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : zug.stops.back().stopCode, 22, 28);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : zug.stops.back().stopCode, 22, 28);
 				// (optional) Index für das x. Auftreten oder Abfahrtszeitpunkt.
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.front().departureTime), 30, 35);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : formatTime(zug.stops.front().departureTime), 30, 35);
 				// (optional) Index für das x. Auftreten oder Ankunftszeitpunkt.
-				printColumn(fileStream, pos, zug.stops.empty() ? std::string() : formatTime(zug.stops.back().arrivalTime), 37, 42);
+				printColumn(fileStream, pos, zug.stops.empty() ? string() : formatTime(zug.stops.back().arrivalTime), 37, 42);
 				// "Kommentar"
 				printZugdatComment(fileStream, pos, commentLine, comment.str());
 				newLine(fileStream, pos);
 
-				// TODO : *** Timetable rows ***
+				// *** Timetable rows ***
 				BOOST_FOREACH(Zug::Stop &stop, zug.stops) {
 					// "Haltestellennummer"
 					printColumn(fileStream, pos, stop.stopCode, 1, 7);
@@ -2282,23 +2364,82 @@ namespace synthese
 			fileStream.close();
 		}
 
-		void HafasFileFormat::Exporter_::printZugdatComment(std::ofstream& fileStream, int& pos, int& commentLine, std::string value) {
+		void HafasFileFormat::Exporter_::exportToEckdatenFile(boost::filesystem::path dir, string file, date _startDate, date _endDate, string _timetableName) const
+		{
+			ofstream fileStream;
+			createFile(fileStream, dir, file);
+			int pos = 1;
+			printColumn(fileStream, pos, formatDate(_startDate), 1);
+			newLine(fileStream, pos);
+			printColumn(fileStream, pos, formatDate(_endDate), 1);
+			newLine(fileStream, pos);
+			printColumn(fileStream, pos, _timetableName, 1);
+			newLine(fileStream, pos);
+			fileStream.close();
+		}
+
+		void HafasFileFormat::Exporter_::exportToZugartFile(boost::filesystem::path dir, string file, Zugarts _zugarts) const
+		{
+			ofstream fileStream;
+			createFile(fileStream, dir, file);
+			int pos = 1;
+			BOOST_FOREACH(const string &zugart, _zugarts) {
+				printColumn(fileStream, pos, zugart, 1);
+				newLine(fileStream, pos);
+			}
+			fileStream.close();
+		}
+
+		void HafasFileFormat::Exporter_::exportToUmsteigbFile(boost::filesystem::path dir, string file) const
+		{
+			ofstream fileStream;
+			createFile(fileStream, dir, file);
+			// TODO : Generate content of UMSTEIGB file
+			/*
+			int pos = 1;
+			{
+				// Haltestellennummer 1.
+				printColumn(fileStream, pos, "", 1, 7);
+				// Umsteigezeit (max. 60 Minuten)
+				printColumn(fileStream, pos, "", 9, 10);
+				// Umsteigezeit
+				printColumn(fileStream, pos, "", 12, 13);
+				// Haltestellenname im Klartext
+				printColumn(fileStream, pos, "", 15);
+				newLine(fileStream, pos);
+			}
+			*/
+			fileStream.close();
+
+		}
+
+		util::ParametersMap HafasFileFormat::Exporter_::getParametersMap() const
+		{
+			ParametersMap result;
+			// TODO : If it's really needed, fill this up (seems that it's not used.)
+			return result;
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		// HELPERS
+
+		void HafasFileFormat::Exporter_::printZugdatComment(ofstream& fileStream, int& pos, int& commentLine, string value) {
 			stringstream ss;
 			ss << "% " << value << " (" << (boost::format("%03d") % commentLine++) << ")";
 			printColumn(fileStream, pos, ss.str(), 59);
 		}
 
-		void HafasFileFormat::Exporter_::printColumn(std::ofstream& fileStream, int& pos, std::string value, int firstColumn, int lastColumn) {
+		void HafasFileFormat::Exporter_::printColumn(ofstream& fileStream, int& pos, string value, int firstColumn, int lastColumn) {
 			if (firstColumn < pos) {
-				std::stringstream error;
+				stringstream error;
 				error << "Impossible to print value \"" << value << "\" at position " << firstColumn << " because we're already at position " << pos << "!";
-				throw std::runtime_error(error.str());
+				throw runtime_error(error.str());
 			} else if (firstColumn > pos) {
 				// We need to add some padding...
-				fileStream << std::string(firstColumn - pos, ' ');
+				fileStream << string(firstColumn - pos, ' ');
 			}
 			int maxLength = lastColumn - firstColumn + 1;
-			std::string toPrint = (lastColumn > 0 && (int) (strlenUtf8(value)) > maxLength) ? firstChars(value, maxLength) : value;
+			string toPrint = (lastColumn > 0 && (int) (strlenUtf8(value)) > maxLength) ? firstChars(value, maxLength) : value;
 			fileStream << toPrint;
 			pos = firstColumn + strlenUtf8(toPrint);
 
@@ -2309,41 +2450,15 @@ namespace synthese
 			pos = 1;
 		}
 
-		util::ParametersMap HafasFileFormat::Exporter_::getParametersMap() const
-		{
-			ParametersMap result;
-			// TODO : Is this really needed?
-			return result;
-		}
-
-		void HafasFileFormat::Exporter_::setFromParametersMap(const ParametersMap& map)
-		{
-			_debug = map.getDefault<bool>(PARAMETER_DEBUG, false);
-
-			_networkName = getMandatoryString(map, PARAMETER_NETWORK_NAME);
-
-			_ftpHost = getMandatoryString(map, PARAMETER_FTP_HOST);
-			_ftpPort = map.getDefault<int>(PARAMETER_FTP_PORT, 21);
-			_ftpUser = getMandatoryString(map, PARAMETER_FTP_USER);
-			_ftpPass = getMandatoryString(map, PARAMETER_FTP_PASS);
-
-			_bitfieldStartDate = getMandatoryString(map, PARAMETER_BITFIELD_START_DATE);
-			_bitfieldEndDate = getMandatoryString(map, PARAMETER_BITFIELD_END_DATE);
-
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-		// HELPERS
-
-		void HafasFileFormat::Exporter_::createFile(std::ofstream& fileStream, boost::filesystem::path dir, string file) {
+		void HafasFileFormat::Exporter_::createFile(ofstream& fileStream, boost::filesystem::path dir, string file) {
 			fileStream.open((dir.native() + file).c_str());
 			if (!fileStream.is_open()) {
-				// TODO : Throw an exception
+				throw runtime_error((boost::format("Unable to open stream to file %1% !") % (dir.native() + file)).str());
 			}
 		}
 
-		std::string HafasFileFormat::Exporter_::getMandatoryString(const ParametersMap& map, std::string parameterName) {
-			std::string result = map.getDefault<std::string>(parameterName, "");
+		string HafasFileFormat::Exporter_::getMandatoryString(const ParametersMap& map, string parameterName) {
+			string result = map.getDefault<string>(parameterName, "");
 			if (result.empty()) {
 				throw RequestException("Missing parameter " + parameterName);
 			}
@@ -2351,17 +2466,17 @@ namespace synthese
 		}
 
 		boost::filesystem::path HafasFileFormat::Exporter_::createRandomFolder() {
-			std::stringstream ss;
+			stringstream ss;
 			ss << boost::uuids::random_generator()() << '/';
 			boost::filesystem::path dir(ss.str());
 			if (boost::filesystem::create_directory(dir)) {
 				return dir;
 			} else {
-				throw RequestException("Unable to create folder " + dir.native() + " !");
+				throw runtime_error("Unable to create folder " + dir.native() + " !");
 			}
 		}
 
-		std::string HafasFileFormat::Exporter_::getCodesForDataSource(const impex::Importable* object, std::string dataSourceName, std::string defaultValue) {
+		string HafasFileFormat::Exporter_::getCodesForDataSource(const impex::Importable* object, string dataSourceName, string defaultValue, bool warnOnNotFound) {
 
 			if (!object) {
 				return defaultValue;
@@ -2369,9 +2484,9 @@ namespace synthese
 
 			stringstream codes;
 
-			std::multimap<const synthese::impex::DataSource*, std::basic_string<char> > dataSourceLinks = object->getDataSourceLinks();
+			multimap<const synthese::impex::DataSource*, basic_string<char> > dataSourceLinks = object->getDataSourceLinks();
 
-			for (std::multimap<const synthese::impex::DataSource*, std::basic_string<char> >::iterator it=dataSourceLinks.begin(); it!=dataSourceLinks.end(); ++it) {
+			for (multimap<const synthese::impex::DataSource*, basic_string<char> >::iterator it=dataSourceLinks.begin(); it!=dataSourceLinks.end(); ++it) {
 
 				if (((*it).first)->get<Name>() == dataSourceName) {
 					if (!codes.str().empty()) {
@@ -2383,9 +2498,11 @@ namespace synthese
 			}
 
 			if (codes.str().empty()) {
-				stringstream warn;
-				warn << "Could't find code in data source " << dataSourceName << " for object with key " << object->getKey()  << " (table: " << object->getTableName() << ") !" << endl;
-				util::Log::GetInstance().warn(warn.str());
+				if (warnOnNotFound) {
+					stringstream warn;
+					warn << "Could't find code in data source " << dataSourceName << " for object with key " << object->getKey()  << " (table: " << object->getTableName() << ") !";
+					util::Log::GetInstance().warn(warn.str());
+				}
 				codes << defaultValue;
 			}
 
@@ -2393,23 +2510,29 @@ namespace synthese
 
 		}
 
-		std::string HafasFileFormat::Exporter_::formatTime(boost::posix_time::time_duration time) {
+		string HafasFileFormat::Exporter_::formatTime(boost::posix_time::time_duration time) {
 			if (time == boost::posix_time::not_a_date_time) {
-				return std::string();
+				return string();
 			}
 			// We want 01:02 to be printed " 00102"
 			return (boost::format(" 0%02d%02d") % time.hours() % time.minutes()).str();
 		}
 
+		string HafasFileFormat::Exporter_::formatDate(date date) {
+			// We want 2015-01-01 to be printed 01.01.2015
+			date::ymd_type ymd = date.year_month_day();
+			return (boost::format("%02d.%02d.%04d") % ymd.day % ymd.month.as_number() % ymd.year).str();
+		}
+
 		// http://stackoverflow.com/a/4063229
-		unsigned int HafasFileFormat::Exporter_::strlenUtf8(std::string str) {
+		unsigned int HafasFileFormat::Exporter_::strlenUtf8(string str) {
 			const char* s = str.c_str();
 			unsigned int len = 0;
 			while (*s) len += (*s++ & 0xc0) != 0x80;
 			return len;
 		}
 
-		std::string HafasFileFormat::Exporter_::firstChars(std::string str, unsigned int maxLen) {
+		string HafasFileFormat::Exporter_::firstChars(string str, unsigned int maxLen) {
 			const char* s = str.c_str();
 			stringstream ss;
 			unsigned int len = 0;
@@ -2423,15 +2546,14 @@ namespace synthese
 			return ss.str();
 		}
 
-
-		std::string HafasFileFormat::Exporter_::getBitfieldCode(std::vector<Zug::CalendarUse> calendars, unsigned int bitfieldSize, BitFields& _bitfields) {
+		string HafasFileFormat::Exporter_::getBitfieldCode(vector<Zug::CalendarUse> calendars, unsigned int bitfieldSize, BitFields& _bitfields) {
 			// If this service runs daily, we return the special code 000000
 			// TODO : What if the service runs every day of the interval, but not daily?
 			if (calendars.size() == bitfieldSize) {
 				return DAILY_SERVICE_CODE;
 			}
 
-			std::string bitfield = computeBitfield(calendars, bitfieldSize);
+			string bitfield = computeBitfield(calendars, bitfieldSize);
 
 			// If this bitfield was already in the map, we reuse its code
 			BOOST_FOREACH(BitFields::value_type &row, _bitfields) {
@@ -2443,14 +2565,14 @@ namespace synthese
 			// If not, we compute its code, insert the bitfield into the map and return the code
 			stringstream ss;
 			ss << boost::format("%06d") % (_bitfields.size() + 1);
-			_bitfields.insert(std::make_pair(ss.str(), bitfield));
+			_bitfields.insert(make_pair(ss.str(), bitfield));
 			return ss.str();
 		}
 
-		std::string HafasFileFormat::Exporter_::computeBitfield(std::vector<Zug::CalendarUse> calendars, unsigned int bitfieldSize) {
+		string HafasFileFormat::Exporter_::computeBitfield(vector<Zug::CalendarUse> calendars, unsigned int bitfieldSize) {
 
 			// Beginning and end bits are ones
-			unsigned short bitfield [BITFIELD_SIZE] = {};
+			unsigned short bitfield [MAX_BITFIELD_SIZE] = {};
 			setBit(bitfield, 0);
 			setBit(bitfield, 1);
 			setBit(bitfield, bitfieldSize + 2);
@@ -2463,7 +2585,7 @@ namespace synthese
 
 			// We print the bitfield
 			stringstream test;
-			for (unsigned int i=0; i<BITFIELD_SIZE; i++) {
+			for (unsigned int i=0; i<MAX_BITFIELD_SIZE; i++) {
 				test << boost::format("%02X") % bitfield[i];
 			}
 			return test.str();

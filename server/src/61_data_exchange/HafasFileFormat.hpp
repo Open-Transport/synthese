@@ -362,39 +362,68 @@ namespace synthese
 
 			// **** HAFAS EXPORTER ****
 
+			/**
+			 * The HAFAS exporter has the following parameters :
+			 *
+			 * - debug               : Debug mode (format: 0/1). If enabled, no file is generated, and the result of the crawling is output as HTML.
+			 * - network             : Name of the network to export.
+			 * - main_ds             : Name of the data source used to get business codes of the TransportNetwork and RollingStock objects.
+			 * - stops_ds            : Name of the data source used to get business codes of the StopArea objects.
+			 * - bitfield_start_date : Beginning of the bitfield. (format: 2013-01-13)
+			 * - bitfield_end_date   : End of the bitfield. Total bitfield length cannot exceed 380 days.
+			 * - timetable_name      : Name of the exported time table. Last line of the ECKDATEN file.
+			 * - ftp_host            : FTP Hostname
+			 * - ftp_port            : FTP Port (optional. Default: 21)
+			 * - ftp_user            : FTP Username
+			 * - ftp_pass            : FTP Password
+			 *
+			 * Example URL : http://synthese:8080/export/?SERVICE=ExportFunction&ff=Hafas&debug=1&network=tl&main_ds=TL&stops_ds=DIDOK&bitfield_start_date=2014-12-14&bitfield_end_date=2015-12-12&timetable_name=Fahrplan+2015+TL&ftp_host=ftp.elca.ch&ftp_port=21&ftp_user=admin&ftp_pass=foobar
+			 *
+			 */
 			class Exporter_: public impex::OneFileExporter<HafasFileFormat> {
 
 				public:
+
+					static const std::string FILE_BAHNHOF;
+					static const std::string FILE_KOORD;
+					static const std::string FILE_ZUGDAT;
+					static const std::string FILE_BITFIELD;
+					static const std::string FILE_ECKDATEN;
+					static const std::string FILE_ZUGART;
+					static const std::string FILE_UMSTEIGB;
+
 					static const std::string PARAMETER_DEBUG;
 					static const std::string PARAMETER_NETWORK_NAME;
+					static const std::string PARAMETER_MAIN_DATA_SOURCE;
+					static const std::string PARAMETER_STOPS_DATA_SOURCE;
+					static const std::string PARAMETER_BITFIELD_START_DATE;
+					static const std::string PARAMETER_BITFIELD_END_DATE;
+					static const std::string PARAMETER_TIMETABLE_NAME;
 					static const std::string PARAMETER_FTP_HOST;
 					static const std::string PARAMETER_FTP_PORT;
 					static const std::string PARAMETER_FTP_USER;
 					static const std::string PARAMETER_FTP_PASS;
-					static const std::string PARAMETER_BITFIELD_START_DATE;
-					static const std::string PARAMETER_BITFIELD_END_DATE;
 
 				private:
 					bool _debug;
 					std::string _networkName;
+					std::string _mainDataSource;
+					std::string _stopsDataSource;
+					std::string _bitfieldStartDate;
+					std::string _bitfieldEndDate;
+					std::string _timetableName;
 					std::string _ftpHost;
 					int _ftpPort;
 					std::string _ftpUser;
 					std::string _ftpPass;
-					std::string _bitfieldStartDate;
-					std::string _bitfieldEndDate;
 
 					mutable util::Env _env;
-
-					// TODO : Turn these into export parameters !
-					static const std::string DIDOK_DATA_SOURCE_NAME;
-					static const std::string TL_DATA_SOURCE_NAME;
 
 					static const std::string OUTWARD_TRIP_CODE;
 					static const std::string RETURN_TRIP_CODE;
 					static const std::string DAILY_SERVICE_CODE;
-					static const int DAYS_PER_BITFIELD;
-					static const unsigned int BITFIELD_SIZE;
+					static const std::string NO_DIDOK;
+					static const unsigned int MAX_BITFIELD_SIZE;
 
 					static const unsigned int COORDINATES_SYSTEM;
 
@@ -407,8 +436,9 @@ namespace synthese
 
 					// General helpers
 					static std::string getMandatoryString(const util::ParametersMap& map, std::string parameterName);
-					static std::string getCodesForDataSource(const impex::Importable* object, std::string dataSourceName, std::string defaultValue = std::string());
+					static std::string getCodesForDataSource(const impex::Importable* object, std::string dataSourceName, std::string defaultValue = std::string(), bool warnOnNotFound = true);
 					static std::string formatTime(boost::posix_time::time_duration time);
+					static std::string formatDate(boost::gregorian::date date);
 					static unsigned int strlenUtf8(std::string str);
 					static std::string firstChars(std::string str, unsigned int maxLen);
 
@@ -418,6 +448,18 @@ namespace synthese
 					static std::string computeBitfield(std::vector<Zug::CalendarUse> calendars, unsigned int bitfieldSize);
 					static void setBit(unsigned short bitfield [], int bit);
 
+					// Export configuration
+					typedef std::set<std::string> Zugarts;
+					struct ExportConfiguration {
+						Zugs zugs;
+						Bahnhofs bahnhofs;
+						BitFields bitfields;
+						Zugarts zugarts;
+						boost::gregorian::date startDate;
+						boost::gregorian::date endDate;
+						std::string timetableName;
+					};
+
 
 				public:
 					Exporter_(const impex::Export& export_);
@@ -426,11 +468,16 @@ namespace synthese
 					virtual util::ParametersMap getParametersMap() const;
 					virtual void setFromParametersMap(const util::ParametersMap& map);
 					virtual std::string getOutputMimeType() const { return "text/html"; }
-					boost::filesystem::path exportToHafasFormat(Bahnhofs _bahnhofs, Zugs _zugs, BitFields _bitfields) const;
-					virtual void exportToBahnhofFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const;
-					virtual void exportToKoordFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const;
-					virtual void exportToZugdatFile(boost::filesystem::path dir, string file, Zugs _zugs) const;
-					virtual void exportToBitfieldFile(boost::filesystem::path dir, string file, BitFields _bitfields) const;
+
+					// HAFAS Export
+					virtual boost::filesystem::path exportToHafasFormat(ExportConfiguration config) const;
+					virtual void exportToBahnhofFile(boost::filesystem::path dir, std::string file, Bahnhofs _bahnhofs) const;
+					virtual void exportToKoordFile(boost::filesystem::path dir, std::string file, Bahnhofs _bahnhofs) const;
+					virtual void exportToZugdatFile(boost::filesystem::path dir, std::string file, Zugs _zugs) const;
+					virtual void exportToBitfieldFile(boost::filesystem::path dir, std::string file, BitFields _bitfields) const;
+					virtual void exportToEckdatenFile(boost::filesystem::path dir, std::string file, boost::gregorian::date _startDate, boost::gregorian::date _endDate, std::string _timetableName) const;
+					virtual void exportToZugartFile(boost::filesystem::path dir, std::string file, Zugarts _zugarts) const;
+					virtual void exportToUmsteigbFile(boost::filesystem::path dir, std::string file) const;
 			};
 
 			// **** /HAFAS EXPORTER ****
