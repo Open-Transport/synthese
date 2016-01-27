@@ -41,6 +41,7 @@
 #include "ContinuousServiceTableSync.h"
 #include "OneFileExporter.hpp"
 #include "RequestException.h"
+#include "ZipWriter.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
@@ -2161,13 +2162,19 @@ namespace synthese
 
 				try {
 
-					boost::filesystem::path hafasExportFolder = exportToHafasFormat(config);
+					// We generate the HAFAS files
+					path hafasExportFolder = exportToHafasFormat(config);
 
-					// TODO : Zip folder to archive
+					// We zip them
+					path hafasZip = zipFolder(hafasExportFolder);
+
+					// We delete the temporary folder
+					remove_all(hafasExportFolder);
+
 					// TODO : Send archive to FTP server
 					// TODO : Delete temporary folder
 
-					os << "OK (" << hafasExportFolder.native() << ")";
+					os << "OK (" << hafasZip.native() << ")";
 
 				} catch (std::exception& e) {
 					// TODO : Remove temporary files
@@ -2180,9 +2187,9 @@ namespace synthese
 			os << flush;
 		}
 
-		boost::filesystem::path HafasFileFormat::Exporter_::exportToHafasFormat(ExportConfiguration config) const
+		path HafasFileFormat::Exporter_::exportToHafasFormat(ExportConfiguration config) const
 		{
-			boost::filesystem::path dir = createRandomFolder();
+			path dir = createRandomFolder();
 			exportToBahnhofFile(dir, FILE_BAHNHOF, config.bahnhofs);
 			exportToKoordFile(dir, FILE_KOORD, config.bahnhofs); // a.k.a. BFKOORD
 			exportToZugdatFile(dir, FILE_ZUGDAT, config.zugs); // a.k.a. FPLAN
@@ -2193,7 +2200,7 @@ namespace synthese
 			return dir;
 		}
 
-		void HafasFileFormat::Exporter_::exportToBahnhofFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const
+		void HafasFileFormat::Exporter_::exportToBahnhofFile(path dir, string file, Bahnhofs _bahnhofs) const
 		{
 			ofstream fileStream;
 			createFile(fileStream, dir, file);
@@ -2208,7 +2215,7 @@ namespace synthese
 			fileStream.close();
 		}
 
-		void HafasFileFormat::Exporter_::exportToKoordFile(boost::filesystem::path dir, string file, Bahnhofs _bahnhofs) const
+		void HafasFileFormat::Exporter_::exportToKoordFile(path dir, string file, Bahnhofs _bahnhofs) const
 		{
 			ofstream fileStream;
 			createFile(fileStream, dir, file);
@@ -2229,7 +2236,7 @@ namespace synthese
 			fileStream.close();
 		}
 
-		void HafasFileFormat::Exporter_::exportToZugdatFile(boost::filesystem::path dir, string file, Zugs _zugs) const
+		void HafasFileFormat::Exporter_::exportToZugdatFile(path dir, string file, Zugs _zugs) const
 		{
 			ofstream fileStream;
 			createFile(fileStream, dir, file);
@@ -2349,7 +2356,7 @@ namespace synthese
 			fileStream.close();
 		}
 
-		void HafasFileFormat::Exporter_::exportToBitfieldFile(boost::filesystem::path dir, string file, BitFields _bitfields) const
+		void HafasFileFormat::Exporter_::exportToBitfieldFile(path dir, string file, BitFields _bitfields) const
 		{
 			ofstream fileStream;
 			createFile(fileStream, dir, file);
@@ -2364,7 +2371,7 @@ namespace synthese
 			fileStream.close();
 		}
 
-		void HafasFileFormat::Exporter_::exportToEckdatenFile(boost::filesystem::path dir, string file, date _startDate, date _endDate, string _timetableName) const
+		void HafasFileFormat::Exporter_::exportToEckdatenFile(path dir, string file, date _startDate, date _endDate, string _timetableName) const
 		{
 			ofstream fileStream;
 			createFile(fileStream, dir, file);
@@ -2378,7 +2385,7 @@ namespace synthese
 			fileStream.close();
 		}
 
-		void HafasFileFormat::Exporter_::exportToZugartFile(boost::filesystem::path dir, string file, Zugarts _zugarts) const
+		void HafasFileFormat::Exporter_::exportToZugartFile(path dir, string file, Zugarts _zugarts) const
 		{
 			ofstream fileStream;
 			createFile(fileStream, dir, file);
@@ -2390,7 +2397,7 @@ namespace synthese
 			fileStream.close();
 		}
 
-		void HafasFileFormat::Exporter_::exportToUmsteigbFile(boost::filesystem::path dir, string file) const
+		void HafasFileFormat::Exporter_::exportToUmsteigbFile(path dir, string file) const
 		{
 			ofstream fileStream;
 			createFile(fileStream, dir, file);
@@ -2423,12 +2430,6 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		// HELPERS
 
-		void HafasFileFormat::Exporter_::printZugdatComment(ofstream& fileStream, int& pos, int& commentLine, string value) {
-			stringstream ss;
-			ss << "% " << value << " (" << (boost::format("%03d") % commentLine++) << ")";
-			printColumn(fileStream, pos, ss.str(), 59);
-		}
-
 		void HafasFileFormat::Exporter_::printColumn(ofstream& fileStream, int& pos, string value, int firstColumn, int lastColumn) {
 			if (firstColumn < pos) {
 				stringstream error;
@@ -2450,7 +2451,61 @@ namespace synthese
 			pos = 1;
 		}
 
-		void HafasFileFormat::Exporter_::createFile(ofstream& fileStream, boost::filesystem::path dir, string file) {
+		void HafasFileFormat::Exporter_::printZugdatComment(ofstream& fileStream, int& pos, int& commentLine, string value) {
+			stringstream ss;
+			ss << "% " << value << " (" << (boost::format("%03d") % commentLine++) << ")";
+			printColumn(fileStream, pos, ss.str(), 59);
+		}
+
+		path HafasFileFormat::Exporter_::createRandomFolder() {
+			stringstream ss;
+			ss << boost::uuids::random_generator()() << "/";
+			path dir(ss.str());
+			if (create_directory(dir)) {
+				return dir;
+			} else {
+				throw runtime_error("Unable to create folder " + dir.native() + " !");
+			}
+		}
+
+		path HafasFileFormat::Exporter_::zipFolder(path sourceFolder) {
+			// Folder /a/b/c/ would become file /a/b/c.zip
+
+			if (!is_directory(sourceFolder)) {
+				throw runtime_error(sourceFolder.native() + " is not a folder!");
+			}
+
+			path zipFile = sourceFolder.parent_path().replace_extension(".zip");
+
+			stringstream info;
+			info << "Zipping folder " << sourceFolder.native() << " to archive " << zipFile.native();
+			util::Log::GetInstance().info(info.str());
+
+			// We prepare the zip file...
+			ofstream zipStream;
+			zipStream.open(zipFile.c_str());
+			ZipWriter * zip = new ZipWriter(zipStream);
+
+			// We iterate through all the files and zip them
+			directory_iterator it(sourceFolder), eod;
+			BOOST_FOREACH(path const &file, std::make_pair(it, eod))
+			{
+			    ifstream fileStream;
+				fileStream.open(file.c_str());
+				stringstream fileContent;
+				fileContent << fileStream.rdbuf();
+				fileStream.close();
+				zip->Write(file.filename().c_str(), fileContent);
+			}
+
+			// We finalize the zip
+			zip->WriteDirectory();
+			zipStream.close();
+
+			return zipFile;
+		}
+
+		void HafasFileFormat::Exporter_::createFile(ofstream& fileStream, path dir, string file) {
 			fileStream.open((dir.native() + file).c_str());
 			if (!fileStream.is_open()) {
 				throw runtime_error((boost::format("Unable to open stream to file %1% !") % (dir.native() + file)).str());
@@ -2463,17 +2518,6 @@ namespace synthese
 				throw RequestException("Missing parameter " + parameterName);
 			}
 			return result;
-		}
-
-		boost::filesystem::path HafasFileFormat::Exporter_::createRandomFolder() {
-			stringstream ss;
-			ss << boost::uuids::random_generator()() << '/';
-			boost::filesystem::path dir(ss.str());
-			if (boost::filesystem::create_directory(dir)) {
-				return dir;
-			} else {
-				throw runtime_error("Unable to create folder " + dir.native() + " !");
-			}
 		}
 
 		string HafasFileFormat::Exporter_::getCodesForDataSource(const impex::Importable* object, string dataSourceName, string defaultValue, bool warnOnNotFound) {

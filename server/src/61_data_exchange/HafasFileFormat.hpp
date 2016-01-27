@@ -430,6 +430,7 @@ namespace synthese
 					// File generation helpers
 					static boost::filesystem::path createRandomFolder();
 					static void createFile(std::ofstream& fileStream, boost::filesystem::path dir, string file);
+					static boost::filesystem::path zipFolder(boost::filesystem::path sourceFolder);
 					static void printColumn(std::ofstream& fileStream, int& pos, std::string value, int firstColumn, int lastColumn = -1);
 					static void newLine(std::ofstream& fileStream, int& pos);
 					static void printZugdatComment(std::ofstream& fileStream, int& pos, int& commentLine, std::string value);
