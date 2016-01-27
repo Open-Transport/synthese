@@ -60,7 +60,6 @@ namespace synthese
 
 		void BroadcastPointsService::_setFromParametersMap(const ParametersMap& map)
 		{
-			/*
 			// Object id
 			RegistryKeyType bpId(
 				map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0)
@@ -69,9 +68,9 @@ namespace synthese
 			{
 				try
 				{
-					_bp = Env::GetOfficialEnv().get<BroadcastPoint>(bpId).get();
+					_bp = Env::GetOfficialEnv().get<CustomBroadcastPoint>(bpId).get();
 				}
-				catch (ObjectNotFoundException<BroadcastPoint>&)
+				catch (ObjectNotFoundException<CustomBroadcastPoint>&)
 				{
 					throw RequestException("No such broadcast point");
 				}
@@ -83,9 +82,9 @@ namespace synthese
 				);
 				if(parentId > 0) try
 				{
-					_parent = Env::GetOfficialEnv().get<BroadcastPoint>(parentId).get();
+					_parent = Env::GetOfficialEnv().get<CustomBroadcastPoint>(parentId).get();
 				}
-				catch (ObjectNotFoundException<BroadcastPoint>&)
+				catch (ObjectNotFoundException<CustomBroadcastPoint>&)
 				{
 					throw RequestException("No such parent broadcast point");
 				}
@@ -93,7 +92,7 @@ namespace synthese
 
 			// Recursive
 			_recursive = map.getDefault<bool>(PARAMETER_RECURSIVE, false);
-			*/
+
             Function::setOutputFormatFromMap(map, string());            
 		}
 
@@ -106,19 +105,18 @@ namespace synthese
 
 			ParametersMap map;
 
-			/*
-			// Single broadcast point export
 			if(_bp)
 			{
 				boost::shared_ptr<ParametersMap> bpPM(new ParametersMap);
-				// TODO _bp->toParametersMap(*bpPM, true);
+				_bp->toParametersMap(*bpPM, true);
+				bpPM->insert(std::string("type"), std::string("client_api_synthese"));
 				map.insert(TAG_BROADCAST_POINT, bpPM);
 			}
 			else // All broadcast points export
 			{
 				_exportLevel(map, _parent);
 			}
-			*/
+
             if (_outputFormat == MimeTypes::JSON)
             {
                 map.outputJSON(stream, "broadcast_points");
@@ -164,11 +162,10 @@ namespace synthese
 			const BroadcastPoint* parent
 		) const	{
 
-/*
 			// Loop on broadcast points
 			BOOST_FOREACH(
 				boost::shared_ptr<BroadcastPoint> bp,
-				BroadcastPointTableSync::Search(
+				CustomBroadcastPointTableSync::Search(
 					Env::GetOfficialEnv(),
 					string(),
 					parent ? parent->getKey() : RegistryKeyType(0)
@@ -176,6 +173,7 @@ namespace synthese
 			){
 				boost::shared_ptr<ParametersMap> bpPM(new ParametersMap);
 				bp->toParametersMap(*bpPM, true);
+				bpPM->insert(std::string("type"), std::string("client_api_synthese"));
 				pm.insert(TAG_BROADCAST_POINT, bpPM);
 
 				// If recursive export in the folder
@@ -184,6 +182,5 @@ namespace synthese
 					_exportLevel(*bpPM, bp.get());
 				}
 			}
-			*/
 		}
 }	}

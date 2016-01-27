@@ -41,7 +41,8 @@ namespace synthese
 			@ingroup m17
 		*/
 		class BroadcastPoint:
-			public util::FactoryBase<BroadcastPoint>
+			public util::FactoryBase<BroadcastPoint>, 
+			public virtual util::Registrable
 		{
 		public:
 			static const std::string VAR_BROADCAST_POINT_TYPE;
