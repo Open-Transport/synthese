@@ -81,6 +81,9 @@ namespace synthese
 			static const std::string PARAMETER_USE_WALK;
 			static const std::string PARAMETER_USE_PT;
 			static const std::string PARAMETER_USE_PUBLICBIKE;
+			static const std::string PARAMETER_USE_TAXI;
+			static const std::string PARAMETER_USE_CARPOOLING;
+			static const std::string PARAMETER_USE_CARLOCATION;
 			static const std::string PARAMETER_LOGGER_PATH;
 
 			static const std::string PARAMETER_ASTAR_FOR_WALK; //TODO : remove when algorithm is chosen
@@ -104,6 +107,9 @@ namespace synthese
 				bool										_useWalk;
 				bool										_usePt;
 				bool										_usePublicBike;
+				bool										_useTaxi;
+				bool										_useCarPooling;
+				bool										_useCarLocation;
 
 				road::RoadModule::ExtendedFetchPlaceResult	_departure_place;
 				road::RoadModule::ExtendedFetchPlaceResult	_arrival_place;
@@ -131,6 +137,14 @@ namespace synthese
 			void _serializeLatLong(boost::shared_ptr<geos::geom::Point> point, boost::shared_ptr<util::ParametersMap> parametersMap) const;
 
 			void _serializePTService(const graph::Service* service,	boost::shared_ptr<util::ParametersMap> parametersMap) const;
+
+			void _serializeTwoJourneys(
+				const graph::Journey& journey1,
+				const graph::Journey& journey2,
+				const geography::Place* departure,
+				const geography::Place* arrival,
+				boost::shared_ptr<util::ParametersMap> parametersMap
+			) const;
 
 			std::string _getRoadName(const road::Road* road) const;
 
