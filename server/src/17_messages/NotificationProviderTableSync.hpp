@@ -35,6 +35,64 @@ namespace synthese
 		{
 		public:
 			virtual ~NotificationProviderTableSync();
+
+			static SearchResult Search(
+				util::Env& env,
+				std::string name = std::string(),
+				boost::optional<util::RegistryKeyType> parentId = boost::optional<util::RegistryKeyType>(),
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				bool orderByName = true,
+				bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+
+			template<class OutputIterator>
+			static 
+				void Search(
+				util::Env& env,
+				OutputIterator result,
+				std::string name = std::string(),
+				boost::optional<util::RegistryKeyType> parentId = boost::optional<util::RegistryKeyType>(),
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				bool orderByName = true,
+				bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			)
+			{
+				db::SelectQuery<NotificationProviderTableSync> query;
+				if (!name.empty())
+				{
+					query.addWhereField(SimpleObjectFieldDefinition<Name>::FIELD.name, name, db::ComposedExpression::OP_LIKE);
+				}
+				if(parentId)
+				{
+					query.addWhereField(
+						ComplexObjectFieldDefinition<NotificationProviderTreeNode>::FIELDS[1].name,
+						*parentId,
+						db::ComposedExpression::OP_EQ
+					);
+				}
+				if (orderByName)
+				{
+					query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
+				}
+				if (number)
+				{
+					query.setNumber(*number + 1);
+				}
+				if (first > 0)
+				{
+					query.setFirst(first);
+				}
+
+				SearchResult searchResult =
+					LoadFromQuery(query.toString(), env, linkLevel);
+				std::copy(searchResult.begin(), searchResult.end(), result);
+		}			
+			
 		};
 
 	} /* namespace messages */

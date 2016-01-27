@@ -23,7 +23,6 @@
 #include "CustomBroadcastPointTableSync.hpp"
 
 #include "DBResult.hpp"
-#include "SelectQuery.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -102,33 +101,12 @@ namespace synthese
 			bool orderByName,
 			bool raisingOrder,
 			LinkLevel linkLevel
-		){
-			SelectQuery<CustomBroadcastPointTableSync> query;
-			if (!name.empty())
-			{
-				query.addWhereField(SimpleObjectFieldDefinition<Name>::FIELD.name, name, ComposedExpression::OP_LIKE);
-			}
-			if(parentId)
-			{
-				query.addWhereField(
-					ComplexObjectFieldDefinition<CustomBroadcastPointTreeNode>::FIELDS[1].name,
-					*parentId,
-					ComposedExpression::OP_EQ
-				);
-			}
-			if (orderByName)
-			{
-				query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
-			}
-			if (number)
-			{
-				query.setNumber(*number + 1);
-			}
-			if (first > 0)
-			{
-				query.setFirst(first);
-			}
-
-			return LoadFromQuery(query, env, linkLevel);
+		)
+		{
+			CustomBroadcastPointTableSync::SearchResult result;
+			CustomBroadcastPointTableSync::Search(env, std::back_inserter(result),
+										  name, parentId, first, number, orderByName, raisingOrder, linkLevel);
+			return result;
 		}
+
 }	}

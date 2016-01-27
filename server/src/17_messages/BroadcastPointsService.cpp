@@ -25,6 +25,7 @@
 #include "BroadcastPointsService.hpp"
 
 #include "CustomBroadcastPointTableSync.hpp"
+#include "NotificationProviderTableSync.hpp"
 #include "RequestException.h"
 #include "Request.h"
 
@@ -161,19 +162,33 @@ namespace synthese
 			util::ParametersMap& pm,
 			const BroadcastPoint* parent
 		) const	{
+			std::vector<boost::shared_ptr<BroadcastPoint> > broadcastPoints;
+			CustomBroadcastPointTableSync::Search(
+				Env::GetOfficialEnv(),
+				std::back_inserter(broadcastPoints),
+				string(),
+				parent ? parent->getKey() : RegistryKeyType(0)
+			);
+			NotificationProviderTableSync::Search(
+				Env::GetOfficialEnv(),
+				std::back_inserter(broadcastPoints),
+				string(),
+				parent ? parent->getKey() : RegistryKeyType(0)
+			);
 
 			// Loop on broadcast points
 			BOOST_FOREACH(
 				boost::shared_ptr<BroadcastPoint> bp,
-				CustomBroadcastPointTableSync::Search(
-					Env::GetOfficialEnv(),
-					string(),
-					parent ? parent->getKey() : RegistryKeyType(0)
-				)
+				broadcastPoints
 			){
 				boost::shared_ptr<ParametersMap> bpPM(new ParametersMap);
 				bp->toParametersMap(*bpPM, true);
-				bpPM->insert(std::string("type"), std::string("client_api_synthese"));
+				if (dynamic_cast<CustomBroadcastPoint*>(bp.get())) {
+					bpPM->insert(std::string("type"), std::string("client_api_synthese"));
+				} else if (dynamic_cast<NotificationProvider*>(bp.get())) {
+					bpPM->insert(std::string("type"), 
+						static_cast<NotificationProvider*>(bp.get())->get<NotificationChannelKey>());
+				}
 				pm.insert(TAG_BROADCAST_POINT, bpPM);
 
 				// If recursive export in the folder

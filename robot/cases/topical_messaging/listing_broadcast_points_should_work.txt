@@ -16,7 +16,13 @@ Listing A Unique "Client API SYNTHESE" Broadcast Point Should Work
   ${broadcast_point_id}=  Create Client API SYNTHESE Broadcast Point  bp_api_0
   ${broadcast_points_xml}=  List Broadcast Points
   Broadcast Points List ${broadcast_points_xml} Contains 1 Elements
-  Broadcast Points List Contains Element With Id  ${broadcast_points_xml}  ${broadcast_point_id}
+  Broadcast Points List Contains Element With Id And Type  ${broadcast_points_xml}  ${broadcast_point_id}  client_api_synthese
+
+Listing A Unique "Email" Broadcast Point Should Work
+  ${broadcast_point_id}=  Create Email Broadcast Point  bp_email_0
+  ${broadcast_points_xml}=  List Broadcast Points
+  Broadcast Points List ${broadcast_points_xml} Contains 1 Elements
+  Broadcast Points List Contains Element With Id And Type  ${broadcast_points_xml}  ${broadcast_point_id}  Email
 
 *** Keywords ***
 

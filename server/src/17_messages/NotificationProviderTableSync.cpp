@@ -21,20 +21,22 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <NotificationProviderTableSync.hpp>
+#include "NotificationProviderTableSync.hpp"
 
-#include <DBTableSync.hpp>
-#include <DBTableSyncTemplate.hpp>
-#include <FactorableTemplate.h>
-#include <Field.hpp>
+#include "DBTableSync.hpp"
+#include "DBTableSyncTemplate.hpp"
+#include "FactorableTemplate.h"
+#include "Field.hpp"
 
-#include <Session.h>
-#include <Registry.h>
+#include "Session.h"
+#include "Registry.h"
 
 #include <string>
 
 namespace synthese
 {
+	using namespace util;
+	using namespace db;
 	using namespace messages;
 
 	namespace util
@@ -100,6 +102,24 @@ namespace synthese
 	{
 		NotificationProviderTableSync::~NotificationProviderTableSync()
 		{ }
+
+		NotificationProviderTableSync::SearchResult 
+		NotificationProviderTableSync::Search(
+			Env& env,
+			std::string name,
+			boost::optional<util::RegistryKeyType> parentId,
+			int first /*= 0*/,
+			boost::optional<std::size_t> number,
+			bool orderByName,
+			bool raisingOrder,
+			LinkLevel linkLevel
+		)
+		{
+			NotificationProviderTableSync::SearchResult result;
+			NotificationProviderTableSync::Search(env, std::back_inserter(result),
+										  name, parentId, first, number, orderByName, raisingOrder, linkLevel);
+			return result;
+		}
 
 	} /* namespace messages */
 } /* namespace synthese */

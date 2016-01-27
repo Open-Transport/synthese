@@ -247,6 +247,12 @@ Create Client API SYNTHESE Broadcast Point
   ${broadcast_point_id}=  Get Element Attribute  source=${content}  name=id
   [Return]  ${broadcast_point_id}
 
+Create Email Broadcast Point
+  [Arguments]  ${name}
+  ${content}=  Create Synthese Object  ${NOTIFICATION_PROVIDERS_TABLE_ID}  field_name\=${name}  field_channel\=Email
+  ${broadcast_point_id}=  Get Element Attribute  source=${content}  name=id
+  [Return]  ${broadcast_point_id}
+
 
 #################################################
 ###        Query broadcast points             ###
@@ -264,7 +270,7 @@ Broadcast Points List ${broadcast_points_xml} Contains ${broadcast_points_count}
   ${actual_broadcast_points_count}=  Get Element Count  ${broadcast_points_xml}  xpath=broadcast_point
   Should Be Equal As Integers  ${actual_broadcast_points_count}  ${broadcast_points_count}
 
-Broadcast Points List Contains Element With Id
-  [Arguments]  ${broadcast_points_xml}  ${broadcast_point_id}
-  Element Should Exist  ${broadcast_points_xml}  xpath=//broadcast_point[@id = ${broadcast_point_id}]
+Broadcast Points List Contains Element With Id And Type
+  [Arguments]  ${broadcast_points_xml}  ${broadcast_point_id}  ${broadcast_point_type}
+  Element Should Exist  ${broadcast_points_xml}  xpath=//broadcast_point[@id = ${broadcast_point_id}][@type = '${broadcast_point_type}']
 
