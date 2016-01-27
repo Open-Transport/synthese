@@ -24,6 +24,8 @@ BroadcastPoint.cpp
 BroadcastPoint.hpp
 BroadcastPointAlarmRecipient.cpp
 BroadcastPointAlarmRecipient.hpp
+BroadcastPointsService.hpp
+BroadcastPointsService.cpp
 ClearAllBroadcastCachesAction.cpp
 ClearAllBroadcastCachesAction.hpp
 CustomBroadcastPoint.cpp

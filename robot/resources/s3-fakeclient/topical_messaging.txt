@@ -236,3 +236,20 @@ Convert Scenario From XML To Json ${scenario_xml}
     Log   ${scenario_json}
     [Return]  ${scenario_json}
 
+
+#################################################
+###        Query broadcast points             ###
+#################################################
+
+List Broadcast Points
+  ${response}=  Call Synthese Service  broadcast_points  of\=xml
+  ${utf8_content}  Decode Bytes To String  ${response.content}  UTF-8  strict
+  ${broadcast_points_xml}=  Parse XML  ${utf8_content}
+  Log  ${utf8_content}
+  [Return]  ${broadcast_points_xml}
+
+
+Broadcast Points List ${broadcast_points_xml} Contains ${broadcast_points_count} Elements
+    ${actual_broadcast_points_count}=  Get Element Count  ${broadcast_points_xml}  xpath=broadcast_point
+    Should Be Equal As Integers  ${actual_broadcast_points_count}  ${broadcast_points_count}
+

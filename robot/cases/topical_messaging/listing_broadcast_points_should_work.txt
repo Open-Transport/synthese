@@ -1,0 +1,19 @@
+*** Settings ***
+Resource          ../../resources/s3-fakeclient/topical_messaging.txt
+Resource          ../../resources/data/topical_messaging_data.txt
+Test Setup        Run Keywords  On Node 0  AND  With Test Data  ${DB}  AND  Start Synthese On Node 0
+Test Teardown     Stop Synthese On Node 0
+
+
+*** Test Cases ***
+
+Listing No Broadcast Point Should Work
+  ${broadcast_points_xml}=  List Broadcast Points
+  Broadcast Points List ${broadcast_points_xml} Contains 0 Elements
+
+
+
+*** Keywords ***
+
+    
+
