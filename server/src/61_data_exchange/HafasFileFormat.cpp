@@ -54,6 +54,9 @@
 #include <fstream>
 #include <cstdlib>
 #include <string>
+#include <iostream>
+#include <cstdio>
+#include <memory>
 #include <geos/geom/Point.h>
 #include <geos/opDistance.h>
 
@@ -112,7 +115,6 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_READ_WAYBACK = "read_way_back";
 		const string HafasFileFormat::Importer_::PARAMETER_CALENDAR_DEFAULT_CODE = "calendar_default_code";
 		const string HafasFileFormat::Importer_::PARAMETER_2015_CARPOSTAL_FORMAT = "format_carpostal_2015";
-
 	}
 
 	namespace impex
@@ -1817,6 +1819,7 @@ namespace synthese
 		const string HafasFileFormat::Exporter_::PARAMETER_FTP_PORT = "ftp_port";
 		const string HafasFileFormat::Exporter_::PARAMETER_FTP_USER = "ftp_user";
 		const string HafasFileFormat::Exporter_::PARAMETER_FTP_PASS = "ftp_pass";
+		const string HafasFileFormat::Exporter_::PARAMETER_FTP_PATH = "ftp_path";
 
 		const string HafasFileFormat::Exporter_::OUTWARD_TRIP_CODE = "H";
 		const string HafasFileFormat::Exporter_::RETURN_TRIP_CODE = "R";
@@ -1843,6 +1846,7 @@ namespace synthese
 			_ftpPort = map.getDefault<int>(PARAMETER_FTP_PORT, 21);
 			_ftpUser = getMandatoryString(map, PARAMETER_FTP_USER);
 			_ftpPass = getMandatoryString(map, PARAMETER_FTP_PASS);
+			_ftpPath = getMandatoryString(map, PARAMETER_FTP_PATH);
 
 			_bitfieldStartDate = getMandatoryString(map, PARAMETER_BITFIELD_START_DATE);
 			_bitfieldEndDate = getMandatoryString(map, PARAMETER_BITFIELD_END_DATE);
@@ -2145,6 +2149,7 @@ namespace synthese
 			html << "</body></html>\n" << flush;
 
 			if (_debug) {
+
 				// In debug mode, we don't export anything
 				os << html.str();
 
@@ -2171,20 +2176,23 @@ namespace synthese
 					// We delete the temporary folder
 					remove_all(hafasExportFolder);
 
-					// TODO : Send archive to FTP server
-					// TODO : Delete temporary folder
+					// We send archive to FTP server
+					ftpUpload(_ftpHost, _ftpPort, _ftpUser, _ftpPass, _ftpPath, hafasZip);
 
-					os << "OK (" << hafasZip.native() << ")";
+					// We delete the archive
+					remove(hafasZip);
+
+					os << "OK" << flush;
 
 				} catch (std::exception& e) {
-					// TODO : Remove temporary files
+
 					os << e.what() << flush;
 					return;
+
 				}
 
 			}
 
-			os << flush;
 		}
 
 		path HafasFileFormat::Exporter_::exportToHafasFormat(ExportConfiguration config) const
@@ -2457,10 +2465,14 @@ namespace synthese
 			printColumn(fileStream, pos, ss.str(), 59);
 		}
 
-		path HafasFileFormat::Exporter_::createRandomFolder() {
+		string HafasFileFormat::Exporter_::getGuid() {
 			stringstream ss;
-			ss << boost::uuids::random_generator()() << "/";
-			path dir(ss.str());
+			ss << boost::uuids::random_generator()();
+			return ss.str();
+		}
+
+		path HafasFileFormat::Exporter_::createRandomFolder() {
+			path dir(getGuid() + "/");
 			if (create_directory(dir)) {
 				return dir;
 			} else {
@@ -2488,9 +2500,9 @@ namespace synthese
 
 			// We iterate through all the files and zip them
 			directory_iterator it(sourceFolder), eod;
-			BOOST_FOREACH(path const &file, std::make_pair(it, eod))
+			BOOST_FOREACH(path const &file, make_pair(it, eod))
 			{
-			    ifstream fileStream;
+				ifstream fileStream;
 				fileStream.open(file.c_str());
 				stringstream fileContent;
 				fileContent << fileStream.rdbuf();
@@ -2509,6 +2521,34 @@ namespace synthese
 			fileStream.open((dir.native() + file).c_str());
 			if (!fileStream.is_open()) {
 				throw runtime_error((boost::format("Unable to open stream to file %1% !") % (dir.native() + file)).str());
+			}
+		}
+
+		void HafasFileFormat::Exporter_::ftpUpload(string host, int port, string user, string pass, string target, path file) {
+
+			stringstream command;
+			path temporaryLogFile("ftp_log_" + getGuid());
+			command << "curl -T " << file.filename().c_str() << " -sS ftp://" << user << ":" << pass << "@" << host << ":" << port << target << " 2> " << temporaryLogFile.native();
+			if (!std::system(NULL)) {
+				throw runtime_error("You don't have the rights to execute this command!");
+			}
+
+			stringstream info;
+			info << "Uploading file " << file.native() << " to FTP server " << host << ":" << port << " using account " << user;
+			util::Log::GetInstance().info(info.str());
+
+			// We run the command
+			int returnCode = std::system(command.str().c_str());
+
+			// We load the log of the command and delete it
+			ifstream ifs(temporaryLogFile.c_str());
+			string output((istreambuf_iterator<char>(ifs)), (istreambuf_iterator<char>()));
+			ifs.close();
+			remove(temporaryLogFile);
+
+			// If there was an error, we throw the log
+			if (returnCode != 0) {
+				throw runtime_error("FTP Upload error : " + output);
 			}
 		}
 

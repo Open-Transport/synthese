@@ -376,8 +376,9 @@ namespace synthese
 			 * - ftp_port            : FTP Port (optional. Default: 21)
 			 * - ftp_user            : FTP Username
 			 * - ftp_pass            : FTP Password
+			 * - ftp_path            : Towards with path upload the archive.
 			 *
-			 * Example URL : http://synthese:8080/export/?SERVICE=ExportFunction&ff=Hafas&debug=1&network=tl&main_ds=TL&stops_ds=DIDOK&bitfield_start_date=2014-12-14&bitfield_end_date=2015-12-12&timetable_name=Fahrplan+2015+TL&ftp_host=ftp.elca.ch&ftp_port=21&ftp_user=admin&ftp_pass=foobar
+			 * Example URL : http://synthese:8080/export/?SERVICE=ExportFunction&ff=Hafas&debug=1&network=tl&main_ds=TL&stops_ds=DIDOK&bitfield_start_date=2014-12-14&bitfield_end_date=2015-12-12&timetable_name=Fahrplan+2015+TL&ftp_host=localhost&ftp_port=21&ftp_user=vagrant&ftp_pass=vagrant&ftp_path=/Desktop/hafas.zip
 			 *
 			 */
 			class Exporter_: public impex::OneFileExporter<HafasFileFormat> {
@@ -403,6 +404,7 @@ namespace synthese
 					static const std::string PARAMETER_FTP_PORT;
 					static const std::string PARAMETER_FTP_USER;
 					static const std::string PARAMETER_FTP_PASS;
+					static const std::string PARAMETER_FTP_PATH;
 
 				private:
 					bool _debug;
@@ -416,6 +418,7 @@ namespace synthese
 					int _ftpPort;
 					std::string _ftpUser;
 					std::string _ftpPass;
+					std::string _ftpPath;
 
 					mutable util::Env _env;
 
@@ -442,6 +445,8 @@ namespace synthese
 					static std::string formatDate(boost::gregorian::date date);
 					static unsigned int strlenUtf8(std::string str);
 					static std::string firstChars(std::string str, unsigned int maxLen);
+					static void ftpUpload(std::string host, int port, std::string user, std::string pass, std::string path, boost::filesystem::path file);
+					static string getGuid();
 
 					// Bit field helpers
 					typedef std::map<std::string, std::string> BitFields;
