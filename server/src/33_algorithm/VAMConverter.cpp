@@ -125,14 +125,6 @@ namespace synthese
 				);
 				iso.integralSearch(vam, optional<size_t>(), optional<time_duration>());
 
-				/*
-				std::cout << "VAMConverter::run : intermediate results " << std::endl;
-				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, vam.getMap())
-				{
-					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
-				}
-				*/
-
 				// Include physical stops from originVam into result of integral search
 				// (cos not taken into account in returned journey vector).
 				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, vam.getMap())
@@ -153,20 +145,27 @@ namespace synthese
 					);
 					BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam2.getMap())
 					{
-						if (it.second.approachDistance + itps.second.approachDistance <=
-							_accessParameters.getMaxApproachDistance())
+						double approachDistance = it.second.approachDistance + itps.second.approachDistance;
+
+						if (approachDistance <=	_accessParameters.getMaxApproachDistance())
 						{
-							result.insert(
-								it.first,
-								VertexAccess(
-									it.second.approachTime + itps.second.approachTime +
-									(	direction == DEPARTURE_TO_ARRIVAL ?
-										vertex->getHub()->getTransferDelay(*vertex, *it.first) :
-										vertex->getHub()->getTransferDelay(*it.first, *vertex)
-									),
-									it.second.approachDistance+ itps.second.approachDistance,
-									itps.second.approachJourney
-							)	);
+							boost::posix_time::time_duration approachTime =
+								it.second.approachTime + itps.second.approachTime +
+								(	direction == DEPARTURE_TO_ARRIVAL ?
+									vertex->getHub()->getTransferDelay(*vertex, *it.first) :
+									vertex->getHub()->getTransferDelay(*it.first, *vertex)
+								);
+							Journey approachJourney(itps.second.approachJourney);
+							if(DEPARTURE_TO_ARRIVAL == direction)
+							{
+								approachJourney.append(it.second.approachJourney);
+							}
+							else
+							{
+								approachJourney.prepend(it.second.approachJourney);
+							}
+
+							result.insert(it.first, VertexAccess(approachTime, approachDistance, approachJourney));
 						}
 					}
 				}
@@ -176,25 +175,20 @@ namespace synthese
 				BOOST_FOREACH(const JourneysResult::ResultSet::value_type& it, resultJourneys.getJourneys())
 				{
 					JourneysResult::ResultSet::key_type oj(it.first);
+					Vertex* startVertex = (direction == DEPARTURE_TO_ARRIVAL) ?
+						oj->getOrigin()->getFromVertex() :
+						oj->getDestination()->getFromVertex();
+					VertexAccess startVertexAccess = vam.getVertexAccess(startVertex);
 
 					// Store each reached physical stop with full approach time addition :
 					//	- approach time in departure place
 					//	- duration of the approach journey
 					//	- transfer delay between approach journey end address and physical stop
 					posix_time::time_duration commonApproachTime(
-						vam.getVertexAccess(
-							direction == DEPARTURE_TO_ARRIVAL ?
-							oj->getOrigin()->getFromVertex() :
-							oj->getDestination()->getFromVertex()
-						).approachTime + minutes(static_cast<long>(ceil(oj->getDuration(false).total_seconds() / double(60))))
+						startVertexAccess.approachTime + minutes(static_cast<long>(ceil(oj->getDuration(false).total_seconds() / double(60))))
 					);
-					double commonApproachDistance(
-						vam.getVertexAccess(
-							direction == DEPARTURE_TO_ARRIVAL ?
-							oj->getOrigin()->getFromVertex() :
-							oj->getDestination()->getFromVertex()
-						).approachDistance + oj->getDistance ()
-					);
+					double commonApproachDistance(startVertexAccess.approachDistance + oj->getDistance());
+
 					VertexAccessMap vam2;
 					const Hub* cp(
 						(	direction == DEPARTURE_TO_ARRIVAL ?
@@ -216,23 +210,33 @@ namespace synthese
 					);
 					BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam2.getMap())
 					{
-						if (it.second.approachDistance + commonApproachDistance <=
-							_accessParameters.getMaxApproachDistance())
+						double approachDistance = it.second.approachDistance + commonApproachDistance;
+
+						if (approachDistance <= _accessParameters.getMaxApproachDistance())
 						{
-							result.insert(
-								it.first,
-								VertexAccess(
-									commonApproachTime + (
-										(&v == it.first) ?
-										seconds(0) :
-										(
-											direction == DEPARTURE_TO_ARRIVAL ?
-											cp->getTransferDelay(v, *it.first) :
-											cp->getTransferDelay(*it.first, v)
-									)	),
-									commonApproachDistance + it.second.approachDistance,
-									*oj
-							)	);
+							boost::posix_time::time_duration approachTime =
+								commonApproachTime +
+								(
+									(&v == it.first) ?
+									seconds(0) :
+									(
+										direction == DEPARTURE_TO_ARRIVAL ?
+										cp->getTransferDelay(v, *it.first) :
+										cp->getTransferDelay(*it.first, v)
+									)
+								);
+							Journey approachJourney(startVertexAccess.approachJourney);
+
+							if(DEPARTURE_TO_ARRIVAL == direction)
+							{
+								approachJourney.append(*oj);
+							}
+							else
+							{
+								approachJourney.prepend(*oj);
+							}
+
+							result.insert(it.first, VertexAccess(approachTime, approachDistance, approachJourney));
 						}
 					}
 				}

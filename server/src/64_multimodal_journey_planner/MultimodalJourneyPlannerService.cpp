@@ -62,6 +62,7 @@
 #include "VAMConverter.hpp"
 #include "TimeSlotRoutePlanner.h"
 #include "RollingStock.hpp"
+#include "Destination.hpp"
 // OVE!!!
 
 #include <boost/lexical_cast.hpp>
@@ -1403,8 +1404,8 @@ namespace synthese
 					graph::USER_PEDESTRIAN,			// user class code
 					false,							// DRT only
 					false,							// without DRT
-					_useWalk ? 700 : 0,				// max approach distance
-					boost::posix_time::minutes(10),	// max approach time
+					_useWalk ? 500 : 0,				// max approach distance
+					boost::posix_time::minutes(8),	// max approach time
 					_useWalk ? 1.111 : 0.0			// approach speed
 				);
 
@@ -1412,8 +1413,8 @@ namespace synthese
 					graph::USER_BIKE,				// user class code
 					false,							// DRT only
 					false,							// without DRT
-					4000,							// max approach distance
-					boost::posix_time::minutes(25),	// max approach time
+					3000,							// max approach distance
+					boost::posix_time::minutes(18),	// max approach time
 					4.167							// approach speed
 				);
 
@@ -1421,8 +1422,8 @@ namespace synthese
 					graph::USER_PEDESTRIAN,			// user class code
 					false,							// DRT only
 					false,							// without DRT
-					_useWalk ? 4700 : 0,			// max approach distance
-					boost::posix_time::minutes(35),	// max approach time
+					_useWalk ? 3500 : 3000,			// max approach distance
+					_useWalk ? boost::posix_time::minutes(26) : boost::posix_time::minutes(18),	// max approach time
 					_useWalk ? 1.111 : 0.0,			// approach speed
 					_maxTransportConnectionCount	// max transport connection count (ie : max number of used transport services - 1)
 				);
@@ -1459,22 +1460,30 @@ namespace synthese
 				std::cout << "departurePTStopsUsingWalkVam has " << departurePTStopsUsingWalkVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, departurePTStopsUsingWalkVam.getMap())
 				{
-					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = "
+							  << vamElement.second.approachTime << "/" << vamElement.second.approachDistance
+							  << "/" << vamElement.second.approachJourney.getServiceUses().size() << std::endl;
 				}
 				std::cout << "arrivalPTStopsUsingWalkVam has " << departurePTStopsUsingWalkVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, arrivalPTStopsUsingWalkVam.getMap())
 				{
-					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = "
+							  << vamElement.second.approachTime << "/" << vamElement.second.approachDistance
+							  << "/" << vamElement.second.approachJourney.getServiceUses().size() << std::endl;
 				}
 				std::cout << "departureBikeStationsUsingWalkVam has " << departureBikeStationsUsingWalkVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, departureBikeStationsUsingWalkVam.getMap())
 				{
-					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = "
+							  << vamElement.second.approachTime << "/" << vamElement.second.approachDistance
+							  << "/" << vamElement.second.approachJourney.getServiceUses().size() << std::endl;
 				}
 				std::cout << "arrivalBikeStationsUsingWalkVam has " << arrivalBikeStationsUsingWalkVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, arrivalBikeStationsUsingWalkVam.getMap())
 				{
-					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = "
+							  << vamElement.second.approachTime << "/" << vamElement.second.approachDistance
+							  << "/" << vamElement.second.approachJourney.getServiceUses().size() << std::endl;
 				}
 
 				// If walk is allowed, gather the stop points and the bike stations reachable from departure and arrival
@@ -1539,7 +1548,6 @@ namespace synthese
 						algorithm::DEPARTURE_TO_ARRIVAL
 					);
 
-					/*
 					std::cout << "fullArrivalBikeStationsUsingWalkVam" << std::endl;
 
 					// Gather all reachable bike stations from arrival using walk only
@@ -1548,41 +1556,46 @@ namespace synthese
 						departureBikeStationsUsingWalkVam,
 						algorithm::ARRIVAL_TO_DEPARTURE
 					);
-					*/
 
 					// Update VAMs
 					departureBikeStationsUsingWalkVam = fullDepartureBikeStationsUsingWalkVam;
-					//arrivalBikeStationsUsingWalkVam = fullArrivalBikeStationsUsingWalkVam;
+					arrivalBikeStationsUsingWalkVam = fullArrivalBikeStationsUsingWalkVam;
 				}
 
 				std::cout << "AFTER PEDESTRIAN VAM EXTENSION : " << std::endl;
 				std::cout << "departurePTStopsUsingWalkVam has " << departurePTStopsUsingWalkVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, departurePTStopsUsingWalkVam.getMap())
 				{
-					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = "
+							  << vamElement.second.approachTime << "/" << vamElement.second.approachDistance
+							  << "/" << vamElement.second.approachJourney.getServiceUses().size() << std::endl;
 				}
 				std::cout << "arrivalPTStopsUsingWalkVam has " << departurePTStopsUsingWalkVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, arrivalPTStopsUsingWalkVam.getMap())
 				{
-					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = "
+							  << vamElement.second.approachTime << "/" << vamElement.second.approachDistance
+							  << "/" << vamElement.second.approachJourney.getServiceUses().size() << std::endl;
 				}
 				std::cout << "departureBikeStationsUsingWalkVam has " << departureBikeStationsUsingWalkVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, departureBikeStationsUsingWalkVam.getMap())
 				{
-					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = "
+							  << vamElement.second.approachTime << "/" << vamElement.second.approachDistance
+							  << "/" << vamElement.second.approachJourney.getServiceUses().size() << std::endl;
 				}
-				/*
 				std::cout << "arrivalBikeStationsUsingWalkVam has " << arrivalBikeStationsUsingWalkVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, arrivalBikeStationsUsingWalkVam.getMap())
 				{
-					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = "
+							  << vamElement.second.approachTime << "/" << vamElement.second.approachDistance
+							  << "/" << vamElement.second.approachJourney.getServiceUses().size() << std::endl;
 				}
-				*/
 
 				// If bike is allowed, compute the list of bike stations reachable from departure and arrival then gather the stop points reachable from those bike stations
 				if(0 < bikeAccessParameters.getApproachSpeed())
 				{
-					// OVE!!! : This code is wrong, we cannot use a simple VAMConverter because it does not take into account the public bike networks
+					// TODO : This code is wrong, we cannot use a simple VAMConverter because it does not differentiate the public bike networks
 					// Use it temporarily to get results, then move to proper implementation
 
 					// Bike stations
@@ -1599,31 +1612,27 @@ namespace synthese
 						arrival
 					);
 
-					// OVE!!! : bike stations VAM contain only bike stations, which do not belong to road::RoadModule::GRAPH_ID and are discarded
-					graph::VertexAccessMap crossingsAroundDepartureBikeStationsVam2 =
+					// Convert the VAM of bike stations into a VAM of crossings (bike stations do not belong to road::RoadModule::GRAPH_ID and would be discarded by the algorithm)
+					graph::VertexAccessMap crossingsAroundDepartureBikeStationsUsingWalkVam =
 						_buildCrossingVAMFromBikeStationVAM(departureBikeStationsUsingWalkVam, pedestrianAccessParameters);
 
 					// Gather the bike stations reachable using bike from the bike stations previously reached from departure
 					departureBikeStationsUsingBikeVam = extenderToBikeStations.run(
-						//departureBikeStationsUsingWalkVam,
-						crossingsAroundDepartureBikeStationsVam2,
+						crossingsAroundDepartureBikeStationsUsingWalkVam,
 						arrivalBikeStationsUsingWalkVam,
 						algorithm::DEPARTURE_TO_ARRIVAL
 					);
 
-					/*
-					// OVE!!! : bike stations VAM contain only bike stations, which do not belong to road::RoadModule::GRAPH_ID and are discarded
-					graph::VertexAccessMap crossingsAroundArrivalBikeStationsVam2 =
+					// Convert the VAM of bike stations into a VAM of crossings (bike stations do not belong to road::RoadModule::GRAPH_ID and would be discarded by the algorithm)
+					graph::VertexAccessMap crossingsAroundArrivalBikeStationsUsingWalkVam =
 						_buildCrossingVAMFromBikeStationVAM(arrivalBikeStationsUsingWalkVam, pedestrianAccessParameters);
 
 					// Gather the bike stations reachable using bike from the bike stations previously reached from arrival
 					arrivalBikeStationsUsingBikeVam = extenderToBikeStations.run(
-						//arrivalBikeStationsUsingWalkVam,
-						crossingsAroundArrivalBikeStationsVam2,
+						crossingsAroundArrivalBikeStationsUsingWalkVam,
 						departureBikeStationsUsingWalkVam,
 						algorithm::ARRIVAL_TO_DEPARTURE
 					);
-					*/
 
 					// Stop points
 					algorithm::VAMConverter extenderToPhysicalStops(
@@ -1639,38 +1648,35 @@ namespace synthese
 						arrival
 					);
 
-					// OVE!!! : bike stations VAM contain only bike stations, which do not belong to road::RoadModule::GRAPH_ID and are discarded
-					graph::VertexAccessMap crossingsAroundDepartureBikeStationsVam =
+					// Convert the VAM of bike stations into a VAM of crossings (bike stations do not belong to road::RoadModule::GRAPH_ID and would be discarded by the algorithm)
+					graph::VertexAccessMap crossingsAroundDepartureBikeStationsUsingBikeVam =
 						_buildCrossingVAMFromBikeStationVAM(departureBikeStationsUsingBikeVam, pedestrianAccessParameters);
 
-					std::cout << "crossingsAroundDepartureBikeStationsVam has " << crossingsAroundDepartureBikeStationsVam.getMap().size() << " elements" << std::endl;
-					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, crossingsAroundDepartureBikeStationsVam.getMap())
+					std::cout << "crossingsAroundDepartureBikeStationsUsingBikeVam has " << crossingsAroundDepartureBikeStationsUsingBikeVam.getMap().size() << " elements" << std::endl;
+					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, crossingsAroundDepartureBikeStationsUsingBikeVam.getMap())
 					{
-						std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+						std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = "
+								  << vamElement.second.approachTime << "/" << vamElement.second.approachDistance
+								  << "/" << vamElement.second.approachJourney.getServiceUses().size() << std::endl;
 					}
 
-					/*
-					graph::VertexAccessMap crossingsAroundArrivalBikeStationsVam =
+					// Convert the VAM of bike stations into a VAM of crossings (bike stations do not belong to road::RoadModule::GRAPH_ID and would be discarded by the algorithm)
+					graph::VertexAccessMap crossingsAroundArrivalBikeStationsUsingBikeVam =
 						_buildCrossingVAMFromBikeStationVAM(arrivalBikeStationsUsingBikeVam, pedestrianAccessParameters);
-					*/
 
-					// Gather all reachable stop points from departure using walk only
+					// Gather all reachable stop points from the bike stations
 					departureVam = extenderToPhysicalStops.run(
-						//departureBikeStationsUsingBikeVam,
-						crossingsAroundDepartureBikeStationsVam,
-						arrivalPTStopsUsingWalkVam,  // OVE!!!
+						crossingsAroundDepartureBikeStationsUsingBikeVam,
+						arrivalPTStopsUsingWalkVam,
 						algorithm::DEPARTURE_TO_ARRIVAL
 					);
 
-					/*
-					// Gather all reachable stop points from arrival using walk only
+					// Gather all reachable stop points from the bike stations
 					arrivalVam = extenderToPhysicalStops.run(
-						//arrivalBikeStationsUsingBikeVam,
-						crossingsAroundArrivalBikeStationsVam,
-						departurePTStopsUsingWalkVam,  // OVE!!!
+						crossingsAroundArrivalBikeStationsUsingBikeVam,
+						departurePTStopsUsingWalkVam,
 						algorithm::ARRIVAL_TO_DEPARTURE
 					);
-					*/
 
 					// Merge departurePTStopsUsingWalkVam into departureVam
 					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& pedestrianVamElement, departurePTStopsUsingWalkVam.getMap())
@@ -1678,44 +1684,46 @@ namespace synthese
 						departureVam.insert(pedestrianVamElement.first, pedestrianVamElement.second);
 					}
 
-					/*
 					// Merge arrivalPTStopsUsingWalkVam into arrivalVam
 					BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& pedestrianVamElement, arrivalPTStopsUsingWalkVam.getMap())
 					{
 						arrivalVam.insert(pedestrianVamElement.first, pedestrianVamElement.second);
 					}
-					*/
-					arrivalVam = arrivalPTStopsUsingWalkVam;
 				}
 
 				std::cout << "AFTER BIKE VAM EXTENSION : " << std::endl;
 				std::cout << "departureBikeStationsUsingBikeVam has " << departureBikeStationsUsingBikeVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, departureBikeStationsUsingBikeVam.getMap())
 				{
-					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = "
+							  << vamElement.second.approachTime << "/" << vamElement.second.approachDistance
+							  << "/" << vamElement.second.approachJourney.getServiceUses().size() << std::endl;
 				}
-				/*
 				std::cout << "arrivalBikeStationsUsingBikeVam has " << arrivalBikeStationsUsingBikeVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, arrivalBikeStationsUsingBikeVam.getMap())
 				{
 					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
 				}
-				*/
 				std::cout << "departureVam has " << departureVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, departureVam.getMap())
 				{
-					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = "
+							  << vamElement.second.approachTime << "/" << vamElement.second.approachDistance
+							  << "/" << vamElement.second.approachJourney.getServiceUses().size() << std::endl;
 				}
 				std::cout << "arrivalVam has " << arrivalVam.getMap().size() << " elements" << std::endl;
 				BOOST_FOREACH(const graph::VertexAccessMap::VamMap::value_type& vamElement, arrivalVam.getMap())
 				{
-					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = " << vamElement.second.approachTime << "/" << vamElement.second.approachDistance << std::endl;
+					std::cout << " * vertex " << vamElement.first->getKey() << " has vertex access = "
+							  << vamElement.second.approachTime << "/" << vamElement.second.approachDistance
+							  << "/" << vamElement.second.approachJourney.getServiceUses().size() << std::endl;
 				}
 
 				algorithm::TimeSlotRoutePlanner::Result ptResults;
 				// OVE!!! : copied from PTTimeSlotRoutePlanner::run()
 
 				// Handle of the case of possible full road approach
+				/*
 				if(departureVam.intersercts(arrivalVam))
 				{
 					std::cout << "VAM intersection !!!" << std::endl;
@@ -1732,14 +1740,32 @@ namespace synthese
 
 					ptResults.push_back(resultJourney);
 				}
+				*/
 
 				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : before public transport + bike journey planning");
 
 				if(ptResults.empty())
 				{
-					std::cout << "before TimeSlotRoutePlanner :" << std::endl;
-					algorithm::TimeSlotRoutePlanner timeSlotRp(
+					algorithm::TimeSlotRoutePlanner timeSlotRp1(
 						departureVam,
+						arrivalPTStopsUsingWalkVam,
+						startDate,
+						endDate,
+						startDate,
+						endDate,
+						pt::PTModule::GRAPH_ID,
+						pt::PTModule::GRAPH_ID,
+						optional<posix_time::time_duration>(),
+						2,
+						finalPedestrianAccessParameters,
+						algorithm::DEPARTURE_FIRST,
+						70, // 252 km/h TODO take it configurable
+						false,
+						inactiveLogger
+					);
+
+					algorithm::TimeSlotRoutePlanner timeSlotRp2(
+						departurePTStopsUsingWalkVam,
 						arrivalVam,
 						startDate,
 						endDate,
@@ -1756,9 +1782,21 @@ namespace synthese
 						inactiveLogger
 					);
 
-					ptResults = timeSlotRp.run();
+					std::cout << "before TimeSlotRoutePlanner #1" << std::endl;
+					ptResults = timeSlotRp1.run();
+					std::cout << "TimeSlotRoutePlanner #1 has " << ptResults.size() << " solutions" << std::endl;
+
+					std::cout << "before TimeSlotRoutePlanner #2" << std::endl;
+					algorithm::TimeSlotRoutePlanner::Result ptResults2 = timeSlotRp2.run();
+					std::cout << "TimeSlotRoutePlanner #2 has " << ptResults2.size() << " solutions" << std::endl;
+
+					BOOST_FOREACH(algorithm::TimeSlotRoutePlanner::Result::value_type& result, ptResults2)
+					{
+						ptResults.push_back(result);
+					}
 					//_logger.closeTimeSlotJourneyPlannerLog();
 				}
+				/*
 				else
 				{
 					algorithm::TimeSlotRoutePlanner timeSlotRp(
@@ -1778,10 +1816,10 @@ namespace synthese
 					ptResults = timeSlotRp.run();
 					//_logger.closeTimeSlotJourneyPlannerLog();
 				}
+				*/
 
 				pt_journey_planner::PTRoutePlannerResult rpResults(departure, arrival, false, ptResults);
 				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after public transport + bike");
-				// OVE!!!
 
 				if(!rpResults.getJourneys().empty())
 				{
@@ -2191,7 +2229,13 @@ namespace synthese
 				return;
 			}
 
-			submapService->insert("direction", line->getDirection());
+			std::string direction(line->getDirection());
+			pt::Destination* destination = line->getDirectionObj();
+			if((true == direction.empty()) && (NULL != destination))
+			{
+				direction = destination->get<DisplayedText>();
+			}
+			submapService->insert("direction", direction);
 
 			const vehicle::RollingStock* rollingStock(line->getRollingStock());
 			submapService->insert("transport_type", (NULL != rollingStock) ? rollingStock->getName() : "Unknown");
