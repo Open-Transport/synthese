@@ -3008,8 +3008,8 @@ namespace synthese
 						road_journey_planner::RoadJourneyPlanner rjp(
 							intermediate,
 							arrival,
-							walkResults.getJourneys().begin()->getLastArrivalTime(),
-							walkResults.getJourneys().begin()->getLastArrivalTime(),
+							walkResults.getJourneys().begin()->getFirstArrivalTime(),
+							walkResults.getJourneys().begin()->getFirstArrivalTime(),
 							endDate,
 							endDate,
 							1,
