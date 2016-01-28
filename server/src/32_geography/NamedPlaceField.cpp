@@ -23,6 +23,7 @@
 #include "NamedPlaceField.hpp"
 
 #include "City.h"
+#include "CityTableSync.h"
 #include "Env.h"
 #include "NamedPlace.h"
 #include "ObjectBase.hpp"
@@ -73,7 +74,7 @@ namespace synthese
 				{
 					try
 					{
-						City* city(env.getEditable<City>(city_id).get());
+						City* city(CityTableSync::GetEditable(city_id, const_cast<util::Env&>(env)).get());
 						if(place.getCity() != city)
 						{
 							place.setCity(city);
