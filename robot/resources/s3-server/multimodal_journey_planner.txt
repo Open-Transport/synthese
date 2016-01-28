@@ -6,7 +6,7 @@ Resource          common.txt
 *** Keywords ***
 
 MultimodalJourneyPlanner
-    [Arguments]  ${departure_city}  ${departure_place}  ${arrival_city}  ${arrival_place}  ${departure_date}  ${departure_time}  ${max_transport_connection_count}=100000  ${use_walk}=0  ${use_pt}=0  ${use_public_bike}=0
-    ${response}=  Call Synthese Service  multimodal_journey_planner  departure_city\=${departure_city}    departure_place\=${departure_place}  arrival_city\=${arrival_city}  arrival_place\=${arrival_place}  departure_date\=${departure_date}  departure_time\=${departure_time}  max_transport_connection_count\=${max_transport_connection_count}  use_walk\=${use_walk}  use_pt\=${use_pt}  use_public_bike\=${use_public_bike}  logger_path\=${SUITE NAME}/${TEST NAME}/${node.node_dir}  of\=xml
+    [Arguments]  ${departure_city}  ${departure_place}  ${arrival_city}  ${arrival_place}  ${departure_date}  ${departure_time}  ${max_transport_connection_count}=100000  ${use_walk}=0  ${use_pt}=0  ${use_public_bike}=0  ${use_taxi}=0  ${use_car_pooling}=0
+    ${response}=  Call Synthese Service  multimodal_journey_planner  departure_city\=${departure_city}    departure_place\=${departure_place}  arrival_city\=${arrival_city}  arrival_place\=${arrival_place}  departure_date\=${departure_date}  departure_time\=${departure_time}  max_transport_connection_count\=${max_transport_connection_count}  use_walk\=${use_walk}  use_pt\=${use_pt}  use_public_bike\=${use_public_bike}    use_taxi\=${use_taxi}    use_car_pooling\=${use_car_pooling}    logger_path\=${SUITE NAME}/${TEST NAME}/${node.node_dir}  of\=xml
     [Return]  ${response}
 

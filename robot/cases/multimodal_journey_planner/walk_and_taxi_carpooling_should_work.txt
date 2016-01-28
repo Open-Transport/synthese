@@ -1,0 +1,22 @@
+*** Settings ***
+Resource          ../../resources/s3-fakeclient/multimodal_journey_planner.txt
+Test Setup        Run Keywords  On Node 0  AND  With SQL Test Data  ../../../resources/data/multimodal_journey_planner/legacy_test_network.sql  AND  Start Synthese On Node 0
+Test Teardown     Stop Synthese On Node 0
+
+*** Test Cases ***
+
+No Solution Case Should Work
+    On Node 0
+    Search Walk And Taxi And CarPooling Journey From "City54, rp40" To "City20, rp50" On 2015-12-08 At 07:02
+    There Should Be 0 Solution(s)
+
+Multiple Solutions Case Should Work
+    On Node 0
+    Search Walk And Taxi And CarPooling Journey From "City54, rp47" To "City38, 99" On 2015-12-08 At 07:05
+    There Should Be 3 Solution(s)
+    There Should Be 1 Solution(s) Using Only Walk
+    # 1 solution marche seult
+    # 1 solution taxi
+    # 1 solution covoiturage
+    All Solutions Should Start From "City54, rp47" And Arrive To "City38, 99"
+

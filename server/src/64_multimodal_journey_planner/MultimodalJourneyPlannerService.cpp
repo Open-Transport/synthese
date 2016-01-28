@@ -1965,6 +1965,10 @@ namespace synthese
 
 					pm.insert("journey", submapJourney);
 				}
+				else
+				{
+					Log::GetInstance().debug("MultimodalJourneyPlannerService::run : no solution by taxi A*");
+				}
 				Log::GetInstance().debug("MultimodalJourneyPlannerService::run : after A* taxi door to door data processing");
 			}
 			else if (_useTaxi)
@@ -2475,7 +2479,7 @@ namespace synthese
 				placesListService.setNumber(1);
 				placesListService.setCoordinatesSystem(&CoordinatesSystem::GetInstanceCoordinatesSystem());
 
-				placesListService.setText("Lausanne Rue de Genève 102");
+				placesListService.setText("Lausanne Enzo locations");
 				road::RoadModule::ExtendedFetchPlaceResult intermediatePlace;
 				intermediatePlace.placeResult = placesListService.getPlaceFromBestResult(
 					placesListService.runWithoutOutput()
@@ -2502,7 +2506,7 @@ namespace synthese
 
 					if(!walkPath.empty())
 					{
-						// 2nd step from Enso location to arrival place by car
+						// 2nd step from Enzo location to arrival place by car
 						graph::AccessParameters enzoAccessParameters(graph::USER_CAR, false, false, 1200000, boost::posix_time::hours(24), 13.889);
 						algorithm::AStarShortestPathCalculator r(
 							intermediate,
@@ -2963,7 +2967,7 @@ namespace synthese
 				placesListService.setNumber(1);
 				placesListService.setCoordinatesSystem(&CoordinatesSystem::GetInstanceCoordinatesSystem());
 
-				placesListService.setText("Lausanne Rue de Genève 102");
+				placesListService.setText("Lausanne Enzo locations");
 				road::RoadModule::ExtendedFetchPlaceResult intermediatePlace;
 				intermediatePlace.placeResult = placesListService.getPlaceFromBestResult(
 					placesListService.runWithoutOutput()
