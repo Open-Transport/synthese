@@ -79,6 +79,14 @@ Search Walk And Taxi And CarPooling From "${departure_city}, ${departure_place}"
     ${xml_response}=  Parse XML  ${utf8_content}
     Set Test Variable  ${xml_solutions}  ${xml_response}
 
+Search Walk And Taxi And CarPooling And CarLocation Journey From "${departure_city}, ${departure_place}" To "${arrival_city}, ${arrival_place}" On ${departure_date:[\d-]+} At ${departure_time:[\d:]+}
+    ${response}=  MultimodalJourneyPlanner  departure_city=${departure_city}  departure_place=${departure_place}  arrival_city=${arrival_city}  arrival_place=${arrival_place}  departure_date=${departure_date}  departure_time=${departure_time}  use_walk=1  use_pt=0  use_public_bike=0  use_taxi=1  use_car_pooling=1  use_car_location=1
+    Log Many  ${response.content}
+    Should Be Equal As Strings  ${response.status_code}  200
+    ${utf8_content}=  Decode Bytes To String  ${response.content}  UTF-8  strict
+    ${xml_response}=  Parse XML  ${utf8_content}
+    Set Test Variable  ${xml_solutions}  ${xml_response}
+
 There Should Be ${expected_solutions_count:\d+} Solution(s)
     ${solutions_count}=  Evaluate Xpath  ${xml_solutions}  count(journey)
     Should Be Equal As Numbers  ${expected_solutions_count}  ${solutions_count}

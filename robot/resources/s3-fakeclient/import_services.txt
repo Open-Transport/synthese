@@ -49,4 +49,7 @@ Import Inter_synthese_package File
 Project StopPoints
     ${response}=  Call Synthese Service    action    action_name=\ProjectAllStopPointsAction
 
+Project PublicPlaces
+    ${response}=  Call Synthese Service    action    action_name=\ProjectAllPublicPlacesAction
+
 
