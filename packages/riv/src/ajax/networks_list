@@ -1,0 +1,6 @@
+<@first=1@>
+[<?PTNetworksListFunction&template=<{network&template=
+  <?if&cond=<@first@>&then=<@first=0@>&else=,?>
+{ "id": "<@id@>", "name": "<@name@>" }
+}>
+?>]

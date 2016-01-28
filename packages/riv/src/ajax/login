@@ -1,0 +1,5 @@
+{
+  "user_id": "<?session&template=<{session&template=<{user&template=<@id@>}>}>?>",
+  "user_name": "<?session&template=<{session&template=<{user&template=<@name@>}>}>?>",
+  "session_id": "<?session&template=<{session&template=<@id@>}>?>"
+}

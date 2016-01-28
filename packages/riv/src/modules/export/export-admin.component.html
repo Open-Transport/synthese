@@ -1,0 +1,70 @@
+<h3>Module d'export Hafas</h3>
+
+<p *ngIf="!model">Chargement en cours...</p>
+
+<form (ngSubmit)="onSubmit()" class="form-horizontal" autocomplete="off"
+      *ngIf="model">
+
+  <div class="alert alert-success" *ngIf="statusMessage?.length">
+    {{statusMessage}}
+  </div>
+
+  <h4>Configuration commune à tous les réseaux</h4>
+
+  <div *ngFor="#globalParameter of model.globalParameters">
+    <parameter-input [parameter]="globalParameter"></parameter-input>
+  </div>
+
+  <br>
+
+  <h4>Configuration des années</h4>
+
+  <div class="form-inline" *ngFor="#year of model.years; #index = index">
+    <label>
+      Année
+      <input type="text" name="year-id" class="input-small"
+             placeholder="AAAA" [(ngModel)]="year.id">
+    </label>
+
+    <label>
+      Début validité
+      <input type="text" name="year-start" class="input-small"
+             placeholder="AAAA-MM-JJ" [(ngModel)]="year.start">
+    </label>
+
+    <label>
+      Fin validité
+      <input type="text" name="year-end" class="input-small"
+             placeholder="AAAA-MM-JJ" [(ngModel)]="year.end">
+    </label>
+
+    <button type="submit" class="btn btn-mini"
+            (click)="onDeleteYear(index)">Supprimer l'année</button>
+  </div>
+
+  <button class="btn" (click)="onAddYear()">Ajouter une année</button>
+
+  <br><br>
+
+  <h4>Configuration spécifique par réseau</h4>
+
+  <p>La configuration ci-dessous surcharge la configuration globale pour un réseau spécifique.</p>
+
+  <ul class="nav nav-tabs">
+    <li *ngFor="#network of model.networks; #i = index" [class.active]="i == 0">
+      <a href="#network-{{network.name}}" data-toggle="tab">{{network.name}}</a>
+    </li>
+  </ul>
+  <div class="tab-content">
+    <div *ngFor="#network of model.networks; #i = index"
+         class="tab-pane active" id="network-{{network.name}}"
+         [class.active]="i == 0">
+      <div *ngFor="#parameter of network.parameters">
+        <parameter-input [parameter]="parameter"></parameter-input>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-warning">Enregistrer</button>
+
+</form>

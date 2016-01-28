@@ -1,0 +1,52 @@
+<h1>Export Hafas</h1>
+
+<div [ngSwitch]="state">
+  <div *ngSwitchWhen="StateEnum.Configuring">
+
+    <form (ngSubmit)="onRunExport()" class="form-horizontal">
+
+      <br>
+
+      <div class="control-group">
+        <label class="control-label">Réseau à exporter</label>
+        <div class="controls">
+          <select name="network" [(ngModel)]="selectedNetwork">
+            <option value="{{n}}" *ngFor="#n of networks">{{n}}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Sélection de l'année</label>
+        <div class="controls">
+          <select name="year" [(ngModel)]="selectedYear">
+            <option value="{{y}}" *ngFor="#y of years">{{y}}</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-warning">Lancer l'export</button>
+
+    </form>
+
+  </div>
+  <div *ngSwitchWhen="StateEnum.Running">
+    <h3 class="text-warning">
+      Export export en cours, veuillez patienter...
+    </h3>
+  </div>
+  <div *ngSwitchWhen="StateEnum.ResultSuccess">
+    <h3 class="text-success">Export réussi</h3>
+    <div *ngIf="output">
+      Résultat:
+      <pre>{{output}}</pre>
+  </div>
+    <button class="btn" (click)="onNewExport()">Nouvel export</button>
+  </div>
+  <div *ngSwitchWhen="StateEnum.ResultFailure">
+    <h3 class="text-error">Echec de l'export</h3>
+    Résultat:
+    <pre>{{output}}</pre>
+    <button class="btn" (click)="onNewExport()">Nouvel export</button>
+  </div>
+</div>
