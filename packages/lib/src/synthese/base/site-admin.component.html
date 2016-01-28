@@ -1,0 +1,14 @@
+<h1>Administration</h1>
+
+<ul id="nav_tabs" class="nav nav-tabs">
+  <li [class.active]="isRouteActive('Admin')">
+    <a [routerLink]="['Admin']">Accueil</a>
+  </li>
+  <li *ngFor="#module of adminModules" [class.active]="isRouteActive('./' + module.routerName)">
+    <a [routerLink]="['./' + module.routerName]">{{module.menuLabel}}</a>
+  </li>
+</ul>
+
+<div id="tab_content" class="tab-content">
+  <router-outlet></router-outlet>
+</div>

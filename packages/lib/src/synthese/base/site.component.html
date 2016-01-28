@@ -1,0 +1,34 @@
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar-inner" style="border-radius:0 !important;">
+    <div class="container-fluid">
+      <a [routerLink]="['Home']" class="brand">{{siteConfig.name}}</a>
+
+      <ul class="nav" *ngIf="session.loggedIn">
+        <li *ngFor="#module of siteConfig.modules">
+          <a [routerLink]="[module.routerName]">{{module.menuLabel}}</a>
+        </li>
+      </ul>
+      <ul class="pull-right nav" *ngIf="session.loggedIn">
+        <li>
+          <a [routerLink]="['Admin']">Administration</a>
+        </li>
+        <li>
+          <a (click)="session.logout(); $event.preventDefault();" href>
+            <i class="icon-off icon-white" title="Fermer la session de {{session.info.user_name}}"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid" id="main_container">
+
+  <login *ngIf="!session.loggedIn"></login>
+
+  <div [hidden]="!session.loggedIn">
+    <router-outlet></router-outlet>
+  </div>
+
+</div>

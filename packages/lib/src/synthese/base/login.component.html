@@ -1,0 +1,14 @@
+<div class="hero-unit">
+ <h2>Bienvenue sur {{siteConfig.name}}</h2>
+ <form (ngSubmit)="onSubmit()" class="form-horizontal well">
+  <label>Veuillez remplir le formulaire suivant pour vous connecter :</label>
+  <input [(ngModel)]="userName" name="userName" type="text" class="span3" placeholder="Login">
+  <label></label>
+  <input [(ngModel)]="password" name="password" type="password" class="span3" placeholder="Mot de passe">
+  <label></label>
+  <div class="alert alert-error" *ngIf="error.length">
+    <small>Echec de connexion, veuillez vérifier votre nom d'utilisateur et mot de passe.</small>
+  </div>
+  <button type="submit" class="btn btn-primary">Connexion</button>
+ </form>
+</div>
