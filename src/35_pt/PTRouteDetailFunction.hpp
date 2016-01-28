@@ -76,6 +76,7 @@ namespace synthese
 			static const std::string DATA_LINE_COLOR;
 			static const std::string DATA_LINE_STYLE;
 			static const std::string DATA_DIRECTION;
+            static const std::string DATA_WAYBACK;
 			static const std::string DATA_STOPS;
 			static const std::string DATA_OPERATOR_CODE;
 			static const std::string DATA_RANK;

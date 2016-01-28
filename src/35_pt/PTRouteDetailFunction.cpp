@@ -76,6 +76,7 @@ namespace synthese
 		const string PTRouteDetailFunction::DATA_LINE_COLOR("lineColor");
 		const string PTRouteDetailFunction::DATA_LINE_STYLE("lineStyle");
 		const string PTRouteDetailFunction::DATA_DIRECTION("direction");
+        const string PTRouteDetailFunction::DATA_WAYBACK("wayback");
 		const string PTRouteDetailFunction::DATA_STOPS("stops");
 		const string PTRouteDetailFunction::DATA_OPERATOR_CODE("operatorCode");
 		const string PTRouteDetailFunction::DATA_RANK("rank");
@@ -236,6 +237,7 @@ namespace synthese
 					_journeyPattern->getDirectionObj()->getDisplayedText() :
 					_journeyPattern->getDirection()
 			);
+            m.insert(DATA_WAYBACK, _journeyPattern->getWayBack());
 
 			// Edges
 			const StopArea* lastConnPlace(NULL);

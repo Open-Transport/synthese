@@ -145,7 +145,8 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_TRANSPORT_MODE("transport_mode");
 		const string DisplayScreenContentFunction::DATA_RANK_IN_PATH("rank_in_path");
 		const string DisplayScreenContentFunction::DATA_DESTINATIONS("destinations");
-		const string DisplayScreenContentFunction::DATA_DIRECTION("direction");
+        const string DisplayScreenContentFunction::DATA_DIRECTION("direction");
+        const string DisplayScreenContentFunction::DATA_WAYBACK("wayback");
 		const string DisplayScreenContentFunction::DATA_IS_CANCELED("is_canceled");
 
 		const string DisplayScreenContentFunction::DATA_IS_SAME_CITY("is_same_city");
@@ -941,6 +942,14 @@ namespace synthese
 			// Is realtime
 			journeyPm->insert(DATA_IS_REAL_TIME, service->hasRealTimeData());
 
+            if(journeyPattern)
+            {
+                journeyPm->insert(
+                    DATA_WAYBACK,
+                    journeyPattern->getWayBack()
+                );
+            }
+
 			boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 			stop->toParametersMap(*stopPM, false);
 			journeyPm->insert("stop", stopPM);
@@ -1684,6 +1693,11 @@ namespace synthese
 					lineDirection
 				);
 
+                pm.insert(
+                    DATA_WAYBACK,
+                    jp->getWayBack()
+                );
+
 				pm.insert(
 					DATA_TRACK,
 					static_cast<const StopPoint*>(row.first.getRealTimeDepartureVertex())->getName()
@@ -1842,6 +1856,11 @@ namespace synthese
 				DATA_DIRECTION,
 				lineDirection.empty() ? line->getDestination()->getConnectionPlace()->getFullName() : lineDirection
 			);
+            pm.insert(
+                DATA_WAYBACK,
+                line->getWayBack()
+            );
+
 
 			// Continuation
 			pm.insert(DATA_IS_CONTINUATION, isContinuation);
